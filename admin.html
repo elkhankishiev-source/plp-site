@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>PLP · Админка УК</title>
+<style>
+:root{
+  --green:#D2D5B3; --green-deep:#A9AE7F; --olive:#5F6242;
+  --ink:#0A0A0A; --panel:#141414; --panel-2:#1c1c1a;
+  --line:rgba(210,213,179,.16); --muted:#8a8a80; --danger:#e0736a; --ok:#93c17a;
+  --r:18px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:Manrope,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  background:var(--ink);color:var(--green);
+  font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  min-height:100vh;padding:0 0 60px;
+}
+a{color:var(--green);text-decoration:none}
+button,input,select,textarea{font:inherit;color:inherit}
+.wrap{max-width:640px;margin:0 auto;padding:0 16px}
+
+/* header */
+.top{position:sticky;top:0;z-index:10;background:rgba(10,10,10,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:-.01em}
+.brand .chip{width:34px;height:34px;border-radius:10px;background:var(--green);color:var(--ink);display:flex;align-items:center;justify-content:center;font-weight:800}
+.brand small{display:block;font-weight:600;font-size:.72rem;color:var(--muted);letter-spacing:.04em}
+.logout{font-size:.82rem;font-weight:700;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:7px 14px;background:var(--panel)}
+.logout:hover{color:var(--green)}
+
+h1{font-size:1.4rem;font-weight:800;letter-spacing:-.02em}
+h2{font-size:1.05rem;font-weight:800;margin-bottom:4px}
+.hint{color:var(--muted);font-size:.85rem}
+
+/* login */
+.login{min-height:calc(100vh - 60px);display:flex;align-items:center;justify-content:center;padding:24px}
+.login .card{max-width:400px;width:100%;text-align:center}
+.login .lock{width:64px;height:64px;border-radius:18px;background:var(--panel);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 18px}
+
+/* tabs */
+.tabs{display:flex;gap:8px;overflow-x:auto;padding:16px 0 4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{white-space:nowrap;padding:10px 16px;border-radius:999px;background:var(--panel);border:1px solid var(--line);font-weight:700;font-size:.9rem;color:var(--muted);flex:none}
+.tab.on{background:var(--green);color:var(--ink);border-color:var(--green)}
+
+/* cards / forms */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:20px;margin-top:16px}
+.field{margin-top:14px}
+.field label{display:block;font-size:.82rem;font-weight:700;color:var(--muted);margin-bottom:6px}
+input,select,textarea{
+  width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;
+  padding:13px 14px;color:var(--green);outline:none;
+}
+input:focus,select:focus,textarea:focus{border-color:var(--green-deep)}
+input::placeholder,textarea::placeholder{color:#6a6a60}
+textarea{min-height:74px;resize:vertical}
+select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23A9AE7F' d='M6 8 0 0h12z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
+.row{display:flex;gap:12px}
+.row>.field{flex:1;min-width:0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;border-radius:999px;padding:15px 22px;font-weight:800;font-size:1rem;background:var(--green);color:var(--ink);margin-top:20px;transition:transform .15s,opacity .15s}
+.btn:active{transform:translateY(1px)}
+.btn:disabled{opacity:.55}
+.btn-ghost{background:transparent;border:1.5px solid var(--green-deep);color:var(--green)}
+.btn-row{display:flex;gap:12px}
+.btn-row .btn{margin-top:0}
+
+.msg{margin-top:16px;border-radius:12px;padding:13px 15px;font-size:.9rem;font-weight:600;display:none;white-space:pre-wrap;word-break:break-word}
+.msg.show{display:block}
+.msg.ok{background:rgba(147,193,122,.12);border:1px solid rgba(147,193,122,.4);color:var(--ok)}
+.msg.err{background:rgba(224,115,106,.12);border:1px solid rgba(224,115,106,.4);color:var(--danger)}
+.hide{display:none!important}
+.sect{display:none}
+.sect.on{display:block}
+.note-frame{background:rgba(210,213,179,.06);border:1px dashed var(--line);border-radius:12px;padding:12px 14px;font-size:.82rem;color:var(--muted);margin-top:12px}
+</style>
+</head>
+<body>
+
+<!-- ===== LOGIN ===== -->
+<div id="login" class="login">
+  <div class="card">
+    <div class="lock">🔐</div>
+    <h1>Админка УК · Property Library</h1>
+    <p class="hint" style="margin:10px 0 20px">Введите ключ доступа. Он сохранится только в этом браузере и не хранится в коде страницы.</p>
+    <form id="loginForm">
+      <div class="field" style="text-align:left">
+        <label for="keyInput">Ключ доступа</label>
+        <input id="keyInput" type="password" autocomplete="current-password" placeholder="••••••••" required>
+      </div>
+      <button class="btn" type="submit">Войти</button>
+    </form>
+    <div id="loginMsg" class="msg err"></div>
+  </div>
+</div>
+
+<!-- ===== APP ===== -->
+<div id="app" class="hide">
+  <header class="top">
+    <div class="wrap">
+      <div class="brand">
+        <div class="chip">PL</div>
+        <div>Админка УК<small>Управление арендой</small></div>
+      </div>
+      <button class="logout" id="logout">Выйти</button>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="tabs" id="tabs">
+      <button class="tab on" data-t="calendar">📅 Календарь</button>
+      <button class="tab" data-t="booking">➕ Бронь</button>
+      <button class="tab" data-t="expense">💸 Расход</button>
+      <button class="tab" data-t="block">⛔ Блок дат</button>
+      <button class="tab" data-t="report">📊 Отчёт</button>
+    </div>
+
+    <!-- Календарь -->
+    <section class="sect on" data-s="calendar">
+      <div class="card">
+        <h2>Календарь занятости</h2>
+        <p class="hint">Выберите месяц и откройте календарь брони/блоков.</p>
+        <div class="field">
+          <label for="calMonth">Месяц</label>
+          <input id="calMonth" type="month">
+        </div>
+        <button class="btn" id="calOpen">Открыть календарь</button>
+        <div class="note-frame">Календарь откроется в новой вкладке (n8n не разрешает встраивание в рамку).</div>
+      </div>
+    </section>
+
+    <!-- Бронь -->
+    <section class="sect" data-s="booking">
+      <div class="card">
+        <h2>Добавить бронь</h2>
+        <p class="hint">Новая бронь гостя. Повторная отправка того же ID обновит запись.</p>
+        <div class="field">
+          <label>Объект</label>
+          <select class="prop"></select>
+        </div>
+        <div class="field prop-custom hide">
+          <label>ID объекта (вручную)</label>
+          <input class="prop-custom-in" placeholder="PLP-...">
+        </div>
+        <div class="row">
+          <div class="field"><label>Заезд</label><input id="bIn" type="date"></div>
+          <div class="field"><label>Выезд</label><input id="bOut" type="date"></div>
+        </div>
+        <div class="field"><label>Имя гостя</label><input id="bName" placeholder="Иван Петров"></div>
+        <div class="row">
+          <div class="field"><label>Телефон</label><input id="bPhone" inputmode="tel" placeholder="+66..."></div>
+          <div class="field">
+            <label>Канал</label>
+            <select id="bChannel">
+              <option value="direct">Напрямую</option>
+              <option value="booking">Booking.com</option>
+              <option value="airbnb">Airbnb</option>
+              <option value="partner">Партнёр</option>
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          <div class="field"><label>Сумма, THB</label><input id="bAmount" inputmode="numeric" placeholder="0"></div>
+          <div class="field"><label>Предоплата, THB</label><input id="bPrepaid" inputmode="numeric" placeholder="0"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>Депозит, THB</label><input id="bDeposit" inputmode="numeric" placeholder="0"></div>
+          <div class="field">
+            <label>Статус</label>
+            <select id="bStatus">
+              <option value="hold">Бронь (не оплачено)</option>
+              <option value="paid">Оплачено</option>
+            </select>
+          </div>
+        </div>
+        <div class="field"><label>Заметка</label><textarea id="bNotes" placeholder="Комментарий..."></textarea></div>
+        <button class="btn" data-submit="booking">Сохранить бронь</button>
+        <div class="msg" data-msg="booking"></div>
+      </div>
+    </section>
+
+    <!-- Расход -->
+    <section class="sect" data-s="expense">
+      <div class="card">
+        <h2>Добавить расход</h2>
+        <div class="field">
+          <label>Объект</label>
+          <select class="prop"></select>
+        </div>
+        <div class="field prop-custom hide">
+          <label>ID объекта (вручную)</label>
+          <input class="prop-custom-in" placeholder="PLP-...">
+        </div>
+        <div class="row">
+          <div class="field">
+            <label>Категория</label>
+            <select id="eCat">
+              <option value="уборка">Уборка</option>
+              <option value="ремонт">Ремонт</option>
+              <option value="коммуналка">Коммуналка</option>
+              <option value="прочее">Прочее</option>
+            </select>
+          </div>
+          <div class="field"><label>Сумма, THB</label><input id="eAmount" inputmode="numeric" placeholder="0"></div>
+        </div>
+        <div class="field"><label>Дата</label><input id="eDate" type="date"></div>
+        <div class="field"><label>Заметка</label><textarea id="eNote" placeholder="Комментарий..."></textarea></div>
+        <button class="btn" data-submit="expense">Сохранить расход</button>
+        <div class="msg" data-msg="expense"></div>
+      </div>
+    </section>
+
+    <!-- Блок дат -->
+    <section class="sect" data-s="block">
+      <div class="card">
+        <h2>Блокировать даты</h2>
+        <p class="hint">Закрыть даты (ремонт, личное проживание и т.п.).</p>
+        <div class="field">
+          <label>Объект</label>
+          <select class="prop"></select>
+        </div>
+        <div class="field prop-custom hide">
+          <label>ID объекта (вручную)</label>
+          <input class="prop-custom-in" placeholder="PLP-...">
+        </div>
+        <div class="row">
+          <div class="field"><label>С</label><input id="kIn" type="date"></div>
+          <div class="field"><label>По</label><input id="kOut" type="date"></div>
+        </div>
+        <div class="field"><label>Причина</label><input id="kReason" placeholder="Ремонт / Личное проживание"></div>
+        <button class="btn" data-submit="block">Заблокировать даты</button>
+        <div class="msg" data-msg="block"></div>
+      </div>
+    </section>
+
+    <!-- Отчёт -->
+    <section class="sect" data-s="report">
+      <div class="card">
+        <h2>Отчёт собственнику</h2>
+        <p class="hint">Сводка дохода, расходов и комиссии за месяц.</p>
+        <div class="field">
+          <label>Объект</label>
+          <select class="prop"></select>
+        </div>
+        <div class="field prop-custom hide">
+          <label>ID объекта (вручную)</label>
+          <input class="prop-custom-in" placeholder="PLP-...">
+        </div>
+        <div class="field">
+          <label>Период</label>
+          <input id="rPeriod" type="month">
+        </div>
+        <button class="btn" id="rOpen">Открыть отчёт</button>
+        <div class="note-frame">Отчёт откроется в новой вкладке.</div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var BASE = "https://proplib.app.n8n.cloud/webhook";
+  var LS = "plp_uk_key";
+  var PROPS = [
+    {id:"PLP-MANOR-S14", label:"Manor S14 — Александр"}
+  ];
+
+  var $ = function(s,r){return (r||document).querySelector(s);};
+  var $$ = function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));};
+
+  function getKey(){ return localStorage.getItem(LS) || ""; }
+  function ym(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0"); }
+  function iso(d){ return d.toISOString().slice(0,10); }
+
+  /* ---------- login ---------- */
+  function showApp(){
+    $("#login").classList.add("hide");
+    $("#app").classList.remove("hide");
+    initApp();
+  }
+  function showLogin(){
+    $("#app").classList.add("hide");
+    $("#login").classList.remove("hide");
+  }
+  if (getKey()) { showApp(); } else { showLogin(); }
+
+  $("#loginForm").addEventListener("submit", function(e){
+    e.preventDefault();
+    var v = $("#keyInput").value.trim();
+    var m = $("#loginMsg");
+    if (!v){ m.textContent="Введите ключ."; m.classList.add("show"); return; }
+    localStorage.setItem(LS, v);
+    m.classList.remove("show");
+    showApp();
+  });
+
+  /* ---------- app init (run once) ---------- */
+  var inited = false;
+  function initApp(){
+    if (inited) return; inited = true;
+
+    $("#logout").addEventListener("click", function(){
+      localStorage.removeItem(LS);
+      $("#keyInput").value="";
+      showLogin();
+    });
+
+    // property selects
+    $$(".prop").forEach(function(sel){
+      var html = "";
+      PROPS.forEach(function(p){ html += '<option value="'+p.id+'">'+p.label+'</option>'; });
+      html += '<option value="__custom">Другой объект (ввести вручную)…</option>';
+      sel.innerHTML = html;
+      sel.addEventListener("change", function(){
+        var custom = sel.closest(".card").querySelector(".prop-custom");
+        if (custom) custom.classList.toggle("hide", sel.value !== "__custom");
+      });
+    });
+
+    // default dates / months
+    var now = new Date();
+    $("#calMonth").value = ym(now);
+    $("#rPeriod").value = ym(now);
+    $("#eDate").value = iso(now);
+
+    // tabs
+    $$(".tab").forEach(function(t){
+      t.addEventListener("click", function(){
+        $$(".tab").forEach(function(x){x.classList.remove("on");});
+        t.classList.add("on");
+        var name = t.getAttribute("data-t");
+        $$(".sect").forEach(function(s){ s.classList.toggle("on", s.getAttribute("data-s")===name); });
+      });
+    });
+
+    // calendar / report open
+    $("#calOpen").addEventListener("click", function(){
+      var mo = $("#calMonth").value || ym(new Date());
+      openTab(BASE+"/uk-calendar?key="+encodeURIComponent(getKey())+"&month="+encodeURIComponent(mo));
+    });
+    $("#rOpen").addEventListener("click", function(){
+      var sect = $('.sect[data-s="report"]');
+      var pid = propOf(sect);
+      if (!pid){ alert("Укажите объект."); return; }
+      var per = $("#rPeriod").value || ym(new Date());
+      openTab(BASE+"/uk-report?key="+encodeURIComponent(getKey())+"&property_id="+encodeURIComponent(pid)+"&period="+encodeURIComponent(per));
+    });
+
+    // submit buttons
+    $$("[data-submit]").forEach(function(btn){
+      btn.addEventListener("click", function(){ submit(btn.getAttribute("data-submit"), btn); });
+    });
+  }
+
+  function openTab(url){
+    var w = window.open(url, "_blank");
+    if (!w) location.href = url; // popup blocked → same tab
+  }
+
+  function propOf(sect){
+    var sel = sect.querySelector(".prop");
+    if (!sel) return "";
+    if (sel.value === "__custom"){
+      var inp = sect.querySelector(".prop-custom-in");
+      return inp ? inp.value.trim() : "";
+    }
+    return sel.value;
+  }
+
+  function numOrNull(v){ v=(v||"").toString().trim(); if(!v) return undefined; var n=Number(v.replace(/\s/g,"")); return isNaN(n)?undefined:n; }
+
+  function buildPayload(action, sect){
+    var pid = propOf(sect);
+    if (!pid) return {error:"Укажите объект."};
+    var p = { property_id: pid };
+    if (action==="booking"){
+      p.check_in = $("#bIn").value; p.check_out = $("#bOut").value;
+      if (!p.check_in || !p.check_out) return {error:"Укажите даты заезда и выезда."};
+      p.guest_name = $("#bName").value.trim();
+      if ($("#bPhone").value.trim()) p.guest_phone = $("#bPhone").value.trim();
+      p.channel = $("#bChannel").value;
+      p.status = $("#bStatus").value;
+      var a=numOrNull($("#bAmount").value); if(a!==undefined)p.amount_thb=a;
+      var pr=numOrNull($("#bPrepaid").value); if(pr!==undefined)p.prepaid_thb=pr;
+      var dp=numOrNull($("#bDeposit").value); if(dp!==undefined)p.deposit_thb=dp;
+      if ($("#bNotes").value.trim()) p.notes=$("#bNotes").value.trim();
+    } else if (action==="expense"){
+      p.category = $("#eCat").value;
+      var ea=numOrNull($("#eAmount").value);
+      if (ea===undefined) return {error:"Укажите сумму расхода."};
+      p.amount_thb = ea;
+      if ($("#eDate").value) p.tx_date=$("#eDate").value;
+      if ($("#eNote").value.trim()) p.note=$("#eNote").value.trim();
+    } else if (action==="block"){
+      p.check_in = $("#kIn").value; p.check_out = $("#kOut").value;
+      if (!p.check_in || !p.check_out) return {error:"Укажите период блокировки."};
+      if ($("#kReason").value.trim()) p.reason=$("#kReason").value.trim();
+    }
+    return {payload:p};
+  }
+
+  function submit(action, btn){
+    var sect = btn.closest(".sect");
+    var msg = sect.querySelector('[data-msg]');
+    var built = buildPayload(action, sect);
+    msg.className = "msg";
+    if (built.error){ msg.textContent = built.error; msg.classList.add("err","show"); return; }
+
+    btn.disabled = true; var orig = btn.textContent; btn.textContent = "Отправка…";
+    msg.classList.remove("show");
+
+    fetch(BASE+"/uk-intake?key="+encodeURIComponent(getKey()), {
+      method:"POST",
+      headers:{"Content-Type":"text/plain;charset=UTF-8"},
+      body: JSON.stringify({ action: action, payload: built.payload })
+    })
+    .then(function(r){ return r.text(); })
+    .then(function(txt){
+      var d; try { d = JSON.parse(txt); } catch(e){ d = null; }
+      if (d && d.ok){
+        var extra = "";
+        if (d.extras){
+          if (d.extras.income_tx) extra += "\n• доход зачтён автоматически";
+          if (d.extras.cleaning_task) extra += "\n• задача уборки создана на выезд";
+        }
+        msg.textContent = "Сохранено ✓" + (d.id? " (ID: "+d.id+")":"") + extra;
+        msg.classList.add("ok","show");
+        resetForm(action, sect);
+      } else {
+        msg.textContent = "Ошибка: " + ((d&&d.error) || "неверный ответ сервера");
+        msg.classList.add("err","show");
+      }
+    })
+    .catch(function(){
+      msg.textContent = "Ошибка сети или неверный ключ доступа. Проверьте ключ (кнопка «Выйти») и соединение.";
+      msg.classList.add("err","show");
+    })
+    .then(function(){ btn.disabled=false; btn.textContent=orig; });
+  }
+
+  function resetForm(action, sect){
+    if (action==="booking"){
+      ["bName","bPhone","bAmount","bPrepaid","bDeposit","bNotes","bIn","bOut"].forEach(function(id){var el=document.getElementById(id); if(el)el.value="";});
+    } else if (action==="expense"){
+      ["eAmount","eNote"].forEach(function(id){var el=document.getElementById(id); if(el)el.value="";});
+    } else if (action==="block"){
+      ["kIn","kOut","kReason"].forEach(function(id){var el=document.getElementById(id); if(el)el.value="";});
+    }
+  }
+})();
+</script>
+</body>
+</html>
