@@ -1186,7 +1186,7 @@ ru: {
   "chat.r.sale":"Хороший запрос. Вход в рынок — от $90k, доходность 6–15% годовых в зависимости от района и проекта. Покажу пару вариантов из нашей базы — а под вашу задачу соберу подборку лично.",
   "chat.r.rent":"Мы сдаём в долгосрочную аренду — от месяца и дольше. Цены и условия по каждому объекту называем по запросу: напишите район, даты и бюджет — подберу вариант. Оставьте WhatsApp или Telegram — отвечу лично.",
   "chat.r.service":"Мы закрываем всё под ключ: юристы по тайскому праву, визы, дизайн, строительство и управление арендой после покупки. Для клиентов услуги бесплатны. Расскажите вашу ситуацию — подскажу, с чего начать.",
-  "chat.r.calc":"Считаю по нашей посезонной модели. {o} ({d}): чистыми ~{n} в год, net yield ~{y}%, окупаемость ~{p} лет. В карточке объекта можно подправить любое допущение — загрузку, ставки, расходы. Точный расчёт по юниту пришлю лично — оставьте контакт.",
+  "chat.r.calc":"Считаю по нашей посезонной модели. {o} ({d}): чистыми ~{n} в год, net yield ~{y}%, окупаемость ~{p} лет. Это осторожная оценка по net-диапазону района — реальная доходность зависит от цены входа и сезона. В карточке объекта можно подправить любое допущение — загрузку, ставки, расходы. Точный расчёт по юниту пришлю лично — оставьте контакт.",
   "chat.r.support":"Понимаю. Чтобы не ввести вас в заблуждение, уточню детали у Эльнура и вернусь с точным ответом. Оставьте WhatsApp или Telegram — отвечу лично в течение 3 минут в рабочее время.",
   "chat.r.generic":"Хороший вопрос. По точным цифрам и условиям сверюсь с Эльнуром, чтобы ответить без ошибок. Оставьте WhatsApp или Telegram — вернусь с ответом лично. А пока могу показать объекты под ваш бюджет.",
   "chat.offerLead":"Чтобы прислать подборку и ответить предметно, мне нужны цель, бюджет и контакт — дальше продолжим в удобном мессенджере.",
@@ -1340,7 +1340,7 @@ en: {
   "chat.r.sale":"Good request. Market entry starts from $90k, with 6–15% annual yield depending on the area and project. I will show a couple of options from our base — and put together a personal shortlist for your goal.",
   "chat.r.rent":"We do long-term rentals — from one month and longer. Prices and terms for each home are given on request: tell me the area, dates and budget and I will find a match. Leave your WhatsApp or Telegram — I will reply personally.",
   "chat.r.service":"We cover everything end-to-end: Thai law attorneys, visas, design, construction and rental management after purchase. Our services are free for clients. Tell me your situation — I will suggest where to start.",
-  "chat.r.calc":"Here is our seasonal model. {o} ({d}): net ~{n} a year, net yield ~{y}%, payback ~{p} years. You can tweak every assumption on the property card — occupancy, rates, expenses. I will send an exact per-unit calculation personally — leave a contact.",
+  "chat.r.calc":"Here is our seasonal model. {o} ({d}): net ~{n} a year, net yield ~{y}%, payback ~{p} years. This is a cautious estimate based on the area's net range — the real figure depends on your entry price and the season. You can tweak every assumption on the property card — occupancy, rates, expenses. I will send an exact per-unit calculation personally — leave a contact.",
   "chat.r.support":"I understand. To avoid misleading you, I will check the details with Elnur and come back with an exact answer. Leave your WhatsApp or Telegram — I will reply personally within 3 minutes during working hours.",
   "chat.r.generic":"Good question. I will verify the exact numbers and terms with Elnur to answer precisely. Leave your WhatsApp or Telegram — I will get back to you personally. Meanwhile I can show properties for your budget.",
   "chat.offerLead":"To send a shortlist and answer in detail I need your goal, budget and contact — then we continue in your favourite messenger.",
@@ -1564,20 +1564,20 @@ PL.RENTALS.forEach(function(p){PL.byId[p.property_id]=p;});
 
 /* ===== DISTRICTS (14 районов) ===== */
 PL.DISTRICTS=[
-  {ru:"Лагуна",en:"Laguna",lat:7.9952,lng:98.2982,dx:14,dy:4,yield:"7–10%",vibe:{ru:"Курортная экосистема, гольф, отели мировых брендов",en:"Resort ecosystem, golf, global hotel brands"},who:{ru:"Инвесторы и семьи",en:"Investors and families"},beach:{ru:"5–10 мин",en:"5–10 min"}},
-  {ru:"Банг Тао",en:"Bang Tao",lat:8.0000,lng:98.2960,dx:-14,dy:0,yield:"7–10%",vibe:{ru:"Главный инвестиционный район острова, beach-clubs",en:"The island's main investment area, beach clubs"},who:{ru:"Инвесторы",en:"Investors"},beach:{ru:"до 10 мин",en:"under 10 min"}},
-  {ru:"Чернг Талай",en:"Cherng Talay",lat:8.0230,lng:98.3050,dx:16,dy:0,yield:"6–9%",vibe:{ru:"Жилая инфраструктура, школы, супермаркеты",en:"Everyday infrastructure, schools, supermarkets"},who:{ru:"Семьи на постоянное проживание",en:"Families living full-time"},beach:{ru:"10–15 мин",en:"10–15 min"}},
-  {ru:"Лаян",en:"Layan",lat:8.0290,lng:98.2900,dx:-13,dy:-4,yield:"7–10%",vibe:{ru:"Тишина и премиум рядом с нацпарком",en:"Quiet premium next to the national park"},who:{ru:"Премиальные покупатели",en:"Premium buyers"},beach:{ru:"5 мин",en:"5 min"}},
-  {ru:"Сурин",en:"Surin",lat:7.9770,lng:98.2780,dx:-13,dy:0,yield:"6–9%",vibe:{ru:"Компактный люкс, рестораны и виды на море",en:"Compact luxury, restaurants and sea views"},who:{ru:"Ценят вид и приватность",en:"Those valuing views and privacy"},beach:{ru:"до 10 мин",en:"under 10 min"}},
-  {ru:"Ката",en:"Kata",lat:7.8200,lng:98.2980,dx:-12,dy:2,yield:"7–10%",vibe:{ru:"Семейные курорты, сёрф и зелёные холмы",en:"Family resorts, surf and green hills"},who:{ru:"Семьи и арендный спрос",en:"Families and rental demand"},beach:{ru:"5–10 мин",en:"5–10 min"}},
-  {ru:"Карон",en:"Karon",lat:7.8460,lng:98.2940,dx:-13,dy:0,yield:"6–9%",vibe:{ru:"Широкий пляж, спокойнее Патонга",en:"A wide beach, calmer than Patong"},who:{ru:"Арендные инвесторы",en:"Rental investors"},beach:{ru:"5 мин",en:"5 min"}},
-  {ru:"Равай",en:"Rawai",lat:7.7770,lng:98.3230,dx:16,dy:2,yield:"6–8%",vibe:{ru:"Спокойный юг, жизнь круглый год, марины",en:"Calm south, year-round living, marinas"},who:{ru:"Для себя и длительной аренды",en:"Own use and long-term rental"},beach:{ru:"5–10 мин",en:"5–10 min"}},
-  {ru:"Найхарн",en:"Naiharn",lat:7.7790,lng:98.3050,dx:-16,dy:6,yield:"6–9%",vibe:{ru:"Лучшие закаты и бухты юга",en:"The best sunsets and southern bays"},who:{ru:"Ценят природу",en:"Nature lovers"},beach:{ru:"5 мин",en:"5 min"}},
-  {ru:"Патонг",en:"Patong",lat:7.8960,lng:98.2960,dx:-14,dy:0,yield:"7–10%",vibe:{ru:"Самый живой турпоток острова",en:"The island's busiest tourist flow"},who:{ru:"Арендные инвесторы",en:"Rental investors"},beach:{ru:"до 10 мин",en:"under 10 min"}},
-  {ru:"Камала",en:"Kamala",lat:7.9550,lng:98.2810,dx:-13,dy:0,yield:"6–9%",vibe:{ru:"Тихий пляжный район западного побережья, семейный, Café del Mar",en:"Quiet beachside area on the west coast, family-friendly, Café del Mar"},who:{ru:"Семьи и арендные инвесторы",en:"Families and rental investors"},beach:{ru:"до 5 мин",en:"under 5 min"}},
-  {ru:"Ко Кео",en:"Koh Kaew",lat:7.9180,lng:98.3830,dx:15,dy:0,yield:"5–8%",vibe:{ru:"Восточная часть у марины Boat Lagoon, семейный район рядом с международной школой BISP, ближе к городу",en:"East side by Boat Lagoon marina, a family area next to the BISP international school, closer to town"},who:{ru:"Семьи на постоянное проживание",en:"Families living full-time"},beach:{ru:"15–20 мин",en:"15–20 min"}},
-  {ru:"Най Янг",en:"Nai Yang",lat:8.0900,lng:98.3000,dx:15,dy:0,yield:"6–9%",vibe:{ru:"Тихий север у нацпарка, близко аэропорт",en:"Quiet north by the park, close to the airport"},who:{ru:"Вход в рынок",en:"Market entry"},beach:{ru:"5 мин",en:"5 min"}},
-  {ru:"Май Кхао",en:"Mai Khao",lat:8.1500,lng:98.2960,dx:15,dy:0,yield:"6–8%",vibe:{ru:"Самый длинный и пустой пляж острова",en:"The longest, emptiest beach on the island"},who:{ru:"Уединение и премиум",en:"Seclusion and premium"},beach:{ru:"до 5 мин",en:"under 5 min"}}
+  {ru:"Лагуна",en:"Laguna",lat:7.9952,lng:98.2982,dx:14,dy:4,yield:"4.5–6%",vibe:{ru:"Курортная экосистема, гольф, отели мировых брендов",en:"Resort ecosystem, golf, global hotel brands"},who:{ru:"Инвесторы и семьи",en:"Investors and families"},beach:{ru:"5–10 мин",en:"5–10 min"}},
+  {ru:"Банг Тао",en:"Bang Tao",lat:8.0000,lng:98.2960,dx:-14,dy:0,yield:"4.5–6%",vibe:{ru:"Главный инвестиционный район острова, beach-clubs",en:"The island's main investment area, beach clubs"},who:{ru:"Инвесторы",en:"Investors"},beach:{ru:"до 10 мин",en:"under 10 min"}},
+  {ru:"Чернг Талай",en:"Cherng Talay",lat:8.0230,lng:98.3050,dx:16,dy:0,yield:"4.5–6%",vibe:{ru:"Жилая инфраструктура, школы, супермаркеты",en:"Everyday infrastructure, schools, supermarkets"},who:{ru:"Семьи на постоянное проживание",en:"Families living full-time"},beach:{ru:"10–15 мин",en:"10–15 min"}},
+  {ru:"Лаян",en:"Layan",lat:8.0290,lng:98.2900,dx:-13,dy:-4,yield:"3.5–5%",vibe:{ru:"Тишина и премиум рядом с нацпарком",en:"Quiet premium next to the national park"},who:{ru:"Премиальные покупатели",en:"Premium buyers"},beach:{ru:"5 мин",en:"5 min"}},
+  {ru:"Сурин",en:"Surin",lat:7.9770,lng:98.2780,dx:-13,dy:0,yield:"4–5.5%",vibe:{ru:"Компактный люкс, рестораны и виды на море",en:"Compact luxury, restaurants and sea views"},who:{ru:"Ценят вид и приватность",en:"Those valuing views and privacy"},beach:{ru:"до 10 мин",en:"under 10 min"}},
+  {ru:"Ката",en:"Kata",lat:7.8200,lng:98.2980,dx:-12,dy:2,yield:"4.5–6%",vibe:{ru:"Семейные курорты, сёрф и зелёные холмы",en:"Family resorts, surf and green hills"},who:{ru:"Семьи и арендный спрос",en:"Families and rental demand"},beach:{ru:"5–10 мин",en:"5–10 min"}},
+  {ru:"Карон",en:"Karon",lat:7.8460,lng:98.2940,dx:-13,dy:0,yield:"4.5–6%",vibe:{ru:"Широкий пляж, спокойнее Патонга",en:"A wide beach, calmer than Patong"},who:{ru:"Арендные инвесторы",en:"Rental investors"},beach:{ru:"5 мин",en:"5 min"}},
+  {ru:"Равай",en:"Rawai",lat:7.7770,lng:98.3230,dx:16,dy:2,yield:"4.5–6%",vibe:{ru:"Спокойный юг, жизнь круглый год, марины",en:"Calm south, year-round living, marinas"},who:{ru:"Для себя и длительной аренды",en:"Own use and long-term rental"},beach:{ru:"5–10 мин",en:"5–10 min"}},
+  {ru:"Найхарн",en:"Naiharn",lat:7.7790,lng:98.3050,dx:-16,dy:6,yield:"5–6.5%",vibe:{ru:"Лучшие закаты и бухты юга",en:"The best sunsets and southern bays"},who:{ru:"Ценят природу",en:"Nature lovers"},beach:{ru:"5 мин",en:"5 min"}},
+  {ru:"Патонг",en:"Patong",lat:7.8960,lng:98.2960,dx:-14,dy:0,yield:"5–6.5%",vibe:{ru:"Самый живой турпоток острова",en:"The island's busiest tourist flow"},who:{ru:"Арендные инвесторы",en:"Rental investors"},beach:{ru:"до 10 мин",en:"under 10 min"}},
+  {ru:"Камала",en:"Kamala",lat:7.9550,lng:98.2810,dx:-13,dy:0,yield:"4.5–6%",vibe:{ru:"Тихий пляжный район западного побережья, семейный, Café del Mar",en:"Quiet beachside area on the west coast, family-friendly, Café del Mar"},who:{ru:"Семьи и арендные инвесторы",en:"Families and rental investors"},beach:{ru:"до 5 мин",en:"under 5 min"}},
+  {ru:"Ко Кео",en:"Koh Kaew",lat:7.9180,lng:98.3830,dx:15,dy:0,yield:"4–5%",vibe:{ru:"Восточная часть у марины Boat Lagoon, семейный район рядом с международной школой BISP, ближе к городу",en:"East side by Boat Lagoon marina, a family area next to the BISP international school, closer to town"},who:{ru:"Семьи на постоянное проживание",en:"Families living full-time"},beach:{ru:"15–20 мин",en:"15–20 min"}},
+  {ru:"Най Янг",en:"Nai Yang",lat:8.0900,lng:98.3000,dx:15,dy:0,yield:"4–5.5%",vibe:{ru:"Тихий север у нацпарка, близко аэропорт",en:"Quiet north by the park, close to the airport"},who:{ru:"Вход в рынок",en:"Market entry"},beach:{ru:"5 мин",en:"5 min"}},
+  {ru:"Май Кхао",en:"Mai Khao",lat:8.1500,lng:98.2960,dx:15,dy:0,yield:"4–5.5%",vibe:{ru:"Самый длинный и пустой пляж острова",en:"The longest, emptiest beach on the island"},who:{ru:"Уединение и премиум",en:"Seclusion and premium"},beach:{ru:"до 5 мин",en:"under 5 min"}}
 ];
 
 /* ===== LANG STATE ===== */
@@ -1645,8 +1645,43 @@ function observeReveals(){
 
 /* ===== HELPERS ===== */
 function fmtUSD(n){return '$'+Math.round(n).toLocaleString('en-US');}
-/* Доходность показываем осторожно: ориентир-диапазон вокруг rental_yield_pct, а не жёсткую цифру */
-function roiRange(r){if(r==null||isNaN(r))return '';var lo=Math.max(1,r-1),hi=r+1;return '≈'+lo+'–'+hi+'%';}
+/* ЧЕСТНЫЙ net-ROI: показываем консервативный net-диапазон РАЙОНА (рынок Пхукета 4–6%), а не оптимистичную цифру из буклета */
+PL.NETYIELD={
+  "Bang Tao":"4.5–6","Cherng Talay":"4.5–6","Layan":"3.5–5","Surin":"4–5.5",
+  "Kamala":"4.5–6","Kata":"4.5–6","Karon":"4.5–6","Rawai":"4.5–6",
+  "Nai Harn":"5–6.5","Nai Yang":"4–5.5","Patong":"5–6.5","Koh Kaew":"4–5","Phuket Town":"4–5.5"
+};
+/* маппинг рус/лат названий районов → ключ справочника NETYIELD */
+PL.DISTRICTKEY={
+  "банг тао":"Bang Tao","bang tao":"Bang Tao",
+  "чернг талай":"Cherng Talay","cherng talay":"Cherng Talay",
+  "лаян":"Layan","layan":"Layan",
+  "сурин":"Surin","surin":"Surin",
+  "камала":"Kamala","kamala":"Kamala",
+  "ката":"Kata","kata":"Kata",
+  "карон":"Karon","karon":"Karon",
+  "равай":"Rawai","раваи":"Rawai","rawai":"Rawai",
+  "найхарн":"Nai Harn","най харн":"Nai Harn","naiharn":"Nai Harn","nai harn":"Nai Harn",
+  "най янг":"Nai Yang","nai yang":"Nai Yang",
+  "патонг":"Patong","patong":"Patong",
+  "ко кео":"Koh Kaew","koh kaew":"Koh Kaew",
+  "пхукет таун":"Phuket Town","пхукет-таун":"Phuket Town","phuket town":"Phuket Town"
+};
+/* net-диапазон района по объекту/району (loc.ru или loc.en) */
+function netYieldByLoc(loc){
+  if(!loc)return null;
+  var keys=[loc.ru,loc.en];
+  for(var i=0;i<keys.length;i++){var k=keys[i];if(k){var m=PL.DISTRICTKEY[String(k).trim().toLowerCase()];if(m&&PL.NETYIELD[m])return PL.NETYIELD[m];}}
+  return null;
+}
+/* Доходность объекта = честный net-диапазон его РАЙОНА; fallback — прежний ориентир вокруг p.roi */
+function roiRange(p){
+  var ny=p&&typeof p==='object'?netYieldByLoc(p.loc):null;
+  if(ny)return '≈'+ny+'%';
+  var r=p&&typeof p==='object'?p.roi:p;
+  if(r==null||isNaN(r))return '';
+  var lo=Math.max(1,r-1),hi=r+1;return '≈'+lo+'–'+hi+'%';
+}
 function fmtTHB(n){return '฿'+Math.round(n).toLocaleString('en-US');}
 function statusBadge(s){return '<span class="stbadge st-'+s+'">'+t('st.'+s)+'</span>';}
 function thumbDiv(p,cls){return '<div class="thumb '+(p.grad||'g1')+' '+(cls||'')+'">'+t('ph.object')+'</div>';}
@@ -1656,7 +1691,7 @@ function renderSale(){
   var car=document.getElementById('saleCar');if(!car)return;
   car.innerHTML=PL.PROPERTIES.map(function(p){
     return '<div class="prop" data-pid="'+p.property_id+'" data-loc="'+p.loc.ru+'" data-budget="'+p.budget+'" data-type="'+p.type.ru+'" onclick="openProp(\''+p.property_id+'\')">'+
-      '<div class="pic '+p.grad+'"><span>'+t('ph.object')+'</span><span class="tag">'+loc(p.loc)+'</span>'+(p.roi!=null?'<span class="roi">ROI '+roiRange(p.roi)+'</span>':'')+
+      '<div class="pic '+p.grad+'"><span>'+t('ph.object')+'</span><span class="tag">'+loc(p.loc)+'</span>'+(p.roi!=null?'<span class="roi">ROI '+roiRange(p)+'</span>':'')+
       '<button type="button" class="fav" onclick="event.stopPropagation();toggleFav(\''+p.property_id+'\')" aria-label="В избранное">♡</button>'+
       '<button type="button" class="cmpb" onclick="event.stopPropagation();toggleCmp(\''+p.property_id+'\')">'+t('u.cmp')+'</button></div>'+
       '<div class="body"><div class="trow"><h3>'+p.title+'</h3>'+statusBadge(p.status)+'</div>'+
@@ -1854,7 +1889,7 @@ function chatCalcReply(low){
   PL.PROPERTIES.forEach(function(x){if(!p&&low.indexOf(x.title.toLowerCase())>-1)p=x;});
   if(!p)p=PL.PROPERTIES.slice().sort(function(a,b){return (b.roi||0)-(a.roi||0);})[0];
   var r=calcFromData(p.calc);
-  botT(tpl('chat.r.calc',{o:p.title,d:loc(p.loc),n:fmtBt(r.net),y:r.netY.toFixed(1),p:r.payback>0?r.payback.toFixed(1):'—'}),700);
+  botT(tpl('chat.r.calc',{o:p.title,d:loc(p.loc),n:fmtBt(r.net),y:(netYieldByLoc(p.loc)||r.netY.toFixed(1)),p:r.payback>0?r.payback.toFixed(1):'—'}),700);
   setTimeout(function(){aiCards([p.property_id]);},2400);
   if(!leadShown)setTimeout(function(){offerLead(false);},3400);
 }
@@ -1876,7 +1911,7 @@ function aiCards(ids){
   if(!items.length)return;
   var w=document.createElement('div');w.className='msg bot chat-cards';
   w.innerHTML=items.map(function(p){
-    var price=p.funnel==='sale'?('$'+Math.round(p.priceUSD/1000)+'k'+(p.roi?(' · ROI '+roiRange(p.roi)):'')):t('u.onreq');
+    var price=p.funnel==='sale'?('$'+Math.round(p.priceUSD/1000)+'k'+(p.roi?(' · ROI '+roiRange(p)):'')):t('u.onreq');
     return '<button type="button" class="cc" onclick="closeChatToProp(\''+p.property_id+'\')">'+thumbDiv(p)+'<span class="ccb"><b>'+p.title+'</b><i>'+loc(p.loc)+' · '+loc(p.type)+'</i><u>'+price+'</u></span></button>';
   }).join('');
   cb.appendChild(w);cb.scrollTop=cb.scrollHeight;
@@ -1894,7 +1929,7 @@ function openProp(pid){
   var p=PL.byId[pid];if(!p||p.soon)return;currentPid=pid;
   var img=document.getElementById('pmImg');
   img.className='pm-img '+(p.grad||'g1');
-  img.innerHTML='<span>'+t('ph.object')+'</span><div class="pm-badges"><span class="pm-tag">'+loc(p.loc)+'</span><span class="pm-roi">'+(p.funnel==='sale'?(p.roi!=null?('ROI '+roiRange(p.roi)):t('u.calc')):t('book.title'))+'</span></div>';
+  img.innerHTML='<span>'+t('ph.object')+'</span><div class="pm-badges"><span class="pm-tag">'+loc(p.loc)+'</span><span class="pm-roi">'+(p.funnel==='sale'?(p.roi!=null?('ROI '+roiRange(p)):t('u.calc')):t('book.title'))+'</span></div>';
   document.getElementById('pmTitle').textContent=p.title;
   document.getElementById('pmDesc').textContent=loc(p.desc);
   document.getElementById('pmPid').textContent=p.property_id;
@@ -1907,7 +1942,7 @@ function openProp(pid){
       '<div class="sp"><b>'+p.area+'</b><span>'+t('u.area')+'</span></div>'+
       '<div class="sp"><b>'+p.beds+'</b><span>'+t('u.beds')+'</span></div>'+
       '<div class="sp"><b>'+loc(p.deadline)+'</b><span>'+t('u.deadline')+'</span></div>'+
-      (p.roi!=null?'<div class="sp"><b>'+roiRange(p.roi)+'</b><span>ROI</span></div><div class="sp" style="grid-column:1/-1;border-top:0;padding-top:0"><span style="font-size:.72rem;color:var(--muted);line-height:1.5">'+t('u.roinote')+'</span></div>':'');
+      (p.roi!=null?'<div class="sp"><b>'+roiRange(p)+'</b><span>ROI</span></div><div class="sp" style="grid-column:1/-1;border-top:0;padding-top:0"><span style="font-size:.72rem;color:var(--muted);line-height:1.5">'+t('u.roinote')+'</span></div>':'');
     document.getElementById('pmTool').innerHTML=calcHTML(p);
     wireCalc(p);
     document.getElementById('pmCta').innerHTML=
@@ -2152,7 +2187,7 @@ function openCompare(){
     [t('cmp.r.loc'),function(p){return loc(p.loc);}],
     [t('cmp.r.type'),function(p){return loc(p.type);}],
     [t('cmp.r.price'),function(p){return fmtUSD(p.priceUSD);}],
-    ['ROI',function(p){return p.roi!=null?roiRange(p.roi):'—';}],
+    ['ROI',function(p){return p.roi!=null?roiRange(p):'—';}],
     [t('cmp.r.area'),function(p){return p.area;}],
     [t('cmp.r.beds'),function(p){return p.beds;}],
     [t('cmp.r.deadline'),function(p){return loc(p.deadline);}],
