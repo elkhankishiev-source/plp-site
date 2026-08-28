@@ -486,41 +486,6 @@ h3{font-size:1.12rem;font-weight:700}
 .avr{display:flex;flex-direction:column;gap:3px;padding:10px 12px;background:var(--green-soft);border:1px solid #d5d8b8;border-radius:11px}
 .avr .ak{font-size:.64rem;font-weight:700;letter-spacing:.08em;color:var(--olive)}
 .avr .av{font-size:.83rem;line-height:1.5;color:#4E3A35}
-
-/* ===== investor calculator (#calculator) ===== */
-.ic-grid{display:grid;gap:16px;margin-top:22px;align-items:start}
-@media(min-width:960px){.ic-grid{grid-template-columns:1.05fr .95fr}}
-.ic-box .th{flex-wrap:wrap}
-.ic-reset{margin-left:auto;font-size:.72rem;font-weight:700;background:#fff;border:1px solid rgba(10,10,10,.12);border-radius:999px;padding:7px 12px;transition:background .2s,transform .15s}
-.ic-reset:hover{background:var(--green);transform:translateY(-1px)}
-#icParams select{width:100%;height:40px;border:1.5px solid rgba(10,10,10,.12);border-radius:10px;padding:0 8px;font-size:.88rem;background:#fff;cursor:pointer}
-#icParams select:focus{outline:none;border-color:var(--ink)}
-.ic-hint{display:block;font-size:.66rem;font-weight:700;letter-spacing:.02em;color:#7a5d22;margin-top:3px}
-.ic-hint:empty{display:none}
-.ic-hero{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.ic-tile{background:var(--paper);border-radius:16px;padding:16px 18px;box-shadow:var(--shadow-sm)}
-.ic-tile b{display:block;font-size:clamp(1.35rem,3vw,1.9rem);font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
-.ic-tile span{font-size:.74rem;color:var(--muted);font-weight:600}
-.ic-tile.hl{background:var(--green);grid-column:1/-1}
-.ic-tile.hl b{font-size:clamp(1.7rem,4vw,2.4rem)}
-.ic-tile.hl span{color:#4E3A35}
-.ic-rows{display:flex;flex-direction:column;gap:7px;background:var(--paper);border-radius:16px;padding:14px 18px;margin-top:10px;box-shadow:var(--shadow-sm)}
-.ic-rows .row{display:flex;justify-content:space-between;font-size:.84rem;color:var(--muted)}
-.ic-rows .row b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
-.ic-expw{margin-top:10px}
-.ic-expw .av{font-variant-numeric:tabular-nums}
-.ic-planbar{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-top:12px}
-.ic-planbar .fld{max-width:160px}
-.ic-plannote{font-size:.72rem;font-weight:600;color:var(--muted);margin-left:auto}
-.ic-twrap{overflow-x:auto;margin-top:12px}
-.ic-table{width:100%;min-width:520px;border-collapse:collapse;font-variant-numeric:tabular-nums}
-.ic-table th{font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:700;text-align:left;padding:8px 10px;border-bottom:1px solid rgba(10,10,10,.12)}
-.ic-table td{font-size:.86rem;padding:10px;border-bottom:1px solid rgba(10,10,10,.07)}
-.ic-table .r,.ic-table th.r{text-align:right}
-.ic-table td:first-child{font-weight:600}
-.ic-table input{width:86px;height:34px;border:1.5px solid rgba(10,10,10,.12);border-radius:9px;padding:0 9px;font-size:.84rem;background:#fff;font-variant-numeric:tabular-nums}
-.ic-table input:focus{outline:none;border-color:var(--ink)}
-.ic-table tfoot td{font-weight:800;border-bottom:0;border-top:2px solid var(--ink);font-size:.92rem}
 /* quiz modal */
 .qz-card{position:relative;background:#fff;border-radius:24px;width:min(560px,100%);max-height:92vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 40px 90px rgba(20,18,14,.4)}
 .qz-top{padding:20px 24px 14px;border-bottom:1px solid rgba(10,10,10,.08)}
@@ -567,7 +532,6 @@ h3{font-size:1.12rem;font-weight:700}
     <nav class="nav" aria-label="Основное меню">
       <a href="#why" data-i18n="nav.why">Почему Пхукет</a>
       <a href="#sale" data-i18n="nav.sale">Продажа</a>
-      <a href="#calculator" data-i18n="nav.calc">Калькулятор</a>
       <a href="#rent" data-i18n="nav.rent">Аренда</a>
       <a href="#map" data-i18n="nav.map">Районы</a>
       <a href="#quiz" data-i18n="nav.quiz">Подбор</a>
@@ -591,7 +555,6 @@ h3{font-size:1.12rem;font-weight:700}
     <div class="top"><b data-i18n="nav.menu">Меню</b><button type="button" class="xx" onclick="toggleNav(false)" aria-label="Закрыть">×</button></div>
     <a href="#why" onclick="toggleNav(false)" data-i18n="nav.why">Почему Пхукет</a>
     <a href="#sale" onclick="toggleNav(false)" data-i18n="nav.sale">Продажа</a>
-    <a href="#calculator" onclick="toggleNav(false)" data-i18n="nav.calc">Калькулятор</a>
     <a href="#rent" onclick="toggleNav(false)" data-i18n="nav.rent">Аренда</a>
     <a href="#map" onclick="toggleNav(false)" data-i18n="nav.map">Районы</a>
     <a href="#quiz" onclick="toggleNav(false)" data-i18n="nav.quiz">Подбор</a>
@@ -692,22 +655,6 @@ h3{font-size:1.12rem;font-weight:700}
       <div class="car" id="saleCar"></div>
       <div class="noresult" id="saleNoResult" data-i18n="noresult">Под выбранные фильтры ничего не нашлось — сбросьте часть условий.</div>
     </div>
-  </div>
-</section>
-
-<!-- ===== INVESTOR CALCULATOR ===== -->
-<section id="calculator" aria-labelledby="calc-title" style="padding-top:0">
-  <div class="container">
-    <div class="reveal">
-      <span class="kicker" data-i18n="ic.lab">Инвестиции · расчёт</span>
-      <h2 id="calc-title" data-i18n="ic.h2">Калькулятор инвестора</h2>
-      <p class="sub" data-i18n="ic.sub">Посезонная модель доходности по данным наших объектов. Каждое допущение редактируется — итоги пересчитываются мгновенно.</p>
-    </div>
-    <div class="ic-grid reveal">
-      <div class="toolbox ic-box" id="icParams"></div>
-      <div id="icOut"></div>
-    </div>
-    <div class="toolbox reveal" id="icPlanBox" style="margin-top:16px"></div>
   </div>
 </section>
 
@@ -983,7 +930,6 @@ h3{font-size:1.12rem;font-weight:700}
         <h3 data-i18n="ft.menu">Меню</h3>
         <ul>
           <li><a href="#sale" data-i18n="ft.buy">Покупка</a></li>
-          <li><a href="#calculator" data-i18n="nav.calc">Калькулятор</a></li>
           <li><a href="#rent" data-i18n="nav.rent">Аренда</a></li>
           <li><a href="#map" data-i18n="nav.map">Районы</a></li>
           <li><a href="#about" data-i18n="nav.about">О нас</a></li>
@@ -1230,27 +1176,6 @@ ru: {
   "v.t.mid":"при таких вводных объект выглядит рабочим вариантом — сверьте цифры с менеджером по конкретному юниту, это бесплатно",
   "v.t.lo":"при таких вводных считать объект инвестицией стоит осторожно — обсудите с менеджером, за счёт чего можно улучшить экономику",
   "v.note":"Разбор по вашим цифрам — не инвестиционная рекомендация.",
-  "nav.calc":"Калькулятор",
-  "ic.lab":"Инвестиции · расчёт","ic.h2":"Калькулятор инвестора",
-  "ic.sub":"Посезонная модель доходности по данным наших объектов. Каждое допущение редактируется — итоги пересчитываются мгновенно.",
-  "ic.obj":"Объект","ic.objman":"Ручной ввод","ic.manbeds":"Спальни","ic.mandist":"Район",
-  "ic.b1":"1 спальня","ic.b2":"2 спальни","ic.b3":"3 спальни",
-  "ic.reset":"Сбросить к данным объекта","ic.reset2":"Сбросить к модели",
-  "ic.rate":"Курс, ฿/$","ic.months":"Сдача через, мес",
-  "ic.usd":"≈ чистыми в год, $","ic.hishare":"Доля high-сезона в доходе",
-  "ic.h.above":"выше рынка","ic.h.below":"консервативно",
-  "ic.exp":"Комментарий эксперта PLP",
-  "ic.e.in":"Чистая доходность {y}% — в рамках {r} по району {d}",
-  "ic.e.above":"Чистая доходность {y}% — выше диапазона {r} по району {d}, проверьте вводные",
-  "ic.e.below":"Чистая доходность {y}% — ниже диапазона {r} по району {d}",
-  "ic.e.high":"High-сезон даёт {s}% годового дохода — декабрь–март решают",
-  "ic.e.pb":"Окупаемость ~{p} лет при текущей загрузке",
-  "ic.e.pbb":"Окупаемость ~{p} лет; до сдачи ({m} мес) объект дохода не приносит",
-  "ic.plan":"График платежей на строительстве","ic.plannote":"Типовой график — уточняется по объекту",
-  "ic.st1":"Бронирование","ic.st2":"Контракт","ic.st3":"Строительство · этап 1","ic.st4":"Строительство · этап 2","ic.st5":"Строительство · этап 3","ic.st6":"Ключи",
-  "ic.c.stage":"Этап","ic.c.date":"Дата","ic.c.share":"Доля","ic.c.sum":"Сумма, ฿","ic.total":"Итого",
-  "ic.cta":"Получить расчёт по этому объекту",
-  "ic.chat":"Видела ваш расчёт в калькуляторе — пришлю точные цифры по юниту и график платежей от застройщика. Оставьте контакт, отвечу лично.",
   "ft.copy":"Property Library Phuket ©2025 · с 2022",
   "chat.fab":"Дарья · на связи","chat.name":"Дарья · Property Library","chat.sub":"онлайн · отвечает сразу","chat.placeholder":"Напишите сообщение…",
   "chat.botline":"Личный диалог. Отвечаем в течение 3 минут в рабочее время",
@@ -1259,7 +1184,7 @@ ru: {
   "chat.r.sale":"Хороший запрос. Вход в рынок — от $90k, доходность 6–15% годовых в зависимости от района и проекта. Покажу пару вариантов из нашей базы — а под вашу задачу соберу подборку лично.",
   "chat.r.rent":"Мы сдаём в долгосрочную аренду — от месяца и дольше. Цены и условия по каждому объекту называем по запросу: напишите район, даты и бюджет — подберу вариант. Оставьте WhatsApp или Telegram — отвечу лично.",
   "chat.r.service":"Мы закрываем всё под ключ: юристы по тайскому праву, визы, дизайн, строительство и управление арендой после покупки. Для клиентов услуги бесплатны. Расскажите вашу ситуацию — подскажу, с чего начать.",
-  "chat.r.calc":"На карточке каждого объекта в продаже есть калькулятор доходности — посезонная модель с расходами и УК. Откройте объект в каталоге и меняйте цифры под себя. А точный расчёт по юниту пришлю лично.",
+  "chat.r.calc":"Считаю по нашей посезонной модели. {o} ({d}): чистыми ~{n} в год, net yield ~{y}%, окупаемость ~{p} лет. В карточке объекта можно подправить любое допущение — загрузку, ставки, расходы. Точный расчёт по юниту пришлю лично — оставьте контакт.",
   "chat.r.support":"Понимаю. Чтобы не ввести вас в заблуждение, уточню детали у Эльнура и вернусь с точным ответом. Оставьте WhatsApp или Telegram — отвечу лично в течение 3 минут в рабочее время.",
   "chat.r.generic":"Хороший вопрос. По точным цифрам и условиям сверюсь с Эльнуром, чтобы ответить без ошибок. Оставьте WhatsApp или Telegram — вернусь с ответом лично. А пока могу показать объекты под ваш бюджет.",
   "chat.offerLead":"Чтобы прислать подборку и ответить предметно, мне нужны цель, бюджет и контакт — дальше продолжим в удобном мессенджере.",
@@ -1403,27 +1328,6 @@ en: {
   "v.t.mid":"with these inputs the property looks workable — verify the numbers with a manager for the specific unit, free of charge",
   "v.t.lo":"with these inputs treat it as an investment with caution — discuss with a manager how the economics could be improved",
   "v.note":"A take based on your numbers — not investment advice.",
-  "nav.calc":"Calculator",
-  "ic.lab":"Invest · numbers","ic.h2":"Investor calculator",
-  "ic.sub":"A seasonal yield model built on our live listings. Every assumption is editable — figures update instantly.",
-  "ic.obj":"Property","ic.objman":"Manual input","ic.manbeds":"Bedrooms","ic.mandist":"Area",
-  "ic.b1":"1 bedroom","ic.b2":"2 bedrooms","ic.b3":"3 bedrooms",
-  "ic.reset":"Reset to property data","ic.reset2":"Reset to model",
-  "ic.rate":"Rate, ฿/$","ic.months":"Handover in, mo",
-  "ic.usd":"≈ net per year, $","ic.hishare":"High-season share of income",
-  "ic.h.above":"above market","ic.h.below":"conservative",
-  "ic.exp":"PLP expert comment",
-  "ic.e.in":"Net yield {y}% — within the {r} range for {d}",
-  "ic.e.above":"Net yield {y}% — above the {r} range for {d}, double-check the inputs",
-  "ic.e.below":"Net yield {y}% — below the {r} range for {d}",
-  "ic.e.high":"High season brings {s}% of annual income — December–March is decisive",
-  "ic.e.pb":"Payback ~{p} years at the current occupancy",
-  "ic.e.pbb":"Payback ~{p} years; no income until handover ({m} mo)",
-  "ic.plan":"Construction payment schedule","ic.plannote":"Typical schedule — refined per property",
-  "ic.st1":"Booking","ic.st2":"Contract","ic.st3":"Construction · stage 1","ic.st4":"Construction · stage 2","ic.st5":"Construction · stage 3","ic.st6":"Handover keys",
-  "ic.c.stage":"Stage","ic.c.date":"Date","ic.c.share":"Share","ic.c.sum":"Amount, ฿","ic.total":"Total",
-  "ic.cta":"Get a quote for this property",
-  "ic.chat":"I saw your numbers in the calculator — I will send exact unit figures and the developer's payment schedule. Leave a contact and I will reply personally.",
   "ft.copy":"Property Library Phuket ©2025 · since 2022",
   "chat.fab":"Daria · online","chat.name":"Daria · Property Library","chat.sub":"online · replies right away","chat.placeholder":"Type a message…",
   "chat.botline":"Personal dialogue. We reply within 3 minutes during working hours",
@@ -1432,7 +1336,7 @@ en: {
   "chat.r.sale":"Good request. Market entry starts from $90k, with 6–15% annual yield depending on the area and project. I will show a couple of options from our base — and put together a personal shortlist for your goal.",
   "chat.r.rent":"We do long-term rentals — from one month and longer. Prices and terms for each home are given on request: tell me the area, dates and budget and I will find a match. Leave your WhatsApp or Telegram — I will reply personally.",
   "chat.r.service":"We cover everything end-to-end: Thai law attorneys, visas, design, construction and rental management after purchase. Our services are free for clients. Tell me your situation — I will suggest where to start.",
-  "chat.r.calc":"Every sale listing has a yield calculator — a seasonal model with expenses and management. Open a property in the catalogue and adjust the numbers. I can also send an exact per-unit calculation personally.",
+  "chat.r.calc":"Here is our seasonal model. {o} ({d}): net ~{n} a year, net yield ~{y}%, payback ~{p} years. You can tweak every assumption on the property card — occupancy, rates, expenses. I will send an exact per-unit calculation personally — leave a contact.",
   "chat.r.support":"I understand. To avoid misleading you, I will check the details with Elnur and come back with an exact answer. Leave your WhatsApp or Telegram — I will reply personally within 3 minutes during working hours.",
   "chat.r.generic":"Good question. I will verify the exact numbers and terms with Elnur to answer precisely. Leave your WhatsApp or Telegram — I will get back to you personally. Meanwhile I can show properties for your budget.",
   "chat.offerLead":"To send a shortlist and answer in detail I need your goal, budget and contact — then we continue in your favourite messenger.",
@@ -1562,7 +1466,7 @@ function applyI18n(){
 function setLang(l){
   if(PL.lang===l)return;
   PL.lang=l;try{localStorage.setItem('pl_lang',l);}catch(e){}
-  applyI18n();renderSale();renderRent();renderMap();renderDList();renderIC();
+  applyI18n();renderSale();renderRent();renderMap();renderDList();
   if(document.getElementById('propModal').classList.contains('open')&&currentPid){openProp(currentPid);}
   if(document.getElementById('quizModal').classList.contains('open'))renderQuiz();
   updateTray();
@@ -1754,13 +1658,11 @@ function openChat(ctx){
   document.getElementById('fab').style.display='none';
   var fld=document.getElementById('chatField');if(fld&&innerWidth>760)fld.focus();
   if(ctx==='rentreq'&&chatStarted){lastTopic='rent';botT(t('chat.rentreq'),500);setTimeout(function(){offerLead(true);},2200);return;}
-  if(ctx==='calcreq'&&chatStarted){lastTopic='sale';botT(t('ic.chat'),500);if(IC.pid)setTimeout(function(){aiCards([IC.pid]);},1900);setTimeout(function(){offerLead(true);},2600);return;}
   if(chatStarted)return;
   chatStarted=true;
   if(chatHist.length){
     replayHist();
     if(ctx==='rentreq'){lastTopic='rent';setTimeout(function(){botT(t('chat.rentreq'),400);setTimeout(function(){offerLead(true);},2000);},300);return;}
-    if(ctx==='calcreq'){lastTopic='sale';setTimeout(function(){botT(t('ic.chat'),400);if(IC.pid)setTimeout(function(){aiCards([IC.pid]);},1600);setTimeout(function(){offerLead(true);},2400);},300);return;}
     if(!leadShown)setTimeout(chatMenu,300);
     return;
   }
@@ -1768,7 +1670,6 @@ function openChat(ctx){
   setTimeout(function(){
     botT(t('chat.hello'),700);
     if(ctx==='rentreq'){lastTopic='rent';setTimeout(function(){botT(t('chat.rentreq'),300);setTimeout(function(){offerLead(true);},1800);},2200);}
-    else if(ctx==='calcreq'){lastTopic='sale';setTimeout(function(){botT(t('ic.chat'),300);if(IC.pid)setTimeout(function(){aiCards([IC.pid]);},1500);setTimeout(function(){offerLead(true);},2200);},2200);}
     else setTimeout(chatMenu,1700);
   },250);
 }
@@ -1813,6 +1714,16 @@ function detectTopic(low){
   if(/проблем|поддержк|помог|не работа|вопрос|support|help|issue/.test(low))return 'support';
   return null;
 }
+/* расчёт доходности прямо в чате: та же посезонная модель, данные объекта */
+function chatCalcReply(low){
+  var p=null;
+  PL.PROPERTIES.forEach(function(x){if(!p&&low.indexOf(x.title.toLowerCase())>-1)p=x;});
+  if(!p)p=PL.PROPERTIES.slice().sort(function(a,b){return b.roi-a.roi;})[0];
+  var r=calcFromData(p.calc);
+  botT(tpl('chat.r.calc',{o:p.title,d:loc(p.loc),n:fmtBt(r.net),y:r.netY.toFixed(1),p:r.payback>0?r.payback.toFixed(1):'—'}),700);
+  setTimeout(function(){aiCards([p.property_id]);},2400);
+  if(!leadShown)setTimeout(function(){offerLead(false);},3400);
+}
 function sendFree(){
   var fld=document.getElementById('chatField');var txt=fld.value.trim();if(!txt)return;fld.value='';
   if(!chatStarted)openChat('free');
@@ -1820,6 +1731,7 @@ function sendFree(){
   /* локальный сценарий-заглушка вместо живого мозга */
   // TODO: POST -> n8n webhook (channelId='site' → brain_core, персона Дарья)
   var topic=detectTopic(txt.toLowerCase());if(topic)lastTopic=topic;
+  if(topic==='calc'){chatCalcReply(txt.toLowerCase());return;}
   var key='chat.r.'+(topic||'generic');
   botT(t(key),700);
   if(topic==='sale'){setTimeout(function(){aiCards(topSaleIds(2));},2000);}
@@ -1923,16 +1835,10 @@ function wireCalc(p){
   function run(){
     var price=num('cPrice'),handover=num('cHand');
     var mgmt=Math.min(100,Math.max(0,num('cMgmt')));
-    var gross=num('cHigh')*num('cMonH')*num('cOccH')/100+num('cShoulder')*num('cMonS')*num('cOccS')/100+num('cLow')*num('cMonL')*num('cOccL')/100;
-    var uk=gross*mgmt/100;
-    var maint=num('cMaint')*num('cArea')*12;
-    var capex=num('cCapex')*num('cArea');
-    var meters=num('cMeters');
-    var expenses=uk+maint+capex+meters;
-    var net=gross-expenses;
-    var grossY=price>0?gross/price*100:0;
-    var netY=price>0?net/price*100:0;
-    var payback=net>0?price/net:0;
+    var r=calcEngine({price:price,high:num('cHigh'),shoulder:num('cShoulder'),low:num('cLow'),
+      occH:num('cOccH'),occS:num('cOccS'),occL:num('cOccL'),monH:num('cMonH'),monS:num('cMonS'),monL:num('cMonL'),
+      mgmt:mgmt,maint:num('cMaint'),area:num('cArea'),capex:num('cCapex'),meters:num('cMeters')});
+    var gross=r.gross,expenses=r.expenses,net=r.net,grossY=r.grossY,netY=r.netY,payback=r.payback;
     var rentYears=Math.max(0,5-num('cBuild'));
     var apprBuild=handover-price;
     var apprAfter=handover*(Math.pow(1+num('cGrowth')/100,rentYears)-1);
@@ -1973,185 +1879,23 @@ function askVerdict(){
     '</div><div class="tnote" style="margin-top:8px">'+t('v.note')+'</div>';
 }
 
-/* ===== INVESTOR CALCULATOR (#calculator): та же посезонная модель, что в карточке объекта ===== */
-var IC={pid:PL.PROPERTIES[0].property_id,beds:2,distRu:'Банг Тао',v:null,base:null};
-var IC_BEDS_AREA={1:45,2:70,3:110}; /* допущение: спальни → м² (настраивается) */
-var IC_SEASON_MONTHS={high:4,shoulder:2,low:6}; /* длительность сезонов, как в карточке */
-/* типовые этапы рассрочки — настраиваемые дефолты: бронь 200к฿ (рынок 100–200к), контракт 30% минус бронь, стройка 20/20/20 на 40/70/90% срока, ключи = остаток */
-function fmtSp(n){n=Math.round(n||0);var s=String(Math.abs(n)).replace(/\B(?=(\d{3})+(?!\d))/g,' ');return (n<0?'−':'')+s;}
-function fmtBt(n){return '฿'+fmtSp(n);}
-function icDeadlineMonths(p){
-  var s=(p&&p.deadline&&p.deadline.ru)||'',m,target=null,now=new Date();
-  if(m=s.match(/([1-4])Q\s*(\d{4})/))target=new Date(+m[2],(+m[1])*3-1,1);
-  else if(m=s.match(/(\d{4})/))target=new Date(+m[1],11,1);
-  if(!target)return 18;
-  return Math.max(1,(target.getFullYear()-now.getFullYear())*12+(target.getMonth()-now.getMonth()));
-}
-function icDefaults(){
-  var c,months;
-  if(IC.pid){var p=PL.byId[IC.pid];c=p.calc;months=icDeadlineMonths(p);}
-  else{
-    var area=IC_BEDS_AREA[IC.beds]||70;
-    var price=(IC.v&&IC.v.price)?IC.v.price:8400000;
-    c=mkCalc(price/RATE,area);months=18;
-  }
-  IC.base=c;
-  IC.v={price:c.priceTHB,rate:RATE,
-    high:c.seasons.high.rent,shoulder:c.seasons.shoulder.rent,low:c.seasons.low.rent,
-    occH:c.seasons.high.occ,occS:c.seasons.shoulder.occ,occL:c.seasons.low.occ,
-    mgmt:c.mgmtPct,area:c.areaM2,maint:c.maintM2Month,capex:c.capexM2,meters:c.metersTHB,
-    months:months,book:200000,pctContract:30,pctS1:20,pctS2:20,pctS3:20};
-}
-function icDistrict(){
-  var ru=IC.pid?(PL.byId[IC.pid].loc&&PL.byId[IC.pid].loc.ru):IC.distRu,d=null;
-  PL.DISTRICTS.forEach(function(x){if(x.ru===ru)d=x;});
-  return d;
-}
+/* ===== YIELD ENGINE (общий движок: карточка объекта + чат Дарьи) ===== */
+function fmtSp(n){n=Math.round(n||0);var s=String(Math.abs(n)).replace(/\B(?=(\d{3})+(?!\d))/g,' ');return (n<0?'\u2212':'')+s;}
+function fmtBt(n){return '\u0e3f'+fmtSp(n);}
 function tpl(k,map){var s=t(k);Object.keys(map).forEach(function(x){s=s.split('{'+x+'}').join(map[x]);});return s;}
-function icDate(mo){
-  var n=new Date(),d=new Date(n.getFullYear(),n.getMonth()+mo,1);
-  return d.toLocaleDateString(PL.lang==='ru'?'ru-RU':'en-GB',{month:'short',year:'numeric'});
-}
-function renderIC(){
-  var box=document.getElementById('icParams');if(!box)return;
-  if(!IC.v)icDefaults();
-  var v=IC.v,manual=!IC.pid;
-  function f(k,label,step){return '<div class="fld"><label>'+t(label)+'</label><input data-k="'+k+'" type="number" '+(step?('step="'+step+'" '):'')+'value="'+v[k]+'"><span class="ic-hint" data-h="'+k+'"></span></div>';}
-  var objOpts=PL.PROPERTIES.map(function(p){
-    return '<option value="'+p.property_id+'"'+(IC.pid===p.property_id?' selected':'')+'>'+p.title+' · '+loc(p.loc)+' · '+fmtBt(p.calc.priceTHB)+'</option>';
-  }).join('')+'<option value=""'+(manual?' selected':'')+'>'+t('ic.objman')+'</option>';
-  var manualHTML=manual?(
-    '<div class="fld"><label>'+t('ic.manbeds')+'</label><select id="icBeds">'+[1,2,3].map(function(b){return '<option value="'+b+'"'+(IC.beds===b?' selected':'')+'>'+t('ic.b'+b)+'</option>';}).join('')+'</select></div>'+
-    '<div class="fld"><label>'+t('ic.mandist')+'</label><select id="icDist">'+PL.DISTRICTS.map(function(d){return '<option value="'+d.ru+'"'+(IC.distRu===d.ru?' selected':'')+'>'+dName(d)+'</option>';}).join('')+'</select></div>'):'';
-  box.innerHTML='<div class="th">📈 '+t('ic.h2')+'<button type="button" class="ic-reset" id="icReset">↺ '+t(manual?'ic.reset2':'ic.reset')+'</button></div>'+
-    '<div class="calc-inputs" style="margin-top:12px">'+
-    '<div class="fld" style="grid-column:1/-1"><label>'+t('ic.obj')+'</label><select id="icObj">'+objOpts+'</select></div>'+
-    manualHTML+
-    f('price','calc.price')+f('rate','ic.rate')+
-    f('high','calc.high')+f('occH','calc.occh','0.1')+
-    f('shoulder','calc.shoulder')+f('occS','calc.occs','0.1')+
-    f('low','calc.low')+f('occL','calc.occl','0.1')+
-    f('mgmt','calc.mgmt')+f('area','calc.area')+
-    f('maint','calc.maint')+f('meters','calc.meters')+
-    f('capex','calc.capex')+
-    '</div>';
-  var out=document.getElementById('icOut');
-  out.innerHTML='<div id="icNums"></div>'+
-    '<div class="avr ic-expw"><span class="ak">'+t('ic.exp')+'</span><span class="av" id="icExp"></span></div>'+
-    '<button type="button" class="btn btn-primary btn-block" id="icCta" style="margin-top:12px">'+t('ic.cta')+'</button>';
-  var plan=document.getElementById('icPlanBox');
-  function inp(k){return '<input data-k="'+k+'" type="number" value="'+v[k]+'">';}
-  plan.innerHTML='<div class="th">📅 '+t('ic.plan')+'<span class="ic-plannote">'+t('ic.plannote')+'</span></div>'+
-    '<div class="ic-planbar"><div class="fld"><label>'+t('ic.months')+'</label>'+inp('months')+'</div></div>'+
-    '<div class="ic-twrap"><table class="ic-table"><thead><tr><th>'+t('ic.c.stage')+'</th><th>'+t('ic.c.date')+'</th><th>'+t('ic.c.share')+'</th><th class="r">'+t('ic.c.sum')+'</th></tr></thead><tbody>'+
-    '<tr><td>'+t('ic.st1')+'</td><td data-d="0"></td><td><span data-sh="book"></span></td><td class="r">'+inp('book')+'</td></tr>'+
-    '<tr><td>'+t('ic.st2')+'</td><td data-d="1"></td><td>'+inp('pctContract')+' %</td><td class="r" data-sum="contract"></td></tr>'+
-    '<tr><td>'+t('ic.st3')+'</td><td data-d="2"></td><td>'+inp('pctS1')+' %</td><td class="r" data-sum="s1"></td></tr>'+
-    '<tr><td>'+t('ic.st4')+'</td><td data-d="3"></td><td>'+inp('pctS2')+' %</td><td class="r" data-sum="s2"></td></tr>'+
-    '<tr><td>'+t('ic.st5')+'</td><td data-d="4"></td><td>'+inp('pctS3')+' %</td><td class="r" data-sum="s3"></td></tr>'+
-    '<tr><td>'+t('ic.st6')+'</td><td data-d="5"></td><td><span data-sh="keys"></span></td><td class="r" data-sum="keys"></td></tr>'+
-    '</tbody><tfoot><tr><td>'+t('ic.total')+'</td><td></td><td>100%</td><td class="r" data-sum="total"></td></tr></tfoot></table></div>';
-  wireIC();
-  icRecalc();
-}
-function wireIC(){
-  var obj=document.getElementById('icObj');
-  if(obj)obj.onchange=function(){IC.pid=obj.value||null;icDefaults();renderIC();};
-  var beds=document.getElementById('icBeds');
-  if(beds)beds.onchange=function(){IC.beds=+beds.value;icDefaults();renderIC();};
-  var dist=document.getElementById('icDist');
-  if(dist)dist.onchange=function(){IC.distRu=dist.value;icRecalc();};
-  var rst=document.getElementById('icReset');
-  if(rst)rst.onclick=function(){icDefaults();renderIC();};
-  var cta=document.getElementById('icCta');
-  if(cta)cta.onclick=icLead;
-  ['icParams','icPlanBox'].forEach(function(id){
-    var el=document.getElementById(id);
-    if(!el||el._icWired)return;el._icWired=1;
-    el.addEventListener('input',function(e){
-      var k=e.target.getAttribute('data-k');if(!k)return;
-      IC.v[k]=+e.target.value||0;icRecalc();
-    });
-  });
-}
-function icHint(k,key){
-  var el=document.querySelector('#icParams [data-h="'+k+'"]');
-  if(el)el.textContent=key?t(key):'';
-}
-function icRecalc(){
-  var v=IC.v;if(!v)return;
-  var gHigh=v.high*IC_SEASON_MONTHS.high*v.occH/100;
-  var gross=gHigh+v.shoulder*IC_SEASON_MONTHS.shoulder*v.occS/100+v.low*IC_SEASON_MONTHS.low*v.occL/100;
-  var mgmt=Math.min(100,Math.max(0,v.mgmt));
-  var expenses=gross*mgmt/100+v.maint*v.area*12+v.capex*v.area+v.meters;
+function calcEngine(v){
+  var gross=v.high*v.monH*v.occH/100+v.shoulder*v.monS*v.occS/100+v.low*v.monL*v.occL/100;
+  var expenses=gross*Math.min(100,Math.max(0,v.mgmt))/100+v.maint*v.area*12+v.capex*v.area+v.meters;
   var net=gross-expenses;
-  var netY=v.price>0?net/v.price*100:0,grossY=v.price>0?gross/v.price*100:0;
-  var payback=net>0?v.price/net:0;
-  var hiShare=gross>0?gHigh/gross*100:0;
-  var usd=v.rate>0?net/v.rate:0;
-  function row(k,val){return '<div class="row"><span>'+k+'</span><b>'+val+'</b></div>';}
-  var nums=document.getElementById('icNums');
-  if(nums)nums.innerHTML='<div class="ic-hero">'+
-    '<div class="ic-tile hl"><b>'+fmtBt(net)+'</b><span>'+t('calc.net')+'</span></div>'+
-    '<div class="ic-tile"><b>'+netY.toFixed(1)+'%</b><span>'+t('calc.netyield')+'</span></div>'+
-    '<div class="ic-tile"><b>'+(payback>0?payback.toFixed(1)+' '+t('calc.years'):'—')+'</b><span>'+t('calc.payback')+'</span></div>'+
-    '</div><div class="ic-rows">'+
-    row(t('calc.gross'),fmtBt(gross))+
-    row(t('calc.expenses'),'−'+fmtBt(expenses))+
-    row(t('ic.usd'),'$'+fmtSp(usd))+
-    row(t('calc.grossyield'),grossY.toFixed(1)+'%')+
-    row(t('ic.hishare'),hiShare.toFixed(0)+'%')+
-    '</div>';
-  /* подсказки «диапазон рынка»: сравнение с базовой моделью объекта */
-  var S=IC.base.seasons;
-  icHint('high',v.high>S.high.rent*1.25?'ic.h.above':(v.high<S.high.rent*0.75?'ic.h.below':''));
-  icHint('shoulder',v.shoulder>S.shoulder.rent*1.25?'ic.h.above':(v.shoulder<S.shoulder.rent*0.75?'ic.h.below':''));
-  icHint('low',v.low>S.low.rent*1.25?'ic.h.above':(v.low<S.low.rent*0.75?'ic.h.below':''));
-  icHint('occH',v.occH>95?'ic.h.above':(v.occH<S.high.occ-15?'ic.h.below':''));
-  icHint('occS',v.occS>95?'ic.h.above':(v.occS<S.shoulder.occ-15?'ic.h.below':''));
-  icHint('occL',v.occL>90?'ic.h.above':(v.occL<S.low.occ-15?'ic.h.below':''));
-  icHint('mgmt',v.mgmt>25?'ic.h.above':(v.mgmt<15?'ic.h.below':''));
-  /* комментарий эксперта: только из данных файла, без выдуманных цифр */
-  var lines=[],d=icDistrict();
-  if(d&&d.yield){
-    var m=d.yield.match(/(\d+)\s*[–-]\s*(\d+)/);
-    if(m){
-      var lo=+m[1],hi=+m[2];
-      var key=netY>hi?'ic.e.above':(netY<lo?'ic.e.below':'ic.e.in');
-      lines.push(tpl(key,{y:netY.toFixed(1),r:d.yield,d:dName(d)}));
-    }
-  }
-  lines.push(tpl('ic.e.high',{s:hiShare.toFixed(0)}));
-  if(payback>0)lines.push(v.months>0?tpl('ic.e.pbb',{p:payback.toFixed(1),m:Math.round(v.months)}):tpl('ic.e.pb',{p:payback.toFixed(1)}));
-  var exp=document.getElementById('icExp');
-  if(exp)exp.innerHTML=lines.join('<br>');
-  icPlanCalc();
-  window.__icSnap={net:net,netY:netY,gross:gross,expenses:expenses,payback:payback,hiShare:hiShare,usd:usd};
+  return {gross:gross,expenses:expenses,net:net,
+    netY:v.price>0?net/v.price*100:0,grossY:v.price>0?gross/v.price*100:0,
+    payback:net>0?v.price/net:0};
 }
-function icPlanCalc(){
-  var v=IC.v,box=document.getElementById('icPlanBox');if(!box)return;
-  var price=v.price||0,mo=Math.max(1,Math.round(v.months||1));
-  var offs=[0,1,Math.round(mo*0.4),Math.round(mo*0.7),Math.round(mo*0.9),mo];
-  for(var oi=1;oi<offs.length;oi++)offs[oi]=Math.max(offs[oi-1],offs[oi]); /* даты этапов не раньше предыдущих */
-  var book=Math.max(0,v.book||0);
-  var aC=Math.max(0,price*(v.pctContract||0)/100-book);
-  var a1=price*(v.pctS1||0)/100,a2=price*(v.pctS2||0)/100,a3=price*(v.pctS3||0)/100;
-  var keys=Math.max(0,price-book-aC-a1-a2-a3); /* ключи = остаток, чтобы сумма сошлась с ценой */
-  box.querySelectorAll('[data-d]').forEach(function(td){td.textContent=icDate(offs[+td.getAttribute('data-d')]);});
-  function set(k,val){var el=box.querySelector('[data-sum="'+k+'"], [data-sh="'+k+'"]');if(el)el.textContent=val;}
-  set('book',price>0?(book/price*100).toFixed(1)+'%':'—');
-  set('contract',fmtSp(aC));set('s1',fmtSp(a1));set('s2',fmtSp(a2));set('s3',fmtSp(a3));
-  var kEl=box.querySelector('[data-sh="keys"]');if(kEl)kEl.textContent=price>0?(keys/price*100).toFixed(1)+'%':'—';
-  var kSum=box.querySelector('[data-sum="keys"]');if(kSum)kSum.textContent=fmtSp(keys);
-  set('total',fmtBt(book+aC+a1+a2+a3+keys));
-}
-function icLead(){
-  var s=window.__icSnap||{};
-  var d=icDistrict();
-  pushLead({funnel:'sale',property_id:IC.pid||null,goal:'invest_calc',
-    calc:{priceTHB:IC.v?IC.v.price:null,netTHB:Math.round(s.net||0),netYieldPct:s.netY!=null?+s.netY.toFixed(1):null,
-      paybackYears:s.payback?+s.payback.toFixed(1):null,months:IC.v?IC.v.months:null,district:d?d.ru:null,manual:!IC.pid}});
-  openChat('calcreq');
+function calcFromData(c){
+  var S=c.seasons;
+  return calcEngine({price:c.priceTHB,high:S.high.rent,shoulder:S.shoulder.rent,low:S.low.rent,
+    occH:S.high.occ,occS:S.shoulder.occ,occL:S.low.occ,monH:S.high.months,monS:S.shoulder.months,monL:S.low.months,
+    mgmt:c.mgmtPct,maint:c.maintM2Month,area:c.areaM2,capex:c.capexM2,meters:c.metersTHB});
 }
 
 /* ===== SALE FILTERS / SEARCH / SORT ===== */
@@ -2466,7 +2210,7 @@ window.openDistrict=openDistrict;window.closeDistrict=closeDistrict;
 
 /* ===== INIT ===== */
 applyI18n();
-renderSale();renderRent();renderMap();renderDList();renderIC();
+renderSale();renderRent();renderMap();renderDList();
 initCarDrag();observeReveals();updateTray();
 
 })();
