@@ -1154,6 +1154,7 @@ ru: {
   "ft.tag":"Мы уже выбрали Пхукет, поможем и вам. Все под ключ — от первого звонка до заезда.",
   "ft.menu":"Меню","ft.buy":"Покупка","ft.contacts":"Контакты","ft.connect":"Мы на связи","ft.bot":"Консьерж в Telegram 24/7","ft.tg":"Telegram-канал","ft.policy":"Политика конфиденциальности",
   "u.from":"от","u.onreq":"цена по запросу","u.calc":"Рассчитать доходность","u.cmp":"Сравнить","u.cmpOn":"В сравнении",
+  "u.roinote":"Оценка; зависит от цены покупки и сезона",
   "u.view":"Записаться на показ","u.podborka":"Получить подборку","u.kp":"Получить КП",
   "u.area":"площадь","u.beds":"спальни","u.deadline":"сдача",
   "st.available":"Доступен","st.reserved":"Резерв","st.sold":"Продан","st.soon":"Скоро",
@@ -1307,6 +1308,7 @@ en: {
   "ft.tag":"We already chose Phuket — let us help you. Full service, from the first call to move-in.",
   "ft.menu":"Menu","ft.buy":"Buy","ft.contacts":"Contacts","ft.connect":"Stay in touch","ft.bot":"Telegram concierge 24/7","ft.tg":"Telegram channel","ft.policy":"Privacy policy",
   "u.from":"from","u.onreq":"price on request","u.calc":"Calculate the yield","u.cmp":"Compare","u.cmpOn":"Comparing",
+  "u.roinote":"Estimate; depends on entry price and season",
   "u.view":"Book a viewing","u.podborka":"Get a shortlist","u.kp":"Get the offer",
   "u.area":"area","u.beds":"bedrooms","u.deadline":"completion",
   "st.available":"Available","st.reserved":"Reserved","st.sold":"Sold","st.soon":"Soon",
@@ -1560,7 +1562,7 @@ PL.byId={};
 PL.PROPERTIES.forEach(function(p){PL.byId[p.property_id]=p;});
 PL.RENTALS.forEach(function(p){PL.byId[p.property_id]=p;});
 
-/* ===== DISTRICTS (12 районов) ===== */
+/* ===== DISTRICTS (14 районов) ===== */
 PL.DISTRICTS=[
   {ru:"Лагуна",en:"Laguna",lat:7.9952,lng:98.2982,dx:14,dy:4,yield:"7–10%",vibe:{ru:"Курортная экосистема, гольф, отели мировых брендов",en:"Resort ecosystem, golf, global hotel brands"},who:{ru:"Инвесторы и семьи",en:"Investors and families"},beach:{ru:"5–10 мин",en:"5–10 min"}},
   {ru:"Банг Тао",en:"Bang Tao",lat:8.0000,lng:98.2960,dx:-14,dy:0,yield:"7–10%",vibe:{ru:"Главный инвестиционный район острова, beach-clubs",en:"The island's main investment area, beach clubs"},who:{ru:"Инвесторы",en:"Investors"},beach:{ru:"до 10 мин",en:"under 10 min"}},
@@ -1572,6 +1574,8 @@ PL.DISTRICTS=[
   {ru:"Равай",en:"Rawai",lat:7.7770,lng:98.3230,dx:16,dy:2,yield:"6–8%",vibe:{ru:"Спокойный юг, жизнь круглый год, марины",en:"Calm south, year-round living, marinas"},who:{ru:"Для себя и длительной аренды",en:"Own use and long-term rental"},beach:{ru:"5–10 мин",en:"5–10 min"}},
   {ru:"Найхарн",en:"Naiharn",lat:7.7790,lng:98.3050,dx:-16,dy:6,yield:"6–9%",vibe:{ru:"Лучшие закаты и бухты юга",en:"The best sunsets and southern bays"},who:{ru:"Ценят природу",en:"Nature lovers"},beach:{ru:"5 мин",en:"5 min"}},
   {ru:"Патонг",en:"Patong",lat:7.8960,lng:98.2960,dx:-14,dy:0,yield:"7–10%",vibe:{ru:"Самый живой турпоток острова",en:"The island's busiest tourist flow"},who:{ru:"Арендные инвесторы",en:"Rental investors"},beach:{ru:"до 10 мин",en:"under 10 min"}},
+  {ru:"Камала",en:"Kamala",lat:7.9550,lng:98.2810,dx:-13,dy:0,yield:"6–9%",vibe:{ru:"Тихий пляжный район западного побережья, семейный, Café del Mar",en:"Quiet beachside area on the west coast, family-friendly, Café del Mar"},who:{ru:"Семьи и арендные инвесторы",en:"Families and rental investors"},beach:{ru:"до 5 мин",en:"under 5 min"}},
+  {ru:"Ко Кео",en:"Koh Kaew",lat:7.9180,lng:98.3830,dx:15,dy:0,yield:"5–8%",vibe:{ru:"Восточная часть у марины Boat Lagoon, семейный район рядом с международной школой BISP, ближе к городу",en:"East side by Boat Lagoon marina, a family area next to the BISP international school, closer to town"},who:{ru:"Семьи на постоянное проживание",en:"Families living full-time"},beach:{ru:"15–20 мин",en:"15–20 min"}},
   {ru:"Най Янг",en:"Nai Yang",lat:8.0900,lng:98.3000,dx:15,dy:0,yield:"6–9%",vibe:{ru:"Тихий север у нацпарка, близко аэропорт",en:"Quiet north by the park, close to the airport"},who:{ru:"Вход в рынок",en:"Market entry"},beach:{ru:"5 мин",en:"5 min"}},
   {ru:"Май Кхао",en:"Mai Khao",lat:8.1500,lng:98.2960,dx:15,dy:0,yield:"6–8%",vibe:{ru:"Самый длинный и пустой пляж острова",en:"The longest, emptiest beach on the island"},who:{ru:"Уединение и премиум",en:"Seclusion and premium"},beach:{ru:"до 5 мин",en:"under 5 min"}}
 ];
@@ -1641,6 +1645,8 @@ function observeReveals(){
 
 /* ===== HELPERS ===== */
 function fmtUSD(n){return '$'+Math.round(n).toLocaleString('en-US');}
+/* Доходность показываем осторожно: ориентир-диапазон вокруг rental_yield_pct, а не жёсткую цифру */
+function roiRange(r){if(r==null||isNaN(r))return '';var lo=Math.max(1,r-1),hi=r+1;return '≈'+lo+'–'+hi+'%';}
 function fmtTHB(n){return '฿'+Math.round(n).toLocaleString('en-US');}
 function statusBadge(s){return '<span class="stbadge st-'+s+'">'+t('st.'+s)+'</span>';}
 function thumbDiv(p,cls){return '<div class="thumb '+(p.grad||'g1')+' '+(cls||'')+'">'+t('ph.object')+'</div>';}
@@ -1650,7 +1656,7 @@ function renderSale(){
   var car=document.getElementById('saleCar');if(!car)return;
   car.innerHTML=PL.PROPERTIES.map(function(p){
     return '<div class="prop" data-pid="'+p.property_id+'" data-loc="'+p.loc.ru+'" data-budget="'+p.budget+'" data-type="'+p.type.ru+'" onclick="openProp(\''+p.property_id+'\')">'+
-      '<div class="pic '+p.grad+'"><span>'+t('ph.object')+'</span><span class="tag">'+loc(p.loc)+'</span>'+(p.roi!=null?'<span class="roi">ROI '+p.roi+'%</span>':'')+
+      '<div class="pic '+p.grad+'"><span>'+t('ph.object')+'</span><span class="tag">'+loc(p.loc)+'</span>'+(p.roi!=null?'<span class="roi">ROI '+roiRange(p.roi)+'</span>':'')+
       '<button type="button" class="fav" onclick="event.stopPropagation();toggleFav(\''+p.property_id+'\')" aria-label="В избранное">♡</button>'+
       '<button type="button" class="cmpb" onclick="event.stopPropagation();toggleCmp(\''+p.property_id+'\')">'+t('u.cmp')+'</button></div>'+
       '<div class="body"><div class="trow"><h3>'+p.title+'</h3>'+statusBadge(p.status)+'</div>'+
@@ -1870,7 +1876,7 @@ function aiCards(ids){
   if(!items.length)return;
   var w=document.createElement('div');w.className='msg bot chat-cards';
   w.innerHTML=items.map(function(p){
-    var price=p.funnel==='sale'?('$'+Math.round(p.priceUSD/1000)+'k'+(p.roi?(' · ROI '+p.roi+'%'):'')):t('u.onreq');
+    var price=p.funnel==='sale'?('$'+Math.round(p.priceUSD/1000)+'k'+(p.roi?(' · ROI '+roiRange(p.roi)):'')):t('u.onreq');
     return '<button type="button" class="cc" onclick="closeChatToProp(\''+p.property_id+'\')">'+thumbDiv(p)+'<span class="ccb"><b>'+p.title+'</b><i>'+loc(p.loc)+' · '+loc(p.type)+'</i><u>'+price+'</u></span></button>';
   }).join('');
   cb.appendChild(w);cb.scrollTop=cb.scrollHeight;
@@ -1888,7 +1894,7 @@ function openProp(pid){
   var p=PL.byId[pid];if(!p||p.soon)return;currentPid=pid;
   var img=document.getElementById('pmImg');
   img.className='pm-img '+(p.grad||'g1');
-  img.innerHTML='<span>'+t('ph.object')+'</span><div class="pm-badges"><span class="pm-tag">'+loc(p.loc)+'</span><span class="pm-roi">'+(p.funnel==='sale'?(p.roi!=null?('ROI '+p.roi+'%'):t('u.calc')):t('book.title'))+'</span></div>';
+  img.innerHTML='<span>'+t('ph.object')+'</span><div class="pm-badges"><span class="pm-tag">'+loc(p.loc)+'</span><span class="pm-roi">'+(p.funnel==='sale'?(p.roi!=null?('ROI '+roiRange(p.roi)):t('u.calc')):t('book.title'))+'</span></div>';
   document.getElementById('pmTitle').textContent=p.title;
   document.getElementById('pmDesc').textContent=loc(p.desc);
   document.getElementById('pmPid').textContent=p.property_id;
@@ -1901,7 +1907,7 @@ function openProp(pid){
       '<div class="sp"><b>'+p.area+'</b><span>'+t('u.area')+'</span></div>'+
       '<div class="sp"><b>'+p.beds+'</b><span>'+t('u.beds')+'</span></div>'+
       '<div class="sp"><b>'+loc(p.deadline)+'</b><span>'+t('u.deadline')+'</span></div>'+
-      (p.roi!=null?'<div class="sp"><b>'+p.roi+'%</b><span>ROI</span></div>':'');
+      (p.roi!=null?'<div class="sp"><b>'+roiRange(p.roi)+'</b><span>ROI</span></div><div class="sp" style="grid-column:1/-1;border-top:0;padding-top:0"><span style="font-size:.72rem;color:var(--muted);line-height:1.5">'+t('u.roinote')+'</span></div>':'');
     document.getElementById('pmTool').innerHTML=calcHTML(p);
     wireCalc(p);
     document.getElementById('pmCta').innerHTML=
@@ -2146,7 +2152,7 @@ function openCompare(){
     [t('cmp.r.loc'),function(p){return loc(p.loc);}],
     [t('cmp.r.type'),function(p){return loc(p.type);}],
     [t('cmp.r.price'),function(p){return fmtUSD(p.priceUSD);}],
-    ['ROI',function(p){return p.roi!=null?p.roi+'%':'—';}],
+    ['ROI',function(p){return p.roi!=null?roiRange(p.roi):'—';}],
     [t('cmp.r.area'),function(p){return p.area;}],
     [t('cmp.r.beds'),function(p){return p.beds;}],
     [t('cmp.r.deadline'),function(p){return loc(p.deadline);}],
