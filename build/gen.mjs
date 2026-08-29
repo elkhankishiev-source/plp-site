@@ -42,6 +42,8 @@ const MARK_START = '/* PLP:AUTO-CATALOG:START — сгенерировано bui
 const MARK_END = '/* PLP:AUTO-CATALOG:END */';
 const MARK_RENT_START = '/* PLP:AUTO-RENTALS:START — сгенерировано build/gen.mjs из Supabase (объекты аренды); вручную не править (grad сохраняется между прогонами) */';
 const MARK_RENT_END = '/* PLP:AUTO-RENTALS:END */';
+const MARK_NY_START = '/* PLP:AUTO-NETYIELD:START — сгенерировано build/gen.mjs из Supabase rental_benchmarks (disp_yield_low/high_pct по району); вручную не править */';
+const MARK_NY_END = '/* PLP:AUTO-NETYIELD:END */';
 
 // EN-район → RU-подпись (loc.ru). loc.en приходит из Supabase objects.district.
 const DISTRICT_RU = {
@@ -309,6 +311,48 @@ function writeRentals(html, rentals) {
   return html.slice(0, ai) + block + html.slice(end);
 }
 
+// ------------------------------------------------- PL.NETYIELD (доходность района)
+// «Одна истина»: диапазон доходности района на карточках = disp_yield_low/high_pct
+// из rental_benchmarks. Если у района несколько unit_type — берём min(low)..max(high)
+// (самый широкий клиентский ориентир). Ключ = EN-название района (как в NETYIELD/DISTRICTKEY).
+function buildNetyield(benchmarks) {
+  const acc = {}; // district → { low, high }
+  for (const b of benchmarks) {
+    const d = b.district;
+    if (!d || b.disp_yield_low_pct == null || b.disp_yield_high_pct == null) continue;
+    const lo = Number(b.disp_yield_low_pct), hi = Number(b.disp_yield_high_pct);
+    if (!isFinite(lo) || !isFinite(hi)) continue;
+    if (!acc[d]) acc[d] = { low: lo, high: hi };
+    else { acc[d].low = Math.min(acc[d].low, lo); acc[d].high = Math.max(acc[d].high, hi); }
+  }
+  const out = {};
+  for (const d of Object.keys(acc).sort()) out[d] = acc[d].low + DASH + acc[d].high; // «7–11» (en-dash)
+  return out;
+}
+
+function emitNetyieldBlock(netyield) {
+  const items = Object.keys(netyield).map(d => '  ' + JSON.stringify(d) + ':' + JSON.stringify(netyield[d])).join(',\n');
+  return MARK_NY_START + '\n' +
+    'PL.NETYIELD={\n' + items + '\n};\n' +
+    MARK_NY_END;
+}
+
+function writeNetyield(html, netyield) {
+  const block = emitNetyieldBlock(netyield);
+  const s = html.indexOf(MARK_NY_START);
+  const e = html.indexOf(MARK_NY_END);
+  if (s !== -1 && e !== -1 && e > s) {
+    return html.slice(0, s) + block + html.slice(e + MARK_NY_END.length);
+  }
+  // первый прогон — оборачиваем существующий PL.NETYIELD={...};
+  const ai = html.indexOf('PL.NETYIELD=');
+  if (ai === -1) { console.error('[gen] PL.NETYIELD не найден в index.html — доходность не обновлена.'); return html; }
+  const lb = html.indexOf('{', ai);
+  const end = html.indexOf('\n};', lb);
+  if (lb === -1 || end === -1) { console.error('[gen] Не разобрал границы PL.NETYIELD — доходность не обновлена.'); return html; }
+  return html.slice(0, ai) + block + html.slice(end + 3); // включая '\n};'
+}
+
 // -------------------------------------------------------------------- SEO/pages
 function htmlEsc(s) {
   return String(s == null ? '' : s)
@@ -521,6 +565,14 @@ async function main() {
   const rentPreserve = parseExistingRentals(html);
   const rentList = buildRentals(rentals, rentPreserve);
   html = writeRentals(html, rentList);
+  // доходность района (PL.NETYIELD) из rental_benchmarks — fail-closed: пустой ответ не трогаем
+  const netyield = buildNetyield(benchmarks);
+  if (Object.keys(netyield).length) {
+    html = writeNetyield(html, netyield);
+    console.log('[gen] PL.NETYIELD обновлён из rental_benchmarks:', Object.keys(netyield).length, 'районов');
+  } else {
+    console.error('[gen] rental_benchmarks пуст — PL.NETYIELD не тронут (fail-closed).');
+  }
   fs.writeFileSync(INDEX, html);
   console.log('[gen] index.html: каталог продажи', catalog.length, '+ аренда', rentList.length, 'обновлены');
 
