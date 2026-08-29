@@ -1390,6 +1390,7 @@ ru: {
   "chat.lead":"Заполните пару полей — и я передам вашу заявку менеджеру. Ответим в течение 5 минут в рабочее время.",
   "chat.thanks":"Спасибо! Заявка у нас. Продолжим в выбранном мессенджере — я напишу первой. Если удобнее сейчас — WhatsApp +66 95-549-2587 или Telegram-бот @elnurphuket_bot.",
   "chat.neterr":"Не смогла отправить заявку — кажется, пропала связь. Напишите мне напрямую: <a href=\"https://wa.me/66955492587\" target=\"_blank\" rel=\"noopener\" style=\"color:#1a7f4b;font-weight:600\">WhatsApp +66 95-549-2587</a> — отвечу лично.",
+  "chat.aifail":"Кажется, у меня пропала связь и я не расслышала. Напишите мне напрямую: <a href=\"https://wa.me/66955492587\" target=\"_blank\" rel=\"noopener\" style=\"color:#1a7f4b;font-weight:600\">WhatsApp +66 95-549-2587</a> — отвечу лично и по делу.",
   "chat.rentreq":"Запрос на аренду принят. Подберу вариант под ваши даты и отвечу по условиям — оставьте контакт, чтобы я могла написать лично.",
   "lead.sent":"Заявка отправлена",
   "lf.goal":"Ваша цель…","lf.goal1":"Инвестиции","lf.goal2":"Для жизни","lf.goal3":"Аренда от месяца","lf.goal4":"Пока изучаю",
@@ -1560,6 +1561,7 @@ en: {
   "chat.lead":"Fill in a few fields and I will pass your request to a manager. We reply within 5 minutes during working hours.",
   "chat.thanks":"Thank you! We have your request. We will continue in your chosen messenger — I will write first. If it is easier right now: WhatsApp +66 95-549-2587 or Telegram bot @elnurphuket_bot.",
   "chat.neterr":"I couldn't send your request — the connection seems to have dropped. Message me directly: <a href=\"https://wa.me/66955492587\" target=\"_blank\" rel=\"noopener\" style=\"color:#1a7f4b;font-weight:600\">WhatsApp +66 95-549-2587</a> — I'll reply personally.",
+  "chat.aifail":"It seems my connection dropped and I missed that. Message me directly: <a href=\"https://wa.me/66955492587\" target=\"_blank\" rel=\"noopener\" style=\"color:#1a7f4b;font-weight:600\">WhatsApp +66 95-549-2587</a> — I'll reply personally and to the point.",
   "chat.rentreq":"Rental enquiry received. I will match a home to your dates and reply with terms — leave a contact so I can write to you personally.",
   "lead.sent":"Request sent",
   "lf.goal":"Your goal…","lf.goal1":"Investment","lf.goal2":"For living","lf.goal3":"Rent from a month","lf.goal4":"Just exploring",
@@ -1843,6 +1845,8 @@ function getSource(){var s={};try{s=JSON.parse(sessionStorage.getItem('pl_source
 /* ===== LEAD PIPELINE (мин. квалификация → amoCRM через n8n) ===== */
 /* Низкопривилегированный ключ ТОЛЬКО для формы сайта — не мастер, можно в публичном коде. */
 var LEAD_ENDPOINT='https://proplib.app.n8n.cloud/webhook/site-lead?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7';
+var CHAT_ENDPOINT='https://proplib.app.n8n.cloud/webhook/site-chat?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7';
+function escHtml(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 var pendingIntent=null; /* клик по объекту/сравнению/району до сбора контакта — переносим в след. заявку */
 function pushLead(p){
   var src=getSource();
@@ -2015,18 +2019,66 @@ function chatCalcReply(low){
   setTimeout(function(){aiCards([p.property_id]);},2400);
   if(!leadShown)setTimeout(function(){offerLead(false);},3400);
 }
+var chatBusy=false;
+function setChatBusy(on){
+  chatBusy=on;
+  var fld=document.getElementById('chatField');
+  var btn=fld&&fld.parentNode?fld.parentNode.querySelector('button.s'):null;
+  if(btn)btn.disabled=on;
+  if(!on&&fld&&innerWidth>760)fld.focus();
+}
+/* контекст объекта для ИИ: если чат открыт из карточки (leadFromModal → pendingIntent) */
+function chatObjCtx(){return (pendingIntent&&pendingIntent.property_id)||'';}
+/* история для ИИ: последние ~8 реплик ДО текущего сообщения, роли user/assistant, без HTML */
+function buildAIHistory(){
+  var tmp=document.createElement('div');
+  return chatHist.slice(0,-1).slice(-8).map(function(m){
+    tmp.innerHTML=String(m.h||'');
+    return {role:m.r==='me'?'user':'assistant',content:(tmp.textContent||'').trim()};
+  }).filter(function(x){return x.content;});
+}
+/* рендер живого текста Дарьи: печать через textContent (безопасно), в историю — экранированный HTML */
+function renderBotText(txt){
+  txt=String(txt||'');
+  var d=bot('',true);chatHist.push({r:'bot',h:escHtml(txt)});saveHist();
+  if(reduceMotion){d.textContent=txt;cb.scrollTop=cb.scrollHeight;return;}
+  var i=0;(function tick(){d.textContent=txt.slice(0,++i);cb.scrollTop=cb.scrollHeight;if(i<txt.length)setTimeout(tick,14);})();
+}
+/* фолбэк при сбое ИИ: реплика-подсказка + прямой контакт WhatsApp */
+function aiFail(reply){if(reply)renderBotText(reply);bot(t('chat.aifail'));}
+/* основной путь свободного вопроса — живой ИИ-бэкенд (brain_core, персона Дарья) */
+function askAI(txt){
+  setChatBusy(true);
+  var ty=typingEl();
+  var body=JSON.stringify({message:txt,history:buildAIHistory(),lang:PL.lang,context:{object_id:chatObjCtx()}});
+  var ctrl=(typeof AbortController!=='undefined')?new AbortController():null;
+  var timer=setTimeout(function(){if(ctrl)ctrl.abort();},25000);
+  var done=false;
+  function finish(){if(done)return;done=true;clearTimeout(timer);ty.remove();setChatBusy(false);}
+  fetch(CHAT_ENDPOINT,{method:'POST',headers:{'Content-Type':'text/plain'},body:body,signal:ctrl?ctrl.signal:undefined})
+    .then(function(r){return r.json().catch(function(){return {ok:false};});})
+    .then(function(data){
+      finish();
+      if(!data||data.ok===false){aiFail(data&&data.reply);return;}
+      var reply=data.reply||t('chat.r.generic');
+      renderBotText(reply);
+      var ids=(data.object_ids||[]).filter(function(id){return PL.byId&&PL.byId[id];});
+      var delay=reduceMotion?200:Math.min(reply.length*14+250,1800);
+      if(ids.length)setTimeout(function(){aiCards(ids);},delay);
+      if(data.suggest_lead&&!leadShown)setTimeout(function(){offerLead(false);},delay+400);
+    })
+    .catch(function(){finish();aiFail();});
+}
 function sendFree(){
+  if(chatBusy)return;
   var fld=document.getElementById('chatField');var txt=fld.value.trim();if(!txt)return;fld.value='';
   if(!chatStarted)openChat('free');
   me(txt);userMsgs++;
-  /* локальный сценарий-заглушка вместо живого мозга */
-  // TODO: POST -> n8n webhook (channelId='site' → brain_core, персона Дарья)
-  var topic=detectTopic(txt.toLowerCase());if(topic)lastTopic=topic;
-  if(topic==='calc'){chatCalcReply(txt.toLowerCase());return;}
-  var key='chat.r.'+(topic||'generic');
-  botT(t(key),700);
-  if(topic==='sale'){setTimeout(function(){aiCards(topSaleIds(2));},2000);}
-  if(!leadShown&&userMsgs>=2)setTimeout(function(){offerLead(false);},2800);
+  var low=txt.toLowerCase();
+  var topic=detectTopic(low);if(topic)lastTopic=topic;
+  /* быстрый локальный расчёт доходности остаётся мгновенным; всё остальное — в ИИ */
+  if(topic==='calc'){chatCalcReply(low);return;}
+  askAI(txt);
 }
 function aiCards(ids){
   var items=ids.map(function(id){return PL.byId[id];}).filter(Boolean).slice(0,3);
