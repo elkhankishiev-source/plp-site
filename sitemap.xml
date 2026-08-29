@@ -1,48 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Пока — одностраничный лендинг + якоря разделов. Полноценные ОТДЕЛЬНЫЕ
-     страницы объектов (для полной Google-индексации) появятся, когда будет
-     генератор каталога из Supabase. Хэш-ссылки объектов (#object=<id>) Google
-     не индексирует как отдельные URL, поэтому здесь их не перечисляем. -->
+<!-- Сгенерировано build/gen.mjs. Главная + якоря + отдельные страницы объектов. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://elkhankishiev-source.github.io/plp-site/</loc>
-    <lastmod>2026-08-29</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>https://elkhankishiev-source.github.io/plp-site/#sale</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://elkhankishiev-source.github.io/plp-site/#rent</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://elkhankishiev-source.github.io/plp-site/#map</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://elkhankishiev-source.github.io/plp-site/#quiz</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://elkhankishiev-source.github.io/plp-site/#about</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://elkhankishiev-source.github.io/plp-site/#faq</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://elkhankishiev-source.github.io/plp-site/#contacts</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
+  <url><loc>https://elkhankishiev-source.github.io/plp-site/</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://elkhankishiev-source.github.io/plp-site/#sale</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://elkhankishiev-source.github.io/plp-site/#rent</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://elkhankishiev-source.github.io/plp-site/#map</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://elkhankishiev-source.github.io/plp-site/#quiz</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://elkhankishiev-source.github.io/plp-site/#about</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://elkhankishiev-source.github.io/plp-site/#faq</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://elkhankishiev-source.github.io/plp-site/#contacts</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://elkhankishiev-source.github.io/plp-site/object/adora.html</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://elkhankishiev-source.github.io/plp-site/object/artrio.html</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://elkhankishiev-source.github.io/plp-site/object/balcony.html</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://elkhankishiev-source.github.io/plp-site/object/biancana.html</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://elkhankishiev-source.github.io/plp-site/object/casademonte.html</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://elkhankishiev-source.github.io/plp-site/object/cielo.html</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://elkhankishiev-source.github.io/plp-site/object/coralina.html</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://elkhankishiev-source.github.io/plp-site/object/estella.html</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://elkhankishiev-source.github.io/plp-site/object/halo1.html</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://elkhankishiev-source.github.io/plp-site/object/heritage.html</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://elkhankishiev-source.github.io/plp-site/object/katabello.html</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://elkhankishiev-source.github.io/plp-site/object/kirara.html</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://elkhankishiev-source.github.io/plp-site/object/legendary.html</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://elkhankishiev-source.github.io/plp-site/object/liberty.html</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://elkhankishiev-source.github.io/plp-site/object/modeva.html</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://elkhankishiev-source.github.io/plp-site/object/peylaa.html</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://elkhankishiev-source.github.io/plp-site/object/serenity.html</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://elkhankishiev-source.github.io/plp-site/object/sierra.html</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://elkhankishiev-source.github.io/plp-site/object/sunhills-layan.html</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://elkhankishiev-source.github.io/plp-site/object/vivana.html</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://elkhankishiev-source.github.io/plp-site/object/vivi.html</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
 </urlset>
