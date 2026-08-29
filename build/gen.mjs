@@ -188,6 +188,7 @@ function buildCatalog(objects, benchmarks, preserve) {
     const keep = preserve[pid] || {};
     const en = o.district || o.beach || '';
     const usp = (o.usp || '').trim();
+    const uspEn = (o.usp_en || '').trim() || usp; // EN-описание из usp_en, фолбэк на usp
     return {
       property_id: pid,
       title: o.name,
@@ -202,7 +203,7 @@ function buildCatalog(objects, benchmarks, preserve) {
       area: areaLabel(o),
       deadline: deadline(o.handover_date),
       status: statusLabel(o.status),
-      desc: { ru: usp, en: usp },
+      desc: { ru: usp, en: uspEn },
       calc: keep.calc || fallbackCalc(o),
     };
   });
@@ -263,6 +264,7 @@ function objectPage(o, benchmarks) {
   const dl = deadline(o.handover_date);
   const yr = yieldRange(benchmarks, en, o.type);
   const usp = (o.usp || '').trim();
+  const uspEn = (o.usp_en || '').trim(); // EN-описание; секция рендерится только если непусто
   const priceTHB = o.price_from_thb;
   const priceFmt = priceTHB ? new Intl.NumberFormat('ru-RU').format(priceTHB) + ' ฿' : '';
   const title = o.name + ' — ' + ru + ', Пхукет | Property Library';
@@ -375,6 +377,7 @@ footer a{color:var(--green);text-decoration:none}
     <div class="lbl">Ориентир доходности по району (${htmlEsc(ru)}, ${htmlEsc(t.ru.toLowerCase())}) — потенциал при активном управлении. Индивидуально, раскрывается со специалистом.</div>
   </div>
   ${usp ? '<section class="desc"><h2>Об объекте</h2><p>' + htmlEsc(usp) + '</p></section>' : ''}
+  ${uspEn ? '<section class="desc" lang="en"><h2>About</h2><p>' + htmlEsc(uspEn) + '</p></section>' : ''}
   <div class="cta">
     <a class="btn wa" href="${htmlEsc(waLink)}" rel="noopener" target="_blank">WhatsApp — узнать детали</a>
     <a class="btn primary" href="${htmlEsc(backLink)}">Смотреть на сайте</a>
@@ -416,7 +419,7 @@ async function main() {
     'objects?on_site=eq.true&order=plp_property_id' +
     '&select=plp_property_id,name,district,beach,purpose,type,price_from_thb,price_to_thb,' +
     'bedrooms,bedrooms_min,bedrooms_max,area_sqm,area_min,area_max,roi,rental_yield_pct,' +
-    'capital_growth_pct,handover_date,status,developer,distance_beach_m,usp,' +
+    'capital_growth_pct,handover_date,status,developer,distance_beach_m,usp,usp_en,' +
     'season_rates,occupancy_est_pct,maintenance_fee_thb_sqm');
   const benchmarks = await sbGet(env,
     'rental_benchmarks?select=district,unit_type,disp_yield_low_pct,disp_yield_high_pct');
