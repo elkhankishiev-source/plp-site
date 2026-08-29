@@ -40,6 +40,8 @@ const RATE = 35; // THB→USD для витринного priceUSD (как в т
 
 const MARK_START = '/* PLP:AUTO-CATALOG:START — сгенерировано build/gen.mjs из Supabase; вручную не править (calc/grad/budget сохраняются между прогонами) */';
 const MARK_END = '/* PLP:AUTO-CATALOG:END */';
+const MARK_RENT_START = '/* PLP:AUTO-RENTALS:START — сгенерировано build/gen.mjs из Supabase (объекты аренды); вручную не править (grad сохраняется между прогонами) */';
+const MARK_RENT_END = '/* PLP:AUTO-RENTALS:END */';
 
 // EN-район → RU-подпись (loc.ru). loc.en приходит из Supabase objects.district.
 const DISTRICT_RU = {
@@ -228,6 +230,82 @@ function writeIndex(html, catalog) {
   const ai = html.indexOf('PL.PROPERTIES=');
   const lb = html.indexOf('[', ai);
   const end = html.indexOf('\n];', lb) + 3; // включая '\n];'
+  return html.slice(0, ai) + block + html.slice(end);
+}
+
+// -------------------------------------------------------------- аренда (RENTALS)
+// Парсит текущий PL.RENTALS для сохранения grad по property_id.
+function parseExistingRentals(html) {
+  const s = html.indexOf(MARK_RENT_START);
+  const e = html.indexOf(MARK_RENT_END);
+  let region = (s !== -1 && e !== -1 && e > s) ? html.slice(s + MARK_RENT_START.length, e) : html;
+  const ai = region.indexOf('PL.RENTALS=');
+  if (ai === -1) return {};
+  const lb = region.indexOf('[', ai);
+  const end = region.indexOf('\n];', lb);
+  if (lb === -1 || end === -1) return {};
+  let arr = [];
+  try { arr = eval(region.slice(lb, end + 2)); } catch (err) { return {}; }
+  const preserve = {};
+  for (const p of arr) if (p && p.property_id) preserve[p.property_id] = { grad: p.grad };
+  return preserve;
+}
+
+// Короткий тег для карточки аренды: до пляжа → мин.срок → «Аренда».
+function rentTag(o) {
+  if (o.distance_beach_m) return { ru: o.distance_beach_m + ' м до моря', en: o.distance_beach_m + ' m to the sea' };
+  if (o.min_stay) return { ru: 'от ' + o.min_stay + ' мес', en: 'from ' + o.min_stay + ' mo' };
+  return { ru: 'Аренда', en: 'Rent' };
+}
+
+function buildRentals(objects, preserve) {
+  return objects.map((o, i) => {
+    const pid = o.plp_property_id;
+    const keep = preserve[pid] || {};
+    const en = o.district || o.beach || '';
+    const usp = (o.usp || '').trim();
+    const uspEn = (o.usp_en || '').trim() || usp;
+    const S = (v) => (v === undefined || v === null) ? '' : String(v).trim();
+    return {
+      property_id: pid,
+      title: o.name,
+      funnel: 'rent',
+      grad: keep.grad || ('g' + ((i % 4) + 1)),
+      loc: { ru: DISTRICT_RU[en] || en, en },
+      type: typeLabel(o.type),
+      beds: bedsLabel(o),
+      area: areaLabel(o),
+      tag: rentTag(o),
+      desc: { ru: usp, en: uspEn },
+      min_stay: (o.min_stay === 0 || o.min_stay) ? o.min_stay : null,
+      deposit: (o.deposit === 0 || o.deposit) ? o.deposit : null,
+      included: S(o.rent_included),
+      excluded: S(o.rent_excluded),
+      rules: S(o.rent_rules),
+    };
+  });
+}
+
+function emitRentalsBlock(rentals) {
+  // < → <, чтобы свободный текст из БД не мог закрыть <script>
+  const items = rentals.map(p => '  ' + JSON.stringify(p).replace(/</g, '\\u003c')).join(',\n');
+  return MARK_RENT_START + '\n' +
+    'PL.RENTALS=[\n' + items + '\n];\n' +
+    MARK_RENT_END;
+}
+
+function writeRentals(html, rentals) {
+  const block = emitRentalsBlock(rentals);
+  const s = html.indexOf(MARK_RENT_START);
+  const e = html.indexOf(MARK_RENT_END);
+  if (s !== -1 && e !== -1 && e > s) {
+    return html.slice(0, s) + block + html.slice(e + MARK_RENT_END.length);
+  }
+  // первый прогон — оборачиваем существующий PL.RENTALS=[...];
+  const ai = html.indexOf('PL.RENTALS=');
+  if (ai === -1) { console.error('[gen] PL.RENTALS не найден в index.html — аренда не обновлена.'); return html; }
+  const lb = html.indexOf('[', ai);
+  const end = html.indexOf('\n];', lb) + 3;
   return html.slice(0, ai) + block + html.slice(end);
 }
 
@@ -424,16 +502,27 @@ async function main() {
   const benchmarks = await sbGet(env,
     'rental_benchmarks?select=district,unit_type,disp_yield_low_pct,disp_yield_high_pct');
 
-  console.log('[gen] Объектов on_site=true:', objects.length, '| benchmarks:', benchmarks.length);
+  // объекты аренды: purpose IN (аренда,rent) И (on_site=true ИЛИ эталон PLP-TEST-RENT)
+  const rentals = await sbGet(env,
+    'objects?select=plp_property_id,name,district,beach,purpose,type,bedrooms,bedrooms_min,' +
+    'bedrooms_max,area_sqm,area_min,area_max,min_stay,deposit,rent_included,rent_excluded,' +
+    'rent_rules,usp,usp_en,distance_beach_m,on_site' +
+    '&and=(or(purpose.eq.' + encodeURIComponent('аренда') + ',purpose.eq.rent),' +
+    'or(on_site.eq.true,plp_property_id.eq.PLP-TEST-RENT))&order=plp_property_id');
+
+  console.log('[gen] Объектов on_site=true:', objects.length, '| benchmarks:', benchmarks.length, '| аренда:', rentals.length);
   if (!objects.length) { console.error('[gen] Пусто — прерываю, index.html не трогаю.'); process.exit(1); }
 
-  // 1) каталог в index.html (с сохранением calc/grad/budget)
+  // 1) каталог продажи + аренда в index.html (с сохранением calc/grad/budget)
   let html = fs.readFileSync(INDEX, 'utf8');
   const { preserve } = parseExisting(html);
   const catalog = buildCatalog(objects, benchmarks, preserve);
   html = writeIndex(html, catalog);
+  const rentPreserve = parseExistingRentals(html);
+  const rentList = buildRentals(rentals, rentPreserve);
+  html = writeRentals(html, rentList);
   fs.writeFileSync(INDEX, html);
-  console.log('[gen] index.html: каталог обновлён (', catalog.length, 'объектов )');
+  console.log('[gen] index.html: каталог продажи', catalog.length, '+ аренда', rentList.length, 'обновлены');
 
   // 2) страницы объектов
   if (!fs.existsSync(OBJDIR)) fs.mkdirSync(OBJDIR, { recursive: true });

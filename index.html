@@ -304,6 +304,20 @@ h3{font-size:1.12rem;font-weight:700}
 
 /* ===== carousel / property cards ===== */
 .filterbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.datefilter{margin-top:20px;background:var(--card,rgba(255,255,255,.06));border:1px solid rgba(10,10,10,.08);border-radius:16px;padding:16px 18px}
+.df-fields{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+.df-fld{display:flex;flex-direction:column;gap:5px;font-size:.78rem;font-weight:600;color:var(--muted,#8a8f7a)}
+.df-fld input[type=date]{font:inherit;font-size:.9rem;font-weight:500;color:inherit;background:rgba(255,255,255,.9);border:1px solid rgba(10,10,10,.12);border-radius:10px;padding:10px 12px;min-width:150px;cursor:pointer}
+.df-status{margin-top:12px;font-size:.82rem;color:var(--muted,#8a8f7a);line-height:1.5}
+.df-status.err{color:#c0392b}
+.df-status.ok{color:var(--olive,#5F6242);font-weight:600}
+.df-status.loading::after{content:"";display:inline-block;width:13px;height:13px;margin-left:8px;vertical-align:-2px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:dfspin .7s linear infinite}
+@keyframes dfspin{to{transform:rotate(360deg)}}
+.rentdetails{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.rd-row{display:flex;flex-direction:column;gap:3px;font-size:.86rem;line-height:1.5}
+.rd-row b{font-size:.74rem;text-transform:uppercase;letter-spacing:.03em;color:var(--muted,#8a8f7a);font-weight:700}
+.prop.booked{opacity:.5;filter:grayscale(.5);pointer-events:none;position:relative}
+.prop.booked .pic::after{content:attr(data-busy);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(10,10,10,.55);color:#fff;font-weight:700;font-size:.9rem;text-align:center;padding:12px;border-radius:inherit}
 .chipf{background:rgba(255,255,255,.85);border:1px solid rgba(10,10,10,.07);border-radius:999px;padding:9px 15px;font-size:.84rem;font-weight:600;cursor:pointer;transition:border-color .2s,background .2s,transform .15s;user-select:none}
 .chipf:hover{border-color:var(--ink)}
 .chipf:active{transform:scale(.97)}
@@ -877,6 +891,15 @@ h3{font-size:1.12rem;font-weight:700}
       </div>
       <div class="arrows"><button type="button" onclick="scrollCar('rentCar',-1)" aria-label="Назад">‹</button><button type="button" onclick="scrollCar('rentCar',1)" aria-label="Вперёд">›</button></div>
     </div>
+    <div class="datefilter reveal" id="rentDateFilter">
+      <div class="df-fields">
+        <label class="df-fld"><span data-i18n="rent.dates.in">Заезд</span><input type="date" id="rentIn" autocomplete="off"></label>
+        <label class="df-fld"><span data-i18n="rent.dates.out">Выезд</span><input type="date" id="rentOut" autocomplete="off"></label>
+        <button type="button" class="btn btn-green" id="rentCheck" onclick="checkAvailability()" disabled data-i18n="rent.dates.btn">Показать свободные</button>
+        <button type="button" class="btn btn-glass df-reset" id="rentReset" onclick="resetAvailability()" style="display:none" data-i18n="rent.dates.reset">Сбросить</button>
+      </div>
+      <div class="df-status" id="rentDateStatus" data-i18n="rent.dates.hint">Выберите даты заезда и выезда — покажем только свободные варианты. Без дат показаны все объекты.</div>
+    </div>
     <div class="filterbar reveal" id="rentFilters"></div>
     <div class="carwrap reveal">
       <div class="car" id="rentCar"></div>
@@ -1346,6 +1369,13 @@ ru: {
   "st.available":"Доступен","st.reserved":"Резерв","st.sold":"Продан","st.soon":"Скоро",
   "soon.t":"Скоро в каталоге","soon.p":"Наполняем витрину аренды: новые виллы и апартаменты появятся здесь. Оставьте запрос — подберём вручную уже сейчас.",
   "book.title":"Запрос на аренду","book.req":"Оставить запрос на аренду",
+  "u.req2":"Запросить (даты/цену)",
+  "rent.dates.in":"Заезд","rent.dates.out":"Выезд","rent.dates.btn":"Показать свободные","rent.dates.reset":"Сбросить дату",
+  "rent.dates.hint":"Выберите даты заезда и выезда — покажем только свободные варианты. Без дат показаны все объекты.",
+  "rent.dates.loading":"Проверяем доступность","rent.dates.free":"Показаны варианты, свободные на выбранные даты.",
+  "rent.dates.busy":"Занято на эти даты","rent.dates.none":"На выбранные даты свободных вариантов нет — оставьте запрос, подберём альтернативу.",
+  "rent.dates.err":"Не удалось проверить доступность — показываем все варианты. Уточните даты в заявке.",
+  "rent.d.min":"Мин. срок","rent.d.dep":"Депозит","rent.d.mo":"мес","rent.d.incl":"Включено","rent.d.excl":"Не включено","rent.d.rules":"Правила проживания",
   "cmp.title":"Сравнение объектов","cmp.cta":"Разобрать различия с менеджером","cmp.win":"выше","cmp.need2":"Отметьте для сравнения хотя бы два объекта","cmp.max":"Сравниваем до трёх объектов — уберите один",
   "cmp.r.loc":"Район","cmp.r.type":"Тип","cmp.r.price":"Цена","cmp.r.area":"Площадь","cmp.r.beds":"Спальни","cmp.r.deadline":"Сдача","cmp.r.status":"Статус",
   "tray.fav":"Подборка","tray.cmp":"Сравнить",
@@ -1517,6 +1547,13 @@ en: {
   "st.available":"Available","st.reserved":"Reserved","st.sold":"Sold","st.soon":"Soon",
   "soon.t":"Coming to the catalogue","soon.p":"We are filling the rental showcase: new villas and apartments will appear here. Leave an enquiry — we will match one manually right now.",
   "book.title":"Rental enquiry","book.req":"Leave a rental enquiry",
+  "u.req2":"Request (dates/price)",
+  "rent.dates.in":"Check-in","rent.dates.out":"Check-out","rent.dates.btn":"Show available","rent.dates.reset":"Reset dates",
+  "rent.dates.hint":"Pick check-in and check-out dates — we will show only what is free. Without dates, all homes are shown.",
+  "rent.dates.loading":"Checking availability","rent.dates.free":"Showing homes available for the selected dates.",
+  "rent.dates.busy":"Booked for these dates","rent.dates.none":"No homes available for the selected dates — leave an enquiry and we will find an alternative.",
+  "rent.dates.err":"Couldn't check availability — showing all homes. Confirm your dates in the enquiry.",
+  "rent.d.min":"Min. stay","rent.d.dep":"Deposit","rent.d.mo":"mo","rent.d.incl":"Included","rent.d.excl":"Not included","rent.d.rules":"House rules",
   "cmp.title":"Property comparison","cmp.cta":"Discuss the differences with a manager","cmp.win":"higher","cmp.need2":"Select at least two properties to compare","cmp.max":"We compare up to three properties — remove one",
   "cmp.r.loc":"Area","cmp.r.type":"Type","cmp.r.price":"Price","cmp.r.area":"Area, m²","cmp.r.beds":"Bedrooms","cmp.r.deadline":"Completion","cmp.r.status":"Status",
   "tray.fav":"Shortlist","tray.cmp":"Compare",
@@ -1618,15 +1655,11 @@ PL.PROPERTIES=[
 /* PLP:AUTO-CATALOG:END */
 
 /* ===== RENT CATALOG (реальные объекты; цены не публикуем) ===== */
+/* PLP:AUTO-RENTALS:START — сгенерировано build/gen.mjs из Supabase (объекты аренды); вручную не править (grad сохраняется между прогонами) */
 PL.RENTALS=[
-  {property_id:"PL-R-2001",title:"Proxima Villas",funnel:"rent",grad:"g4",
-   loc:{ru:"Банг Тао",en:"Bang Tao"},type:{ru:"Вилла",en:"Villa"},
-   beds:"4",area:"239–359 м²",tag:{ru:"120 м от моря",en:"120 m to the sea"},
-   desc:{ru:"Просторная 4-спальная вилла после реновации в люксовом комплексе на Банг Тао, где расположено более сорока элитных вилл. Рядом въезд в 5* курорт Лагуна, в 2 минутах ходьбы — рестораны, кафе, магазины, и всего 1 км до пляжа Бангтао.",
-         en:"A spacious renovated 4-bedroom villa in a luxury Bang Tao estate of over forty premium villas. Next to the 5* Laguna resort entrance, 2 minutes' walk to restaurants, cafes and shops, and just 1 km to Bang Tao beach."}},
-  {property_id:"PL-R-SOON1",soon:true,grad:"g1",loc:{ru:"Лагуна",en:"Laguna"},type:{ru:"Кондо",en:"Condo"}},
-  {property_id:"PL-R-SOON2",soon:true,grad:"g2",loc:{ru:"Ката",en:"Kata"},type:{ru:"Вилла",en:"Villa"}}
+  {"property_id":"PLP-TEST-RENT","title":"Вилла-эталон (тест аренды)","funnel":"rent","grad":"g1","loc":{"ru":"Банг Тао","en":"Bang Tao"},"type":{"ru":"Вилла","en":"Villa"},"beds":"3","area":"250 м²","tag":{"ru":"от 3 мес","en":"from 3 mo"},"desc":{"ru":"ЭТАЛОН-ШАБЛОН аренды для теста стандарта. 3-спальная вилла с бассейном в Банг Тао. Цена по запросу, согласуется индивидуально.","en":"RENTAL TEMPLATE for standard testing. 3-bedroom pool villa in Bang Tao. Price on request, agreed individually."},"min_stay":"3","deposit":"30000","included":"Уборка 2×/нед, вода, интернет, бассейн, парковка","excluded":"Электричество по счётчику, доп.уборки, трансфер (заказывается отдельно)","rules":"Заезд 15:00, выезд 11:00. Без животных. Тихий час после 22:00. Депозит возвращается при выезде."}
 ];
+/* PLP:AUTO-RENTALS:END */
 
 PL.byId={};
 PL.PROPERTIES.forEach(function(p){PL.byId[p.property_id]=p;});
@@ -1762,6 +1795,7 @@ function fmtTHB(n){return '฿'+Math.round(n).toLocaleString('en-US');}
 function thbOf(p){return (p&&p.calc&&p.calc.priceTHB)?p.calc.priceTHB:Math.round(((p&&p.priceUSD)||0)*RATE);}
 /* клиентский формат цены в батах: «฿4.6 млн» / «฿4.6M» */
 function fmtBaht(thb){var s=(Math.round(thb/1e5)/10).toFixed(1).replace(/\.0$/,'');return '฿'+s+(PL.lang==='en'?'M':' млн');}
+function fmtMoney(v){var n=Number(v);if(!isFinite(n))return String(v);try{return new Intl.NumberFormat(PL.lang==='en'?'en-US':'ru-RU').format(n)+' ฿';}catch(e){return n+' ฿';}}
 function areaOf(p){var a=(p&&p.area)||'';return PL.lang==='en'?a.replace(/м²/g,'m²'):a;}
 /* бюджет-бакет по РЕАЛЬНОЙ THB-цене: b1<฿5млн, b2<฿10млн, b3 ฿10млн+ */
 function budgetOf(p){var thb=thbOf(p);return thb<5e6?'b1':thb<10e6?'b2':'b3';}
@@ -1846,6 +1880,7 @@ function getSource(){var s={};try{s=JSON.parse(sessionStorage.getItem('pl_source
 /* Низкопривилегированный ключ ТОЛЬКО для формы сайта — не мастер, можно в публичном коде. */
 var LEAD_ENDPOINT='https://proplib.app.n8n.cloud/webhook/site-lead?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7';
 var CHAT_ENDPOINT='https://proplib.app.n8n.cloud/webhook/site-chat?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7';
+var AVAIL_ENDPOINT='https://proplib.app.n8n.cloud/webhook/check-availability?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7';
 function escHtml(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 var pendingIntent=null; /* клик по объекту/сравнению/району до сбора контакта — переносим в след. заявку */
 function pushLead(p){
@@ -2127,11 +2162,14 @@ function openProp(pid){
     document.getElementById('pmPrice').innerHTML='<span>'+t('u.onreq')+'</span>';
     document.getElementById('pmSpecs').innerHTML=
       '<div class="sp"><b>'+p.beds+'</b><span>'+t('u.beds')+'</span></div>'+
-      '<div class="sp"><b>'+areaOf(p)+'</b><span>'+t('u.area')+'</span></div>';
+      '<div class="sp"><b>'+areaOf(p)+'</b><span>'+t('u.area')+'</span></div>'+
+      (p.min_stay!=null?'<div class="sp"><b>'+p.min_stay+' '+t('rent.d.mo')+'</b><span>'+t('rent.d.min')+'</span></div>':'')+
+      (p.deposit!=null?'<div class="sp"><b>'+fmtMoney(p.deposit)+'</b><span>'+t('rent.d.dep')+'</span></div>':'');
     document.getElementById('pmTool').innerHTML=
+      rentDetailsHTML(p)+
       '<div class="toolbox"><div class="th">✉️ '+t('book.title')+'<span class="pid">'+p.property_id+'</span></div>'+
       '<div class="tnote">'+t('rent.b1p')+'</div>'+
-      '<button type="button" class="btn btn-primary btn-block" id="bReq" style="margin-top:10px">'+t('book.req')+'</button></div>'+
+      '<button type="button" class="btn btn-primary btn-block" id="bReq" style="margin-top:10px">'+t('u.req2')+'</button></div>'+
       '<details class="calc-more" style="margin-top:14px"><summary>📈 '+t('calc.any')+'</summary><div style="margin-top:10px">'+calcHTML({property_id:p.property_id,calc:CALC_DEFAULTS})+'</div></details>';
     wireBooking(p);wireCalc(null);
     document.getElementById('pmCta').innerHTML=
@@ -2186,12 +2224,23 @@ function openFromHash(){
 }
 function closeProp(){document.getElementById('propModal').classList.remove('open');document.body.style.overflow='';currentPid=null;clearObjectHash();}
 function leadFromModal(pid,kind){var p=PL.byId[pid];closeProp();pushLead({funnel:p.funnel,property_id:pid,goal:kind});openChat('object');setTimeout(function(){offerLead(true);},600);}
+/* блок «включено / не включено / правила» для карточки аренды (значения из БД, RU-текст) */
+function rentDetailsHTML(p){
+  var rows='';
+  if(p.included)rows+='<div class="rd-row"><b>✓ '+t('rent.d.incl')+'</b><span>'+escHtml(p.included)+'</span></div>';
+  if(p.excluded)rows+='<div class="rd-row"><b>— '+t('rent.d.excl')+'</b><span>'+escHtml(p.excluded)+'</span></div>';
+  if(p.rules)rows+='<div class="rd-row"><b>ⓘ '+t('rent.d.rules')+'</b><span>'+escHtml(p.rules)+'</span></div>';
+  if(!rows)return '';
+  return '<div class="rentdetails">'+rows+'</div>';
+}
 function wireBooking(p){
   var req=document.getElementById('bReq');if(!req)return;
   req.onclick=function(){
-    pushLead({funnel:'rent',property_id:p.property_id,goal:'rent_request'});
+    var note2=rentSelDates?('Даты: '+rentSelDates.check_in+' → '+rentSelDates.check_out):null;
+    pushLead({funnel:'rent',property_id:p.property_id,goal:'rent_request',note:note2,
+      check_in:rentSelDates?rentSelDates.check_in:null,check_out:rentSelDates?rentSelDates.check_out:null});
     closeProp();lastTopic='rent';openChat('rentreq');
-    if(chatStarted){setTimeout(function(){note('amoCRM · '+t('book.title')+' · '+p.property_id);},300);}
+    if(chatStarted){setTimeout(function(){note('amoCRM · '+t('book.title')+' · '+p.property_id+(note2?(' · '+note2):''));},300);}
   };
 }
 function calcHTML(p){
@@ -2374,6 +2423,9 @@ function buildLocChips(){
   });
 }
 var activeRent={loc:new Set(),type:new Set()};
+/* доступность по датам: null = фильтр выключен (все свободны); иначе Set свободных property_id */
+var rentAvailable=null;
+var rentSelDates=null; /* выбранные даты заезда/выезда — переносим в заявку на аренду */
 function buildRentChips(){
   var bar=document.getElementById('rentFilters');if(!bar)return;
   bar.innerHTML='';
@@ -2390,11 +2442,74 @@ function buildRentChips(){
   types.forEach(function(label,val){mk('type',val,label);});
 }
 function applyRentFilters(){
+  var shownFree=0;
   document.querySelectorAll('#rentCar .prop').forEach(function(el){
     var okL=activeRent.loc.size===0||activeRent.loc.has(el.dataset.loc);
     var okT=activeRent.type.size===0||activeRent.type.has(el.dataset.type);
     el.style.display=okL&&okT?'':'none';
+    /* доступность: помечаем «занято», клик отключён; свободные — как обычно */
+    var pid=el.dataset.pid;
+    var pic=el.querySelector('.pic');
+    if(rentAvailable&&pid){
+      var free=rentAvailable.has(pid);
+      el.classList.toggle('booked',!free);
+      if(pic)pic.setAttribute('data-busy',t('rent.dates.busy'));
+      if(free&&okL&&okT)shownFree++;
+    }else{
+      el.classList.remove('booked');
+      if(pic)pic.removeAttribute('data-busy');
+    }
   });
+  if(rentAvailable){
+    var st=document.getElementById('rentDateStatus');
+    if(st){
+      if(shownFree===0){st.className='df-status err';st.textContent=t('rent.dates.none');}
+      else{st.className='df-status ok';st.textContent=t('rent.dates.free');}
+    }
+  }
+}
+/* ===== КЛИЕНТСКИЙ ФИЛЬТР ДАТ АРЕНДЫ (сверка с бронями через WF_availability) ===== */
+function initRentDates(){
+  var ci=document.getElementById('rentIn'),co=document.getElementById('rentOut'),btn=document.getElementById('rentCheck');
+  if(!ci||!co||!btn)return;
+  var today=new Date().toISOString().slice(0,10);
+  ci.min=today;co.min=today;
+  function sync(){
+    if(ci.value){var nx=new Date(ci.value);nx.setDate(nx.getDate()+1);co.min=nx.toISOString().slice(0,10);if(co.value&&co.value<=ci.value)co.value='';}
+    var ok=ci.value&&co.value&&co.value>ci.value;
+    btn.disabled=!ok;
+  }
+  ci.onchange=sync;co.onchange=sync;sync();
+}
+function rentDateStatus(cls,key){var st=document.getElementById('rentDateStatus');if(!st)return;st.className='df-status'+(cls?(' '+cls):'');st.textContent=t(key);}
+function checkAvailability(){
+  var ci=document.getElementById('rentIn'),co=document.getElementById('rentOut');
+  if(!ci||!co||!ci.value||!co.value||co.value<=ci.value)return;
+  rentSelDates={check_in:ci.value,check_out:co.value};
+  rentDateStatus('loading','rent.dates.loading');
+  document.getElementById('rentReset').style.display='';
+  fetch(AVAIL_ENDPOINT+'&check_in='+encodeURIComponent(ci.value)+'&check_out='+encodeURIComponent(co.value))
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(!d||d.ok!==true||!Array.isArray(d.available))throw new Error('bad response');
+      rentAvailable=new Set(d.available);
+      applyRentFilters(); /* сам выставит статус: свободно / нет вариантов */
+    })
+    .catch(function(){
+      /* мягкая деградация: сеть/сервер недоступны — показываем все */
+      rentAvailable=null;applyRentFilters();
+      rentDateStatus('err','rent.dates.err');
+    });
+}
+function resetAvailability(){
+  var ci=document.getElementById('rentIn'),co=document.getElementById('rentOut');
+  if(ci)ci.value='';if(co)co.value='';
+  rentAvailable=null;rentSelDates=null;
+  var btn=document.getElementById('rentCheck');if(btn)btn.disabled=true;
+  document.getElementById('rentReset').style.display='none';
+  var co2=document.getElementById('rentOut');if(co2)co2.min=new Date().toISOString().slice(0,10);
+  applyRentFilters();
+  rentDateStatus('','rent.dates.hint');
 }
 function toggleFilter(chip){
   var f=chip.dataset.facet,v=chip.dataset.val;
@@ -2514,7 +2629,7 @@ function openQuiz(){qzIdx=0;qzAns={};document.getElementById('quizModal').classL
 function closeQuiz(){document.getElementById('quizModal').classList.remove('open');document.body.style.overflow='';}
 function quizMatch(){
   var b=qzAns.budget,ty=qzAns.type;
-  if(b==='rent'||qzAns.goal==='rent')return PL.RENTALS[0];
+  if(b==='rent'||qzAns.goal==='rent')return PL.RENTALS[0]||PL.PROPERTIES[0];
   var pool=PL.PROPERTIES.filter(function(p){return p.status!=='sold';});
   if(b){var pb=pool.filter(function(p){return budgetOf(p)===b;});if(pb.length)pool=pb;}
   if(ty){var pt=pool.filter(function(p){return p.type.ru===ty;});if(pt.length)pool=pt;}
@@ -2670,6 +2785,7 @@ window.setLang=setLang;window.toggleNav=toggleNav;
 window.openQuiz=openQuiz;window.closeQuiz=closeQuiz;window.quizNext=quizNext;window.quizBack=quizBack;window.pickQuiz=pickQuiz;
 window.openChat=openChat;window.closeChat=closeChat;window.clearChat=clearChat;window.sendFree=sendFree;window.closeChatToProp=closeChatToProp;
 window.openRentRequest=openRentRequest;
+window.checkAvailability=checkAvailability;window.resetAvailability=resetAvailability;window.pushLead=pushLead;
 window.scrollCar=scrollCar;window.toggleFilter=toggleFilter;window.onSaleSearch=onSaleSearch;window.setSaleSort=setSaleSort;window.toggleFavOnly=toggleFavOnly;
 window.toggleFav=toggleFav;window.toggleCmp=toggleCmp;window.openCompare=openCompare;window.closeCompare=closeCompare;window.cmpLead=cmpLead;window.favLead=favLead;
 window.openProp=openProp;window.closeProp=closeProp;window.leadFromModal=leadFromModal;window.askVerdict=askVerdict;window.shareProp=shareProp;
@@ -2678,6 +2794,7 @@ window.openDistrict=openDistrict;window.closeDistrict=closeDistrict;
 /* ===== INIT ===== */
 applyI18n();
 renderSale();renderRent();renderMap();renderDList();
+initRentDates();
 initCarDrag();observeReveals();updateTray();
 openFromHash(); /* шеринг-ссылка #object=<id> → открыть карточку объекта */
 addEventListener('hashchange',function(){if(isObjectHash())openFromHash();});
