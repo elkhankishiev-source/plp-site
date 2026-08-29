@@ -551,13 +551,14 @@ async function main() {
   const benchmarks = await sbGet(env,
     'rental_benchmarks?select=district,unit_type,disp_yield_low_pct,disp_yield_high_pct');
 
-  // объекты аренды: purpose IN (аренда,rent) И (on_site=true ИЛИ эталон PLP-TEST-RENT)
+  // объекты аренды: purpose IN (аренда,rent) И on_site=true.
+  // 30.08: убрано исключение для PLP-TEST-RENT — тестовый эталон утекал на публичный сайт.
   const rentals = await sbGet(env,
     'objects?select=plp_property_id,name,district,beach,purpose,type,bedrooms,bedrooms_min,' +
     'bedrooms_max,area_sqm,area_min,area_max,min_stay,deposit,rent_included,rent_excluded,' +
     'rent_rules,amenities,usp,usp_en,distance_beach_m,on_site' +
     '&and=(or(purpose.eq.' + encodeURIComponent('аренда') + ',purpose.eq.rent),' +
-    'or(on_site.eq.true,plp_property_id.eq.PLP-TEST-RENT))&order=plp_property_id');
+    'on_site.eq.true)&order=plp_property_id');
 
   console.log('[gen] Объектов on_site=true:', objects.length, '| benchmarks:', benchmarks.length, '| аренда:', rentals.length);
   if (!objects.length) { console.error('[gen] Пусто — прерываю, index.html не трогаю.'); process.exit(1); }
@@ -569,6 +570,16 @@ async function main() {
   html = writeIndex(html, catalog);
   const rentPreserve = parseExistingRentals(html);
   const rentList = buildRentals(rentals, rentPreserve);
+  // 30.08: пока в аренде нет объектов с on_site=true — показываем штатную карточку
+  // «Скоро в каталоге» (ветка p.soon в renderRent), а не пустую полосу.
+  if (!rentList.length) {
+    rentList.push({
+      property_id: 'PLP-RENT-SOON', soon: true, funnel: 'rent', grad: 'g1',
+      loc: { ru: 'Пхукет', en: 'Phuket' },
+      type: { ru: 'Вилла / апартаменты', en: 'Villa / apartment' },
+    });
+    console.log('[gen] аренда пуста → вставлена карточка «Скоро в каталоге»');
+  }
   html = writeRentals(html, rentList);
   // доходность района (PL.NETYIELD) из rental_benchmarks — fail-closed: пустой ответ не трогаем
   const netyield = buildNetyield(benchmarks);
