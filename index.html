@@ -1098,6 +1098,7 @@ ru: {
   "quiz.sub":"8 коротких шагов: цель, бюджет, район, тип, спальни и сроки. В конце соберём контакт и сразу покажем подходящий объект.",
   "quiz.cta":"Начать подбор","quiz.step":"Шаг","quiz.of":"из","quiz.back":"Назад","quiz.next":"Далее","quiz.match":"Похоже, вам подойдёт","quiz.view":"Открыть объект",
   "quiz.done.t":"Спасибо! Заявка принята","quiz.done.p":"Специалист свяжется с вами в течение 5 минут в рабочее время и пришлёт персональную подборку. Продолжить можно в чате с Дарьей или в Telegram.","quiz.done.close":"Закрыть",
+  "quiz.err.t":"Не удалось отправить","quiz.err.p":"Похоже, пропала связь. Напишите нам напрямую в WhatsApp — ответим лично и подберём вариант.",
   "q.1":"Какая у вас цель?","q.1a":"Инвестиции и доходность","q.1b":"Для жизни и переезда","q.1c":"Аренда от месяца","q.1d":"Пока изучаю рынок",
   "q.2":"На какой бюджет ориентируетесь?","q.2a":"฿3–5 млн","q.2b":"฿5–10 млн","q.2c":"฿10 млн и выше","q.2d":"Интересует аренда",
   "q.3":"Какой район интересен?","q.3a":"Банг Тао / Лагуна","q.3b":"Лаян / Сурин","q.3c":"Ката / Карон","q.3d":"Равай / Найхарн","q.3e":"Патонг","q.3f":"Север: Най Янг / Май Кхао","q.3g":"Пхукет-таун","q.3h":"Доверюсь вашему совету",
@@ -1195,6 +1196,7 @@ ru: {
   "chat.offerBtn":"Оставить контакт",
   "chat.lead":"Заполните пару полей — и я передам вашу заявку менеджеру. Ответим в течение 5 минут в рабочее время.",
   "chat.thanks":"Спасибо! Заявка у нас. Продолжим в выбранном мессенджере — я напишу первой. Если удобнее сейчас — WhatsApp +66 95-549-2587 или Telegram-бот @elnurphuket_bot.",
+  "chat.neterr":"Не смогла отправить заявку — кажется, пропала связь. Напишите мне напрямую: <a href=\"https://wa.me/66955492587\" target=\"_blank\" rel=\"noopener\" style=\"color:#1a7f4b;font-weight:600\">WhatsApp +66 95-549-2587</a> — отвечу лично.",
   "chat.rentreq":"Запрос на аренду принят. Подберу вариант под ваши даты и отвечу по условиям — оставьте контакт, чтобы я могла написать лично.",
   "lead.sent":"Заявка отправлена",
   "lf.goal":"Ваша цель…","lf.goal1":"Инвестиции","lf.goal2":"Для жизни","lf.goal3":"Аренда от месяца","lf.goal4":"Пока изучаю",
@@ -1253,6 +1255,7 @@ en: {
   "quiz.sub":"8 short steps: goal, budget, area, type, bedrooms and timing. At the end we take your contact and instantly show a matching property.",
   "quiz.cta":"Start","quiz.step":"Step","quiz.of":"of","quiz.back":"Back","quiz.next":"Next","quiz.match":"Looks like a match for you","quiz.view":"Open the property",
   "quiz.done.t":"Thank you! Request received","quiz.done.p":"A specialist will contact you within 5 minutes during working hours with a personal shortlist. You can also continue in the chat with Daria or on Telegram.","quiz.done.close":"Close",
+  "quiz.err.t":"Couldn't send","quiz.err.p":"Looks like the connection dropped. Message us directly on WhatsApp — we'll reply personally and find you a match.",
   "q.1":"What is your goal?","q.1a":"Investment and yield","q.1b":"Living and relocation","q.1c":"Renting from a month","q.1d":"Just exploring",
   "q.2":"What budget do you have in mind?","q.2a":"฿3–5M","q.2b":"฿5–10M","q.2c":"฿10M and above","q.2d":"Interested in renting",
   "q.3":"Which area interests you?","q.3a":"Bang Tao / Laguna","q.3b":"Layan / Surin","q.3c":"Kata / Karon","q.3d":"Rawai / Naiharn","q.3e":"Patong","q.3f":"North: Nai Yang / Mai Khao","q.3g":"Phuket Town","q.3h":"I trust your advice",
@@ -1350,6 +1353,7 @@ en: {
   "chat.offerBtn":"Leave contact",
   "chat.lead":"Fill in a few fields and I will pass your request to a manager. We reply within 5 minutes during working hours.",
   "chat.thanks":"Thank you! We have your request. We will continue in your chosen messenger — I will write first. If it is easier right now: WhatsApp +66 95-549-2587 or Telegram bot @elnurphuket_bot.",
+  "chat.neterr":"I couldn't send your request — the connection seems to have dropped. Message me directly: <a href=\"https://wa.me/66955492587\" target=\"_blank\" rel=\"noopener\" style=\"color:#1a7f4b;font-weight:600\">WhatsApp +66 95-549-2587</a> — I'll reply personally.",
   "chat.rentreq":"Rental enquiry received. I will match a home to your dates and reply with terms — leave a contact so I can write to you personally.",
   "lead.sent":"Request sent",
   "lf.goal":"Your goal…","lf.goal1":"Investment","lf.goal2":"For living","lf.goal3":"Rent from a month","lf.goal4":"Just exploring",
@@ -1774,6 +1778,9 @@ function getSource(){var s={};try{s=JSON.parse(sessionStorage.getItem('pl_source
 })();
 
 /* ===== LEAD PIPELINE (мин. квалификация → amoCRM через n8n) ===== */
+/* Низкопривилегированный ключ ТОЛЬКО для формы сайта — не мастер, можно в публичном коде. */
+var LEAD_ENDPOINT='https://proplib.app.n8n.cloud/webhook/site-lead?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7';
+var pendingIntent=null; /* клик по объекту/сравнению/району до сбора контакта — переносим в след. заявку */
 function pushLead(p){
   var src=getSource();
   var funnelMap={sale:'Продажа',rent:'Аренда',uk:'УК'};
@@ -1787,8 +1794,45 @@ function pushLead(p){
     qualified:!!(p.contact&&(p.goal||p.budget||p.property_id)),
     lang:PL.lang,payload:p
   },src);
-  console.log('[amoCRM lead]',JSON.stringify(lead,null,2)); // TODO: POST -> n8n webhook (channel_adapter → brain_core → amoCRM, 3 воронки: Продажа/Аренда/УК)
+  lead.__send=sendLead(lead,p); // Promise: resolve при HTTP 200 (best-effort бэкенд), reject при сбое сети
   return lead;
+}
+/* Реальная отправка в n8n → brain_core → amoCRM (3 воронки: Продажа/Аренда/УК).
+   Content-Type: text/plain — иначе CORS preflight, который вебхук не обрабатывает. */
+function sendLead(lead,p){
+  var contact=(lead.contact||'').trim();
+  // Клик-намерение без контакта (Получить КП / Смотреть / подборка / сравнение / район / бронь):
+  // не шлём (бэкенду нужен phone|contact), но запоминаем объект/цель для следующей заявки с контактом.
+  if(!contact){
+    if(lead.property_id||p.goal||p.note){
+      pendingIntent={funnel:lead.funnel,property_id:lead.property_id||null,goal:p.goal||null,note:p.note||null};
+    }
+    return Promise.resolve({ok:true,skipped:true});
+  }
+  var objectId=lead.property_id||'';
+  var funnel=lead.funnel||'sale';
+  var goal=p.goal||p.qual_goal||'';
+  var note=p.note||p.message||'';
+  var pi=pendingIntent;pendingIntent=null;
+  if(!objectId&&pi){ // заявка из чата после клика по объекту — подтягиваем контекст
+    objectId=pi.property_id||'';
+    if(pi.funnel)funnel=pi.funnel;
+    if(!goal)goal=pi.goal||'';
+    if(!note)note=pi.note||'';
+  }
+  var digits=contact.replace(/[^\d+]/g,'');
+  var phone=/\d{6,}/.test(digits)?digits:'';
+  var obj=(objectId&&typeof PL!=='undefined'&&PL.byId)?PL.byId[objectId]:null;
+  var utm={};['utm_source','utm_medium','utm_campaign','utm_content','utm_term','gclid','fbclid','referrer','landing'].forEach(function(k){if(lead[k])utm[k]=lead[k];});
+  var payload={
+    name:lead.name||'',phone:phone,contact:contact,
+    funnel:funnel,goal:goal,budget:p.budget||p.qual_budget||'',
+    object_id:objectId,object_name:obj?obj.title:'',
+    message:note,source:'website',channel:lead.channel||'',
+    consent:!!lead.consent,lang:PL.lang,utm:utm,page:location.href
+  };
+  return fetch(LEAD_ENDPOINT,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload)})
+    .then(function(r){if(!r.ok)throw new Error('http '+r.status);return r;});
 }
 
 /* ===== CHAT — Дарья (локальный сценарий-заглушка) ===== */
@@ -1882,11 +1926,11 @@ function showLead(){
     if(send.disabled)return;
     var funnel=(goal.value==='rent'||lastTopic==='rent')?'rent':'sale';
     var lead=pushLead({funnel:funnel,name:f.querySelector('.lf-name').value.trim(),contact:f.querySelector('.lf-phone').value.trim(),channel:f.querySelector('.lf-ch').value,consent:true,goal:lastTopic||'chat',qual_goal:goal.value,qual_budget:budget.value});
-    f.remove();me(t('lead.sent'));
-    setTimeout(function(){
+    f.remove();me(t('lead.sent'));var gv=goal.value,bv=budget.value;
+    lead.__send.then(function(){
       bot(t('chat.thanks'));
-      note('amoCRM · '+lead.funnel_title+' · '+(lead.utm_source||lead.referrer||'direct')+(lead.property_id?(' · '+lead.property_id):'')+' · '+goal.value+'/'+budget.value);
-    },500);
+      note('amoCRM · '+lead.funnel_title+' · '+(lead.utm_source||lead.referrer||'direct')+(lead.property_id?(' · '+lead.property_id):'')+' · '+gv+'/'+bv);
+    }).catch(function(){bot(t('chat.neterr'));});
   };
 }
 function detectTopic(low){
@@ -2291,20 +2335,28 @@ function submitQuiz(){
   if(document.getElementById('qzHp').value.trim()){closeQuiz();return;}
   if(Date.now()-qzRenderedAt<1200)return;
   if(!document.getElementById('qzOk').checked)return;
+  var qzSend=document.getElementById('qzSend');if(qzSend)qzSend.disabled=true; // анти-дубль пока идёт сеть
   var m=quizMatch();
-  pushLead({
+  var lead=pushLead({
     funnel:(qzAns.budget==='rent'||qzAns.goal==='rent')?'rent':'sale',
     property_id:m.property_id,
     name:document.getElementById('qzName').value.trim(),
     contact:document.getElementById('qzContact').value.trim(),
     channel:qzAns.channel,consent:true,goal:qzAns.goal,budget:qzAns.budget,answers:qzAns
   });
-  document.getElementById('qzBody').innerHTML='<div class="qz-done"><div class="ic">✓</div><h3>'+t('quiz.done.t')+'</h3><p>'+t('quiz.done.p')+'</p>'+
-    '<div class="qz-match" style="margin-top:18px">'+thumbDiv(m)+'<div><div class="k">'+t('quiz.match')+'</div><div class="v">'+(m.title||t('soon.t'))+' · '+loc(m.loc)+'</div><div class="pid">'+m.property_id+'</div></div></div></div>';
-  document.getElementById('qzFoot').innerHTML='<button type="button" class="qz-back" onclick="closeQuiz()">'+t('quiz.done.close')+'</button>'+
-    (m.soon?'':('<button type="button" class="qz-next" onclick="closeQuiz();openProp(\''+m.property_id+'\')">'+t('quiz.view')+'</button>'));
-  document.getElementById('qzStep').textContent='';
-  document.getElementById('qzBar').style.width='100%';
+  lead.__send.then(function(){
+    document.getElementById('qzBody').innerHTML='<div class="qz-done"><div class="ic">✓</div><h3>'+t('quiz.done.t')+'</h3><p>'+t('quiz.done.p')+'</p>'+
+      '<div class="qz-match" style="margin-top:18px">'+thumbDiv(m)+'<div><div class="k">'+t('quiz.match')+'</div><div class="v">'+(m.title||t('soon.t'))+' · '+loc(m.loc)+'</div><div class="pid">'+m.property_id+'</div></div></div></div>';
+    document.getElementById('qzFoot').innerHTML='<button type="button" class="qz-back" onclick="closeQuiz()">'+t('quiz.done.close')+'</button>'+
+      (m.soon?'':('<button type="button" class="qz-next" onclick="closeQuiz();openProp(\''+m.property_id+'\')">'+t('quiz.view')+'</button>'));
+    document.getElementById('qzStep').textContent='';
+    document.getElementById('qzBar').style.width='100%';
+  }).catch(function(){
+    document.getElementById('qzBody').innerHTML='<div class="qz-done"><div class="ic">!</div><h3>'+t('quiz.err.t')+'</h3><p>'+t('quiz.err.p')+'</p>'+
+      '<div style="margin-top:18px"><a class="btn btn-green btn-block" href="https://wa.me/66955492587" target="_blank" rel="noopener">WhatsApp · +66 95-549-2587</a></div></div>';
+    document.getElementById('qzFoot').innerHTML='<button type="button" class="qz-back" onclick="closeQuiz()">'+t('quiz.done.close')+'</button>';
+    if(qzSend)qzSend.disabled=false;
+  });
 }
 
 /* ===== MAP + DISTRICTS ===== */
