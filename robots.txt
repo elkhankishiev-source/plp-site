@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://elkhankishiev-source.github.io/plp-site/sitemap.xml
