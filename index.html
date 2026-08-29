@@ -1156,7 +1156,7 @@ h3{font-size:1.12rem;font-weight:700}
     </div>
     <div class="footer-bottom">
       <span data-i18n="ft.copy">Property Library Phuket © 2022</span>
-      <span data-i18n="ft.policy">Политика конфиденциальности</span>
+      <a href="privacy.html" data-i18n="ft.policy">Политика конфиденциальности</a>
     </div>
   </div>
 </footer>
@@ -1754,11 +1754,21 @@ function observeReveals(){
 /* ===== HELPERS ===== */
 function fmtUSD(n){return '$'+Math.round(n).toLocaleString('en-US');}
 /* Ориентировочный ПОТЕНЦИАЛ доходности по РАЙОНУ (клиентские диапазоны, не пугающе-низко); точная доходность — индивидуально со специалистом */
+/* PLP:AUTO-NETYIELD:START — сгенерировано build/gen.mjs из Supabase rental_benchmarks (disp_yield_low/high_pct по району); вручную не править */
 PL.NETYIELD={
-  "Bang Tao":"7–11","Cherng Talay":"7–11","Layan":"6–9","Surin":"6–10",
-  "Kamala":"7–10","Kata":"7–10","Karon":"7–10","Rawai":"6–10",
-  "Nai Harn":"7–11","Nai Yang":"6–9","Patong":"8–12","Koh Kaew":"6–8","Phuket Town":"6–8"
+  "Bang Tao":"7–11",
+  "Cherng Talay":"7–11",
+  "Kamala":"7–10",
+  "Kata":"7–10",
+  "Koh Kaew":"6–8",
+  "Layan":"6–9",
+  "Nai Harn":"7–11",
+  "Nai Yang":"6–9",
+  "Patong":"8–12",
+  "Rawai":"6–10",
+  "Surin":"6–10"
 };
+/* PLP:AUTO-NETYIELD:END */
 /* маппинг рус/лат названий районов → ключ справочника NETYIELD */
 PL.DISTRICTKEY={
   "банг тао":"Bang Tao","bang tao":"Bang Tao",
@@ -1933,6 +1943,8 @@ function sendLead(lead,p){
     message:note,source:'website',channel:lead.channel||'',
     consent:!!lead.consent,lang:PL.lang,utm:utm,page:location.href
   };
+  // тёплый хендофф из чата: боли/цель/бюджет клиента (site-chat lead_summary) — в message И meta, чтобы менеджер видел
+  if(p.lead_summary){payload.meta={lead_summary:p.lead_summary};payload.message=(payload.message?payload.message+' | ':'')+'[Чат] '+p.lead_summary;}
   return fetch(LEAD_ENDPOINT,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload)})
     .then(function(r){if(!r.ok)throw new Error('http '+r.status);return r;});
 }
@@ -1940,6 +1952,7 @@ function sendLead(lead,p){
 /* ===== CHAT — Дарья (локальный сценарий-заглушка) ===== */
 var cb=document.getElementById('chatbody');
 var chatStarted=false,leadShown=false,userMsgs=0,lastTopic=null;
+var lastLeadSummary=null; /* боли/цель/бюджет клиента из ответа site-chat (suggest_lead) — прикладываем к чат-лиду */
 var chatHist=[];try{chatHist=JSON.parse(localStorage.getItem('pl_chat')||'[]');}catch(e){}
 function saveHist(){try{localStorage.setItem('pl_chat',JSON.stringify(chatHist.slice(-40)));}catch(e){}}
 function bot(html,noSave){var d=document.createElement('div');d.className='msg bot';d.innerHTML=html;cb.appendChild(d);cb.scrollTop=cb.scrollHeight;if(!noSave){chatHist.push({r:'bot',h:html});saveHist();}return d;}
@@ -2027,7 +2040,7 @@ function showLead(){
     if(Date.now()-renderedAt<1500){bot(t('lf.wait'));return;}
     if(send.disabled)return;
     var funnel=(goal.value==='rent'||lastTopic==='rent')?'rent':'sale';
-    var lead=pushLead({funnel:funnel,name:f.querySelector('.lf-name').value.trim(),contact:f.querySelector('.lf-phone').value.trim(),channel:f.querySelector('.lf-ch').value,consent:true,goal:lastTopic||'chat',qual_goal:goal.value,qual_budget:budget.value});
+    var lead=pushLead({funnel:funnel,name:f.querySelector('.lf-name').value.trim(),contact:f.querySelector('.lf-phone').value.trim(),channel:f.querySelector('.lf-ch').value,consent:true,goal:lastTopic||'chat',qual_goal:goal.value,qual_budget:budget.value,lead_summary:lastLeadSummary});
     f.remove();me(t('lead.sent'));var gv=goal.value,bv=budget.value;
     lead.__send.then(function(){
       bot(t('chat.thanks'));
@@ -2095,6 +2108,7 @@ function askAI(txt){
     .then(function(data){
       finish();
       if(!data||data.ok===false){aiFail(data&&data.reply);return;}
+      if(data.lead_summary)lastLeadSummary=String(data.lead_summary).slice(0,500);
       var reply=data.reply||t('chat.r.generic');
       renderBotText(reply);
       var ids=(data.object_ids||[]).filter(function(id){return PL.byId&&PL.byId[id];});
@@ -2126,7 +2140,7 @@ function aiCards(ids){
   cb.appendChild(w);cb.scrollTop=cb.scrollHeight;
 }
 function closeChatToProp(pid){closeChat();openProp(pid);}
-function clearChat(){chatHist=[];leadShown=false;chatStarted=false;userMsgs=0;lastTopic=null;saveHist();cb.innerHTML='';openChat('reset');}
+function clearChat(){chatHist=[];leadShown=false;chatStarted=false;userMsgs=0;lastTopic=null;lastLeadSummary=null;saveHist();cb.innerHTML='';openChat('reset');}
 function closeChat(){document.getElementById('chatwin').classList.remove('open');document.getElementById('fab').style.display='flex';}
 
 /* ===== MOBILE NAV ===== */
