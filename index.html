@@ -442,7 +442,7 @@ h3{font-size:1.12rem;font-weight:700}
 .cmp-grid .cv .wb{font-size:.6rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--olive)}
 /* property modal */
 .pm-card{position:relative;background:#fff;border-radius:24px;overflow:hidden;width:min(940px,100%);max-height:90vh;display:grid;box-shadow:0 40px 90px rgba(20,18,14,.4)}
-@media(min-width:900px){.pm-card{grid-template-columns:1.02fr 1fr}}
+@media(min-width:900px){.pm-card{grid-template-columns:1.02fr 1fr}.pm-body{min-height:0;max-height:90vh}}
 @media(max-width:899px){.pm-card{overflow-y:auto;max-height:92vh}}
 .pm-img{position:relative;overflow:hidden;min-height:220px;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:600;color:rgba(10,10,10,.45)}
 @media(max-width:899px){.pm-img{max-height:30vh}}
@@ -582,11 +582,11 @@ h3{font-size:1.12rem;font-weight:700}
         <button type="button" class="btn btn-primary" onclick="openQuiz()" data-i18n="hero.cta1">Подобрать за 10 минут</button>
         <a class="btn btn-ghost" href="#sale" data-i18n="hero.cta2">Смотреть объекты</a>
       </div>
-      <p class="hero-note" data-i18n="hero.note">Бесплатная консультация · отвечаем в течение 3 минут</p>
+      <p class="hero-note" data-i18n="hero.note">Бесплатная консультация · отвечаем в течение 5 минут в рабочее время</p>
     </div>
     <div class="reveal">
       <div class="hero-photo" role="img" aria-label="Фото Эльнура Ханкишиева, основателя Property Library Phuket">
-        <button type="button" class="hero-float" onclick="openChat('hero')"><span class="dot"></span><span data-i18n="hero.float">Ответим за 3 минуты</span></button>
+        <button type="button" class="hero-float" onclick="openChat('hero')"><span class="dot"></span><span data-i18n="hero.float">Ответим в течение 5 минут</span></button>
         <span class="ph-label" data-i18n="ph.elnur">фото Эльнура</span>
       </div>
     </div>
@@ -598,7 +598,7 @@ h3{font-size:1.12rem;font-weight:700}
   <div class="trust" aria-label="Факты об агентстве">
     <div class="trust-grid">
       <div><div class="trust-num" data-i18n="trust.1v">5+ лет</div><div class="trust-label" data-i18n="trust.1k">В сфере инвестиционной недвижимости</div></div>
-      <div><div class="trust-num">237+</div><div class="trust-label" data-i18n="trust.2k">Реализованных проектов</div></div>
+      <div><div class="trust-num">237+</div><div class="trust-label" data-i18n="trust.2k">Закрытых сделок</div></div>
       <div><div class="trust-num" data-i18n="trust.3v">450+ млн ฿</div><div class="trust-label" data-i18n="trust.3k">Помогли инвестировать за год</div></div>
       <div><div class="trust-num">6–15%</div><div class="trust-label" data-i18n="trust.4k">Средняя доходность</div></div>
     </div>
@@ -613,7 +613,7 @@ h3{font-size:1.12rem;font-weight:700}
       <h2 id="why-title" data-i18n="why.h2">Пхукет — больше, чем просто курорт</h2>
     </div>
     <div class="why-grid">
-      <div class="why-card reveal"><div class="num">6–15%</div><h3 data-i18n="why.1t">Высокая доходность</h3><p data-i18n="why.1p">Потенциал доходности 6–12% годовых — в зависимости от объекта и стратегии.</p></div>
+      <div class="why-card reveal"><div class="num">6–15%</div><h3 data-i18n="why.1t">Высокая доходность</h3><p data-i18n="why.1p">Потенциал доходности 6–15% годовых — в зависимости от объекта и стратегии.</p></div>
       <div class="why-card reveal"><div class="num">Eco</div><h3 data-i18n="why.2t">Здоровая экология</h3><p data-i18n="why.2p">Чистый воздух, море и природа без тяжёлой промышленности.</p></div>
       <div class="why-card reveal"><div class="num">Edu</div><h3 data-i18n="why.3t">Международное образование</h3><p data-i18n="why.3p">Школы мирового уровня — UWC, BISP — рядом с домом.</p></div>
       <div class="why-card reveal"><div class="num">↑</div><h3 data-i18n="why.4t">Стабильный рост</h3><p data-i18n="why.4p">Премиальные виллы дорожают на 12–18% в год, кондо — на 7–10%.</p></div>
@@ -621,7 +621,7 @@ h3{font-size:1.12rem;font-weight:700}
     <div class="wstats reveal" aria-label="Цифры рынка">
       <div class="ws"><b>+12–18%</b><span data-i18n="why.s1k">виллы премиум за год · кондо +7–10%</span></div>
       <div class="ws"><b>6–15%</b><span data-i18n="why.s2k">годовых на аренде</span></div>
-      <div class="ws"><b data-i18n="why.s3v">от ฿3 млн</b><span data-i18n="why.s3k">вход в рынок острова</span></div>
+      <div class="ws"><b data-i18n="why.s3v">от ฿3.9 млн</b><span data-i18n="why.s3k">вход в рынок острова</span></div>
       <div class="ws"><b data-i18n="why.s4v">12 мес</b><span data-i18n="why.s4k">спрос на аренду круглый год</span></div>
     </div>
     <p class="wsrc reveal" data-i18n="why.src">По данным анализа рынка Пхукета, 2026 — динамика зависит от района и проекта; точные цифры покажем на конкретных объектах.</p>
@@ -757,7 +757,7 @@ h3{font-size:1.12rem;font-weight:700}
           <path class="island" d="M120,20 C160,15 190,45 185,90 C182,120 200,140 195,175 C190,205 215,225 210,260 C206,290 225,315 218,350 C212,382 190,400 185,430 C180,462 195,485 175,510 C158,532 120,545 100,525 C82,508 95,485 85,460 C76,437 55,430 52,400 C49,372 62,352 55,325 C48,300 32,285 38,255 C44,228 60,215 58,185 C56,158 42,140 50,110 C58,80 85,25 120,20 Z"></path>
           <g id="mapMarkers"></g>
         </svg>
-        <span class="maplabel" data-i18n="map.badge">12 районов · объекты из базы</span>
+        <span class="maplabel" data-i18n="map.badge">14 районов · объекты из базы</span>
       </div>
       <div class="dlist" id="dList"></div>
     </div>
@@ -820,11 +820,11 @@ h3{font-size:1.12rem;font-weight:700}
     </div>
     <div class="reveal">
       <span class="kicker" data-i18n="who.lab">Основатель и директор</span>
-      <h2 id="about-title" data-i18n="who.h2">Приветствую! Я&nbsp;— Эльнур Ханкишиев</h2>
+      <h2 id="about-title" data-i18n="who.h2">Здравствуйте! Меня зовут Эльнур Ханкишиев</h2>
       <p class="sub" data-i18n="who.p1">В 2011 году я впервые оказался на Пхукете — и сразу почувствовал, что это место особенное. Несколько раз я возвращался сюда снова и снова, пока однажды не решил остаться.</p>
       <p class="sub" data-i18n="who.p2">Более 5 лет я помогаю другим людям сделать этот остров своим домом — так же, как когда-то сделал это сам. Вам не придётся разбираться в рынке, переговорах и документах — мы всё объясним простыми словами и пройдём с вами путь до ключей в руках.</p>
       <div class="metrics">
-        <div><b>237+</b><span data-i18n="who.m1">реализованных проектов</span></div>
+        <div><b>237+</b><span data-i18n="who.m1">закрытых сделок</span></div>
         <div><b data-i18n="who.m2v">450+ млн ฿</b><span data-i18n="who.m2">помог инвестировать за год</span></div>
         <div><b>6–15%</b><span data-i18n="who.m3">средняя доходность</span></div>
         <div><b data-i18n="who.m4v">5+ лет</b><span data-i18n="who.m4">в сфере недвижимости</span></div>
@@ -910,7 +910,7 @@ h3{font-size:1.12rem;font-weight:700}
 <div class="container reveal">
   <div class="final">
     <h2 data-i18n="cta.h2">Поможем выбрать, купить и переехать</h2>
-    <p class="sub" data-i18n="cta.p">Оставьте заявку — ответим в течение 3 минут и бесплатно проконсультируем, чтобы подобрать лучший вариант для покупки или аренды.</p>
+    <p class="sub" data-i18n="cta.p">Оставьте заявку — ответим в течение 5 минут в рабочее время и бесплатно проконсультируем, чтобы подобрать лучший вариант для покупки или аренды.</p>
     <div class="final-cta">
       <button type="button" class="btn btn-green" onclick="openChat('consult')" data-i18n="cta.b1">Оставить заявку</button>
       <a class="btn" style="background:#fff;color:var(--ink)" href="https://wa.me/66955492587" target="_blank" rel="noopener" data-i18n="cta.b2">Написать в WhatsApp</a>
@@ -940,7 +940,7 @@ h3{font-size:1.12rem;font-weight:700}
       <div>
         <h3 data-i18n="ft.contacts">Контакты</h3>
         <ul>
-          <li><a href="tel:+66954143874">+(66) 95-414-3874</a></li>
+          <li><a href="tel:+66955492587">+(66) 95-549-2587</a></li>
           <li><a href="mailto:info@property-library.com">info@property-library.com</a></li>
           <li>Thep Krasattri 134/137 Cherngtaley, Bangtao, Phuket</li>
         </ul>
@@ -956,7 +956,7 @@ h3{font-size:1.12rem;font-weight:700}
       </div>
     </div>
     <div class="footer-bottom">
-      <span data-i18n="ft.copy">Property Library Phuket ©2025 · с 2022</span>
+      <span data-i18n="ft.copy">Property Library Phuket © 2022</span>
       <span data-i18n="ft.policy">Политика конфиденциальности</span>
     </div>
   </div>
@@ -1055,15 +1055,15 @@ ru: {
   "hero.h1":"Мы уже выбрали Пхукет — поможем и&nbsp;вам",
   "hero.lead":"Подберем недвижимость для покупки или аренды, оформим сделку, поможем с визой и обустройством. Все под ключ — от первого звонка до заезда.",
   "hero.cta1":"Подобрать за 10 минут","hero.cta2":"Смотреть объекты",
-  "hero.note":"Бесплатная консультация · отвечаем в течение 3 минут","hero.float":"Ответим за 3 минуты",
+  "hero.note":"Бесплатная консультация · отвечаем в течение 5 минут в рабочее время","hero.float":"Ответим в течение 5 минут",
   "ph.elnur":"фото Эльнура","ph.object":"фото скоро",
-  "trust.1v":"5+ лет","trust.1k":"В сфере инвестиционной недвижимости","trust.2k":"Реализованных проектов","trust.3v":"450+ млн ฿","trust.3k":"Помогли инвестировать за год","trust.4k":"Средняя доходность",
+  "trust.1v":"5+ лет","trust.1k":"В сфере инвестиционной недвижимости","trust.2k":"Закрытых сделок","trust.3v":"450+ млн ฿","trust.3k":"Помогли инвестировать за год","trust.4k":"Средняя доходность",
   "why.lab":"Почему Пхукет","why.h2":"Пхукет — больше, чем просто курорт",
-  "why.1t":"Высокая доходность","why.1p":"Потенциал доходности 6–12% годовых — в зависимости от объекта и стратегии.",
+  "why.1t":"Высокая доходность","why.1p":"Потенциал доходности 6–15% годовых — в зависимости от объекта и стратегии.",
   "why.2t":"Здоровая экология","why.2p":"Чистый воздух, море и природа без тяжёлой промышленности.",
   "why.3t":"Международное образование","why.3p":"Школы мирового уровня — UWC, BISP — рядом с домом.",
   "why.4t":"Стабильный рост","why.4p":"Премиальные виллы дорожают на 12–18% в год, кондо — на 7–10%.",
-  "why.s1k":"виллы премиум за год · кондо +7–10%","why.s2k":"годовых на аренде","why.s3v":"от ฿3 млн","why.s3k":"вход в рынок острова","why.s4v":"12 мес","why.s4k":"спрос на аренду круглый год",
+  "why.s1k":"виллы премиум за год · кондо +7–10%","why.s2k":"годовых на аренде","why.s3v":"от ฿3.9 млн","why.s3k":"вход в рынок острова","why.s4v":"12 мес","why.s4k":"спрос на аренду круглый год",
   "why.src":"По данным анализа рынка Пхукета, 2026 — динамика зависит от района и проекта; точные цифры покажем на конкретных объектах.",
   "sale.lab":"Продажа","sale.h2":"Проверенные объекты в продаже",
   "sale.sub":"Каждый проект проходит нашу внутреннюю проверку перед публикацией. Нажмите на карточку — внутри детали и калькулятор доходности.",
@@ -1091,7 +1091,7 @@ ru: {
   "rent.upcta":"Смотреть объекты в продаже","rent.upquiz":"Подобрать за 10 минут",
   "map.lab":"География","map.h2":"Район решает половину вопроса",
   "map.sub":"Один и тот же бюджет в разных частях острова даёт разную жизнь и разную доходность. Нажмите на метку или карточку района.",
-  "map.badge":"12 районов · объекты из базы","map.island":"Пхукет",
+  "map.badge":"14 районов · объекты из базы","map.island":"Пхукет",
   "d.yield":"ориентир доходности","d.beach":"до пляжа","d.count":"объектов в базе","d.who":"Кому подходит: ",
   "d.none":"Сейчас в открытой базе нет объектов в этом районе — подберём под запрос.","d.cta":"Подобрать объект: ","d.inbase":" в базе · ",
   "quiz.lab":"Подбор за 10 минут","quiz.h2":"Пройдите квиз — пришлём подборку под ваши задачи",
@@ -1116,10 +1116,10 @@ ru: {
   "do.6t":"Удалённое оформление","do.6p":"Купить или арендовать можно за тысячи километров.",
   "val.lab":"Наши ценности","val.h2":"Почему с нами спокойно",
   "val.1":"Честно и на равных","val.2":"Без давления","val.3":"Простым языком","val.4":"На стороне клиента","val.5":"Сервис до и после сделки","val.6":"Прозрачные цифры",
-  "who.lab":"Основатель и директор","who.h2":"Приветствую! Я&nbsp;— Эльнур Ханкишиев",
+  "who.lab":"Основатель и директор","who.h2":"Здравствуйте! Меня зовут Эльнур Ханкишиев",
   "who.p1":"В 2011 году я впервые оказался на Пхукете — и сразу почувствовал, что это место особенное. Несколько раз я возвращался сюда снова и снова, пока однажды не решил остаться.",
   "who.p2":"Более 5 лет я помогаю другим людям сделать этот остров своим домом — так же, как когда-то сделал это сам. Вам не придётся разбираться в рынке, переговорах и документах — мы всё объясним простыми словами и пройдём с вами путь до ключей в руках.",
-  "who.m1":"реализованных проектов","who.m2v":"450+ млн ฿","who.m2":"помог инвестировать за год","who.m3":"средняя доходность","who.m4v":"5+ лет","who.m4":"в сфере недвижимости",
+  "who.m1":"закрытых сделок","who.m2v":"450+ млн ฿","who.m2":"помог инвестировать за год","who.m3":"средняя доходность","who.m4v":"5+ лет","who.m4":"в сфере недвижимости",
   "who.cta":"Задать вопрос в WhatsApp",
   "steps.lab":"Пошаговый процесс","steps.h2":"Сопровождаем на каждом этапе",
   "st.1t":"Знакомство","st.1p":"Уточняем цели и подбираем релевантные варианты.",
@@ -1151,7 +1151,7 @@ ru: {
   "faq.6q":"Сколько стоят ваши услуги?",
   "faq.6a":"Для наших клиентов услуги бесплатны. Мы — аккредитованные официальные представители застройщиков и независимые эксперты рынка. Вы получаете эксклюзивные предложения до старта открытых продаж, персональные условия, юридическое сопровождение сделки и управление арендой после покупки.",
   "cta.h2":"Поможем выбрать, купить и переехать",
-  "cta.p":"Оставьте заявку — ответим в течение 3 минут и бесплатно проконсультируем, чтобы подобрать лучший вариант для покупки или аренды.",
+  "cta.p":"Оставьте заявку — ответим в течение 5 минут в рабочее время и бесплатно проконсультируем, чтобы подобрать лучший вариант для покупки или аренды.",
   "cta.b1":"Оставить заявку","cta.b2":"Написать в WhatsApp","cta.b3":"Перейти в Telegram-бот",
   "ft.tag":"Мы уже выбрали Пхукет, поможем и вам. Все под ключ — от первого звонка до заезда.",
   "ft.menu":"Меню","ft.buy":"Покупка","ft.contacts":"Контакты","ft.connect":"Мы на связи","ft.bot":"Консьерж в Telegram 24/7","ft.tg":"Telegram-канал","ft.policy":"Политика конфиденциальности",
@@ -1180,20 +1180,20 @@ ru: {
   "v.t.mid":"при таких вводных объект выглядит рабочим вариантом — сверьте цифры с менеджером по конкретному юниту, это бесплатно",
   "v.t.lo":"при таких вводных считать объект инвестицией стоит осторожно — обсудите с менеджером, за счёт чего можно улучшить экономику",
   "v.note":"Разбор по вашим цифрам — не инвестиционная рекомендация.",
-  "ft.copy":"Property Library Phuket ©2025 · с 2022",
+  "ft.copy":"Property Library Phuket © 2022",
   "chat.fab":"Дарья · на связи","chat.name":"Дарья · Property Library","chat.sub":"онлайн · отвечает сразу","chat.placeholder":"Напишите сообщение…",
-  "chat.botline":"Личный диалог. Отвечаем в течение 3 минут в рабочее время",
+  "chat.botline":"Личный диалог. Отвечаем в течение 5 минут в рабочее время",
   "chat.hello":"Здравствуйте! Я Дарья, менеджер Property Library из команды Эльнура. Помогу с покупкой, арендой и любым вопросом по Пхукету. Что вам интересно?",
   "chat.menu1":"Купить / инвестировать","chat.menu2":"Аренда от месяца","chat.menu3":"Услуги и сопровождение","chat.menu4":"Оставить контакт",
-  "chat.r.sale":"Хороший запрос. Вход в рынок — от ฿3 млн, доходность 6–15% годовых в зависимости от района и проекта. Покажу пару вариантов из нашей базы — а под вашу задачу соберу подборку лично.",
+  "chat.r.sale":"Хороший запрос. Вход в рынок — от ฿3.9 млн, доходность 6–15% годовых в зависимости от района и проекта. Покажу пару вариантов из нашей базы — а под вашу задачу соберу подборку лично.",
   "chat.r.rent":"Мы сдаём в долгосрочную аренду — от месяца и дольше. Цены и условия по каждому объекту называем по запросу: напишите район, даты и бюджет — подберу вариант. Оставьте WhatsApp или Telegram — отвечу лично.",
   "chat.r.service":"Мы закрываем всё под ключ: юристы по тайскому праву, визы, дизайн, строительство и управление арендой после покупки. Для клиентов услуги бесплатны. Расскажите вашу ситуацию — подскажу, с чего начать.",
   "chat.r.calc":"Смотрю по нашей посезонной модели. {o} ({d}): чистыми ~{n} в год, ориентир доходности по району ~{y}% годовых, окупаемость ~{p} лет. Это ориентир — точную доходность по юниту рассчитаем индивидуально: она зависит от объекта, стратегии и управления. В карточке объекта можно подправить любое допущение — загрузку, ставки, расходы. Оставьте контакт — соберу точный расчёт лично.",
-  "chat.r.support":"Понимаю. Чтобы не ввести вас в заблуждение, уточню детали у Эльнура и вернусь с точным ответом. Оставьте WhatsApp или Telegram — отвечу лично в течение 3 минут в рабочее время.",
+  "chat.r.support":"Понимаю. Чтобы не ввести вас в заблуждение, уточню детали у Эльнура и вернусь с точным ответом. Оставьте WhatsApp или Telegram — отвечу лично в течение 5 минут в рабочее время.",
   "chat.r.generic":"Хороший вопрос. По точным цифрам и условиям сверюсь с Эльнуром, чтобы ответить без ошибок. Оставьте WhatsApp или Telegram — вернусь с ответом лично. А пока могу показать объекты под ваш бюджет.",
   "chat.offerLead":"Чтобы прислать подборку и ответить предметно, мне нужны цель, бюджет и контакт — дальше продолжим в удобном мессенджере.",
   "chat.offerBtn":"Оставить контакт",
-  "chat.lead":"Заполните пару полей — и я передам вашу заявку менеджеру. Ответим в течение 3 минут в рабочее время.",
+  "chat.lead":"Заполните пару полей — и я передам вашу заявку менеджеру. Ответим в течение 5 минут в рабочее время.",
   "chat.thanks":"Спасибо! Заявка у нас. Продолжим в выбранном мессенджере — я напишу первой. Если удобнее сейчас — WhatsApp +66 95-549-2587 или Telegram-бот @elnurphuket_bot.",
   "chat.rentreq":"Запрос на аренду принят. Подберу вариант под ваши даты и отвечу по условиям — оставьте контакт, чтобы я могла написать лично.",
   "lead.sent":"Заявка отправлена",
@@ -1210,15 +1210,15 @@ en: {
   "hero.h1":"We already chose Phuket — let us help&nbsp;you",
   "hero.lead":"We find property to buy or rent, handle the deal, help with visas and settling in. Full service — from the first call to move-in.",
   "hero.cta1":"Get matched in 10 minutes","hero.cta2":"Browse properties",
-  "hero.note":"Free consultation · we reply within 3 minutes","hero.float":"We reply in 3 minutes",
+  "hero.note":"Free consultation · we reply within 5 minutes during working hours","hero.float":"We reply within 5 minutes",
   "ph.elnur":"photo of Elnur","ph.object":"photo soon",
-  "trust.1v":"5+ years","trust.1k":"In investment real estate","trust.2k":"Completed projects","trust.3v":"450+ mln ฿","trust.3k":"Invested with our help in a year","trust.4k":"Average yield",
+  "trust.1v":"5+ years","trust.1k":"In investment real estate","trust.2k":"Closed deals","trust.3v":"450+ mln ฿","trust.3k":"Invested with our help in a year","trust.4k":"Average yield",
   "why.lab":"Why Phuket","why.h2":"Phuket is more than just a resort",
-  "why.1t":"High yield","why.1p":"Yield potential of 6–12% a year — depending on the property and strategy.",
+  "why.1t":"High yield","why.1p":"Yield potential of 6–15% a year — depending on the property and strategy.",
   "why.2t":"Healthy environment","why.2p":"Clean air, sea and nature with no heavy industry.",
   "why.3t":"International education","why.3p":"World-class schools — UWC, BISP — next door.",
   "why.4t":"Steady growth","why.4p":"Premium villas appreciate 12–18% a year, condos 7–10%.",
-  "why.s1k":"premium villas per year · condos +7–10%","why.s2k":"a year on rentals","why.s3v":"from ฿3M","why.s3k":"market entry point","why.s4v":"12 mo","why.s4k":"rental demand all year round",
+  "why.s1k":"premium villas per year · condos +7–10%","why.s2k":"a year on rentals","why.s3v":"from ฿3.9M","why.s3k":"market entry point","why.s4v":"12 mo","why.s4k":"rental demand all year round",
   "why.src":"Based on Phuket market analysis, 2026 — dynamics depend on the area and project; we will show exact figures on specific properties.",
   "sale.lab":"For sale","sale.h2":"Verified properties for sale",
   "sale.sub":"Every project passes our internal check before publication. Open a card to see details and the yield calculator.",
@@ -1246,7 +1246,7 @@ en: {
   "rent.upcta":"Browse properties for sale","rent.upquiz":"Get matched in 10 minutes",
   "map.lab":"Geography","map.h2":"The area is half the decision",
   "map.sub":"The same budget in different parts of the island buys a different life and a different yield. Tap a marker or an area card.",
-  "map.badge":"12 areas · properties from our base","map.island":"Phuket",
+  "map.badge":"14 areas · properties from our base","map.island":"Phuket",
   "d.yield":"yield guideline","d.beach":"to the beach","d.count":"properties in base","d.who":"Best suited for: ",
   "d.none":"No open listings here right now — we will match one on request.","d.cta":"Find a property in ","d.inbase":" in base · ",
   "quiz.lab":"Matched in 10 minutes","quiz.h2":"Take the quiz — we will send a personal shortlist",
@@ -1271,10 +1271,10 @@ en: {
   "do.6t":"Remote purchase","do.6p":"Buy or rent from thousands of kilometres away.",
   "val.lab":"Our values","val.h2":"Why it feels safe with us",
   "val.1":"Honest and as equals","val.2":"No pressure","val.3":"Plain language","val.4":"On the client's side","val.5":"Service before and after the deal","val.6":"Transparent numbers",
-  "who.lab":"Founder and director","who.h2":"Hello! I am Elnur Khankishiev",
+  "who.lab":"Founder and director","who.h2":"Hello! My name is Elnur Khankishiev",
   "who.p1":"In 2011 I first came to Phuket — and immediately felt this place was special. I kept coming back until one day I decided to stay.",
   "who.p2":"For more than 5 years I have been helping people make this island their home — just as I once did myself. You will not need to figure out the market, negotiations or paperwork — we explain everything in plain words and walk with you all the way to the keys.",
-  "who.m1":"completed projects","who.m2v":"450+ mln ฿","who.m2":"invested with my help in a year","who.m3":"average yield","who.m4v":"5+ years","who.m4":"in real estate",
+  "who.m1":"closed deals","who.m2v":"450+ mln ฿","who.m2":"invested with my help in a year","who.m3":"average yield","who.m4v":"5+ years","who.m4":"in real estate",
   "who.cta":"Ask a question on WhatsApp",
   "steps.lab":"Step by step","steps.h2":"With you at every stage",
   "st.1t":"Introduction","st.1p":"We clarify your goals and select relevant options.",
@@ -1306,7 +1306,7 @@ en: {
   "faq.6q":"How much do your services cost?",
   "faq.6a":"Our services are free for clients. We are accredited official representatives of developers and independent market experts. You get exclusive offers before public launch, personal terms, legal support of the deal and rental management after purchase.",
   "cta.h2":"We will help you choose, buy and move",
-  "cta.p":"Leave a request — we will reply within 3 minutes and consult you for free to find the best option to buy or rent.",
+  "cta.p":"Leave a request — we will reply within 5 minutes during working hours and consult you for free to find the best option to buy or rent.",
   "cta.b1":"Leave a request","cta.b2":"Message on WhatsApp","cta.b3":"Open the Telegram bot",
   "ft.tag":"We already chose Phuket — let us help you. Full service, from the first call to move-in.",
   "ft.menu":"Menu","ft.buy":"Buy","ft.contacts":"Contacts","ft.connect":"Stay in touch","ft.bot":"Telegram concierge 24/7","ft.tg":"Telegram channel","ft.policy":"Privacy policy",
@@ -1335,20 +1335,20 @@ en: {
   "v.t.mid":"with these inputs the property looks workable — verify the numbers with a manager for the specific unit, free of charge",
   "v.t.lo":"with these inputs treat it as an investment with caution — discuss with a manager how the economics could be improved",
   "v.note":"A take based on your numbers — not investment advice.",
-  "ft.copy":"Property Library Phuket ©2025 · since 2022",
+  "ft.copy":"Property Library Phuket © 2022",
   "chat.fab":"Daria · online","chat.name":"Daria · Property Library","chat.sub":"online · replies right away","chat.placeholder":"Type a message…",
-  "chat.botline":"Personal dialogue. We reply within 3 minutes during working hours",
+  "chat.botline":"Personal dialogue. We reply within 5 minutes during working hours",
   "chat.hello":"Hello! I am Daria, a Property Library manager from Elnur's team. I will help with buying, renting and any question about Phuket. What are you interested in?",
   "chat.menu1":"Buy / invest","chat.menu2":"Rent from a month","chat.menu3":"Services and support","chat.menu4":"Leave my contact",
-  "chat.r.sale":"Good request. Market entry starts from ฿3M, with 6–15% annual yield depending on the area and project. I will show a couple of options from our base — and put together a personal shortlist for your goal.",
+  "chat.r.sale":"Good request. Market entry starts from ฿3.9M, with 6–15% annual yield depending on the area and project. I will show a couple of options from our base — and put together a personal shortlist for your goal.",
   "chat.r.rent":"We do long-term rentals — from one month and longer. Prices and terms for each home are given on request: tell me the area, dates and budget and I will find a match. Leave your WhatsApp or Telegram — I will reply personally.",
   "chat.r.service":"We cover everything end-to-end: Thai law attorneys, visas, design, construction and rental management after purchase. Our services are free for clients. Tell me your situation — I will suggest where to start.",
   "chat.r.calc":"Here is our seasonal model. {o} ({d}): net ~{n} a year, an area yield guideline of ~{y}% a year, payback ~{p} years. This is a guideline — we calculate the exact figure per unit individually: it depends on the property, strategy and management. You can tweak every assumption on the property card — occupancy, rates, expenses. Leave a contact and I will put together an exact calculation personally.",
-  "chat.r.support":"I understand. To avoid misleading you, I will check the details with Elnur and come back with an exact answer. Leave your WhatsApp or Telegram — I will reply personally within 3 minutes during working hours.",
+  "chat.r.support":"I understand. To avoid misleading you, I will check the details with Elnur and come back with an exact answer. Leave your WhatsApp or Telegram — I will reply personally within 5 minutes during working hours.",
   "chat.r.generic":"Good question. I will verify the exact numbers and terms with Elnur to answer precisely. Leave your WhatsApp or Telegram — I will get back to you personally. Meanwhile I can show properties for your budget.",
   "chat.offerLead":"To send a shortlist and answer in detail I need your goal, budget and contact — then we continue in your favourite messenger.",
   "chat.offerBtn":"Leave contact",
-  "chat.lead":"Fill in a few fields and I will pass your request to a manager. We reply within 3 minutes during working hours.",
+  "chat.lead":"Fill in a few fields and I will pass your request to a manager. We reply within 5 minutes during working hours.",
   "chat.thanks":"Thank you! We have your request. We will continue in your chosen messenger — I will write first. If it is easier right now: WhatsApp +66 95-549-2587 or Telegram bot @elnurphuket_bot.",
   "chat.rentreq":"Rental enquiry received. I will match a home to your dates and reply with terms — leave a contact so I can write to you personally.",
   "lead.sent":"Request sent",
@@ -2036,7 +2036,7 @@ function wireCalc(p){
       '<div class="big"><span class="k">'+t('calc.netyield')+'</span><span class="v">'+netY.toFixed(1)+'%</span></div>'+
       '<div class="row" style="margin-top:6px"><span>'+t('calc.grossyield')+'</span><b>'+grossY.toFixed(1)+'%</b></div>'+
       '<div class="row"><span>'+t('calc.roi5')+'</span><b>'+roi5.toFixed(0)+'%</b></div>'+
-      '<div class="row"><span>'+t('calc.payback')+'</span><b>'+payback.toFixed(1)+' '+t('calc.years')+'</b></div>'+
+      '<div class="row"><span>'+t('calc.payback')+'</span><b>'+(payback>0?payback.toFixed(1)+' '+t('calc.years'):'—')+'</b></div>'+
       '<div class="ai-verdict" id="aiVerdict"><button type="button" class="ai-ask" onclick="askVerdict()">'+t('calc.ask')+'</button></div>';
     window.__calcSnapshot={pid:p&&p.property_id,gross:gross,expenses:expenses,net:net,grossY:grossY,netY:netY,payback:payback,roi5:roi5,price:price,handover:handover,mgmt:mgmt,build:num('cBuild')};
   }
