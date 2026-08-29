@@ -332,6 +332,9 @@ h3{font-size:1.12rem;font-weight:700}
 .rf-check:hover{border-color:var(--ink)}
 .rf-check.on{background:var(--green);border-color:transparent;font-weight:700}
 .rf-check input{accent-color:var(--olive,#5F6242);width:15px;height:15px;cursor:pointer;margin:0}
+.rf-more{margin-top:16px}
+.rf-more>summary{font-size:.82rem;font-weight:700;color:var(--olive,#5F6242);padding:4px 0;list-style:none}
+.rf-more>summary::-webkit-details-marker{display:none}
 .rf-reset{align-self:flex-start;margin-top:16px}
 .prop .amwarn{display:none}
 .prop.softmatch .amwarn{display:inline-block;margin-top:8px;font-size:.72rem;font-weight:600;color:var(--muted,#8a8f7a);background:rgba(10,10,10,.05);border-radius:999px;padding:4px 10px}
@@ -1389,7 +1392,7 @@ ru: {
   "rent.dates.loading":"Проверяем доступность","rent.dates.free":"Показаны варианты, свободные на выбранные даты.",
   "rent.dates.busy":"Занято на эти даты","rent.dates.none":"На выбранные даты свободных вариантов нет — оставьте запрос, подберём альтернативу.",
   "rent.dates.err":"Не удалось проверить доступность — показываем все варианты. Уточните даты в заявке.",
-  "rent.f.district":"Район","rent.f.beds":"Спальни","rent.f.type":"Тип","rent.f.amen":"Удобства","rent.f.reset":"Сбросить фильтры",
+  "rent.f.district":"Район","rent.f.beds":"Спальни","rent.f.type":"Тип","rent.f.amen":"Удобства","rent.f.reset":"Сбросить фильтры","rent.f.more":"Больше фильтров",
   "rent.beds.4":"4+",
   "rent.am.pool":"Бассейн","rent.am.beach":"У моря / 1-я линия","rent.am.parking":"Парковка","rent.am.gym":"Спортзал","rent.am.pets":"Можно с питомцами",
   "rent.am.soft":"удобства уточняются",
@@ -1572,7 +1575,7 @@ en: {
   "rent.dates.loading":"Checking availability","rent.dates.free":"Showing homes available for the selected dates.",
   "rent.dates.busy":"Booked for these dates","rent.dates.none":"No homes available for the selected dates — leave an enquiry and we will find an alternative.",
   "rent.dates.err":"Couldn't check availability — showing all homes. Confirm your dates in the enquiry.",
-  "rent.f.district":"Area","rent.f.beds":"Bedrooms","rent.f.type":"Type","rent.f.amen":"Amenities","rent.f.reset":"Reset filters",
+  "rent.f.district":"Area","rent.f.beds":"Bedrooms","rent.f.type":"Type","rent.f.amen":"Amenities","rent.f.reset":"Reset filters","rent.f.more":"More filters",
   "rent.beds.4":"4+",
   "rent.am.pool":"Pool","rent.am.beach":"Beachfront","rent.am.parking":"Parking","rent.am.gym":"Gym","rent.am.pets":"Pet-friendly",
   "rent.am.soft":"amenities to be confirmed",
@@ -2508,11 +2511,12 @@ function rentBedsMatch(p,val){
 function buildRentChips(){
   var bar=document.getElementById('rentFilters');if(!bar)return;
   bar.innerHTML='';
-  function group(labelKey){
+  function group(labelKey,parent){
+    var host=parent||bar;
     var g=document.createElement('div');g.className='rf-group';
     var l=document.createElement('div');l.className='rf-label';l.textContent=t(labelKey);
     var row=document.createElement('div');row.className='rf-chips';
-    g.appendChild(l);g.appendChild(row);bar.appendChild(g);return row;
+    g.appendChild(l);g.appendChild(row);host.appendChild(g);return row;
   }
   function chip(row,f,val,label){
     var s=document.createElement('span');
@@ -2521,18 +2525,22 @@ function buildRentChips(){
     s.onclick=function(){var set=activeRent[f];if(set.has(val))set.delete(val);else set.add(val);s.classList.toggle('on');applyRentFilters();};
     row.appendChild(s);
   }
-  /* район — из данных */
+  /* НА ВИДУ: район — из данных */
   var locs=new Map();PL.RENTALS.forEach(function(p){locs.set(p.loc.ru,loc(p.loc));});
   if(locs.size){var rl=group('rent.f.district');locs.forEach(function(label,val){chip(rl,'loc',val,label);});}
-  /* спальни — фикс. набор 1/2/3/4+ */
+  /* НА ВИДУ: спальни — фикс. набор 1/2/3/4+ */
   var rb=group('rent.f.beds');
   ['1','2','3'].forEach(function(v){chip(rb,'beds',v,v);});
   chip(rb,'beds','4',t('rent.beds.4'));
+  /* ПОД СПОЙЛЕРОМ «Больше фильтров»: тип + удобства (свёрнуто по умолчанию) */
+  var det=document.createElement('details');det.className='calc-more rf-more';
+  var sum=document.createElement('summary');sum.textContent=t('rent.f.more')+' ▾';
+  det.appendChild(sum);bar.appendChild(det);
   /* тип — из данных */
   var types=new Map();PL.RENTALS.forEach(function(p){types.set(p.type.ru,loc(p.type));});
-  if(types.size){var rt=group('rent.f.type');types.forEach(function(label,val){chip(rt,'type',val,label);});}
+  if(types.size){var rt=group('rent.f.type',det);types.forEach(function(label,val){chip(rt,'type',val,label);});}
   /* удобства — чекбоксы */
-  var ra=group('rent.f.amen');
+  var ra=group('rent.f.amen',det);
   RENT_AMEN.forEach(function(a){
     var lab=document.createElement('label');
     lab.className='rf-check'+(activeRent.amen.has(a.id)?' on':'');
@@ -2541,7 +2549,7 @@ function buildRentChips(){
     inp.onchange=function(){if(inp.checked)activeRent.amen.add(a.id);else activeRent.amen.delete(a.id);lab.classList.toggle('on',inp.checked);applyRentFilters();};
     lab.appendChild(inp);lab.appendChild(sp);ra.appendChild(lab);
   });
-  /* сброс фильтров (даты сбрасываются отдельной кнопкой) */
+  /* сброс фильтров (на виду; даты сбрасываются отдельной кнопкой) */
   var rs=document.createElement('span');rs.className='chipf rf-reset';rs.textContent=t('rent.f.reset');
   rs.onclick=resetRentFilters;bar.appendChild(rs);
 }
