@@ -723,7 +723,8 @@ h3{font-size:1.12rem;font-weight:700}
 .qz-done .ic{width:64px;height:64px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:1.8rem}
 .qz-done h3{font-size:1.3rem;font-weight:800}
 .qz-done p{color:var(--muted);font-size:.92rem;line-height:1.5;margin:10px auto 0;max-width:380px}
-.thumb{display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;color:rgba(10,10,10,.4)}
+.thumb{display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;color:rgba(10,10,10,.4);position:relative;overflow:hidden}
+.thumb .thumb-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 </style>
 </head>
 <body>
@@ -1838,7 +1839,7 @@ function areaOf(p){var a=(p&&p.area)||'';return PL.lang==='en'?a.replace(/м²/g
 /* бюджет-бакет по РЕАЛЬНОЙ THB-цене: b1<฿5млн, b2<฿10млн, b3 ฿10млн+ */
 function budgetOf(p){var thb=thbOf(p);return thb<5e6?'b1':thb<10e6?'b2':'b3';}
 function statusBadge(s){return '<span class="stbadge st-'+s+'">'+t('st.'+s)+'</span>';}
-function thumbDiv(p,cls){return '<div class="thumb '+(p.grad||'g1')+' '+(cls||'')+'">'+t('ph.object')+'</div>';}
+function thumbDiv(p,cls){return '<div class="thumb '+(p.grad||'g1')+' '+(cls||'')+'">'+t('ph.object')+picPhoto(p).replace('pic-photo','thumb-photo')+'</div>';}
 /* реальное фото объекта поверх градиента; onerror → откат на градиент */
 function picPhoto(p){return p&&p.img?'<img class="pic-photo" src="'+p.img+'" alt="'+((p.title||'').replace(/"/g,'&quot;'))+'" loading="lazy" onerror="this.remove()">':'';}
 
@@ -2129,7 +2130,9 @@ function askAI(txt){
   var ty=typingEl();
   var body=JSON.stringify({message:txt,history:buildAIHistory(),lang:PL.lang,context:{object_id:chatObjCtx()}});
   var ctrl=(typeof AbortController!=='undefined')?new AbortController():null;
-  var timer=setTimeout(function(){if(ctrl)ctrl.abort();},25000);
+  /* 30.08: было 25000 — бэкенд отвечает 15–28с (замеры), содержательные ответы обрывались
+     по таймауту и клиент видел заглушку вместо готовой подборки. */
+  var timer=setTimeout(function(){if(ctrl)ctrl.abort();},60000);
   var done=false;
   function finish(){if(done)return;done=true;clearTimeout(timer);ty.remove();setChatBusy(false);}
   fetch(CHAT_ENDPOINT,{method:'POST',headers:{'Content-Type':'text/plain'},body:body,signal:ctrl?ctrl.signal:undefined})
