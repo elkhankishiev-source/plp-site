@@ -276,11 +276,16 @@ function buildRentals(objects, preserve) {
       loc: { ru: DISTRICT_RU[en] || en, en },
       type: typeLabel(o.type),
       beds: bedsLabel(o),
+      bmin: (o.bedrooms_min === 0 || o.bedrooms_min) ? o.bedrooms_min : null,
+      bmax: (o.bedrooms_max === 0 || o.bedrooms_max) ? o.bedrooms_max : null,
       area: areaLabel(o),
       tag: rentTag(o),
       desc: { ru: usp, en: uspEn },
       min_stay: (o.min_stay === 0 || o.min_stay) ? o.min_stay : null,
       deposit: (o.deposit === 0 || o.deposit) ? o.deposit : null,
+      // фильтр удобств: источники — amenities (если есть) + rent_included; distance_beach_m для «у моря»
+      amenities: S(o.amenities),
+      beach_m: (o.distance_beach_m === 0 || o.distance_beach_m) ? o.distance_beach_m : null,
       included: S(o.rent_included),
       excluded: S(o.rent_excluded),
       rules: S(o.rent_rules),
@@ -550,7 +555,7 @@ async function main() {
   const rentals = await sbGet(env,
     'objects?select=plp_property_id,name,district,beach,purpose,type,bedrooms,bedrooms_min,' +
     'bedrooms_max,area_sqm,area_min,area_max,min_stay,deposit,rent_included,rent_excluded,' +
-    'rent_rules,usp,usp_en,distance_beach_m,on_site' +
+    'rent_rules,amenities,usp,usp_en,distance_beach_m,on_site' +
     '&and=(or(purpose.eq.' + encodeURIComponent('аренда') + ',purpose.eq.rent),' +
     'or(on_site.eq.true,plp_property_id.eq.PLP-TEST-RENT))&order=plp_property_id');
 

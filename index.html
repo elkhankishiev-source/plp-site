@@ -322,6 +322,19 @@ h3{font-size:1.12rem;font-weight:700}
 .chipf:hover{border-color:var(--ink)}
 .chipf:active{transform:scale(.97)}
 .chipf.on{background:var(--green);border-color:transparent;font-weight:700}
+/* ===== rent filters (район/спальни/тип/удобства/сброс) ===== */
+#rentFilters{flex-direction:column;align-items:stretch;gap:0;margin-top:18px}
+.rf-group{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+.rf-group:first-child{margin-top:0}
+.rf-label{font-size:.72rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted,#8a8f7a)}
+.rf-chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.rf-check{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.85);border:1px solid rgba(10,10,10,.07);border-radius:999px;padding:8px 14px;font-size:.84rem;font-weight:600;cursor:pointer;user-select:none;transition:border-color .2s,background .2s}
+.rf-check:hover{border-color:var(--ink)}
+.rf-check.on{background:var(--green);border-color:transparent;font-weight:700}
+.rf-check input{accent-color:var(--olive,#5F6242);width:15px;height:15px;cursor:pointer;margin:0}
+.rf-reset{align-self:flex-start;margin-top:16px}
+.prop .amwarn{display:none}
+.prop.softmatch .amwarn{display:inline-block;margin-top:8px;font-size:.72rem;font-weight:600;color:var(--muted,#8a8f7a);background:rgba(10,10,10,.05);border-radius:999px;padding:4px 10px}
 .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:14px}
 .toolbar .search{flex:1 1 220px;min-width:180px}
 .toolbar .search input{width:100%;font-size:.9rem;padding:11px 16px;border-radius:999px;border:1px solid rgba(10,10,10,.09);background:rgba(255,255,255,.9);outline:none;transition:border-color .2s,box-shadow .2s}
@@ -903,6 +916,7 @@ h3{font-size:1.12rem;font-weight:700}
     <div class="filterbar reveal" id="rentFilters"></div>
     <div class="carwrap reveal">
       <div class="car" id="rentCar"></div>
+      <div class="noresult" id="rentNoResult" data-i18n="rent.noresult">По выбранным фильтрам ничего не нашлось — измените условия или сбросьте фильтры.</div>
     </div>
     <div class="rentband reveal">
       <div>
@@ -1375,6 +1389,11 @@ ru: {
   "rent.dates.loading":"Проверяем доступность","rent.dates.free":"Показаны варианты, свободные на выбранные даты.",
   "rent.dates.busy":"Занято на эти даты","rent.dates.none":"На выбранные даты свободных вариантов нет — оставьте запрос, подберём альтернативу.",
   "rent.dates.err":"Не удалось проверить доступность — показываем все варианты. Уточните даты в заявке.",
+  "rent.f.district":"Район","rent.f.beds":"Спальни","rent.f.type":"Тип","rent.f.amen":"Удобства","rent.f.reset":"Сбросить фильтры",
+  "rent.beds.4":"4+",
+  "rent.am.pool":"Бассейн","rent.am.beach":"У моря / 1-я линия","rent.am.parking":"Парковка","rent.am.gym":"Спортзал","rent.am.pets":"Можно с питомцами",
+  "rent.am.soft":"удобства уточняются",
+  "rent.noresult":"По выбранным фильтрам ничего не нашлось — измените условия или сбросьте фильтры.",
   "rent.d.min":"Мин. срок","rent.d.dep":"Депозит","rent.d.mo":"мес","rent.d.incl":"Включено","rent.d.excl":"Не включено","rent.d.rules":"Правила проживания",
   "cmp.title":"Сравнение объектов","cmp.cta":"Разобрать различия с менеджером","cmp.win":"выше","cmp.need2":"Отметьте для сравнения хотя бы два объекта","cmp.max":"Сравниваем до трёх объектов — уберите один",
   "cmp.r.loc":"Район","cmp.r.type":"Тип","cmp.r.price":"Цена","cmp.r.area":"Площадь","cmp.r.beds":"Спальни","cmp.r.deadline":"Сдача","cmp.r.status":"Статус",
@@ -1553,6 +1572,11 @@ en: {
   "rent.dates.loading":"Checking availability","rent.dates.free":"Showing homes available for the selected dates.",
   "rent.dates.busy":"Booked for these dates","rent.dates.none":"No homes available for the selected dates — leave an enquiry and we will find an alternative.",
   "rent.dates.err":"Couldn't check availability — showing all homes. Confirm your dates in the enquiry.",
+  "rent.f.district":"Area","rent.f.beds":"Bedrooms","rent.f.type":"Type","rent.f.amen":"Amenities","rent.f.reset":"Reset filters",
+  "rent.beds.4":"4+",
+  "rent.am.pool":"Pool","rent.am.beach":"Beachfront","rent.am.parking":"Parking","rent.am.gym":"Gym","rent.am.pets":"Pet-friendly",
+  "rent.am.soft":"amenities to be confirmed",
+  "rent.noresult":"Nothing matches the selected filters — adjust or reset them.",
   "rent.d.min":"Min. stay","rent.d.dep":"Deposit","rent.d.mo":"mo","rent.d.incl":"Included","rent.d.excl":"Not included","rent.d.rules":"House rules",
   "cmp.title":"Property comparison","cmp.cta":"Discuss the differences with a manager","cmp.win":"higher","cmp.need2":"Select at least two properties to compare","cmp.max":"We compare up to three properties — remove one",
   "cmp.r.loc":"Area","cmp.r.type":"Type","cmp.r.price":"Price","cmp.r.area":"Area, m²","cmp.r.beds":"Bedrooms","cmp.r.deadline":"Completion","cmp.r.status":"Status",
@@ -1657,7 +1681,7 @@ PL.PROPERTIES=[
 /* ===== RENT CATALOG (реальные объекты; цены не публикуем) ===== */
 /* PLP:AUTO-RENTALS:START — сгенерировано build/gen.mjs из Supabase (объекты аренды); вручную не править (grad сохраняется между прогонами) */
 PL.RENTALS=[
-  {"property_id":"PLP-TEST-RENT","title":"Вилла-эталон (тест аренды)","funnel":"rent","grad":"g1","loc":{"ru":"Банг Тао","en":"Bang Tao"},"type":{"ru":"Вилла","en":"Villa"},"beds":"3","area":"250 м²","tag":{"ru":"от 3 мес","en":"from 3 mo"},"desc":{"ru":"ЭТАЛОН-ШАБЛОН аренды для теста стандарта. 3-спальная вилла с бассейном в Банг Тао. Цена по запросу, согласуется индивидуально.","en":"RENTAL TEMPLATE for standard testing. 3-bedroom pool villa in Bang Tao. Price on request, agreed individually."},"min_stay":"3","deposit":"30000","included":"Уборка 2×/нед, вода, интернет, бассейн, парковка","excluded":"Электричество по счётчику, доп.уборки, трансфер (заказывается отдельно)","rules":"Заезд 15:00, выезд 11:00. Без животных. Тихий час после 22:00. Депозит возвращается при выезде."}
+  {"property_id":"PLP-TEST-RENT","title":"Вилла-эталон (тест аренды)","funnel":"rent","grad":"g1","loc":{"ru":"Банг Тао","en":"Bang Tao"},"type":{"ru":"Вилла","en":"Villa"},"beds":"3","bmin":3,"bmax":3,"area":"250 м²","tag":{"ru":"от 3 мес","en":"from 3 mo"},"desc":{"ru":"ЭТАЛОН-ШАБЛОН аренды для теста стандарта. 3-спальная вилла с бассейном в Банг Тао. Цена по запросу, согласуется индивидуально.","en":"RENTAL TEMPLATE for standard testing. 3-bedroom pool villa in Bang Tao. Price on request, agreed individually."},"min_stay":"3","deposit":"30000","amenities":"","beach_m":null,"included":"Уборка 2×/нед, вода, интернет, бассейн, парковка","excluded":"Электричество по счётчику, доп.уборки, трансфер (заказывается отдельно)","rules":"Заезд 15:00, выезд 11:00. Без животных. Тихий час после 22:00. Депозит возвращается при выезде."}
 ];
 /* PLP:AUTO-RENTALS:END */
 
@@ -1850,6 +1874,7 @@ function renderRent(){
       '<p class="desc">'+loc(p.desc)+'</p>'+
       '<div class="price"><span>'+t('u.onreq')+'</span></div>'+
       '<div class="meta"><span>🛏 '+p.beds+'</span><span>◫ '+areaOf(p)+'</span><span>'+loc(p.type)+'</span></div>'+
+      '<span class="amwarn">'+t('rent.am.soft')+'</span>'+
       '<div class="pid">'+p.property_id+'</div></div></div>';
   }).join('');
   buildRentChips();applyRentFilters();
@@ -2436,48 +2461,133 @@ function buildLocChips(){
     bar.insertBefore(s,anchor);
   });
 }
-var activeRent={loc:new Set(),type:new Set()};
+var activeRent={loc:new Set(),type:new Set(),beds:new Set(),amen:new Set()};
 /* доступность по датам: null = фильтр выключен (все свободны); иначе Set свободных property_id */
 var rentAvailable=null;
 var rentSelDates=null; /* выбранные даты заезда/выезда — переносим в заявку на аренду */
+/* удобства: ключ → регэксп по тексту (amenities + rent_included + desc), RU+EN. Без выдумок:
+   если у объекта нет данных об удобствах — он не отсеивается (мягкое совпадение, помечается бейджем). */
+var RENT_AMEN=[
+  {id:'pool',re:/бассейн|pool/i},
+  {id:'beach',re:/перв\S*\s*лини|у моря|на берегу моря|на берегу\b|beach\s?front|first\s?line|у самого моря/i},
+  {id:'parking',re:/парковк|паркинг|parking|гараж|garage/i},
+  {id:'gym',re:/спортзал|тренаж|фитнес|gym\b|fitness/i},
+  {id:'pets',re:/pet[-\s]?friendly|питом|можно с животными|разрешены животные|с животными можно|pets allowed/i}
+];
+/* флаги удобств объекта. hasData=есть текстовый источник (amenities|rent_included) → можно отсеивать строго.
+   Нет текста → hasData=false → по удобствам не режем (мягко), но позитивные признаки (вилла→бассейн,
+   distance_beach_m→у моря) всё равно засчитываем как совпадение. */
+function rentAmenInfo(p){
+  var set=new Set();
+  if(!p)return{set:set,hasData:false};
+  var base=[p.amenities,p.included].filter(Boolean).join(' ').trim();
+  var txt=[p.amenities,p.included,p.desc&&p.desc.ru,p.desc&&p.desc.en].filter(Boolean).join(' ');
+  RENT_AMEN.forEach(function(a){if(a.re.test(txt))set.add(a.id);});
+  /* точечная защита от отрицаний: снимаем флаг, если рядом явное «без …» этого удобства */
+  if(/без бассейн|no pool/i.test(txt))set.delete('pool');
+  if(/без парковк|no parking/i.test(txt))set.delete('parking');
+  if(/без животных|no pets|pets not allowed|нельзя с животными/i.test(txt))set.delete('pets');
+  if(/без спортзал|no gym/i.test(txt))set.delete('gym');
+  /* позитивные деривации (не вызывают отсева, только добавляют совпадение) */
+  if(p.beach_m!=null&&p.beach_m<=150)set.add('beach');
+  if(p.type&&p.type.ru==='Вилла'&&!/без бассейн|no pool/i.test(txt))set.add('pool');
+  return{set:set,hasData:base.length>0};
+}
+/* совпадение по спальням: val = '1'|'2'|'3'|'4' (4 = 4+). Неизвестно → true (не режем). */
+function rentBedsMatch(p,val){
+  var n=parseInt(val,10);var lo=p&&p.bmin,hi=p&&p.bmax;
+  if(lo==null&&hi==null){
+    var m=(p&&p.beds||'').match(/\d+/g);
+    if(!m){if(/студи|studio/i.test(p&&p.beds||''))lo=hi=0;else return true;}
+    else{lo=parseInt(m[0],10);hi=parseInt(m[m.length-1],10);}
+  }
+  if(lo==null)lo=hi;if(hi==null)hi=lo;
+  if(val==='4')return hi>=4;
+  return lo<=n&&n<=hi;
+}
 function buildRentChips(){
   var bar=document.getElementById('rentFilters');if(!bar)return;
   bar.innerHTML='';
-  function mk(f,val,label){
+  function group(labelKey){
+    var g=document.createElement('div');g.className='rf-group';
+    var l=document.createElement('div');l.className='rf-label';l.textContent=t(labelKey);
+    var row=document.createElement('div');row.className='rf-chips';
+    g.appendChild(l);g.appendChild(row);bar.appendChild(g);return row;
+  }
+  function chip(row,f,val,label){
     var s=document.createElement('span');
     s.className='chipf'+(activeRent[f].has(val)?' on':'');
     s.dataset.facet=f;s.dataset.val=val;s.textContent=label;
     s.onclick=function(){var set=activeRent[f];if(set.has(val))set.delete(val);else set.add(val);s.classList.toggle('on');applyRentFilters();};
-    bar.appendChild(s);
+    row.appendChild(s);
   }
+  /* район — из данных */
   var locs=new Map();PL.RENTALS.forEach(function(p){locs.set(p.loc.ru,loc(p.loc));});
-  locs.forEach(function(label,val){mk('loc',val,label);});
+  if(locs.size){var rl=group('rent.f.district');locs.forEach(function(label,val){chip(rl,'loc',val,label);});}
+  /* спальни — фикс. набор 1/2/3/4+ */
+  var rb=group('rent.f.beds');
+  ['1','2','3'].forEach(function(v){chip(rb,'beds',v,v);});
+  chip(rb,'beds','4',t('rent.beds.4'));
+  /* тип — из данных */
   var types=new Map();PL.RENTALS.forEach(function(p){types.set(p.type.ru,loc(p.type));});
-  types.forEach(function(label,val){mk('type',val,label);});
+  if(types.size){var rt=group('rent.f.type');types.forEach(function(label,val){chip(rt,'type',val,label);});}
+  /* удобства — чекбоксы */
+  var ra=group('rent.f.amen');
+  RENT_AMEN.forEach(function(a){
+    var lab=document.createElement('label');
+    lab.className='rf-check'+(activeRent.amen.has(a.id)?' on':'');
+    var inp=document.createElement('input');inp.type='checkbox';inp.checked=activeRent.amen.has(a.id);inp.dataset.amen=a.id;
+    var sp=document.createElement('span');sp.textContent=t('rent.am.'+a.id);
+    inp.onchange=function(){if(inp.checked)activeRent.amen.add(a.id);else activeRent.amen.delete(a.id);lab.classList.toggle('on',inp.checked);applyRentFilters();};
+    lab.appendChild(inp);lab.appendChild(sp);ra.appendChild(lab);
+  });
+  /* сброс фильтров (даты сбрасываются отдельной кнопкой) */
+  var rs=document.createElement('span');rs.className='chipf rf-reset';rs.textContent=t('rent.f.reset');
+  rs.onclick=resetRentFilters;bar.appendChild(rs);
+}
+function resetRentFilters(){
+  activeRent.loc.clear();activeRent.type.clear();activeRent.beds.clear();activeRent.amen.clear();
+  buildRentChips();applyRentFilters();
 }
 function applyRentFilters(){
-  var shownFree=0;
+  var visible=0,freeVisible=0;
   document.querySelectorAll('#rentCar .prop').forEach(function(el){
+    var pid=el.dataset.pid;var p=pid?PL.byId[pid]:null;
     var okL=activeRent.loc.size===0||activeRent.loc.has(el.dataset.loc);
     var okT=activeRent.type.size===0||activeRent.type.has(el.dataset.type);
-    el.style.display=okL&&okT?'':'none';
-    /* доступность: помечаем «занято», клик отключён; свободные — как обычно */
-    var pid=el.dataset.pid;
+    var okB=activeRent.beds.size===0||Array.prototype.some.call(Array.from(activeRent.beds),function(v){return rentBedsMatch(p,v);});
+    var okA=true,soft=false;
+    if(activeRent.amen.size){
+      var info=rentAmenInfo(p);
+      okA=Array.from(activeRent.amen).every(function(a){return info.set.has(a)||!info.hasData;});
+      /* мягкое совпадение: прошёл только из-за отсутствия данных → пометить бейджем */
+      if(okA)soft=Array.from(activeRent.amen).some(function(a){return !info.set.has(a)&&!info.hasData;});
+    }
+    var vis=okL&&okT&&okB&&okA;
+    el.style.display=vis?'':'none';
+    el.classList.toggle('softmatch',vis&&soft);
     var pic=el.querySelector('.pic');
-    if(rentAvailable&&pid){
-      var free=rentAvailable.has(pid);
-      el.classList.toggle('booked',!free);
-      if(pic)pic.setAttribute('data-busy',t('rent.dates.busy'));
-      if(free&&okL&&okT)shownFree++;
+    if(vis){
+      visible++;
+      if(rentAvailable&&pid){
+        var free=rentAvailable.has(pid);
+        el.classList.toggle('booked',!free);
+        if(pic)pic.setAttribute('data-busy',t('rent.dates.busy'));
+        if(free)freeVisible++;
+      }else{
+        el.classList.remove('booked');
+        if(pic)pic.removeAttribute('data-busy');
+        freeVisible++;
+      }
     }else{
-      el.classList.remove('booked');
-      if(pic)pic.removeAttribute('data-busy');
+      el.classList.remove('booked');el.classList.remove('softmatch');
     }
   });
-  if(rentAvailable){
+  var nr=document.getElementById('rentNoResult');if(nr)nr.style.display=visible?'none':'block';
+  if(rentAvailable&&visible){
     var st=document.getElementById('rentDateStatus');
     if(st){
-      if(shownFree===0){st.className='df-status err';st.textContent=t('rent.dates.none');}
+      if(freeVisible===0){st.className='df-status err';st.textContent=t('rent.dates.none');}
       else{st.className='df-status ok';st.textContent=t('rent.dates.free');}
     }
   }
@@ -2799,7 +2909,7 @@ window.setLang=setLang;window.toggleNav=toggleNav;
 window.openQuiz=openQuiz;window.closeQuiz=closeQuiz;window.quizNext=quizNext;window.quizBack=quizBack;window.pickQuiz=pickQuiz;
 window.openChat=openChat;window.closeChat=closeChat;window.clearChat=clearChat;window.sendFree=sendFree;window.closeChatToProp=closeChatToProp;
 window.openRentRequest=openRentRequest;
-window.checkAvailability=checkAvailability;window.resetAvailability=resetAvailability;window.pushLead=pushLead;
+window.checkAvailability=checkAvailability;window.resetAvailability=resetAvailability;window.resetRentFilters=resetRentFilters;window.pushLead=pushLead;
 window.scrollCar=scrollCar;window.toggleFilter=toggleFilter;window.onSaleSearch=onSaleSearch;window.setSaleSort=setSaleSort;window.toggleFavOnly=toggleFavOnly;
 window.toggleFav=toggleFav;window.toggleCmp=toggleCmp;window.openCompare=openCompare;window.closeCompare=closeCompare;window.cmpLead=cmpLead;window.favLead=favLead;
 window.openProp=openProp;window.closeProp=closeProp;window.leadFromModal=leadFromModal;window.askVerdict=askVerdict;window.shareProp=shareProp;
