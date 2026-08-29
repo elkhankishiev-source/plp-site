@@ -613,12 +613,43 @@ h3{font-size:1.12rem;font-weight:700}
 @media(max-width:520px){.calc-inputs{grid-template-columns:1fr}}
 .fld{display:flex;flex-direction:column;gap:4px}
 .fld label{font-size:.68rem;color:var(--muted);font-weight:600}
-.fld input{height:40px;border:1.5px solid rgba(10,10,10,.12);border-radius:10px;padding:0 11px;font-size:.88rem;background:#fff;width:100%}
-.fld input:focus{outline:none;border-color:var(--ink)}
-.calc-more{margin-top:10px}
-.calc-more summary{cursor:pointer;font-size:.8rem;font-weight:700;padding:4px 0}
+.fld input,.fld select{height:40px;border:1.5px solid rgba(10,10,10,.12);border-radius:10px;padding:0 11px;font-size:.88rem;background:#fff;width:100%}
+.fld input:focus,.fld select:focus{outline:none;border-color:var(--ink)}
+/* first view: price + KPI tiles */
+.calc-price-lead{margin-top:12px}
+.calc-price-lead label{font-size:.68rem;color:var(--muted);font-weight:600;display:block;margin-bottom:4px}
+.calc-price-lead .prow{display:flex;align-items:center;gap:10px}
+.calc-price-lead input{flex:1;height:46px;border:1.5px solid rgba(10,10,10,.12);border-radius:12px;padding:0 12px;font-size:1.1rem;font-weight:800;background:#fff}
+.calc-price-lead input:focus{outline:none;border-color:var(--ink)}
+.calc-price-lead .usd{font-size:.8rem;color:var(--muted);font-weight:600;white-space:nowrap}
+.calc-disc{margin-top:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.calc-disc label{font-size:.68rem;color:var(--muted);font-weight:600}
+.calc-disc input{width:70px;height:34px;border:1.5px solid rgba(10,10,10,.12);border-radius:9px;padding:0 9px;font-size:.85rem;font-weight:700;background:#fff}
+.calc-disc input:focus{outline:none;border-color:var(--ink)}
+.calc-preset{display:inline-flex;gap:5px}
+.calc-preset button{font-size:.74rem;font-weight:700;padding:6px 10px;background:#fff;border:1.5px solid rgba(10,10,10,.14);border-radius:8px;cursor:pointer;color:var(--muted)}
+.calc-preset button.on{background:var(--green);border-color:var(--green);color:var(--ink)}
+.calc-disc .disout{font-size:.78rem;color:var(--olive);font-weight:700;flex-basis:100%}
+.calc-out .row.grow b{color:var(--olive)}
+.calc-kpi{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px}
+@media(max-width:400px){.calc-kpi{grid-template-columns:1fr;gap:6px}}
+.calc-kpi .kpi{background:var(--green-soft);border:1px solid #d5d8b8;border-radius:12px;padding:10px 11px;display:flex;flex-direction:column;gap:2px}
+.calc-kpi .kpi .kv{font-size:1.15rem;font-weight:800;color:var(--ink);line-height:1.15}
+.calc-kpi .kpi .kl{font-size:.62rem;font-weight:700;letter-spacing:.03em;color:var(--olive);text-transform:uppercase}
+.calc-grp{margin-top:14px}
+.calc-grp>.gh{font-size:.7rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--olive);margin:0 0 4px}
+.calc-seg{display:inline-flex;border:1.5px solid rgba(10,10,10,.14);border-radius:10px;overflow:hidden;margin-bottom:4px}
+.calc-seg button{font-size:.78rem;font-weight:700;padding:8px 14px;background:#fff;border:0;cursor:pointer;color:var(--muted)}
+.calc-seg button.on{background:var(--green);color:var(--ink)}
+.calc-sched{width:100%;border-collapse:collapse;margin-top:8px;font-size:.78rem}
+.calc-sched th,.calc-sched td{text-align:left;padding:6px 8px;border-bottom:1px solid rgba(10,10,10,.07)}
+.calc-sched th{font-size:.64rem;text-transform:uppercase;letter-spacing:.04em;color:var(--olive);font-weight:700}
+.calc-sched td.num,.calc-sched th.num{text-align:right;font-variant-numeric:tabular-nums}
+.calc-sched tr.total td{font-weight:800;border-bottom:0;border-top:1.5px solid rgba(10,10,10,.14)}
+.calc-more{margin-top:14px}
+.calc-more summary{cursor:pointer;font-size:.82rem;font-weight:700;padding:6px 0}
 .calc-more summary:hover{text-decoration:underline;text-underline-offset:3px}
-.calc-out{margin-top:12px;display:flex;flex-direction:column;gap:7px}
+.calc-out{margin-top:14px;display:flex;flex-direction:column;gap:7px}
 .calc-out .row{display:flex;justify-content:space-between;font-size:.84rem;color:var(--muted)}
 .calc-out .row b{color:var(--ink);font-weight:600}
 .calc-out .big{display:flex;justify-content:space-between;align-items:baseline;background:var(--green);border-radius:12px;padding:12px 14px;margin-top:4px}
@@ -1318,7 +1349,7 @@ ru: {
   "cmp.title":"Сравнение объектов","cmp.cta":"Разобрать различия с менеджером","cmp.win":"выше","cmp.need2":"Отметьте для сравнения хотя бы два объекта","cmp.max":"Сравниваем до трёх объектов — уберите один",
   "cmp.r.loc":"Район","cmp.r.type":"Тип","cmp.r.price":"Цена","cmp.r.area":"Площадь","cmp.r.beds":"Спальни","cmp.r.deadline":"Сдача","cmp.r.status":"Статус",
   "tray.fav":"Подборка","tray.cmp":"Сравнить",
-  "calc.title":"Калькулятор доходности","calc.hint":"Посезонная модель: аренда High / Shoulder / Low сезонов × загрузка, минус УК, обслуживание и капрасходы. Меняйте цифры под себя.",
+  "calc.title":"Калькулятор доходности","calc.hint":"Оценка по аренде за вычетом УК, комиссий площадок, обслуживания и налогов. Меняйте цифры под себя — «Ещё параметры» раскрывает детали и график рассрочки.",
   "calc.price":"Цена сейчас, ฿","calc.handover":"Цена к сдаче, ฿","calc.high":"Аренда High, ฿/мес","calc.shoulder":"Аренда Shoulder, ฿/мес","calc.low":"Аренда Low, ฿/мес","calc.mgmt":"УК, %",
   "calc.more":"Ещё параметры","calc.occh":"Загрузка High, %","calc.occs":"Загрузка Shoulder, %","calc.occl":"Загрузка Low, %",
   "calc.monh":"Мес. High","calc.mons":"Мес. Shoulder","calc.monl":"Мес. Low","calc.area":"Площадь, м²","calc.maint":"Обслуживание, ฿/м²/мес","calc.capex":"Капремонт, ฿/м²/год","calc.meters":"Счётчики, ฿/год","calc.growth":"Рост цены, %/год","calc.build":"Стройка, лет",
@@ -1326,7 +1357,17 @@ ru: {
   "calc.note":"Расчёт-примерка по введённым цифрам, не оферта и не гарантия доходности. Точные цифры по объекту сверим с менеджером.",
   "calc.estimated":"Посезонные ставки по этому объекту уточняются — стартовые цифры оценены по доходности. Впишите свои значения.",
   "calc.any":"Посчитать со своими данными","calc.ask":"Разбор от Дарьи: плюсы и риски",
-  "v.strong":"СИЛЬНОЕ","v.risks":"РИСКИ","v.total":"ИТОГ",
+  "calc.netyr":"Чистыми/год","calc.usd":"≈ ${v} по курсу {r}",
+  "grp.rent":"Аренда","grp.exp":"Расходы в год","grp.oneoff":"Разовые (можно оставить 0)","grp.exit":"Рост и выход","grp.inst":"Рассрочка","grp.fx":"Курс",
+  "calc.modeS":"Краткосрок","calc.modeL":"Долгосрок","calc.longrent":"Аренда, ฿/мес","calc.longocc":"Загрузка, %",
+  "calc.ota":"Комиссия площадок (OTA), %","calc.tax":"Налог с аренды, %",
+  "calc.furn":"Мебельный пакет, ฿","calc.reg":"Регистрация/сбор, ฿","calc.sink":"Фонд капремонта, ฿",
+  "calc.horizon":"Горизонт, лет","calc.exit":"Комиссия при перепродаже, %",
+  "calc.down":"Первый взнос, %","calc.st1":"Этап стройки 1, %","calc.st2":"Этап стройки 2, %","calc.st3":"Этап стройки 3, %","calc.rate":"Курс, ฿/$",
+  "calc.fullinc":"Полный доход за {n} лет","calc.capgain":"Прирост стоимости за {n} лет","calc.disc":"Скидка, %","calc.discp":"Со скидкой: {b} (≈ ${u})","calc.schedttl":"График платежей",
+  "calc.sc.pay":"Платёж","calc.sc.date":"Дата","calc.sc.pct":"%","calc.sc.amt":"Сумма","calc.sc.down":"Первый взнос","calc.sc.stage":"Этап","calc.sc.keys":"Ключи","calc.sc.total":"Итого",
+  "calc.schednote":"Типовой график — уточняется по объекту.","calc.schedwarn":"Сумма этапов больше цены — уменьшите проценты.",
+  "v.strong":"СИЛЬНОЕ","v.risks":"РИСКИ","v.total":"ИТОГ","v.fi":"с учётом роста полный доход ~{r}% за {n} лет","v.fi.hi":" — это сильный совокупный результат","v.fi.lo":" — основной вклад даёт рост цены, а не аренда",
   "v.y.hi":"чистая доходность выше 8% — сильный результат для Пхукета","v.y.mid":"чистая доходность в норме рынка (6–8%)","v.y.lo":"чистая доходность ниже 5% — для инвестиции слабовато, скорее вариант «для себя»",
   "v.roi.hi":"расчётный ROI за 5 лет с ростом капитала выглядит уверенно","v.roi.lo":"основной вклад в результат даёт рост цены, а не аренда — это стоит проверить",
   "v.r.occ":"загрузка и ставки сезонов — прогноз, а не гарантия: проверьте их по аналогам района","v.r.build":"до сдачи объект дохода не приносит — учитывайте срок стройки",
@@ -1478,7 +1519,7 @@ en: {
   "cmp.title":"Property comparison","cmp.cta":"Discuss the differences with a manager","cmp.win":"higher","cmp.need2":"Select at least two properties to compare","cmp.max":"We compare up to three properties — remove one",
   "cmp.r.loc":"Area","cmp.r.type":"Type","cmp.r.price":"Price","cmp.r.area":"Area, m²","cmp.r.beds":"Bedrooms","cmp.r.deadline":"Completion","cmp.r.status":"Status",
   "tray.fav":"Shortlist","tray.cmp":"Compare",
-  "calc.title":"Yield calculator","calc.hint":"Seasonal model: High / Shoulder / Low season rent × occupancy, minus management, maintenance and capital costs. Adjust the numbers to your case.",
+  "calc.title":"Yield calculator","calc.hint":"An estimate from rent minus management, platform fees, maintenance and taxes. Adjust the numbers to your case — “More parameters” reveals the details and the installment schedule.",
   "calc.price":"Price now, ฿","calc.handover":"Price at handover, ฿","calc.high":"High season rent, ฿/mo","calc.shoulder":"Shoulder rent, ฿/mo","calc.low":"Low season rent, ฿/mo","calc.mgmt":"Management, %",
   "calc.more":"More parameters","calc.occh":"High occupancy, %","calc.occs":"Shoulder occupancy, %","calc.occl":"Low occupancy, %",
   "calc.monh":"High months","calc.mons":"Shoulder months","calc.monl":"Low months","calc.area":"Area, m²","calc.maint":"Maintenance, ฿/m²/mo","calc.capex":"Capex, ฿/m²/yr","calc.meters":"Meters, ฿/yr","calc.growth":"Price growth, %/yr","calc.build":"Construction, yrs",
@@ -1486,7 +1527,17 @@ en: {
   "calc.note":"A trial calculation based on your inputs — not an offer or a yield guarantee. We will verify exact numbers per unit with a manager.",
   "calc.estimated":"Seasonal rates for this property are being confirmed — starting figures are estimated from the target yield. Enter your own values.",
   "calc.any":"Calculate with your own numbers","calc.ask":"Daria's take: strengths and risks",
-  "v.strong":"STRONG","v.risks":"RISKS","v.total":"BOTTOM LINE",
+  "calc.netyr":"Net/year","calc.usd":"≈ ${v} at rate {r}",
+  "grp.rent":"Rent","grp.exp":"Expenses per year","grp.oneoff":"One-off (can leave 0)","grp.exit":"Growth & exit","grp.inst":"Installments","grp.fx":"Exchange rate",
+  "calc.modeS":"Short-term","calc.modeL":"Long-term","calc.longrent":"Rent, ฿/mo","calc.longocc":"Occupancy, %",
+  "calc.ota":"Platform fee (OTA), %","calc.tax":"Rental tax, %",
+  "calc.furn":"Furniture package, ฿","calc.reg":"Registration/fees, ฿","calc.sink":"Sinking fund, ฿",
+  "calc.horizon":"Horizon, yrs","calc.exit":"Resale commission, %",
+  "calc.down":"Down payment, %","calc.st1":"Construction stage 1, %","calc.st2":"Construction stage 2, %","calc.st3":"Construction stage 3, %","calc.rate":"Rate, ฿/$",
+  "calc.fullinc":"Total return over {n} yrs","calc.capgain":"Capital growth over {n} yrs","calc.disc":"Discount, %","calc.discp":"Discounted: {b} (≈ ${u})","calc.schedttl":"Payment schedule",
+  "calc.sc.pay":"Payment","calc.sc.date":"Date","calc.sc.pct":"%","calc.sc.amt":"Amount","calc.sc.down":"Down payment","calc.sc.stage":"Stage","calc.sc.keys":"Keys","calc.sc.total":"Total",
+  "calc.schednote":"Typical schedule — confirmed per property.","calc.schedwarn":"Stages exceed the price — reduce the percentages.",
+  "v.strong":"STRONG","v.risks":"RISKS","v.total":"BOTTOM LINE","v.fi":"with growth, total return is ~{r}% over {n} yrs","v.fi.hi":" — a strong combined result","v.fi.lo":" — most of it comes from price growth, not rent",
   "v.y.hi":"net yield above 8% — a strong result for Phuket","v.y.mid":"net yield within the market norm (6–8%)","v.y.lo":"net yield below 5% — weak as an investment, more of a lifestyle purchase",
   "v.roi.hi":"the projected 5-year ROI with capital growth looks solid","v.roi.lo":"most of the result comes from price growth rather than rent — worth double-checking",
   "v.r.occ":"season rates and occupancy are a forecast, not a guarantee: verify against comparable homes in the area","v.r.build":"the property earns nothing until handover — factor in the construction period",
@@ -1554,11 +1605,11 @@ PL.PROPERTIES=[
   {"property_id":"PLP-KIRARA","title":"The Title Villa Kirara Bang-Tao","funnel":"sale","grad":"g3","loc":{"ru":"Банг Тао","en":"Bang Tao"},"type":{"ru":"Вилла","en":"Villa"},"priceUSD":829143,"roi":6,"budget":"b3","beds":"3–4","area":"295–660 м²","deadline":{"ru":"2Q 2026","en":"Q2 2026"},"status":"available","desc":{"ru":"The Title Villa Kirara Bang-Tao — premium pool villa-комьюнити в Si Sunthon, в 5 минутах от Bang Tao Beach. 37 вилл, 5 планировок (3-4BR, 1- и 2-этажные), площади 305-660 м², потолки до 6 м. Приватные бассейны. Клубхаус ~2,000 м² с family onsen, gym, salon. Рядом Mingle Mall, Boat Avenue, Laguna. От 36.1M THB. Completion Q2 2026.","en":"The Title Villa Kirara Bang Tao — a premium pool villa community in Si Sunthon, 5 minutes from Bang Tao Beach. 37 villas, 5 layouts (3–4BR, one- and two-storey), areas 305–660 m², ceilings up to 6 m. Private pools. A ~2,000 m² clubhouse with family onsen, gym, salon. Near Mingle Mall, Boat Avenue, Laguna. From 36.1M THB. Completion Q2 2026."},"calc":{"priceTHB":29020000,"handoverTHB":29020000,"areaM2":295,"mgmtPct":20,"maintM2Month":80,"capexM2":800,"metersTHB":15000,"capGrowthPct":7,"buildYears":0,"estimated":false,"seasons":{"high":{"rent":250000,"occ":65,"months":4},"shoulder":{"rent":200000,"occ":65,"months":2},"low":{"rent":150000,"occ":65,"months":6}}}},
   {"property_id":"PLP-LEGENDARY","title":"The Title Legendary Bang-Tao","funnel":"sale","grad":"g1","loc":{"ru":"Банг Тао","en":"Bang Tao"},"type":{"ru":"Кондо","en":"Condo"},"priceUSD":117143,"roi":7,"budget":"b1","beds":"Studio–2","area":"31–94 м²","deadline":{"ru":"3Q 2025","en":"Q3 2025"},"status":"available","desc":{"ru":"The Title Legendary Bang-Tao — единственный ready-to-move-in проект The Title в 700 м от Bang Tao Beach. 9 корпусов по 7 этажей, 637 юнитов: Studio 31-36 м², 1BR 40-57 м², 1BR Plus 52-56 м², 2BR 65-89 м². Timeless classic + modern luxury дизайн. Premium facilities: golf simulator, boxing gym, onsen+sauna, theater, music room, fitness. EIA approved, ready.","en":"The Title Legendary Bang Tao — the only ready-to-move-in The Title project, 700 m from Bang Tao Beach. 9 buildings of 7 floors, 637 units: Studio 31–36 m², 1BR 40–57 m², 1BR Plus 52–56 m², 2BR 65–89 m². Timeless classic + modern luxury design. Premium facilities: golf simulator, boxing gym, onsen + sauna, theater, music room, fitness. EIA approved, ready."},"calc":{"priceTHB":4100000,"handoverTHB":4100000,"areaM2":31,"mgmtPct":20,"maintM2Month":80,"capexM2":800,"metersTHB":15000,"capGrowthPct":7,"buildYears":0,"estimated":false,"seasons":{"high":{"rent":65000,"occ":75,"months":4},"shoulder":{"rent":50000,"occ":75,"months":2},"low":{"rent":35000,"occ":75,"months":6}}}},
   {"property_id":"PLP-LIBERTY","title":"The Liberty by Wallaya Villas","funnel":"sale","grad":"g3","loc":{"ru":"Банг Тао","en":"Bang Tao"},"type":{"ru":"Кондо","en":"Condo"},"priceUSD":235286,"roi":7,"budget":"b2","beds":"1–2","area":"61–119 м²","deadline":{"ru":"2Q 2028","en":"Q2 2028"},"status":"available","desc":{"ru":"The Liberty by Wallaya Villas — премиальный кондоминиум-комплекс на Cherng Talay из 5 корпусов и 324 юнитов. Стартовая цена 135,000 бат/м² с полной меблировкой. Корпус C — pet-friendly. Project Land Area: 8 Rais (12,800 м²). Дизайн для комфортной современной жизни и высокого инвестиционного потенциала в одной из самых востребованных локаций Пхукета.","en":"The Liberty by Wallaya Villas — a premium condominium complex in Cherng Talay comprising 5 buildings and 324 units. Starting price 135,000 THB/m² fully furnished. Building C is pet-friendly. Project land area: 8 rai (12,800 m²). Designed for comfortable modern living and high investment potential in one of Phuket's most sought-after locations."},"calc":{"priceTHB":8235000,"handoverTHB":9591619,"areaM2":61,"mgmtPct":20,"maintM2Month":80,"capexM2":800,"metersTHB":15000,"capGrowthPct":10,"buildYears":1.6,"estimated":false,"seasons":{"high":{"rent":52000,"occ":70,"months":4},"shoulder":{"rent":40500,"occ":70,"months":2},"low":{"rent":29000,"occ":70,"months":6}}}},
-  {"property_id":"PLP-MODEVA","title":"The Modeva Bang-Tao","funnel":"sale","grad":"g1","loc":{"ru":"Банг Тао","en":"Bang Tao"},"type":{"ru":"Кондо","en":"Condo"},"priceUSD":135720,"roi":null,"budget":"b1","beds":"1–3","area":"29–148 м²","deadline":{"ru":"2Q 2026","en":"Q2 2026"},"status":"available","desc":{"ru":"Кондоминиум с 1-спальными апартаментами площадью 29-32 кв.м в районе Банgtao, Таланг, Пхукет","en":"A condominium with 1-bedroom apartments of 29–32 m² in the Bang Tao area, Thalang, Phuket."},"calc":{"priceTHB":4750200,"handoverTHB":4750200,"areaM2":29,"mgmtPct":20,"maintM2Month":80,"capexM2":800,"metersTHB":15000,"capGrowthPct":5,"buildYears":0,"estimated":false,"seasons":{"high":{"rent":52000,"occ":70,"months":4},"shoulder":{"rent":40500,"occ":70,"months":2},"low":{"rent":29000,"occ":70,"months":6}}}},
+  {"property_id":"PLP-MODEVA","title":"The Modeva Bang-Tao","funnel":"sale","grad":"g1","loc":{"ru":"Банг Тао","en":"Bang Tao"},"type":{"ru":"Кондо","en":"Condo"},"priceUSD":135720,"roi":null,"budget":"b1","beds":"1–3","area":"29–148 м²","deadline":{"ru":"2Q 2026","en":"Q2 2026"},"status":"available","desc":{"ru":"Кондоминиум с 1-спальными апартаментами площадью 29-32 кв.м в районе Бангтао, Таланг, Пхукет","en":"A condominium with 1-bedroom apartments of 29–32 m² in the Bang Tao area, Thalang, Phuket."},"calc":{"priceTHB":4750200,"handoverTHB":4750200,"areaM2":29,"mgmtPct":20,"maintM2Month":80,"capexM2":800,"metersTHB":15000,"capGrowthPct":5,"buildYears":0,"estimated":false,"seasons":{"high":{"rent":52000,"occ":70,"months":4},"shoulder":{"rent":40500,"occ":70,"months":2},"low":{"rent":29000,"occ":70,"months":6}}}},
   {"property_id":"PLP-PEYLAA","title":"PEYLAA Phuket, Autograph Collection Residences","funnel":"sale","grad":"g3","loc":{"ru":"Банг Тао","en":"Bang Tao"},"type":{"ru":"Кондо","en":"Condo"},"priceUSD":220286,"roi":null,"budget":"b2","beds":"1–3","area":"45–129 м²","deadline":{"ru":"4Q 2027","en":"Q4 2027"},"status":"available","desc":{"ru":"Первые брендовые резиденции Marriott Autograph на Пхукете (Bang Tao, 500 м до моря). Freehold, мебель в цене, сдача Q4 2027. 1BR 45.6 м² от ฿7.71M; 2BR 83.5 м² ฿14.5–16.3M; 3BR ฿22.1–25.0M (прайс застройщика 24.06.2026).","en":"The first branded Marriott Autograph residences in Phuket (Bang Tao, 500 m from the sea). Freehold, furniture included, handover Q4 2027. 1BR 45.6 m² from ฿7.71M; 2BR 83.5 m² ฿14.5–16.3M; 3BR ฿22.1–25.0M (developer price list 24.06.2026)."},"calc":{"priceTHB":7710000,"handoverTHB":8214866,"areaM2":45,"mgmtPct":20,"maintM2Month":80,"capexM2":800,"metersTHB":15000,"capGrowthPct":5,"buildYears":1.3,"estimated":false,"seasons":{"high":{"rent":52000,"occ":70,"months":4},"shoulder":{"rent":40500,"occ":70,"months":2},"low":{"rent":29000,"occ":70,"months":6}}}},
   {"property_id":"PLP-SERENITY","title":"The Title Serenity Naiyang","funnel":"sale","grad":"g1","loc":{"ru":"Най Янг","en":"Nai Yang"},"type":{"ru":"Кондо","en":"Condo"},"priceUSD":146547,"roi":6,"budget":"b1","beds":"1–3","area":"26–123 м²","deadline":{"ru":"2Q 2026","en":"Q2 2026"},"status":"available","desc":{"ru":"The Title Serenity Naiyang — Modern Oceanic style рядом с Sirinat National Park. 6 корпусов по 7 этажей, 814 апартаментов 26-123 м². 22,053 м² (13.78 rai). Rooftop infinity pool, climbing wall, hydrotherapy corner, onsen, karaoke theater. 400 м до Nai Yang Beach, 7 км до аэропорта (5 мин). Construction Sep 2024 → Completion June 2026.","en":"The Title Serenity Naiyang — Modern Oceanic style next to Sirinat National Park. 6 buildings of 7 floors, 814 apartments of 26–123 m². 22,053 m² (13.78 rai). Rooftop infinity pool, climbing wall, hydrotherapy corner, onsen, karaoke theater. 400 m to Nai Yang Beach, 7 km to the airport (5 min). Construction Sep 2024 → Completion June 2026."},"calc":{"priceTHB":5129155,"handoverTHB":5129155,"areaM2":26,"mgmtPct":20,"maintM2Month":80,"capexM2":800,"metersTHB":15000,"capGrowthPct":7,"buildYears":0,"estimated":false,"seasons":{"high":{"rent":44000,"occ":65,"months":4},"shoulder":{"rent":35000,"occ":65,"months":2},"low":{"rent":26000,"occ":65,"months":6}}}},
   {"property_id":"PLP-SIERRA","title":"The Title Sierra","funnel":"sale","grad":"g4","loc":{"ru":"Банг Тао","en":"Bang Tao"},"type":{"ru":"Кондо","en":"Condo"},"priceUSD":89869,"roi":7,"budget":"b1","beds":"1–2","area":"28–63 м²","deadline":{"ru":"4Q 2027","en":"Q4 2027"},"status":"available","desc":{"ru":"The Title Sierra — Urban Leisure Living в 3 км от Bang Tao. 3 корпуса (A, B, C pet-friendly) по 8 этажей, 4 типа планировок 28-63 м². Land 4.348 rai (6,957 м²). 24 facilities: Lap Pool 4×25м, Drift Pool, Party Pool, Sip Bar, Theater Room, Game Room, Kids Room, Co-Working. 1,700+ м² зелёных пространств. Shuttle до пляжа.","en":"The Title Sierra — Urban Leisure Living 3 km from Bang Tao. 3 buildings (A, B, C pet-friendly) of 8 floors, 4 layout types of 28–63 m². Land 4.348 rai (6,957 m²). 24 facilities: Lap Pool 4×25 m, Drift Pool, Party Pool, Sip Bar, Theater Room, Game Room, Kids Room, Co-Working. 1,700+ m² of green space. Shuttle to the beach."},"calc":{"priceTHB":3145400,"handoverTHB":3434589,"areaM2":28,"mgmtPct":20,"maintM2Month":80,"capexM2":800,"metersTHB":15000,"capGrowthPct":7,"buildYears":1.3,"estimated":false,"seasons":{"high":{"rent":52000,"occ":70,"months":4},"shoulder":{"rent":40500,"occ":70,"months":2},"low":{"rent":29000,"occ":70,"months":6}}}},
-  {"property_id":"PLP-SUNHILLS-LAYAN","title":"SUN HILLS Layan","funnel":"sale","grad":"g1","loc":{"ru":"Лаян","en":"Layan"},"type":{"ru":"Кондо","en":"Condo"},"priceUSD":94643,"roi":8,"budget":"b1","beds":"Studio–2","area":"26.5–70.4 м²","deadline":{"ru":"4Q 2027","en":"Q4 2027"},"status":"available","desc":{"ru":"Амбассадор Хабиб Нурмагомедов; управление Unicorn Hospitality; Layan Beach; Net Yield старт 7–9%, Cap Rate 5,5%, IRR 15 лет 13–18%","en":"Ambassador Khabib Nurmagomedov; managed by Unicorn Hospitality; Layan Beach; Net Yield starting 7–9%, Cap Rate 5.5%, 15-year IRR 13–18%."},"calc":{"priceTHB":3312500,"handoverTHB":4519608,"areaM2":26.5,"mgmtPct":20,"maintM2Month":80,"capexM2":800,"metersTHB":15000,"capGrowthPct":27,"buildYears":1.3,"estimated":true,"seasons":{"high":{"rent":48607,"occ":70,"months":4},"shoulder":{"rent":48607,"occ":70,"months":2},"low":{"rent":48607,"occ":70,"months":6}}}},
+  {"property_id":"PLP-SUNHILLS-LAYAN","title":"SUN HILLS Layan","funnel":"sale","grad":"g1","loc":{"ru":"Лаян","en":"Layan"},"type":{"ru":"Кондо","en":"Condo"},"priceUSD":94643,"roi":8,"budget":"b1","beds":"Studio–2","area":"26.5–70.4 м²","deadline":{"ru":"4Q 2027","en":"Q4 2027"},"status":"available","desc":{"ru":"Амбассадор Хабиб Нурмагомедов; управление Unicorn Hospitality; Layan Beach; Net Yield старт 7–9%, Cap Rate 5,5%, IRR 15 лет 13–18%","en":"Ambassador Khabib Nurmagomedov; managed by Unicorn Hospitality; Layan Beach; Net Yield starting 7–9%, Cap Rate 5.5%, 15-year IRR 13–18%."},"calc":{"priceTHB":3312500,"handoverTHB":4519608,"areaM2":26.5,"mgmtPct":20,"maintM2Month":80,"capexM2":800,"metersTHB":15000,"capGrowthPct":10,"buildYears":1.3,"estimated":true,"seasons":{"high":{"rent":48607,"occ":70,"months":4},"shoulder":{"rent":48607,"occ":70,"months":2},"low":{"rent":48607,"occ":70,"months":6}}}},
   {"property_id":"PLP-VIVANA","title":"The Title Vivana Kamala","funnel":"sale","grad":"g2","loc":{"ru":"Камала","en":"Kamala"},"type":{"ru":"Кондо","en":"Condo"},"priceUSD":99600,"roi":7,"budget":"b1","beds":"1–2","area":"30–128 м²","deadline":{"ru":"4Q 2028","en":"Q4 2028"},"status":"available","desc":{"ru":"The Title Vivana Kamala — Italian Coastal Style проект вдохновленный Amalfi Coast и Cinque Terre. 6.4 рай (10,360 м²), 4 корпуса по 8 этажей (A pet-friendly + B, C, D), 363 units. 7 типов планировок 30-128 м². Common 5,230 м² (вкл. green 1,800, pool 770, rooftop 380). 20 outdoor + 8 indoor facilities, 25м lap pool, pet park, hydrotherapy. Shuttle Mingle Crystal Lake → Kamala. 1.4 км до Kamala Beach. От 3,486,000 THB. Completion 2028.","en":"The Title Vivana Kamala — Italian Coastal Style project inspired by the Amalfi Coast and Cinque Terre. 6.4 rai (10,360 m²), 4 buildings of 8 floors (A pet-friendly + B, C, D), 363 units. 7 layout types of 30–128 m². Common area 5,230 m² (incl. 1,800 green, 770 pool, 380 rooftop). 20 outdoor + 8 indoor facilities, 25 m lap pool, pet park, hydrotherapy. Shuttle Mingle Crystal Lake → Kamala. 1.4 km to Kamala Beach. From 3,486,000 THB. Completion 2028."},"calc":{"priceTHB":3486000,"handoverTHB":4250190,"areaM2":30,"mgmtPct":20,"maintM2Month":80,"capexM2":800,"metersTHB":15000,"capGrowthPct":9,"buildYears":2.3,"estimated":false,"seasons":{"high":{"rent":55000,"occ":73,"months":4},"shoulder":{"rent":42500,"occ":73,"months":2},"low":{"rent":30000,"occ":73,"months":6}}}},
   {"property_id":"PLP-VIVI","title":"The Title VIVI","funnel":"sale","grad":"g4","loc":{"ru":"Банг Тао","en":"Bang Tao"},"type":{"ru":"Кондо","en":"Condo"},"priceUSD":100000,"roi":7,"budget":"b1","beds":"1","area":"27–52 м²","deadline":{"ru":"4Q 2027","en":"Q4 2027"},"status":"available","desc":{"ru":"Бутик-кондо с уникальной концепцией per-floor amenities у Банг Тао: коворкинг, кинозал, кофейня и сауна на разных этажах. 1 башня, 8 этажей, 181 апартамент, rooftop infinity pool. Цены от 3,5 млн THB. Сдача Q4 2027.","en":"A boutique condo with a unique per-floor amenities concept by Bang Tao: co-working, cinema, coffee shop and sauna on different floors. 1 tower, 8 floors, 181 apartments, rooftop infinity pool. Prices from 3.5M THB. Handover Q4 2027."},"calc":{"priceTHB":3500000,"handoverTHB":3961672,"areaM2":27,"mgmtPct":20,"maintM2Month":80,"capexM2":800,"metersTHB":15000,"capGrowthPct":10,"buildYears":1.3,"estimated":false,"seasons":{"high":{"rent":30000,"occ":75,"months":4},"shoulder":{"rent":25000,"occ":75,"months":2},"low":{"rent":20000,"occ":75,"months":6}}}}
 ];
@@ -2093,55 +2144,118 @@ function wireBooking(p){
 }
 function calcHTML(p){
   var c=p.calc,S=c.seasons;
+  function d(v,dflt){return v!=null?v:dflt;}
   function fld(id,label,val,step){return '<div class="fld"><label>'+label+'</label><input id="'+id+'" type="number" '+(step?('step="'+step+'" '):'')+'value="'+val+'"></div>';}
+  function grp(title,inner){return '<div class="calc-grp"><div class="gh">'+title+'</div>'+inner+'</div>';}
+  var sink=Math.round((c.capexM2||0)*(c.areaM2||0));           /* prefill фонда капремонта из capex×площадь */
+  var longRent=Math.round(S.shoulder.rent);                    /* стартовая долгосрочная = shoulder */
+  var seasonal='<div class="calc-inputs" id="segSeason">'+
+    fld('cHigh',t('calc.high'),S.high.rent)+fld('cShoulder',t('calc.shoulder'),S.shoulder.rent)+fld('cLow',t('calc.low'),S.low.rent)+
+    fld('cOccH',t('calc.occh'),S.high.occ,'0.1')+fld('cOccS',t('calc.occs'),S.shoulder.occ,'0.1')+fld('cOccL',t('calc.occl'),S.low.occ,'0.1')+
+    fld('cMonH',t('calc.monh'),S.high.months)+fld('cMonS',t('calc.mons'),S.shoulder.months)+fld('cMonL',t('calc.monl'),S.low.months)+
+    '</div>';
+  var longt='<div class="calc-inputs" id="segLong" style="display:none">'+
+    fld('cLong',t('calc.longrent'),longRent)+fld('cLongOcc',t('calc.longocc'),95,'0.1')+'</div>';
+  var rentGrp=grp(t('grp.rent'),
+    '<div class="calc-seg" id="cModeSeg"><button type="button" data-m="short" class="on">'+t('calc.modeS')+'</button><button type="button" data-m="long">'+t('calc.modeL')+'</button></div>'+
+    seasonal+longt);
+  var expGrp=grp(t('grp.exp'),'<div class="calc-inputs">'+
+    fld('cMgmt',t('calc.mgmt'),c.mgmtPct,'0.1')+fld('cOta',t('calc.ota'),d(c.otaPct,15),'0.1')+
+    fld('cMaint',t('calc.maint'),c.maintM2Month)+fld('cArea',t('calc.area'),c.areaM2)+
+    fld('cMeters',t('calc.meters'),c.metersTHB)+fld('cTax',t('calc.tax'),d(c.taxPct,0),'0.1')+'</div>');
+  var oneGrp=grp(t('grp.oneoff'),'<div class="calc-inputs">'+
+    fld('cFurn',t('calc.furn'),d(c.furnitureTHB,0))+fld('cReg',t('calc.reg'),d(c.regTHB,0))+fld('cSink',t('calc.sink'),sink)+'</div>');
+  var exitGrp=grp(t('grp.exit'),'<div class="calc-inputs">'+
+    fld('cGrowth',t('calc.growth'),c.capGrowthPct,'0.1')+fld('cHorizon',t('calc.horizon'),d(c.horizonYears,5))+
+    fld('cBuild',t('calc.build'),c.buildYears,'0.1')+fld('cExit',t('calc.exit'),d(c.exitPct,0),'0.1')+'</div>');
+  var instGrp=grp(t('grp.inst'),'<div class="calc-inputs">'+
+    fld('cHand',t('calc.handover'),c.handoverTHB)+fld('cDown',t('calc.down'),d(c.downPct,30),'0.1')+
+    fld('cSt1',t('calc.st1'),d(c.stage1Pct,10),'0.1')+fld('cSt2',t('calc.st2'),d(c.stage2Pct,10),'0.1')+fld('cSt3',t('calc.st3'),d(c.stage3Pct,10),'0.1')+'</div>');
+  var fxGrp=grp(t('grp.fx'),'<div class="calc-inputs">'+fld('cRate',t('calc.rate'),RATE,'0.1')+'</div>');
   return '<div class="toolbox"><div class="th">📈 '+t('calc.title')+'<span class="pid">'+p.property_id+'</span></div>'+
     '<div class="tnote" style="margin-bottom:10px">'+t('calc.hint')+'</div>'+
     (c.estimated?'<div class="tnote" style="margin-bottom:10px;color:#b8863b">⚠️ '+t('calc.estimated')+'</div>':'')+
-    '<div class="calc-inputs">'+
-    fld('cPrice',t('calc.price'),c.priceTHB)+
-    fld('cHand',t('calc.handover'),c.handoverTHB)+
-    fld('cHigh',t('calc.high'),S.high.rent)+
-    fld('cShoulder',t('calc.shoulder'),S.shoulder.rent)+
-    fld('cLow',t('calc.low'),S.low.rent)+
-    fld('cMgmt',t('calc.mgmt'),c.mgmtPct)+
-    '</div>'+
-    '<details class="calc-more"><summary>'+t('calc.more')+'</summary><div class="calc-inputs" style="margin-top:10px">'+
-    fld('cOccH',t('calc.occh'),S.high.occ,'0.1')+fld('cOccS',t('calc.occs'),S.shoulder.occ,'0.1')+fld('cOccL',t('calc.occl'),S.low.occ,'0.1')+
-    fld('cMonH',t('calc.monh'),S.high.months)+fld('cMonS',t('calc.mons'),S.shoulder.months)+fld('cMonL',t('calc.monl'),S.low.months)+
-    fld('cArea',t('calc.area'),c.areaM2)+fld('cMaint',t('calc.maint'),c.maintM2Month)+
-    fld('cCapex',t('calc.capex'),c.capexM2)+fld('cMeters',t('calc.meters'),c.metersTHB)+
-    fld('cGrowth',t('calc.growth'),c.capGrowthPct,'0.1')+fld('cBuild',t('calc.build'),c.buildYears)+
-    '</div></details>'+
+    '<div class="calc-price-lead"><label>'+t('calc.price')+'</label><div class="prow"><input id="cPrice" type="number" value="'+c.priceTHB+'"><span class="usd" id="cUsd"></span></div>'+
+    '<div class="calc-disc"><label>'+t('calc.disc')+'</label><input id="cDisc" type="number" step="0.1" value="'+d(c.discountPct,0)+'"><div class="calc-preset" id="cDiscPre"><button type="button" data-v="0">0</button><button type="button" data-v="5">5%</button><button type="button" data-v="10">10%</button></div><span class="disout" id="cDiscOut"></span></div></div>'+
+    '<div class="calc-kpi" id="calcKpi"></div>'+
+    '<details class="calc-more"><summary>'+t('calc.more')+' &#9662;</summary>'+
+    rentGrp+expGrp+oneGrp+exitGrp+instGrp+fxGrp+'</details>'+
     '<div class="calc-out" id="calcOut"></div>'+
     '<div class="tnote">'+t('calc.note')+'</div></div>';
 }
+/* график рассрочки: down сегодня, 3 этапа по срокам стройки, ключи=остаток; итог сходится с ценой */
+function schedHTML(base,downPct,s1,s2,s3,buildYears){
+  base=Math.max(0,base||0);
+  var keysPct=100-(downPct+s1+s2+s3),warn=keysPct<-0.001;if(keysPct<0)keysPct=0;
+  var now=new Date(),months=Math.max(0,(buildYears||0)*12);
+  function addM(m){var x=new Date(now);x.setMonth(x.getMonth()+Math.round(m));return x;}
+  function fd(x){return ('0'+(x.getMonth()+1)).slice(-2)+'.'+x.getFullYear();}
+  var rows=[[t('calc.sc.down'),now,downPct],[t('calc.sc.stage')+' 1',addM(months/4),s1],[t('calc.sc.stage')+' 2',addM(months/2),s2],[t('calc.sc.stage')+' 3',addM(months*3/4),s3],[t('calc.sc.keys'),addM(months),keysPct]];
+  var total=0,body='';
+  rows.forEach(function(r){var amt=base*Math.max(0,r[2])/100;total+=amt;
+    body+='<tr><td>'+r[0]+'</td><td>'+fd(r[1])+'</td><td class="num">'+(Math.max(0,r[2])).toFixed(0)+'%</td><td class="num">'+fmtTHB(amt)+'</td></tr>';});
+  return '<table class="calc-sched"><thead><tr><th>'+t('calc.sc.pay')+'</th><th>'+t('calc.sc.date')+'</th><th class="num">'+t('calc.sc.pct')+'</th><th class="num">'+t('calc.sc.amt')+'</th></tr></thead><tbody>'+body+
+    '<tr class="total"><td>'+t('calc.sc.total')+'</td><td></td><td class="num">'+((downPct+s1+s2+s3+keysPct)).toFixed(0)+'%</td><td class="num">'+fmtTHB(total)+'</td></tr></tbody></table>'+
+    (warn?'<div class="tnote" style="color:#b8863b">⚠️ '+t('calc.schedwarn')+'</div>':'')+'<div class="tnote">'+t('calc.schednote')+'</div>';
+}
 function wireCalc(p){
-  var ids=['cPrice','cHand','cHigh','cShoulder','cLow','cMgmt','cOccH','cOccS','cOccL','cMonH','cMonS','cMonL','cArea','cMaint','cCapex','cMeters','cGrowth','cBuild'];
-  function num(id){return +document.getElementById(id).value||0;}
+  var mode='short';
+  var ids=['cPrice','cDisc','cHand','cHigh','cShoulder','cLow','cLong','cLongOcc','cMgmt','cOta','cMaint','cArea','cMeters','cTax','cFurn','cReg','cSink','cGrowth','cHorizon','cBuild','cExit','cDown','cSt1','cSt2','cSt3','cRate'];
+  function num(id){var el=document.getElementById(id);return el?(+el.value||0):0;}
   function run(){
-    var price=num('cPrice'),handover=num('cHand');
+    var listed=num('cPrice'),handover=num('cHand'),rate=num('cRate')||RATE;
+    var disc=Math.min(100,Math.max(0,num('cDisc')));
+    var price=listed*(1-disc/100);   /* цена покупки со скидкой = база для доходности */
     var mgmt=Math.min(100,Math.max(0,num('cMgmt')));
-    var r=calcEngine({price:price,high:num('cHigh'),shoulder:num('cShoulder'),low:num('cLow'),
+    var r=calcEngine({price:price,mode:mode,longRent:num('cLong'),longOcc:num('cLongOcc'),
+      high:num('cHigh'),shoulder:num('cShoulder'),low:num('cLow'),
       occH:num('cOccH'),occS:num('cOccS'),occL:num('cOccL'),monH:num('cMonH'),monS:num('cMonS'),monL:num('cMonL'),
-      mgmt:mgmt,maint:num('cMaint'),area:num('cArea'),capex:num('cCapex'),meters:num('cMeters')});
+      mgmt:mgmt,ota:num('cOta'),tax:num('cTax'),maint:num('cMaint'),area:num('cArea'),meters:num('cMeters')});
     var gross=r.gross,expenses=r.expenses,net=r.net,grossY=r.grossY,netY=r.netY,payback=r.payback;
-    var rentYears=Math.max(0,5-num('cBuild'));
-    var apprBuild=handover-price;
-    var apprAfter=handover*(Math.pow(1+num('cGrowth')/100,rentYears)-1);
-    var accNet=net*rentYears;
-    var roi5=price>0?(apprBuild+apprAfter+accNet)/price*100:0;
+    var horizon=Math.max(0,num('cHorizon')),build=num('cBuild');
+    var rentYears=Math.max(0,horizon-build);
+    var growth=num('cGrowth')/100;
+    var valueEnd=handover*Math.pow(1+growth,rentYears);
+    var capGain=valueEnd-price;
+    var exitFee=valueEnd*Math.max(0,num('cExit'))/100;
+    var oneOff=num('cFurn')+num('cReg')+num('cSink');
+    var rentalTotal=net*rentYears;
+    var fullInc=rentalTotal+capGain-oneOff-exitFee;
+    var roi5=price>0?(capGain+rentalTotal)/price*100:0;   /* для разбора Дарьи (сохранена семантика) */
+    var usd=document.getElementById('cUsd');
+    if(usd)usd.textContent=listed>0?tpl('calc.usd',{v:Math.round(listed/rate).toLocaleString('en-US'),r:rate}):'';
+    var dout=document.getElementById('cDiscOut');
+    if(dout)dout.textContent=disc>0?tpl('calc.discp',{b:fmtTHB(price),u:Math.round(price/rate).toLocaleString('en-US')}):'';
+    var pre=document.getElementById('cDiscPre');
+    if(pre)pre.querySelectorAll('button').forEach(function(b){b.classList.toggle('on',+b.dataset.v===disc);});
+    document.getElementById('calcKpi').innerHTML=
+      '<div class="kpi"><div class="kv">'+fmtTHB(net)+'</div><div class="kl">'+t('calc.netyr')+'</div></div>'+
+      '<div class="kpi"><div class="kv">'+netY.toFixed(1)+'%</div><div class="kl">'+t('calc.netyield')+'</div></div>'+
+      '<div class="kpi"><div class="kv">'+(payback>0?payback.toFixed(1)+' '+t('calc.years'):'—')+'</div><div class="kl">'+t('calc.payback')+'</div></div>';
     document.getElementById('calcOut').innerHTML=
+      '<div class="big"><span class="k">'+tpl('calc.fullinc',{n:horizon})+'</span><span class="v">'+fmtTHB(fullInc)+'</span></div>'+
+      '<div class="row grow" style="margin-top:6px"><span>'+tpl('calc.capgain',{n:horizon})+'</span><b>+'+fmtTHB(capGain)+'</b></div>'+
       '<div class="row"><span>'+t('calc.gross')+'</span><b>'+fmtTHB(gross)+'</b></div>'+
       '<div class="row"><span>'+t('calc.expenses')+'</span><b>−'+fmtTHB(expenses)+'</b></div>'+
-      '<div class="row"><span>'+t('calc.net')+'</span><b>'+fmtTHB(net)+'</b></div>'+
-      '<div class="big"><span class="k">'+t('calc.netyield')+'</span><span class="v">'+netY.toFixed(1)+'%</span></div>'+
-      '<div class="row" style="margin-top:6px"><span>'+t('calc.grossyield')+'</span><b>'+grossY.toFixed(1)+'%</b></div>'+
-      '<div class="row"><span>'+t('calc.roi5')+'</span><b>'+roi5.toFixed(0)+'%</b></div>'+
-      '<div class="row"><span>'+t('calc.payback')+'</span><b>'+(payback>0?payback.toFixed(1)+' '+t('calc.years'):'—')+'</b></div>'+
+      '<div class="row"><span>'+t('calc.grossyield')+'</span><b>'+grossY.toFixed(1)+'%</b></div>'+
+      '<details class="calc-more"><summary>'+t('calc.schedttl')+' &#9662;</summary>'+schedHTML(handover,num('cDown'),num('cSt1'),num('cSt2'),num('cSt3'),build)+'</details>'+
       '<div class="ai-verdict" id="aiVerdict"><button type="button" class="ai-ask" onclick="askVerdict()">'+t('calc.ask')+'</button></div>';
-    window.__calcSnapshot={pid:p&&p.property_id,gross:gross,expenses:expenses,net:net,grossY:grossY,netY:netY,payback:payback,roi5:roi5,price:price,handover:handover,mgmt:mgmt,build:num('cBuild')};
+    window.__calcSnapshot={pid:p&&p.property_id,gross:gross,expenses:expenses,net:net,grossY:grossY,netY:netY,payback:payback,roi5:roi5,fullInc:fullInc,horizon:horizon,price:price,handover:handover,mgmt:mgmt,build:build,mode:mode};
   }
-  ids.forEach(function(id){var el=document.getElementById(id);if(el)el.addEventListener('input',run);});
+  var pre=document.getElementById('cDiscPre');
+  if(pre)pre.querySelectorAll('button').forEach(function(b){b.addEventListener('click',function(){
+    var di=document.getElementById('cDisc');if(di){di.value=b.dataset.v;}run();
+  });});
+  var seg=document.getElementById('cModeSeg');
+  if(seg)seg.querySelectorAll('button').forEach(function(b){b.addEventListener('click',function(){
+    mode=b.dataset.m;
+    seg.querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x===b);});
+    var ss=document.getElementById('segSeason'),sl=document.getElementById('segLong');
+    if(ss)ss.style.display=mode==='long'?'none':'';
+    if(sl)sl.style.display=mode==='long'?'':'none';
+    run();
+  });});
+  ids.concat(['cOccH','cOccS','cOccL','cMonH','cMonS','cMonL']).forEach(function(id){var el=document.getElementById(id);if(el)el.addEventListener('input',run);});
   run();
 }
 /* Разбор доходности словами — локальные правила (пороги рынка: net 6–8% норма, >8% сильно, <5% слабо) */
@@ -2157,6 +2271,9 @@ function askVerdict(){
   if(s.netY<5)risks.push(t('v.y.lo'));
   else if(s.build>=1)risks.push(t('v.r.build'));
   total=(s.netY>=5?t('v.t.mid'):t('v.t.lo'));
+  if(s.roi5!=null&&isFinite(s.roi5)){   /* явно про полный доход с учётом роста */
+    total+='. '+tpl('v.fi',{r:s.roi5.toFixed(0),n:s.horizon!=null?s.horizon:5})+(s.roi5>=60?t('v.fi.hi'):t('v.fi.lo'));
+  }
   function block(k,v){return '<div class="avr"><span class="ak">'+k+'</span><span class="av">'+v+'</span></div>';}
   box.innerHTML='<div class="ai-txt">'+
     block(t('v.strong'),strong.join('; '))+
@@ -2170,8 +2287,12 @@ function fmtSp(n){n=Math.round(n||0);var s=String(Math.abs(n)).replace(/\B(?=(\d
 function fmtBt(n){return '\u0e3f'+fmtSp(n);}
 function tpl(k,map){var s=t(k);Object.keys(map).forEach(function(x){s=s.split('{'+x+'}').join(map[x]);});return s;}
 function calcEngine(v){
-  var gross=v.high*v.monH*v.occH/100+v.shoulder*v.monS*v.occS/100+v.low*v.monL*v.occL/100;
-  var expenses=gross*Math.min(100,Math.max(0,v.mgmt))/100+v.maint*v.area*12+v.capex*v.area+v.meters;
+  var gross;
+  if(v.mode==='long'){gross=(v.longRent||0)*12*Math.min(100,Math.max(0,v.longOcc||0))/100;}
+  else{gross=v.high*v.monH*v.occH/100+v.shoulder*v.monS*v.occS/100+v.low*v.monL*v.occL/100;}
+  var ota=(v.mode==='long')?0:gross*Math.max(0,v.ota||0)/100;   /* OTA только для краткосрока */
+  var tax=gross*Math.max(0,v.tax||0)/100;
+  var expenses=gross*Math.min(100,Math.max(0,v.mgmt))/100+ota+tax+(v.maint||0)*(v.area||0)*12+(v.meters||0);
   var net=gross-expenses;
   return {gross:gross,expenses:expenses,net:net,
     netY:v.price>0?net/v.price*100:0,grossY:v.price>0?gross/v.price*100:0,
@@ -2181,7 +2302,7 @@ function calcFromData(c){
   var S=c.seasons;
   return calcEngine({price:c.priceTHB,high:S.high.rent,shoulder:S.shoulder.rent,low:S.low.rent,
     occH:S.high.occ,occS:S.shoulder.occ,occL:S.low.occ,monH:S.high.months,monS:S.shoulder.months,monL:S.low.months,
-    mgmt:c.mgmtPct,maint:c.maintM2Month,area:c.areaM2,capex:c.capexM2,meters:c.metersTHB});
+    mgmt:c.mgmtPct,maint:c.maintM2Month,area:c.areaM2,meters:c.metersTHB});
 }
 
 /* ===== SALE FILTERS / SEARCH / SORT ===== */
