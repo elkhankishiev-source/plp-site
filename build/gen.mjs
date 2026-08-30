@@ -534,6 +534,10 @@ function sitemap(objects) {
   for (const a of anchors) {
     parts.push(`  <url><loc>${SITE_BASE}/${a}</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>`);
   }
+  // 30.08: правовые документы тоже индексируем — они часть сайта
+  for (const doc of ['privacy.html', 'rules.html', 'terms.html']) {
+    parts.push(`  <url><loc>${SITE_BASE}/${doc}</loc><lastmod>${today}</lastmod><changefreq>yearly</changefreq><priority>0.3</priority></url>`);
+  }
   for (const o of objects) {
     const loc = SITE_BASE + '/object/' + slugOf(o.plp_property_id) + '.html';
     parts.push(`  <url><loc>${loc}</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>`);

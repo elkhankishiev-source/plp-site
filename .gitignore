@@ -1,0 +1,7 @@
+# внутренние черновики и ТЗ — на публичный сайт не выкладываем
+prototype_*.html
+site_about.html
+site_home.html
+site_rent.html
+tz_*.txt
+*.bak
