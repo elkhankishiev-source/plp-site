@@ -200,10 +200,23 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
           <div class="field">
             <label>Категория</label>
             <select id="eCat">
-              <option value="уборка">Уборка</option>
-              <option value="ремонт">Ремонт</option>
-              <option value="коммуналка">Коммуналка</option>
-              <option value="прочее">Прочее</option>
+              <optgroup label="Коммунальные (договоры на имя собственника)">
+                <option value="electricity">Электроэнергия</option>
+                <option value="water">Водоснабжение</option>
+                <option value="internet">Интернет</option>
+                <option value="waste">Вывоз мусора</option>
+              </optgroup>
+              <optgroup label="Эксплуатация">
+                <option value="cleaning">Уборка</option>
+                <option value="repair">Ремонт и инженерные системы</option>
+                <option value="aircon">Обслуживание кондиционеров и оборудования</option>
+                <option value="security">Охранная и пожарная сигнализация</option>
+              </optgroup>
+              <optgroup label="Прочее по договору">
+                <option value="insurance">Страхование объекта</option>
+                <option value="tax">Налоги и сборы</option>
+                <option value="other">Прочее</option>
+              </optgroup>
             </select>
           </div>
           <div class="field"><label>Сумма, THB</label><input id="eAmount" inputmode="numeric" placeholder="0"></div>
