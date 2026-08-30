@@ -266,6 +266,15 @@ h3{font-size:1.12rem;font-weight:700}
 .hero-grid{display:grid;gap:28px;align-items:center}
 @media(min-width:900px){.hero-grid{grid-template-columns:1.15fr 1fr;gap:56px}.hero{padding:56px 0}}
 .hero-cta{display:flex;flex-wrap:wrap;gap:14px;margin-top:22px}
+.srv-strip{margin-bottom:34px}
+.srv-head h3{font-size:1.5rem;margin:6px 0 8px;letter-spacing:-.02em}
+.srv-head p{color:var(--muted);max-width:58ch;margin:0 0 18px}
+.srv-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.srv-card{display:flex;flex-direction:column;align-items:flex-start;gap:5px;text-align:left;background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 20px;cursor:pointer;transition:transform .2s,box-shadow .2s}
+.srv-card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.srv-card b{font-size:1rem}
+.srv-card span{font-size:.85rem;color:var(--muted);line-height:1.45}
+.srv-card i{font-style:normal;font-size:.8rem;font-weight:700;color:var(--green-deep);margin-top:6px}
 .hero-photo{
   position:relative;aspect-ratio:4/5;border-radius:24px;overflow:hidden;
   background:
@@ -1011,6 +1020,7 @@ h3{font-size:1.12rem;font-weight:700}
 <section id="do" style="padding-top:0">
   <div class="container">
     <div class="reveal">
+      <div class="srv-strip"><div class="srv-head"><span class="kicker" data-i18n="srv.lab">Сервис</span><h3 data-i18n="srv.h2">Не только сделка</h3><p data-i18n="srv.p">Встретим, довезём, поможем на месте. Условия согласуем лично — напишите, что нужно.</p></div><div class="srv-cards"><button type="button" class="srv-card" onclick="requestService('transfer')"><b data-i18n="srv.transfer">Трансфер на просмотр</b><span data-i18n="srv.transfer.d">Показываем объекты — забираем и привозим</span><i data-i18n="srv.cta">Оставить заявку</i></button><button type="button" class="srv-card" onclick="requestService('meet')"><b data-i18n="srv.meet">Встреча в аэропорту</b><span data-i18n="srv.meet.d">Встретим рейс и довезём до жилья</span><i data-i18n="srv.cta">Оставить заявку</i></button><button type="button" class="srv-card" onclick="requestService('clean')"><b data-i18n="srv.clean">Уборка</b><span data-i18n="srv.clean.d">Для тех, кто уже живёт в нашем объекте</span><i data-i18n="srv.cta">Оставить заявку</i></button></div></div>
       <span class="kicker" data-i18n="do.lab">Преимущества</span>
       <h2 data-i18n="do.h2">С нами легко выбрать, купить и переехать</h2>
     </div>
@@ -1336,7 +1346,7 @@ ru: {
   "q.7":"Где удобнее общаться?","q.7a":"WhatsApp","q.7b":"Telegram","q.7c":"Viber","q.7d":"Звонок",
   "q.8":"Куда прислать подборку?","q.8name":"Ваше имя","q.8contact":"Телефон или @ник","q.8consent":"Согласен на обработку персональных данных и получение подборки",
   "q.8send":"Получить подборку",
-  "do.lab":"Преимущества","do.h2":"С нами легко выбрать, купить и переехать",
+  "srv.lab":"Сервис","srv.h2":"Не только сделка","srv.p":"Встретим, довезём, поможем на месте. Условия согласуем лично — напишите, что нужно.","srv.transfer":"Трансфер на просмотр","srv.meet":"Встреча в аэропорту","srv.clean":"Уборка","srv.transfer.d":"Показываем объекты — забираем и привозим","srv.meet.d":"Встретим рейс и довезём до жилья","srv.clean.d":"Для тех, кто уже живёт в нашем объекте","srv.cta":"Оставить заявку","do.lab":"Преимущества","do.h2":"С нами легко выбрать, купить и переехать",
   "do.1t":"Эксклюзивные объекты","do.1p":"Уникальные варианты жилья, которых нет в открытом доступе.",
   "do.2t":"Партнёрство с застройщиками","do.2p":"Выгодные условия и дополнительные бонусы для наших клиентов.",
   "do.3t":"Консультация под цели","do.3p":"Поможем понять рынок и подберём недвижимость под ваши задачи.",
@@ -1519,7 +1529,7 @@ en: {
   "q.7":"Where is it easier to talk?","q.7a":"WhatsApp","q.7b":"Telegram","q.7c":"Viber","q.7d":"Phone call",
   "q.8":"Where should we send the shortlist?","q.8name":"Your name","q.8contact":"Phone or @handle","q.8consent":"I agree to personal data processing and receiving the shortlist",
   "q.8send":"Get the shortlist",
-  "do.lab":"Advantages","do.h2":"Choosing, buying and moving is easy with us",
+  "srv.lab":"Service","srv.h2":"More than a deal","srv.p":"We meet you, drive you, and help on the ground. Terms agreed personally — just tell us what you need.","srv.transfer":"Viewing transfer","srv.meet":"Airport pickup","srv.clean":"Cleaning","srv.transfer.d":"We collect you and bring you back","srv.meet.d":"We meet your flight and drive you home","srv.clean.d":"For guests already staying with us","srv.cta":"Send a request","do.lab":"Advantages","do.h2":"Choosing, buying and moving is easy with us",
   "do.1t":"Exclusive properties","do.1p":"Unique homes you will not find on the open market.",
   "do.2t":"Developer partnerships","do.2p":"Better terms and extra bonuses for our clients.",
   "do.3t":"Goal-based advice","do.3p":"We help you understand the market and match property to your goals.",
@@ -2058,6 +2068,17 @@ function openChat(ctx){
     if(ctx==='rentreq'){lastTopic='rent';setTimeout(function(){botT(t('chat.rentreq'),300);setTimeout(function(){offerLead(true);},1800);},2200);}
     else setTimeout(chatMenu,1700);
   },250);
+}
+
+/* 30.08: заказ услуги. Цену НЕ называем — согласует менеджер, как и по аренде.
+   Никакой новой воронки: помечаем заявку как сервисную и ведём через тот же чат. */
+function requestService(kind){
+  var map={transfer:'srv.transfer',meet:'srv.meet',clean:'srv.clean'};
+  var label=t(map[kind]||'srv.transfer');
+  pendingIntent={funnel:'rent',property_id:null,goal:'service',note:'Услуга: '+label};
+  openChat('service');
+  bot(label+' — оставьте контакт, согласуем время и условия.');
+  showLead();
 }
 function openRentRequest(){openChat('rentreq');}
 function showLead(){
@@ -2936,7 +2957,7 @@ addEventListener('keydown',function(e){
 window.setLang=setLang;window.toggleNav=toggleNav;
 window.openQuiz=openQuiz;window.closeQuiz=closeQuiz;window.quizNext=quizNext;window.quizBack=quizBack;window.pickQuiz=pickQuiz;
 window.openChat=openChat;window.closeChat=closeChat;window.clearChat=clearChat;window.sendFree=sendFree;window.closeChatToProp=closeChatToProp;
-window.openRentRequest=openRentRequest;
+window.openRentRequest=openRentRequest;window.requestService=requestService;
 window.checkAvailability=checkAvailability;window.resetAvailability=resetAvailability;window.resetRentFilters=resetRentFilters;window.pushLead=pushLead;
 window.scrollCar=scrollCar;window.toggleFilter=toggleFilter;window.onSaleSearch=onSaleSearch;window.setSaleSort=setSaleSort;window.toggleFavOnly=toggleFavOnly;
 window.toggleFav=toggleFav;window.toggleCmp=toggleCmp;window.openCompare=openCompare;window.closeCompare=closeCompare;window.cmpLead=cmpLead;window.favLead=favLead;
