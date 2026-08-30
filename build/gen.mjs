@@ -258,7 +258,9 @@ function parseExistingRentals(html) {
 function rentTag(o) {
   if (o.distance_beach_m) return { ru: o.distance_beach_m + ' м до моря', en: o.distance_beach_m + ' m to the sea' };
   if (o.min_stay) return { ru: 'от ' + o.min_stay + ' мес', en: 'from ' + o.min_stay + ' mo' };
-  return { ru: 'Аренда', en: 'Rent' };
+  // 30.08: раньше падало в заглушку «Аренда» — но блок и так называется «Аренда».
+  // Нечего сказать по объекту — не пишем ничего.
+  return { ru: '', en: '' };
 }
 
 function buildRentals(objects, preserve) {
@@ -605,7 +607,16 @@ async function main() {
     fs.writeFileSync(path.join(OBJDIR, slug + '.html'), objectPage(o, benchmarks));
     pages++;
   }
-  console.log('[gen] object/*.html:', pages, 'страниц');
+  // 30.08: удаляем страницы объектов, которых больше нет в каталоге.
+  // Раньше генератор только дописывал — из-за бага с протечкой аренды в продажу
+  // на прод уехали страницы арендных юнитов с ИМЕНЕМ СОБСТВЕННИКА и номером
+  // квартиры, и после исправления каталога они там так и остались.
+  const keep = new Set(objects.map(o => slugOf(o.plp_property_id) + '.html'));
+  let removed = 0;
+  for (const f of fs.readdirSync(OBJDIR)) {
+    if (f.endsWith('.html') && !keep.has(f)) { fs.unlinkSync(path.join(OBJDIR, f)); removed++; }
+  }
+  console.log('[gen] object/*.html:', pages, 'страниц' + (removed ? ', удалено лишних: ' + removed : ''));
 
   // 3) sitemap
   fs.writeFileSync(SITEMAP, sitemap(objects));
