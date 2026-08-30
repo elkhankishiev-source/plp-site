@@ -117,6 +117,7 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
       <button class="tab" data-t="expense">💸 Расход</button>
       <button class="tab" data-t="block">⛔ Блок дат</button>
       <button class="tab" data-t="report">📊 Отчёт</button>
+      <button class="tab" data-t="objects">🏠 Объекты</button>
     </div>
 
     <!-- Календарь -->
@@ -237,6 +238,66 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
       </div>
     </section>
 
+
+    <!-- Объекты -->
+    <section class="sect" data-s="objects">
+      <div class="card">
+        <h2>Каталог объектов</h2>
+        <p class="hint">Галочка «На сайте» публикует объект сразу — сайт пересобирается из базы, править HTML не нужно.</p>
+        <button class="btn" id="objReload">Загрузить список</button>
+        <div id="objList" class="note-frame">Нажмите «Загрузить список».</div>
+        <div class="msg" data-msg></div>
+      </div>
+
+      <div class="card">
+        <h2>Добавить или изменить объект</h2>
+        <p class="hint">Если ID уже существует — поля обновятся, остальные останутся как были. Пустые поля не затираются.</p>
+        <div class="row">
+          <div class="field"><label>ID объекта</label><input id="oId" placeholder="PLP-EXAMPLE"></div>
+          <div class="field">
+            <label>Назначение</label>
+            <select id="oPurpose">
+              <option value="">— не менять —</option>
+              <option value="продажа">Продажа</option>
+              <option value="аренда">Аренда</option>
+            </select>
+          </div>
+        </div>
+        <div class="field"><label>Название</label><input id="oName" placeholder="The Title Example"></div>
+        <div class="row">
+          <div class="field"><label>Район (по-английски)</label><input id="oDistrict" placeholder="Bang Tao"></div>
+          <div class="field">
+            <label>Тип</label>
+            <select id="oType">
+              <option value="">— не менять —</option>
+              <option value="condo">Апартаменты</option>
+              <option value="villa">Вилла</option>
+              <option value="townhouse">Таунхаус</option>
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          <div class="field"><label>Спален от</label><input id="oBedMin" inputmode="numeric" placeholder="1"></div>
+          <div class="field"><label>Спален до</label><input id="oBedMax" inputmode="numeric" placeholder="3"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>Площадь от, м²</label><input id="oAreaMin" inputmode="numeric" placeholder="35"></div>
+          <div class="field"><label>Площадь до, м²</label><input id="oAreaMax" inputmode="numeric" placeholder="120"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>Цена от, THB</label><input id="oPriceFrom" inputmode="numeric" placeholder="5000000"></div>
+          <div class="field"><label>Цена до, THB</label><input id="oPriceTo" inputmode="numeric" placeholder="12000000"></div>
+        </div>
+        <div class="field"><label>Описание для клиента</label><input id="oUsp" placeholder="Коротко о главном"></div>
+        <div class="field">
+          <label>Папка с фото и брошюрой (ссылка на Google Drive)</label>
+          <input id="oBrochure" placeholder="https://drive.google.com/drive/folders/...">
+        </div>
+        <button class="btn" id="objSave">Сохранить объект</button>
+        <div class="msg" data-msg></div>
+      </div>
+    </section>
+
     <!-- Отчёт -->
     <section class="sect" data-s="report">
       <div class="card">
@@ -321,6 +382,8 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
         if (custom) custom.classList.toggle("hide", sel.value !== "__custom");
       });
     });
+
+    initObjects();
 
     // default dates / months
     var now = new Date();
@@ -441,6 +504,83 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
       msg.classList.add("err","show");
     })
     .then(function(){ btn.disabled=false; btn.textContent=orig; });
+  }
+
+
+  // ── Объекты: список, публикация, добавление ───────────────────────
+  function objApi(action, payload){
+    return fetch(BASE+"/uk-intake?key="+encodeURIComponent(getKey()), {
+      method:"POST", headers:{"Content-Type":"text/plain;charset=UTF-8"},
+      body: JSON.stringify({ action: action, payload: payload || {} })
+    }).then(function(r){ return r.text(); }).then(function(t){
+      try { return JSON.parse(t); } catch(e){ return { ok:false, error:"неверный ответ сервера (проверьте ключ)" }; }
+    });
+  }
+
+  function renderObjects(rows){
+    var box = document.getElementById("objList");
+    if (!rows.length){ box.textContent = "Объектов нет."; return; }
+    var byPurpose = { "продажа": [], "аренда": [] };
+    rows.forEach(function(o){ (byPurpose[o.purpose] || (byPurpose[o.purpose]=[])).push(o); });
+    var html = "";
+    Object.keys(byPurpose).forEach(function(k){
+      var list = byPurpose[k]; if (!list.length) return;
+      html += '<div style="font-weight:700;margin:14px 0 8px">'+(k==="продажа"?"Продажа":"Аренда")+' — '+list.length+'</div>';
+      list.forEach(function(o){
+        html += '<label style="display:flex;gap:10px;align-items:center;padding:7px 0;border-bottom:1px solid rgba(0,0,0,.06)">'
+             +  '<input type="checkbox" style="width:18px;height:18px;min-width:18px;flex:none;margin:0;padding:0" data-pid="'+o.plp_property_id+'"'+(o.on_site?" checked":"")+'>'
+             +  '<span style="flex:1"><b>'+(o.name||o.plp_property_id)+'</b>'
+             +  '<span style="opacity:.6"> · '+(o.district||"—")+'</span></span>'
+             +  '<code style="opacity:.5;font-size:11px">'+o.plp_property_id+'</code></label>';
+      });
+    });
+    box.innerHTML = html;
+    box.querySelectorAll('input[type=checkbox]').forEach(function(cb){
+      cb.addEventListener("change", function(){
+        cb.disabled = true;
+        objApi("object_publish", { plp_property_id: cb.dataset.pid, on_site: cb.checked })
+          .then(function(d){ if(!d.ok){ cb.checked = !cb.checked; alert("Не удалось: "+(d.error||"")); } })
+          .then(function(){ cb.disabled = false; });
+      });
+    });
+  }
+
+  function initObjects(){
+    var reload = document.getElementById("objReload");
+    if (!reload) return;
+    reload.addEventListener("click", function(){
+      var box = document.getElementById("objList");
+      box.textContent = "Загружаю…";
+      objApi("object_list").then(function(d){
+        if (d.ok) renderObjects(d.objects || []);
+        else box.textContent = "Ошибка: " + (d.error || "");
+      });
+    });
+    document.getElementById("objSave").addEventListener("click", function(){
+      var btn = this, sect = btn.closest(".card"), msg = sect.querySelector("[data-msg]");
+      var pid = (document.getElementById("oId").value||"").trim();
+      msg.className = "msg";
+      if (!pid){ msg.textContent = "Укажите ID объекта"; msg.classList.add("err","show"); return; }
+      var pl = { plp_property_id: pid };
+      [["oPurpose","purpose"],["oName","name"],["oDistrict","district"],["oType","type"],
+       ["oUsp","usp"],["oBrochure","brochure_url"],["oAreaMin","area_min"],["oAreaMax","area_max"],
+       ["oBedMin","bedrooms_min"],["oBedMax","bedrooms_max"],
+       ["oPriceFrom","price_from_thb"],["oPriceTo","price_to_thb"]].forEach(function(pair){
+        var el = document.getElementById(pair[0]); var v = el && (el.value||"").trim();
+        if (v) pl[pair[1]] = v;
+      });
+      btn.disabled = true; var orig = btn.textContent; btn.textContent = "Сохраняю…";
+      objApi("object_upsert", pl).then(function(d){
+        if (d.ok){
+          msg.textContent = (d.mode === "created" ? "Объект создан ✓" : "Объект обновлён ✓") + " — " + d.plp_property_id;
+          msg.classList.add("ok","show");
+          var rl = document.getElementById("objReload"); if (rl) rl.click();
+        } else {
+          msg.textContent = "Ошибка: " + (d.error || "");
+          msg.classList.add("err","show");
+        }
+      }).then(function(){ btn.disabled = false; btn.textContent = orig; });
+    });
   }
 
   function resetForm(action, sect){
