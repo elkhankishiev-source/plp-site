@@ -1,4 +1,7 @@
 User-agent: *
 Allow: /
 
+# админка УК — под ключом, но в поиске ей не место
+Disallow: /admin.html
+
 Sitemap: https://elkhankishiev-source.github.io/plp-site/sitemap.xml
