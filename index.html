@@ -276,10 +276,6 @@ h3{font-size:1.12rem;font-weight:700}
 }
 /* 30.08: реальное фото человека поверх градиента; нет файла -> onerror убирает img,
    остаётся прежняя градиентная заглушка. Подпись снимается, когда фото загрузилось. */
-.founder-facts{position:absolute;inset:0;z-index:0;display:grid;grid-template-columns:1fr 1fr;align-content:center;gap:18px 14px;padding:28px;color:#1d2410}
-.founder-facts div{display:flex;flex-direction:column;gap:2px}
-.founder-facts b{font-size:1.5rem;line-height:1.1;letter-spacing:-.02em}
-.founder-facts span{font-size:.76rem;opacity:.7;line-height:1.3}
 .person-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;display:block}
 .hero-photo .ph-label{margin:0 auto 20px;background:rgba(255,255,255,.8);border-radius:999px;padding:8px 18px;font-size:.85rem;font-weight:600;color:var(--muted)}
 .hero-photo::before{content:"";position:absolute;inset:auto -20% -35% -20%;height:70%;background:radial-gradient(50% 50% at 50% 50%,rgba(255,255,255,.5),transparent 70%)}
@@ -1043,7 +1039,7 @@ h3{font-size:1.12rem;font-weight:700}
     <div class="reveal">
       <div class="about-photo" role="img" aria-label="Фото Эльнура Ханкишиева">
         <img class="person-photo" src="img/elnur-founder.jpg" alt="Эльнур Ханкишиев, основатель и директор" onerror="this.remove()" onload="var s=this.parentNode.querySelector('.ph-label');if(s)s.remove();">
-        <div class="founder-facts"><div><b>2019</b><span>на Пхукете с семьёй</span></div><div><b>237+</b><span>сделок</span></div><div><b>450 млн ฿</b><span>оборот в год</span></div><div><b>Cherngtalay</b><span>наш офис</span></div></div>
+        <span class="ph-label" data-i18n="ph.elnur">фото Эльнура</span>
       </div>
     </div>
     <div class="reveal">
