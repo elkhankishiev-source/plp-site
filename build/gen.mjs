@@ -52,6 +52,7 @@ const DISTRICT_RU = {
   'Kata': 'Ката', 'Layan': 'Лаян', 'Patong': 'Патонг',
   'Cherng Talay': 'Чернг Талай', 'Nai Harn': 'Най Харн', 'Laguna': 'Лагуна',
   'Kamala Beach': 'Камала', 'Nai Thon': 'Най Тон',
+  'Thalang': 'Таланг', 'Mai Khao': 'Май Кхао', 'Karon': 'Карон', 'Naiharn': 'Найхарн',
 };
 
 // -------------------------------------------------------------- env / supabase
@@ -542,8 +543,12 @@ async function main() {
   const env = loadEnv();
   console.log('[gen] Supabase:', env.url);
 
+  // 30.08: добавлен фильтр по назначению. Раньше в каталог продажи попадало ВСЁ с
+  // on_site=true — пока аренды на витрине не было, баг не проявлялся; как только
+  // появились арендные объекты, они протекли в продажу (21 → 27).
   const objects = await sbGet(env,
-    'objects?on_site=eq.true&order=plp_property_id' +
+    'objects?on_site=eq.true&purpose=not.in.(' + encodeURIComponent('аренда') + ',rent)' +
+    '&order=plp_property_id' +
     '&select=plp_property_id,name,district,beach,purpose,type,price_from_thb,price_to_thb,' +
     'bedrooms,bedrooms_min,bedrooms_max,area_sqm,area_min,area_max,roi,rental_yield_pct,' +
     'capital_growth_pct,handover_date,status,developer,distance_beach_m,usp,usp_en,' +
