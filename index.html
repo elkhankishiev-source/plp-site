@@ -274,6 +274,9 @@ h3{font-size:1.12rem;font-weight:700}
   box-shadow:var(--shadow);
   display:flex;align-items:flex-end;justify-content:center;
 }
+/* 30.08: реальное фото человека поверх градиента; нет файла -> onerror убирает img,
+   остаётся прежняя градиентная заглушка. Подпись снимается, когда фото загрузилось. */
+.person-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;display:block}
 .hero-photo .ph-label{margin:0 auto 20px;background:rgba(255,255,255,.8);border-radius:999px;padding:8px 18px;font-size:.85rem;font-weight:600;color:var(--muted)}
 .hero-photo::before{content:"";position:absolute;inset:auto -20% -35% -20%;height:70%;background:radial-gradient(50% 50% at 50% 50%,rgba(255,255,255,.5),transparent 70%)}
 .hero-float{position:absolute;right:14px;top:14px;z-index:3;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-radius:14px;padding:11px 15px;box-shadow:var(--shadow);font-size:.82rem;font-weight:600;display:flex;align-items:center;gap:8px;transition:transform .2s}
@@ -468,7 +471,7 @@ h3{font-size:1.12rem;font-weight:700}
 .val::before{content:"✓";color:var(--espresso);margin-right:8px;font-weight:800}
 .about-grid{display:grid;gap:28px;align-items:center}
 @media(min-width:900px){.about-grid{grid-template-columns:1fr 1.2fr;gap:60px}}
-.about-photo{aspect-ratio:4/5;border-radius:24px;box-shadow:var(--shadow);background:linear-gradient(160deg,var(--green-soft),var(--green) 55%,var(--green-deep));display:flex;align-items:flex-end;justify-content:center}
+.about-photo{position:relative;overflow:hidden;aspect-ratio:4/5;border-radius:24px;box-shadow:var(--shadow);background:linear-gradient(160deg,var(--green-soft),var(--green) 55%,var(--green-deep));display:flex;align-items:flex-end;justify-content:center}
 .about-photo .ph-label{margin:0 auto 20px;background:rgba(255,255,255,.8);border-radius:999px;padding:8px 18px;font-size:.85rem;font-weight:600;color:var(--muted)}
 .metrics{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}
 .metrics b{font-size:1.6rem;font-weight:800;letter-spacing:-.03em;display:block;line-height:1}
@@ -795,6 +798,7 @@ h3{font-size:1.12rem;font-weight:700}
     </div>
     <div class="reveal">
       <div class="hero-photo" role="img" aria-label="Фото Эльнура Ханкишиева, основателя Property Library Phuket">
+        <img class="person-photo" src="img/elnur-hero.jpg" alt="Эльнур Ханкишиев, основатель Property Library Phuket" loading="eager" onerror="this.remove()" onload="var s=this.parentNode.querySelector('.ph-label');if(s)s.remove();">
         <button type="button" class="hero-float" onclick="openChat('hero')"><span class="dot"></span><span data-i18n="hero.float">Ответим в течение 5 минут</span></button>
         <span class="ph-label" data-i18n="ph.elnur">фото Эльнура</span>
       </div>
@@ -1034,6 +1038,7 @@ h3{font-size:1.12rem;font-weight:700}
   <div class="container about-grid">
     <div class="reveal">
       <div class="about-photo" role="img" aria-label="Фото Эльнура Ханкишиева">
+        <img class="person-photo" src="img/elnur-founder.jpg" alt="Эльнур Ханкишиев, основатель и директор" loading="lazy" onerror="this.remove()" onload="var s=this.parentNode.querySelector('.ph-label');if(s)s.remove();">
         <span class="ph-label" data-i18n="ph.elnur">фото Эльнура</span>
       </div>
     </div>
