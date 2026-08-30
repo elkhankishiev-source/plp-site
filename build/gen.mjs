@@ -208,6 +208,8 @@ function buildCatalog(objects, benchmarks, preserve) {
       area: areaLabel(o),
       deadline: deadline(o.handover_date),
       status: statusLabel(o.status),
+      // 30.08 канон №38: «готов/сдан» — ТОЛЬКО из stage='Ready', никогда из даты сдачи.
+      ready: o.stage === 'Ready',
       desc: { ru: usp, en: uspEn },
       calc: keep.calc || fallbackCalc(o),
     };
@@ -553,7 +555,7 @@ async function main() {
     '&order=plp_property_id' +
     '&select=plp_property_id,name,district,beach,purpose,type,price_from_thb,price_to_thb,' +
     'bedrooms,bedrooms_min,bedrooms_max,area_sqm,area_min,area_max,roi,rental_yield_pct,' +
-    'capital_growth_pct,handover_date,status,developer,distance_beach_m,usp,usp_en,' +
+    'capital_growth_pct,handover_date,status,stage,developer,distance_beach_m,usp,usp_en,' +
     'season_rates,occupancy_est_pct,maintenance_fee_thb_sqm');
   const benchmarks = await sbGet(env,
     'rental_benchmarks?select=district,unit_type,disp_yield_low_pct,disp_yield_high_pct');
