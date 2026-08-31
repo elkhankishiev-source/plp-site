@@ -4,4 +4,7 @@ Allow: /
 # админка УК — под ключом, но в поиске ей не место
 Disallow: /admin.html
 
+# кабинет собственника — только по личному коду, в поиске ему не место
+Disallow: /owner.html
+
 Sitemap: https://elkhankishiev-source.github.io/plp-site/sitemap.xml
