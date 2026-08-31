@@ -9,8 +9,8 @@
 :root{--bg:#0d0d0c;--card:#141413;--line:#232320;--txt:#EDEDE9;--dim:#8a8a80;--acc:#D2D5B3;--warm:#1a1c12;--bad:#c98b7a}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--txt);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
-.wrap{max-width:820px;margin:0 auto;padding:22px 16px 64px}
-.brand{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:12px}
+.wrap{max-width:840px;margin:0 auto;padding:22px 16px 64px}
+.brand{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;gap:12px}
 .brand b{color:var(--acc);font-size:13px;letter-spacing:.08em;text-transform:uppercase}
 .brand a{color:var(--dim);font-size:13px;text-decoration:none;border-bottom:1px dotted var(--dim);cursor:pointer}
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px}
@@ -24,11 +24,12 @@ h2{font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--dim)
 .payout .lbl{color:var(--acc);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
 .payout .val{color:var(--acc);font-size:32px;font-weight:800;margin-top:6px;line-height:1.1}
 .payout .note{color:var(--dim);font-size:13px;margin-top:8px}
-.row{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--line)}
+.row{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px solid var(--line)}
 .row:last-child{border-bottom:0}
-.row span{color:var(--dim)}
+.row span{color:var(--dim);flex:0 0 auto}
 .row b{font-weight:600;text-align:right}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
 .metric{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
 .metric .k{color:var(--dim);font-size:12px;text-transform:uppercase;letter-spacing:.05em}
 .metric .v{font-size:20px;font-weight:700;margin-top:4px}
@@ -40,6 +41,11 @@ td.r,th.r{text-align:right}
 .pos{color:var(--acc)}.neg{color:var(--bad)}
 .chip{display:inline-block;background:var(--warm);color:var(--acc);font-size:11px;padding:1px 7px;border-radius:6px;margin-left:6px}
 .chip.grey{background:#1e1e1c;color:var(--dim)}
+.photo{width:100%;border-radius:12px;display:block;margin-bottom:12px}
+.links{display:flex;flex-wrap:wrap;gap:8px}
+.links a{display:inline-block;background:var(--warm);color:var(--acc);border:1px solid var(--line);border-radius:10px;
+         padding:9px 13px;font-size:14px;text-decoration:none}
+.pre{white-space:pre-wrap;color:var(--txt);font-size:14px;margin:0}
 label{display:block;color:var(--dim);font-size:13px;margin:12px 0 5px}
 input,select,textarea{width:100%;background:#0a0a09;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:11px 13px;font-size:15px;font-family:inherit}
 textarea{min-height:76px;resize:vertical}
@@ -49,7 +55,7 @@ button.ghost{background:transparent;border:1px solid var(--line);color:var(--txt
 .ok{color:var(--acc);font-size:14px;margin-top:10px}
 .foot{color:var(--dim);font-size:12px;text-align:center;margin-top:26px;line-height:1.8}
 .foot a{color:var(--dim)}
-@media(max-width:520px){.grid{grid-template-columns:1fr}.payout .val{font-size:27px}}
+@media(max-width:560px){.grid,.grid3{grid-template-columns:1fr}.payout .val{font-size:27px}}
 </style>
 </head>
 <body>
@@ -60,7 +66,6 @@ button.ghost{background:transparent;border:1px solid var(--line);color:var(--txt
     <a id="logout" style="display:none">Выйти</a>
   </div>
 
-  <!-- ВХОД -->
   <div id="gate" class="card" style="display:none">
     <h1>Вход для владельцев</h1>
     <p class="sub">Логин и пароль выдаёт ваш менеджер Property Library.</p>
@@ -72,7 +77,6 @@ button.ghost{background:transparent;border:1px solid var(--line);color:var(--txt
     <div class="err" id="gate-err"></div>
   </div>
 
-  <!-- СМЕНА ПАРОЛЯ -->
   <div id="pwd" class="card" style="display:none">
     <h1>Задайте свой пароль</h1>
     <p class="sub">Вы вошли по временному паролю. Придумайте постоянный — не короче 8 символов.</p>
@@ -87,32 +91,10 @@ button.ghost{background:transparent;border:1px solid var(--line);color:var(--txt
 
   <div id="loading" class="card"><p class="sub">Загружаем данные…</p></div>
 
-  <!-- КАБИНЕТ -->
   <div id="app" style="display:none">
+    <div id="portfolio"></div>
     <div class="tabs" id="prop-tabs"></div>
-
-    <div class="card">
-      <h1 id="obj-name">—</h1>
-      <p class="sub" id="obj-sub">—</p>
-    </div>
-
-    <div class="payout">
-      <div class="lbl" id="payout-lbl">К выплате</div>
-      <div class="val" id="payout-val">—</div>
-      <div class="note" id="payout-note"></div>
-    </div>
-
-    <div class="grid">
-      <div class="metric"><div class="k">Доход периода</div><div class="v pos" id="m-inc">—</div></div>
-      <div class="metric"><div class="k">Расходы периода</div><div class="v neg" id="m-exp">—</div></div>
-    </div>
-
-    <div class="card"><h2>Операции текущего периода</h2><div id="tx-wrap"></div></div>
-    <div class="card"><h2>Календарь заездов</h2><div id="bk-wrap"></div></div>
-    <div class="card"><h2>Работы по объекту</h2><div id="tasks-wrap"></div></div>
-    <div class="card"><h2>Ставки аренды</h2><div id="rates-wrap"></div></div>
-    <div class="card"><h2>Договор</h2><div id="contract-wrap"></div></div>
-    <div class="card"><h2>История отчётов</h2><div id="st-wrap"></div></div>
+    <div id="prop"></div>
 
     <div class="card">
       <h2>Оставить заявку</h2>
@@ -150,23 +132,48 @@ button.ghost{background:transparent;border:1px solid var(--line);color:var(--txt
   var DATA=null, CUR=0, TOKEN=null;
 
   function money(n,cur){
+    if(n==null||n==='') return '—';
     n=Number(n)||0;
-    return Math.round(n).toLocaleString('ru-RU').replace(/ /g,' ')+' '+(cur==='THB'?'฿':(cur||''));
+    return Math.round(n).toLocaleString('ru-RU').replace(/ /g,' ')+' '+(cur==='USD'?'$':(cur==='THB'||!cur?'฿':cur));
   }
   function dmy(s){ if(!s) return '—'; var p=String(s).slice(0,10).split('-'); return p.length===3?p[2]+'.'+p[1]+'.'+p[0]:s; }
   function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
   function show(id){['gate','pwd','loading','app'].forEach(function(x){$(x).style.display=(x===id?'':'none');});}
-
   function post(body){
     return fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})
       .then(function(r){return r.json();});
   }
+  function has(v){ return v!==null && v!==undefined && v!=='' && !(Array.isArray(v)&&!v.length); }
+  // строка «ключ — значение», пустые не рисуем
+  function line(k,v){ return has(v) ? '<div class="row"><span>'+esc(k)+'</span><b>'+esc(v)+'</b></div>' : ''; }
+  function card(title,inner){ return inner ? '<div class="card"><h2>'+esc(title)+'</h2>'+inner+'</div>' : ''; }
 
   var KINDS={cleaning:'Уборка',repair:'Ремонт',maintenance:'Обслуживание',inspection:'Осмотр',
              checkin:'Заезд',checkout:'Выезд',block_dates:'Блокировка дат',payout:'Выплата',other:'Другое'};
   var CATS={booking:'Бронирование',cleaning:'Уборка',repair:'Ремонт',utilities:'Коммунальные',
             management:'Управление',supplies:'Расходники',other:'Прочее'};
   var RSTAT={'new':'принята','in_progress':'в работе','done':'выполнена','rejected':'отклонена'};
+  var RT={mixed:'посуточно и долгосрочно',short:'посуточная аренда',long:'долгосрочная аренда'};
+  var ST={active:'действует',paused:'приостановлен',ended:'завершён'};
+
+  // ── сводка по всему портфелю ────────────────────────────────
+  function renderPortfolio(){
+    var t=DATA.totals, o=DATA.owner||{};
+    if(!t){ $('portfolio').innerHTML=''; return; }
+    var h='<div class="card"><h1>'+esc(o.name||'Личный кабинет')+'</h1>'+
+          '<p class="sub">Объектов в кабинете: '+t.properties+' · период '+dmy(DATA.period.start)+' — '+dmy(DATA.period.end)+'</p></div>';
+    h+='<div class="payout"><div class="lbl">Итого к выплате по всем объектам</div>'+
+       '<div class="val">'+(t.payout===null?'—':money(t.payout,'THB'))+'</div>'+
+       '<div class="note">'+(t.payout===null
+         ? 'Закрытых отчётов пока нет — первый будет сформирован '+dmy(DATA.period.end)+'.'
+         : 'Сумма по последним закрытым отчётам всех объектов.')+'</div></div>';
+    h+='<div class="grid3">'+
+       '<div class="metric"><div class="k">Доход периода</div><div class="v pos">'+money(t.income,'THB')+'</div></div>'+
+       '<div class="metric"><div class="k">Расходы периода</div><div class="v neg">'+money(t.expenses,'THB')+'</div></div>'+
+       '<div class="metric"><div class="k">Заездов · работ</div><div class="v">'+t.bookings+' · '+t.tasks+'</div></div>'+
+       '</div>';
+    $('portfolio').innerHTML=h;
+  }
 
   function renderTabs(){
     var p=DATA.properties||[];
@@ -175,120 +182,177 @@ button.ghost{background:transparent;border:1px solid var(--line);color:var(--txt
       return '<div class="tab'+(i===CUR?' on':'')+'" data-i="'+i+'">'+esc(x.name||x.id)+'</div>';
     }).join('');
     Array.prototype.forEach.call($('prop-tabs').children,function(el){
-      el.onclick=function(){ CUR=+el.getAttribute('data-i'); renderTabs(); renderProp(); };
+      el.onclick=function(){ CUR=+el.getAttribute('data-i'); renderTabs(); renderProp(); window.scrollTo(0,0); };
     });
   }
 
+  // ── карточка одного объекта, по разделам ────────────────────
   function renderProp(){
     var p=(DATA.properties||[])[CUR];
-    if(!p){ $('obj-name').textContent='Объекты не привязаны'; $('obj-sub').textContent='Обратитесь к менеджеру.'; return; }
-    var c=p.contract||{}, cur=c.currency||'THB';
+    if(!p){ $('prop').innerHTML='<div class="card"><p class="sub">Объекты не привязаны. Обратитесь к менеджеру.</p></div>'; return; }
+    var c=p.contract||{}, cur=c.currency||'THB', H='';
 
-    $('obj-name').textContent=p.name||p.id;
+    // шапка
     var bits=[];
     if(p.district) bits.push(p.district);
     if(p.bedrooms) bits.push('спален: '+p.bedrooms);
-    $('obj-sub').textContent=bits.join(' · ')||p.id;
+    if(p.stage) bits.push(p.stage);
+    H+='<div class="card"><h1>'+esc(p.name||p.id)+'</h1><p class="sub">'+esc(bits.join(' · ')||p.id)+'</p></div>';
 
-    // выплату НЕ считаем сами — берём из закрытого отчёта
+    // выплата по объекту
     var closed=(p.statements||[]).filter(function(s){return s.status&&s.status!=='draft';});
     var last=closed[0]||(p.statements||[])[0]||null;
-    if(last){
-      $('payout-val').textContent=money(last.net,last.currency||cur);
-      $('payout-lbl').textContent='К выплате · период '+last.period;
-      $('payout-note').textContent=(last.status==='draft')
-        ? 'Черновик — отчёт ещё не утверждён, сумма может измениться.' : 'Отчёт закрыт и утверждён.';
-    }else{
-      $('payout-val').textContent='—';
-      $('payout-lbl').textContent='К выплате';
-      $('payout-note').textContent='Первый отчёт будет сформирован '+dmy(DATA.period.end)+'.';
+    H+='<div class="payout"><div class="lbl">'+(last?'К выплате · период '+esc(last.period):'К выплате')+'</div>'+
+       '<div class="val">'+(last?money(last.net,last.currency||cur):'—')+'</div>'+
+       '<div class="note">'+(last
+         ? (last.status==='draft'?'Черновик — сумма может измениться.':'Отчёт закрыт и утверждён.')
+         : 'Первый отчёт будет сформирован '+dmy(DATA.period.end)+'.')+'</div></div>';
+
+    H+='<div class="grid">'+
+       '<div class="metric"><div class="k">Доход периода</div><div class="v pos">'+money(p.current.income,cur)+'</div></div>'+
+       '<div class="metric"><div class="k">Расходы периода</div><div class="v neg">'+money(p.current.expenses,cur)+'</div></div>'+
+       '</div>';
+
+    // фото и материалы
+    var m=p.media||{}, ml='';
+    var photo='img/'+p.id+'.jpg';
+    var mediaInner='<img class="photo" src="'+photo+'" alt="" onerror="this.style.display=\'none\'">';
+    if(has(m.brochure_url))  ml+='<a href="'+esc(m.brochure_url)+'" target="_blank" rel="noopener">Фото и документы на Диске</a>';
+    if(has(m.video_url))     ml+='<a href="'+esc(m.video_url)+'" target="_blank" rel="noopener">Видео объекта</a>';
+    if(has(m.floorplan_url)) ml+='<a href="'+esc(m.floorplan_url)+'" target="_blank" rel="noopener">Планировка</a>';
+    if(has(m.map_url))       ml+='<a href="'+esc(m.map_url)+'" target="_blank" rel="noopener">На карте</a>';
+    mediaInner += ml ? '<div class="links">'+ml+'</div>'
+                     : '<div class="empty">Материалы по объекту пока не загружены.</div>';
+    H+=card('Фото и материалы', mediaInner);
+
+    // об объекте
+    var a=p.about||{}, ab='';
+    ab+=line('Застройщик',a.developer);
+    ab+=line('Форма собственности',a.ownership);
+    ab+=line('Срок сдачи',a.handover_date?dmy(a.handover_date):null);
+    ab+=line('Площадь',a.area_sqm?a.area_sqm+' м²':null);
+    ab+=line('Вид',a.view_type);
+    ab+=line('Назначение',a.purpose);
+    ab+=line('Рядом',a.nearby);
+    ab+=line('Удобства',a.amenities);
+    if(has(a.usp)) ab+='<div style="margin-top:12px"><p class="pre">'+esc(a.usp)+'</p></div>';
+    H+=card('Об объекте', ab);
+
+    // экономика
+    var e=p.economics||{}, ec='';
+    ec+=line('Доходность',e.rental_yield_pct?e.rental_yield_pct+'% годовых':null);
+    ec+=line('Ожидаемая загрузка',e.occupancy_est_pct?e.occupancy_est_pct+'%':null);
+    ec+=line('Аренда в месяц',has(e.rent_price_month_thb)?money(e.rent_price_month_thb,'THB'):null);
+    ec+=line('Цена от',has(e.price_from_thb)?money(e.price_from_thb,'THB'):null);
+    H+=card('Экономика объекта', ec);
+
+    // график платежей по покупке
+    var ps='';
+    if(has(p.payment_schedule)) ps+='<p class="pre">'+esc(p.payment_schedule)+'</p>';
+    if((p.payments||[]).length){
+      ps+='<table style="margin-top:10px"><tr><th>Дата</th><th>Этап</th><th class="r">Сумма</th><th class="r">Статус</th></tr>';
+      p.payments.forEach(function(x){
+        ps+='<tr><td>'+dmy(x.payment_date)+'</td><td>'+esc(x.milestone||'—')+'</td>'+
+            '<td class="r">'+money(x.amount_usd,'USD')+'</td><td class="r">'+esc(x.status||'—')+'</td></tr>';
+      });
+      ps+='</table>';
     }
+    H+=card('График платежей по покупке', ps);
 
-    $('m-inc').textContent=money(p.current.income,cur);
-    $('m-exp').textContent=money(p.current.expenses,cur);
-
-    // операции
+    // операции периода
     var tx=p.transactions||[];
-    var h='<p class="sub" style="margin-bottom:10px">'+dmy(DATA.period.start)+' — '+dmy(DATA.period.end)+'</p>';
-    if(!tx.length){ h+='<div class="empty">Операций за этот период пока нет.</div>'; }
+    var th='<p class="sub" style="margin-bottom:10px">'+dmy(DATA.period.start)+' — '+dmy(DATA.period.end)+'</p>';
+    if(!tx.length){ th+='<div class="empty">Операций за этот период пока нет.</div>'; }
     else{
-      h+='<table><tr><th>Дата</th><th>Операция</th><th class="r">Сумма</th></tr>';
+      th+='<table><tr><th>Дата</th><th>Операция</th><th class="r">Сумма</th></tr>';
       tx.forEach(function(t){
         var isInc=String(t.kind)==='income';
-        h+='<tr><td>'+dmy(t.tx_date)+'</td><td>'+esc(CATS[t.category]||t.category||(isInc?'Доход':'Расход'))+
-           (t.note?'<br><span style="color:var(--dim);font-size:12px">'+esc(t.note)+'</span>':'')+'</td>'+
-           '<td class="r '+(isInc?'pos':'neg')+'">'+(isInc?'+':'−')+money(t.amount_thb,cur)+'</td></tr>';
+        th+='<tr><td>'+dmy(t.tx_date)+'</td><td>'+esc(CATS[t.category]||t.category||(isInc?'Доход':'Расход'))+
+            (t.note?'<br><span style="color:var(--dim);font-size:12px">'+esc(t.note)+'</span>':'')+'</td>'+
+            '<td class="r '+(isInc?'pos':'neg')+'">'+(isInc?'+':'−')+money(t.amount_thb,cur)+'</td></tr>';
       });
-      h+='</table>';
+      th+='</table>';
     }
-    $('tx-wrap').innerHTML=h;
+    H+=card('Доходы и расходы периода', th);
 
-    // брони
-    var bk=p.bookings||[];
-    if(!bk.length){ $('bk-wrap').innerHTML='<div class="empty">Заездов пока нет.</div>'; }
+    // календарь
+    var bk=p.bookings||[], bh='';
+    if(!bk.length){ bh='<div class="empty">Заездов пока нет.</div>'; }
     else{
-      var bh='<table><tr><th>Заезд</th><th>Выезд</th><th>Гостей</th><th class="r">Статус</th></tr>';
+      bh='<table><tr><th>Заезд</th><th>Выезд</th><th>Гостей</th><th class="r">Статус</th></tr>';
       bk.forEach(function(g){
         bh+='<tr><td>'+dmy(g.check_in)+'</td><td>'+dmy(g.check_out)+'</td><td>'+(g.guests||'—')+
             '</td><td class="r">'+esc(g.status||'—')+'</td></tr>';
       });
-      $('bk-wrap').innerHTML=bh+'</table>';
+      bh+='</table>';
     }
-
-    // работы
-    var tk=p.tasks||[];
-    if(!tk.length){ $('tasks-wrap').innerHTML='<div class="empty">Запланированных работ нет.</div>'; }
-    else{
-      var th='<table><tr><th>Срок</th><th>Работа</th><th class="r">Стоимость</th></tr>';
-      tk.forEach(function(t){
-        th+='<tr><td>'+dmy(t.due_date)+'</td><td>'+esc(KINDS[t.kind]||t.kind||'—')+
-            (t.note?'<br><span style="color:var(--dim);font-size:12px">'+esc(t.note)+'</span>':'')+
-            '</td><td class="r">'+(t.cost_thb?money(t.cost_thb,cur):'—')+'</td></tr>';
-      });
-      $('tasks-wrap').innerHTML=th+'</table>';
-    }
+    H+=card('Календарь заездов', bh);
 
     // ставки
-    var rt=p.rates||[];
-    if(!rt.length){ $('rates-wrap').innerHTML='<div class="empty">Ставки не заданы.</div>'; }
-    else{
-      var rh='<table><tr><th>Сезон</th><th class="r">За ночь</th><th class="r">Мин. ночей</th></tr>';
+    var rt=p.rates||[], rh='';
+    if(rt.length){
+      rh='<table><tr><th>Сезон</th><th class="r">За ночь</th><th class="r">Мин. ночей</th></tr>';
       rt.forEach(function(r){
         rh+='<tr><td>'+esc(r.season||'—')+'</td><td class="r">'+money(r.nightly_thb,cur)+
             '</td><td class="r">'+(r.min_nights||'—')+'</td></tr>';
       });
-      $('rates-wrap').innerHTML=rh+'</table>';
+      rh+='</table>';
     }
+    H+=card('Ставки аренды', rh);
+
+    // работы
+    var tk=p.tasks||[], kh='';
+    if(!tk.length){ kh='<div class="empty">Запланированных работ нет.</div>'; }
+    else{
+      kh='<table><tr><th>Срок</th><th>Работа</th><th class="r">Стоимость</th></tr>';
+      tk.forEach(function(t){
+        kh+='<tr><td>'+dmy(t.due_date)+'</td><td>'+esc(KINDS[t.kind]||t.kind||'—')+
+            (t.note?'<br><span style="color:var(--dim);font-size:12px">'+esc(t.note)+'</span>':'')+
+            '</td><td class="r">'+(t.cost_thb?money(t.cost_thb,cur):'—')+'</td></tr>';
+      });
+      kh+='</table>';
+    }
+    H+=card('Работы по объекту', kh);
+
+    // расходы владения
+    var co=p.costs||{}, ch='';
+    ch+=line('Фонд капремонта',has(co.sinking_fund_thb)?money(co.sinking_fund_thb,'THB'):null);
+    ch+=line('Обслуживание за м²',has(co.maintenance_fee_thb_sqm)?money(co.maintenance_fee_thb_sqm,'THB'):null);
+    ch+=line('Сбор за перевод права',co.transfer_fee);
+    ch+=line('Депозит брони',has(co.booking_deposit_thb)?money(co.booking_deposit_thb,'THB'):null);
+    ch+=line('Налоги',co.taxes_note);
+    ch+=line('Общая территория',co.common_area_fee_note);
+    H+=card('Расходы владения', ch);
 
     // договор
-    var RT={mixed:'посуточно и долгосрочно',short:'посуточная аренда',long:'долгосрочная аренда'};
-    var ST={active:'действует',paused:'приостановлен',ended:'завершён'};
-    if(!p.contract){ $('contract-wrap').innerHTML='<div class="empty">Договора управления по этому объекту нет.</div>'; }
-    else{
-      var ch='';
-      ch+='<div class="row"><span>Статус</span><b>'+esc(ST[c.status]||c.status||'—')+'</b></div>';
-      ch+='<div class="row"><span>Тип аренды</span><b>'+esc(RT[c.rental_type]||c.rental_type||'—')+'</b></div>';
-      if(c.commission_short_pct!=null) ch+='<div class="row"><span>Комиссия · посуточно</span><b>'+c.commission_short_pct+'%</b></div>';
-      if(c.commission_long_pct!=null) ch+='<div class="row"><span>Комиссия · долгосрочно</span><b>'+c.commission_long_pct+'%</b></div>';
-      ch+='<div class="row"><span>Действует с</span><b>'+dmy(c.start_date)+'</b></div>';
-      if(c.end_date) ch+='<div class="row"><span>Действует до</span><b>'+dmy(c.end_date)+'</b></div>';
-      ch+='<div class="row"><span>Реквизиты выплаты</span><b>'+(c.payout_set?'указаны':'не указаны')+'</b></div>';
-      $('contract-wrap').innerHTML=ch;
-    }
+    var dh='';
+    if(p.contract){
+      dh+=line('Статус',ST[c.status]||c.status);
+      dh+=line('Тип аренды',RT[c.rental_type]||c.rental_type);
+      if(c.commission_short_pct!=null) dh+=line('Комиссия · посуточно',c.commission_short_pct+'%');
+      if(c.commission_long_pct!=null)  dh+=line('Комиссия · долгосрочно',c.commission_long_pct+'%');
+      dh+=line('Действует с',dmy(c.start_date));
+      if(c.end_date) dh+=line('Действует до',dmy(c.end_date));
+      dh+=line('Реквизиты выплаты',c.payout_set?'указаны':'не указаны');
+    }else dh='<div class="empty">Договора управления по этому объекту нет.</div>';
+    H+=card('Договор управления', dh);
 
     // отчёты
-    var st=p.statements||[];
-    if(!st.length){ $('st-wrap').innerHTML='<div class="empty">Закрытых отчётов пока нет.</div>'; }
+    var st=p.statements||[], sh='';
+    if(!st.length){ sh='<div class="empty">Закрытых отчётов пока нет.</div>'; }
     else{
-      var sh='<table><tr><th>Период</th><th class="r">Доход</th><th class="r">Расходы</th><th class="r">К выплате</th></tr>';
+      sh='<table><tr><th>Период</th><th class="r">Доход</th><th class="r">Расходы</th><th class="r">К выплате</th></tr>';
       st.forEach(function(s){
         sh+='<tr><td>'+esc(s.period)+(s.status==='draft'?'<span class="chip grey">черновик</span>':'')+'</td>'+
             '<td class="r">'+money(s.income,s.currency||cur)+'</td>'+
             '<td class="r">'+money(s.expenses,s.currency||cur)+'</td>'+
             '<td class="r"><b>'+money(s.net,s.currency||cur)+'</b></td></tr>';
       });
-      $('st-wrap').innerHTML=sh+'</table>';
+      sh+='</table>';
     }
+    H+=card('История отчётов', sh);
+
+    $('prop').innerHTML=H;
   }
 
   function renderRequests(){
@@ -303,14 +367,19 @@ button.ghost{background:transparent;border:1px solid var(--line);color:var(--txt
     $('req-wrap').innerHTML=h+'</table>';
   }
 
+  function draw(){
+    show('app'); $('logout').style.display='';
+    renderPortfolio(); renderTabs(); renderProp(); renderRequests();
+  }
+
   function loadData(){
     show('loading');
     post({action:'data',token:TOKEN}).then(function(d){
       if(!d||!d.ok){ try{localStorage.removeItem(LS);}catch(e){} TOKEN=null; show('gate');
-        $('gate-err').textContent = (d&&d.error==='expired') ? 'Сессия истекла — войдите заново.' : ''; return; }
+        $('gate-err').textContent=(d&&d.error==='expired')?'Сессия истекла — войдите заново.':''; return; }
       DATA=d; CUR=0;
       if(d.owner&&d.owner.must_change_password){ show('pwd'); return; }
-      show('app'); $('logout').style.display=''; renderTabs(); renderProp(); renderRequests();
+      draw();
     }).catch(function(){ show('gate'); $('gate-err').textContent='Нет связи с сервером. Попробуйте позже.'; });
   }
 
@@ -322,9 +391,9 @@ button.ghost{background:transparent;border:1px solid var(--line);color:var(--txt
       if(d&&d.ok){ TOKEN=d.token; try{localStorage.setItem(LS,TOKEN);}catch(e){} loadData(); }
       else{
         show('gate');
-        $('gate-err').textContent = (d&&d.error==='locked') ? 'Слишком много попыток. Попробуйте через 15 минут.'
-                                 : (d&&d.error==='disabled') ? 'Доступ приостановлен — свяжитесь с менеджером.'
-                                 : 'Неверный логин или пароль.';
+        $('gate-err').textContent=(d&&d.error==='locked')?'Слишком много попыток. Попробуйте через 15 минут.'
+          :(d&&d.error==='disabled')?'Доступ приостановлен — свяжитесь с менеджером.'
+          :'Неверный логин или пароль.';
       }
     }).catch(function(){ show('gate'); $('gate-err').textContent='Нет связи с сервером.'; });
   };
@@ -335,10 +404,10 @@ button.ghost{background:transparent;border:1px solid var(--line);color:var(--txt
     if(!n||n.length<8){ $('pwd-err').textContent='Новый пароль — не короче 8 символов.'; return; }
     post({action:'password',token:TOKEN,old:o,new_password:n}).then(function(d){
       if(d&&d.ok){ $('pwd-err').textContent=''; loadData(); }
-      else $('pwd-err').textContent = (d&&d.error==='bad_old_password') ? 'Текущий пароль указан неверно.' : 'Не удалось сменить пароль.';
+      else $('pwd-err').textContent=(d&&d.error==='bad_old_password')?'Текущий пароль указан неверно.':'Не удалось сменить пароль.';
     });
   };
-  $('p-skip').onclick=function(){ show('app'); $('logout').style.display=''; renderTabs(); renderProp(); renderRequests(); };
+  $('p-skip').onclick=function(){ draw(); };
 
   $('r-send').onclick=function(){
     var p=(DATA.properties||[])[CUR];
@@ -358,7 +427,6 @@ button.ghost{background:transparent;border:1px solid var(--line);color:var(--txt
     $('login').value=''; $('pass').value=''; show('gate');
   };
 
-  // восстановление сессии
   try{ TOKEN=localStorage.getItem(LS); }catch(e){}
   if(TOKEN) loadData(); else show('gate');
 })();
