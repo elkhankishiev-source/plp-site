@@ -818,6 +818,38 @@ h3{font-size:1.12rem;font-weight:700}
     <h2 style="font-size:20px;margin:28px 0 8px">Другие вопросы</h2>
     <ul style="padding-left:18px;margin:0"><li style="margin:8px 0"><a href="leasehold-ili-freehold.html">Leasehold или Freehold — что выбрать?</a></li><li style="margin:8px 0"><a href="skolko-oformlyaetsya-sdelka.html">Сколько оформляется сделка купли-продажи?</a></li><li style="margin:8px 0"><a href="rashody-pri-pokupke.html">Какие расходы при покупке, кроме цены объекта?</a></li><li style="margin:8px 0"><a href="kupit-udalenno.html">Я не в Таиланде. Можно купить удалённо?</a></li><li style="margin:8px 0"><a href="stoimost-uslug.html">Сколько стоят ваши услуги?</a></li></ul>
   </div></section>
+  <section id="sale" aria-labelledby="sale-title">
+  <div class="container">
+    <div class="head-row reveal">
+      <div>
+        <span class="kicker" data-i18n="sale.lab">Продажа</span>
+        <h2 id="sale-title" data-i18n="sale.h2">Проверенные объекты в продаже</h2>
+        <p class="sub" data-i18n="sale.sub">Каждый проект проходит нашу внутреннюю проверку перед публикацией. Нажмите на карточку — внутри детали и калькулятор доходности.</p>
+      </div>
+      <div class="arrows"><button type="button" onclick="scrollCar('saleCar',-1)" aria-label="Назад">‹</button><button type="button" onclick="scrollCar('saleCar',1)" aria-label="Вперёд">›</button></div>
+    </div>
+    <div class="filterbar reveal" id="saleFilters">
+      <span class="chipf on" data-facet="budget" data-val="" onclick="toggleFilter(this)" data-i18n="f.budget.all">Все бюджеты</span><span class="chipf" data-facet="budget" data-val="b1" onclick="toggleFilter(this)" data-i18n="f.b1">฿3–5 млн</span><span class="chipf" data-facet="budget" data-val="b2" onclick="toggleFilter(this)" data-i18n="f.b2">฿5–10 млн</span><span class="chipf" data-facet="budget" data-val="b3" onclick="toggleFilter(this)" data-i18n="f.b3">฿10 млн+</span><span class="chipf" data-facet="type" data-val="Вилла" onclick="toggleFilter(this)" data-i18n="f.type.villa">Вилла</span><span class="chipf" data-facet="type" data-val="Кондо" onclick="toggleFilter(this)" data-i18n="f.type.condo">Кондо</span>
+    </div>
+    <div class="toolbar reveal">
+      <label class="search"><input type="search" id="saleSearch" data-i18n-ph="sale.search" placeholder="Поиск: район, название, ID…" oninput="onSaleSearch(this.value)"></label>
+      <select id="saleSort" onchange="setSaleSort(this.value)" aria-label="Сортировка">
+        <option value="" data-i18n="sort.default">По порядку</option>
+        <option value="roi" data-i18n="sort.roi">Сначала высокая доходность</option>
+        <option value="price" data-i18n="sort.cheap">Сначала доступные</option>
+        <option value="price-desc" data-i18n="sort.rich">Сначала дорогие</option>
+      </select>
+      <span class="chipf" id="favChip" style="display:none" onclick="toggleFavOnly()" data-i18n="f.favs">♥ Избранное</span>
+    </div>
+    <div class="carwrap reveal">
+      <div class="car" id="saleCar"></div>
+      <div class="noresult" id="saleNoResult" data-i18n="noresult">Под выбранные фильтры ничего не нашлось — сбросьте часть условий.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CATALOG PDF ===== -->
+
 </main>
 </div><!-- /stage -->
 
