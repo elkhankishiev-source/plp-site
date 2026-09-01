@@ -828,6 +828,71 @@ h3{font-size:1.12rem;font-weight:700}
   </div>
 </div></section>
 
+<section id="rent" aria-labelledby="rent-title" style="padding-top:0">
+  <div class="container">
+    <div class="head-row reveal">
+      <div>
+        <span class="kicker" data-i18n="rent.lab">Аренда · 24/7</span>
+        <h2 id="rent-title" data-i18n="rent.h2">Объекты, где хочется жить</h2>
+        <p class="sub" data-i18n="rent.sub">Виллы и апартаменты на Пхукете для жизни и комфортного отдыха — аренда от месяца. Цены и условия — по запросу: оставьте заявку, подберём вариант и ответим лично. От первого касания до заселения — отдыхайте с самого начала.</p>
+      </div>
+      <div class="arrows"><button type="button" onclick="scrollCar('rentCar',-1)" aria-label="Назад">‹</button><button type="button" onclick="scrollCar('rentCar',1)" aria-label="Вперёд">›</button></div>
+    </div>
+    <div class="datefilter reveal" id="rentDateFilter">
+      <div class="df-fields">
+        <label class="df-fld"><span data-i18n="rent.dates.in">Заезд</span><input type="date" id="rentIn" autocomplete="off"></label>
+        <label class="df-fld"><span data-i18n="rent.dates.out">Выезд</span><input type="date" id="rentOut" autocomplete="off"></label>
+        <button type="button" class="btn btn-green" id="rentCheck" onclick="checkAvailability()" disabled data-i18n="rent.dates.btn">Показать свободные</button>
+        <button type="button" class="btn btn-glass df-reset" id="rentReset" onclick="resetAvailability()" style="display:none" data-i18n="rent.dates.reset">Сбросить</button>
+      </div>
+      <div class="df-status" id="rentDateStatus" data-i18n="rent.dates.hint">Выберите даты заезда и выезда — покажем только свободные варианты. Без дат показаны все объекты.</div>
+    </div>
+    <div class="filterbar reveal" id="rentFilters"></div>
+    <div class="carwrap reveal">
+      <div class="car" id="rentCar"></div>
+      <div class="noresult" id="rentNoResult" data-i18n="rent.noresult">По выбранным фильтрам ничего не нашлось — измените условия или сбросьте фильтры.</div>
+    </div>
+    <div class="rentband reveal">
+      <div>
+        <h3 data-i18n="rent.b1t">Запрос на аренду — 24/7</h3>
+        <p data-i18n="rent.b1p">Заполните заявку — менеджер подберёт жильё под ваши даты и бюджет и ответит по условиям. Аренда только долгосрочная, от 30 дней.</p>
+      </div>
+      <div class="cta">
+        <button type="button" class="btn btn-green" onclick="openRentRequest()" data-i18n="rent.b1cta">Оставить запрос</button>
+        <a class="btn btn-glass" href="https://t.me/elnurphuket_bot" target="_blank" rel="noopener" data-i18n="rent.b1tg">Консьерж в Telegram</a>
+      </div>
+    </div>
+    <div class="reveal" style="margin-top:28px">
+      <span class="kicker" data-i18n="rent.servlab">Аренда с заботой</span>
+      <h2 data-i18n="rent.servh2">Организуем всё и даже больше</h2>
+      <p class="sub" data-i18n="rent.servsub">Закройте все организационные вопросы в одном месте</p>
+    </div>
+    <div class="serv-grid reveal">
+      <div class="serv-card"><h4 data-i18n="rs.1t">Бронирование</h4><p data-i18n="rs.1p">Подбираем и бронируем жильё без лишней волокиты</p></div>
+      <div class="serv-card"><h4 data-i18n="rs.2t">Консультации</h4><p data-i18n="rs.2p">Помощь при выборе района, школ, инфраструктуры</p></div>
+      <div class="serv-card"><h4 data-i18n="rs.3t">Трансфер</h4><p data-i18n="rs.3p">Встречаем в аэропорту и организуем комфортный переезд</p></div>
+      <div class="serv-card"><h4 data-i18n="rs.4t">Уборка</h4><p data-i18n="rs.4p">Регулярная уборка — по графику или по запросу</p></div>
+      <div class="serv-card"><h4 data-i18n="rs.5t">Сопровождение</h4><p data-i18n="rs.5p">Поддержка в банках, миграционных службах и не только</p></div>
+      <div class="serv-card"><h4 data-i18n="rs.6t">Юридические услуги</h4><p data-i18n="rs.6p">Продление виз и ВНЖ, налоговые консультации</p></div>
+      <div class="serv-card"><h4 data-i18n="rs.7t">Сервис и услуги</h4><p data-i18n="rs.7p">Подрядчики для ремонта и дизайна, чистка бассейна, уход за территорией</p></div>
+      <div class="serv-card"><h4 data-i18n="rs.8t">Дополнительно</h4><p data-i18n="rs.8p">Аренда яхты, экскурсии и другие активности</p></div>
+    </div>
+    <div class="rentband reveal" style="background:var(--green);color:var(--ink)">
+      <div>
+        <h3 data-i18n="rent.upt">Понравился остров?</h3>
+        <p style="color:#4E3A35" data-i18n="rent.upp">Многие наши гости после аренды решают стать владельцами — подберём объект для покупки под вашу задачу и бюджет.</p>
+      </div>
+      <div class="cta">
+        <a class="btn btn-primary" href="index.html#sale" data-i18n="rent.upcta">Смотреть объекты в продаже</a>
+        <button type="button" class="btn" style="background:#fff" onclick="openQuiz()" data-i18n="rent.upquiz">Подобрать за 10 минут</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== MAP / DISTRICTS ===== -->
+
+
 <section style="padding-top:26px"><div class="container">
   <h2 style="font-size:clamp(22px,3vw,28px);margin:0 0 14px">Сколько это стоит</h2>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px">
