@@ -723,14 +723,12 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
 
   <div id="gate" class="card" style="display:none">
     <div class="gate-head">
-      <h1 id="gate-title">Вход для владельцев</h1>
+      <h1 id="gate-title">Войдите в кабинет</h1>
       <p class="sub" id="gate-sub">или <a class="reg-link" id="to-reg-top">разместить объект</a></p>
     </div>
 
     <!-- шаг 1: номер телефона -->
     <div id="step-phone">
-      <p class="sub" style="margin:16px 0 0">Внутри — ваши объекты: доход и расходы, отчёты и выплаты,
-      календарь заездов, заказ уборки и ремонта.</p>
       <div class="label-row"><label for="login">Ваш номер телефона</label><a id="to-pass-2">Войти по паролю</a></div>
       <input id="login" type="tel" autocomplete="tel" spellcheck="false" placeholder="+66 95 123 4567 — тот, что вы давали менеджеру">
 
@@ -747,7 +745,6 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
 
     <!-- заявка: коротко, галочками -->
     <div id="step-reg" style="display:none">
-      <p class="sub">Ответьте на несколько вопросов — менеджер свяжется и всё посчитает. Обязательны только имя и телефон.</p>
 
       <label>Что у вас за объект</label>
       <div class="opts" id="o-type">
@@ -1191,7 +1188,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   }
 
   // ── экраны входа: телефон → код, с запасным входом по паролю ──
-  var GATE_TITLES={phone:'Вход для владельцев',code:'Введите код',
+  var GATE_TITLES={phone:'Войдите в кабинет',code:'Введите код',
                    pass:'Вход по паролю',reg:'Разместить объект'};
   function gateStep(which){
     ['step-phone','step-code','step-pass','step-reg'].forEach(function(x){
