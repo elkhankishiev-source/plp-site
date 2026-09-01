@@ -225,6 +225,9 @@ h3{font-size:1.12rem;font-weight:700}
   .btn-wa,.btn-tg{padding:10px 12px}
 }
 @media(max-width:400px){ .btn-tel{display:none} }
+@media(max-width:760px){
+  .hero-photo,.about-photo{aspect-ratio:3/2;max-height:300px}
+}
 @media(max-width:900px){.btn-cab{display:none}}
 .btn-glass{background:rgba(255,255,255,.16);color:#fff;border:1.5px solid rgba(255,255,255,.55);backdrop-filter:blur(8px)}
 .btn-glass:hover{background:rgba(255,255,255,.28)}
@@ -296,7 +299,8 @@ h3{font-size:1.12rem;font-weight:700}
 .srv-card span{font-size:.85rem;color:var(--muted);line-height:1.45}
 .srv-card i{font-style:normal;font-size:.8rem;font-weight:700;color:var(--green-deep);margin-top:6px}
 .hero-photo{
-  position:relative;aspect-ratio:4/5;border-radius:24px;overflow:hidden;
+  position:relative;aspect-ratio:4/5;max-height:520px;margin:0 auto;width:100%;
+  border-radius:24px;overflow:hidden;
   background:
     radial-gradient(120% 90% at 80% 10%,#f4f5e8 0%,transparent 60%),
     linear-gradient(150deg,var(--green-soft) 0%,var(--green) 45%,var(--green-deep) 100%);
@@ -500,7 +504,7 @@ h3{font-size:1.12rem;font-weight:700}
 .val::before{content:"✓";color:var(--espresso);margin-right:8px;font-weight:800}
 .about-grid{display:grid;gap:28px;align-items:center}
 @media(min-width:900px){.about-grid{grid-template-columns:1fr 1.2fr;gap:60px}}
-.about-photo{position:relative;overflow:hidden;aspect-ratio:4/5;border-radius:24px;box-shadow:var(--shadow);background:linear-gradient(160deg,var(--green-soft),var(--green) 55%,var(--green-deep));display:flex;align-items:flex-end;justify-content:center}
+.about-photo{position:relative;overflow:hidden;aspect-ratio:4/5;max-height:520px;margin:0 auto;width:100%;border-radius:24px;box-shadow:var(--shadow);background:linear-gradient(160deg,var(--green-soft),var(--green) 55%,var(--green-deep));display:flex;align-items:flex-end;justify-content:center}
 .about-photo .ph-label{margin:0 auto 20px;background:rgba(255,255,255,.8);border-radius:999px;padding:8px 18px;font-size:.85rem;font-weight:600;color:var(--muted)}
 .metrics{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}
 .metrics b{font-size:1.6rem;font-weight:800;letter-spacing:-.03em;display:block;line-height:1}
