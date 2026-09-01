@@ -51,6 +51,8 @@ input,select,textarea{width:100%;background:#0a0a09;border:1px solid var(--line)
 textarea{min-height:76px;resize:vertical}
 button{background:var(--acc);color:#14140f;border:0;border-radius:10px;padding:12px 18px;font-size:15px;font-weight:700;cursor:pointer;margin-top:14px;width:100%}
 button.ghost{background:transparent;border:1px solid var(--line);color:var(--txt)}
+.alt{display:block;text-align:center;color:var(--dim);font-size:14px;margin-top:14px;
+     text-decoration:none;border-bottom:1px dotted var(--dim);width:fit-content;margin-left:auto;margin-right:auto;cursor:pointer}
 .err{color:var(--bad);font-size:14px;margin-top:10px}
 .ok{color:var(--acc);font-size:14px;margin-top:10px}
 .foot{color:var(--dim);font-size:12px;text-align:center;margin-top:26px;line-height:1.8}
@@ -68,13 +70,39 @@ button.ghost{background:transparent;border:1px solid var(--line);color:var(--txt
 
   <div id="gate" class="card" style="display:none">
     <h1>Вход для владельцев</h1>
-    <p class="sub">Логин и пароль выдаёт ваш менеджер Property Library.</p>
-    <label for="login">Логин</label>
-    <input id="login" autocomplete="username" spellcheck="false" placeholder="телефон или email">
-    <label for="pass">Пароль</label>
-    <input id="pass" type="password" autocomplete="current-password">
-    <button id="enter">Войти</button>
-    <div class="err" id="gate-err"></div>
+
+    <!-- шаг 1: номер телефона -->
+    <div id="step-phone">
+      <p class="sub">Введите номер телефона — пришлём код в WhatsApp.</p>
+      <label for="login">Номер телефона</label>
+      <input id="login" type="tel" autocomplete="tel" spellcheck="false" placeholder="например 66954143874">
+      <button id="send-code">Получить код</button>
+      <a class="alt" id="to-pass">Войти по паролю</a>
+      <div class="err" id="gate-err"></div>
+    </div>
+
+    <!-- шаг 2: код -->
+    <div id="step-code" style="display:none">
+      <p class="sub" id="code-hint">Код отправлен.</p>
+      <label for="code">Код из сообщения</label>
+      <input id="code" type="text" inputmode="numeric" autocomplete="one-time-code"
+             maxlength="6" placeholder="6 цифр" style="font-size:22px;letter-spacing:.3em;text-align:center">
+      <button id="check-code">Войти</button>
+      <a class="alt" id="back-phone">Ввести другой номер</a>
+      <div class="err" id="code-err"></div>
+    </div>
+
+    <!-- запасной путь: пароль -->
+    <div id="step-pass" style="display:none">
+      <p class="sub">Логин и пароль выдаёт ваш менеджер.</p>
+      <label for="login2">Логин</label>
+      <input id="login2" autocomplete="username" spellcheck="false" placeholder="телефон или email">
+      <label for="pass">Пароль</label>
+      <input id="pass" type="password" autocomplete="current-password">
+      <button id="enter">Войти</button>
+      <a class="alt" id="to-code">Войти по коду из WhatsApp</a>
+      <div class="err" id="pass-err"></div>
+    </div>
   </div>
 
   <div id="pwd" class="card" style="display:none">
@@ -375,27 +403,79 @@ button.ghost{background:transparent;border:1px solid var(--line);color:var(--txt
   function loadData(){
     show('loading');
     post({action:'data',token:TOKEN}).then(function(d){
-      if(!d||!d.ok){ try{localStorage.removeItem(LS);}catch(e){} TOKEN=null; show('gate');
-        $('gate-err').textContent=(d&&d.error==='expired')?'Сессия истекла — войдите заново.':''; return; }
+      if(!d||!d.ok){ try{localStorage.removeItem(LS);}catch(e){} TOKEN=null; gateStep('phone');
+        $('gate-err').textContent=(d&&d.error==='expired')?'Вход истёк — получите новый код.':''; return; }
       DATA=d; CUR=0;
       if(d.owner&&d.owner.must_change_password){ show('pwd'); return; }
       draw();
-    }).catch(function(){ show('gate'); $('gate-err').textContent='Нет связи с сервером. Попробуйте позже.'; });
+    }).catch(function(){ gateStep('phone'); $('gate-err').textContent='Нет связи с сервером. Попробуйте позже.'; });
   }
 
+  // ── экраны входа: телефон → код, с запасным входом по паролю ──
+  function gateStep(which){
+    ['step-phone','step-code','step-pass'].forEach(function(x){
+      $(x).style.display = (x==='step-'+which ? '' : 'none');
+    });
+    ['gate-err','code-err','pass-err'].forEach(function(x){ $(x).textContent=''; });
+    show('gate');
+  }
+  $('to-pass').onclick=function(){ gateStep('pass'); };
+  $('to-code').onclick=function(){ gateStep('phone'); };
+  $('back-phone').onclick=function(){ gateStep('phone'); };
+
+  $('send-code').onclick=function(){
+    var l=$('login').value.trim();
+    if(!l){ $('gate-err').textContent='Введите номер телефона.'; return; }
+    $('gate-err').textContent=''; $('send-code').disabled=true; $('send-code').textContent='Отправляем…';
+    post({action:'request_code',login:l}).then(function(d){
+      $('send-code').disabled=false; $('send-code').textContent='Получить код';
+      if(d&&d.ok&&d.sent){
+        gateStep('code');
+        $('code-hint').textContent='Код отправлен в '+(d.channel==='telegram'?'Telegram':'WhatsApp')+
+          (d.mask&&d.mask!=='Telegram'?' на номер '+d.mask:'')+'. Действует 10 минут.';
+        $('code').focus();
+      }else if(d&&d.error==='too_many_requests'){
+        $('gate-err').textContent='Код уже запрашивали несколько раз. Подождите 15 минут.';
+      }else{
+        // о том, есть ли номер в базе, не сообщаем — но человека не бросаем
+        $('gate-err').textContent='Не получилось отправить код. Проверьте номер или войдите по паролю — '+
+          'либо напишите менеджеру, он откроет доступ.';
+      }
+    }).catch(function(){
+      $('send-code').disabled=false; $('send-code').textContent='Получить код';
+      $('gate-err').textContent='Нет связи с сервером.';
+    });
+  };
+  $('login').addEventListener('keydown',function(e){ if(e.key==='Enter') $('send-code').click(); });
+
+  $('check-code').onclick=function(){
+    var l=$('login').value.trim(), c=$('code').value.trim();
+    if(!c){ $('code-err').textContent='Введите код из сообщения.'; return; }
+    $('code-err').textContent=''; show('loading');
+    post({action:'verify_code',login:l,code:c}).then(function(d){
+      if(d&&d.ok){ TOKEN=d.token; try{localStorage.setItem(LS,TOKEN);}catch(e){} loadData(); }
+      else{
+        gateStep('code');
+        $('code-err').textContent=(d&&d.error==='too_many_attempts')
+          ? 'Слишком много попыток. Запросите новый код.' : 'Код не подошёл. Проверьте и введите ещё раз.';
+      }
+    }).catch(function(){ gateStep('code'); $('code-err').textContent='Нет связи с сервером.'; });
+  };
+  $('code').addEventListener('keydown',function(e){ if(e.key==='Enter') $('check-code').click(); });
+
   $('enter').onclick=function(){
-    var l=$('login').value.trim(), p=$('pass').value;
-    if(!l||!p){ $('gate-err').textContent='Введите логин и пароль.'; return; }
-    $('gate-err').textContent=''; show('loading');
+    var l=$('login2').value.trim(), p=$('pass').value;
+    if(!l||!p){ $('pass-err').textContent='Введите логин и пароль.'; return; }
+    $('pass-err').textContent=''; show('loading');
     post({action:'login',login:l,password:p}).then(function(d){
       if(d&&d.ok){ TOKEN=d.token; try{localStorage.setItem(LS,TOKEN);}catch(e){} loadData(); }
       else{
-        show('gate');
-        $('gate-err').textContent=(d&&d.error==='locked')?'Слишком много попыток. Попробуйте через 15 минут.'
+        gateStep('pass');
+        $('pass-err').textContent=(d&&d.error==='locked')?'Слишком много попыток. Попробуйте через 15 минут.'
           :(d&&d.error==='disabled')?'Доступ приостановлен — свяжитесь с менеджером.'
           :'Неверный логин или пароль.';
       }
-    }).catch(function(){ show('gate'); $('gate-err').textContent='Нет связи с сервером.'; });
+    }).catch(function(){ gateStep('pass'); $('pass-err').textContent='Нет связи с сервером.'; });
   };
   $('pass').addEventListener('keydown',function(e){ if(e.key==='Enter') $('enter').click(); });
 
@@ -424,11 +504,12 @@ button.ghost{background:transparent;border:1px solid var(--line);color:var(--txt
     post({action:'logout',token:TOKEN});
     try{localStorage.removeItem(LS);}catch(e){}
     TOKEN=null; DATA=null; $('logout').style.display='none';
-    $('login').value=''; $('pass').value=''; show('gate');
+    $('login').value=''; $('login2').value=''; $('pass').value=''; $('code').value='';
+    gateStep('phone');
   };
 
   try{ TOKEN=localStorage.getItem(LS); }catch(e){}
-  if(TOKEN) loadData(); else show('gate');
+  if(TOKEN) loadData(); else gateStep('phone');
 })();
 </script>
 </body>
