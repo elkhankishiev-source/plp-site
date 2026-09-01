@@ -632,3 +632,85 @@ async function main() {
 }
 
 main().catch(e => { console.error('[gen] ОШИБКА:', e.message); process.exit(1); });
+
+/* ═══════════════════════════════════════════════════════════════
+   СТРАНИЦЫ РАЗДЕЛОВ (01.09)
+   Собираются ИЗ index.html, а не пишутся заново: шапка, подвал,
+   стили и скрипты берутся оттуда же. Правка на главной автоматически
+   расходится по всем разделам — один экземпляр вместо копий.
+   ═══════════════════════════════════════════════════════════════ */
+
+function splitSections(mainHtml) {
+  // режем <main> на секции; для каждой запоминаем id (если есть)
+  const parts = [];
+  const re = /<section\b[^>]*>/g;
+  const starts = [];
+  let m;
+  while ((m = re.exec(mainHtml)) !== null) starts.push({ i: m.index, tag: m[0] });
+  for (let k = 0; k < starts.length; k++) {
+    const from = starts[k].i;
+    const to = k + 1 < starts.length ? starts[k + 1].i : mainHtml.length;
+    const idm = starts[k].tag.match(/id="([^"]+)"/);
+    parts.push({ id: idm ? idm[1] : null, html: mainHtml.slice(from, to), order: k });
+  }
+  return parts;
+}
+
+function sectionPage(indexHtml, opts) {
+  const mStart = indexHtml.indexOf('<main');
+  const mOpenEnd = indexHtml.indexOf('>', mStart) + 1;
+  const mEnd = indexHtml.indexOf('</main>');
+  const head = indexHtml.slice(0, mOpenEnd);
+  const tail = indexHtml.slice(mEnd);
+  const parts = splitSections(indexHtml.slice(mOpenEnd, mEnd));
+
+  // берём только нужные секции: по id или по порядковому номеру
+  const picked = opts.sections.map(sel => {
+    const found = typeof sel === 'number'
+      ? parts.find(p => p.order === sel)
+      : parts.find(p => p.id === sel);
+    return found ? found.html : '';
+  }).join('\n');
+
+  const intro =
+    '<section style="padding-bottom:0"><div class="container">' +
+    '<h1 style="font-size:clamp(28px,4.2vw,42px);margin:0 0 10px">' + htmlEsc(opts.h1) + '</h1>' +
+    '<p class="sub" style="max-width:62ch;margin:0">' + htmlEsc(opts.intro) + '</p>' +
+    '</div></section>';
+
+  let out = head + '\n' + intro + '\n' + picked + '\n' + tail;
+
+  // мета под конкретный раздел
+  const url = SITE_BASE + '/' + opts.file;
+  out = out.replace(/<title>[\s\S]*?<\/title>/, '<title>' + htmlEsc(opts.title) + '</title>');
+  out = out.replace(/(<meta name="description" content=")[^"]*(")/, '$1' + htmlEsc(opts.desc) + '$2');
+  out = out.replace(/(<link rel="canonical" href=")[^"]*(")/, '$1' + url + '$2');
+  out = out.replace(/(<meta property="og:url" content=")[^"]*(")/, '$1' + url + '$2');
+  out = out.replace(/(<meta property="og:title" content=")[^"]*(")/, '$1' + htmlEsc(opts.title) + '$2');
+  out = out.replace(/(<meta property="og:description" content=")[^"]*(")/, '$1' + htmlEsc(opts.desc) + '$2');
+  // пункт меню, соответствующий разделу, подсвечиваем
+  out = out.replace('href="index.html#' + (opts.navId || '') + '"',
+                    'href="index.html#' + (opts.navId || '') + '" class="on"');
+  return out;
+}
+
+export function buildSectionPages(indexHtml) {
+  const pages = [
+    { file: 'buy.html', navId: 'sale', sections: ['sale', 8, 9],
+      h1: 'Купить недвижимость на Пхукете',
+      intro: 'Проверенные виллы и апартаменты от застройщиков и собственников. Каждый объект мы смотрим лично перед тем, как показать.',
+      title: 'Купить недвижимость на Пхукете — виллы и апартаменты | Property Library',
+      desc: 'Виллы, апартаменты и кондо на Пхукете от застройщиков и собственников. Проверенные объекты, расчёт доходности, сопровождение сделки.' },
+    { file: 'rent.html', navId: 'rent', sections: ['rent'],
+      h1: 'Аренда жилья на Пхукете',
+      intro: 'Виллы и апартаменты для жизни и отдыха, аренда от месяца. Подберём под даты и бюджет, встретим и заселим.',
+      title: 'Аренда виллы или апартаментов на Пхукете | Property Library',
+      desc: 'Долгосрочная аренда вилл и апартаментов на Пхукете. Свободные объекты по датам, трансфер, уборка, помощь на месте.' },
+  ];
+  const written = [];
+  for (const p of pages) {
+    fs.writeFileSync(path.join(ROOT, p.file), sectionPage(indexHtml, p));
+    written.push(p.file);
+  }
+  return written;
+}
