@@ -610,6 +610,12 @@ h3{font-size:1.12rem;font-weight:700}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--txt);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
 .wrap{max-width:840px;margin:0 auto;padding:28px 16px 56px}
+.wrap.narrow{max-width:470px}
+.gate-head{text-align:center;margin-bottom:4px}
+.gate-head h1{margin-bottom:6px}
+.gate-head .reg-link{color:var(--olive);font-weight:600;cursor:pointer;text-decoration:none;border-bottom:1px solid currentColor}
+.label-row{display:flex;justify-content:space-between;align-items:baseline}
+.label-row a{font-size:13px;color:var(--olive);cursor:pointer;text-decoration:none;border-bottom:1px solid currentColor}
 .brand{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;gap:12px}
 .brand .home{color:var(--dim);font-size:14px;text-decoration:none;font-weight:600}
 .brand .home:hover{color:var(--txt)}
@@ -716,20 +722,20 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
   <div class="brand"><span></span><a id="logout" style="display:none">Выйти</a></div>
 
   <div id="gate" class="card" style="display:none">
-    <h1 id="gate-title">Вход для владельцев</h1>
+    <div class="gate-head">
+      <h1 id="gate-title">Вход для владельцев</h1>
+      <p class="sub" id="gate-sub">или <a class="reg-link" id="to-reg-top">оставьте заявку на управление</a></p>
+    </div>
 
     <!-- шаг 1: номер телефона -->
     <div id="step-phone">
-      <p class="sub">Здесь собственники видят свои объекты: доход и расходы, отчёты и выплаты,
-      календарь заездов, и отсюда же заказывают уборку или ремонт.</p>
-      <label for="login">Ваш номер телефона</label>
+      <p class="sub" style="margin:16px 0 0">Внутри — ваши объекты: доход и расходы, отчёты и выплаты,
+      календарь заездов, заказ уборки и ремонта.</p>
+      <div class="label-row"><label for="login">Ваш номер телефона</label><a id="to-pass-2">Войти по паролю</a></div>
       <input id="login" type="tel" autocomplete="tel" spellcheck="false" placeholder="+66 95 123 4567 — тот, что вы давали менеджеру">
       <button id="send-code">Войти — пришлём код в WhatsApp</button>
-      <a class="alt" id="to-pass">Войти по паролю</a>
       <div class="err" id="gate-err"></div>
-      <div class="sep"><span>или</span></div>
-      <p class="sub" style="text-align:center">Ещё не наш клиент?</p>
-      <button class="ghost" id="to-reg">Отдать объект в управление</button>
+
     </div>
 
     <!-- заявка: коротко, галочками -->
@@ -1161,6 +1167,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   }
 
   function draw(){
+    document.querySelector('.wrap').classList.remove('narrow');
     show('app'); $('logout').style.display='';
     renderPortfolio(); renderTabs(); renderProp(); renderRequests();
   }
@@ -1184,11 +1191,21 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       $(x).style.display = (x==='step-'+which ? '' : 'none');
     });
     if($('gate-title')) $('gate-title').textContent = GATE_TITLES[which] || 'Личный кабинет';
+    // подпись под заголовком ведёт туда, куда человек ещё не заходил
+    var sub=$('gate-sub');
+    if(sub){
+      if(which==='reg') sub.innerHTML='или <a class="reg-link" id="to-login-top">войдите в кабинет</a>';
+      else sub.innerHTML='или <a class="reg-link" id="to-reg-top">оставьте заявку на управление</a>';
+      var a=sub.querySelector('a');
+      if(a) a.onclick=function(){ gateStep(which==='reg'?'phone':'reg'); };
+    }
+    document.querySelector('.wrap').classList.add('narrow');
     ['gate-err','code-err','pass-err','reg-err','reg-ok'].forEach(function(x){ if($(x)) $(x).textContent=''; });
     show('gate');
   }
   $('to-pass').onclick=function(){ gateStep('pass'); };
-  $('to-reg').onclick=function(){ gateStep('reg'); };
+  if($('to-reg-top')) $('to-reg-top').onclick=function(){ gateStep('reg'); };
+  if($('to-pass-2')) $('to-pass-2').onclick=function(){ gateStep('pass'); };
   $('to-login').onclick=function(){ gateStep('phone'); };
 
   // галочки: один выбор в группе, повторное нажатие снимает
