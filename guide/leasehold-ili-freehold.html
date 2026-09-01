@@ -746,6 +746,16 @@ h3{font-size:1.12rem;font-weight:700}
 .qz-done p{color:var(--muted);font-size:.92rem;line-height:1.5;margin:10px auto 0;max-width:380px}
 .thumb{display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;color:rgba(10,10,10,.4);position:relative;overflow:hidden}
 .thumb .thumb-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+@media(min-width:900px){.assist-box{grid-template-columns:1fr}}
+.assist-box .chipf{cursor:pointer;background:rgba(255,255,255,.75);border-color:transparent}
+.assist-box .chipf:hover{background:#fff}
+#toTop{position:fixed;right:18px;bottom:96px;z-index:60;width:46px;height:46px;border-radius:50%;
+  border:1px solid rgba(10,10,10,.12);background:rgba(255,255,255,.92);backdrop-filter:blur(6px);
+  color:var(--ink);font-size:20px;line-height:1;cursor:pointer;box-shadow:var(--shadow-sm);
+  opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s,transform .2s}
+#toTop.on{opacity:1;pointer-events:auto;transform:none}
+#toTop:hover{background:#fff}
+@media(max-width:600px){#toTop{right:14px;bottom:88px;width:42px;height:42px}}
 </style>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Leasehold или Freehold — что выбрать?","acceptedAnswer":{"@type":"Answer","text":"Freehold — полное право собственности, зарегистрированное в Земельном департаменте; сбор при регистрации ~2% от стоимости. Leasehold — зарегистрированная долгосрочная аренда: первый срок 30 лет с продлениями, суммарно до 90 лет; сбор ~1.1%. Для квартир чаще выбирают freehold, для вилл — leasehold. Подскажем, что выгоднее под вашу задачу — консультация бесплатная."}}]}</script>
 </head>
@@ -849,6 +859,7 @@ h3{font-size:1.12rem;font-weight:700}
 </section>
 
 <!-- ===== CATALOG PDF ===== -->
+
 
 </main>
 </div><!-- /stage -->
@@ -1715,6 +1726,13 @@ function offerLead(direct){
   if(leadShown){if(direct)showLead();return;}
   if(direct){showLead();return;}
   bot(t('chat.offerLead'));chips([{t:t('chat.offerBtn'),fn:showLead}]);
+}
+function askAssistant(q){
+  openChat('assistant');
+  setTimeout(function(){
+    var inp=document.getElementById('chatField');
+    if(inp){ inp.value=q; if(typeof sendFree==='function') sendFree(); }
+  },260);
 }
 function openChat(ctx){
   document.getElementById('chatwin').classList.add('open');
@@ -2639,6 +2657,16 @@ initCarDrag();observeReveals();updateTray();
 openFromHash(); /* шеринг-ссылка #object=<id> → открыть карточку объекта */
 addEventListener('hashchange',function(){if(isObjectHash())openFromHash();});
 
+})();
+</script>
+<button type="button" id="toTop" aria-label="Наверх" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<script>
+(function(){
+  var b=document.getElementById('toTop');
+  if(!b) return;
+  function upd(){ b.classList.toggle('on', window.scrollY>600); }
+  window.addEventListener('scroll',upd,{passive:true});
+  upd();
 })();
 </script>
 </body>

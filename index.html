@@ -746,6 +746,16 @@ h3{font-size:1.12rem;font-weight:700}
 .qz-done p{color:var(--muted);font-size:.92rem;line-height:1.5;margin:10px auto 0;max-width:380px}
 .thumb{display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;color:rgba(10,10,10,.4);position:relative;overflow:hidden}
 .thumb .thumb-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+@media(min-width:900px){.assist-box{grid-template-columns:1fr}}
+.assist-box .chipf{cursor:pointer;background:rgba(255,255,255,.75);border-color:transparent}
+.assist-box .chipf:hover{background:#fff}
+#toTop{position:fixed;right:18px;bottom:96px;z-index:60;width:46px;height:46px;border-radius:50%;
+  border:1px solid rgba(10,10,10,.12);background:rgba(255,255,255,.92);backdrop-filter:blur(6px);
+  color:var(--ink);font-size:20px;line-height:1;cursor:pointer;box-shadow:var(--shadow-sm);
+  opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s,transform .2s}
+#toTop.on{opacity:1;pointer-events:auto;transform:none}
+#toTop:hover{background:#fff}
+@media(max-width:600px){#toTop{right:14px;bottom:88px;width:42px;height:42px}}
 </style>
 </head>
 <body>
@@ -871,6 +881,35 @@ h3{font-size:1.12rem;font-weight:700}
 </section>
 
 <!-- ===== CATALOG PDF ===== -->
+
+<section id="assistant" style="padding-top:0">
+  <div class="container">
+    <div style="background:linear-gradient(150deg,#E9EBD9,#D2D5B3);border-radius:24px;
+                padding:clamp(22px,4vw,38px);display:grid;gap:20px;align-items:center;
+                grid-template-columns:1fr" class="assist-box">
+      <div>
+        <span class="kicker" style="color:#5F6242">Консультант</span>
+        <h2 style="font-size:clamp(22px,3.2vw,32px);margin:6px 0 10px;max-width:22ch">
+          Не уверены, что подходит именно вам?</h2>
+        <p class="sub" style="max-width:56ch;margin:0 0 6px;color:#3f4133">
+          Спросите Дарью — нашего цифрового консультанта. Она знает каждый объект в базе,
+          считает доходность под ваш бюджет и сравнивает районы между собой. Отвечает сразу,
+          в любое время суток. Если вопрос сложный — передаст живому менеджеру вместе со всей перепиской.</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
+          <span class="chipf" onclick="askAssistant('Что можно купить на 5 млн ฿?')">Что купить на 5 млн ฿?</span>
+          <span class="chipf" onclick="askAssistant('В каком районе выше доходность аренды?')">Где выше доходность?</span>
+          <span class="chipf" onclick="askAssistant('Чем Банг Тао лучше Раваи для инвестиций?')">Чем Банг Тао лучше Раваи?</span>
+          <span class="chipf" onclick="askAssistant('Какие расходы при покупке кроме цены объекта?')">Сколько выйдет с налогами?</span>
+        </div>
+        <div class="hero-cta" style="margin-top:20px">
+          <button type="button" class="btn btn-primary" onclick="openChat('assistant')">Задать вопрос</button>
+          <a class="btn btn-ghost" href="https://wa.me/66955492587" target="_blank" rel="noopener">Написать в WhatsApp</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section id="rent" aria-labelledby="rent-title" style="padding-top:0">
   <div class="container">
     <div class="head-row reveal">
@@ -2076,6 +2115,13 @@ function offerLead(direct){
   if(direct){showLead();return;}
   bot(t('chat.offerLead'));chips([{t:t('chat.offerBtn'),fn:showLead}]);
 }
+function askAssistant(q){
+  openChat('assistant');
+  setTimeout(function(){
+    var inp=document.getElementById('chatField');
+    if(inp){ inp.value=q; if(typeof sendFree==='function') sendFree(); }
+  },260);
+}
 function openChat(ctx){
   document.getElementById('chatwin').classList.add('open');
   document.getElementById('fab').style.display='none';
@@ -2999,6 +3045,16 @@ initCarDrag();observeReveals();updateTray();
 openFromHash(); /* шеринг-ссылка #object=<id> → открыть карточку объекта */
 addEventListener('hashchange',function(){if(isObjectHash())openFromHash();});
 
+})();
+</script>
+<button type="button" id="toTop" aria-label="Наверх" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<script>
+(function(){
+  var b=document.getElementById('toTop');
+  if(!b) return;
+  function upd(){ b.classList.toggle('on', window.scrollY>600); }
+  window.addEventListener('scroll',upd,{passive:true});
+  upd();
 })();
 </script>
 </body>

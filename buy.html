@@ -746,6 +746,16 @@ h3{font-size:1.12rem;font-weight:700}
 .qz-done p{color:var(--muted);font-size:.92rem;line-height:1.5;margin:10px auto 0;max-width:380px}
 .thumb{display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;color:rgba(10,10,10,.4);position:relative;overflow:hidden}
 .thumb .thumb-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+@media(min-width:900px){.assist-box{grid-template-columns:1fr}}
+.assist-box .chipf{cursor:pointer;background:rgba(255,255,255,.75);border-color:transparent}
+.assist-box .chipf:hover{background:#fff}
+#toTop{position:fixed;right:18px;bottom:96px;z-index:60;width:46px;height:46px;border-radius:50%;
+  border:1px solid rgba(10,10,10,.12);background:rgba(255,255,255,.92);backdrop-filter:blur(6px);
+  color:var(--ink);font-size:20px;line-height:1;cursor:pointer;box-shadow:var(--shadow-sm);
+  opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s,transform .2s}
+#toTop.on{opacity:1;pointer-events:auto;transform:none}
+#toTop:hover{background:#fff}
+@media(max-width:600px){#toTop{right:14px;bottom:88px;width:42px;height:42px}}
 </style>
 </head>
 <body>
@@ -836,6 +846,28 @@ h3{font-size:1.12rem;font-weight:700}
 
 <!-- ===== CATALOG PDF ===== -->
 
+
+<section id="quiz" style="padding-top:0">
+  <div class="container">
+    <div class="quizband reveal">
+      <div>
+        <span class="kicker" data-i18n="quiz.lab">Подбор за 10 минут</span>
+        <h2 data-i18n="quiz.h2">Пройдите квиз — пришлём подборку под ваши задачи</h2>
+        <p data-i18n="quiz.sub">8 коротких шагов: цель, бюджет, район, тип, спальни и сроки. В конце соберём контакт и сразу покажем подходящий объект.</p>
+        <button type="button" class="btn btn-green" onclick="openQuiz()" data-i18n="quiz.cta">Начать подбор</button>
+      </div>
+      <div class="qprev" aria-hidden="true">
+        <div class="qcell"><div class="k" data-i18n="quiz.step">Шаг</div><div class="v" data-i18n="q.1">Какая у вас цель?</div></div>
+        <div class="qcell"><div class="k" data-i18n="quiz.step">Шаг</div><div class="v" data-i18n="q.2">На какой бюджет ориентируетесь?</div></div>
+        <div class="qcell"><div class="k" data-i18n="quiz.step">Шаг</div><div class="v" data-i18n="q.3">Какой район интересен?</div></div>
+        <div class="qcell"><div class="k" data-i18n="quiz.step">Шаг</div><div class="v" data-i18n="q.6">Когда планируете сделку?</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ADVANTAGES ===== -->
+
 <section id="do" style="padding-top:0">
   <div class="container">
     <div class="reveal">
@@ -863,34 +895,6 @@ h3{font-size:1.12rem;font-weight:700}
 </section>
 
 <!-- ===== ABOUT / FOUNDER ===== -->
-
-<section id="about" aria-labelledby="about-title" style="padding-top:0">
-  <div class="container about-grid">
-    <div class="reveal">
-      <div class="about-photo" role="img" aria-label="Фото Эльнура Ханкишиева">
-        <img class="person-photo" src="img/elnur-founder.jpg" alt="Эльнур Ханкишиев, основатель и директор" onerror="this.remove()" onload="var s=this.parentNode.querySelector('.ph-label');if(s)s.remove();">
-        <span class="ph-label" data-i18n="ph.elnur">фото Эльнура</span>
-      </div>
-    </div>
-    <div class="reveal">
-      <span class="kicker" data-i18n="who.lab">Основатель и директор</span>
-      <h2 id="about-title" data-i18n="who.h2">Здравствуйте! Меня зовут Эльнур Ханкишиев</h2>
-      <p class="sub" data-i18n="who.p1">В 2011 году я впервые оказался на Пхукете — и сразу почувствовал, что это место особенное. Несколько раз я возвращался сюда снова и снова, пока однажды не решил остаться.</p>
-      <p class="sub" data-i18n="who.p2">Более 5 лет я помогаю другим людям сделать этот остров своим домом — так же, как когда-то сделал это сам. Вам не придётся разбираться в рынке, переговорах и документах — мы всё объясним простыми словами и пройдём с вами путь до ключей в руках.</p>
-      <div class="metrics">
-        <div><b>237+</b><span data-i18n="who.m1">закрытых сделок</span></div>
-        <div><b data-i18n="who.m2v">450+ млн ฿</b><span data-i18n="who.m2">помог инвестировать за год</span></div>
-        <div><b>6–12%</b><span data-i18n="who.m3">средняя доходность</span></div>
-        <div><b data-i18n="who.m4v">5+ лет</b><span data-i18n="who.m4">в сфере недвижимости</span></div>
-      </div>
-      <div class="hero-cta">
-        <a class="btn btn-green" href="https://wa.me/66955492587" target="_blank" rel="noopener" data-i18n="who.cta">Задать вопрос в WhatsApp</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ===== STEPS ===== -->
 
 </main>
 </div><!-- /stage -->
@@ -1757,6 +1761,13 @@ function offerLead(direct){
   if(leadShown){if(direct)showLead();return;}
   if(direct){showLead();return;}
   bot(t('chat.offerLead'));chips([{t:t('chat.offerBtn'),fn:showLead}]);
+}
+function askAssistant(q){
+  openChat('assistant');
+  setTimeout(function(){
+    var inp=document.getElementById('chatField');
+    if(inp){ inp.value=q; if(typeof sendFree==='function') sendFree(); }
+  },260);
 }
 function openChat(ctx){
   document.getElementById('chatwin').classList.add('open');
@@ -2681,6 +2692,16 @@ initCarDrag();observeReveals();updateTray();
 openFromHash(); /* шеринг-ссылка #object=<id> → открыть карточку объекта */
 addEventListener('hashchange',function(){if(isObjectHash())openFromHash();});
 
+})();
+</script>
+<button type="button" id="toTop" aria-label="Наверх" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<script>
+(function(){
+  var b=document.getElementById('toTop');
+  if(!b) return;
+  function upd(){ b.classList.toggle('on', window.scrollY>600); }
+  window.addEventListener('scroll',upd,{passive:true});
+  upd();
 })();
 </script>
 </body>
