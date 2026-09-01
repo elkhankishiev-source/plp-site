@@ -724,7 +724,7 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
   <div id="gate" class="card" style="display:none">
     <div class="gate-head">
       <h1 id="gate-title">Вход для владельцев</h1>
-      <p class="sub" id="gate-sub">или <a class="reg-link" id="to-reg-top">оставьте заявку на управление</a></p>
+      <p class="sub" id="gate-sub">или <a class="reg-link" id="to-reg-top">разместить объект</a></p>
     </div>
 
     <!-- шаг 1: номер телефона -->
@@ -1185,7 +1185,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
 
   // ── экраны входа: телефон → код, с запасным входом по паролю ──
   var GATE_TITLES={phone:'Вход для владельцев',code:'Введите код',
-                   pass:'Вход по паролю',reg:'Отдать объект в управление'};
+                   pass:'Вход по паролю',reg:'Разместить объект'};
   function gateStep(which){
     ['step-phone','step-code','step-pass','step-reg'].forEach(function(x){
       $(x).style.display = (x==='step-'+which ? '' : 'none');
@@ -1195,7 +1195,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     var sub=$('gate-sub');
     if(sub){
       if(which==='reg') sub.innerHTML='или <a class="reg-link" id="to-login-top">войдите в кабинет</a>';
-      else sub.innerHTML='или <a class="reg-link" id="to-reg-top">оставьте заявку на управление</a>';
+      else sub.innerHTML='или <a class="reg-link" id="to-reg-top">разместить объект</a>';
       var a=sub.querySelector('a');
       if(a) a.onclick=function(){ gateStep(which==='reg'?'phone':'reg'); };
     }
