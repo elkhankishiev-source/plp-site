@@ -1203,10 +1203,9 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     ['gate-err','code-err','pass-err','reg-err','reg-ok'].forEach(function(x){ if($(x)) $(x).textContent=''; });
     show('gate');
   }
-  $('to-pass').onclick=function(){ gateStep('pass'); };
   if($('to-reg-top')) $('to-reg-top').onclick=function(){ gateStep('reg'); };
   if($('to-pass-2')) $('to-pass-2').onclick=function(){ gateStep('pass'); };
-  $('to-login').onclick=function(){ gateStep('phone'); };
+  if($('to-login')) $('to-login').onclick=function(){ gateStep('phone'); };
 
   // галочки: один выбор в группе, повторное нажатие снимает
   ['o-type','o-beds','o-goal','o-stage','o-area','o-when','o-chan'].forEach(function(gid){
@@ -1257,8 +1256,8 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         $('reg-err').textContent='Не отправилось. Напишите нам в WhatsApp — ответим сразу.';
       });
   };
-  $('to-code').onclick=function(){ gateStep('phone'); };
-  $('back-phone').onclick=function(){ gateStep('phone'); };
+  if($('to-code')) $('to-code').onclick=function(){ gateStep('phone'); };
+  if($('back-phone')) $('back-phone').onclick=function(){ gateStep('phone'); };
 
   $('send-code').onclick=function(){
     var l=$('login').value.trim();
