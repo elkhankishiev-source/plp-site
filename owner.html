@@ -733,7 +733,14 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
       календарь заездов, заказ уборки и ремонта.</p>
       <div class="label-row"><label for="login">Ваш номер телефона</label><a id="to-pass-2">Войти по паролю</a></div>
       <input id="login" type="tel" autocomplete="tel" spellcheck="false" placeholder="+66 95 123 4567 — тот, что вы давали менеджеру">
-      <button id="send-code">Войти — пришлём код в WhatsApp</button>
+
+      <label>Куда прислать код</label>
+      <div class="opts" id="o-way">
+        <button type="button" class="opt on" data-v="whatsapp">WhatsApp</button>
+        <button type="button" class="opt" data-v="telegram">Telegram</button>
+      </div>
+
+      <button id="send-code">Войти</button>
       <div class="err" id="gate-err"></div>
 
     </div>
@@ -1208,7 +1215,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   if($('to-login')) $('to-login').onclick=function(){ gateStep('phone'); };
 
   // галочки: один выбор в группе, повторное нажатие снимает
-  ['o-type','o-beds','o-goal','o-stage','o-area','o-when','o-chan'].forEach(function(gid){
+  ['o-way','o-type','o-beds','o-goal','o-stage','o-area','o-when','o-chan'].forEach(function(gid){
     var g=$(gid); if(!g) return;
     Array.prototype.forEach.call(g.querySelectorAll('.opt'),function(b){
       b.onclick=function(){
@@ -1262,13 +1269,13 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   $('send-code').onclick=function(){
     var l=$('login').value.trim();
     if(!l){ $('gate-err').textContent='Введите номер телефона.'; return; }
-    $('gate-err').textContent=''; $('send-code').disabled=true; $('send-code').textContent='Отправляем…';
-    post({action:'request_code',login:l}).then(function(d){
-      $('send-code').disabled=false; $('send-code').textContent='Получить код';
+    $('gate-err').textContent=''; $('send-code').disabled=true; $('send-code').textContent='Отправляем код…';
+    post({action:'request_code',login:l,channel:picked('o-way')||'whatsapp'}).then(function(d){
+      $('send-code').disabled=false; $('send-code').textContent='Войти';
       if(d&&d.ok&&d.sent){
         gateStep('code');
-        $('code-hint').textContent='Код отправлен в '+(d.channel==='telegram'?'Telegram':'WhatsApp')+
-          (d.mask&&d.mask!=='Telegram'?' на номер '+d.mask:'')+'. Действует 10 минут.';
+        $('code-hint').textContent='Код в '+(d.channel==='telegram'?'Telegram':'WhatsApp')+
+          (d.mask&&d.mask!=='Telegram'?' на '+d.mask:'')+'. Живёт 10 минут.';
         $('code').focus();
       }else if(d&&d.error==='too_many_requests'){
         $('gate-err').textContent='Код уже запрашивали несколько раз. Подождите 15 минут.';
@@ -1278,7 +1285,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
           'либо напишите менеджеру, он откроет доступ.';
       }
     }).catch(function(){
-      $('send-code').disabled=false; $('send-code').textContent='Получить код';
+      $('send-code').disabled=false; $('send-code').textContent='Войти';
       $('gate-err').textContent='Нет связи с сервером.';
     });
   };
