@@ -79,7 +79,7 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
   </div>
 
   <div id="gate" class="card" style="display:none">
-    <h1>Вход для владельцев</h1>
+    <h1 id="gate-title">Вход для владельцев</h1>
 
     <!-- шаг 1: номер телефона -->
     <div id="step-phone">
@@ -464,10 +464,13 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
   }
 
   // ── экраны входа: телефон → код, с запасным входом по паролю ──
+  var GATE_TITLES={phone:'Вход для владельцев',code:'Введите код',
+                   pass:'Вход по паролю',reg:'Отдать объект в управление'};
   function gateStep(which){
     ['step-phone','step-code','step-pass','step-reg'].forEach(function(x){
       $(x).style.display = (x==='step-'+which ? '' : 'none');
     });
+    if($('gate-title')) $('gate-title').textContent = GATE_TITLES[which] || 'Личный кабинет';
     ['gate-err','code-err','pass-err','reg-err','reg-ok'].forEach(function(x){ if($(x)) $(x).textContent=''; });
     show('gate');
   }
