@@ -444,7 +444,13 @@ h3{font-size:1.12rem;font-weight:700}
 .dcard b{display:block;font-size:.92rem;font-weight:700}
 .dcard span{display:block;font-size:.78rem;color:var(--muted);margin-top:3px}
 .dcard u{display:inline-block;margin-top:7px;text-decoration:none;font-size:.68rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--olive)}
-@media(max-width:900px){.dlist{max-height:none}}
+@media(max-width:900px){
+  /* на телефоне список районов не разворачиваем во всю длину — иначе блок
+     превращается в бесконечную прокрутку. Держим высоту, крутим внутри. */
+  .dlist{max-height:330px}
+  .mapbox,.mapbox svg{min-height:300px}
+  .mapbox svg{max-height:340px}
+}
 .dfacts{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:16px}
 .dfacts div{background:var(--bg);border-radius:12px;padding:11px 13px}
 .dfacts b{display:block;font-size:1.1rem;font-weight:800}
