@@ -6,23 +6,27 @@
 <meta name="robots" content="noindex,nofollow">
 <title>Личный кабинет — Property Library Phuket</title>
 <style>
-:root{--bg:#0d0d0c;--card:#141413;--line:#232320;--txt:#EDEDE9;--dim:#8a8a80;--acc:#D2D5B3;--warm:#1a1c12;--bad:#c98b7a}
+/* палитра совпадает с сайтом: кабинет — его продолжение, а не отдельный продукт */
+:root{--bg:#f7f6f1;--card:#ffffff;--line:#e7e5dc;--txt:#0A0A0A;--dim:#5c5c54;
+      --acc:#5F6242;--green:#D2D5B3;--warm:#E9EBD9;--bad:#8f4b3a}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--txt);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+body{margin:0;background:var(--bg);color:var(--txt);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
 .wrap{max-width:840px;margin:0 auto;padding:22px 16px 64px}
 .brand{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;gap:12px}
-.brand b{color:var(--acc);font-size:13px;letter-spacing:.08em;text-transform:uppercase}
+.brand .home{color:var(--dim);font-size:14px;text-decoration:none;font-weight:600}
+.brand .home:hover{color:var(--txt)}
 .brand a{color:var(--dim);font-size:13px;text-decoration:none;border-bottom:1px dotted var(--dim);cursor:pointer}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px}
-h1{font-size:22px;margin:0 0 4px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:22px;margin-bottom:16px;
+      box-shadow:0 4px 14px rgba(10,10,10,.06)}
+h1{font-size:26px;margin:0 0 6px;letter-spacing:-.01em}
 h2{font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--dim);margin:0 0 12px;font-weight:600}
 .sub{color:var(--dim);font-size:14px;margin:0}
 .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
 .tab{background:var(--card);border:1px solid var(--line);color:var(--dim);border-radius:10px;padding:9px 14px;font-size:14px;cursor:pointer}
-.tab.on{background:var(--warm);border-color:var(--acc);color:var(--acc);font-weight:600}
-.payout{background:var(--warm);border:1px solid var(--acc);border-radius:14px;padding:20px;margin-bottom:14px}
+.tab.on{background:var(--warm);border-color:var(--green);color:var(--txt);font-weight:700}
+.payout{background:var(--warm);border:1px solid var(--green);border-radius:20px;padding:22px;margin-bottom:16px}
 .payout .lbl{color:var(--acc);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
-.payout .val{color:var(--acc);font-size:32px;font-weight:800;margin-top:6px;line-height:1.1}
+.payout .val{color:var(--txt);font-size:32px;font-weight:800;margin-top:6px;line-height:1.1}
 .payout .note{color:var(--dim);font-size:13px;margin-top:8px}
 .row{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px solid var(--line)}
 .row:last-child{border-bottom:0}
@@ -38,7 +42,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}
 th{text-align:left;color:var(--dim);font-weight:600;font-size:12px;text-transform:uppercase;padding:6px 6px 6px 0}
 td{padding:8px 6px 8px 0;border-top:1px solid var(--line);vertical-align:top}
 td.r,th.r{text-align:right}
-.pos{color:var(--acc)}.neg{color:var(--bad)}
+.pos{color:#3f6b34}.neg{color:var(--bad)}
 .chip{display:inline-block;background:var(--warm);color:var(--acc);font-size:11px;padding:1px 7px;border-radius:6px;margin-left:6px}
 .chip.grey{background:#1e1e1c;color:var(--dim)}
 .photo{width:100%;border-radius:12px;display:block;margin-bottom:12px}
@@ -47,12 +51,18 @@ td.r,th.r{text-align:right}
          padding:9px 13px;font-size:14px;text-decoration:none}
 .pre{white-space:pre-wrap;color:var(--txt);font-size:14px;margin:0}
 label{display:block;color:var(--dim);font-size:13px;margin:12px 0 5px}
-input,select,textarea{width:100%;background:#0a0a09;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:11px 13px;font-size:15px;font-family:inherit}
+input,select,textarea{width:100%;background:#fff;border:1px solid var(--line);color:var(--txt);border-radius:14px;padding:11px 13px;font-size:15px;font-family:inherit}
 textarea{min-height:76px;resize:vertical}
-button{background:var(--acc);color:#14140f;border:0;border-radius:10px;padding:12px 18px;font-size:15px;font-weight:700;cursor:pointer;margin-top:14px;width:100%}
-button.ghost{background:transparent;border:1px solid var(--line);color:var(--txt)}
+button{background:var(--txt);color:#fff;border:0;border-radius:999px;padding:12px 18px;font-size:15px;font-weight:700;cursor:pointer;margin-top:14px;width:100%}
+button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt);font-weight:700}
 .alt{display:block;text-align:center;color:var(--dim);font-size:14px;margin-top:14px;
      text-decoration:none;border-bottom:1px dotted var(--dim);width:fit-content;margin-left:auto;margin-right:auto;cursor:pointer}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{width:auto;margin:0;background:transparent;border:1px solid var(--line);color:var(--txt);
+     border-radius:999px;padding:9px 15px;font-size:14px;font-weight:500;cursor:pointer}
+.opt.on{background:var(--green);border-color:var(--green);color:#14140f;font-weight:700}
+.sep{display:flex;align-items:center;gap:12px;margin:22px 0 4px;color:var(--dim);font-size:13px}
+.sep::before,.sep::after{content:"";flex:1;height:1px;background:var(--line)}
 .err{color:var(--bad);font-size:14px;margin-top:10px}
 .ok{color:var(--acc);font-size:14px;margin-top:10px}
 .foot{color:var(--dim);font-size:12px;text-align:center;margin-top:26px;line-height:1.8}
@@ -64,7 +74,7 @@ button.ghost{background:transparent;border:1px solid var(--line);color:var(--txt
 <div class="wrap">
 
   <div class="brand">
-    <b>Property Library · Личный кабинет</b>
+    <a class="home" href="index.html">← Property Library</a>
     <a id="logout" style="display:none">Выйти</a>
   </div>
 
@@ -73,12 +83,54 @@ button.ghost{background:transparent;border:1px solid var(--line);color:var(--txt
 
     <!-- шаг 1: номер телефона -->
     <div id="step-phone">
-      <p class="sub">Введите номер телефона — пришлём код в WhatsApp.</p>
-      <label for="login">Номер телефона</label>
-      <input id="login" type="tel" autocomplete="tel" spellcheck="false" placeholder="например 66954143874">
-      <button id="send-code">Получить код</button>
+      <p class="sub">Здесь собственники видят свои объекты: доход и расходы, отчёты и выплаты,
+      календарь заездов, и отсюда же заказывают уборку или ремонт.</p>
+      <label for="login">Ваш номер телефона</label>
+      <input id="login" type="tel" autocomplete="tel" spellcheck="false" placeholder="+66 …">
+      <button id="send-code">Войти — пришлём код в WhatsApp</button>
       <a class="alt" id="to-pass">Войти по паролю</a>
       <div class="err" id="gate-err"></div>
+      <div class="sep"><span>или</span></div>
+      <p class="sub" style="text-align:center">Ещё не наш клиент?</p>
+      <button class="ghost" id="to-reg">Отдать объект в управление</button>
+    </div>
+
+    <!-- заявка: коротко, галочками -->
+    <div id="step-reg" style="display:none">
+      <p class="sub">Три вопроса — и менеджер свяжется с вами.</p>
+
+      <label>Что у вас за объект</label>
+      <div class="opts" id="o-type">
+        <button type="button" class="opt" data-v="Вилла">Вилла</button>
+        <button type="button" class="opt" data-v="Кондо">Кондо</button>
+        <button type="button" class="opt" data-v="Дом">Дом</button>
+        <button type="button" class="opt" data-v="Участок">Участок</button>
+      </div>
+
+      <label>Что хотите</label>
+      <div class="opts" id="o-goal">
+        <button type="button" class="opt" data-v="Сдавать через вас">Сдавать через вас</button>
+        <button type="button" class="opt" data-v="Продать">Продать</button>
+        <button type="button" class="opt" data-v="Просто консультация">Консультация</button>
+      </div>
+
+      <label>Район</label>
+      <div class="opts" id="o-area">
+        <button type="button" class="opt" data-v="Банг Тао">Банг Тао</button>
+        <button type="button" class="opt" data-v="Лаян">Лаян</button>
+        <button type="button" class="opt" data-v="Камала">Камала</button>
+        <button type="button" class="opt" data-v="Раваи">Раваи</button>
+        <button type="button" class="opt" data-v="Найхарн">Найхарн</button>
+        <button type="button" class="opt" data-v="Другой">Другой</button>
+      </div>
+
+      <label for="reg-phone">Телефон для связи</label>
+      <input id="reg-phone" type="tel" autocomplete="tel" placeholder="+66 …">
+
+      <button id="reg-send">Отправить</button>
+      <a class="alt" id="to-login">У меня уже есть доступ</a>
+      <div class="ok" id="reg-ok"></div>
+      <div class="err" id="reg-err"></div>
     </div>
 
     <!-- шаг 2: код -->
@@ -147,8 +199,8 @@ button.ghost{background:transparent;border:1px solid var(--line);color:var(--txt
   </div>
 
   <div class="foot">
-    Property Library Phuket · управление недвижимостью<br>
-    Вопрос по отчёту — <a href="https://wa.me/66955492587">напишите менеджеру</a>
+    Не получается войти — <a href="https://wa.me/66955492587">напишите менеджеру</a>,
+    откроем доступ
   </div>
 </div>
 
@@ -413,13 +465,54 @@ button.ghost{background:transparent;border:1px solid var(--line);color:var(--txt
 
   // ── экраны входа: телефон → код, с запасным входом по паролю ──
   function gateStep(which){
-    ['step-phone','step-code','step-pass'].forEach(function(x){
+    ['step-phone','step-code','step-pass','step-reg'].forEach(function(x){
       $(x).style.display = (x==='step-'+which ? '' : 'none');
     });
-    ['gate-err','code-err','pass-err'].forEach(function(x){ $(x).textContent=''; });
+    ['gate-err','code-err','pass-err','reg-err','reg-ok'].forEach(function(x){ if($(x)) $(x).textContent=''; });
     show('gate');
   }
   $('to-pass').onclick=function(){ gateStep('pass'); };
+  $('to-reg').onclick=function(){ gateStep('reg'); };
+  $('to-login').onclick=function(){ gateStep('phone'); };
+
+  // галочки: один выбор в группе, повторное нажатие снимает
+  ['o-type','o-goal','o-area'].forEach(function(gid){
+    var g=$(gid); if(!g) return;
+    Array.prototype.forEach.call(g.querySelectorAll('.opt'),function(b){
+      b.onclick=function(){
+        var was=b.classList.contains('on');
+        Array.prototype.forEach.call(g.querySelectorAll('.opt'),function(x){x.classList.remove('on');});
+        if(!was) b.classList.add('on');
+      };
+    });
+  });
+  function picked(gid){ var el=$(gid).querySelector('.opt.on'); return el?el.getAttribute('data-v'):''; }
+
+  $('reg-send').onclick=function(){
+    var phone=$('reg-phone').value.trim();
+    $('reg-ok').textContent=''; $('reg-err').textContent='';
+    if(!phone){ $('reg-err').textContent='Оставьте телефон — иначе не сможем ответить.'; return; }
+    var type=picked('o-type'), goal=picked('o-goal'), area=picked('o-area');
+    $('reg-send').disabled=true; $('reg-send').textContent='Отправляем…';
+    // заявка идёт в тот же приём, что и заявки с сайта — попадает в CRM и к менеджеру
+    fetch('https://proplib.app.n8n.cloud/webhook/site-lead?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7',
+      {method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({
+        name:'Собственник', contact:phone, phone:phone, funnel:'management', goal:goal||'управление',
+        district:area||'', lang:'ru', source:'owner_cabinet',
+        message:'Заявка из кабинета · объект: '+(type||'не указан')+' · цель: '+(goal||'не указана')+' · район: '+(area||'не указан'),
+        tags:['Кабинет','Управление']
+      })})
+      .then(function(r){ if(!r.ok) throw new Error('http '+r.status); })
+      .then(function(){
+        $('reg-send').disabled=false; $('reg-send').textContent='Отправить';
+        $('reg-ok').textContent='Заявка принята — менеджер свяжется с вами.';
+        $('reg-phone').value='';
+      })
+      .catch(function(){
+        $('reg-send').disabled=false; $('reg-send').textContent='Отправить';
+        $('reg-err').textContent='Не отправилось. Напишите нам в WhatsApp — ответим сразу.';
+      });
+  };
   $('to-code').onclick=function(){ gateStep('phone'); };
   $('back-phone').onclick=function(){ gateStep('phone'); };
 
