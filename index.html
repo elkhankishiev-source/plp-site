@@ -209,6 +209,8 @@ h3{font-size:1.12rem;font-weight:700}
 .btn-primary:hover{box-shadow:var(--shadow)}
 .btn-green{background:var(--green);color:var(--ink);box-shadow:var(--shadow-sm)}
 .btn-ghost{background:transparent;border:2px solid var(--ink)}
+.btn-cab{padding:9px 16px;font-size:14px;border-width:1px}
+@media(max-width:1100px){.btn-cab{display:none}}
 .btn-glass{background:rgba(255,255,255,.16);color:#fff;border:1.5px solid rgba(255,255,255,.55);backdrop-filter:blur(8px)}
 .btn-glass:hover{background:rgba(255,255,255,.28)}
 .btn-block{width:100%}
@@ -765,6 +767,7 @@ h3{font-size:1.12rem;font-weight:700}
         <button type="button" data-l="ru" class="on" onclick="setLang('ru')">RU</button>
         <button type="button" data-l="en" onclick="setLang('en')">EN</button>
       </div>
+      <a class="btn btn-ghost btn-cab" href="owner.html" data-i18n="nav.cabinet">Кабинет</a>
       <a class="btn btn-green" href="https://wa.me/66955492587" target="_blank" rel="noopener">WhatsApp</a>
       <button type="button" class="burger" aria-label="Меню" onclick="toggleNav(true)"><i></i><i></i><i></i></button>
     </div>
@@ -786,6 +789,7 @@ h3{font-size:1.12rem;font-weight:700}
       <button type="button" data-l="ru" class="on" onclick="setLang('ru')">RU</button>
       <button type="button" data-l="en" onclick="setLang('en')">EN</button>
     </div>
+    <a href="owner.html" onclick="toggleNav(false)" data-i18n="nav.cabinet">Кабинет владельца</a>
     <a class="mwa" href="https://wa.me/66955492587" target="_blank" rel="noopener">WhatsApp · +66 95-549-2587</a>
   </div>
 </div>
@@ -1299,6 +1303,7 @@ ru: {
   "ph.elnur":"фото Эльнура","ph.object":"фото скоро",
   "trust.1v":"5+ лет","trust.1k":"В сфере инвестиционной недвижимости","trust.2k":"Реализованных проектов","trust.3v":"450+ млн ฿","trust.3k":"Помогли инвестировать за год","trust.4k":"Средняя доходность — прогноз, не гарантия",
   "why.lab":"Почему Пхукет","why.h2":"Пхукет — больше, чем просто курорт",
+  "nav.cabinet":"Кабинет",
   "why.1t":"Высокая доходность","why.1p":"Потенциал доходности 6–12% годовых — в зависимости от объекта и стратегии.",
   "why.2t":"Здоровая экология","why.2p":"Чистый воздух, море и природа без тяжёлой промышленности.",
   "why.3t":"Международное образование","why.3p":"Школы мирового уровня — UWC, BISP, Headstart — рядом с домом.",
@@ -1482,6 +1487,7 @@ en: {
   "ph.elnur":"photo of Elnur","ph.object":"photo soon",
   "trust.1v":"5+ years","trust.1k":"In investment real estate","trust.2k":"Projects realized","trust.3v":"450+ mln ฿","trust.3k":"Invested with our help in a year","trust.4k":"Average yield — a forecast, not a guarantee",
   "why.lab":"Why Phuket","why.h2":"Phuket is more than just a resort",
+  "nav.cabinet":"Account",
   "why.1t":"High yield","why.1p":"Yield potential of 6–12% a year — depending on the property and strategy.",
   "why.2t":"Healthy environment","why.2p":"Clean air, sea and nature with no heavy industry.",
   "why.3t":"International education","why.3p":"World-class schools — UWC, BISP, Headstart — next door.",
