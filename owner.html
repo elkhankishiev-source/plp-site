@@ -649,6 +649,7 @@ td.r,th.r{text-align:right}
          padding:9px 13px;font-size:14px;text-decoration:none}
 .pre{white-space:pre-wrap;color:var(--txt);font-size:14px;margin:0}
 label{display:block;color:var(--dim);font-size:13px;margin:12px 0 5px}
+input::placeholder,textarea::placeholder{color:var(--dim);opacity:.55}
 input,select,textarea{width:100%;background:#fff;border:1px solid var(--line);color:var(--txt);border-radius:14px;padding:11px 13px;font-size:15px;font-family:inherit}
 textarea{min-height:76px;resize:vertical}
 button{background:var(--txt);color:#fff;border:0;border-radius:999px;padding:12px 18px;font-size:15px;font-weight:700;cursor:pointer;margin-top:14px;width:100%}
@@ -722,7 +723,7 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
       <p class="sub">Здесь собственники видят свои объекты: доход и расходы, отчёты и выплаты,
       календарь заездов, и отсюда же заказывают уборку или ремонт.</p>
       <label for="login">Ваш номер телефона</label>
-      <input id="login" type="tel" autocomplete="tel" spellcheck="false" placeholder="+66 …">
+      <input id="login" type="tel" autocomplete="tel" spellcheck="false" placeholder="+66 95 123 4567 — тот, что вы давали менеджеру">
       <button id="send-code">Войти — пришлём код в WhatsApp</button>
       <a class="alt" id="to-pass">Войти по паролю</a>
       <div class="err" id="gate-err"></div>
@@ -733,7 +734,7 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
 
     <!-- заявка: коротко, галочками -->
     <div id="step-reg" style="display:none">
-      <p class="sub">Три вопроса — и менеджер свяжется с вами.</p>
+      <p class="sub">Ответьте на несколько вопросов — менеджер свяжется и всё посчитает. Обязательны только имя и телефон.</p>
 
       <label>Что у вас за объект</label>
       <div class="opts" id="o-type">
@@ -743,11 +744,27 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
         <button type="button" class="opt" data-v="Участок">Участок</button>
       </div>
 
+      <label>Сколько спален</label>
+      <div class="opts" id="o-beds">
+        <button type="button" class="opt" data-v="Студия">Студия</button>
+        <button type="button" class="opt" data-v="1">1</button>
+        <button type="button" class="opt" data-v="2">2</button>
+        <button type="button" class="opt" data-v="3">3</button>
+        <button type="button" class="opt" data-v="4+">4 и больше</button>
+      </div>
+
       <label>Что хотите</label>
       <div class="opts" id="o-goal">
         <button type="button" class="opt" data-v="Сдавать через вас">Сдавать через вас</button>
         <button type="button" class="opt" data-v="Продать">Продать</button>
         <button type="button" class="opt" data-v="Просто консультация">Консультация</button>
+      </div>
+
+      <label>Объект готов?</label>
+      <div class="opts" id="o-stage">
+        <button type="button" class="opt" data-v="Готов, можно заселять">Готов</button>
+        <button type="button" class="opt" data-v="Строится">Ещё строится</button>
+        <button type="button" class="opt" data-v="Уже сдаётся">Уже сдаётся</button>
       </div>
 
       <label>Район</label>
@@ -760,10 +777,30 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
         <button type="button" class="opt" data-v="Другой">Другой</button>
       </div>
 
-      <label for="reg-phone">Телефон для связи</label>
-      <input id="reg-phone" type="tel" autocomplete="tel" placeholder="+66 …">
+      <label>Когда планируете начать</label>
+      <div class="opts" id="o-when">
+        <button type="button" class="opt" data-v="Сейчас">Сейчас</button>
+        <button type="button" class="opt" data-v="В течение месяца">В течение месяца</button>
+        <button type="button" class="opt" data-v="Пока просто узнаю">Пока просто узнаю</button>
+      </div>
 
-      <button id="reg-send">Отправить</button>
+      <label for="reg-name">Как к вам обращаться</label>
+      <input id="reg-name" autocomplete="name" placeholder="Например, Александр">
+
+      <label for="reg-phone">Телефон для связи</label>
+      <input id="reg-phone" type="tel" autocomplete="tel" placeholder="+66 95 123 4567 или +7 916 …">
+
+      <label>Где удобнее общаться</label>
+      <div class="opts" id="o-chan">
+        <button type="button" class="opt" data-v="WhatsApp">WhatsApp</button>
+        <button type="button" class="opt" data-v="Telegram">Telegram</button>
+        <button type="button" class="opt" data-v="Звонок">Звонок</button>
+      </div>
+
+      <label for="reg-note">Что ещё важно знать</label>
+      <textarea id="reg-note" placeholder="Например: вилла с бассейном, сдавалась через Airbnb, нужен управляющий с сентября"></textarea>
+
+      <button id="reg-send">Отправить заявку</button>
       <a class="alt" id="to-login">У меня уже есть доступ</a>
       <div class="ok" id="reg-ok"></div>
       <div class="err" id="reg-err"></div>
@@ -784,7 +821,7 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
     <div id="step-pass" style="display:none">
       <p class="sub">Логин и пароль выдаёт ваш менеджер.</p>
       <label for="login2">Логин</label>
-      <input id="login2" autocomplete="username" spellcheck="false" placeholder="телефон или email">
+      <input id="login2" autocomplete="username" spellcheck="false" placeholder="телефон или email, который вам выдали">
       <label for="pass">Пароль</label>
       <input id="pass" type="password" autocomplete="current-password">
       <button id="enter">Войти</button>
@@ -1155,7 +1192,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   $('to-login').onclick=function(){ gateStep('phone'); };
 
   // галочки: один выбор в группе, повторное нажатие снимает
-  ['o-type','o-goal','o-area'].forEach(function(gid){
+  ['o-type','o-beds','o-goal','o-stage','o-area','o-when','o-chan'].forEach(function(gid){
     var g=$(gid); if(!g) return;
     Array.prototype.forEach.call(g.querySelectorAll('.opt'),function(b){
       b.onclick=function(){
@@ -1171,24 +1208,35 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     var phone=$('reg-phone').value.trim();
     $('reg-ok').textContent=''; $('reg-err').textContent='';
     if(!phone){ $('reg-err').textContent='Оставьте телефон — иначе не сможем ответить.'; return; }
-    var type=picked('o-type'), goal=picked('o-goal'), area=picked('o-area');
+    var name=$('reg-name').value.trim();
+    if(!name){ $('reg-err').textContent='Как к вам обращаться?'; return; }
+    var type=picked('o-type'), goal=picked('o-goal'), area=picked('o-area'),
+        beds=picked('o-beds'), stage=picked('o-stage'), when=picked('o-when'),
+        chan=picked('o-chan'), note=$('reg-note').value.trim();
     $('reg-send').disabled=true; $('reg-send').textContent='Отправляем…';
     // заявка идёт в тот же приём, что и заявки с сайта — попадает в CRM и к менеджеру
     fetch('https://proplib.app.n8n.cloud/webhook/site-lead?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7',
       {method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({
-        name:'Собственник', contact:phone, phone:phone, funnel:'management', goal:goal||'управление',
-        district:area||'', lang:'ru', source:'owner_cabinet',
-        message:'Заявка из кабинета · объект: '+(type||'не указан')+' · цель: '+(goal||'не указана')+' · район: '+(area||'не указан'),
+        name:name, contact:phone, phone:phone, funnel:'management', goal:goal||'управление',
+        district:area||'', beds:beds||'', lang:'ru', source:'owner_cabinet',
+        message:'Заявка из кабинета\n'+
+          'Объект: '+(type||'—')+(beds?', спален: '+beds:'')+'\n'+
+          'Готовность: '+(stage||'—')+'\n'+
+          'Цель: '+(goal||'—')+'\n'+
+          'Район: '+(area||'—')+'\n'+
+          'Когда начать: '+(when||'—')+'\n'+
+          'Связь: '+(chan||'—')+
+          (note?'\nКомментарий: '+note:''),
         tags:['Кабинет','Управление']
       })})
       .then(function(r){ if(!r.ok) throw new Error('http '+r.status); })
       .then(function(){
-        $('reg-send').disabled=false; $('reg-send').textContent='Отправить';
+        $('reg-send').disabled=false; $('reg-send').textContent='Отправить заявку';
         $('reg-ok').textContent='Заявка принята — менеджер свяжется с вами.';
-        $('reg-phone').value='';
+        $('reg-phone').value=''; $('reg-name').value=''; $('reg-note').value='';
       })
       .catch(function(){
-        $('reg-send').disabled=false; $('reg-send').textContent='Отправить';
+        $('reg-send').disabled=false; $('reg-send').textContent='Отправить заявку';
         $('reg-err').textContent='Не отправилось. Напишите нам в WhatsApp — ответим сразу.';
       });
   };
