@@ -211,6 +211,11 @@ function buildCatalog(objects, benchmarks, preserve) {
       // 30.08 канон №38: «готов/сдан» — ТОЛЬКО из stage='Ready', никогда из даты сдачи.
       ready: o.stage === 'Ready',
       desc: { ru: usp, en: uspEn },
+      // 02.09: то, что человек ищет глазами в первую очередь — море и застройщик.
+      // Пишем только если данные есть, пустое поле карточка не рисует.
+      beach: o.beach || null,
+      beachM: (o.distance_beach_m === 0 || o.distance_beach_m) ? o.distance_beach_m : null,
+      developer: o.developer || null,
       calc: keep.calc || fallbackCalc(o),
     };
   });
@@ -525,7 +530,17 @@ footer a{color:var(--green);text-decoration:none}
 // -------------------------------------------------------------------- sitemap
 function sitemap(objects) {
   const today = new Date().toISOString().slice(0, 10);
-  const anchors = ['#sale', '#rent', '#map', '#quiz', '#about', '#faq', '#contacts'];
+  // 02.09: якоря заменены отдельными страницами — их и индексируем.
+  // Раньше генератор перезаписывал sitemap и терял разделы, собранные скриптами.
+  const anchors = ['#quiz', '#about', '#faq', '#contacts'];
+  const pages = [
+    ['buy.html', '0.9'], ['rent.html', '0.9'], ['management.html', '0.8'],
+    ...['bang-tao','layan','surin','kamala','rawai','kata','nai-yang','koh-kaew']
+        .map(d => ['districts/' + d + '.html', '0.8']),
+    ...['inostranec-mozhet-kupit','leasehold-ili-freehold','skolko-oformlyaetsya-sdelka',
+        'rashody-pri-pokupke','kupit-udalenno','stoimost-uslug']
+        .map(g => ['guide/' + g + '.html', '0.6']),
+  ];
   const parts = [];
   parts.push('<?xml version="1.0" encoding="UTF-8"?>');
   parts.push('<!-- Сгенерировано build/gen.mjs. Главная + якоря + отдельные страницы объектов. -->');
@@ -533,6 +548,9 @@ function sitemap(objects) {
   parts.push(`  <url><loc>${SITE_BASE}/</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>`);
   for (const a of anchors) {
     parts.push(`  <url><loc>${SITE_BASE}/${a}</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>`);
+  }
+  for (const [pg, pri] of pages) {
+    parts.push(`  <url><loc>${SITE_BASE}/${pg}</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>${pri}</priority></url>`);
   }
   // 30.08: правовые документы тоже индексируем — они часть сайта
   for (const doc of ['privacy.html', 'rules.html', 'terms.html']) {
