@@ -2905,7 +2905,8 @@ function renderDList(){
          так человек не уходит со страницы и не теряет место */
       list.querySelectorAll('.dcard').forEach(function(x){x.classList.remove('on');});
       el.classList.add('on');
-      focusDistrict(d.ru);
+      /* карту не двигаем, пока открыто окно: Leaflet теряет размер под модалом,
+         и первый клик получался дёрганым. Карта поедет по кнопке «Показать на карте». */
       openDistrict(d.ru);
     });
   });
@@ -2966,7 +2967,9 @@ function openDistrict(nameRu){
   cta.onclick=function(){closeDistrict();pushLead({funnel:'sale',goal:'district',note:nameRu});openChat('district');setTimeout(function(){offerLead(true);},600);};
   document.getElementById('distModal').classList.add('open');document.body.style.overflow='hidden';
 }
-function closeDistrict(){document.getElementById('distModal').classList.remove('open');document.body.style.overflow='';}
+function closeDistrict(){document.getElementById('distModal').classList.remove('open');document.body.style.overflow='';
+  /* пока окно было открыто, страница не прокручивалась — карта могла потерять размер */
+  setTimeout(function(){ try{ if(PLPMAP) PLPMAP.invalidateSize(); }catch(e){} },80);}
 
 /* ===== FAQ accordion ===== */
 document.querySelectorAll('.faq-item').forEach(function(item){
