@@ -1,0 +1,310 @@
+{
+ "PLP-ADORA": {
+  "available": 113,
+  "total_rows": 113,
+  "price_from_thb": 5332000,
+  "price_to_thb": 13172000,
+  "tiers": [
+   {
+    "bedrooms": 1,
+    "area_sqm": 43.0,
+    "price_from_thb": 5332000
+   },
+   {
+    "bedrooms": 2,
+    "area_sqm": 81.0,
+    "price_from_thb": 11664000
+   }
+  ]
+ },
+ "PLP-BALCONY": {
+  "available": 95,
+  "total_rows": 95,
+  "price_from_thb": 6087270,
+  "price_to_thb": 12275550,
+  "tiers": [
+   {
+    "bedrooms": 1,
+    "area_sqm": 33.0,
+    "price_from_thb": 6087270
+   },
+   {
+    "bedrooms": 2,
+    "area_sqm": 50.64,
+    "price_from_thb": 8916810
+   }
+  ]
+ },
+ "PLP-BIANCANA": {
+  "available": 107,
+  "total_rows": 107,
+  "price_from_thb": 6235950,
+  "price_to_thb": 28282000,
+  "tiers": [
+   {
+    "bedrooms": 0,
+    "area_sqm": 131.0,
+    "price_from_thb": 27609000
+   },
+   {
+    "bedrooms": 1,
+    "area_sqm": 33.0,
+    "price_from_thb": 6235950
+   },
+   {
+    "bedrooms": 2,
+    "area_sqm": 62.0,
+    "price_from_thb": 12493900
+   }
+  ]
+ },
+ "PLP-CASADEMONTE": {
+  "available": 62,
+  "total_rows": 62,
+  "price_from_thb": 11779000,
+  "price_to_thb": 47268000,
+  "tiers": [
+   {
+    "bedrooms": 0,
+    "area_sqm": 29.33,
+    "price_from_thb": 11779000
+   }
+  ]
+ },
+ "PLP-CIELO": {
+  "available": 14,
+  "total_rows": 14,
+  "price_from_thb": 6191000,
+  "price_to_thb": 14007000,
+  "tiers": [
+   {
+    "bedrooms": 1,
+    "area_sqm": 41.0,
+    "price_from_thb": 6191000
+   },
+   {
+    "bedrooms": 2,
+    "area_sqm": 72.0,
+    "price_from_thb": 11304000
+   }
+  ]
+ },
+ "PLP-CORALINA": {
+  "available": 199,
+  "total_rows": 199,
+  "price_from_thb": 4767552,
+  "price_to_thb": 21325248,
+  "tiers": [
+   {
+    "bedrooms": 1,
+    "area_sqm": 31.0,
+    "price_from_thb": 4767552
+   },
+   {
+    "bedrooms": 2,
+    "area_sqm": 64.0,
+    "price_from_thb": 9379584
+   },
+   {
+    "bedrooms": 3,
+    "area_sqm": 128.0,
+    "price_from_thb": 21217248
+   }
+  ]
+ },
+ "PLP-ESTELLA": {
+  "available": 1,
+  "total_rows": 1,
+  "price_from_thb": 22418000,
+  "price_to_thb": 22418000,
+  "tiers": [
+   {
+    "bedrooms": 0,
+    "area_sqm": 64.5,
+    "price_from_thb": 22418000
+   }
+  ]
+ },
+ "PLP-HALO1": {
+  "available": 5,
+  "total_rows": 5,
+  "price_from_thb": 5137480,
+  "price_to_thb": 7594600,
+  "tiers": [
+   {
+    "bedrooms": 0,
+    "area_sqm": 35.88,
+    "price_from_thb": 5137480
+   }
+  ]
+ },
+ "PLP-HERITAGE": {
+  "available": 314,
+  "total_rows": 314,
+  "price_from_thb": 5525730,
+  "price_to_thb": 32849900,
+  "tiers": [
+   {
+    "bedrooms": 1,
+    "area_sqm": 35.8,
+    "price_from_thb": 5525730
+   },
+   {
+    "bedrooms": 2,
+    "area_sqm": 64.68,
+    "price_from_thb": 11002068
+   },
+   {
+    "bedrooms": 3,
+    "area_sqm": 122.04,
+    "price_from_thb": 20887146
+   }
+  ]
+ },
+ "PLP-KATABELLO": {
+  "available": 178,
+  "total_rows": 178,
+  "price_from_thb": 4256000,
+  "price_to_thb": 20286000,
+  "tiers": [
+   {
+    "bedrooms": 1,
+    "area_sqm": 28.0,
+    "price_from_thb": 4256000
+   },
+   {
+    "bedrooms": 2,
+    "area_sqm": 121.0,
+    "price_from_thb": 17666000
+   },
+   {
+    "bedrooms": 3,
+    "area_sqm": 100.0,
+    "price_from_thb": 13300000
+   }
+  ]
+ },
+ "PLP-KIRARA": {
+  "available": 24,
+  "total_rows": 24,
+  "price_from_thb": 29020000,
+  "price_to_thb": 97400000,
+  "tiers": [
+   {
+    "bedrooms": 0,
+    "area_sqm": 67.5,
+    "price_from_thb": 29020000
+   }
+  ]
+ },
+ "PLP-LEGENDARY": {
+  "available": 66,
+  "total_rows": 66,
+  "price_from_thb": 6679500,
+  "price_to_thb": 14530000,
+  "tiers": [
+   {
+    "bedrooms": 0,
+    "area_sqm": 37.1,
+    "price_from_thb": 8105200
+   },
+   {
+    "bedrooms": 1,
+    "area_sqm": 42.9,
+    "price_from_thb": 6679500
+   },
+   {
+    "bedrooms": 2,
+    "area_sqm": 85.3,
+    "price_from_thb": 12886300
+   }
+  ]
+ },
+ "PLP-MODEVA": {
+  "available": 267,
+  "total_rows": 267,
+  "price_from_thb": 4750200,
+  "price_to_thb": 24568000,
+  "tiers": [
+   {
+    "bedrooms": 1,
+    "area_sqm": 29.0,
+    "price_from_thb": 4750200
+   },
+   {
+    "bedrooms": 2,
+    "area_sqm": 93.0,
+    "price_from_thb": 14418720
+   },
+   {
+    "bedrooms": 3,
+    "area_sqm": 146.0,
+    "price_from_thb": 22192000
+   }
+  ]
+ },
+ "PLP-SERENITY": {
+  "available": 155,
+  "total_rows": 155,
+  "price_from_thb": 5221467,
+  "price_to_thb": 18125100,
+  "tiers": [
+   {
+    "bedrooms": 1,
+    "area_sqm": 36.35,
+    "price_from_thb": 5221467
+   },
+   {
+    "bedrooms": 2,
+    "area_sqm": 56.45,
+    "price_from_thb": 8108715
+   },
+   {
+    "bedrooms": 3,
+    "area_sqm": 112.55,
+    "price_from_thb": 13826768
+   }
+  ]
+ },
+ "PLP-SIERRA": {
+  "available": 297,
+  "total_rows": 297,
+  "price_from_thb": 2906700,
+  "price_to_thb": 7880200,
+  "tiers": [
+   {
+    "bedrooms": 1,
+    "area_sqm": 28.4,
+    "price_from_thb": 2906700
+   },
+   {
+    "bedrooms": 2,
+    "area_sqm": 55.7,
+    "price_from_thb": 6523800
+   }
+  ]
+ },
+ "PLP-VIVANA": {
+  "available": 276,
+  "total_rows": 276,
+  "price_from_thb": 4232629,
+  "price_to_thb": 19131284,
+  "tiers": [
+   {
+    "bedrooms": 0,
+    "area_sqm": 55.5,
+    "price_from_thb": 8878870
+   },
+   {
+    "bedrooms": 1,
+    "area_sqm": 33.0,
+    "price_from_thb": 4232629
+   },
+   {
+    "bedrooms": 2,
+    "area_sqm": 60.0,
+    "price_from_thb": 7990467
+   }
+  ]
+ }
+}
