@@ -486,6 +486,9 @@ h3{font-size:1.12rem;font-weight:700}
   background:var(--paper);border:1px solid rgba(10,10,10,.08);border-radius:13px;padding:11px 13px;
   cursor:pointer;text-decoration:none;color:inherit;transition:box-shadow .2s,transform .2s}
 .dgrid .dcard:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
+.dgrid .dcard.on{border-color:var(--ink);background:var(--warm,#EFEEE7)}
+.dextra{display:flex;gap:8px;margin-bottom:10px}
+.dextra .btn{flex:1;justify-content:center;text-align:center;font-size:.84rem;padding:9px 12px}
 .dgrid .dcard b{font-size:.92rem}
 .dgrid .dcard span{color:var(--muted);font-size:.78rem;line-height:1.35}
 .dgrid .dcard u{text-decoration:none;color:var(--olive);font-weight:700;font-size:.74rem;margin-top:1px}
@@ -1137,7 +1140,7 @@ h3{font-size:1.12rem;font-weight:700}
   <div class="cw">
     <div class="chd"><h3 id="dTitle">Район</h3><button type="button" class="cx" onclick="closeDistrict()" aria-label="Закрыть">×</button></div>
     <div class="cmp-body" id="dBody"></div>
-    <div class="cmp-foot"><button type="button" class="btn btn-primary btn-block" id="dCta">Подобрать объект в этом районе</button></div>
+    <div class="cmp-foot"><div class="dextra" id="dExtra"></div><button type="button" class="btn btn-primary btn-block" id="dCta">Подобрать объект в этом районе</button></div>
   </div>
 </div>
 
@@ -2858,7 +2861,13 @@ function renderMapReal(){
        иначе карта перехватывает прокрутку и по ней невозможно проехать */
     PLPMAP.on('click', function(){ PLPMAP.scrollWheelZoom.enable(); });
     PLPMAP.on('mouseout', function(){ PLPMAP.scrollWheelZoom.disable(); });
-    PLPMAP.on('zoomend', function(){ drawPins(true); });
+    PLPMAP.on('zoomend', function(){
+      drawPins(true);
+      var rb=document.getElementById('plpReset');
+      if(rb) rb.style.display = PLPMAP.getZoom() > 11 ? '' : 'none';
+    });
+    var rb=document.getElementById('plpReset');
+    if(rb) rb.onclick=function(){ resetMapView(); };
 
     var vb=document.getElementById('plpView');
     if(vb) Array.prototype.forEach.call(vb.querySelectorAll('button'),function(b){
@@ -2977,14 +2986,42 @@ function renderDList(){
   list.innerHTML=PL.DISTRICTS.map(function(d,i){
     var n=distProps(d.ru).length;
     var inner='<b>'+dName(d)+'</b><span>'+loc(d.vibe)+'</span><u>'+(n?(n+t('d.inbase')+d.yield):d.yield)+'</u>';
-    var slug=DPAGE[d.ru];
-    return slug ? '<a class="dcard" href="districts/'+slug+'.html">'+inner+'</a>'
-                : '<button type="button" class="dcard" data-d="'+i+'">'+inner+'</button>';
+    return '<button type="button" class="dcard" data-d="'+i+'">'+inner+'</button>';
   }).join('');
   list.querySelectorAll('button.dcard').forEach(function(el){
-    el.addEventListener('click',function(){openDistrict(PL.DISTRICTS[+el.dataset.d].ru);});
+    el.addEventListener('click',function(){
+      var d=PL.DISTRICTS[+el.dataset.d];
+      /* подсвечиваем выбранный, ведём карту к району и открываем окно —
+         так человек не уходит со страницы и не теряет место */
+      list.querySelectorAll('.dcard').forEach(function(x){x.classList.remove('on');});
+      el.classList.add('on');
+      focusDistrict(d.ru);
+      openDistrict(d.ru);
+    });
   });
 }
+/* карта приближается к району: по объектам, если они есть, иначе по центру района */
+function focusDistrict(nameRu){
+  if(!PLPMAP) return;
+  var d=null; PL.DISTRICTS.forEach(function(x){ if(x.ru===nameRu) d=x; });
+  var pts=distProps(nameRu).filter(function(p){return p.lat&&p.lng;})
+    .map(function(p){return [Number(p.lat),Number(p.lng)];});
+  try{
+    if(pts.length>1) PLPMAP.flyToBounds(pts,{padding:[60,60],maxZoom:14,duration:.8});
+    else if(pts.length===1) PLPMAP.flyTo(pts[0],14,{duration:.8});
+    else if(d) PLPMAP.flyTo([d.lat,d.lng],13,{duration:.8});
+  }catch(e){}
+}
+/* вернуть общий вид острова */
+function resetMapView(){
+  if(!PLPMAP) return;
+  var all=PL.PROPERTIES.concat(PL.RENTALS).filter(function(p){return p.lat&&p.lng;})
+    .map(function(p){return [Number(p.lat),Number(p.lng)];});
+  var list=document.getElementById('dList');
+  if(list) list.querySelectorAll('.dcard').forEach(function(x){x.classList.remove('on');});
+  try{ if(all.length>1) PLPMAP.flyToBounds(all,{padding:[44,44],duration:.7}); }catch(e){}
+}
+
 function openDistrict(nameRu){
   var d=null;
   PL.DISTRICTS.forEach(function(x){if(x.ru===nameRu)d=x;});
@@ -3002,6 +3039,18 @@ function openDistrict(nameRu){
   document.getElementById('dBody').querySelectorAll('.dprops button').forEach(function(b){
     b.addEventListener('click',function(){closeDistrict();openProp(b.dataset.pid);});
   });
+  /* под содержимым — что делать дальше: остаться на карте или уйти в подробную страницу */
+  var slug=DPAGE[nameRu], extra=document.getElementById('dExtra');
+  if(extra){
+    extra.innerHTML='<button type="button" class="btn btn-ghost" id="dMap">Показать на карте</button>'+
+      (slug?'<a class="btn btn-ghost" href="districts/'+slug+'.html">Подробно о районе</a>':'');
+    var bm=document.getElementById('dMap');
+    if(bm) bm.onclick=function(){
+      closeDistrict(); focusDistrict(nameRu);
+      var box=document.getElementById('plpMap');
+      if(box) window.scrollTo({top:box.getBoundingClientRect().top+window.scrollY-90,behavior:'smooth'});
+    };
+  }
   var cta=document.getElementById('dCta');
   cta.textContent=t('d.cta')+dName(d);
   cta.onclick=function(){closeDistrict();pushLead({funnel:'sale',goal:'district',note:nameRu});openChat('district');setTimeout(function(){offerLead(true);},600);};
