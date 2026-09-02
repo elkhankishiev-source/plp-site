@@ -916,6 +916,7 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
       <a data-go="sec-calendar">Календарь</a>
       <a data-go="sec-reports">Отчёты</a>
       <div class="cab-group">Действия</div>
+      <a data-go="sec-edit">Дополнить карточку</a>
       <a data-go="sec-addobj">Добавить объект</a>
       <a data-go="sec-request">Заявка</a>
       <a data-go="req-wrap">Мои заявки</a>
@@ -929,6 +930,29 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
     <div id="portfolio"></div>
     <div class="tabs" id="prop-tabs"></div>
     <div id="prop"></div>
+
+    <div class="card" id="sec-edit">
+      <h2>Дополнить карточку объекта</h2>
+      <p class="sub" style="margin:0 0 4px">Вы знаете свой объект лучше всех. Напишите, что важно —
+      мы проверим и добавим в карточку.</p>
+      <div id="edit-was" class="sub" style="margin:8px 0 0;display:none"></div>
+
+      <label for="e-desc">Описание объекта</label>
+      <textarea id="e-desc" placeholder="Например: угловая вилла, окна на закат, кухня-остров, детская площадка через дорогу"></textarea>
+
+      <label for="e-amen">Что есть в доме</label>
+      <textarea id="e-amen" placeholder="Например: бассейн 8×4, барбекю, стиральная и сушильная машины, генератор, сейф"></textarea>
+
+      <label for="e-near">Что рядом</label>
+      <textarea id="e-near" placeholder="Например: пляж 7 минут пешком, Villa Market 1,5 км, школа UWC 10 минут на машине"></textarea>
+
+      <label for="e-rules">Правила для гостей</label>
+      <textarea id="e-rules" placeholder="Например: без вечеринок, животные по согласованию, тихий час с 22:00"></textarea>
+
+      <button id="e-send">Отправить на проверку</button>
+      <div class="ok" id="e-ok"></div>
+      <div class="err" id="e-err"></div>
+    </div>
 
     <div class="card" id="sec-addobj">
       <h2>Добавить ещё объект</h2>
@@ -1083,8 +1107,12 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   function renderPortfolio(){
     var t=DATA.totals, o=DATA.owner||{};
     if(!t){ $('portfolio').innerHTML=''; return; }
-    var h='<div class="card"><h1>'+esc(o.name||'Личный кабинет')+'</h1>'+
-          '<p class="sub">Объектов в кабинете: '+t.properties+' · период '+dmy(DATA.period.start)+' — '+dmy(DATA.period.end)+'</p></div>';
+    var hour=new Date().getHours();
+    var greet = hour<5?'Доброй ночи':hour<12?'Доброе утро':hour<18?'Добрый день':'Добрый вечер';
+    var first = String(o.name||'').trim().split(/\s+/)[0] || '';
+    var h='<div class="card"><h1>'+esc(greet+(first?', '+first:''))+'</h1>'+
+          '<p class="sub">'+(t.properties===1?'Ваш объект':'Ваших объектов: '+t.properties)+
+          ' · период '+dmy(DATA.period.start)+' — '+dmy(DATA.period.end)+'</p></div>';
     h+='<div class="payout"><div class="lbl">Итого к выплате по всем объектам</div>'+
        '<div class="val">'+(t.payout===null?'—':money(t.payout,'THB'))+'</div>'+
        '<div class="note">'+(t.payout===null
@@ -1283,6 +1311,18 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     $('prop').innerHTML=H;
   }
 
+  function renderEditState(){
+    var p=(DATA.properties||[])[CUR], box=$('edit-was');
+    if(!box) return;
+    var e = p && p.owner_edit;
+    if(!e){ box.style.display='none'; return; }
+    var st = e.status==='applied' ? 'уже добавлено в карточку'
+           : e.status==='rejected' ? 'не принято, менеджер свяжется'
+           : 'на проверке у менеджера';
+    box.style.display='';
+    box.innerHTML='Последнее дополнение от '+dmy(e.created_at)+' — <b>'+esc(st)+'</b>.';
+  }
+
   function renderRequests(){
     var rq=DATA.requests||[];
     if(!rq.length){ $('req-wrap').innerHTML='<div class="empty">Заявок пока не было.</div>'; return; }
@@ -1326,7 +1366,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     document.querySelector('.wrap').classList.remove('narrow');
     var dn=document.getElementById('demo-note'); if(dn) dn.style.display = DEMO_MODE ? '' : 'none';
     show('app'); $('logout').style.display='';
-    renderPortfolio(); renderTabs(); renderProp(); renderRequests(); initCabNav();
+    renderPortfolio(); renderTabs(); renderProp(); renderRequests(); renderEditState(); initCabNav();
   }
 
   function loadData(){
@@ -1506,6 +1546,26 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       };
     });
   });
+
+  $('e-send').onclick=function(){
+    var p=(DATA.properties||[])[CUR];
+    $('e-ok').textContent=''; $('e-err').textContent='';
+    if(!p){ $('e-err').textContent='Объект не выбран.'; return; }
+    var body={action:'save_object',token:TOKEN,property_id:p.id,
+      description:$('e-desc').value.trim(), amenities:$('e-amen').value.trim(),
+      nearby:$('e-near').value.trim(), house_rules:$('e-rules').value.trim()};
+    if(!body.description && !body.amenities && !body.nearby && !body.house_rules){
+      $('e-err').textContent='Заполните хотя бы одно поле.'; return; }
+    $('e-send').disabled=true; $('e-send').textContent='Отправляем…';
+    post(body).then(function(d){
+      $('e-send').disabled=false; $('e-send').textContent='Отправить на проверку';
+      if(d&&d.ok){ $('e-ok').textContent='Спасибо — отправили менеджеру. Проверим и добавим в карточку.'; loadData(); }
+      else $('e-err').textContent = (d&&d.error==='not_your_property') ? 'Этот объект не привязан к вашему кабинету.' : 'Не удалось отправить.';
+    }).catch(function(){
+      $('e-send').disabled=false; $('e-send').textContent='Отправить на проверку';
+      $('e-err').textContent='Нет связи с сервером.';
+    });
+  };
 
   $('a-send').onclick=function(){
     $('a-ok').textContent=''; $('a-err').textContent='';
