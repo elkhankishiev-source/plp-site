@@ -695,6 +695,8 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
 .btn-mini{width:auto;margin:0;padding:9px 16px;font-size:13.5px;border-radius:999px;
   background:transparent;border:1px solid var(--line);color:var(--txt);font-weight:600}
 .btn-mini:hover{border-color:var(--txt)}
+.btn-mini.done{background:var(--green,#D2D5B3);border-color:transparent;color:var(--txt)}
+.btn-mini:disabled{opacity:.6}
 .ava{width:38px;height:38px;border-radius:50%;background:var(--green,#D2D5B3);color:var(--txt);
   display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex:0 0 auto}
 .ov-obj{margin-bottom:20px}
@@ -1320,6 +1322,30 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     $('portfolio').innerHTML=h;
     var rb=document.getElementById('ov-report');
     if(rb) rb.onclick=function(){ cabPage('docs'); };
+    bindNowActions(p);
+  }
+
+  /* Кнопки в блоке «Объект сейчас»: согласование работы уходит менеджеру
+     как заявка, чтобы решение владельца не потерялось в переписке. */
+  function bindNowActions(p){
+    document.querySelectorAll('#portfolio .nowrow button[data-now]').forEach(function(b){
+      b.onclick=function(){
+        var go=b.getAttribute('data-go');
+        if(go){ cabPage(go); return; }
+        var row=b.closest('.nowrow');
+        var what=row?row.querySelector('b').textContent:'работа';
+        var when=row?row.querySelector('span').textContent:'';
+        b.disabled=true; b.textContent='Отправляем…';
+        post({action:'request', token:TOKEN, kind:'other',
+              property_id:(p&&p.id)||'',
+              details:'Владелец согласовал: '+what+(when?' ('+when+')':'')})
+          .then(function(d){
+            if(d&&d.ok){ b.textContent='Согласовано'; b.classList.add('done'); }
+            else { b.disabled=false; b.textContent='Согласовать'; }
+          })
+          .catch(function(){ b.disabled=false; b.textContent='Согласовать'; });
+      };
+    });
   }
 
   /* четыре показателя: доход за год с динамикой, загрузка, ставка, выплата */
