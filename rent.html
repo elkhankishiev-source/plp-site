@@ -2841,19 +2841,31 @@ function renderMapReal(){
   function plural(n){ var a=n%10,b=n%100;
     return (a===1&&b!==11)?'':((a>=2&&a<=4&&(b<10||b>20))?'а':'ов'); }
 
+  /* Своя страница есть только у продажных объектов: у арендных её намеренно нет,
+     туда когда-то утекали имя собственника и номер квартиры. Для них открываем
+     карточку окном, чтобы ссылка не вела в никуда. */
+  function hasPage(p){
+    return PL.PROPERTIES.some(function(x){ return x.property_id===p.property_id; });
+  }
   function href(p){ return 'object/'+String(p.property_id||'').replace(/^PLP-/,'').toLowerCase()+'.html'; }
-  function popupOne(p){
-    return '<a class="plp-pop" href="'+href(p)+'">'+
-      '<span class="t"><b>'+p.title+'</b><span>'+loc(p.loc)+' · '+p.beds+'</span>'+
+  function popupBody(p){
+    return '<span class="t"><b>'+p.title+'</b><span>'+loc(p.loc)+' · '+p.beds+'</span>'+
       '<span class="price">'+fmtBaht(thbOf(p))+'</span>'+
       (p.coordOk?'':'<span style="font-size:11.5px;color:#8a8a80;margin-top:4px">расположение примерное — уточняем</span>')+
-      '<span class="go">Открыть объект →</span></span></a>';
+      '<span class="go">Открыть объект →</span></span>';
+  }
+  function popupOne(p){
+    return hasPage(p)
+      ? '<a class="plp-pop" href="'+href(p)+'">'+popupBody(p)+'</a>'
+      : '<a class="plp-pop" href="#" onclick="event.preventDefault();openProp(\''+p.property_id+'\')">'+popupBody(p)+'</a>';
   }
   function popupMany(g){
     return '<span class="t" style="display:block;padding:12px 13px"><b>'+loc(g[0].loc)+
       '</b><span style="margin-bottom:6px">'+g.length+' объект'+plural(g.length)+' рядом</span>'+
       g.map(function(p){
-        return '<a href="'+href(p)+'" style="display:flex;justify-content:space-between;gap:10px;'+
+        var open = hasPage(p) ? 'href="'+href(p)+'"'
+          : 'href="#" onclick="event.preventDefault();openProp(\''+p.property_id+'\')"';
+        return '<a '+open+' style="display:flex;justify-content:space-between;gap:10px;'+
           'padding:7px 0;border-top:1px solid #eeede6;color:inherit;text-decoration:none;font-size:12.5px">'+
           '<span>'+p.title+'</span><b style="white-space:nowrap">'+fmtBaht(thbOf(p))+'</b></a>';
       }).join('')+'</span>';
