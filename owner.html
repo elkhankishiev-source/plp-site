@@ -1425,7 +1425,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       });
       kh+='</table>';
     }
-    H+=card('Работы по объекту', kh);
+    H+=card('Работы по объекту', kh, 'sec-service');
 
     // расходы владения
     var co=p.costs||{}, ch='';
@@ -1435,7 +1435,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     ch+=line('Депозит брони',has(co.booking_deposit_thb)?money(co.booking_deposit_thb,'THB'):null);
     ch+=line('Налоги',co.taxes_note);
     ch+=line('Общая территория',co.common_area_fee_note);
-    H+=card('Расходы владения', ch);
+    H+=card('Расходы владения', ch, 'sec-costs');
 
     // договор
     var dh='';
@@ -1685,6 +1685,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   var TAB_OF={
     'portfolio':'overview', 'prop-tabs':'object', 'prop':'object',
     'sec-money':'money', 'sec-calendar':'calendar', 'sec-reports':'docs',
+    'sec-service':'service', 'sec-costs':'money',
     'sec-edit':'object', 'sec-addobj':'actions', 'sec-request':'actions',
     'sec-myreq':'actions', 'sec-moder':'staff', 'sec-coords':'staff'
   };
@@ -1701,7 +1702,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       el.style.display=(t===name)?'':'none';
     });
     /* работы и брони живут внутри карточки объекта — вытаскиваем их в свои разделы */
-    ['sec-money','sec-calendar','sec-reports'].forEach(function(id){
+    ['sec-money','sec-calendar','sec-reports','sec-service','sec-costs'].forEach(function(id){
       var el=document.getElementById(id); if(!el) return;
       el.style.display=(TAB_OF[id]===name)?'':'none';
       if(TAB_OF[id]===name && el.parentElement && el.parentElement.id!=='cab-body'){
