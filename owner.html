@@ -898,6 +898,52 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
     <div id="prop"></div>
 
     <div class="card">
+      <h2>Добавить ещё объект</h2>
+      <p class="sub" style="margin:0 0 4px">Если у вас есть другая недвижимость — отдайте её в управление здесь.</p>
+
+      <label>Что за объект</label>
+      <div class="opts" id="a-type">
+        <button type="button" class="opt" data-v="Вилла">Вилла</button>
+        <button type="button" class="opt" data-v="Кондо">Кондо</button>
+        <button type="button" class="opt" data-v="Дом">Дом</button>
+        <button type="button" class="opt" data-v="Участок">Участок</button>
+      </div>
+
+      <label>Спален</label>
+      <div class="opts" id="a-beds">
+        <button type="button" class="opt" data-v="Студия">Студия</button>
+        <button type="button" class="opt" data-v="1">1</button>
+        <button type="button" class="opt" data-v="2">2</button>
+        <button type="button" class="opt" data-v="3">3</button>
+        <button type="button" class="opt" data-v="4+">4 и больше</button>
+      </div>
+
+      <label>Район</label>
+      <div class="opts" id="a-area">
+        <button type="button" class="opt" data-v="Банг Тао">Банг Тао</button>
+        <button type="button" class="opt" data-v="Лаян">Лаян</button>
+        <button type="button" class="opt" data-v="Камала">Камала</button>
+        <button type="button" class="opt" data-v="Раваи">Раваи</button>
+        <button type="button" class="opt" data-v="Най Харн">Най Харн</button>
+        <button type="button" class="opt" data-v="Другой">Другой</button>
+      </div>
+
+      <label>Готовность</label>
+      <div class="opts" id="a-stage">
+        <button type="button" class="opt" data-v="Готов">Готов</button>
+        <button type="button" class="opt" data-v="Строится">Строится</button>
+        <button type="button" class="opt" data-v="Уже сдаётся">Уже сдаётся</button>
+      </div>
+
+      <label for="a-note">Адрес или название комплекса</label>
+      <textarea id="a-note" placeholder="Например: Laguna Park 2, вилла 14/3, бассейн, мебель есть"></textarea>
+
+      <button id="a-send">Отправить на подключение</button>
+      <div class="ok" id="a-ok"></div>
+      <div class="err" id="a-err"></div>
+    </div>
+
+    <div class="card">
       <h2>Оставить заявку</h2>
       <label for="r-kind">Что нужно</label>
       <select id="r-kind">
@@ -1388,6 +1434,38 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     });
   };
   $('p-skip').onclick=function(){ draw(); };
+
+  ['a-type','a-beds','a-area','a-stage'].forEach(function(gid){
+    var g=$(gid); if(!g) return;
+    Array.prototype.forEach.call(g.querySelectorAll('.opt'),function(b){
+      b.onclick=function(){
+        var was=b.classList.contains('on');
+        Array.prototype.forEach.call(g.querySelectorAll('.opt'),function(x){x.classList.remove('on');});
+        if(!was) b.classList.add('on');
+      };
+    });
+  });
+
+  $('a-send').onclick=function(){
+    $('a-ok').textContent=''; $('a-err').textContent='';
+    var type=picked('a-type'), beds=picked('a-beds'), area=picked('a-area'),
+        stage=picked('a-stage'), note=$('a-note').value.trim();
+    if(!type && !note){ $('a-err').textContent='Напишите хотя бы название комплекса или выберите тип.'; return; }
+    $('a-send').disabled=true; $('a-send').textContent='Отправляем…';
+    // заявка на подключение объекта идёт тем же путём, что и остальные — в кабинет и к менеджеру
+    post({action:'request',token:TOKEN,kind:'other',
+      details:'Подключить объект: '+(type||'—')+(beds?', спален '+beds:'')+
+              ', район '+(area||'—')+', готовность '+(stage||'—')+
+              (note?'. '+note:'')}).then(function(d){
+      $('a-send').disabled=false; $('a-send').textContent='Отправить на подключение';
+      if(d&&d.ok){ $('a-ok').textContent='Заявка принята — менеджер свяжется и подключит объект.';
+        $('a-note').value=''; loadData(); }
+      else $('a-err').textContent='Не удалось отправить. Напишите менеджеру в WhatsApp.';
+    }).catch(function(){
+      $('a-send').disabled=false; $('a-send').textContent='Отправить на подключение';
+      $('a-err').textContent='Нет связи с сервером.';
+    });
+  };
 
   $('r-send').onclick=function(){
     var p=(DATA.properties||[])[CUR];
