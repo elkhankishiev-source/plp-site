@@ -217,7 +217,10 @@ function buildCatalog(objects, benchmarks, preserve) {
       lat: (o.lat === 0 || o.lat) ? Number(o.lat) : null,
       lng: (o.lng === 0 || o.lng) ? Number(o.lng) : null,
       // 02.09: приблизительные точки помечаем — карта не должна выдавать их за адрес
-      coordOk: o.coord_source === 'exact',
+      coordOk: o.coord_source === 'exact' || o.coord_source === 'verified',
+      // 02.09: цена в карточке — это минимум из прайса на дату сверки, а не
+      // «сегодня». Отдаём дату, чтобы витрина честно её показывала.
+      priceDate: o.last_synced_at ? String(o.last_synced_at).slice(0, 10) : null,
       beach: o.beach || null,
       beachM: (o.distance_beach_m === 0 || o.distance_beach_m) ? o.distance_beach_m : null,
       developer: o.developer || null,
@@ -299,7 +302,7 @@ function buildRentals(objects, preserve) {
       // 02.09: аренда тоже встаёт на карту — координаты из той же таблицы
       lat: (o.lat === 0 || o.lat) ? Number(o.lat) : null,
       lng: (o.lng === 0 || o.lng) ? Number(o.lng) : null,
-      coordOk: o.coord_source === 'exact',
+      coordOk: o.coord_source === 'exact' || o.coord_source === 'verified',
       min_stay: (o.min_stay === 0 || o.min_stay) ? o.min_stay : null,
       deposit: (o.deposit === 0 || o.deposit) ? o.deposit : null,
       // фильтр удобств: источники — amenities (если есть) + rent_included; distance_beach_m для «у моря»
@@ -588,7 +591,7 @@ async function main() {
     '&select=plp_property_id,name,district,beach,purpose,type,price_from_thb,price_to_thb,' +
     'bedrooms,bedrooms_min,bedrooms_max,area_sqm,area_min,area_max,roi,rental_yield_pct,' +
     'capital_growth_pct,handover_date,status,stage,developer,distance_beach_m,usp,usp_en,' +
-    'season_rates,occupancy_est_pct,maintenance_fee_thb_sqm,lat,lng,coord_source');
+    'season_rates,occupancy_est_pct,maintenance_fee_thb_sqm,lat,lng,coord_source,last_synced_at');
   const benchmarks = await sbGet(env,
     'rental_benchmarks?select=district,unit_type,disp_yield_low_pct,disp_yield_high_pct');
 
@@ -597,7 +600,7 @@ async function main() {
   const rentals = await sbGet(env,
     'objects?select=plp_property_id,name,district,beach,purpose,type,bedrooms,bedrooms_min,' +
     'bedrooms_max,area_sqm,area_min,area_max,min_stay,deposit,rent_included,rent_excluded,' +
-    'rent_rules,amenities,usp,usp_en,distance_beach_m,on_site,lat,lng,coord_source' +
+    'rent_rules,amenities,usp,usp_en,distance_beach_m,on_site,lat,lng,coord_source,last_synced_at' +
     '&and=(or(purpose.eq.' + encodeURIComponent('аренда') + ',purpose.eq.rent),' +
     'on_site.eq.true)&order=plp_property_id');
 
