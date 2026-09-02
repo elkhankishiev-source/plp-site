@@ -634,9 +634,27 @@ async function main() {
   console.log('[gen] index.html: каталог продажи', catalog.length, '+ аренда', rentList.length, 'обновлены');
 
   // 2) страницы объектов
+  // Аренде страницы тоже нужны — карта и каталог на них ссылаются. Раньше их не
+  // делали из-за утечки: в 08.26 из-за протечки аренды в продажу на прод уехали
+  // страницы с именем собственника. Сейчас objectPage поля owner_ref/owner_contact_id
+  // не выводит вовсе, поэтому безопасно; выборку для аренды берём полную, чтобы
+  // страница не собиралась из половины данных.
+  const rentIds = rentals.map(r => r.plp_property_id).filter(Boolean);
+  let rentFull = [];
+  if (rentIds.length) {
+    rentFull = await sbGet(env, 'objects?plp_property_id=in.(' +
+      rentIds.map(encodeURIComponent).join(',') + ')&select=*');
+  }
+  const seenPage = new Set();
+  const pageList = [];
+  for (const o of objects.concat(rentFull)) {
+    if (!o || !o.plp_property_id || seenPage.has(o.plp_property_id)) continue;
+    seenPage.add(o.plp_property_id);
+    pageList.push(o);
+  }
   if (!fs.existsSync(OBJDIR)) fs.mkdirSync(OBJDIR, { recursive: true });
   let pages = 0;
-  for (const o of objects) {
+  for (const o of pageList) {
     const slug = slugOf(o.plp_property_id);
     fs.writeFileSync(path.join(OBJDIR, slug + '.html'), objectPage(o, benchmarks));
     pages++;
@@ -645,7 +663,7 @@ async function main() {
   // Раньше генератор только дописывал — из-за бага с протечкой аренды в продажу
   // на прод уехали страницы арендных юнитов с ИМЕНЕМ СОБСТВЕННИКА и номером
   // квартиры, и после исправления каталога они там так и остались.
-  const keep = new Set(objects.map(o => slugOf(o.plp_property_id) + '.html'));
+  const keep = new Set(pageList.map(o => slugOf(o.plp_property_id) + '.html'));
   let removed = 0;
   for (const f of fs.readdirSync(OBJDIR)) {
     if (f.endsWith('.html') && !keep.has(f)) { fs.unlinkSync(path.join(OBJDIR, f)); removed++; }
