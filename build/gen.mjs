@@ -210,6 +210,15 @@ function buildCatalog(objects, benchmarks, preserve) {
       status: statusLabel(o.status),
       // 30.08 канон №38: «готов/сдан» — ТОЛЬКО из stage='Ready', никогда из даты сдачи.
       ready: o.stage === 'Ready',
+      // 03.09: стадия отдельным полем — по ней фильтр и бейдж на карточке
+      stage_key: (function(){
+        var st = String(o.stage || '').toLowerCase();
+        if (st === 'ready') return 'ready';
+        if (st === 'construction') return 'construction';
+        if (st === 'pre-sale' || st === 'presale') return 'presale';
+        if (st === 'resale' || String(o.purpose||'').toLowerCase() === 'resale') return 'resale';
+        return '';
+      })(),
       desc: { ru: usp, en: uspEn },
       // 02.09: то, что человек ищет глазами в первую очередь — море и застройщик.
       // Пишем только если данные есть, пустое поле карточка не рисует.
