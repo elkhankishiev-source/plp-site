@@ -673,6 +673,23 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
 .sep{display:flex;align-items:center;gap:12px;margin:22px 0 4px;color:var(--dim);font-size:13px}
 .sep::before,.sep::after{content:"";flex:1;height:1px;background:var(--line)}
 .err{color:var(--bad);font-size:14px;margin-top:10px}
+.msub{border:1px solid var(--line);border-radius:16px;padding:16px;margin-top:12px;background:#fff}
+.msub h3{margin:0 0 2px;font-size:16.5px}
+.msub .meta{color:var(--dim);font-size:13px;margin:0 0 10px}
+.msub .gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px;margin:10px 0}
+.msub .gal a{display:block;aspect-ratio:1;border-radius:10px;overflow:hidden;background:#f1f0ea}
+.msub .gal img{width:100%;height:100%;object-fit:cover;display:block}
+.msub .gal .vid{display:flex;align-items:center;justify-content:center;height:100%;font-size:12px;color:var(--dim)}
+.msub .f{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:10px}
+.msub label{font-size:12px;color:var(--dim);display:block;margin-bottom:4px}
+.msub input,.msub textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:9px 11px;
+  font:inherit;font-size:14px;background:#fff;box-sizing:border-box}
+.msub textarea{min-height:70px;resize:vertical}
+.msub .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.msub .acts button{width:auto;margin:0;padding:10px 16px;font-size:14px}
+.msub .acts .gh{background:transparent;border:1px solid var(--line);color:var(--txt)}
+.msub .tag{display:inline-block;font-size:11.5px;border-radius:999px;padding:3px 10px;
+  background:var(--warm);color:var(--txt);margin-left:6px;vertical-align:middle}
 .ok{color:var(--acc);font-size:14px;margin-top:10px}
 .foot{color:var(--dim);font-size:12px;text-align:center;margin-top:26px;line-height:1.8}
 .foot a{color:var(--dim)}
@@ -920,6 +937,8 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
       <a data-go="sec-addobj">Добавить объект</a>
       <a data-go="sec-request">Заявка</a>
       <a data-go="req-wrap">Мои заявки</a>
+      <div class="cab-group" id="mod-group">Модерация</div>
+      <a data-go="sec-moder">Заявки с сайта</a>
     </div>
     <div id="cab-body">
     <div id="demo-note" style="display:none;background:#E9EBD9;border:1px solid #D2D5B3;border-radius:14px;
@@ -956,48 +975,24 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
 
     <div class="card" id="sec-addobj">
       <h2>Добавить ещё объект</h2>
-      <p class="sub" style="margin:0 0 4px">Если у вас есть другая недвижимость — отдайте её в управление здесь.</p>
+      <p class="sub" style="margin:0 0 14px">Есть другая недвижимость? Заполните короткую анкету
+      и приложите фото — за пять шагов. Мы проверим и оформим карточку.</p>
+      <a href="add-property.html" style="display:inline-block;background:var(--txt);color:#fff;
+         border-radius:999px;padding:12px 20px;font-size:15px;font-weight:700;text-decoration:none">Разместить объект</a>
+    </div>
 
-      <label>Что за объект</label>
-      <div class="opts" id="a-type">
-        <button type="button" class="opt" data-v="Вилла">Вилла</button>
-        <button type="button" class="opt" data-v="Кондо">Кондо</button>
-        <button type="button" class="opt" data-v="Дом">Дом</button>
-        <button type="button" class="opt" data-v="Участок">Участок</button>
+    <div class="card" id="sec-moder" style="display:none">
+      <h2>Заявки с сайта</h2>
+      <p class="sub" style="margin:0 0 12px">Собственники присылают объект с фотографиями.
+      Проверьте, поправьте текст и опубликуйте — карточка встанет в каталог.</p>
+      <div class="opts" id="m-filter">
+        <button type="button" class="opt on" data-v="">Новые</button>
+        <button type="button" class="opt" data-v="published">Опубликованные</button>
+        <button type="button" class="opt" data-v="rejected">Отклонённые</button>
       </div>
-
-      <label>Спален</label>
-      <div class="opts" id="a-beds">
-        <button type="button" class="opt" data-v="Студия">Студия</button>
-        <button type="button" class="opt" data-v="1">1</button>
-        <button type="button" class="opt" data-v="2">2</button>
-        <button type="button" class="opt" data-v="3">3</button>
-        <button type="button" class="opt" data-v="4+">4 и больше</button>
-      </div>
-
-      <label>Район</label>
-      <div class="opts" id="a-area">
-        <button type="button" class="opt" data-v="Банг Тао">Банг Тао</button>
-        <button type="button" class="opt" data-v="Лаян">Лаян</button>
-        <button type="button" class="opt" data-v="Камала">Камала</button>
-        <button type="button" class="opt" data-v="Раваи">Раваи</button>
-        <button type="button" class="opt" data-v="Най Харн">Най Харн</button>
-        <button type="button" class="opt" data-v="Другой">Другой</button>
-      </div>
-
-      <label>Готовность</label>
-      <div class="opts" id="a-stage">
-        <button type="button" class="opt" data-v="Готов">Готов</button>
-        <button type="button" class="opt" data-v="Строится">Строится</button>
-        <button type="button" class="opt" data-v="Уже сдаётся">Уже сдаётся</button>
-      </div>
-
-      <label for="a-note">Адрес или название комплекса</label>
-      <textarea id="a-note" placeholder="Например: Laguna Park 2, вилла 14/3, бассейн, мебель есть"></textarea>
-
-      <button id="a-send">Отправить на подключение</button>
-      <div class="ok" id="a-ok"></div>
-      <div class="err" id="a-err"></div>
+      <div id="m-list"></div>
+      <div class="ok" id="m-ok"></div>
+      <div class="err" id="m-err"></div>
     </div>
 
     <div class="card" id="sec-request">
@@ -1335,6 +1330,107 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     $('req-wrap').innerHTML=h+'</table>';
   }
 
+  // ── модерация заявок с сайта (только для сотрудника) ──
+  var MOD_STATUS='';
+  function renderModeration(){
+    var sec=document.getElementById('sec-moder');
+    var isStaff = DATA && DATA.owner && DATA.owner.is_staff === true;
+    if(!isStaff){
+      if(sec) sec.remove();
+      var g=document.getElementById('mod-group'); if(g) g.remove();
+      var l=document.querySelector('#cab-nav a[data-go="sec-moder"]'); if(l) l.remove();
+      return;
+    }
+    sec.style.display='';
+    var fb=document.getElementById('m-filter');
+    Array.prototype.forEach.call(fb.querySelectorAll('.opt'),function(o){
+      o.onclick=function(){
+        Array.prototype.forEach.call(fb.querySelectorAll('.opt'),function(x){x.classList.remove('on');});
+        o.classList.add('on'); MOD_STATUS=o.getAttribute('data-v'); loadModeration();
+      };
+    });
+    loadModeration();
+  }
+  function loadModeration(){
+    var box=document.getElementById('m-list'); if(!box) return;
+    box.innerHTML='<p class="sub">Загружаем…</p>';
+    post({action:'mod_list',token:TOKEN,status:MOD_STATUS}).then(function(d){
+      if(!d||!d.ok){ box.innerHTML='<p class="sub">Не удалось загрузить заявки.</p>'; return; }
+      var items=d.items||[];
+      if(!items.length){ box.innerHTML='<p class="sub">Заявок нет.</p>'; return; }
+      box.innerHTML='';
+      items.forEach(function(it){ box.appendChild(subCard(it)); });
+    });
+  }
+  function subCard(it){
+    var d=document.createElement('div'); d.className='msub';
+    var media=Array.isArray(it.media)?it.media:[];
+    var when=String(it.created_at||'').slice(0,10).split('-').reverse().join('.');
+    var tag = it.status==='published' ? '<span class="tag">опубликован</span>'
+            : it.status==='rejected' ? '<span class="tag">отклонён</span>'
+            : it.status==='in_review' ? '<span class="tag">в работе</span>' : '';
+    var gal = media.length ? '<div class="gal">'+media.map(function(m){
+        var u=esc(m.url||'');
+        return /^video\//.test(m.type||'')
+          ? '<a href="'+u+'" target="_blank" rel="noopener"><span class="vid">видео</span></a>'
+          : '<a href="'+u+'" target="_blank" rel="noopener"><img src="'+u+'" alt="" loading="lazy"></a>';
+      }).join('')+'</div>' : '<p class="sub">Файлов нет.</p>';
+
+    function fld(k,lab,val,wide){
+      return '<div'+(wide?' style="grid-column:1/-1"':'')+'><label>'+lab+'</label>'+
+        (wide?'<textarea data-k="'+k+'">'+esc(val||'')+'</textarea>'
+             :'<input data-k="'+k+'" value="'+esc(val||'')+'">')+'</div>';
+    }
+    d.innerHTML =
+      '<h3>'+esc(it.address || ((it.kind||'Объект')+(it.district?' · '+it.district:'')))+tag+'</h3>'+
+      '<p class="meta">'+esc(it.name||'—')+' · '+esc(it.phone||'')+
+        (it.contact_via?' · '+esc(it.contact_via):'')+' · '+when+' · заявка '+esc(it.ref)+'</p>'+
+      gal+
+      '<div class="f">'+
+        fld('kind','Тип',it.kind)+fld('district','Район',it.district)+
+        fld('beds','Спален',it.beds)+fld('area_sqm','Площадь, м²',it.area_sqm)+
+        fld('stage','Готовность',it.stage)+fld('goal','Цель',it.goal)+
+        fld('price_thb','Цена, ฿',it.price_thb)+fld('address','Название и адрес',it.address)+
+        fld('description','Описание',it.description,1)+
+        fld('amenities','Что есть в доме',it.amenities,1)+
+        fld('note','Заметка для нас',it.note,1)+
+      '</div>'+
+      '<div class="acts">'+
+        '<button data-a="publish">Опубликовать на сайте</button>'+
+        '<button class="gh" data-a="save">Сохранить правки</button>'+
+        '<button class="gh" data-a="reject">Отклонить</button>'+
+      '</div>';
+
+    function patch(){
+      var o={};
+      Array.prototype.forEach.call(d.querySelectorAll('[data-k]'),function(el){
+        o[el.getAttribute('data-k')]=el.value.trim();
+      });
+      return o;
+    }
+    Array.prototype.forEach.call(d.querySelectorAll('.acts button'),function(btn){
+      btn.onclick=function(){
+        var a=btn.getAttribute('data-a');
+        $('m-ok').textContent=''; $('m-err').textContent='';
+        var body={token:TOKEN,ref:it.ref};
+        if(a==='publish'){ body.action='mod_publish'; body.patch=patch(); }
+        else if(a==='save'){ body.action='mod_save'; body.patch=patch(); }
+        else { body.action='mod_reject'; body.note=patch().note||''; }
+        var t=btn.textContent; btn.disabled=true; btn.textContent='…';
+        post(body).then(function(r){
+          btn.disabled=false; btn.textContent=t;
+          if(r&&r.ok){
+            $('m-ok').textContent = a==='publish'
+              ? ('Опубликовано: '+(r.property_id||'')+'. Карточка появится на сайте после ближайшей пересборки каталога.')
+              : (a==='save' ? 'Правки сохранены.' : 'Заявка отклонена.');
+            loadModeration();
+          } else { $('m-err').textContent='Не получилось: '+((r&&r.error)||'ошибка'); }
+        });
+      };
+    });
+    return d;
+  }
+
   // навигация по кабинету: клик — плавный переход, подсветка следует за прокруткой
   function initCabNav(){
     var nav=document.getElementById('cab-nav'); if(!nav) return;
@@ -1366,7 +1462,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     document.querySelector('.wrap').classList.remove('narrow');
     var dn=document.getElementById('demo-note'); if(dn) dn.style.display = DEMO_MODE ? '' : 'none';
     show('app'); $('logout').style.display='';
-    renderPortfolio(); renderTabs(); renderProp(); renderRequests(); renderEditState(); initCabNav();
+    renderPortfolio(); renderTabs(); renderProp(); renderRequests(); renderEditState(); renderModeration(); initCabNav();
   }
 
   function loadData(){
