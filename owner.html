@@ -727,7 +727,7 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
 
   <div id="gate" class="card" style="display:none">
     <div class="gate-head">
-      <h1 id="gate-title">Вход в кабинет</h1>
+      <h1 id="gate-title">Личный кабинет</h1>
       <p class="sub" id="gate-sub">нет доступа? <a class="reg-link" id="to-reg-top">оставьте заявку</a></p>
     </div>
 
@@ -1220,7 +1220,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   }
 
   // ── экраны входа: телефон → код, с запасным входом по паролю ──
-  var GATE_TITLES={phone:'Вход в кабинет',code:'Введите код',
+  var GATE_TITLES={phone:'Личный кабинет',code:'Введите код',
                    pass:'Вход по паролю',reg:'Заявка на доступ'};
   function gateStep(which){
     ['step-phone','step-code','step-pass','step-reg'].forEach(function(x){
