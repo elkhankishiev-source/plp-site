@@ -688,6 +688,24 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
 .msub .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
 .msub .acts button{width:auto;margin:0;padding:10px 16px;font-size:14px}
 .msub .acts .gh{background:transparent;border:1px solid var(--line);color:var(--txt)}
+.coordwrap{display:grid;grid-template-columns:260px minmax(0,1fr);gap:14px;align-items:start}
+@media(max-width:820px){.coordwrap{grid-template-columns:1fr}}
+.coordlist{max-height:520px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;padding-right:4px}
+.coitem{text-align:left;background:#fff;border:1px solid var(--line);border-radius:12px;padding:9px 11px;
+  cursor:pointer;width:100%;margin:0;font:inherit;color:var(--txt);display:block}
+.coitem:hover{border-color:var(--acc)}
+.coitem.on{border-color:var(--txt);background:var(--warm)}
+.coitem b{display:block;font-size:13.5px;font-weight:700;line-height:1.3}
+.coitem span{display:block;font-size:11.5px;color:var(--dim);margin-top:2px}
+.coitem .st{display:inline-block;font-size:10.5px;border-radius:999px;padding:2px 7px;margin-top:4px}
+.coitem .st.exact{background:#E4EBDD;color:#3f6b34}
+.coitem .st.approx{background:#F5EBCF;color:#7a5f21}
+.coitem .st.none{background:#F0E2DE;color:#8f4b3a}
+.coordmap{height:520px;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#e7ecea}
+@media(max-width:820px){.coordmap{height:380px}}
+.coordbar{display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap}
+.coordbar button{width:auto;margin:0;padding:9px 16px;font-size:14px}
+.coordbar button:disabled{opacity:.45;cursor:default}
 .msub .tag{display:inline-block;font-size:11.5px;border-radius:999px;padding:3px 10px;
   background:var(--warm);color:var(--txt);margin-left:6px;vertical-align:middle}
 .ok{color:var(--acc);font-size:14px;margin-top:10px}
@@ -715,6 +733,7 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
   .cab-nav a{border:1px solid var(--line);padding:8px 14px}
 }
 </style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 </head>
 <body>
 <header class="header">
@@ -931,6 +950,7 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
       <a data-go="req-wrap">Мои заявки</a>
       <div class="cab-group" id="mod-group">Модерация</div>
       <a data-go="sec-moder">Заявки с сайта</a>
+      <a data-go="sec-coords">Точки на карте</a>
     </div>
     <div id="cab-body">
     <div id="demo-note" style="display:none;background:#E9EBD9;border:1px solid #D2D5B3;border-radius:14px;
@@ -985,6 +1005,24 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
       <div id="m-list"></div>
       <div class="ok" id="m-ok"></div>
       <div class="err" id="m-err"></div>
+    </div>
+
+    <div class="card" id="sec-coords" style="display:none">
+      <h2>Точки объектов на карте</h2>
+      <p class="sub" style="margin:0 0 12px">Выберите объект слева и нажмите на карте там, где он стоит.
+      Точка сохранится, и объект встанет на своё место на сайте. Приблизительные помечены жёлтым.</p>
+      <div class="coordwrap">
+        <div class="coordlist" id="co-list"></div>
+        <div>
+          <div id="co-map" class="coordmap"></div>
+          <div class="coordbar">
+            <span id="co-hint" class="sub" style="font-size:13px">Выберите объект в списке.</span>
+            <button type="button" id="co-save" disabled>Сохранить точку</button>
+          </div>
+          <div class="ok" id="co-ok"></div>
+          <div class="err" id="co-err"></div>
+        </div>
+      </div>
     </div>
 
     <div class="card" id="sec-request">
@@ -1423,6 +1461,92 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     return d;
   }
 
+  // ── точки объектов на карте: сотрудник ставит их мышкой ──
+  var COMAP=null, COMARK=null, COPICK=null, COITEMS=[];
+  function renderCoords(){
+    var sec=document.getElementById('sec-coords');
+    if(!sec) return;
+    if(!(DATA && DATA.owner && DATA.owner.is_staff === true)){
+      sec.remove();
+      var l=document.querySelector('#cab-nav a[data-go="sec-coords"]'); if(l) l.remove();
+      return;
+    }
+    sec.style.display='';
+    post({action:'mod_coords',token:TOKEN}).then(function(d){
+      if(!d||!d.ok) return;
+      COITEMS=d.items||[];
+      drawCoList();
+      initCoMap();
+    });
+  }
+  function drawCoList(){
+    var box=document.getElementById('co-list'); if(!box) return;
+    box.innerHTML='';
+    COITEMS.forEach(function(it){
+      var st = !it.lat ? 'none' : (it.coord_source==='exact' ? 'exact' : 'approx');
+      var lab = st==='none' ? 'нет точки' : (st==='exact' ? 'точная' : 'приблизительная');
+      var b=document.createElement('button');
+      b.type='button'; b.className='coitem'+(COPICK&&COPICK.plp_property_id===it.plp_property_id?' on':'');
+      b.innerHTML='<b>'+esc(it.name||it.plp_property_id)+'</b>'+
+        '<span>'+esc(it.district||'—')+' · '+esc(it.plp_property_id)+'</span>'+
+        '<span class="st '+st+'">'+lab+'</span>';
+      b.onclick=function(){ pickObject(it); };
+      box.appendChild(b);
+    });
+  }
+  function initCoMap(){
+    var box=document.getElementById('co-map');
+    if(!box || COMAP || !window.L) return;
+    COMAP=L.map(box,{scrollWheelZoom:true}).setView([7.95,98.33],11);
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{
+      maxZoom:19, attribution:'Esri'}).addTo(COMAP);
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',{
+      maxZoom:19, opacity:.9}).addTo(COMAP);
+    COMAP.attributionControl.setPrefix('');
+    /* на снимке видно сам дом — по нему и ставим точку */
+    COMAP.on('click', function(e){
+      if(!COPICK){ $('co-err').textContent='Сначала выберите объект слева.'; return; }
+      setPin(e.latlng.lat, e.latlng.lng);
+    });
+    setTimeout(function(){ try{ COMAP.invalidateSize(); }catch(x){} }, 200);
+  }
+  function pickObject(it){
+    COPICK=it; $('co-ok').textContent=''; $('co-err').textContent='';
+    drawCoList();
+    $('co-hint').textContent='Выбран: '+(it.name||it.plp_property_id)+
+      (it.lat ? ' · нажмите на карте, чтобы поправить точку' : ' · нажмите на карте, где он стоит');
+    $('co-save').disabled = true;
+    if(COMARK){ COMAP.removeLayer(COMARK); COMARK=null; }
+    if(it.lat && it.lng){ setPin(Number(it.lat), Number(it.lng), true); COMAP.setView([it.lat,it.lng], 16); }
+    else { COMAP.setView([7.95,98.33], 11); }
+  }
+  function setPin(la, ln, quiet){
+    if(COMARK) COMAP.removeLayer(COMARK);
+    COMARK=L.marker([la,ln],{draggable:true}).addTo(COMAP);
+    COMARK.on('dragend', function(){ $('co-save').disabled=false; });
+    if(!quiet) $('co-save').disabled=false;
+    $('co-hint').textContent=(COPICK?COPICK.name+' · ':'')+la.toFixed(5)+', '+ln.toFixed(5)+
+      ' — метку можно двигать мышкой';
+  }
+  (function bindCoSave(){
+    var b=document.getElementById('co-save'); if(!b) return;
+    b.onclick=function(){
+      if(!COPICK||!COMARK) return;
+      var ll=COMARK.getLatLng();
+      $('co-ok').textContent=''; $('co-err').textContent='';
+      b.disabled=true; var t=b.textContent; b.textContent='Сохраняем…';
+      post({action:'mod_setcoord',token:TOKEN,property_id:COPICK.plp_property_id,
+            lat:ll.lat,lng:ll.lng}).then(function(d){
+        b.textContent=t;
+        if(d&&d.ok){
+          $('co-ok').textContent='Точка сохранена. На сайт попадёт после ближайшей пересборки каталога.';
+          COPICK.lat=ll.lat; COPICK.lng=ll.lng; COPICK.coord_source='exact';
+          drawCoList();
+        } else { b.disabled=false; $('co-err').textContent='Не сохранилось: '+((d&&d.error)||'ошибка'); }
+      });
+    };
+  })();
+
   // навигация по кабинету: клик — плавный переход, подсветка следует за прокруткой
   function initCabNav(){
     var nav=document.getElementById('cab-nav'); if(!nav) return;
@@ -1454,7 +1578,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     document.querySelector('.wrap').classList.remove('narrow');
     var dn=document.getElementById('demo-note'); if(dn) dn.style.display = DEMO_MODE ? '' : 'none';
     show('app'); $('logout').style.display='';
-    renderPortfolio(); renderTabs(); renderProp(); renderRequests(); renderEditState(); renderModeration(); initCabNav();
+    renderPortfolio(); renderTabs(); renderProp(); renderRequests(); renderEditState(); renderModeration(); renderCoords(); initCabNav();
   }
 
   /* Ответ идёт около трёх секунд — столько занимает запуск сценария на стороне
@@ -1716,5 +1840,6 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   if(TOKEN) loadData(); else gateStep('phone');
 })();
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" defer></script>
 </body>
 </html>
