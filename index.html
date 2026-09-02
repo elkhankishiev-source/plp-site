@@ -477,6 +477,7 @@ h3{font-size:1.12rem;font-weight:700}
 .on-sat .plp-pin.rent{background:var(--green,#D2D5B3);color:var(--ink)}
 /* точка ещё не подтверждена — показываем пунктиром, чтобы не выдавать за адрес */
 .plp-pin.approx{border-style:dashed;opacity:.92}
+.mark-hl .plp-pin{background:var(--green,#D2D5B3);color:var(--ink);transform:translate(-50%,calc(-100% - 13px)) scale(1.12);z-index:600}
 /* несколько объектов рядом — одна метка со счётчиком, раскрывается по клику */
 .plp-cluster{background:#fff;color:var(--ink);border:2px solid var(--ink);border-radius:999px;
   min-width:34px;height:34px;display:flex;align-items:center;justify-content:center;
@@ -3067,7 +3068,7 @@ var DPAGE={'Банг Тао':'bang-tao','Лаян':'layan','Сурин':'surin',
            'Равай':'rawai','Раваи':'rawai','Ката':'kata','Най Янг':'nai-yang','Ко Кео':'koh-kaew'};
 /* живая карта: метки стоят по координатам объектов из базы.
    Объекты без координат на карту не попадают — лучше пусто, чем ложная точка. */
-var PLPMAP=null, PLPLAYER=null, PLPFILTER='all', PLPTILES=null, PLPVIEW='map';
+var PLPMAP=null, PLPLAYER=null, PLPFILTER='all', PLPTILES=null, PLPVIEW='map', PLPMARKS={};
 function renderMapReal(){
   var box=document.getElementById('plpMap'); if(!box||!window.L) return;
   var all=PL.PROPERTIES.filter(function(p){return p.lat&&p.lng;});
@@ -3129,6 +3130,7 @@ function renderMapReal(){
     });
   }
   drawPins();
+  renderMapReal.__draw=drawPins;
 
   function drawPins(keepView){
     var pts=all.filter(function(p){
@@ -3136,8 +3138,14 @@ function renderMapReal(){
       var isRent = p.funnel==='rent';
       return PLPFILTER==='rent' ? isRent : !isRent;
     });
+    /* на страницах каталога карта показывает ровно то, что осталось в списке */
+    if(typeof window.PLP_MAP_FILTER==='function'){
+      var keep=window.PLP_MAP_FILTER();
+      if(keep && keep.length) pts=pts.filter(function(p){ return keep.indexOf(p.property_id)>=0; });
+    }
     if(PLPLAYER){ PLPMAP.removeLayer(PLPLAYER); }
     PLPLAYER=L.layerGroup().addTo(PLPMAP);
+    PLPMARKS={};
 
     /* Соседние объекты сливаем в одну метку со счётчиком, иначе ценники
        наезжают друг на друга. Порог зависит от масштаба: чем ближе, тем мельче
@@ -3168,6 +3176,7 @@ function renderMapReal(){
           iconSize:[0,0], iconAnchor:[0,0]})});
         m.bindPopup(popupOne(p),{maxWidth:260,minWidth:236});
         m.addTo(PLPLAYER);
+        PLPMARKS[p.property_id]=m;
       }
     });
 
@@ -3221,6 +3230,20 @@ function renderMapReal(){
     io.observe(box);
   }
 }
+
+/* каталог просит карту перерисоваться после фильтров */
+window.drawPinsExternal=function(){ try{ if(PLPMAP) renderMapReal.__draw && renderMapReal.__draw(true); }catch(e){} };
+/* подсветка метки при наведении на карточку в списке */
+window.PLP_HIGHLIGHT=function(pid){
+  Object.keys(PLPMARKS).forEach(function(k){
+    var el=PLPMARKS[k].getElement && PLPMARKS[k].getElement();
+    if(el) el.classList.toggle('mark-hl', !!pid && k===pid);
+  });
+  if(pid && PLPMARKS[pid] && PLPMAP){
+    var ll=PLPMARKS[pid].getLatLng();
+    if(!PLPMAP.getBounds().contains(ll)) PLPMAP.panTo(ll,{animate:true,duration:.4});
+  }
+};
 
 function renderDList(){
   var list=document.getElementById('dList');if(!list)return;
