@@ -294,6 +294,9 @@ function buildRentals(objects, preserve) {
       area: areaLabel(o),
       tag: rentTag(o),
       desc: { ru: usp, en: uspEn },
+      // 02.09: аренда тоже встаёт на карту — координаты из той же таблицы
+      lat: (o.lat === 0 || o.lat) ? Number(o.lat) : null,
+      lng: (o.lng === 0 || o.lng) ? Number(o.lng) : null,
       min_stay: (o.min_stay === 0 || o.min_stay) ? o.min_stay : null,
       deposit: (o.deposit === 0 || o.deposit) ? o.deposit : null,
       // фильтр удобств: источники — amenities (если есть) + rent_included; distance_beach_m для «у моря»
@@ -591,7 +594,7 @@ async function main() {
   const rentals = await sbGet(env,
     'objects?select=plp_property_id,name,district,beach,purpose,type,bedrooms,bedrooms_min,' +
     'bedrooms_max,area_sqm,area_min,area_max,min_stay,deposit,rent_included,rent_excluded,' +
-    'rent_rules,amenities,usp,usp_en,distance_beach_m,on_site' +
+    'rent_rules,amenities,usp,usp_en,distance_beach_m,on_site,lat,lng' +
     '&and=(or(purpose.eq.' + encodeURIComponent('аренда') + ',purpose.eq.rent),' +
     'on_site.eq.true)&order=plp_property_id');
 
