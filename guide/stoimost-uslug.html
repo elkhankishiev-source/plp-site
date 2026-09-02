@@ -176,7 +176,7 @@ ul{list-style:none}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 input,select{font:inherit}
 .container{max-width:1200px;margin:0 auto;padding:0 20px}
-section{padding:40px 0;position:relative}
+section{padding:34px 0;position:relative}
 @media(min-width:768px){section{padding:64px 0}}
 
 h1,h2,h3{font-weight:800;line-height:1.12;letter-spacing:-.02em}
@@ -264,9 +264,9 @@ h3{font-size:1.12rem;font-weight:700}
 .mnav .mwa{margin-top:auto;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--green);color:var(--ink);border-radius:12px;font-weight:700;padding:14px}
 
 /* ===== hero ===== */
-.hero{padding:32px 0 40px;overflow:hidden}
+.hero{padding:24px 0 20px;overflow:hidden}
 .hero-grid{display:grid;gap:28px;align-items:center}
-@media(min-width:900px){.hero-grid{grid-template-columns:1.15fr 1fr;gap:56px}.hero{padding:56px 0}}
+@media(min-width:900px){.hero-grid{grid-template-columns:1.15fr 1fr;gap:48px}.hero{padding:32px 0 24px}}
 .hero-cta{display:flex;flex-wrap:wrap;gap:14px;margin-top:22px}
 .srv-strip{margin-bottom:34px}
 .srv-head h3{font-size:1.5rem;margin:6px 0 8px;letter-spacing:-.02em}
@@ -278,7 +278,7 @@ h3{font-size:1.12rem;font-weight:700}
 .srv-card span{font-size:.85rem;color:var(--muted);line-height:1.45}
 .srv-card i{font-style:normal;font-size:.8rem;font-weight:700;color:var(--green-deep);margin-top:6px}
 .hero-photo{
-  position:relative;aspect-ratio:3/2;max-height:520px;border-radius:24px;overflow:hidden;
+  position:relative;aspect-ratio:3/2;max-height:390px;border-radius:24px;overflow:hidden;
   background:
     radial-gradient(120% 90% at 80% 10%,#f4f5e8 0%,transparent 60%),
     linear-gradient(150deg,var(--green-soft) 0%,var(--green) 45%,var(--green-deep) 100%);
@@ -439,6 +439,15 @@ h3{font-size:1.12rem;font-weight:700}
 .mapbox .dmk .cnt{fill:#fff;stroke:none;font-size:9px;font-weight:800}
 .maplabel{position:absolute;left:14px;bottom:12px;background:rgba(255,255,255,.92);border-radius:999px;padding:7px 14px;font-size:.75rem;font-weight:700;box-shadow:var(--shadow-sm)}
 .dlist{display:flex;flex-direction:column;gap:8px;max-height:560px;overflow-y:auto;padding-right:4px}
+/* районы сеткой на всю ширину: каждая карточка ведёт на свою страницу */
+.dgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin-top:20px}
+.dgrid .dcard{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;
+  background:var(--paper);border:1px solid rgba(10,10,10,.08);border-radius:16px;padding:16px 18px;
+  cursor:pointer;text-decoration:none;color:inherit;transition:box-shadow .2s,transform .2s}
+.dgrid .dcard:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
+.dgrid .dcard b{font-size:1.02rem}
+.dgrid .dcard span{color:var(--muted);font-size:.86rem;line-height:1.4}
+.dgrid .dcard u{text-decoration:none;color:var(--olive);font-weight:700;font-size:.86rem;margin-top:2px}
 .dcard{text-align:left;background:var(--paper);border:1px solid rgba(10,10,10,.08);border-radius:15px;padding:13px 15px;cursor:pointer;transition:transform .2s,box-shadow .2s,border-color .2s}
 .dcard:hover{transform:translateX(3px);box-shadow:var(--shadow-sm);border-color:var(--green)}
 .dcard b{display:block;font-size:.92rem;font-weight:700}
@@ -863,7 +872,7 @@ h3{font-size:1.12rem;font-weight:700}
 </div><!-- /stage -->
 
 <!-- ===== CHAT WIDGET ===== -->
-<button type="button" class="fab" id="fab" onclick="openChat('hi')"><span class="av" data-i18n="chat.av">Д</span> <span data-i18n="chat.fab">Дарья · на связи</span> <span class="dot"></span></button>
+<button type="button" class="fab" id="fab" onclick="openChat('hi')"><span class="av" data-i18n="chat.av">Д</span> <span data-i18n="chat.fab">Консультант · на связи</span> <span class="dot"></span></button>
 <div class="chatwin" id="chatwin" role="dialog" aria-label="Чат с менеджером">
   <div class="chathead">
     <span class="av" data-i18n="chat.av">Д</span>
@@ -1118,7 +1127,7 @@ ru: {
   "v.t.lo":"при таких вводных считать объект инвестицией стоит осторожно — обсудите с менеджером, за счёт чего можно улучшить экономику",
   "v.note":"Разбор по вашим цифрам — не инвестиционная рекомендация.",
   "ft.copy":"Property Library Phuket © 2022",
-  "chat.av":"Д","chat.fab":"Дарья · на связи","chat.name":"Дарья · Property Library","chat.sub":"онлайн · отвечает сразу","chat.placeholder":"Напишите сообщение…",
+  "chat.av":"Д","chat.fab":"Консультант · на связи","chat.name":"Консультант · Property Library","chat.sub":"онлайн · отвечает сразу","chat.placeholder":"Напишите сообщение…",
   "chat.botline":"Личный диалог. Отвечаем в течение 5 минут в рабочее время",
   "chat.hello":"Здравствуйте! Я Дарья, менеджер Property Library из команды Эльнура. Помогу с покупкой, арендой и любым вопросом по Пхукету. Что вам интересно?",
   "chat.menu1":"Купить / инвестировать","chat.menu2":"Аренда от месяца","chat.menu3":"Услуги и сопровождение","chat.menu4":"Оставить контакт",
@@ -1302,7 +1311,7 @@ en: {
   "v.t.lo":"with these inputs treat it as an investment with caution — discuss with a manager how the economics could be improved",
   "v.note":"A take based on your numbers — not investment advice.",
   "ft.copy":"Property Library Phuket © 2022",
-  "chat.av":"D","chat.fab":"Daria · online","chat.name":"Daria · Property Library","chat.sub":"online · replies right away","chat.placeholder":"Type a message…",
+  "chat.av":"D","chat.fab":"Consultant · online","chat.name":"Consultant · Property Library","chat.sub":"online · replies right away","chat.placeholder":"Type a message…",
   "chat.botline":"Personal dialogue. We reply within 5 minutes during working hours",
   "chat.hello":"Hello! I am Daria, a Property Library manager from Elnur's team. I will help with buying, renting and any question about Phuket. What are you interested in?",
   "chat.menu1":"Buy / invest","chat.menu2":"Rent from a month","chat.menu3":"Services and support","chat.menu4":"Leave my contact",
@@ -2587,13 +2596,19 @@ function renderMap(){
     el.addEventListener('click',function(){openDistrict(PL.DISTRICTS[+el.dataset.d].ru);});
   });
 }
+/* у восьми районов есть свои страницы — карточка ведёт туда, остальные открываются окном */
+var DPAGE={'Банг Тао':'bang-tao','Лаян':'layan','Сурин':'surin','Камала':'kamala',
+           'Равай':'rawai','Раваи':'rawai','Ката':'kata','Най Янг':'nai-yang','Ко Кео':'koh-kaew'};
 function renderDList(){
   var list=document.getElementById('dList');if(!list)return;
   list.innerHTML=PL.DISTRICTS.map(function(d,i){
     var n=distProps(d.ru).length;
-    return '<button type="button" class="dcard" data-d="'+i+'"><b>'+dName(d)+'</b><span>'+loc(d.vibe)+'</span><u>'+(n?(n+t('d.inbase')+d.yield):d.yield)+'</u></button>';
+    var inner='<b>'+dName(d)+'</b><span>'+loc(d.vibe)+'</span><u>'+(n?(n+t('d.inbase')+d.yield):d.yield)+'</u>';
+    var slug=DPAGE[d.ru];
+    return slug ? '<a class="dcard" href="districts/'+slug+'.html">'+inner+'</a>'
+                : '<button type="button" class="dcard" data-d="'+i+'">'+inner+'</button>';
   }).join('');
-  list.querySelectorAll('.dcard').forEach(function(el){
+  list.querySelectorAll('button.dcard').forEach(function(el){
     el.addEventListener('click',function(){openDistrict(PL.DISTRICTS[+el.dataset.d].ru);});
   });
 }
