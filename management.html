@@ -2834,7 +2834,7 @@ function renderMapReal(){
        наезжают друг на друга. Порог зависит от масштаба: чем ближе, тем мельче
        сетка, и на зуме метки расходятся сами. */
     var z=PLPMAP.getZoom();
-    var step = z>=15 ? 0.0008 : z>=13 ? 0.004 : z>=11 ? 0.012 : 0.05;
+    var step = z>=16 ? 0.0006 : z>=15 ? 0.0015 : z>=14 ? 0.004 : z>=13 ? 0.008 : z>=12 ? 0.02 : 0.035;
     var groups={};
     pts.forEach(function(p){
       var k=Math.round(p.lat/step)+'|'+Math.round(p.lng/step);
@@ -2848,6 +2848,7 @@ function renderMapReal(){
       if(g.length>1){
         var c=L.marker(ll,{icon:L.divIcon({className:'plp-icon',
           html:'<span class="plp-cluster">'+g.length+'</span>',iconSize:[0,0],iconAnchor:[0,0]})});
+        c.on('click', function(){ if(PLPMAP.getZoom()<15) PLPMAP.flyTo(ll, Math.min(PLPMAP.getZoom()+3,16),{duration:.6}); });
         c.bindPopup(popupMany(g),{maxWidth:260,minWidth:236});
         c.addTo(PLPLAYER);
       } else {
