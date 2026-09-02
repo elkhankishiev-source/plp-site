@@ -757,6 +757,7 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
       </div>
 
       <button id="send-code">Войти</button>
+      <a class="alt" id="see-demo">Посмотреть, как выглядит кабинет</a>
       <div class="err" id="gate-err"></div>
 
     </div>
@@ -887,6 +888,11 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
   <div id="loading" class="card"><p class="sub">Загружаем данные…</p></div>
 
   <div id="app" style="display:none">
+    <div id="demo-note" style="display:none;background:#E9EBD9;border:1px solid #D2D5B3;border-radius:14px;
+         padding:12px 16px;margin-bottom:14px;font-size:14px">
+      <b>Это пример.</b> Так кабинет выглядит, когда объект уже работает: цифры и брони вымышленные.
+      <a href="owner.html" style="color:var(--acc)">Вернуться ко входу</a>
+    </div>
     <div id="portfolio"></div>
     <div class="tabs" id="prop-tabs"></div>
     <div id="prop"></div>
@@ -965,6 +971,64 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   var LS='plp_owner_session';
   var $=function(id){return document.getElementById(id);};
   var DATA=null, CUR=0, TOKEN=null;
+
+  // ── ПРИМЕР: так кабинет выглядит, когда объект работает.
+  // Цифры вымышленные и помечены плашкой — с реальными данными не смешиваются.
+  var DEMO = {
+    ok:true, demo:true,
+    owner:{ name:'Пример', is_staff:false, must_change_password:false },
+    period:{ start:'2026-07-26', end:'2026-08-25', closes_on:'2026-08-25' },
+    totals:{ properties:1, income:285000, expenses:47500, payout:180500, bookings:3, tasks:2 },
+    requests:[
+      { kind:'cleaning', details:'Генеральная уборка перед заездом', status:'done', created_at:'2026-08-12' },
+      { kind:'repair', details:'Не работает кондиционер в спальне', status:'in_progress', created_at:'2026-08-20' }
+    ],
+    properties:[{
+      id:'PLP-DEMO', name:'Вилла с бассейном, 3 спальни', district:'Банг Тао', bedrooms:'3', stage:'Ready',
+      contract:{ status:'active', rental_type:'mixed', commission_short_pct:20, commission_long_pct:15,
+                 start_date:'2026-02-01', end_date:null, currency:'THB', payout_set:true },
+      current:{ income:285000, expenses:47500, tx_count:7 },
+      media:{ brochure_url:'#', video_url:null, floorplan_url:null, map_url:null, gallery:null, main_image_url:null },
+      about:{ developer:'Laguna Property', ownership:'Leasehold 30+30 лет', handover_date:'2024-11-15',
+              area_sqm:'320', view_type:'сад и бассейн', purpose:'аренда',
+              nearby:'пляж Банг Тао 700 м, школа UWC 4 км', amenities:'бассейн, парковка, охрана 24/7',
+              usp:'Тихая линия у Лагуны, стабильная загрузка круглый год.' },
+      economics:{ rental_yield_pct:7.4, occupancy_est_pct:72, rent_price_month_thb:165000, price_from_thb:24500000 },
+      costs:{ sinking_fund_thb:96000, maintenance_fee_thb_sqm:80, transfer_fee:'~2% при регистрации',
+              booking_deposit_thb:100000, taxes_note:'налог на аренду удерживается у источника',
+              common_area_fee_note:'обслуживание территории входит в CAM' },
+      payment_schedule:null, payments:[],
+      statements:[
+        { period:'2026-07', income:262000, expenses:41000, commission:52400, net:168600, currency:'THB', status:'paid' },
+        { period:'2026-06', income:198000, expenses:38500, commission:39600, net:119900, currency:'THB', status:'paid' },
+        { period:'2026-05', income:174000, expenses:36000, commission:34800, net:103200, currency:'THB', status:'paid' }
+      ],
+      transactions:[
+        { kind:'income', category:'booking', amount_thb:145000, tx_date:'2026-08-18', note:'Заезд 18–28 августа, 4 гостя', receipt_url:null },
+        { kind:'income', category:'booking', amount_thb:96000, tx_date:'2026-08-05', note:'Заезд 5–12 августа', receipt_url:null },
+        { kind:'income', category:'booking', amount_thb:44000, tx_date:'2026-07-29', note:'Продление на 3 ночи', receipt_url:null },
+        { kind:'expense', category:'cleaning', amount_thb:9500, tx_date:'2026-08-19', note:'Уборка после выезда', receipt_url:'#' },
+        { kind:'expense', category:'utilities', amount_thb:18400, tx_date:'2026-08-15', note:'Электричество и вода за июль', receipt_url:'#' },
+        { kind:'expense', category:'repair', amount_thb:14200, tx_date:'2026-08-09', note:'Замена насоса бассейна', receipt_url:'#' },
+        { kind:'expense', category:'supplies', amount_thb:5400, tx_date:'2026-08-02', note:'Расходники и бытовая химия', receipt_url:null }
+      ],
+      tasks:[
+        { kind:'cleaning', due_date:'2026-08-29', status:'planned', cost_thb:9500, note:'Перед следующим заездом' },
+        { kind:'maintenance', due_date:'2026-09-03', status:'planned', cost_thb:3200, note:'Плановое обслуживание бассейна' }
+      ],
+      bookings:[
+        { check_in:'2026-08-18', check_out:'2026-08-28', status:'проживание', guests:4, booking_id:'B-1042' },
+        { check_in:'2026-09-02', check_out:'2026-09-14', status:'подтверждена', guests:2, booking_id:'B-1051' },
+        { check_in:'2026-08-05', check_out:'2026-08-12', status:'завершена', guests:3, booking_id:'B-1038' }
+      ],
+      rates:[
+        { season:'высокий (ноя–апр)', nightly_thb:28000, min_nights:5, valid_from:null, valid_to:null },
+        { season:'средний (май, окт)', nightly_thb:18000, min_nights:3, valid_from:null, valid_to:null },
+        { season:'низкий (июн–сен)', nightly_thb:12000, min_nights:2, valid_from:null, valid_to:null }
+      ]
+    }]
+  };
+
 
   function money(n,cur){
     if(n==null||n==='') return '—';
@@ -1240,6 +1304,11 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     show('gate');
   }
   if($('to-reg-top')) $('to-reg-top').onclick=function(){ gateStep('reg'); };
+  if($('see-demo')) $('see-demo').onclick=function(){
+    DATA=DEMO; CUR=0; draw();
+    var b=document.getElementById('demo-note');
+    if(b) b.style.display='';
+  };
   if($('to-pass-2')) $('to-pass-2').onclick=function(){ gateStep('pass'); };
   if($('to-login')) $('to-login').onclick=function(){ gateStep('phone'); };
 
