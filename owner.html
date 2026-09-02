@@ -688,6 +688,27 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
 .msub .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
 .msub .acts button{width:auto;margin:0;padding:10px 16px;font-size:14px}
 .msub .acts .gh{background:transparent;border:1px solid var(--line);color:var(--txt)}
+.eyebrow{display:block;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
+.ov-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:22px}
+.ov-head h1{margin:0;font-size:clamp(24px,3.4vw,34px)}
+.ov-act{display:flex;align-items:center;gap:12px}
+.btn-mini{width:auto;margin:0;padding:9px 16px;font-size:13.5px;border-radius:999px;
+  background:transparent;border:1px solid var(--line);color:var(--txt);font-weight:600}
+.btn-mini:hover{border-color:var(--txt)}
+.ava{width:38px;height:38px;border-radius:50%;background:var(--green,#D2D5B3);color:var(--txt);
+  display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex:0 0 auto}
+.ov-obj{margin-bottom:20px}
+.ov-obj h2{margin:0;font-size:clamp(20px,2.6vw,26px)}
+.ov-obj .sub{margin-top:4px}
+.ov-kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:18px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 20px}
+.kpi .k{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--dim)}
+.kpi .v{font-size:26px;font-weight:800;margin-top:8px;line-height:1.1}
+.kpi .n{margin-top:6px;font-size:12px;color:var(--dim)}
+.nowrow{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 0;border-top:1px solid var(--line)}
+.nowrow:first-of-type{border-top:0}
+.nowrow b{display:block;font-size:14.5px}
+.nowrow span{display:block;font-size:12.5px;color:var(--dim);margin-top:2px}
 .metric .sm{font-size:11.5px;color:var(--dim);margin-top:4px}
 .stats2 .v{font-size:20px}
 .dyn{font-size:15px;font-weight:700}
@@ -963,11 +984,12 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
   <div id="app" style="display:none">
     <div id="cab-nav" class="cab-nav" aria-label="Разделы кабинета">
       <a data-tab="overview" class="on">Обзор</a>
-      <a data-tab="object">Объект</a>
-      <a data-tab="money">Финансы</a>
       <a data-tab="calendar">Бронирования</a>
-      <a data-tab="service">Обслуживание</a>
+      <a data-tab="money">Финансы</a>
+      <a data-tab="costs">Расходы</a>
       <a data-tab="docs">Документы</a>
+      <a data-tab="service">Обслуживание</a>
+      <a data-tab="object">Объект</a>
       <a data-tab="actions">Заявки</a>
       <a data-tab="staff" id="tab-staff">Модерация</a>
     </div>
@@ -1261,26 +1283,107 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   function renderPortfolio(){
     var t=DATA.totals, o=DATA.owner||{};
     if(!t){ $('portfolio').innerHTML=''; return; }
+    var p=(DATA.properties||[])[CUR]||{};
     var hour=new Date().getHours();
     var greet = hour<5?'Доброй ночи':hour<12?'Доброе утро':hour<18?'Добрый день':'Добрый вечер';
     var first = String(o.name||'').trim().split(/\s+/)[0] || '';
-    var h='<div class="card"><h1>'+esc(greet+(first?', '+first:''))+'</h1>'+
-          '<p class="sub">'+(t.properties===1?'Ваш объект':'Ваших объектов: '+t.properties)+
-          ' · период '+dmy(DATA.period.start)+' — '+dmy(DATA.period.end)+'</p></div>';
-    h+='<div class="payout"><div class="lbl">Итого к выплате по всем объектам</div>'+
-       '<div class="val">'+(t.payout===null?'—':money(t.payout,'THB'))+'</div>'+
-       '<div class="note">'+(t.payout===null
-         ? 'Закрытых отчётов пока нет — первый будет сформирован '+dmy(DATA.period.end)+'.'
-         : 'Сумма по последним закрытым отчётам всех объектов.')+'</div></div>';
-    h+='<div class="grid3">'+
-       '<div class="metric"><div class="k">Доход периода</div><div class="v pos">'+money(t.income,'THB')+'</div></div>'+
-       '<div class="metric"><div class="k">Расходы периода</div><div class="v neg">'+money(t.expenses,'THB')+'</div></div>'+
-       '<div class="metric"><div class="k">Заездов · работ</div><div class="v">'+t.bookings+' · '+t.tasks+'</div></div>'+
-       '</div>';
-    h+=keyStats();
+    var ini = first ? first.slice(0,1).toUpperCase() : '·';
+
+    /* 1. Шапка: надзаголовок, приветствие, действие и аватар */
+    var h='<div class="ov-head">'+
+      '<div><span class="eyebrow">Кабинет владельца</span>'+
+        '<h1>'+esc(greet+(first?', '+first:''))+'</h1></div>'+
+      '<div class="ov-act">'+
+        '<button type="button" class="btn-mini" id="ov-report">Скачать отчёт</button>'+
+        '<span class="ava">'+esc(ini)+'</span></div></div>';
+
+    /* 2. Какой объект показываем */
+    var addr=[p.district, p.bedrooms?('спален: '+p.bedrooms):'', p.stage].filter(Boolean).join(' · ');
+    h+='<div class="ov-obj"><span class="eyebrow">'+
+        (t.properties>1?'Объект '+(CUR+1)+' из '+t.properties:'Ваш объект')+
+        (p.id?' · '+esc(p.id):'')+'</span>'+
+      '<h2>'+esc(p.name||'—')+'</h2>'+
+      (addr?'<p class="sub">'+esc(addr)+'</p>':'')+'</div>';
+
+    /* 3. Четыре показателя в ряд */
+    h+='<div class="ov-kpi">'+kpiCards(t,p)+'</div>';
+
+    /* 4. График дохода по месяцам */
     h+=monthChart();
+
+    /* 5. Ближайшие бронирования */
     h+=nextStays();
+
+    /* 6. Объект сейчас: статус и задачи */
+    h+=nowBlock(p);
+
     $('portfolio').innerHTML=h;
+    var rb=document.getElementById('ov-report');
+    if(rb) rb.onclick=function(){ cabPage('docs'); };
+  }
+
+  /* четыре показателя: доход за год с динамикой, загрузка, ставка, выплата */
+  function kpiCards(t,p){
+    var per=DATA.period||{}, from=per.start, to=per.end;
+    var d0=from?new Date(from+'T00:00:00'):null, d1=to?new Date(to+'T00:00:00'):null;
+    var periodNights=(d0&&d1)?Math.max(1,Math.round((d1-d0)/86400000)):30;
+    var props=Math.max(1,(DATA.properties||[]).length);
+
+    var busy=0, revenue=0;
+    (DATA.properties||[]).forEach(function(x){
+      (x.bookings||[]).forEach(function(b){
+        if(!b.check_in||!b.check_out) return;
+        if(String(b.status||'').toLowerCase()==='cancelled') return;
+        var a=new Date(Math.max(new Date(b.check_in+'T00:00:00'), d0||new Date(b.check_in)));
+        var z=new Date(Math.min(new Date(b.check_out+'T00:00:00'), d1||new Date(b.check_out)));
+        var n=Math.round((z-a)/86400000);
+        if(n>0){ busy+=n; revenue+=Number(b.amount_thb)||0; }
+      });
+    });
+    var load=Math.min(100, Math.round(busy/(periodNights*props)*100));
+    var adr=busy?Math.round(revenue/busy):0;
+
+    /* доход за текущий год и сравнение с прошлым */
+    var yr=new Date().getFullYear(), curY=0, prevY=0;
+    (DATA.properties||[]).forEach(function(x){
+      (x.statements||[]).forEach(function(st){
+        var y=parseInt(String(st.period||'').slice(0,4),10);
+        if(y===yr) curY+=Number(st.net)||0;
+        else if(y===yr-1) prevY+=Number(st.net)||0;
+      });
+    });
+    var dyn = prevY>0 ? (function(){
+      var pc=Math.round((curY-prevY)/prevY*100);
+      return '<span class="dyn '+(pc>=0?'up':'down')+'">'+(pc>=0?'↑':'↓')+' '+Math.abs(pc)+'% к прошлому году</span>';
+    })() : '<span class="sm">за '+yr+' год</span>';
+
+    function card(k,v,note){ return '<div class="kpi"><div class="k">'+k+'</div><div class="v">'+v+'</div><div class="n">'+note+'</div></div>'; }
+    return card('Доход в '+yr, curY?money(curY,'THB'):money(t.income,'THB'), dyn)+
+      card('Загрузка', load+'%', '<span class="sm">'+busy+' ноч. забронировано</span>')+
+      card('Средняя ставка', adr?money(adr,'THB'):'—', '<span class="sm">за занятую ночь</span>')+
+      card('Ближайшая выплата', t.payout===null?'—':money(t.payout,'THB'),
+           '<span class="sm">'+(t.payout===null?'первый отчёт '+dmy(per.end):dmy(per.end))+'</span>');
+  }
+
+  /* «Объект сейчас»: кто живёт, что ждёт решения, что готово */
+  function nowBlock(p){
+    var items=[], today=new Date().toISOString().slice(0,10);
+    var live=(p.bookings||[]).find(function(b){ return b.check_in<=today && b.check_out>=today; });
+    if(live) items.push({t:'Гость проживает', s:'Выезд '+dmy(live.check_out), a:''});
+    (p.tasks||[]).slice(0,3).forEach(function(k){
+      items.push({t:(KINDS[k.kind]||k.kind||'Работа'),
+                  s:(k.due_date?dmy(k.due_date)+' · ':'')+(k.cost_thb?money(k.cost_thb,'THB'):'по факту'),
+                  a:'Согласовать', kind:k.kind, cost:k.cost_thb});
+    });
+    var st=(p.statements||[])[0];
+    if(st) items.push({t:'Отчёт за '+String(st.period||'').slice(0,7)+' готов', s:'Смотреть в разделе «Документы»', a:'Открыть', go:'docs'});
+    if(!items.length) return '';
+    return '<div class="card"><span class="eyebrow">Объект сейчас</span><h2>Статус и задачи</h2>'+
+      items.map(function(i,n){
+        return '<div class="nowrow"><div><b>'+esc(i.t)+'</b><span>'+esc(i.s)+'</span></div>'+
+          (i.a?'<button type="button" class="btn-mini" data-now="'+n+'"'+(i.go?' data-go="'+i.go+'"':'')+'>'+i.a+'</button>':'')+
+          '</div>';
+      }).join('')+'</div>';
   }
 
   function renderTabs(){
@@ -1685,7 +1788,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   var TAB_OF={
     'portfolio':'overview', 'prop-tabs':'object', 'prop':'object',
     'sec-money':'money', 'sec-calendar':'calendar', 'sec-reports':'docs',
-    'sec-service':'service', 'sec-costs':'money',
+    'sec-service':'service', 'sec-costs':'costs',
     'sec-edit':'object', 'sec-addobj':'actions', 'sec-request':'actions',
     'sec-myreq':'actions', 'sec-moder':'staff', 'sec-coords':'staff'
   };
