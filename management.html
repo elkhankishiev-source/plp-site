@@ -475,14 +475,21 @@ h3{font-size:1.12rem;font-weight:700}
 .plp-pop .price{color:var(--ink);font-weight:800;font-size:14px;margin-top:6px}
 .plp-pop .go{display:inline-block;margin-top:8px;font-weight:700;font-size:12.5px;color:var(--ink)}
 .plp-pop a{display:inline-block;margin-top:6px;font-weight:700;color:var(--ink)}
-.dgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin-top:20px}
-.dgrid .dcard{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;
-  background:var(--paper);border:1px solid rgba(10,10,10,.08);border-radius:16px;padding:16px 18px;
+/* карта и список районов стоят рядом: так остров крупнее, а карточки компактнее */
+.maprow{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;align-items:start;margin-top:20px}
+.dcol-t{margin:0 0 10px;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.dcol .dgrid{max-height:min(620px,72vh);overflow-y:auto;padding-right:4px}
+@media(max-width:900px){.maprow{grid-template-columns:1fr}
+  .dcol .dgrid{max-height:none;overflow:visible}}
+.dgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin-top:0}
+.dgrid .dcard{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;
+  background:var(--paper);border:1px solid rgba(10,10,10,.08);border-radius:13px;padding:11px 13px;
   cursor:pointer;text-decoration:none;color:inherit;transition:box-shadow .2s,transform .2s}
 .dgrid .dcard:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
-.dgrid .dcard b{font-size:1.02rem}
-.dgrid .dcard span{color:var(--muted);font-size:.86rem;line-height:1.4}
-.dgrid .dcard u{text-decoration:none;color:var(--olive);font-weight:700;font-size:.86rem;margin-top:2px}
+.dgrid .dcard b{font-size:.92rem}
+.dgrid .dcard span{color:var(--muted);font-size:.78rem;line-height:1.35}
+.dgrid .dcard u{text-decoration:none;color:var(--olive);font-weight:700;font-size:.74rem;margin-top:1px}
+@media(min-width:901px){.dcol .dgrid{grid-template-columns:1fr}}
 .dcard{text-align:left;background:var(--paper);border:1px solid rgba(10,10,10,.08);border-radius:15px;padding:13px 15px;cursor:pointer;transition:transform .2s,box-shadow .2s,border-color .2s}
 .dcard:hover{transform:translateX(3px);box-shadow:var(--shadow-sm);border-color:var(--green)}
 .dcard b{display:block;font-size:.92rem;font-weight:700}
