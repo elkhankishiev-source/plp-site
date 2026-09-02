@@ -445,6 +445,10 @@ h3{font-size:1.12rem;font-weight:700}
   border:1px solid rgba(10,10,10,.08);box-shadow:var(--shadow-sm);background:#e7ecea;z-index:1}
 @media(max-width:700px){.plpmap{height:min(460px,64vh)}}
 .plpmap .leaflet-container{font:inherit;background:#e7ecea}
+.plpmap .leaflet-attribution-flag{display:none!important}
+.plpmap .leaflet-control-attribution{font-size:10.5px;background:rgba(255,255,255,.75);
+  padding:1px 6px;border-radius:8px 0 0 0;color:#5c5c54}
+.plpmap .leaflet-control-attribution a{color:#5c5c54}
 .plpmap .leaflet-control-zoom a{border-radius:10px;color:var(--ink);font-weight:700}
 .plpmap .leaflet-popup-content-wrapper{border-radius:16px;box-shadow:0 18px 46px rgba(10,10,10,.22)}
 .plpmap .leaflet-popup-content{margin:0;width:236px!important}
@@ -456,17 +460,26 @@ h3{font-size:1.12rem;font-weight:700}
 .plpfilt button.on{background:var(--ink);color:#fff}
 .plpview{left:auto;right:56px;top:12px}
 @media(max-width:560px){.plpview{right:12px;top:56px}}
+/* Метка висит НАД точкой и опирается на неё хвостиком: сама координата —
+   это остриё снизу по центру, а не угол пилюли. */
+.plp-icon{width:0;height:0}
+.plp-icon>*{position:absolute;left:0;top:0}
 .plp-pin{background:var(--ink);color:#fff;border-radius:999px;padding:4px 10px;font-size:12px;
   font-weight:700;white-space:nowrap;box-shadow:0 6px 18px rgba(10,10,10,.28);
-  border:2px solid #fff;transition:transform .12s}
-.plp-pin:hover{transform:translateY(-2px) scale(1.05)}
+  border:2px solid #fff;transition:transform .12s;
+  transform:translate(-50%,calc(-100% - 9px))}
+.plp-pin::after{content:'';position:absolute;left:50%;bottom:-5px;width:9px;height:9px;
+  background:inherit;border:inherit;border-top:0;border-left:0;
+  transform:translateX(-50%) rotate(45deg)}
+.plp-pin:hover{transform:translate(-50%,calc(-100% - 13px)) scale(1.04)}
 .plp-pin.rent{background:var(--olive,#5F6242)}
 .on-sat .plp-pin{background:#fff;color:var(--ink);border-color:var(--ink)}
 .on-sat .plp-pin.rent{background:var(--green,#D2D5B3);color:var(--ink)}
 /* несколько объектов рядом — одна метка со счётчиком, раскрывается по клику */
 .plp-cluster{background:#fff;color:var(--ink);border:2px solid var(--ink);border-radius:999px;
   min-width:34px;height:34px;display:flex;align-items:center;justify-content:center;
-  font-size:13px;font-weight:800;box-shadow:0 6px 18px rgba(10,10,10,.22)}
+  font-size:13px;font-weight:800;box-shadow:0 6px 18px rgba(10,10,10,.22);
+  transform:translate(-50%,-50%)}
 .plp-pop{display:block;text-decoration:none;color:inherit}
 .plp-pop img{width:100%;height:124px;object-fit:cover;display:block;background:#efeee7}
 .plp-pop .t{padding:11px 13px 13px}
@@ -2857,6 +2870,7 @@ function renderMapReal(){
       ])
     };
     PLPTILES.map.addTo(PLPMAP);
+    PLPMAP.attributionControl.setPrefix('');
     /* колесо прокручивает страницу, карта масштабируется по Ctrl или после клика —
        иначе карта перехватывает прокрутку и по ней невозможно проехать */
     PLPMAP.on('click', function(){ PLPMAP.scrollWheelZoom.enable(); });
@@ -2917,15 +2931,15 @@ function renderMapReal(){
       var g=groups[k], p=g[0], ll=[Number(p.lat),Number(p.lng)];
       bounds.push(ll);
       if(g.length>1){
-        var c=L.marker(ll,{icon:L.divIcon({className:'',
-          html:'<span class="plp-cluster">'+g.length+'</span>',iconSize:[34,34],iconAnchor:[17,17]})});
+        var c=L.marker(ll,{icon:L.divIcon({className:'plp-icon',
+          html:'<span class="plp-cluster">'+g.length+'</span>',iconSize:[0,0],iconAnchor:[0,0]})});
         c.bindPopup(popupMany(g),{maxWidth:260,minWidth:236});
         c.addTo(PLPLAYER);
       } else {
         var isRent=p.funnel==='rent';
-        var m=L.marker(ll,{icon:L.divIcon({className:'',
+        var m=L.marker(ll,{icon:L.divIcon({className:'plp-icon',
           html:'<span class="plp-pin'+(isRent?' rent':'')+'">'+fmtBaht(thbOf(p))+'</span>',
-          iconSize:null})});
+          iconSize:[0,0], iconAnchor:[0,0]})});
         m.bindPopup(popupOne(p),{maxWidth:260,minWidth:236});
         m.addTo(PLPLAYER);
       }
