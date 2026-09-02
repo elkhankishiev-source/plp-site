@@ -1138,9 +1138,10 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     // ставки
     var rt=p.rates||[], rh='';
     if(rt.length){
+      var SEA={high:'высокий · ноя–апр',shoulder:'средний · май, окт',low:'низкий · июн–сен'};
       rh='<table><tr><th>Сезон</th><th class="r">За ночь</th><th class="r">Мин. ночей</th></tr>';
       rt.forEach(function(r){
-        rh+='<tr><td>'+esc(r.season||'—')+'</td><td class="r">'+money(r.nightly_thb,cur)+
+        rh+='<tr><td>'+esc(SEA[r.season]||r.season||'—')+'</td><td class="r">'+money(r.nightly_thb,cur)+
             '</td><td class="r">'+(r.min_nights||'—')+'</td></tr>';
       });
       rh+='</table>';
