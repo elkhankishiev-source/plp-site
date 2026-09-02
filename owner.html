@@ -1820,7 +1820,6 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   };
   function cabPage(name){
     CAB_TAB=name;
-    try{ localStorage.setItem('plp_cab_tab', name); }catch(e){}
     var body=document.getElementById('cab-body'); if(!body) return;
     Array.prototype.forEach.call(body.children, function(el){
       if(el.id==='demo-note') return;                 // подсказка о демо видна всегда
@@ -1830,13 +1829,14 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       }
       el.style.display=(t===name)?'':'none';
     });
-    /* работы и брони живут внутри карточки объекта — вытаскиваем их в свои разделы */
+    /* блоки финансов, броней и работ рисуются внутри карточки объекта —
+       выносим их в тело кабинета сразу, иначе разделы открываются пустыми */
     ['sec-money','sec-calendar','sec-reports','sec-service','sec-costs'].forEach(function(id){
       var el=document.getElementById(id); if(!el) return;
-      el.style.display=(TAB_OF[id]===name)?'':'none';
-      if(TAB_OF[id]===name && el.parentElement && el.parentElement.id!=='cab-body'){
+      if(el.parentElement && el.parentElement.id!=='cab-body'){
         document.getElementById('cab-body').appendChild(el);
       }
+      el.style.display=(TAB_OF[id]===name)?'':'none';
     });
     var nav=document.getElementById('cab-nav');
     if(nav) Array.prototype.forEach.call(nav.querySelectorAll('a[data-tab]'), function(a){
@@ -1855,10 +1855,9 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     });
     var staff=document.getElementById('tab-staff');
     if(staff && !(DATA && DATA.owner && DATA.owner.is_staff===true)) staff.remove();
-    var want='overview';
-    try{ want=localStorage.getItem('plp_cab_tab')||'overview'; }catch(e){}
-    if(!nav.querySelector('a[data-tab="'+want+'"]')) want='overview';
-    cabPage(want);
+    /* всегда начинаем с обзора: запомненный раздел сбивал с толку —
+       человек заходил и видел, например, одни «Заявки» */
+    cabPage('overview');
   }
 
   function draw(){
