@@ -688,6 +688,11 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
 .msub .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
 .msub .acts button{width:auto;margin:0;padding:10px 16px;font-size:14px}
 .msub .acts .gh{background:transparent;border:1px solid var(--line);color:var(--txt)}
+.metric .sm{font-size:11.5px;color:var(--dim);margin-top:4px}
+.stats2 .v{font-size:20px}
+.dyn{font-size:15px;font-weight:700}
+.dyn.up{color:var(--acc,#5F6242)}
+.dyn.down{color:#8f4b3a}
 .chart h2{margin-bottom:2px}
 .mchart{display:flex;align-items:flex-end;gap:6px;margin-top:18px;padding-top:22px}
 .mbar{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;position:relative}
@@ -746,7 +751,7 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
 .cab-nav a{display:block;padding:8px 12px;border-radius:10px;color:var(--dim);font-size:14.5px;
   text-decoration:none;cursor:pointer;white-space:nowrap}
 .cab-nav a:hover{background:#efeee7;color:var(--txt)}
-.cab-nav a.on{background:var(--warm);color:var(--txt);font-weight:600}
+.cab-nav a.on{background:var(--txt);color:#fff;font-weight:600}
 @media(max-width:999px){
   .cab-nav{flex-direction:row;overflow-x:auto;gap:6px;padding-bottom:6px;-webkit-overflow-scrolling:touch}
   .cab-nav .cab-group{display:none}
@@ -957,20 +962,14 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
 
   <div id="app" style="display:none">
     <div id="cab-nav" class="cab-nav" aria-label="Разделы кабинета">
-      <div class="cab-group">Кабинет</div>
-      <a data-go="portfolio">Сводка</a>
-      <a data-go="prop">Объект</a>
-      <a data-go="sec-money">Деньги</a>
-      <a data-go="sec-calendar">Календарь</a>
-      <a data-go="sec-reports">Отчёты</a>
-      <div class="cab-group">Действия</div>
-      <a data-go="sec-edit">Дополнить карточку</a>
-      <a data-go="sec-addobj">Добавить объект</a>
-      <a data-go="sec-request">Заявка</a>
-      <a data-go="req-wrap">Мои заявки</a>
-      <div class="cab-group" id="mod-group">Модерация</div>
-      <a data-go="sec-moder">Заявки с сайта</a>
-      <a data-go="sec-coords">Точки на карте</a>
+      <a data-tab="overview" class="on">Обзор</a>
+      <a data-tab="object">Объект</a>
+      <a data-tab="money">Финансы</a>
+      <a data-tab="calendar">Бронирования</a>
+      <a data-tab="service">Обслуживание</a>
+      <a data-tab="docs">Документы</a>
+      <a data-tab="actions">Заявки</a>
+      <a data-tab="staff" id="tab-staff">Модерация</a>
     </div>
     <div id="cab-body">
     <div id="demo-note" style="display:none;background:#E9EBD9;border:1px solid #D2D5B3;border-radius:14px;
@@ -1149,6 +1148,58 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   var ST={active:'действует',paused:'приостановлен',ended:'завершён'};
 
   // ── сводка по всему портфелю ────────────────────────────────
+  /* Загрузка, средняя ставка и динамика — считаем из тех же броней и отчётов,
+     что уже приходят в кабинет. Владельцу это понятнее, чем голая сумма. */
+  function keyStats(){
+    var per=DATA.period||{}, from=per.start, to=per.end;
+    if(!from||!to) return '';
+    var d0=new Date(from+'T00:00:00'), d1=new Date(to+'T00:00:00');
+    var periodNights=Math.max(1, Math.round((d1-d0)/86400000));
+    var busy=0, revenue=0;
+    (DATA.properties||[]).forEach(function(p){
+      (p.bookings||[]).forEach(function(b){
+        if(!b.check_in||!b.check_out) return;
+        if(String(b.status||'').toLowerCase()==='cancelled') return;
+        // считаем только ночи, попавшие в период
+        var a=new Date(Math.max(new Date(b.check_in+'T00:00:00'), d0));
+        var z=new Date(Math.min(new Date(b.check_out+'T00:00:00'), d1));
+        var n=Math.round((z-a)/86400000);
+        if(n>0){ busy+=n; revenue+=Number(b.amount_thb)||0; }
+      });
+    });
+    var props=Math.max(1,(DATA.properties||[]).length);
+    var load=Math.min(100, Math.round(busy/(periodNights*props)*100));
+    var adr=busy?Math.round(revenue/busy):0;
+
+    /* динамика: последний закрытый отчёт против предыдущего */
+    var nets=[];
+    (DATA.properties||[]).forEach(function(p){
+      (p.statements||[]).forEach(function(st){
+        var k=String(st.period||'').slice(0,7);
+        if(/^\d{4}-\d{2}$/.test(k)) nets.push([k, Number(st.net)||0]);
+      });
+    });
+    var by={}; nets.forEach(function(x){ by[x[0]]=(by[x[0]]||0)+x[1]; });
+    var ks=Object.keys(by).sort();
+    var dyn='';
+    if(ks.length>=2){
+      var cur=by[ks[ks.length-1]], prev=by[ks[ks.length-2]];
+      if(prev>0){
+        var pct=Math.round((cur-prev)/prev*100);
+        dyn='<span class="dyn '+(pct>=0?'up':'down')+'">'+(pct>=0?'↑':'↓')+' '+Math.abs(pct)+'% к прошлому месяцу</span>';
+      }
+    }
+    if(!busy && !dyn) return '';
+    return '<div class="grid3 stats2">'+
+      '<div class="metric"><div class="k">Загрузка</div><div class="v">'+load+'%</div>'+
+        '<div class="sm">'+busy+' ноч. из '+periodNights*props+'</div></div>'+
+      '<div class="metric"><div class="k">Средняя ставка</div><div class="v">'+(adr?money(adr,'THB'):'—')+'</div>'+
+        '<div class="sm">за занятую ночь</div></div>'+
+      '<div class="metric"><div class="k">Динамика</div><div class="v">'+(dyn||'—')+'</div>'+
+        '<div class="sm">чистый доход</div></div>'+
+      '</div>';
+  }
+
   /* Доход по месяцам столбиками: сразу видно сезонность и провалы.
      Берём закрытые отчёты по всем объектам и складываем по месяцу. */
   function monthChart(){
@@ -1226,6 +1277,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
        '<div class="metric"><div class="k">Расходы периода</div><div class="v neg">'+money(t.expenses,'THB')+'</div></div>'+
        '<div class="metric"><div class="k">Заездов · работ</div><div class="v">'+t.bookings+' · '+t.tasks+'</div></div>'+
        '</div>';
+    h+=keyStats();
     h+=monthChart();
     h+=nextStays();
     $('portfolio').innerHTML=h;
@@ -1447,8 +1499,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     var isStaff = DATA && DATA.owner && DATA.owner.is_staff === true;
     if(!isStaff){
       if(sec) sec.remove();
-      var g=document.getElementById('mod-group'); if(g) g.remove();
-      var l=document.querySelector('#cab-nav a[data-go="sec-moder"]'); if(l) l.remove();
+      var l=document.getElementById('tab-staff'); if(l) l.remove();
       return;
     }
     sec.style.display='';
@@ -1548,7 +1599,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     if(!sec) return;
     if(!(DATA && DATA.owner && DATA.owner.is_staff === true)){
       sec.remove();
-      var l=document.querySelector('#cab-nav a[data-go="sec-coords"]'); if(l) l.remove();
+      var l=document.getElementById('tab-staff'); if(l) l.remove();
       return;
     }
     sec.style.display='';
@@ -1627,31 +1678,57 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     };
   })();
 
-  // навигация по кабинету: клик — плавный переход, подсветка следует за прокруткой
+  /* Кабинет разложен по разделам, а не одной простынёй: каждый пункт слева —
+     своя страница, как в концепте. Блоки уже отрисованы, мы их только
+     раскладываем по вкладкам и показываем одну за раз. */
+  var CAB_TAB='overview';
+  var TAB_OF={
+    'portfolio':'overview', 'prop-tabs':'object', 'prop':'object',
+    'sec-money':'money', 'sec-calendar':'calendar', 'sec-reports':'docs',
+    'sec-edit':'object', 'sec-addobj':'actions', 'sec-request':'actions',
+    'sec-myreq':'actions', 'sec-moder':'staff', 'sec-coords':'staff'
+  };
+  function cabPage(name){
+    CAB_TAB=name;
+    try{ localStorage.setItem('plp_cab_tab', name); }catch(e){}
+    var body=document.getElementById('cab-body'); if(!body) return;
+    Array.prototype.forEach.call(body.children, function(el){
+      if(el.id==='demo-note') return;                 // подсказка о демо видна всегда
+      var t=TAB_OF[el.id];
+      if(!t){                                          // блоки без прописки — в раздел объекта
+        el.style.display=(name==='object')?'':'none'; return;
+      }
+      el.style.display=(t===name)?'':'none';
+    });
+    /* работы и брони живут внутри карточки объекта — вытаскиваем их в свои разделы */
+    ['sec-money','sec-calendar','sec-reports'].forEach(function(id){
+      var el=document.getElementById(id); if(!el) return;
+      el.style.display=(TAB_OF[id]===name)?'':'none';
+      if(TAB_OF[id]===name && el.parentElement && el.parentElement.id!=='cab-body'){
+        document.getElementById('cab-body').appendChild(el);
+      }
+    });
+    var nav=document.getElementById('cab-nav');
+    if(nav) Array.prototype.forEach.call(nav.querySelectorAll('a[data-tab]'), function(a){
+      a.classList.toggle('on', a.getAttribute('data-tab')===name);
+    });
+    try{ if(PLPMAP_OWNER) setTimeout(function(){ COMAP && COMAP.invalidateSize(); },80); }catch(e){}
+    if(name==='staff' && COMAP) setTimeout(function(){ try{COMAP.invalidateSize();}catch(e){} },120);
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  var PLPMAP_OWNER=null;
+
   function initCabNav(){
     var nav=document.getElementById('cab-nav'); if(!nav) return;
-    var links=Array.prototype.slice.call(nav.querySelectorAll('a[data-go]'));
-    links.forEach(function(a){
-      a.onclick=function(e){
-        e.preventDefault();
-        var el=document.getElementById(a.getAttribute('data-go'));
-        if(el) window.scrollTo({top:el.getBoundingClientRect().top+window.scrollY-84,behavior:'smooth'});
-      };
+    Array.prototype.forEach.call(nav.querySelectorAll('a[data-tab]'), function(a){
+      a.onclick=function(e){ e.preventDefault(); cabPage(a.getAttribute('data-tab')); };
     });
-    function upd(){
-      var best=null,bestTop=-1e9;
-      links.forEach(function(a){
-        var el=document.getElementById(a.getAttribute('data-go'));
-        if(!el) { a.style.display='none'; return; }
-        a.style.display='';
-        var t=el.getBoundingClientRect().top-100;
-        if(t<=0 && t>bestTop){ bestTop=t; best=a; }
-      });
-      links.forEach(function(a){ a.classList.toggle('on', a===best); });
-    }
-    window.removeEventListener('scroll',upd);
-    window.addEventListener('scroll',upd,{passive:true});
-    upd();
+    var staff=document.getElementById('tab-staff');
+    if(staff && !(DATA && DATA.owner && DATA.owner.is_staff===true)) staff.remove();
+    var want='overview';
+    try{ want=localStorage.getItem('plp_cab_tab')||'overview'; }catch(e){}
+    if(!nav.querySelector('a[data-tab="'+want+'"]')) want='overview';
+    cabPage(want);
   }
 
   function draw(){
