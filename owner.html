@@ -721,20 +721,14 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
   <div class="container header-inner">
     <a class="logo" href="index.html" aria-label="Property Library — на главную"><span class="chip"><img src="img/brand/plp-mark-ink.png" alt="Property Library Phuket" width="24"></span><span class="lname">Property <span>Library</span></span></a>
     <nav class="nav" aria-label="Основное меню">
-      <a href="index.html#why" data-i18n="nav.why">Почему Пхукет</a>
-      <a href="index.html#sale" data-i18n="nav.sale">Продажа</a>
-      <a href="index.html#rent" data-i18n="nav.rent">Аренда</a>
+      <a href="buy.html" data-i18n="nav.sale">Продажа</a>
+      <a href="rent.html" data-i18n="nav.rent">Аренда</a>
       <a href="index.html#map" data-i18n="nav.map">Районы</a>
-      <a href="index.html#quiz" data-i18n="nav.quiz">Подбор</a>
+      <a href="management.html">Управление</a>
       <a href="index.html#about" data-i18n="nav.about">О нас</a>
-      <a href="index.html#faq" data-i18n="nav.faq">FAQ</a>
     </nav>
     <div class="htools">
-      <div class="lang" role="group" aria-label="Язык">
-        <button type="button" data-l="ru" class="on" onclick="setLang('ru')">RU</button>
-        <button type="button" data-l="en" onclick="setLang('en')">EN</button>
-      </div>
-      <a class="btn btn-ghost btn-cab" href="owner.html" class="on" data-i18n="nav.cabinet">Кабинет</a>
+      <a class="btn btn-ghost btn-cab on" href="owner.html" data-i18n="nav.cabinet">Кабинет</a>
       <a class="btn btn-green" href="https://wa.me/66955492587" target="_blank" rel="noopener">WhatsApp</a>
       <button type="button" class="burger" aria-label="Меню" onclick="toggleNav(true)"><i></i><i></i><i></i></button>
     </div>
@@ -744,16 +738,14 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
   <div class="sheet">
     <div class="top"><b data-i18n="nav.menu">Меню</b><button type="button" class="xx" onclick="toggleNav(false)" aria-label="Закрыть">×</button></div>
     <a href="index.html#why" onclick="toggleNav(false)" data-i18n="nav.why">Почему Пхукет</a>
-    <a href="index.html#sale" onclick="toggleNav(false)" data-i18n="nav.sale">Продажа</a>
-    <a href="index.html#rent" onclick="toggleNav(false)" data-i18n="nav.rent">Аренда</a>
+    <a href="buy.html" data-i18n="nav.sale">Продажа</a>
+    <a href="rent.html" data-i18n="nav.rent">Аренда</a>
     <a href="index.html#map" onclick="toggleNav(false)" data-i18n="nav.map">Районы</a>
+    <a href="management.html">Управление</a>
     <a href="index.html#quiz" onclick="toggleNav(false)" data-i18n="nav.quiz">Подбор</a>
     <a href="index.html#about" onclick="toggleNav(false)" data-i18n="nav.about">О нас</a>
     <a href="index.html#faq" onclick="toggleNav(false)" data-i18n="nav.faq">FAQ</a>
-    <div class="mlang">
-      <button type="button" data-l="ru" class="on" onclick="setLang('ru')">RU</button>
-      <button type="button" data-l="en" onclick="setLang('en')">EN</button>
-    </div>
+    <a href="add-property.html">Разместить объект</a>
     <a href="owner.html" onclick="toggleNav(false)" data-i18n="nav.cabinet">Кабинет владельца</a>
     <a class="mwa" href="https://wa.me/66955492587" target="_blank" rel="noopener">WhatsApp · +66 95-549-2587</a>
   </div>
@@ -1030,7 +1022,7 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
         <h3 data-i18n="ft.menu">Меню</h3>
         <ul>
           <li><a href="index.html#sale" data-i18n="ft.buy">Покупка</a></li>
-          <li><a href="index.html#rent" data-i18n="nav.rent">Аренда</a></li>
+          <li><a href="rent.html" data-i18n="nav.rent">Аренда</a></li>
           <li><a href="index.html#map" data-i18n="nav.map">Районы</a></li>
           <li><a href="index.html#about" data-i18n="nav.about">О нас</a></li>
           <li><a href="index.html#faq">FAQ</a></li>
