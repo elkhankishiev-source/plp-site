@@ -819,7 +819,7 @@ h3{font-size:1.12rem;font-weight:700}
     <a href="index.html#quiz" onclick="toggleNav(false)" data-i18n="nav.quiz">Подбор</a>
     <a href="index.html#about" onclick="toggleNav(false)" data-i18n="nav.about">О нас</a>
     <a href="index.html#faq" onclick="toggleNav(false)" data-i18n="nav.faq">FAQ</a>
-    <a href="management.html#list-property">Разместить объект</a>
+    <a href="add-property.html">Разместить объект</a>
     <div class="mlang">
       <button type="button" data-l="ru" class="on" onclick="setLang('ru')">RU</button>
       <button type="button" data-l="en" onclick="setLang('en')">EN</button>
@@ -953,93 +953,21 @@ h3{font-size:1.12rem;font-weight:700}
   <div style="background:#fff;border:1px solid #e7e5dc;border-radius:24px;padding:clamp(20px,3vw,32px);max-width:760px">
     <span class="kicker">Свой объект</span>
     <h2 style="font-size:clamp(22px,3vw,30px);margin:6px 0 8px">Разместить свой объект</h2>
-    <p class="sub" style="margin:0 0 4px">Ответьте на четыре вопроса — посчитаем доходность вашего объекта
-    и предложим условия. Регистрация не нужна.</p>
-
-    <label style="display:block;color:#5c5c54;font-size:13px;margin:16px 0 6px">Что за объект</label>
-    <div class="filters" id="lp-type">
-      <span class="chipf" data-v="Вилла">Вилла</span><span class="chipf" data-v="Кондо">Кондо</span>
-      <span class="chipf" data-v="Дом">Дом</span><span class="chipf" data-v="Участок">Участок</span>
+    <p class="sub" style="margin:0 0 18px">Пять коротких шагов: расскажите об объекте и приложите фото.
+    Мы проверим материалы, оформим карточку и опубликуем. Регистрация не нужна.</p>
+    <ol style="margin:0 0 22px;padding-left:20px;color:#5c5c54;font-size:15px;line-height:1.9">
+      <li>Тип, район, спальни</li>
+      <li>Готовность и на что рассчитываете</li>
+      <li>Фото и видео — можно перетащить сразу пачкой</li>
+      <li>Описание и адрес</li>
+      <li>Контакты — и всё</li>
+    </ol>
+    <div class="hero-cta" style="margin:0">
+      <a class="btn btn-primary" href="add-property.html">Разместить объект</a>
+      <a class="btn btn-ghost" href="owner.html">Личный кабинет</a>
     </div>
-
-    <label style="display:block;color:#5c5c54;font-size:13px;margin:16px 0 6px">Сколько спален</label>
-    <div class="filters" id="lp-beds">
-      <span class="chipf" data-v="Студия">Студия</span><span class="chipf" data-v="1">1</span>
-      <span class="chipf" data-v="2">2</span><span class="chipf" data-v="3">3</span>
-      <span class="chipf" data-v="4+">4 и больше</span>
-    </div>
-
-    <label style="display:block;color:#5c5c54;font-size:13px;margin:16px 0 6px">Район</label>
-    <div class="filters" id="lp-area">
-      <span class="chipf" data-v="Банг Тао">Банг Тао</span><span class="chipf" data-v="Лаян">Лаян</span>
-      <span class="chipf" data-v="Камала">Камала</span><span class="chipf" data-v="Раваи">Раваи</span>
-      <span class="chipf" data-v="Най Харн">Най Харн</span><span class="chipf" data-v="Другой">Другой</span>
-    </div>
-
-    <label style="display:block;color:#5c5c54;font-size:13px;margin:16px 0 6px">Что хотите</label>
-    <div class="filters" id="lp-goal">
-      <span class="chipf" data-v="Сдавать через вас">Сдавать через вас</span>
-      <span class="chipf" data-v="Продать">Продать</span>
-      <span class="chipf" data-v="Посчитать доходность">Посчитать доходность</span>
-    </div>
-
-    <div style="display:grid;gap:12px;grid-template-columns:1fr;margin-top:18px">
-      <div><label for="lp-name" style="display:block;color:#5c5c54;font-size:13px;margin-bottom:6px">Как к вам обращаться</label>
-        <input id="lp-name" placeholder="Например, Александр" style="width:100%;border:1px solid #e7e5dc;border-radius:14px;padding:12px 14px;font-size:15px;font-family:inherit"></div>
-      <div><label for="lp-phone" style="display:block;color:#5c5c54;font-size:13px;margin-bottom:6px">Телефон или WhatsApp</label>
-        <input id="lp-phone" type="tel" placeholder="+66 95 123 4567" style="width:100%;border:1px solid #e7e5dc;border-radius:14px;padding:12px 14px;font-size:15px;font-family:inherit"></div>
-      <div><label for="lp-note" style="display:block;color:#5c5c54;font-size:13px;margin-bottom:6px">Название комплекса или адрес</label>
-        <textarea id="lp-note" placeholder="Например: Laguna Park 2, вилла 14/3, бассейн, мебель есть" style="width:100%;min-height:76px;border:1px solid #e7e5dc;border-radius:14px;padding:12px 14px;font-size:15px;font-family:inherit"></textarea></div>
-    </div>
-
-    <button type="button" class="btn btn-primary" id="lp-send" style="margin-top:18px">Отправить</button>
-    <div id="lp-ok" style="color:#3f6b34;font-size:14px;margin-top:10px"></div>
-    <div id="lp-err" style="color:#8f4b3a;font-size:14px;margin-top:10px"></div>
   </div>
 </div></section>
-
-<script>
-(function(){
-  var g=function(id){return document.getElementById(id);};
-  ['lp-type','lp-beds','lp-area','lp-goal'].forEach(function(gid){
-    var box=g(gid); if(!box) return;
-    Array.prototype.forEach.call(box.querySelectorAll('.chipf'),function(c){
-      c.style.cursor='pointer';
-      c.onclick=function(){
-        var was=c.classList.contains('on');
-        Array.prototype.forEach.call(box.querySelectorAll('.chipf'),function(x){x.classList.remove('on');});
-        if(!was) c.classList.add('on');
-      };
-    });
-  });
-  function pick(gid){ var el=g(gid).querySelector('.chipf.on'); return el?el.getAttribute('data-v'):''; }
-  g('lp-send').onclick=function(){
-    g('lp-ok').textContent=''; g('lp-err').textContent='';
-    var name=g('lp-name').value.trim(), phone=g('lp-phone').value.trim();
-    if(!name){ g('lp-err').textContent='Как к вам обращаться?'; return; }
-    if(!phone){ g('lp-err').textContent='Оставьте телефон — иначе не сможем ответить.'; return; }
-    var b=g('lp-send'); b.disabled=true; b.textContent='Отправляем…';
-    fetch('https://proplib.app.n8n.cloud/webhook/site-lead?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7',
-      {method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({
-        name:name, contact:phone, phone:phone, funnel:'management',
-        goal:pick('lp-goal')||'управление', district:pick('lp-area')||'', lang:'ru',
-        source:'management_page', tags:['Управление','Свой объект'],
-        message:'Заявка на размещение объекта\n'+
-          'Объект: '+(pick('lp-type')||'—')+(pick('lp-beds')?', спален '+pick('lp-beds'):'')+'\n'+
-          'Район: '+(pick('lp-area')||'—')+'\n'+
-          'Цель: '+(pick('lp-goal')||'—')+
-          (g('lp-note').value.trim()?'\
-Адрес: '+g('lp-note').value.trim():'')
-      })})
-      .then(function(r){ if(!r.ok) throw new Error('http '+r.status); })
-      .then(function(){ b.disabled=false; b.textContent='Отправить';
-        g('lp-ok').textContent='Заявка принята — свяжемся и всё посчитаем.';
-        g('lp-name').value=''; g('lp-phone').value=''; g('lp-note').value=''; })
-      .catch(function(){ b.disabled=false; b.textContent='Отправить';
-        g('lp-err').textContent='Не отправилось. Напишите нам в WhatsApp — ответим сразу.'; });
-  };
-})();
-</script>
 </main>
 </div><!-- /stage -->
 
