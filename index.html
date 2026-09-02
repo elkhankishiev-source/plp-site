@@ -588,6 +588,7 @@ h3{font-size:1.12rem;font-weight:700}
 .fab{position:fixed;right:20px;bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:70;display:flex;align-items:center;gap:10px;background:var(--ink);color:#fff;border-radius:999px;padding:12px 18px 12px 12px;box-shadow:0 16px 40px rgba(20,18,14,.32);font-weight:600;font-size:.88rem;transition:transform .2s,box-shadow .2s}
 .fab:hover{transform:translateY(-2px)}
 .fab .av{width:34px;height:34px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;color:var(--ink);font-weight:800}
+.fab .av img,.chathead .av img{width:20px;height:20px;object-fit:contain;display:block}
 .fab .dot{width:8px;height:8px;border-radius:50%;background:#5fce8f;box-shadow:0 0 0 3px rgba(95,206,143,.3);animation:fabdot 2.4s infinite}
 @keyframes fabdot{0%,100%{box-shadow:0 0 0 3px rgba(95,206,143,.3)}50%{box-shadow:0 0 0 6px rgba(95,206,143,.12)}}
 @media(prefers-reduced-motion:reduce){.fab .dot,.msg{animation:none}}
@@ -1292,11 +1293,11 @@ h3{font-size:1.12rem;font-weight:700}
 </div><!-- /stage -->
 
 <!-- ===== CHAT WIDGET ===== -->
-<button type="button" class="fab" id="fab" onclick="openChat('hi')"><span class="av" data-i18n="chat.av">Д</span> <span data-i18n="chat.fab">Консультант · на связи</span> <span class="dot"></span></button>
+<button type="button" class="fab" id="fab" onclick="openChat('hi')"><span class="av"><img src="img/brand/plp-mark-ink.png" alt="" width="20" height="20"></span> <span data-i18n="chat.fab">Дарья · на связи</span> <span class="dot"></span></button>
 <div class="chatwin" id="chatwin" role="dialog" aria-label="Чат с менеджером">
   <div class="chathead">
-    <span class="av" data-i18n="chat.av">Д</span>
-    <div><b data-i18n="chat.name">Дарья · Property Library</b><div class="st2"><span class="dot"></span> <span data-i18n="chat.sub">онлайн · отвечает сразу</span></div></div>
+    <span class="av"><img src="img/brand/plp-mark-ink.png" alt="" width="20" height="20"></span>
+    <div><b data-i18n="chat.name">Дарья</b><div class="st2"><span class="dot"></span> <span data-i18n="chat.sub">персональный менеджер · отвечает сразу</span></div></div>
     <button type="button" class="clr" onclick="clearChat()" title="Очистить историю">⟲</button>
     <button type="button" class="x" onclick="closeChat()" aria-label="Закрыть">×</button>
   </div>
@@ -1547,7 +1548,7 @@ ru: {
   "v.t.lo":"при таких вводных считать объект инвестицией стоит осторожно — обсудите с менеджером, за счёт чего можно улучшить экономику",
   "v.note":"Разбор по вашим цифрам — не инвестиционная рекомендация.",
   "ft.copy":"Property Library Phuket © 2022",
-  "chat.av":"Д","chat.fab":"Консультант · на связи","chat.name":"Консультант · Property Library","chat.sub":"онлайн · отвечает сразу","chat.placeholder":"Напишите сообщение…",
+  "chat.av":"Д","chat.fab":"Дарья · на связи","chat.name":"Дарья","chat.sub":"персональный менеджер · отвечает сразу","chat.placeholder":"Напишите сообщение…",
   "chat.botline":"Личный диалог. Отвечаем в течение 5 минут в рабочее время",
   "chat.hello":"Здравствуйте! Я Дарья, менеджер Property Library из команды Эльнура. Помогу с покупкой, арендой и любым вопросом по Пхукету. Что вам интересно?",
   "chat.menu1":"Купить / инвестировать","chat.menu2":"Аренда от месяца","chat.menu3":"Услуги и сопровождение","chat.menu4":"Оставить контакт",
@@ -1731,7 +1732,7 @@ en: {
   "v.t.lo":"with these inputs treat it as an investment with caution — discuss with a manager how the economics could be improved",
   "v.note":"A take based on your numbers — not investment advice.",
   "ft.copy":"Property Library Phuket © 2022",
-  "chat.av":"D","chat.fab":"Consultant · online","chat.name":"Consultant · Property Library","chat.sub":"online · replies right away","chat.placeholder":"Type a message…",
+  "chat.av":"D","chat.fab":"Daria · online","chat.name":"Daria","chat.sub":"personal manager · replies right away","chat.placeholder":"Type a message…",
   "chat.botline":"Personal dialogue. We reply within 5 minutes during working hours",
   "chat.hello":"Hello! I am Daria, a Property Library manager from Elnur's team. I will help with buying, renting and any question about Phuket. What are you interested in?",
   "chat.menu1":"Buy / invest","chat.menu2":"Rent from a month","chat.menu3":"Services and support","chat.menu4":"Leave my contact",
