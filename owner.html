@@ -1100,7 +1100,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   var CATS={booking:'Бронирование',cleaning:'Уборка',repair:'Ремонт',utilities:'Коммунальные',
             management:'Управление',supplies:'Расходники',other:'Прочее'};
   var RSTAT={'new':'принята','in_progress':'в работе','done':'выполнена','rejected':'отклонена'};
-  var RT={mixed:'посуточно и долгосрочно',short:'посуточная аренда',long:'долгосрочная аренда'};
+  var RT={mixed:'короткие и длинные сроки',short:'короткие сроки',long:'договор на год'};
   var ST={active:'действует',paused:'приостановлен',ended:'завершён'};
 
   // ── сводка по всему портфелю ────────────────────────────────
@@ -1285,8 +1285,8 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     if(p.contract){
       dh+=line('Статус',ST[c.status]||c.status);
       dh+=line('Тип аренды',RT[c.rental_type]||c.rental_type);
-      if(c.commission_short_pct!=null) dh+=line('Комиссия · посуточно',c.commission_short_pct+'%');
-      if(c.commission_long_pct!=null)  dh+=line('Комиссия · долгосрочно',c.commission_long_pct+'%');
+      if(c.commission_short_pct!=null) dh+=line('Комиссия · короткие сроки',c.commission_short_pct+'%');
+      if(c.commission_long_pct!=null)  dh+=line('Комиссия · договор на год',c.commission_long_pct+'%');
       dh+=line('Действует с',dmy(c.start_date));
       if(c.end_date) dh+=line('Действует до',dmy(c.end_date));
       dh+=line('Реквизиты выплаты',c.payout_set?'указаны':'не указаны');
