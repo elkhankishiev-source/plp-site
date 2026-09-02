@@ -2663,6 +2663,15 @@ function renderMapReal(){
     bounds.push([p.lat,p.lng]);
   });
   if(bounds.length>1) PLPMAP.fitBounds(bounds,{padding:[36,36]});
+  /* карта создаётся в блоке, который появляется с анимацией: без пересчёта
+     размера получается серый прямоугольник без плиток */
+  function fix(){ try{ PLPMAP.invalidateSize(); if(bounds.length>1) PLPMAP.fitBounds(bounds,{padding:[36,36]}); }catch(e){} }
+  setTimeout(fix,150); setTimeout(fix,600); setTimeout(fix,1500);
+  window.addEventListener('resize',fix);
+  if(window.IntersectionObserver){
+    var io=new IntersectionObserver(function(en){ en.forEach(function(e){ if(e.isIntersecting) fix(); }); });
+    io.observe(box);
+  }
 }
 
 function renderDList(){
