@@ -1457,15 +1457,51 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     renderPortfolio(); renderTabs(); renderProp(); renderRequests(); renderEditState(); renderModeration(); initCabNav();
   }
 
+  /* Ответ идёт около трёх секунд — столько занимает запуск сценария на стороне
+     сервера. Чтобы кабинет не выглядел зависшим, показываем прошлые данные
+     сразу из памяти браузера и молча заменяем их свежими, когда придут. */
+  var CACHE='plp_owner_data';
   function loadData(){
-    show('loading');
+    var shown=false;
+    try{
+      var raw=localStorage.getItem(CACHE);
+      if(raw){
+        var c=JSON.parse(raw);
+        if(c && c.token===TOKEN && c.data && (Date.now()-c.at) < 7*24*3600e3){
+          DATA=c.data; CUR=0;
+          if(!(DATA.owner&&DATA.owner.must_change_password)){ draw(); shown=true; markStale(true); }
+        }
+      }
+    }catch(e){}
+    if(!shown) show('loading');
+
     post({action:'data',token:TOKEN}).then(function(d){
-      if(!d||!d.ok){ try{localStorage.removeItem(LS);}catch(e){} TOKEN=null; gateStep('phone');
+      if(!d||!d.ok){
+        try{localStorage.removeItem(LS);localStorage.removeItem(CACHE);}catch(e){}
+        TOKEN=null; gateStep('phone');
         $('gate-err').textContent=(d&&d.error==='expired')?'Вход истёк — получите новый код.':''; return; }
       DATA=d; CUR=0;
+      try{ localStorage.setItem(CACHE, JSON.stringify({token:TOKEN,at:Date.now(),data:d})); }catch(e){}
       if(d.owner&&d.owner.must_change_password){ show('pwd'); return; }
-      draw();
-    }).catch(function(){ gateStep('phone'); $('gate-err').textContent='Нет связи с сервером. Попробуйте позже.'; });
+      draw(); markStale(false);
+    }).catch(function(){
+      if(shown){ markStale(false, 'нет связи — показаны последние данные'); return; }
+      gateStep('phone'); $('gate-err').textContent='Нет связи с сервером. Попробуйте позже.';
+    });
+  }
+  /* тонкая полоска сверху, пока идёт обновление */
+  function markStale(on, text){
+    var el=document.getElementById('stale');
+    if(!el){
+      el=document.createElement('div'); el.id='stale';
+      el.style.cssText='position:fixed;left:0;right:0;top:0;z-index:99;height:26px;line-height:26px;'+
+        'text-align:center;font-size:12.5px;background:var(--warm);color:var(--txt);'+
+        'transition:opacity .3s';
+      document.body.appendChild(el);
+    }
+    el.textContent = text || 'Обновляем данные…';
+    el.style.display = on ? '' : 'none';
+    if(text){ el.style.display=''; setTimeout(function(){ el.style.display='none'; }, 4000); }
   }
 
   // ── экраны входа: телефон → код, с запасным входом по паролю ──
@@ -1689,6 +1725,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
 
   $('logout').onclick=function(){
     post({action:'logout',token:TOKEN});
+    try{localStorage.removeItem(CACHE);}catch(e){}
     try{localStorage.removeItem(LS);}catch(e){}
     TOKEN=null; DATA=null; $('logout').style.display='none';
     $('login').value=''; $('login2').value=''; $('pass').value=''; $('code').value='';

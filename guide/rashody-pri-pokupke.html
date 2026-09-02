@@ -454,11 +454,15 @@ h3{font-size:1.12rem;font-weight:700}
 .plpfilt button{border:0;background:none;font:inherit;font-size:12.5px;font-weight:700;color:#5c5c54;
   border-radius:999px;padding:6px 13px;cursor:pointer;white-space:nowrap}
 .plpfilt button.on{background:var(--ink);color:#fff}
+.plpview{left:auto;right:56px;top:12px}
+@media(max-width:560px){.plpview{right:12px;top:56px}}
 .plp-pin{background:var(--ink);color:#fff;border-radius:999px;padding:4px 10px;font-size:12px;
   font-weight:700;white-space:nowrap;box-shadow:0 6px 18px rgba(10,10,10,.28);
   border:2px solid #fff;transition:transform .12s}
 .plp-pin:hover{transform:translateY(-2px) scale(1.05)}
 .plp-pin.rent{background:var(--olive,#5F6242)}
+.on-sat .plp-pin{background:#fff;color:var(--ink);border-color:var(--ink)}
+.on-sat .plp-pin.rent{background:var(--green,#D2D5B3);color:var(--ink)}
 /* несколько объектов рядом — одна метка со счётчиком, раскрывается по клику */
 .plp-cluster{background:#fff;color:var(--ink);border:2px solid var(--ink);border-radius:999px;
   min-width:34px;height:34px;display:flex;align-items:center;justify-content:center;
@@ -799,6 +803,8 @@ h3{font-size:1.12rem;font-weight:700}
 @media(max-width:600px){#toTop{right:14px;bottom:88px;width:42px;height:42px}}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="preconnect" href="https://tile.openstreetmap.org" crossorigin>
+<link rel="preconnect" href="https://server.arcgisonline.com" crossorigin>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Какие расходы при покупке, кроме цены объекта?","acceptedAnswer":{"@type":"Answer","text":"Разовые при получении ключей: регистрация права (freehold ~2%, leasehold ~1.1%), фонд капитального ремонта ~800 ฿/м², подключение счётчиков ~15 000 ฿. Ежемесячно: обслуживание комплекса (CAM) ~80 ฿/м². Все цифры показываем в расчёте до сделки — без сюрпризов."}}]}</script>
 </head>
 <body>
@@ -2634,7 +2640,7 @@ var DPAGE={'Банг Тао':'bang-tao','Лаян':'layan','Сурин':'surin',
            'Равай':'rawai','Раваи':'rawai','Ката':'kata','Най Янг':'nai-yang','Ко Кео':'koh-kaew'};
 /* живая карта: метки стоят по координатам объектов из базы.
    Объекты без координат на карту не попадают — лучше пусто, чем ложная точка. */
-var PLPMAP=null, PLPLAYER=null, PLPFILTER='all';
+var PLPMAP=null, PLPLAYER=null, PLPFILTER='all', PLPTILES=null, PLPVIEW='map';
 function renderMapReal(){
   var box=document.getElementById('plpMap'); if(!box||!window.L) return;
   var all=PL.PROPERTIES.filter(function(p){return p.lat&&p.lng;});
@@ -2644,15 +2650,38 @@ function renderMapReal(){
     PLPMAP=L.map(box,{scrollWheelZoom:false,attributionControl:true,zoomControl:false})
       .setView([7.95,98.33],11);
     L.control.zoom({position:'topright'}).addTo(PLPMAP);
-    /* OpenStreetMap — единственный слой, который работает без ключа и оплаты.
-       CARTO пробовали: без API-ключа он штампует поверх карты «API KEY REQUIRED». */
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
-      maxZoom:19, attribution:'© OpenStreetMap'}).addTo(PLPMAP);
+    /* Два слоя без ключа и без оплаты: обычная карта и снимки со спутника.
+       CARTO пробовали — без API-ключа он штампует поверх «API KEY REQUIRED». */
+    PLPTILES = {
+      map: L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
+        maxZoom:19, attribution:'© OpenStreetMap'}),
+      sat: L.layerGroup([
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{
+          maxZoom:19, attribution:'Esri, Maxar, Earthstar Geographics'}),
+        /* поверх снимка — прозрачный слой с названиями дорог и пляжей */
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',{
+          maxZoom:19, opacity:.9})
+      ])
+    };
+    PLPTILES.map.addTo(PLPMAP);
     /* колесо прокручивает страницу, карта масштабируется по Ctrl или после клика —
        иначе карта перехватывает прокрутку и по ней невозможно проехать */
     PLPMAP.on('click', function(){ PLPMAP.scrollWheelZoom.enable(); });
     PLPMAP.on('mouseout', function(){ PLPMAP.scrollWheelZoom.disable(); });
     PLPMAP.on('zoomend', function(){ drawPins(true); });
+
+    var vb=document.getElementById('plpView');
+    if(vb) Array.prototype.forEach.call(vb.querySelectorAll('button'),function(b){
+      b.onclick=function(){
+        Array.prototype.forEach.call(vb.querySelectorAll('button'),function(x){x.classList.remove('on');});
+        b.classList.add('on');
+        var v=b.getAttribute('data-v');
+        if(v===PLPVIEW) return;
+        PLPMAP.removeLayer(PLPTILES[PLPVIEW]); PLPVIEW=v; PLPTILES[v].addTo(PLPMAP);
+        /* на снимке чёрные ценники теряются — делаем их светлыми */
+        document.getElementById('plpMap').classList.toggle('on-sat', v==='sat');
+      };
+    });
 
     var fb=document.getElementById('plpFilt');
     if(fb) Array.prototype.forEach.call(fb.querySelectorAll('button'),function(b){
@@ -2836,7 +2865,8 @@ addEventListener('hashchange',function(){if(isObjectHash())openFromHash();});
   upd();
 })();
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" defer
+  onload="try{renderMapReal();}catch(e){}"></script>
 <script>window.addEventListener("load",function(){try{renderMapReal();}catch(e){}});</script>
 </body>
 </html>
