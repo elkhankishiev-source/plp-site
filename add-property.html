@@ -441,9 +441,9 @@ h3{font-size:1.12rem;font-weight:700}
 .dlist{display:flex;flex-direction:column;gap:8px;max-height:560px;overflow-y:auto;padding-right:4px}
 /* районы сеткой на всю ширину: каждая карточка ведёт на свою страницу */
 .plpwrap{position:relative;margin-top:18px}
-.plpmap{height:min(620px,72vh);border-radius:22px;overflow:hidden;
+.plpmap{height:min(700px,80vh);border-radius:22px;overflow:hidden;
   border:1px solid rgba(10,10,10,.08);box-shadow:var(--shadow-sm);background:#e7ecea;z-index:1}
-@media(max-width:700px){.plpmap{height:min(460px,64vh)}}
+@media(max-width:700px){.plpmap{height:min(520px,70vh)}}
 .plpmap .leaflet-container{font:inherit;background:#e7ecea}
 .plpmap .leaflet-attribution-flag{display:none!important}
 .plpmap .leaflet-control-attribution{font-size:10.5px;background:rgba(255,255,255,.75);
@@ -493,7 +493,7 @@ h3{font-size:1.12rem;font-weight:700}
 /* карта и список районов стоят рядом: так остров крупнее, а карточки компактнее */
 .maprow{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;align-items:start;margin-top:20px}
 .dcol-t{margin:0 0 10px;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-.dcol .dgrid{max-height:min(620px,72vh);overflow-y:auto;padding-right:4px}
+.dcol .dgrid{max-height:min(700px,80vh);overflow-y:auto;padding-right:4px}
 @media(max-width:900px){.maprow{grid-template-columns:1fr}
   .dcol .dgrid{max-height:none;overflow:visible}}
 .dgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin-top:0}
@@ -2960,7 +2960,7 @@ function renderMapReal(){
         (hidden>0 ? ' Ещё '+hidden+' — без точного адреса, они в каталоге.' : '');
     }
     if(!keepView){
-      if(bounds.length>1) PLPMAP.fitBounds(bounds,{padding:[44,44]});
+      if(bounds.length>1) PLPMAP.fitBounds(bounds,{padding:[24,24]});
       else if(bounds.length===1) PLPMAP.setView(bounds[0],14);
     }
   }
@@ -3042,7 +3042,7 @@ function resetMapView(){
     .map(function(p){return [Number(p.lat),Number(p.lng)];});
   var list=document.getElementById('dList');
   if(list) list.querySelectorAll('.dcard').forEach(function(x){x.classList.remove('on');});
-  try{ if(all.length>1) PLPMAP.flyToBounds(all,{padding:[44,44],duration:.7}); }catch(e){}
+  try{ if(all.length>1) PLPMAP.flyToBounds(all,{padding:[24,24],duration:.7}); }catch(e){}
 }
 
 function openDistrict(nameRu){
