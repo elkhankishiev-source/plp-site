@@ -213,6 +213,9 @@ function buildCatalog(objects, benchmarks, preserve) {
       desc: { ru: usp, en: uspEn },
       // 02.09: то, что человек ищет глазами в первую очередь — море и застройщик.
       // Пишем только если данные есть, пустое поле карточка не рисует.
+      // координаты нужны карте объектов — без них метку не поставить
+      lat: (o.lat === 0 || o.lat) ? Number(o.lat) : null,
+      lng: (o.lng === 0 || o.lng) ? Number(o.lng) : null,
       beach: o.beach || null,
       beachM: (o.distance_beach_m === 0 || o.distance_beach_m) ? o.distance_beach_m : null,
       developer: o.developer || null,
@@ -578,7 +581,7 @@ async function main() {
     '&select=plp_property_id,name,district,beach,purpose,type,price_from_thb,price_to_thb,' +
     'bedrooms,bedrooms_min,bedrooms_max,area_sqm,area_min,area_max,roi,rental_yield_pct,' +
     'capital_growth_pct,handover_date,status,stage,developer,distance_beach_m,usp,usp_en,' +
-    'season_rates,occupancy_est_pct,maintenance_fee_thb_sqm');
+    'season_rates,occupancy_est_pct,maintenance_fee_thb_sqm,lat,lng');
   const benchmarks = await sbGet(env,
     'rental_benchmarks?select=district,unit_type,disp_yield_low_pct,disp_yield_high_pct');
 
