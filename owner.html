@@ -1691,26 +1691,6 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     });
   };
 
-  $('a-send').onclick=function(){
-    $('a-ok').textContent=''; $('a-err').textContent='';
-    var type=picked('a-type'), beds=picked('a-beds'), area=picked('a-area'),
-        stage=picked('a-stage'), note=$('a-note').value.trim();
-    if(!type && !note){ $('a-err').textContent='Напишите хотя бы название комплекса или выберите тип.'; return; }
-    $('a-send').disabled=true; $('a-send').textContent='Отправляем…';
-    // заявка на подключение объекта идёт тем же путём, что и остальные — в кабинет и к менеджеру
-    post({action:'request',token:TOKEN,kind:'other',
-      details:'Подключить объект: '+(type||'—')+(beds?', спален '+beds:'')+
-              ', район '+(area||'—')+', готовность '+(stage||'—')+
-              (note?'. '+note:'')}).then(function(d){
-      $('a-send').disabled=false; $('a-send').textContent='Отправить на подключение';
-      if(d&&d.ok){ $('a-ok').textContent='Заявка принята — менеджер свяжется и подключит объект.';
-        $('a-note').value=''; loadData(); }
-      else $('a-err').textContent='Не удалось отправить. Напишите менеджеру в WhatsApp.';
-    }).catch(function(){
-      $('a-send').disabled=false; $('a-send').textContent='Отправить на подключение';
-      $('a-err').textContent='Нет связи с сервером.';
-    });
-  };
 
   $('r-send').onclick=function(){
     var p=(DATA.properties||[])[CUR];
