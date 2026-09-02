@@ -596,10 +596,11 @@ h3{font-size:1.12rem;font-weight:700}
 .footer-bottom{margin-top:28px;padding-top:18px;border-top:1px solid rgba(10,10,10,.07);display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;font-size:.82rem;color:var(--muted)}
 
 /* ===== chat widget ===== */
-.fab{position:fixed;right:20px;bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:70;display:flex;align-items:center;gap:10px;background:var(--ink);color:#fff;border-radius:999px;padding:12px 18px 12px 12px;box-shadow:0 16px 40px rgba(20,18,14,.32);font-weight:600;font-size:.88rem;transition:transform .2s,box-shadow .2s}
+.fab{position:fixed;right:20px;bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:70;display:flex;align-items:center;gap:8px;background:var(--ink);color:#fff;border-radius:999px;padding:8px 15px 8px 8px;box-shadow:0 12px 32px rgba(20,18,14,.28);font-weight:600;font-size:.8rem;transition:transform .2s,box-shadow .2s}
 .fab:hover{transform:translateY(-2px)}
-.fab .av{width:34px;height:34px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;color:var(--ink);font-weight:800}
-.fab .av img,.chathead .av img{width:20px;height:20px;object-fit:contain;display:block}
+.fab .av{width:27px;height:27px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;color:var(--ink);font-weight:800}
+.fab .av img{width:16px;height:16px;object-fit:contain;display:block}
+.chathead .av img{width:20px;height:20px;object-fit:contain;display:block}
 .fab .dot{width:8px;height:8px;border-radius:50%;background:#5fce8f;box-shadow:0 0 0 3px rgba(95,206,143,.3);animation:fabdot 2.4s infinite}
 @keyframes fabdot{0%,100%{box-shadow:0 0 0 3px rgba(95,206,143,.3)}50%{box-shadow:0 0 0 6px rgba(95,206,143,.12)}}
 @media(prefers-reduced-motion:reduce){.fab .dot,.msg{animation:none}}
@@ -652,7 +653,7 @@ h3{font-size:1.12rem;font-weight:700}
 @media(max-width:760px){
   .chatwin{right:10px;bottom:10px;width:calc(100vw - 20px)}
   .chatbody{height:50vh}
-  .fab{right:14px;bottom:14px;padding:11px 16px 11px 11px}
+  .fab{right:14px;bottom:14px;padding:7px 13px 7px 7px;font-size:.78rem}
 }
 
 /* ===== tray (favs / compare) ===== */
