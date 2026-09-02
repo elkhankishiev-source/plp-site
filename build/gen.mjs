@@ -34,7 +34,7 @@ const INDEX = path.join(ROOT, 'index.html');
 const OBJDIR = path.join(ROOT, 'object');
 const SITEMAP = path.join(ROOT, 'sitemap.xml');
 
-const SITE_BASE = 'https://elkhankishiev-source.github.io/plp-site';
+const SITE_BASE = 'https://property-library.com';
 const WA = '66955492587';
 const RATE = 35; // THB→USD для витринного priceUSD (как в текущем каталоге)
 
