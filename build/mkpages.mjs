@@ -51,8 +51,7 @@ function sectionPage(indexHtml,opts){
    чтобы не ломать её ритм. */
 const CATALOG_CSS = `
 <style>
-.catalog .filterbar{position:sticky;top:64px;z-index:40;background:rgba(250,250,247,.94);
-  backdrop-filter:saturate(140%) blur(8px);margin:0 -14px;padding:12px 14px;border-radius:0 0 16px 16px}
+.catalog .filterbar{margin-top:16px}
 .catalog .arrows{display:none}
 .catalog .found{margin:14px 0 4px;font-size:.92rem;color:var(--muted)}
 .catalog .found b{color:var(--ink);font-size:1.05rem}
@@ -62,7 +61,7 @@ const CATALOG_CSS = `
   overflow:visible;padding:2px;cursor:default;scroll-snap-type:none}
 .catalog .car .prop{width:auto!important;min-width:0;scroll-snap-align:none;flex:none}
 .catalog .car .prop.hl{outline:2px solid var(--ink);outline-offset:2px}
-.catmap{position:sticky;top:132px}
+.catmap{position:sticky;top:88px}
 .catmap .plpmap{height:calc(100vh - 168px);max-height:760px;margin:0}
 .catmap .plpwrap{margin:0}
 .catmap .capt{font-size:.8rem;color:var(--muted);margin:8px 0 0}
@@ -138,7 +137,7 @@ const pages=[
   intro:'Проверенные виллы и апартаменты от застройщиков и собственников. Каждый объект смотрим лично перед тем, как показать.',
   title:'Купить недвижимость на Пхукете — виллы и апартаменты | Property Library',
   desc:'Виллы, апартаменты и кондо на Пхукете от застройщиков и собственников. Проверенные объекты, расчёт доходности, сопровождение сделки.'},
- {file:'rent.html',self:'rent',sections:['rent'],catalogCar:'rentCar',
+ {file:'rent.html',self:'rent',sections:['rent'],
   h1:'Аренда жилья на Пхукете',
   intro:'Виллы и апартаменты для жизни и отдыха, аренда от месяца. Подберём под даты и бюджет, встретим и заселим.',
   title:'Аренда виллы или апартаментов на Пхукете | Property Library',
