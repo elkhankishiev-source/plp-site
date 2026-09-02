@@ -2640,16 +2640,18 @@ function renderMapReal(){
   if(!all.length){ box.style.display='none'; return; }
 
   if(!PLPMAP){
-    PLPMAP=L.map(box,{scrollWheelZoom:false,attributionControl:true,zoomControl:true})
+    PLPMAP=L.map(box,{scrollWheelZoom:false,attributionControl:true,zoomControl:false})
       .setView([7.95,98.33],11);
-    /* CARTO Voyager: те же данные OpenStreetMap, но подписи на латинице и чище рисунок */
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{
-      maxZoom:19, subdomains:'abcd',
-      attribution:'© OpenStreetMap, © CARTO'}).addTo(PLPMAP);
+    L.control.zoom({position:'topright'}).addTo(PLPMAP);
+    /* OpenStreetMap — единственный слой, который работает без ключа и оплаты.
+       CARTO пробовали: без API-ключа он штампует поверх карты «API KEY REQUIRED». */
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
+      maxZoom:19, attribution:'© OpenStreetMap'}).addTo(PLPMAP);
     /* колесо прокручивает страницу, карта масштабируется по Ctrl или после клика —
        иначе карта перехватывает прокрутку и по ней невозможно проехать */
     PLPMAP.on('click', function(){ PLPMAP.scrollWheelZoom.enable(); });
     PLPMAP.on('mouseout', function(){ PLPMAP.scrollWheelZoom.disable(); });
+    PLPMAP.on('zoomend', function(){ drawPins(true); });
 
     var fb=document.getElementById('plpFilt');
     if(fb) Array.prototype.forEach.call(fb.querySelectorAll('button'),function(b){
@@ -2661,7 +2663,7 @@ function renderMapReal(){
   }
   drawPins();
 
-  function drawPins(){
+  function drawPins(keepView){
     var pts=all.filter(function(p){
       if(PLPFILTER==='all') return true;
       var isRent = p.funnel==='rent';
@@ -2670,11 +2672,14 @@ function renderMapReal(){
     if(PLPLAYER){ PLPMAP.removeLayer(PLPLAYER); }
     PLPLAYER=L.layerGroup().addTo(PLPMAP);
 
-    /* объекты одного комплекса стоят вплотную — собираем их в одну метку,
-       иначе ценники наезжают друг на друга и читать нечего */
+    /* Соседние объекты сливаем в одну метку со счётчиком, иначе ценники
+       наезжают друг на друга. Порог зависит от масштаба: чем ближе, тем мельче
+       сетка, и на зуме метки расходятся сами. */
+    var z=PLPMAP.getZoom();
+    var step = z>=15 ? 0.0008 : z>=13 ? 0.004 : z>=11 ? 0.012 : 0.05;
     var groups={};
     pts.forEach(function(p){
-      var k=Number(p.lat).toFixed(3)+','+Number(p.lng).toFixed(3);
+      var k=Math.round(p.lat/step)+'|'+Math.round(p.lng/step);
       (groups[k]=groups[k]||[]).push(p);
     });
 
@@ -2703,8 +2708,10 @@ function renderMapReal(){
       note.textContent='На карте '+pts.length+' объект'+plural(pts.length)+'. Нажмите метку — откроется карточка.'+
         (hidden>0 ? ' Ещё '+hidden+' — без точного адреса, они в каталоге.' : '');
     }
-    if(bounds.length>1) PLPMAP.fitBounds(bounds,{padding:[44,44]});
-    else if(bounds.length===1) PLPMAP.setView(bounds[0],14);
+    if(!keepView){
+      if(bounds.length>1) PLPMAP.fitBounds(bounds,{padding:[44,44]});
+      else if(bounds.length===1) PLPMAP.setView(bounds[0],14);
+    }
   }
 
   function plural(n){ var a=n%10,b=n%100;
@@ -2728,7 +2735,15 @@ function renderMapReal(){
   }
 
   /* карта живёт в блоке с анимацией появления: без пересчёта размера остаётся серый прямоугольник */
-  function fix(){ try{ PLPMAP.invalidateSize(); }catch(e){} }
+  var framed=false;
+  function fix(){
+    try{
+      PLPMAP.invalidateSize();
+      /* пока блок скрыт, размер нулевой и рамка считается неверно —
+         подгоняем её один раз, когда карта уже видна */
+      if(!framed && box.offsetWidth>200){ framed=true; drawPins(); }
+    }catch(e){}
+  }
   setTimeout(fix,150); setTimeout(fix,600); setTimeout(fix,1500);
   window.addEventListener('resize',fix);
   if(window.IntersectionObserver){
