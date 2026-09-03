@@ -1082,6 +1082,17 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
     <div class="card" id="sec-mine" style="display:none">
       <h2 id="mine-hi">Моя недвижимость</h2>
       <div id="mine-body"></div>
+      <h4 style="margin:18px 0 6px">Мои данные</h4>
+      <p class="sub" style="margin:0 0 8px">Поправьте, если что-то указано неверно — у нас обновится сразу.</p>
+      <div class="fgrid">
+        <label>Как к вам обращаться<input id="my-name" type="text"></label>
+        <label>Почта<input id="my-email" type="text" placeholder="для документов и отчётов"></label>
+        <label>Ещё один номер<input id="my-phone2" type="text" placeholder="если пишете с другого"></label>
+        <label class="wide">Что нам важно знать<input id="my-note" type="text" placeholder="предпочтения, планы, пожелания"></label>
+      </div>
+      <div class="fbtns"><button type="button" class="btn ghost" id="my-save">Сохранить</button></div>
+      <div class="ok" id="my-saved"></div>
+
       <h4 style="margin:18px 0 6px">Написать нам</h4>
       <div class="fgrid">
         <label>О чём<select id="my-kind">
@@ -1924,6 +1935,23 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         h+='</ul><p class="sub"><a href="#" class="lnk" id="cl-addtask">Поставить задачу</a></p>';
       }
 
+      h+='<h4>Контакты</h4>';
+      var cl2=(k.channels||[]);
+      if(!cl2.length){ h+='<p class="sub">Контактов нет.</p>'; }
+      else {
+        h+='<ul class="tline">';
+        cl2.forEach(function(x){
+          var main=(x.channel==='wa' && x.handle===c.phone);
+          h+='<li>'+(SRC_RU[x.channel]||x.channel)+' <b class="mono">'+clEsc(x.handle)+'</b>'+
+             (main?' <span class="tmp t-client">основной</span>':'')+'</li>';
+        });
+        h+='</ul>';
+      }
+      h+='<p class="sub">У человека может быть несколько номеров — все ведут в эту же карточку. '+
+         '<a href="#" class="lnk" id="cl-addch">Добавить контакт</a> · '+
+         '<a href="#" class="lnk" id="cl-sim">Найти дубли</a></p>';
+      h+='<div id="cl-simbox"></div>';
+
       var tl=k.timeline||[];
       h+='<h4>История</h4>';
       if(!tl.length){ h+='<p class="sub">Пока пусто — записи появятся с первым сообщением.</p>'; }
@@ -1961,6 +1989,35 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         var v=document.getElementById('cl-note').value.trim(); if(!v) return;
         post({action:'client_update',token:TOKEN,code:code,note:v}).then(function(){ openClient(code); });
       };
+      var ac=document.getElementById('cl-addch');
+      if(ac) ac.onclick=function(e){ e.preventDefault();
+        var v=prompt('Номер или Telegram id этого же человека:'); if(!v) return;
+        var ch=/^\+?[0-9 ()-]{8,}$/.test(v)?'wa':'tg';
+        post({action:'client_link',token:TOKEN,code:code,channel:ch,handle:v.trim()})
+          .then(function(r){ if(r&&r.ok){ openClient(code); loadClients(); }
+                             else alert((r&&r.error)||'Не получилось'); }); };
+      var sm=document.getElementById('cl-sim');
+      if(sm) sm.onclick=function(e){ e.preventDefault();
+        var box=document.getElementById('cl-simbox');
+        box.innerHTML='<p class="sub">Ищем…</p>';
+        post({action:'client_similar',token:TOKEN,code:code}).then(function(r){
+          var arr=(r&&r.similar)||[];
+          if(!arr.length){ box.innerHTML='<p class="sub">Похожих карточек нет.</p>'; return; }
+          var hh='<table class="ctable inner"><tr><th>Номер</th><th>Имя</th><th>Телефон</th><th>Сделок</th><th></th></tr>';
+          arr.forEach(function(x){
+            hh+='<tr><td class="mono">'+x.code+'</td><td>'+clEsc(x.name||'—')+'</td><td>'+
+                (x.phone||'—')+'</td><td>'+(x.deals||0)+'</td><td>'+
+                '<a href="#" class="lnk mrg" data-drop="'+x.code+'">это он же</a></td></tr>';
+          });
+          box.innerHTML=hh+'</table>';
+          Array.prototype.forEach.call(box.querySelectorAll('.mrg'),function(a){
+            a.onclick=function(ev){ ev.preventDefault();
+              var drop=a.getAttribute('data-drop');
+              if(!confirm('Объединить '+drop+' в '+code+'? Вся история перейдёт сюда, отменить нельзя.')) return;
+              post({action:'client_merge',token:TOKEN,keep:code,drop:drop})
+                .then(function(){ openClient(code); loadClients(); }); };
+          });
+        }); };
       var pp=document.getElementById('cl-portal');
       if(pp) pp.onclick=function(e){ e.preventDefault();
         post({action:'client_portal',token:TOKEN,code:code}).then(function(r){
@@ -2030,6 +2087,25 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
              clEsc(f.title||f.kind||'документ')+'</a></li>'; }).join('')+'</ul>';
       }
       document.getElementById('mine-body').innerHTML=h;
+      var mn=document.getElementById('my-name');
+      if(mn && d.me.name) mn.value=d.me.name;
+      var ms=document.getElementById('my-save');
+      if(ms) ms.onclick=function(){
+        var patch={};
+        if(fv('my-name')) patch.name=fv('my-name');
+        if(fv('my-email')) patch.email=fv('my-email');
+        if(fv('my-phone2')) patch.phone_extra=fv('my-phone2');
+        if(fv('my-note')) patch.note=fv('my-note');
+        if(!Object.keys(patch).length){ alert('Нечего сохранять'); return; }
+        ms.disabled=true;
+        post({action:'my_update',token:TOKEN,patch:patch}).then(function(r){
+          ms.disabled=false;
+          document.getElementById('my-saved').textContent =
+            (r&&r.ok) ? 'Сохранили, спасибо.' : ((r&&r.error)||'Не сохранилось.');
+          if(r&&r.ok){ document.getElementById('my-phone2').value='';
+                       document.getElementById('my-note').value=''; }
+        });
+      };
       var sb=document.getElementById('my-send');
       if(sb) sb.onclick=function(){
         var t=document.getElementById('my-text').value.trim();
