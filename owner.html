@@ -1129,6 +1129,7 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
       <div class="clbar">
         <button type="button" class="btn ghost" id="cl-new">+ Завести человека</button>
         <button type="button" class="btn ghost" id="cl-board">Что горит</button>
+        <button type="button" class="btn ghost" id="cl-dupes">Сверка дублей</button>
       </div>
       <div id="cl-form"></div>
       <div id="cl-list"></div>
@@ -1837,6 +1838,8 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     if(nb) nb.onclick=function(){ newClientForm(); };
     var bb=document.getElementById('cl-board');
     if(bb) bb.onclick=function(){ tasksBoard(); };
+    var db=document.getElementById('cl-dupes');
+    if(db) db.onclick=function(){ dupesBoard(); };
     var go=document.getElementById('cl-go'), qi=document.getElementById('cl-q');
     if(go) go.onclick=function(){ CL_Q=qi.value.trim(); loadClients(); };
     if(qi) qi.onkeydown=function(e){ if(e.key==='Enter'){ CL_Q=qi.value.trim(); loadClients(); } };
@@ -1982,10 +1985,21 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       } else {
         h+='<p class="sub">Документы и фото складываем на Google Диск, здесь останутся ссылки.</p>';
       }
-      h+='<h4>Доступ в кабинет</h4>'+
-         (c.cabinet_enabled
-           ? '<p class="sub">Вход открыт. Заходит по своему номеру на /owner.html — код приходит в WhatsApp или Telegram.</p>'
-           : '<p class="sub">Пока доступа нет. <a href="#" class="lnk" id="cl-portal">Открыть вход</a> — человек сможет заходить по своему номеру и видеть свои объекты, шаги и документы.</p>');
+      h+='<h4>Доступ в кабинет</h4>';
+      if(c.cabinet_enabled){
+        h+='<p class="sub">Вход открыт. Заходит по своему номеру на /owner.html — код приходит в '+
+           'WhatsApp или Telegram. <a href="#" class="lnk" id="cl-deny">Закрыть доступ</a></p>';
+      } else if(c.temp==='cold'){
+        h+='<p class="sub">Человек ещё холодный — доступ не выдаём. Сначала квалификация: '+
+           'кто он, что ищет, реальный ли интерес. Иначе кабинет откроется кому угодно, '+
+           'включая тех, кто просто собирает нашу базу.</p>';
+      } else {
+        h+='<p class="sub">'+(c.portal_status==='requested'?'<b>Просит доступ.</b> ':'')+
+           '<a href="#" class="lnk" id="cl-portal">Открыть вход</a> — увидит свои объекты, '+
+           'шаги и документы. Открывайте, когда человек понятен.'+
+           (c.portal_status==='requested'?' · <a href="#" class="lnk" id="cl-deny">Отказать</a>':'')+
+           '</p>';
+      }
       h+='<h4>Пометка</h4><div class="clnote"><input id="cl-note" type="text" placeholder="Что важно помнить об этом человеке">'+
          '<button type="button" class="btn" id="cl-save">Записать</button></div>'+
          '<div class="opts" id="cl-temp">'+['cold','warm','hot','client','lost'].map(function(t){
@@ -2027,6 +2041,11 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
                 .then(function(){ openClient(code); loadClients(); }); };
           });
         }); };
+      var dn=document.getElementById('cl-deny');
+      if(dn) dn.onclick=function(e){ e.preventDefault();
+        var why=prompt('Почему отказываем?','не квалифицирован'); if(why===null) return;
+        post({action:'client_portal_deny',token:TOKEN,code:code,why:why})
+          .then(function(){ openClient(code); }); };
       var pp=document.getElementById('cl-portal');
       if(pp) pp.onclick=function(e){ e.preventDefault();
         post({action:'client_portal',token:TOKEN,code:code}).then(function(r){
@@ -2129,6 +2148,48 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
           });
       };
     }).catch(function(){});
+  }
+
+  // сверка дублей: решает человек, система только показывает похожих
+  function dupesBoard(){
+    var box=document.getElementById('cl-form');
+    box.innerHTML='<div class="ccard"><p class="sub">Ищем похожих…</p></div>';
+    post({action:'client_dupes',token:TOKEN,limit:60}).then(function(d){
+      var pr=(d&&d.pairs)||[];
+      var h='<div class="ccard"><div class="chead"><h3 style="margin:0">Похожие карточки</h3>'+
+            '<button type="button" class="btn ghost" id="f-cancel">Закрыть</button></div>'+
+            '<p class="sub">Совпадают последние девять цифр номера, но имена написаны по-разному. '+
+            'Решаете вы: один это человек или разные.</p>';
+      if(!pr.length){ h+='<p class="sub">Спорных пар не осталось.</p>'; }
+      else {
+        h+='<table class="ctable inner"><tr><th>Первая</th><th>Вторая</th><th></th></tr>';
+        pr.forEach(function(x){
+          var a=x.a||{}, b=x.b||{};
+          h+='<tr><td><span class="mono">'+a.code+'</span><br>'+clEsc(a.name||'—')+
+             '<br><span class="sub">'+(a.phone||'—')+' · сделок '+(a.deals||0)+
+             ' · с '+clDate(a.first)+'</span></td>'+
+             '<td><span class="mono">'+b.code+'</span><br>'+clEsc(b.name||'—')+
+             '<br><span class="sub">'+(b.phone||'—')+' · сделок '+(b.deals||0)+
+             ' · с '+clDate(b.first)+'</span></td>'+
+             '<td><a href="#" class="lnk dp-same" data-id="'+x.id+'">это один</a><br>'+
+             '<a href="#" class="lnk dp-diff" data-id="'+x.id+'">разные</a></td></tr>';
+        });
+        h+='</table>';
+      }
+      box.innerHTML=h+'</div>';
+      document.getElementById('f-cancel').onclick=function(){ box.innerHTML=''; };
+      function decide(id, same){
+        post({action:'client_dupe_decide',token:TOKEN,id:id,same:same})
+          .then(function(){ dupesBoard(); loadClients(); });
+      }
+      Array.prototype.forEach.call(box.querySelectorAll('.dp-same'),function(a){
+        a.onclick=function(e){ e.preventDefault();
+          if(confirm('Объединить? Вся история перейдёт в первую карточку.')) decide(a.getAttribute('data-id'), true); };
+      });
+      Array.prototype.forEach.call(box.querySelectorAll('.dp-diff'),function(a){
+        a.onclick=function(e){ e.preventDefault(); decide(a.getAttribute('data-id'), false); };
+      });
+    });
   }
 
   // формы: завести человека, добавить объект, поставить задачу, доска задач
