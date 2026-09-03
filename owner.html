@@ -847,6 +847,9 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
   .bcell.bwarn{border-color:#e0b8a8;background:#fdf5f2}
   .bnum{display:block;font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.1}
   .blbl{display:block;font-size:12px;color:#8b8f7c;margin-top:3px}
+  .upbox{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .docbox{margin:8px 0 0;padding:12px;border:1px solid var(--line);border-radius:10px;background:#fcfcf8}
+  .tgcode{margin-top:8px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:#fcfcf8}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 </head>
@@ -1116,6 +1119,20 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
     <div class="card" id="sec-mine" style="display:none">
       <h2 id="mine-hi">Моя недвижимость</h2>
       <div id="mine-body"></div>
+      <h4 style="margin:18px 0 6px">Загрузить договор</h4>
+      <p class="sub" style="margin:0 0 8px">Пришлите договор или график платежей — PDF или фото.
+      Система прочитает его и сама заполнит карточку объекта: проект, юнит, цену, сроки
+      и все платежи. Вам останется проверить. Документ виден только вам и вашему менеджеру.</p>
+      <div class="upbox">
+        <input id="my-file" type="file" accept=".pdf,image/*" hidden>
+        <button type="button" class="btn" id="my-upload">Выбрать файл</button>
+        <span class="sub" id="my-upname"></span>
+      </div>
+      <div id="my-docs"></div>
+
+      <h4 style="margin:18px 0 6px">Уведомления в Telegram</h4>
+      <div id="my-tg"></div>
+
       <h4 style="margin:18px 0 6px">Мои данные</h4>
       <p class="sub" style="margin:0 0 8px">Поправьте, если что-то указано неверно — у нас обновится сразу.</p>
       <div class="fgrid">
@@ -2156,6 +2173,59 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
              clEsc(f.title||f.kind||'документ')+'</a></li>'; }).join('')+'</ul>';
       }
       document.getElementById('mine-body').innerHTML=h;
+      // документы: загрузка, разбор, подтверждение
+      drawDocs(d.docs||[]);
+      var fi=document.getElementById('my-file'), ub=document.getElementById('my-upload');
+      if(ub) ub.onclick=function(){ fi.click(); };
+      if(fi) fi.onchange=function(){
+        var f=fi.files && fi.files[0]; if(!f) return;
+        if(f.size > 20*1024*1024){ alert('Файл больше 20 МБ — пришлите поменьше'); return; }
+        document.getElementById('my-upname').textContent='Отправляем «'+f.name+'»…';
+        ub.disabled=true;
+        var rd=new FileReader();
+        rd.onload=function(){
+          var b64=String(rd.result).split(',')[1]||'';
+          post({action:'my_doc',token:TOKEN,file_name:f.name,mime:f.type,data:b64})
+            .then(function(r){
+              ub.disabled=false; fi.value='';
+              if(r&&r.ok){
+                document.getElementById('my-upname').textContent=
+                  'Приняли. Читаем документ — это займёт до минуты.';
+                setTimeout(loadMine, 25000);
+                setTimeout(loadMine, 60000);
+              } else {
+                document.getElementById('my-upname').textContent=(r&&r.error)||'Не загрузилось';
+              }
+            });
+        };
+        rd.readAsDataURL(f);
+      };
+
+      // Telegram
+      var tgb=document.getElementById('my-tg');
+      if(tgb){
+        if(d.me.tg_linked){
+          tgb.innerHTML='<p class="sub">Telegram подключён. Пишем туда, когда появляется '+
+            'что-то важное: разобрали документ, подходит платёж, готов отчёт, ответили на заявку. '+
+            '<a class="lnk" href="https://t.me/property_library_phuket" target="_blank" rel="noopener">Наш канал</a> — '+
+            'там гайды, разборы и закрытые предложения.</p>';
+        } else {
+          tgb.innerHTML='<p class="sub">Подключите Telegram — будем присылать туда важное по вашим '+
+            'объектам, и сможете задавать вопросы боту. '+
+            '<a href="#" class="lnk" id="my-tgcode">Получить код</a></p><div id="my-tgbox"></div>';
+          document.getElementById('my-tgcode').onclick=function(e){ e.preventDefault();
+            post({action:'my_tg_code',token:TOKEN}).then(function(r){
+              var box=document.getElementById('my-tgbox');
+              if(!r||!r.ok){ box.innerHTML='<p class="sub">'+((r&&r.error)||'Не вышло')+'</p>'; return; }
+              box.innerHTML='<div class="tgcode"><b class="mono big">'+r.code+'</b>'+
+                '<p class="sub">Откройте <a class="lnk" href="https://t.me/elnurphuket_bot" '+
+                'target="_blank" rel="noopener">@elnurphuket_bot</a> и отправьте ему этот код. '+
+                'Он действует '+r.minutes+' минут.</p></div>';
+            });
+          };
+        }
+      }
+
       var mn=document.getElementById('my-name');
       if(mn && d.me.name) mn.value=d.me.name;
       var ms=document.getElementById('my-save');
@@ -2189,6 +2259,58 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
           });
       };
     }).catch(function(){});
+  }
+
+  function drawDocs(docs){
+    var box=document.getElementById('my-docs'); if(!box) return;
+    if(!docs.length){ box.innerHTML=''; return; }
+    var ST={new:'приняли',reading:'читаем…',parsed:'проверьте',
+            confirmed:'учтено',failed:'не разобрали'};
+    var h='<ul class="tline">';
+    docs.forEach(function(dc){
+      h+='<li><span class="tdate">'+clDate(dc.created_at)+'</span> '+clEsc(dc.name||'документ')+
+         ' <span class="tmp t-'+(dc.status==='confirmed'?'client':
+            dc.status==='failed'?'lost':dc.status==='parsed'?'warm':'cold')+'">'+
+         (ST[dc.status]||dc.status)+'</span>';
+      if(dc.status==='parsed' && dc.parsed){
+        var p=dc.parsed;
+        h+='<div class="docbox"><div class="crow">'+
+           (p.project?'<div><span class="lbl">Проект</span>'+clEsc(p.project)+'</div>':'')+
+           (p.unit?'<div><span class="lbl">Юнит</span>'+clEsc(p.unit)+'</div>':'')+
+           (p.area_sqm?'<div><span class="lbl">Площадь</span>'+p.area_sqm+' м²</div>':'')+
+           (p.price?'<div><span class="lbl">Сумма</span>'+Number(p.price).toLocaleString('ru-RU')+
+             ' '+(p.currency||'THB')+'</div>':'')+
+           (p.handover_date?'<div><span class="lbl">Сдача</span>'+clDate(p.handover_date)+'</div>':'')+
+           (p.developer?'<div><span class="lbl">Застройщик</span>'+clEsc(p.developer)+'</div>':'')+
+           '</div>';
+        var pay=p.payments||[];
+        if(pay.length){
+          h+='<p class="sub" style="margin:8px 0 4px">График платежей — '+pay.length+':</p>'+
+             '<table class="ctable inner"><tr><th>Когда</th><th>Сколько</th><th>За что</th></tr>';
+          pay.slice(0,12).forEach(function(x){
+            h+='<tr><td>'+(x.date?clDate(x.date):'—')+'</td><td>'+
+               (x.amount?Number(x.amount).toLocaleString('ru-RU'):(x.percent?x.percent+' %':'—'))+
+               '</td><td>'+clEsc(x.note||'')+'</td></tr>';
+          });
+          h+='</table>';
+        }
+        h+='<div class="fbtns"><button type="button" class="btn doc-ok" data-id="'+dc.id+
+           '">Всё верно, сохранить</button></div>';
+        if(p.confidence==='low') h+='<p class="sub warn">Документ читался плохо — проверьте внимательно.</p>';
+        h+='</div>';
+      }
+      if(dc.status==='failed') h+='<div class="sub">'+clEsc(dc.error||'не получилось прочитать')+
+        ' — менеджер посмотрит вручную.</div>';
+      h+='</li>';
+    });
+    box.innerHTML=h+'</ul>';
+    Array.prototype.forEach.call(box.querySelectorAll('.doc-ok'),function(bn){
+      bn.onclick=function(){ bn.disabled=true;
+        post({action:'my_doc_confirm',token:TOKEN,doc_id:bn.getAttribute('data-id')})
+          .then(function(r){ bn.disabled=false;
+            if(r&&r.ok) loadMine(); else alert((r&&r.error)||'Не сохранилось'); });
+      };
+    });
   }
 
   // приборная панель: вся система одним экраном
