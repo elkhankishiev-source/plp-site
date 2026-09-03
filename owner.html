@@ -840,6 +840,13 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
   .obox{padding:14px;border:1px solid var(--line);border-radius:12px;background:#fcfcf8}
   .obox h3{margin:0 0 8px;font-size:16px}
   .sub.warn{color:#a33418}
+  .bgroup{margin-bottom:18px}
+  .bgroup h4{margin:0 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:#7b7f6a}
+  .bgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:10px}
+  .bcell{padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#fcfcf8}
+  .bcell.bwarn{border-color:#e0b8a8;background:#fdf5f2}
+  .bnum{display:block;font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.1}
+  .blbl{display:block;font-size:12px;color:#8b8f7c;margin-top:3px}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 </head>
@@ -1053,6 +1060,7 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
       <a data-tab="service">Обслуживание</a>
       <a data-tab="object">Объект</a>
       <a data-tab="actions">Заявки</a>
+      <a data-tab="board" id="tab-board">Система</a>
       <a data-tab="mine" id="tab-mine" style="display:none">Моя недвижимость</a>
       <a data-tab="clients" id="tab-clients">Люди</a>
       <a data-tab="staff" id="tab-staff">Модерация</a>
@@ -1096,6 +1104,13 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
       и приложите фото — за пять шагов. Мы проверим и оформим карточку.</p>
       <a href="add-property.html" style="display:inline-block;background:var(--txt);color:#fff;
          border-radius:999px;padding:12px 20px;font-size:15px;font-weight:700;text-decoration:none">Разместить объект</a>
+    </div>
+
+    <div class="card" id="sec-board" style="display:none">
+      <h2>Система</h2>
+      <p class="sub" style="margin:0 0 12px">Что происходит прямо сейчас: люди, сайт, работа, связь.
+      Обновляется при каждом заходе.</p>
+      <div id="board-body"></div>
     </div>
 
     <div class="card" id="sec-mine" style="display:none">
@@ -2176,6 +2191,39 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     }).catch(function(){});
   }
 
+  // приборная панель: вся система одним экраном
+  function renderBoard(){
+    var sec=document.getElementById('sec-board'); if(!sec) return;
+    if(!(DATA && DATA.owner && DATA.owner.is_staff===true)){ sec.remove(); return; }
+    var box=document.getElementById('board-body');
+    box.innerHTML='<p class="sub">Снимаем показания…</p>';
+    post({action:'board',token:TOKEN}).then(function(d){
+      if(!d||!d.ok||!d.board){ box.innerHTML='<p class="sub">Не удалось собрать сводку.</p>'; return; }
+      var b=d.board;
+      function group(title, obj, marks){
+        var h='<div class="bgroup"><h4>'+title+'</h4><div class="bgrid">';
+        Object.keys(obj||{}).forEach(function(k){
+          var v=obj[k], warn=(marks||[]).indexOf(k)>=0 && Number(v)>0;
+          h+='<div class="bcell'+(warn?' bwarn':'')+'"><span class="bnum">'+
+             (v===null||v===undefined?'—':v)+'</span><span class="blbl">'+
+             k.replace(/_/g,' ')+'</span></div>';
+        });
+        return h+'</div></div>';
+      }
+      var h='';
+      h+=group('Люди', b['люди'], ['просят_кабинет']);
+      h+=group('Номера', b['номера'], ['без_кода_страны','короткие','длинные','тестовые']);
+      h+=group('Сайт', b['сайт'], ['заявок_на_модерации','без_точки','точка_неточная']);
+      h+=group('Работа', b['работа'], ['просрочено']);
+      h+=group('Связь', b['связь'], []);
+      h+='<p class="sub" style="margin-top:14px">Снято '+
+         String(b['обновлено']||'').slice(11,16)+'. Исходящие сообщения '+
+         (String(b['связь'] && b['связь']['исходящие_включены'])==='true'
+          ? '<b>включены</b>' : 'выключены — система думает, но никому не пишет')+'.</p>';
+      box.innerHTML=h;
+    });
+  }
+
   // битые номера: только показываем, что не так. Ничего не сливаем и не удаляем —
   // номер правит человек, обычно достаточно дописать цифру кода страны.
   function dupesBoard(){
@@ -2421,7 +2469,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     'sec-service':'service', 'sec-costs':'costs',
     'sec-edit':'object', 'sec-addobj':'actions', 'sec-request':'actions',
     'sec-myreq':'actions', 'sec-moder':'staff', 'sec-coords':'staff',
-    'sec-clients':'clients', 'sec-mine':'mine'
+    'sec-clients':'clients', 'sec-mine':'mine', 'sec-board':'board'
   };
   function cabPage(name){
     CAB_TAB=name;
@@ -2462,6 +2510,8 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     if(staff && !(DATA && DATA.owner && DATA.owner.is_staff===true)) staff.remove();
     var tcl=document.getElementById('tab-clients');
     if(tcl && !(DATA && DATA.owner && DATA.owner.is_staff===true)) tcl.remove();
+    var tbd=document.getElementById('tab-board');
+    if(tbd && !(DATA && DATA.owner && DATA.owner.is_staff===true)) tbd.remove();
     /* всегда начинаем с обзора: запомненный раздел сбивал с толку —
        человек заходил и видел, например, одни «Заявки» */
     cabPage('overview');
@@ -2471,7 +2521,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     document.querySelector('.wrap').classList.remove('narrow');
     var dn=document.getElementById('demo-note'); if(dn) dn.style.display = DEMO_MODE ? '' : 'none';
     show('app'); $('logout').style.display='';
-    renderPortfolio(); renderTabs(); renderProp(); renderRequests(); renderEditState(); renderModeration(); renderCoords(); renderClients(); initCabNav();
+    renderPortfolio(); renderTabs(); renderProp(); renderRequests(); renderEditState(); renderModeration(); renderCoords(); renderClients(); renderBoard(); initCabNav();
   }
 
   /* Ответ идёт около трёх секунд — столько занимает запуск сценария на стороне
