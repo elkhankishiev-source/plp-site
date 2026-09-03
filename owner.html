@@ -780,6 +780,33 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
   .cab-nav .cab-group{display:none}
   .cab-nav a{border:1px solid var(--line);padding:8px 14px}
 }
+  .clsearch{display:flex;gap:8px;margin:10px 0 0}
+  .clsearch input{flex:1;min-width:0;padding:9px 12px;border:1px solid var(--line);border-radius:9px;font:inherit;background:#fff}
+  .ctable{width:100%;border-collapse:collapse;margin-top:12px;font-size:14px}
+  .ctable th{text-align:left;font-weight:600;color:#7b7f6a;padding:7px 8px;border-bottom:1px solid var(--line);font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+  .ctable td{padding:9px 8px;border-bottom:1px solid #f0f0ea}
+  .clrow{cursor:pointer}
+  .clrow:hover td{background:#fafaf4}
+  .mono{font-variant-numeric:tabular-nums;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px}
+  .mono.big{font-size:16px;font-weight:600}
+  .tmp{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;white-space:nowrap}
+  .t-cold{background:#e8eef5;color:#3d5a80}
+  .t-warm{background:#fdf1dd;color:#8a5a12}
+  .t-hot{background:#fde4de;color:#a33418}
+  .t-client{background:#e4f1e2;color:#2f6b30}
+  .t-lost{background:#f0f0ec;color:#83837a}
+  .ccard{margin-top:16px;padding:16px;border:1px solid var(--line);border-radius:12px;background:#fcfcf8}
+  .chead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:6px}
+  .ccard h3{margin:2px 0 12px}
+  .ccard h4{margin:16px 0 6px;font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:#7b7f6a}
+  .crow{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px 16px}
+  .crow .lbl{display:block;font-size:12px;color:#8b8f7c;margin-bottom:1px}
+  .tline{list-style:none;padding:0;margin:0}
+  .tline li{padding:6px 0;border-bottom:1px solid #f0f0ea;font-size:14px}
+  .tdate{color:#8b8f7c;font-variant-numeric:tabular-nums;margin-right:6px}
+  .clnote{display:flex;gap:8px}
+  .clnote input{flex:1;min-width:0;padding:9px 12px;border:1px solid var(--line);border-radius:9px;font:inherit;background:#fff}
+  @media(max-width:640px){.ctable th:nth-child(3),.ctable td:nth-child(3){display:none}}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 </head>
@@ -993,6 +1020,7 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
       <a data-tab="service">Обслуживание</a>
       <a data-tab="object">Объект</a>
       <a data-tab="actions">Заявки</a>
+      <a data-tab="clients" id="tab-clients">Люди</a>
       <a data-tab="staff" id="tab-staff">Модерация</a>
     </div>
     <div id="cab-body">
@@ -1034,6 +1062,27 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
       и приложите фото — за пять шагов. Мы проверим и оформим карточку.</p>
       <a href="add-property.html" style="display:inline-block;background:var(--txt);color:#fff;
          border-radius:999px;padding:12px 20px;font-size:15px;font-weight:700;text-decoration:none">Разместить объект</a>
+    </div>
+
+    <div class="card" id="sec-clients" style="display:none">
+      <h2>Люди</h2>
+      <p class="sub" style="margin:0 0 12px">У каждого свой номер <b>PLP-xxxxxx</b>. Под ним — весь учёт:
+      откуда пришёл, что писал, какие объекты смотрел, документы и деньги.
+      Холодный — тот, кто пока не оставил номер для связи.</p>
+      <div class="opts" id="cl-filter">
+        <button type="button" class="opt on" data-v="">Все</button>
+        <button type="button" class="opt" data-v="cold">Холодные</button>
+        <button type="button" class="opt" data-v="warm">С номером</button>
+        <button type="button" class="opt" data-v="client">Клиенты</button>
+        <button type="button" class="opt" data-v="lost">Отложены</button>
+      </div>
+      <div class="clsearch">
+        <input id="cl-q" type="text" placeholder="Имя, номер или PLP-001234" autocomplete="off">
+        <button type="button" class="btn ghost" id="cl-go">Найти</button>
+      </div>
+      <div id="cl-sum" class="sub" style="margin:10px 0 0"></div>
+      <div id="cl-list"></div>
+      <div id="cl-card"></div>
     </div>
 
     <div class="card" id="sec-moder" style="display:none">
@@ -1721,6 +1770,113 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     return d;
   }
 
+
+  // ── единая база людей: у каждого свой номер PLP-xxxxxx ──
+  var CL_TEMP='', CL_Q='';
+  function renderClients(){
+    var sec=document.getElementById('sec-clients'); if(!sec) return;
+    if(!(DATA && DATA.owner && DATA.owner.is_staff===true)){ sec.remove(); return; }
+    var fb=document.getElementById('cl-filter');
+    Array.prototype.forEach.call(fb.querySelectorAll('.opt'),function(o){
+      o.onclick=function(){
+        Array.prototype.forEach.call(fb.querySelectorAll('.opt'),function(x){x.classList.remove('on');});
+        o.classList.add('on'); CL_TEMP=o.getAttribute('data-v'); loadClients();
+      };
+    });
+    var go=document.getElementById('cl-go'), qi=document.getElementById('cl-q');
+    if(go) go.onclick=function(){ CL_Q=qi.value.trim(); loadClients(); };
+    if(qi) qi.onkeydown=function(e){ if(e.key==='Enter'){ CL_Q=qi.value.trim(); loadClients(); } };
+    loadClients();
+  }
+  var TEMP_RU={cold:'холодный',warm:'есть номер',hot:'горячий',client:'клиент',lost:'отложен'};
+  var SRC_RU={wa:'WhatsApp',tg:'Telegram',tg_bot:'бот в Telegram',tg_dm:'Telegram',
+              ig:'Instagram',ig_direct:'директ Instagram',ig_comment:'комментарий в Instagram',
+              threads:'Threads',site:'сайт',crm:'CRM',meta_ads:'реклама Meta'};
+  function clEsc(t){ return String(t).replace(/[<>&]/g,function(c){return {'<':'&lt;','>':'&gt;','&':'&amp;'}[c];}); }
+  function clDate(v){ return String(v||'').slice(0,10).split('-').reverse().join('.'); }
+  function loadClients(){
+    var box=document.getElementById('cl-list'); if(!box) return;
+    var cc=document.getElementById('cl-card'); if(cc) cc.innerHTML='';
+    box.innerHTML='<p class="sub">Загружаем…</p>';
+    post({action:'clients',token:TOKEN,temp:CL_TEMP,q:CL_Q,limit:80}).then(function(d){
+      if(!d||!d.ok||!d.data){ box.innerHTML='<p class="sub">Не удалось загрузить.</p>'; return; }
+      var c=d.data.counts||{}, rows=d.data.rows||[];
+      document.getElementById('cl-sum').innerHTML =
+        'Всего в базе <b>'+(d.data.total||0)+'</b> · холодных '+(c.cold||0)+
+        ' · с номером '+(c.warm||0)+' · клиентов '+(c.client||0);
+      if(!rows.length){ box.innerHTML='<p class="sub">Никого не нашлось.</p>'; return; }
+      var h='<table class="ctable"><tr><th>Номер</th><th>Имя</th><th>Откуда</th><th>Состояние</th><th>Последний раз</th></tr>';
+      rows.forEach(function(r){
+        h+='<tr class="clrow" data-code="'+r.code+'"><td class="mono">'+r.code+'</td><td>'+
+           clEsc(r.name||'—')+'</td><td>'+(SRC_RU[r.source]||r.source||'—')+'</td><td><span class="tmp t-'+
+           r.temp+'">'+(TEMP_RU[r.temp]||r.temp)+'</span></td><td>'+clDate(r.last_seen_at)+'</td></tr>';
+      });
+      box.innerHTML=h+'</table>';
+      Array.prototype.forEach.call(box.querySelectorAll('.clrow'),function(tr){
+        tr.onclick=function(){ openClient(tr.getAttribute('data-code')); };
+      });
+    });
+  }
+  function openClient(code){
+    var box=document.getElementById('cl-card'); if(!box) return;
+    box.innerHTML='<p class="sub">Открываем карточку…</p>';
+    post({action:'client_card',token:TOKEN,code:code}).then(function(d){
+      if(!d||!d.ok||!d.card){ box.innerHTML='<p class="sub">Карточка не открылась.</p>'; return; }
+      var k=d.card, c=k.client||{};
+      var chans=(k.channels||[]).map(function(x){return SRC_RU[x.channel]||x.channel;});
+      var INT={buy:'покупка',rent:'аренда',management:'управление',sell:'продажа'};
+      var h='<div class="ccard"><div class="chead"><div><span class="mono big">'+c.code+'</span> '+
+        '<span class="tmp t-'+c.temp+'">'+(TEMP_RU[c.temp]||c.temp)+'</span></div>'+
+        '<button type="button" class="btn ghost" id="cl-close">Закрыть</button></div>'+
+        '<h3>'+clEsc(c.name||'Без имени')+'</h3><div class="crow">'+
+        '<div><span class="lbl">Телефон</span>'+(c.phone||'<i>не оставил</i>')+'</div>'+
+        '<div><span class="lbl">Пришёл</span>'+(SRC_RU[c.source_channel]||c.source_channel||'—')+'</div>'+
+        '<div><span class="lbl">Каналы</span>'+(chans.join(', ')||'—')+'</div>'+
+        '<div><span class="lbl">Интерес</span>'+(INT[c.intent]||'—')+'</div>'+
+        '<div><span class="lbl">Первое касание</span>'+clDate(c.first_seen_at)+'</div>'+
+        '<div><span class="lbl">В amoCRM</span>'+(c.amo_lead_id?('сделка '+c.amo_lead_id):'нет')+'</div></div>';
+      var tl=k.timeline||[];
+      h+='<h4>История</h4>';
+      if(!tl.length){ h+='<p class="sub">Пока пусто — записи появятся с первым сообщением.</p>'; }
+      else {
+        h+='<ul class="tline">';
+        tl.slice(0,25).forEach(function(t){
+          var who=(t.actor==='client'?'клиент':(t.actor==='ai'?'ИИ':'система'));
+          h+='<li><span class="tdate">'+clDate(t.ts)+'</span> '+clEsc(t.title||t.kind)+
+             ' <span class="sub">· '+who+'</span></li>';
+        });
+        h+='</ul>';
+      }
+      var fl=k.files||[];
+      h+='<h4>Файлы</h4>';
+      if(fl.length){
+        h+='<ul class="tline">'+fl.map(function(f){
+          return '<li><a href="'+f.url+'" target="_blank" rel="noopener">'+clEsc(f.title||f.kind||'файл')+'</a></li>';
+        }).join('')+'</ul>';
+      } else {
+        h+='<p class="sub">Документы и фото складываем на Google Диск, здесь останутся ссылки.</p>';
+      }
+      h+='<h4>Пометка</h4><div class="clnote"><input id="cl-note" type="text" placeholder="Что важно помнить об этом человеке">'+
+         '<button type="button" class="btn" id="cl-save">Записать</button></div>'+
+         '<div class="opts" id="cl-temp">'+['cold','warm','hot','client','lost'].map(function(t){
+           return '<button type="button" class="opt'+(t===c.temp?' on':'')+'" data-v="'+t+'">'+TEMP_RU[t]+'</button>';
+         }).join('')+'</div></div>';
+      box.innerHTML=h;
+      box.scrollIntoView({behavior:'smooth',block:'start'});
+      document.getElementById('cl-close').onclick=function(){ box.innerHTML=''; };
+      document.getElementById('cl-save').onclick=function(){
+        var v=document.getElementById('cl-note').value.trim(); if(!v) return;
+        post({action:'client_update',token:TOKEN,code:code,note:v}).then(function(){ openClient(code); });
+      };
+      Array.prototype.forEach.call(document.getElementById('cl-temp').querySelectorAll('.opt'),function(o){
+        o.onclick=function(){
+          post({action:'client_update',token:TOKEN,code:code,temp:o.getAttribute('data-v')})
+            .then(function(){ openClient(code); loadClients(); });
+        };
+      });
+    });
+  }
+
   // ── точки объектов на карте: сотрудник ставит их мышкой ──
   var COMAP=null, COMARK=null, COPICK=null, COITEMS=[];
   function renderCoords(){
@@ -1816,7 +1972,8 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     'sec-money':'money', 'sec-calendar':'calendar', 'sec-reports':'docs',
     'sec-service':'service', 'sec-costs':'costs',
     'sec-edit':'object', 'sec-addobj':'actions', 'sec-request':'actions',
-    'sec-myreq':'actions', 'sec-moder':'staff', 'sec-coords':'staff'
+    'sec-myreq':'actions', 'sec-moder':'staff', 'sec-coords':'staff',
+    'sec-clients':'clients'
   };
   function cabPage(name){
     CAB_TAB=name;
@@ -1855,6 +2012,8 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     });
     var staff=document.getElementById('tab-staff');
     if(staff && !(DATA && DATA.owner && DATA.owner.is_staff===true)) staff.remove();
+    var tcl=document.getElementById('tab-clients');
+    if(tcl && !(DATA && DATA.owner && DATA.owner.is_staff===true)) tcl.remove();
     /* всегда начинаем с обзора: запомненный раздел сбивал с толку —
        человек заходил и видел, например, одни «Заявки» */
     cabPage('overview');
@@ -1864,7 +2023,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     document.querySelector('.wrap').classList.remove('narrow');
     var dn=document.getElementById('demo-note'); if(dn) dn.style.display = DEMO_MODE ? '' : 'none';
     show('app'); $('logout').style.display='';
-    renderPortfolio(); renderTabs(); renderProp(); renderRequests(); renderEditState(); renderModeration(); renderCoords(); initCabNav();
+    renderPortfolio(); renderTabs(); renderProp(); renderRequests(); renderEditState(); renderModeration(); renderCoords(); renderClients(); initCabNav();
   }
 
   /* Ответ идёт около трёх секунд — столько занимает запуск сценария на стороне
