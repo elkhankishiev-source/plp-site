@@ -850,6 +850,8 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
   .upbox{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
   .docbox{margin:8px 0 0;padding:12px;border:1px solid var(--line);border-radius:10px;background:#fcfcf8}
   .tgcode{margin-top:8px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:#fcfcf8}
+  .hintbox{padding:10px 12px;border-left:3px solid var(--green);background:#fbfbf6;border-radius:0 8px 8px 0}
+  .pay-ck{width:16px;height:16px;cursor:pointer}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 </head>
@@ -1118,6 +1120,9 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
 
     <div class="card" id="sec-mine" style="display:none">
       <h2 id="mine-hi">Моя недвижимость</h2>
+      <p class="sub hintbox" style="margin:0 0 14px">Здесь ваши объекты, графики платежей и документы.
+      Всё, что вы сюда добавите, видите вы и ваш менеджер — больше никто.
+      <a href="#" class="lnk" id="my-privacy">Как мы храним ваши данные</a></p>
       <div id="mine-body"></div>
       <h4 style="margin:18px 0 6px">Загрузить договор</h4>
       <p class="sub" style="margin:0 0 8px">Пришлите договор или график платежей — PDF или фото.
@@ -2152,7 +2157,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
              (o.uk_status?('<div><span class="lbl">Управление</span>'+(UK[o.uk_status]||o.uk_status)+'</div>'):'')+
              (o.next_payment_on?('<div><span class="lbl">Следующий платёж</span>'+clDate(o.next_payment_on)+
                (o.next_payment_amount?(' · '+Number(o.next_payment_amount).toLocaleString('ru-RU')+' ฿'):'')+'</div>'):'')+
-             '</div></div>';
+             '</div>'+payTable(o)+'</div>';
         });
         h+='</div>';
       }
@@ -2173,6 +2178,15 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
              clEsc(f.title||f.kind||'документ')+'</a></li>'; }).join('')+'</ul>';
       }
       document.getElementById('mine-body').innerHTML=h;
+      bindPayChecks();
+      var pv=document.getElementById('my-privacy');
+      if(pv) pv.onclick=function(e){ e.preventDefault();
+        var box=document.getElementById('mine-body');
+        var d=document.createElement('div'); d.innerHTML=privacyText();
+        box.insertBefore(d, box.firstChild);
+        d.scrollIntoView({behavior:'smooth',block:'nearest'});
+        document.getElementById('pv-close').onclick=function(){ d.remove(); };
+      };
       // документы: загрузка, разбор, подтверждение
       drawDocs(d.docs||[]);
       var fi=document.getElementById('my-file'), ub=document.getElementById('my-upload');
@@ -2259,6 +2273,57 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
           });
       };
     }).catch(function(){});
+  }
+
+  // короткий и честный ответ на вопрос «а что с моими данными»
+  function privacyText(){
+    return '<div class="ccard"><div class="chead"><h3 style="margin:0">Ваши данные</h3>'+
+      '<button type="button" class="btn ghost" id="pv-close">Закрыть</button></div>'+
+      '<ul class="tline">'+
+      '<li><b>Кто видит.</b> Вашу карточку — вы и ваш менеджер. Другие клиенты не видят ничего.</li>'+
+      '<li><b>Документы.</b> Договоры и графики лежат в закрытом хранилище. Прямой ссылки на них '+
+      'не существует: файл открывается только из кабинета после входа.</li>'+
+      '<li><b>Вход.</b> По вашему номеру, одноразовым кодом в WhatsApp или Telegram. '+
+      'Пароля нет — значит его нельзя подобрать или украсть.</li>'+
+      '<li><b>Зачем нам ваши документы.</b> Чтобы собрать график платежей и напоминать заранее, '+
+      'а не чтобы куда-то передавать. Мы не продаём и не передаём данные третьим лицам.</li>'+
+      '<li><b>Удаление.</b> Напишите нам — удалим документы и закроем кабинет. Без объяснений.</li>'+
+      '<li><b>Уведомления.</b> Пишем только по делу: разобрали документ, подходит платёж, '+
+      'готов отчёт. Не чаще трёх раз в неделю и не ночью. Отключить можно в любой момент.</li>'+
+      '</ul><p class="sub">Подробно — в <a class="lnk" href="/privacy.html" target="_blank" '+
+      'rel="noopener">политике конфиденциальности</a>.</p></div>';
+  }
+
+  // график платежей: галочка ставится, когда платёж прошёл
+  function payTable(o){
+    var pl=o.payment_plan||[];
+    if(!pl.length) return '';
+    var oid=(o.project||o.object_id||'').replace(/"/g,'&quot;');
+    var h='<h4 style="margin:14px 0 6px">График платежей</h4>'+
+          '<table class="ctable inner"><tr><th></th><th>Когда</th><th>Сколько</th><th>За что</th></tr>';
+    pl.forEach(function(x,i){
+      var paid=!!x.paid;
+      h+='<tr'+(paid?' class="tdone"':'')+'><td>'+
+         '<input type="checkbox" class="pay-ck" data-obj="'+oid+'" data-i="'+i+'"'+
+         (paid?' checked':'')+'></td><td>'+(x.date?clDate(x.date):'—')+'</td><td>'+
+         (x.amount?Number(x.amount).toLocaleString('ru-RU'):(x.percent?x.percent+' %':'—'))+
+         '</td><td>'+clEsc(x.note||'')+'</td></tr>';
+    });
+    var done=pl.filter(function(x){return x.paid;}).length;
+    return h+'</table><p class="sub">Отмечено оплаченных: '+done+' из '+pl.length+
+           '. Ставьте галочку, когда платёж прошёл — мы будем напоминать только о том, что впереди.</p>';
+  }
+  function bindPayChecks(){
+    Array.prototype.forEach.call(document.querySelectorAll('.pay-ck'),function(ck){
+      ck.onchange=function(){
+        ck.disabled=true;
+        post({action:'my_payment',token:TOKEN,object_id:ck.getAttribute('data-obj'),
+              index:Number(ck.getAttribute('data-i')),paid:ck.checked})
+          .then(function(r){ ck.disabled=false;
+            if(r&&r.ok) loadMine(); else { ck.checked=!ck.checked;
+              alert((r&&r.error)||'Не сохранилось'); } });
+      };
+    });
   }
 
   function drawDocs(docs){
