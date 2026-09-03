@@ -1736,11 +1736,11 @@ function setCur(c){
   document.querySelectorAll('[data-cur]').forEach(function(b){
     b.classList.toggle('on', b.getAttribute('data-cur')===PL.cur);
   });
-  // перерисовываем всё, где показана цена: сами карточки, окно объекта, сравнение
-  ['renderSale','renderRent','renderDList'].forEach(function(fn){
-    try{ if(typeof window[fn]==='function') window[fn](); }catch(e){}
-  });
-  try{ if(typeof applyFilters==='function') applyFilters(); }catch(e){}
+  /* Перерисовываем всё, где показана цена. Функции живут в этом же замыкании,
+     через window их не достать — зовём напрямую. */
+  try{ renderSale(); }catch(e){}
+  try{ renderRent(); }catch(e){}
+  try{ applyFilters(); }catch(e){}
 }
 function fmtBaht(thb){
   var n=Math.round(thb||0);
