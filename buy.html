@@ -869,6 +869,9 @@ html,body{overflow-x:clip;max-width:100%}
 #toTop.on{opacity:1;pointer-events:auto;transform:none}
 #toTop:hover{background:#fff}
 @media(max-width:600px){#toTop{right:14px;bottom:88px;width:42px;height:42px}}
+  .curswitch{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:#fff}
+  .curswitch button{border:0;background:none;padding:6px 13px;font:inherit;font-weight:600;cursor:pointer;color:var(--muted);line-height:1}
+  .curswitch button.on{background:var(--green);color:var(--ink)}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.6.0/maplibre-gl.min.css">
@@ -981,6 +984,9 @@ section#rent,section#sale{padding-top:10px}
         <option value="price-desc" data-i18n="sort.rich">Сначала дорогие</option>
       </select>
       <span class="chipf" id="favChip" style="display:none" onclick="toggleFavOnly()" data-i18n="f.favs">♥ Избранное</span>
+      <span class="curswitch" title="Валюта показа">
+        <button type="button" data-cur="thb" class="on" onclick="setCur('thb')">฿</button><button type="button" data-cur="usd" onclick="setCur('usd')">$</button>
+      </span>
     </div>
     <div class="carwrap reveal">
       <p class="found" id="found"></p><div class="catrow"><div><div class="car" id="saleCar"></div></div>
@@ -1606,6 +1612,7 @@ PL.DISTRICTS=[
 
 /* ===== LANG STATE ===== */
 PL.lang=(function(){try{return localStorage.getItem('pl_lang')||'ru';}catch(e){return 'ru';}})();
+document.addEventListener('DOMContentLoaded',function(){ try{ setCur(PL.cur); }catch(e){} });
 function t(k){var d=PL.I18N[PL.lang]||PL.I18N.ru;return d[k]!=null?d[k]:(PL.I18N.ru[k]!=null?PL.I18N.ru[k]:k);}
 function loc(o){return (o&&(o[PL.lang]||o.ru))||'';}
 
@@ -1721,7 +1728,30 @@ function fmtTHB(n){return '฿'+Math.round(n).toLocaleString('en-US');}
 /* реальная THB-цена объекта (calc.priceTHB), fallback = priceUSD*RATE */
 function thbOf(p){return (p&&p.calc&&p.calc.priceTHB)?p.calc.priceTHB:Math.round(((p&&p.priceUSD)||0)*RATE);}
 /* клиентский формат цены в батах: «฿4.6 млн» / «฿4.6M» */
-function fmtBaht(thb){var s=(Math.round(thb/1e5)/10).toFixed(1).replace(/\.0$/,'');return '฿'+s+(PL.lang==='en'?'M':' млн');}
+/* Валюта витрины: считаем в батах, показываем в той, что выбрал человек. */
+PL.cur=(function(){try{return localStorage.getItem('pl_cur')||'thb';}catch(e){return 'thb';}})();
+function setCur(c){
+  PL.cur=(c==='usd')?'usd':'thb';
+  try{localStorage.setItem('pl_cur',PL.cur);}catch(e){}
+  document.querySelectorAll('[data-cur]').forEach(function(b){
+    b.classList.toggle('on', b.getAttribute('data-cur')===PL.cur);
+  });
+  // перерисовываем всё, где показана цена: сами карточки, окно объекта, сравнение
+  ['renderSale','renderRent','renderDList'].forEach(function(fn){
+    try{ if(typeof window[fn]==='function') window[fn](); }catch(e){}
+  });
+  try{ if(typeof applyFilters==='function') applyFilters(); }catch(e){}
+}
+function fmtBaht(thb){
+  var n=Math.round(thb||0);
+  if(PL.cur==='usd'){
+    var u=n/RATE;
+    if(u>=1e6) return '$'+(Math.round(u/1e5)/10).toFixed(1).replace(/\.0$/,'')+(PL.lang==='en'?'M':' млн');
+    return '$'+Math.round(u/1000)+(PL.lang==='en'?'K':' тыс');
+  }
+  var s=(Math.round(n/1e5)/10).toFixed(1).replace(/\.0$/,'');
+  return '฿'+s+(PL.lang==='en'?'M':' млн');
+}
 function fmtMoney(v){var n=Number(v);if(!isFinite(n))return String(v);try{return new Intl.NumberFormat(PL.lang==='en'?'en-US':'ru-RU').format(n)+' ฿';}catch(e){return n+' ฿';}}
 function areaOf(p){var a=(p&&p.area)||'';return PL.lang==='en'?a.replace(/м²/g,'m²'):a;}
 /* бюджет-бакет по РЕАЛЬНОЙ THB-цене: b1<฿5млн, b2<฿10млн, b3 ฿10млн+ */
