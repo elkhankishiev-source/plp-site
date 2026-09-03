@@ -21,13 +21,21 @@ function sectionPage(indexHtml,opts){
   const mEnd=indexHtml.indexOf('</main>');
   const head=indexHtml.slice(0,mOpenEnd), tail=indexHtml.slice(mEnd);
   const parts=splitSections(indexHtml.slice(mOpenEnd,mEnd));
-  const picked=opts.sections.map(sel=>{
+  let picked=opts.sections.map(sel=>{
     const f = typeof sel==='number' ? parts.find(p=>p.order===sel) : parts.find(p=>p.id===sel);
     return f?f.html:'';
   }).join('\n');
-  const intro='<section style="padding-bottom:0"><div class="container">'+
-    '<h1 style="font-size:clamp(28px,4.2vw,42px);margin:0 0 10px">'+htmlEsc(opts.h1)+'</h1>'+
-    '<p class="sub" style="max-width:62ch;margin:0">'+htmlEsc(opts.intro)+'</p></div></section>';
+  // компактное вступление: объекты должны попадать на первый экран
+  const intro='<section style="padding:22px 0 0"><div class="container">'+
+    '<h1 style="font-size:clamp(24px,3.2vw,34px);margin:0 0 6px">'+htmlEsc(opts.h1)+'</h1>'+
+    '<p class="sub" style="max-width:62ch;margin:0;font-size:.95rem">'+htmlEsc(opts.intro)+'</p></div></section>';
+  // Заголовок секции дублирует H1 страницы — вдвоём они съедали весь первый
+  // экран, и ни одного объекта не было видно без прокрутки. На внутренней
+  // странице оставляем только H1.
+  picked = picked.replace(
+    /<div class="head-row reveal">\s*<div>\s*<span class="kicker"[^>]*>[\s\S]*?<\/p>\s*<\/div>/,
+    '<div class="head-row reveal"><div>');
+  picked = picked.replace(/\s+aria-labelledby="(sale|rent)-title"/, '');
   let out=head+'\n'+intro+'\n'+picked+'\n'+tail;
   const url=SITE_BASE+'/'+opts.file;
   out=out.replace(/<title>[\s\S]*?<\/title>/,'<title>'+htmlEsc(opts.title)+'</title>');
@@ -51,7 +59,9 @@ function sectionPage(indexHtml,opts){
    чтобы не ломать её ритм. */
 const CATALOG_CSS = `
 <style>
-.catalog .filterbar{margin-top:16px}
+.catalog{padding-top:14px}
+.catalog .filterbar{margin-top:12px}
+.catalog .container>.reveal{margin-bottom:0}
 .catalog .arrows{display:none}
 .catalog .found{margin:14px 0 4px;font-size:.92rem;color:var(--muted)}
 .catalog .found b{color:var(--ink);font-size:1.05rem}
@@ -123,6 +133,7 @@ function asCatalog(html, carId){
   // секцию каталога оборачиваем в две колонки и подкладываем карту
   const openIdx = html.indexOf('<div class="car" id="'+carId+'"></div>');
   if(openIdx < 0) return html;
+
   let out = html.replace('<div class="car" id="'+carId+'"></div>',
     '<p class="found" id="found"></p>'+
     '<div class="catrow"><div><div class="car" id="'+carId+'"></div></div>'+CATALOG_MAP+'</div>');
