@@ -211,6 +211,9 @@ function buildCatalog(objects, benchmarks, preserve) {
       // 30.08 канон №38: «готов/сдан» — ТОЛЬКО из stage='Ready', никогда из даты сдачи.
       ready: o.stage === 'Ready',
       // 03.09: стадия отдельным полем — по ней фильтр и бейдж на карточке
+      // числовой диапазон спален — по нему работает фильтр «Спальни»
+      bmin: (o.bedrooms_min === 0 || o.bedrooms_min) ? o.bedrooms_min : null,
+      bmax: (o.bedrooms_max === 0 || o.bedrooms_max) ? o.bedrooms_max : null,
       stage_key: (function(){
         var st = String(o.stage || '').toLowerCase();
         if (st === 'ready') return 'ready';
@@ -601,7 +604,8 @@ async function main() {
     '&order=plp_property_id' +
     '&select=plp_property_id,name,district,beach,purpose,type,price_from_thb,price_to_thb,' +
     'bedrooms,bedrooms_min,bedrooms_max,area_sqm,area_min,area_max,roi,rental_yield_pct,' +
-    'capital_growth_pct,handover_date,status,stage,developer,distance_beach_m,usp,usp_en,' +
+    'capital_growth_pct,handover_date,status,stage,developer,distance_beach_m,usp,usp_en,'+
+    'bedrooms_min,bedrooms_max,' +
     'season_rates,occupancy_est_pct,maintenance_fee_thb_sqm,lat,lng,coord_source,last_synced_at,availability');
   const benchmarks = await sbGet(env,
     'rental_benchmarks?select=district,unit_type,disp_yield_low_pct,disp_yield_high_pct');
