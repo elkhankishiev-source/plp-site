@@ -111,11 +111,8 @@ const CATALOG_JS = `
   window.PLP_MAP_FILTER=function(){ return visiblePids(); };
   function sync(){ countFound(); if(window.renderMapReal){ try{ window.PLPMAP && window.drawPinsExternal && window.drawPinsExternal(); }catch(e){} } }
 
-  /* фильтры перерисовывают список — ловим это и обновляем счётчик с картой */
-  var oldApply = window.applyFilters;
-  if(typeof oldApply==='function'){
-    window.applyFilters=function(){ var r=oldApply.apply(this,arguments); setTimeout(sync,30); return r; };
-  }
+  /* каталог зовёт нас после каждой фильтрации — обновляем счётчик и карту */
+  window.PLP_AFTER_FILTER=function(){ setTimeout(sync, 20); };
   document.addEventListener('mouseover', function(e){
     var card=e.target.closest && e.target.closest('.catalog .car .prop');
     if(!card||!card.dataset.pid) return;
