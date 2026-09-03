@@ -1127,6 +1127,13 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
     <div class="tabs" id="prop-tabs"></div>
     <div id="prop"></div>
 
+    <div class="card" id="sec-objedit" style="display:none">
+      <h2>Карточка объекта</h2>
+      <p class="sub" style="margin:0 0 10px">Правьте прямо здесь — что впишете, то и сохранится
+      в объекте и на сайте. Пустое поле оставит прежнее значение.</p>
+      <div id="oe-body"></div>
+    </div>
+
     <div class="card" id="sec-edit">
       <h2>Дополнить карточку объекта</h2>
       <p class="sub" style="margin:0 0 4px">Вы знаете свой объект лучше всех. Напишите, что важно —
@@ -1452,6 +1459,165 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
 
   /* Доход по месяцам столбиками: сразу видно сезонность и провалы.
      Берём закрытые отчёты по всем объектам и складываем по месяцу. */
+  /* Правка карточки объекта: каждое поле редактируется, сохранённое значение
+     подставляется в следующий раз — вводить заново не нужно. */
+  var OE_FIELDS=[
+    ['name','Название'], ['district','Район'], ['type','Тип'],
+    ['bedrooms','Спальни'], ['area_sqm','Площадь'], ['stage','Стадия'],
+    ['handover_date','Сдача','date'], ['price_from_thb','Цена от, ฿','number'],
+    ['price_to_thb','Цена до, ฿','number'], ['roi','Доходность, %','number'],
+    ['first_payment','Первый взнос, %','number'], ['payment_plan','Рассрочка'],
+    ['developer','Застройщик'], ['ownership','Форма владения'],
+    ['view_type','Вид из окон'], ['beach','Пляж'],
+    ['availability','Свободно'], ['brochure_url','Брошюра, ссылка'],
+    ['floorplan_url','Планировки, ссылка'], ['video_url','Видео, ссылка'],
+    ['amenities','Что есть','area'], ['nearby','Что рядом','area'], ['usp','Описание','area']
+  ];
+  function renderObjEdit(){
+    var sec=document.getElementById('sec-objedit'); if(!sec) return;
+    if(!(DATA.owner&&DATA.owner.is_staff===true)){ sec.remove(); return; }
+    sec.style.display='';
+    var p=(DATA.properties||[])[CUR]||{}, o=p.object||{}, ab=p.about||{}, md=p.media||{};
+    var cur={ name:p.name, district:p.district, bedrooms:p.bedrooms, stage:p.stage,
+              area_sqm:ab.area_sqm, handover_date:ab.handover_date, developer:ab.developer,
+              ownership:ab.ownership, view_type:ab.view_type, amenities:ab.amenities,
+              nearby:ab.nearby, usp:ab.usp, brochure_url:md.brochure_url,
+              floorplan_url:md.floorplan_url, video_url:md.video_url };
+    var h='<p class="sub">Объект: <b>'+clEsc(p.name||p.id||'—')+'</b></p><div class="fgrid">';
+    OE_FIELDS.forEach(function(f){
+      var k=f[0], label=f[1], kind=f[2]||'text';
+      var v=(cur[k]===null||cur[k]===undefined)?'':String(cur[k]);
+      if(kind==='date') v=v.slice(0,10);
+      h+= (kind==='area')
+        ? '<label class="wide">'+label+'<textarea id="oe-'+k+'" class="cmtext" rows="2">'+clEsc(v)+'</textarea></label>'
+        : '<label>'+label+'<input id="oe-'+k+'" type="'+(kind==='number'?'number':kind)+'" value="'+
+          clEsc(v).replace(/"/g,'&quot;')+'"></label>';
+    });
+    h+='</div><div class="fbtns"><button type="button" class="btn" id="oe-save">Сохранить</button>'+
+       '<span class="sub" id="oe-msg"></span></div>';
+    document.getElementById('oe-body').innerHTML=h;
+    document.getElementById('oe-save').onclick=function(){
+      var patch={}, n=0;
+      OE_FIELDS.forEach(function(f){
+        var el=document.getElementById('oe-'+f[0]); if(!el) return;
+        var v=(el.value||'').trim();
+        if(v && v!==String(cur[f[0]]||'')){ patch[f[0]]=v; n++; }
+      });
+      if(!n){ document.getElementById('oe-msg').textContent='Ничего не изменилось.'; return; }
+      var btn=this; btn.disabled=true;
+      post({action:'object_edit',token:TOKEN,property_id:(p.id||''),patch:patch}).then(function(r){
+        btn.disabled=false;
+        document.getElementById('oe-msg').textContent =
+          (r&&r.ok) ? ('Сохранено полей: '+r['полей']+'. На сайте обновится при следующей сборке.')
+                    : ((r&&r.error)||'Не сохранилось');
+        if(r&&r.ok) loadData();
+      });
+    };
+  }
+
+  /* Отчёт: собираем страницу с деталями и отдаём на печать или в PDF.
+     Печать браузера сохраняет в PDF — отдельная библиотека не нужна. */
+  function buildReport(){
+    var props=DATA.properties||[];
+    if(!props.length){ alert('Пока нет объектов, по которым делать отчёт.'); return; }
+    var months=allMonths();
+    var rows=(CHART_RANGE==='all')?months:months.slice(-(CHART_RANGE||12));
+    var inc=rows.reduce(function(a,m){return a+m.income;},0);
+    var exp=rows.reduce(function(a,m){return a+m.expenses;},0);
+    var net=rows.reduce(function(a,m){return a+m.net;},0);
+    var who=(DATA.owner&&DATA.owner.name)||'';
+    var period=rows.length?(monthName(rows[0].month)+' — '+monthName(rows[rows.length-1].month)):'';
+
+    var h='<div class="rep">'+
+      '<div class="rep-head"><div><div class="rep-brand">Property Library Phuket</div>'+
+      '<h1>Отчёт по управлению</h1>'+
+      '<p>'+esc(who)+(period?(' · '+period):'')+' · подготовлен '+
+      new Date().toLocaleDateString('ru-RU')+'</p></div></div>'+
+      '<div class="rep-sum"><div><span>Поступило</span><b>'+money(inc,'THB')+'</b></div>'+
+      '<div><span>Расходы</span><b>'+money(exp,'THB')+'</b></div>'+
+      '<div><span>Итог</span><b>'+money(net,'THB')+'</b></div></div>';
+
+    // по месяцам
+    if(rows.length){
+      h+='<h2>По месяцам</h2><table class="rep-t"><tr><th>Месяц</th><th>Поступило</th>'+
+         '<th>Расходы</th><th>Итог</th></tr>';
+      rows.forEach(function(m){
+        h+='<tr><td>'+monthName(m.month)+'</td><td>'+money(m.income,'THB')+'</td><td>'+
+           money(m.expenses,'THB')+'</td><td><b>'+money(m.net,'THB')+'</b></td></tr>';
+      });
+      h+='</table>';
+      // расходы по статьям за весь период
+      var cats={};
+      rows.forEach(function(m){ Object.keys(m.cats||{}).forEach(function(c){
+        cats[c]=(cats[c]||0)+m.cats[c]; }); });
+      var ck=Object.keys(cats).sort(function(a,b){return cats[b]-cats[a];});
+      if(ck.length){
+        h+='<h2>Из чего сложились расходы</h2><table class="rep-t">'+
+           '<tr><th>Статья</th><th>Сумма</th><th>Доля</th></tr>';
+        ck.forEach(function(c){
+          h+='<tr><td>'+esc(c)+'</td><td>'+money(cats[c],'THB')+'</td><td>'+
+             (exp?Math.round(cats[c]/exp*100):0)+' %</td></tr>';
+        });
+        h+='</table>';
+      }
+    }
+
+    // по объектам
+    h+='<h2>Объекты</h2>';
+    props.forEach(function(p){
+      var pm=(p.months||[]);
+      var pi=pm.reduce(function(a,m){return a+(Number(m.income)||0);},0);
+      var pe=pm.reduce(function(a,m){return a+(Number(m.expenses)||0);},0);
+      h+='<div class="rep-obj"><h3>'+esc(p.name||p.id)+'</h3>'+
+         '<p>'+esc([p.district,p.bedrooms&&(p.bedrooms+' спальни'),p.stage].filter(Boolean).join(' · '))+'</p>'+
+         '<table class="rep-t"><tr><th>Поступило</th><th>Расходы</th><th>Итог</th>'+
+         '<th>Заездов</th><th>Работ</th></tr><tr>'+
+         '<td>'+money(pi,'THB')+'</td><td>'+money(pe,'THB')+'</td><td><b>'+
+         money(pi-pe,'THB')+'</b></td><td>'+((p.bookings||[]).length)+'</td><td>'+
+         ((p.tasks_all||[]).length)+'</td></tr></table>';
+      var bk=(p.bookings||[]).slice(0,10);
+      if(bk.length){
+        h+='<table class="rep-t"><tr><th>Заезд</th><th>Выезд</th><th>Гость</th><th>Сумма</th></tr>';
+        bk.forEach(function(b){
+          h+='<tr><td>'+dmy(b.check_in)+'</td><td>'+dmy(b.check_out)+'</td><td>'+
+             esc(b.guest_name||'—')+'</td><td>'+(b.amount_thb?money(b.amount_thb,'THB'):'—')+'</td></tr>';
+        });
+        h+='</table>';
+      }
+      h+='</div>';
+    });
+
+    h+='<p class="rep-foot">Property Library Phuket · property-library.com · '+
+       'Отчёт сформирован из данных кабинета. Вопросы — вашему менеджеру.</p></div>';
+
+    var w=window.open('','_blank');
+    if(!w){ alert('Браузер заблокировал окно отчёта — разрешите всплывающие окна.'); return; }
+    w.document.write('<!doctype html><html lang="ru"><head><meta charset="utf-8">'+
+      '<title>Отчёт — Property Library Phuket</title><style>'+
+      'body{font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif;color:#14120e;margin:0;padding:32px;background:#fff}'+
+      '.rep{max-width:820px;margin:0 auto}'+
+      '.rep-brand{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#5F6242}'+
+      'h1{font-size:26px;margin:6px 0 4px}h2{font-size:17px;margin:26px 0 8px}'+
+      'h3{font-size:15px;margin:0 0 2px}'+
+      '.rep-head p{color:#6b6b60;margin:0}'+
+      '.rep-sum{display:flex;gap:14px;margin:18px 0 6px;flex-wrap:wrap}'+
+      '.rep-sum div{flex:1;min-width:150px;border:1px solid #e6e5dd;border-radius:12px;padding:12px 14px}'+
+      '.rep-sum span{display:block;font-size:12px;color:#8b8f7c}'+
+      '.rep-sum b{font-size:19px}'+
+      '.rep-t{width:100%;border-collapse:collapse;margin:8px 0 14px;font-size:13px}'+
+      '.rep-t th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.05em;'+
+      'color:#8b8f7c;border-bottom:1px solid #e6e5dd;padding:6px 8px}'+
+      '.rep-t td{padding:7px 8px;border-bottom:1px solid #f1f0e9}'+
+      '.rep-obj{border:1px solid #e6e5dd;border-radius:14px;padding:14px 16px;margin:12px 0}'+
+      '.rep-obj p{color:#6b6b60;font-size:13px;margin:0 0 6px}'+
+      '.rep-foot{margin-top:28px;padding-top:12px;border-top:1px solid #e6e5dd;'+
+      'color:#8b8f7c;font-size:12px}'+
+      '@media print{body{padding:0}.rep-obj{break-inside:avoid}}'+
+      '</style></head><body>'+h+'</body></html>');
+    w.document.close();
+    setTimeout(function(){ try{ w.focus(); w.print(); }catch(e){} }, 400);
+  }
+
   /* Формы внесения по объекту: операция, работа, документ.
      Открываются окном, после сохранения кабинет обновляется. */
   function bindUkForms(){
@@ -1724,7 +1890,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
 
     $('portfolio').innerHTML=h;
     var rb=document.getElementById('ov-report');
-    if(rb) rb.onclick=function(){ cabPage('docs'); };
+    if(rb) rb.onclick=function(){ buildReport(); };
     bindNowActions(p);
   }
 
@@ -3340,7 +3506,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     'sec-money':'money', 'sec-calendar':'calendar', 'sec-reports':'docs',
     'sec-docs':'docs',
     'sec-service':'service', 'sec-costs':'costs',
-    'sec-edit':'object', 'sec-addobj':'actions', 'sec-request':'actions',
+    'sec-edit':'object', 'sec-objedit':'object', 'sec-addobj':'actions', 'sec-request':'actions',
     'sec-myreq':'actions', 'sec-moder':'staff', 'sec-coords':'staff',
     'sec-clients':'clients', 'sec-mine':'mine', 'sec-board':'board', 'sec-camp':'camp'
   };
@@ -3407,7 +3573,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     document.querySelector('.wrap').classList.remove('narrow');
     var dn=document.getElementById('demo-note'); if(dn) dn.style.display = DEMO_MODE ? '' : 'none';
     show('app'); $('logout').style.display='';
-    renderPortfolio(); renderTabs(); renderProp(); renderRequests(); renderEditState(); renderModeration(); renderCoords(); renderClients(); renderBoard(); renderCamp(); renderRequestForm(); bindChart(); bindUkForms(); initCabNav();
+    renderPortfolio(); renderTabs(); renderProp(); renderRequests(); renderEditState(); renderModeration(); renderCoords(); renderClients(); renderBoard(); renderCamp(); renderRequestForm(); bindChart(); bindUkForms(); renderObjEdit(); initCabNav();
   }
 
   /* Ответ идёт около трёх секунд — столько занимает запуск сценария на стороне
