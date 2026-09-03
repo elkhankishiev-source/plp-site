@@ -63,6 +63,18 @@ function sectionPage(indexHtml,opts){
 /* Раскладка каталога: сетка карточек слева, живая карта справа.
    Включается только на buy.html и rent.html — главная остаётся каруселью,
    чтобы не ломать её ритм. */
+/* На страницах-разделах фильтры должны быть узкой полосой, а не колонкой
+   во весь экран: объекты обязаны попадать в первый экран. */
+const COMPACT_CSS = `
+<style>
+#rentFilters{flex-direction:row!important;flex-wrap:wrap;align-items:center;gap:8px!important;margin-top:12px!important}
+#rentFilters .rf-lab,#rentFilters>span.kicker{display:none}
+#rentFilters .rf-more{margin-top:0;margin-left:auto}
+#rentDateFilter{margin-top:10px}
+#rentDateFilter .df-status{font-size:.8rem;margin-top:6px}
+section#rent,section#sale{padding-top:10px}
+</style>`;
+
 const CATALOG_CSS = `
 <style>
 .catalog{padding-top:14px}
@@ -165,6 +177,7 @@ for(const p of pages){
     html=html.replace('</head>', CATALOG_CSS+'\n</head>');
     html=html.replace('</body>', CATALOG_JS+'\n</body>');
   }
+  html=html.replace('</head>', COMPACT_CSS+'\n</head>');
   fs.writeFileSync(path.join(ROOT,p.file),html);
   console.log(p.file,'—',html.length,'байт, секций:',p.sections.length,p.catalogCar?'(каталог с картой)':'');
 }
