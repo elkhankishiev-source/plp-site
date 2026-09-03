@@ -1373,6 +1373,10 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
 function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.toggle("on",!!v);document.body.style.overflow=v?"hidden":"";}
 (function(){
   var API='https://proplib.app.n8n.cloud/webhook/uk-owner';
+  /* Хранилище: сюда кладём файл для рассылки. Ключ публичный и ограничен
+     на стороне базы — писать можно только в свои папки. */
+  var SB='https://dyxufgjrumebvrhadjun.supabase.co';
+  var ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR5eHVmZ2pydW1lYnZyaGFkanVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyMzcxOTYsImV4cCI6MjA5MzgxMzE5Nn0.VLIX0d-OGqZfDpS6WWaBaGkEsTxWa4iQhCozRqOcEAo';
   var LS='plp_owner_session';
   var $=function(id){return document.getElementById(id);};
   var DATA=null, CUR=0, TOKEN=null, DEMO_MODE=false;
@@ -1613,7 +1617,9 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       '.rep-foot{margin-top:28px;padding-top:12px;border-top:1px solid #e6e5dd;'+
       'color:#8b8f7c;font-size:12px}'+
       '@media print{body{padding:0}.rep-obj{break-inside:avoid}}'+
-      '</style></head><body>'+h+'</body></html>');
+      '  .stay-go{cursor:pointer;border-radius:10px;transition:background .15s}
+  .stay-go:hover{background:#f7f8ee}
+</style></head><body>'+h+'</body></html>');
     w.document.close();
     setTimeout(function(){ try{ w.focus(); w.print(); }catch(e){} }, 400);
   }
@@ -1705,6 +1711,53 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
           else alert((r&&r.error)||'Не сохранилось');
         });
       });
+  }
+
+  /* Заезд открывается окном: кто, когда, сколько, по какому объекту
+     и что с этим можно сделать. */
+  var STAYS=[];
+  function bindStays(){
+    Array.prototype.forEach.call(document.querySelectorAll('.stay-go'),function(el){
+      el.onclick=function(){ openStay(Number(el.getAttribute('data-i'))); };
+    });
+  }
+  function openStay(i){
+    var r=STAYS[i]; if(!r) return;
+    var d=new Date(r.ci+'T00:00:00');
+    var nights=r.co?Math.round((new Date(r.co)-d)/86400000):null;
+    var BST={upcoming:'ожидается',checked_in:'проживает',checked_out:'выехал',
+             cancelled:'отменена',hold:'бронь',pending:'ждёт оплаты',paid:'оплачена'};
+    var perNight=(r.sum&&nights)?Math.round(r.sum/nights):null;
+    clForm('<h3>'+clEsc(r.who)+'</h3>'+
+      '<div class="crow">'+
+      '<div><span class="lbl">Объект</span>'+clEsc(r.obj||'—')+'</div>'+
+      '<div><span class="lbl">Заезд</span>'+dmy(r.ci)+'</div>'+
+      '<div><span class="lbl">Выезд</span>'+(r.co?dmy(r.co):'—')+'</div>'+
+      (nights?'<div><span class="lbl">Ночей</span>'+nights+'</div>':'')+
+      '<div><span class="lbl">Сумма</span>'+(r.sum?money(r.sum,'THB'):'—')+'</div>'+
+      (perNight?'<div><span class="lbl">За ночь</span>'+money(perNight,'THB')+'</div>':'')+
+      '<div><span class="lbl">Состояние</span>'+(BST[r.st]||r.st||'—')+'</div>'+
+      '</div>'+
+      '<h4>Что можно сделать</h4>'+
+      '<div class="fbtns">'+
+      '<button type="button" class="btn ghost" id="st-clean">Заказать уборку</button>'+
+      '<button type="button" class="btn ghost" id="st-check">Проверить объект</button>'+
+      '<button type="button" class="btn ghost" id="f-cancel">Закрыть</button></div>',
+      null);
+    var mk=function(kind, note){
+      return function(){
+        var pid=null;
+        (DATA.properties||[]).forEach(function(p){ if((p.name||p.id)===r.obj) pid=p.id; });
+        post({action:'uk_task',token:TOKEN,property_id:pid,kind:kind,
+              due:r.co||r.ci,note:note+' · '+r.who}).then(function(x){
+          document.getElementById('cl-form').innerHTML='';
+          document.body.style.overflow='';
+          if(x&&x.ok) loadData(); else alert((x&&x.error)||'Не получилось');
+        });
+      };
+    };
+    var a=document.getElementById('st-clean'); if(a) a.onclick=mk('cleaning','уборка после гостя');
+    var b2=document.getElementById('st-check'); if(b2) b2.onclick=mk('check','проверка после выезда');
   }
 
   /* Доход по месяцам: можно выбрать период и раскрыть любой месяц —
@@ -1839,16 +1892,18 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
              .sort(function(a,b){return a.ci<b.ci?-1:1;}).slice(0,4);
     if(!rows.length) return '';
     var MON=['ЯНВ','ФЕВ','МАР','АПР','МАЙ','ИЮН','ИЮЛ','АВГ','СЕН','ОКТ','НОЯ','ДЕК'];
-    var items=rows.map(function(r){
+    STAYS=rows;
+    var items=rows.map(function(r,i){
       var d=new Date(r.ci+'T00:00:00');
       var nights=r.co?Math.round((new Date(r.co)-d)/86400000):null;
-      return '<div class="stay">'+
+      return '<div class="stay stay-go" data-i="'+i+'" title="нажмите — покажу подробности">'+
         '<div class="st-date"><b>'+String(d.getDate()).padStart(2,'0')+'</b><span>'+MON[d.getMonth()]+'</span></div>'+
         '<div class="st-who"><b>'+esc(r.who)+'</b>'+
           '<span>'+dmy(r.ci)+(r.co?' — '+dmy(r.co):'')+(nights?' · '+nights+' ноч.':'')+'</span></div>'+
         '<div class="st-sum">'+(r.sum?money(r.sum,'THB'):'')+'</div></div>';
     }).join('');
-    return '<div class="card"><h2>Ближайшие заезды</h2>'+items+'</div>';
+    return '<div class="card"><h2>Ближайшие заезды</h2>'+items+
+           '<p class="sub" style="margin:10px 0 0">Нажмите на заезд — подробности и что можно сделать.</p></div>';
   }
 
   function renderPortfolio(){
@@ -3063,7 +3118,14 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         'Если пришлёте договор — система соберёт график платежей и будет напоминать заранее.</textarea>'+
         '<h4>Что приложить</h4>'+
         '<div class="fgrid"><label class="wide">Ссылка на объект или расчёт'+
-        '<div id="cm-offer"></div></label></div>'+
+        '<div id="cm-offer"></div></label>'+
+        '<label class="wide">Файл — уйдёт вторым сообщением'+
+        '<div class="upbox"><input id="cm-file" type="file" hidden '+
+        'accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx">'+
+        '<button type="button" class="btn ghost" id="cm-filebtn">Выбрать файл</button>'+
+        '<span class="sub" id="cm-filename">не выбран</span></div>'+
+        '<span class="sub">Первым идёт текст, через несколько секунд — файл. '+
+        'Так он не выглядит спамом и реже блокируется.</span></label></div>'+
         '<h4>Кому отправляем</h4>'+
         '<div class="fgrid"><label class="wide">Получатели<div id="cm-who"></div></label>'+
         '<label class="wide">Или вставьте номера списком'+
@@ -3088,6 +3150,34 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         }
       });
       pickWho.set(people.filter(function(p){return p.temp==='client';}).map(function(p){return p.code;}));
+
+      // файл кладём в хранилище офферов и передаём ссылкой
+      var ATTACH={url:null,name:null};
+      var fb=document.getElementById('cm-filebtn'), fi=document.getElementById('cm-file');
+      if(fb) fb.onclick=function(){ fi.click(); };
+      if(fi) fi.onchange=function(){
+        var f=fi.files&&fi.files[0]; if(!f) return;
+        if(f.size>15*1024*1024){ alert('Файл больше 15 МБ — WhatsApp такой не пропустит'); return; }
+        var nm=document.getElementById('cm-filename');
+        nm.textContent='загружаем «'+f.name+'»…';
+        var safe=f.name.replace(/[^a-zA-Z0-9._-]/g,'_').slice(-60);
+        var key='campaign/'+Date.now()+'_'+safe;
+        var xhr=new XMLHttpRequest();
+        xhr.open('POST', SB+'/storage/v1/object/offers/'+key, true);
+        xhr.setRequestHeader('Authorization','Bearer '+ANON);
+        xhr.setRequestHeader('apikey',ANON);
+        xhr.setRequestHeader('x-upsert','true');
+        if(f.type) xhr.setRequestHeader('Content-Type',f.type);
+        xhr.onload=function(){
+          if(xhr.status>=200&&xhr.status<300){
+            ATTACH.url=SB+'/storage/v1/object/public/offers/'+key;
+            ATTACH.name=f.name;
+            nm.textContent='приложен: '+f.name;
+          } else { nm.textContent='не загрузился'; }
+        };
+        xhr.onerror=function(){ nm.textContent='не загрузился'; };
+        xhr.send(f);
+      };
       document.getElementById('cmp-cancel').onclick=function(){ box.innerHTML=''; };
       document.getElementById('cm-all').onclick=function(){
         pickWho.add(people.filter(function(p){return p.temp==='client';}).map(function(p){return p.code;}));
@@ -3123,7 +3213,8 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
               name:fv('cm-name')||'Рассылка',purpose:fv('cm-purpose'),
               template:document.getElementById('cm-text').value,
               codes:codes,channel:(fr[1]==='telegram'?'tg':'wa'),
-              from_id:fr[0],from_label:fr[2],per_day:Number(fv('cm-perday')||20)})
+              from_id:fr[0],from_label:fr[2],per_day:Number(fv('cm-perday')||20),
+              attach_url:ATTACH.url,attach_name:ATTACH.name})
           .then(function(r){
             if(r&&r.ok){ box.innerHTML=''; loadCamps(); campOpen(r.id); }
             else alert((r&&r.error)||'Не собралось');
@@ -3573,7 +3664,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     document.querySelector('.wrap').classList.remove('narrow');
     var dn=document.getElementById('demo-note'); if(dn) dn.style.display = DEMO_MODE ? '' : 'none';
     show('app'); $('logout').style.display='';
-    renderPortfolio(); renderTabs(); renderProp(); renderRequests(); renderEditState(); renderModeration(); renderCoords(); renderClients(); renderBoard(); renderCamp(); renderRequestForm(); bindChart(); bindUkForms(); renderObjEdit(); initCabNav();
+    renderPortfolio(); renderTabs(); renderProp(); renderRequests(); renderEditState(); renderModeration(); renderCoords(); renderClients(); renderBoard(); renderCamp(); renderRequestForm(); bindChart(); bindUkForms(); bindStays(); renderObjEdit(); initCabNav();
   }
 
   /* Ответ идёт около трёх секунд — столько занимает запуск сценария на стороне
