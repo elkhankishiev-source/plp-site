@@ -73,6 +73,14 @@ const COMPACT_CSS = `
 #rentDateFilter{margin-top:10px}
 #rentDateFilter .df-status{font-size:.8rem;margin-top:6px}
 section#rent,section#sale{padding-top:10px}
+@media(max-width:700px){
+  /* на телефоне блок дат и фильтры не должны занимать весь экран */
+  #rentDateFilter .df-fields{gap:8px}
+  #rentFilters{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-left:-14px;margin-right:-14px;padding:2px 14px 6px}
+  #rentFilters::-webkit-scrollbar{display:none}
+  #rentFilters .rf-more{margin-left:8px}
+  #rentDateFilter .df-status{display:none}
+}
 </style>`;
 
 const CATALOG_CSS = `
