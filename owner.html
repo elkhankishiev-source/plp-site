@@ -1935,6 +1935,15 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         h+='</ul><p class="sub"><a href="#" class="lnk" id="cl-addtask">Поставить задачу</a></p>';
       }
 
+      var fx=k.facts||{};
+      var fk=Object.keys(fx);
+      if(fk.length){
+        h+='<h4>Что мы о нём знаем</h4><div class="crow">';
+        fk.forEach(function(key){
+          h+='<div><span class="lbl">'+clEsc(key)+'</span>'+clEsc(fx[key])+'</div>';
+        });
+        h+='</div><p class="sub">Из карточек amoCRM и разговоров.</p>';
+      }
       h+='<h4>Контакты</h4>';
       var cl2=(k.channels||[]);
       if(!cl2.length){ h+='<p class="sub">Контактов нет.</p>'; }
