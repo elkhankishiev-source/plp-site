@@ -818,6 +818,9 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
   .fgrid label.wide{grid-column:1/-1}
   .fgrid input,.fgrid select{width:100%;box-sizing:border-box;margin-top:3px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font:inherit;background:#fff;color:inherit}
   .fbtns{display:flex;gap:8px;margin-top:14px}
+  .ogrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:12px}
+  .obox{padding:14px;border:1px solid var(--line);border-radius:12px;background:#fcfcf8}
+  .obox h3{margin:0 0 8px;font-size:16px}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 </head>
@@ -1031,6 +1034,7 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
       <a data-tab="service">Обслуживание</a>
       <a data-tab="object">Объект</a>
       <a data-tab="actions">Заявки</a>
+      <a data-tab="mine" id="tab-mine" style="display:none">Моя недвижимость</a>
       <a data-tab="clients" id="tab-clients">Люди</a>
       <a data-tab="staff" id="tab-staff">Модерация</a>
     </div>
@@ -1073,6 +1077,25 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
       и приложите фото — за пять шагов. Мы проверим и оформим карточку.</p>
       <a href="add-property.html" style="display:inline-block;background:var(--txt);color:#fff;
          border-radius:999px;padding:12px 20px;font-size:15px;font-weight:700;text-decoration:none">Разместить объект</a>
+    </div>
+
+    <div class="card" id="sec-mine" style="display:none">
+      <h2 id="mine-hi">Моя недвижимость</h2>
+      <div id="mine-body"></div>
+      <h4 style="margin:18px 0 6px">Написать нам</h4>
+      <div class="fgrid">
+        <label>О чём<select id="my-kind">
+          <option value="вопрос">вопрос</option>
+          <option value="платёж">платёж</option>
+          <option value="документы">документы</option>
+          <option value="управление">сдача в аренду</option>
+          <option value="продажа">продажа объекта</option>
+          <option value="ремонт">ремонт и обслуживание</option>
+        </select></label>
+        <label class="wide">Что нужно<input id="my-text" type="text" placeholder="Опишите коротко"></label>
+      </div>
+      <div class="fbtns"><button type="button" class="btn" id="my-send">Отправить</button></div>
+      <div class="ok" id="my-ok"></div>
     </div>
 
     <div class="card" id="sec-clients" style="display:none">
@@ -1922,6 +1945,10 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       } else {
         h+='<p class="sub">Документы и фото складываем на Google Диск, здесь останутся ссылки.</p>';
       }
+      h+='<h4>Доступ в кабинет</h4>'+
+         (c.cabinet_enabled
+           ? '<p class="sub">Вход открыт. Заходит по своему номеру на /owner.html — код приходит в WhatsApp или Telegram.</p>'
+           : '<p class="sub">Пока доступа нет. <a href="#" class="lnk" id="cl-portal">Открыть вход</a> — человек сможет заходить по своему номеру и видеть свои объекты, шаги и документы.</p>');
       h+='<h4>Пометка</h4><div class="clnote"><input id="cl-note" type="text" placeholder="Что важно помнить об этом человеке">'+
          '<button type="button" class="btn" id="cl-save">Записать</button></div>'+
          '<div class="opts" id="cl-temp">'+['cold','warm','hot','client','lost'].map(function(t){
@@ -1934,6 +1961,12 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         var v=document.getElementById('cl-note').value.trim(); if(!v) return;
         post({action:'client_update',token:TOKEN,code:code,note:v}).then(function(){ openClient(code); });
       };
+      var pp=document.getElementById('cl-portal');
+      if(pp) pp.onclick=function(e){ e.preventDefault();
+        post({action:'client_portal',token:TOKEN,code:code}).then(function(r){
+          if(r&&r.ok) alert('Готово. Вход по номеру '+r.login+', код придёт в '+r.channel+'.');
+          else alert((r&&r.error)||'Не получилось открыть доступ.');
+          openClient(code); }); };
       var ao=document.getElementById('cl-addobj');
       if(ao) ao.onclick=function(e){ e.preventDefault(); objForm(code); };
       var at=document.getElementById('cl-addtask');
@@ -1952,6 +1985,66 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     });
   }
 
+
+  // личный кабинет клиента: он видит свои объекты, шаги и документы
+  function loadMine(){
+    post({action:'me',token:TOKEN}).then(function(d){
+      var tab=document.getElementById('tab-mine'), sec=document.getElementById('sec-mine');
+      if(!d||!d.ok||!d.me){ if(tab) tab.remove(); if(sec) sec.remove(); return; }
+      if(tab) tab.style.display='';
+      document.getElementById('mine-hi').textContent =
+        (d.me.name? (d.me.name+', ваша недвижимость') : 'Моя недвижимость');
+      var h='<p class="sub">Ваш номер в системе: <b class="mono">'+d.me.code+'</b>'+
+            (d.me.manager?(' · ведёт '+clEsc(d.me.manager)):'')+'</p>';
+      var ob=d.objects||[];
+      if(!ob.length){ h+='<p class="sub">Объекты появятся здесь, как только оформим сделку.</p>'; }
+      else {
+        h+='<div class="ogrid">';
+        ob.forEach(function(o){
+          var UK={none:'не в управлении',planned:'готовим к сдаче',contract:'договор подписан',active:'сдаём для вас'};
+          h+='<div class="obox"><h3>'+clEsc(o.project||'Объект')+(o.unit?(' · '+clEsc(o.unit)):'')+'</h3>'+
+             '<div class="crow">'+
+             (o.stage?('<div><span class="lbl">Стадия</span>'+clEsc(o.stage)+'</div>'):'')+
+             (o.handover_on?('<div><span class="lbl">Сдача</span>'+clDate(o.handover_on)+'</div>'):'')+
+             (o.uk_status?('<div><span class="lbl">Управление</span>'+(UK[o.uk_status]||o.uk_status)+'</div>'):'')+
+             (o.next_payment_on?('<div><span class="lbl">Следующий платёж</span>'+clDate(o.next_payment_on)+
+               (o.next_payment_amount?(' · '+Number(o.next_payment_amount).toLocaleString('ru-RU')+' ฿'):'')+'</div>'):'')+
+             '</div></div>';
+        });
+        h+='</div>';
+      }
+      var st=d.steps||[];
+      if(st.length){
+        h+='<h4 style="margin:18px 0 6px">Что сейчас происходит</h4><ul class="tline">';
+        st.forEach(function(t){
+          var done=(t.status==='done');
+          h+='<li'+(done?' class="tdone"':'')+'>'+(t.due_on?('<span class="tdate">'+clDate(t.due_on)+'</span> '):'')+
+             clEsc(t.title)+(t.details?(' <span class="sub">· '+clEsc(t.details)+'</span>'):'')+'</li>';
+        });
+        h+='</ul>';
+      }
+      var fl=d.files||[];
+      if(fl.length){
+        h+='<h4 style="margin:18px 0 6px">Ваши документы</h4><ul class="tline">'+
+           fl.map(function(f){ return '<li><a href="'+f.url+'" target="_blank" rel="noopener">'+
+             clEsc(f.title||f.kind||'документ')+'</a></li>'; }).join('')+'</ul>';
+      }
+      document.getElementById('mine-body').innerHTML=h;
+      var sb=document.getElementById('my-send');
+      if(sb) sb.onclick=function(){
+        var t=document.getElementById('my-text').value.trim();
+        if(!t){ alert('Напишите, что нужно'); return; }
+        sb.disabled=true;
+        post({action:'my_request',token:TOKEN,kind:document.getElementById('my-kind').value,text:t})
+          .then(function(r){
+            sb.disabled=false;
+            if(r&&r.ok){ document.getElementById('my-text').value='';
+              document.getElementById('my-ok').textContent='Приняли. Менеджер свяжется с вами.'; }
+            else { document.getElementById('my-ok').textContent='Не отправилось, попробуйте ещё раз.'; }
+          });
+      };
+    }).catch(function(){});
+  }
 
   // формы: завести человека, добавить объект, поставить задачу, доска задач
   function clForm(html, onSave){
@@ -2155,7 +2248,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     'sec-service':'service', 'sec-costs':'costs',
     'sec-edit':'object', 'sec-addobj':'actions', 'sec-request':'actions',
     'sec-myreq':'actions', 'sec-moder':'staff', 'sec-coords':'staff',
-    'sec-clients':'clients'
+    'sec-clients':'clients', 'sec-mine':'mine'
   };
   function cabPage(name){
     CAB_TAB=name;
@@ -2234,7 +2327,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       DATA=d; CUR=0;
       try{ localStorage.setItem(CACHE, JSON.stringify({token:TOKEN,at:Date.now(),data:d})); }catch(e){}
       if(d.owner&&d.owner.must_change_password){ show('pwd'); return; }
-      draw(); markStale(false);
+      draw(); markStale(false); loadMine();
     }).catch(function(){
       if(shown){ markStale(false, 'нет связи — показаны последние данные'); return; }
       gateStep('phone'); $('gate-err').textContent='Нет связи с сервером. Попробуйте позже.';
