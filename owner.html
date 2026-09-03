@@ -821,6 +821,7 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
   .ogrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:12px}
   .obox{padding:14px;border:1px solid var(--line);border-radius:12px;background:#fcfcf8}
   .obox h3{margin:0 0 8px;font-size:16px}
+  .sub.warn{color:#a33418}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 </head>
@@ -1129,7 +1130,7 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
       <div class="clbar">
         <button type="button" class="btn ghost" id="cl-new">+ Завести человека</button>
         <button type="button" class="btn ghost" id="cl-board">Что горит</button>
-        <button type="button" class="btn ghost" id="cl-dupes">Сверка дублей</button>
+        <button type="button" class="btn ghost" id="cl-dupes">Битые номера</button>
       </div>
       <div id="cl-form"></div>
       <div id="cl-list"></div>
@@ -1959,9 +1960,14 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         });
         h+='</ul>';
       }
+      var PHW={broken_prefix:'у номера обрезан код страны — впишите полный',
+               short:'номер слишком короткий',test:'тестовый номер'};
+      if(c.phone_status && c.phone_status!=='ok'){
+        h+='<p class="sub warn">⚠ '+(PHW[c.phone_status]||c.phone_status)+'</p>';
+      }
       h+='<p class="sub">У человека может быть несколько номеров — все ведут в эту же карточку. '+
          '<a href="#" class="lnk" id="cl-addch">Добавить контакт</a> · '+
-         '<a href="#" class="lnk" id="cl-sim">Найти дубли</a></p>';
+         '<a href="#" class="lnk" id="cl-sim">Проверить совпадения</a></p>';
       h+='<div id="cl-simbox"></div>';
 
       var tl=k.timeline||[];
@@ -2026,11 +2032,13 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         post({action:'client_similar',token:TOKEN,code:code}).then(function(r){
           var arr=(r&&r.similar)||[];
           if(!arr.length){ box.innerHTML='<p class="sub">Похожих карточек нет.</p>'; return; }
-          var hh='<table class="ctable inner"><tr><th>Номер</th><th>Имя</th><th>Телефон</th><th>Сделок</th><th></th></tr>';
+          var hh='<p class="sub">Совпадения точные: тот же номер, почта или телеграм. '+
+                 'Объединять — только если вы уверены.</p>'+
+                 '<table class="ctable inner"><tr><th>Номер</th><th>Имя</th><th>Телефон</th><th>Сделок</th><th></th></tr>';
           arr.forEach(function(x){
             hh+='<tr><td class="mono">'+x.code+'</td><td>'+clEsc(x.name||'—')+'</td><td>'+
                 (x.phone||'—')+'</td><td>'+(x.deals||0)+'</td><td>'+
-                '<a href="#" class="lnk mrg" data-drop="'+x.code+'">это он же</a></td></tr>';
+                clEsc(x.why||'')+' · <a href="#" class="lnk mrg" data-drop="'+x.code+'">это он же</a></td></tr>';
           });
           box.innerHTML=hh+'</table>';
           Array.prototype.forEach.call(box.querySelectorAll('.mrg'),function(a){
@@ -2150,44 +2158,45 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     }).catch(function(){});
   }
 
-  // сверка дублей: решает человек, система только показывает похожих
+  // битые номера: только показываем, что не так. Ничего не сливаем и не удаляем —
+  // номер правит человек, обычно достаточно дописать цифру кода страны.
   function dupesBoard(){
     var box=document.getElementById('cl-form');
-    box.innerHTML='<div class="ccard"><p class="sub">Ищем похожих…</p></div>';
-    post({action:'client_dupes',token:TOKEN,limit:60}).then(function(d){
-      var pr=(d&&d.pairs)||[];
-      var h='<div class="ccard"><div class="chead"><h3 style="margin:0">Похожие карточки</h3>'+
+    box.innerHTML='<div class="ccard"><p class="sub">Проверяем номера…</p></div>';
+    post({action:'phone_issues',token:TOKEN,limit:80}).then(function(d){
+      var data=(d&&d.data)||{}, rows=data.rows||[], cnt=data.counts||{};
+      var WHY={broken_prefix:'обрезан код страны',short:'слишком короткий',test:'тестовый'};
+      var h='<div class="ccard"><div class="chead"><h3 style="margin:0">Битые номера</h3>'+
             '<button type="button" class="btn ghost" id="f-cancel">Закрыть</button></div>'+
-            '<p class="sub">Совпадают последние девять цифр номера, но имена написаны по-разному. '+
-            'Решаете вы: один это человек или разные.</p>';
-      if(!pr.length){ h+='<p class="sub">Спорных пар не осталось.</p>'; }
+            '<p class="sub">Номера с обрезанной цифрой кода страны и прочий брак из CRM. '+
+            'Карточки не трогаем — просто впишите правильный номер. '+
+            'Всего: обрезанных '+(cnt.broken_prefix||0)+', коротких '+(cnt.short||0)+
+            ', тестовых '+(cnt.test||0)+'.</p>';
+      if(!rows.length){ h+='<p class="sub">Всё в порядке.</p>'; }
       else {
-        h+='<table class="ctable inner"><tr><th>Первая</th><th>Вторая</th><th></th></tr>';
-        pr.forEach(function(x){
-          var a=x.a||{}, b=x.b||{};
-          h+='<tr><td><span class="mono">'+a.code+'</span><br>'+clEsc(a.name||'—')+
-             '<br><span class="sub">'+(a.phone||'—')+' · сделок '+(a.deals||0)+
-             ' · с '+clDate(a.first)+'</span></td>'+
-             '<td><span class="mono">'+b.code+'</span><br>'+clEsc(b.name||'—')+
-             '<br><span class="sub">'+(b.phone||'—')+' · сделок '+(b.deals||0)+
-             ' · с '+clDate(b.first)+'</span></td>'+
-             '<td><a href="#" class="lnk dp-same" data-id="'+x.id+'">это один</a><br>'+
-             '<a href="#" class="lnk dp-diff" data-id="'+x.id+'">разные</a></td></tr>';
+        h+='<table class="ctable inner"><tr><th>Номер</th><th>Имя</th><th>Что не так</th>'+
+           '<th>Похоже на</th><th>Сделок</th><th></th></tr>';
+        rows.forEach(function(r){
+          h+='<tr><td class="mono">'+r.code+'<br><span class="sub">'+(r.phone||'—')+'</span></td>'+
+             '<td>'+clEsc(r.name||'—')+'</td><td>'+(WHY[r.status]||r.status)+'</td>'+
+             '<td class="mono">'+(r.looks_like||'—')+'</td><td>'+(r.deals||0)+'</td>'+
+             '<td><a href="#" class="lnk ph-fix" data-code="'+r.code+'" data-cur="'+
+             (r.phone||'')+'" data-hint="'+(r.looks_like||'')+'">исправить</a></td></tr>';
         });
         h+='</table>';
       }
       box.innerHTML=h+'</div>';
       document.getElementById('f-cancel').onclick=function(){ box.innerHTML=''; };
-      function decide(id, same){
-        post({action:'client_dupe_decide',token:TOKEN,id:id,same:same})
-          .then(function(){ dupesBoard(); loadClients(); });
-      }
-      Array.prototype.forEach.call(box.querySelectorAll('.dp-same'),function(a){
+      Array.prototype.forEach.call(box.querySelectorAll('.ph-fix'),function(a){
         a.onclick=function(e){ e.preventDefault();
-          if(confirm('Объединить? Вся история перейдёт в первую карточку.')) decide(a.getAttribute('data-id'), true); };
-      });
-      Array.prototype.forEach.call(box.querySelectorAll('.dp-diff'),function(a){
-        a.onclick=function(e){ e.preventDefault(); decide(a.getAttribute('data-id'), false); };
+          var cur=a.getAttribute('data-cur'), hint=a.getAttribute('data-hint');
+          var v=prompt('Правильный номер для '+a.getAttribute('data-code')+':', hint||cur);
+          if(!v) return;
+          post({action:'phone_fix',token:TOKEN,code:a.getAttribute('data-code'),phone:v})
+            .then(function(r){
+              if(r&&r.ok){ dupesBoard(); loadClients(); }
+              else alert((r&&r.error)||'Не сохранилось'); });
+        };
       });
     });
   }
