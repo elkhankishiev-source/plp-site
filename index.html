@@ -2817,8 +2817,11 @@ function buildRentChips(){
 }
 function resetRentFilters(){
   activeRent.loc.clear();activeRent.type.clear();activeRent.beds.clear();activeRent.amen.clear();
-  buildRentChips();applyRentFilters();
+  buildRentChips();applyRentFilters();finishRentFilters();
 }
+/* после сборки фильтров аренды сворачиваем их в меню */
+function finishRentFilters(){ try{ groupRentMenus(); }catch(e){} }
+
 function applyRentFilters(){
   var visible=0,freeVisible=0;
   document.querySelectorAll('#rentCar .prop').forEach(function(el){
@@ -2917,6 +2920,32 @@ var FILTER_MENUS=[
       {v:'0',t:'Студия'},{v:'1',t:'1'},{v:'2',t:'2'},{v:'3',t:'3'},{v:'4',t:'4 и больше'}]},
   {key:'stage',  label:'Стадия'}
 ];
+/* Аренда рисует фильтры своими группами «подпись + чипы» — сворачиваем их
+   в такие же кнопки с выпадающим списком, чтобы поведение было одинаковым. */
+function groupRentMenus(){
+  var bar=document.getElementById('rentFilters');
+  if(!bar || bar.dataset.grouped) return;
+  var groups=Array.prototype.slice.call(bar.querySelectorAll('.rf-group'));
+  if(!groups.length) return;
+  var extra=Array.prototype.slice.call(bar.children).filter(function(e){ return !e.classList.contains('rf-group'); });
+  bar.innerHTML=''; bar.dataset.grouped='1'; bar.classList.add('fbar-menus');
+  groups.forEach(function(g){
+    var label=(g.querySelector('.rf-label')||{}).textContent||'Фильтр';
+    var chips=g.querySelector('.rf-chips');
+    var wrap=document.createElement('div'); wrap.className='fmenu';
+    var btn=document.createElement('button'); btn.type='button'; btn.className='fbtn';
+    btn.innerHTML='<span class="fb-t">'+label+'</span><span class="fb-v"></span><i>▾</i>';
+    var pan=document.createElement('div'); pan.className='fpan';
+    if(chips) Array.prototype.slice.call(chips.children).forEach(function(c){ pan.appendChild(c); });
+    wrap.appendChild(btn); wrap.appendChild(pan); bar.appendChild(wrap);
+    btn.onclick=function(e){ e.stopPropagation(); wrap.classList.toggle('open'); closeOthers(wrap); };
+    pan.addEventListener('click', function(){ setTimeout(syncMenuLabels, 30); });
+  });
+  extra.forEach(function(e){ bar.appendChild(e); });
+  document.addEventListener('click', function(){ closeOthers(null); });
+  syncMenuLabels();
+}
+
 function buildFilterMenus(barId){
   var bar=document.getElementById(barId);
   if(!bar || bar.dataset.grouped) return;
