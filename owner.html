@@ -860,10 +860,15 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
   .pill:hover{background:#fafaf4}
   .msgprev{white-space:pre-wrap;font:inherit;font-size:13px;margin:8px 0 0;padding:10px;
            background:#fff;border:1px solid var(--line);border-radius:8px;color:#3a3a34}
-  .clsplit{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:16px;margin-top:12px;align-items:start}
-  @media(max-width:900px){.clsplit{grid-template-columns:1fr}}
-  .clsplit #cl-list{max-height:640px;overflow:auto}
-  .clsplit #cl-card{position:sticky;top:12px;max-height:calc(100vh - 40px);overflow:auto}
+  .modal[hidden]{display:none}
+  .modal{position:fixed;inset:0;z-index:200;display:flex;align-items:flex-start;justify-content:center;padding:28px 16px}
+  .modal-back{position:absolute;inset:0;background:rgba(20,18,14,.42);backdrop-filter:blur(2px)}
+  .modal-win{position:relative;width:min(760px,100%);max-height:calc(100vh - 56px);overflow:auto;
+             background:var(--paper);border-radius:18px;box-shadow:var(--shadow-lg)}
+  .modal-win .ccard{margin:0;border:0;background:none;padding:22px 24px}
+  .modal-win .chead{position:sticky;top:0;background:var(--paper);padding:4px 0 10px;margin:0 0 4px;z-index:2}
+  @media(max-width:640px){.modal{padding:0}.modal-win{max-height:100vh;border-radius:0}
+    .modal-win .ccard{padding:16px 14px}}
   .clrow.on td{background:#f2f3e6}
   .empty{padding:24px 16px;text-align:center;border:1px dashed var(--line);border-radius:12px;background:#fcfcf8}
   .opts.tight .opt{padding:5px 11px;font-size:12px}
@@ -1243,9 +1248,10 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
         <button type="button" class="btn ghost" id="cl-dupes">Битые номера</button>
       </div>
       <div id="cl-form"></div>
-      <div class="clsplit">
-        <div id="cl-list"></div>
-        <div id="cl-card"><p class="sub empty">Выберите человека слева — карточка откроется здесь.</p></div>
+      <div id="cl-list"></div>
+      <div id="cl-modal" class="modal" hidden>
+        <div class="modal-back"></div>
+        <div class="modal-win"><div id="cl-card"></div></div>
       </div>
     </div>
 
@@ -2005,8 +2011,19 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       });
     });
   }
+  function closeClient(){
+    var m=document.getElementById('cl-modal');
+    if(m){ m.hidden=true; document.body.style.overflow=''; }
+  }
   function openClient(code){
     var box=document.getElementById('cl-card'); if(!box) return;
+    var m=document.getElementById('cl-modal');
+    if(m){
+      m.hidden=false; document.body.style.overflow='hidden';
+      var bk=m.querySelector('.modal-back');
+      if(bk) bk.onclick=closeClient;
+      document.onkeydown=function(e){ if(e.key==='Escape') closeClient(); };
+    }
     box.innerHTML='<p class="sub">Открываем карточку…</p>';
     post({action:'client_card',token:TOKEN,code:code}).then(function(d){
       if(!d||!d.ok||!d.card){ box.innerHTML='<p class="sub">Карточка не открылась.</p>'; return; }
@@ -2054,6 +2071,8 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
 
       var tk=k.tasks||[];
       h+='<h4>Что нужно сделать</h4>';
+      h+='<p class="sub"><a href="#" class="lnk" id="cl-req">Оформить заявку за клиента</a> — '+
+         'бронь, ремонт, уборка, документы, что угодно.</p>';
       if(!tk.length){ h+='<p class="sub">Задач нет. <a href="#" class="lnk" id="cl-addtask">Поставить</a></p>'; }
       else {
         h+='<ul class="tline">';
@@ -2142,8 +2161,8 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
          '<div class="clnote"><input id="cl-note" type="text" placeholder="Что важно помнить об этом человеке">'+
          '<button type="button" class="btn ghost" id="cl-save">Записать</button></div></div>';
       box.innerHTML=h;
-      box.scrollIntoView({behavior:'smooth',block:'start'});
-      document.getElementById('cl-close').onclick=function(){ box.innerHTML=''; };
+      var win=box.closest('.modal-win'); if(win) win.scrollTop=0;
+      document.getElementById('cl-close').onclick=closeClient;
       document.getElementById('cl-save').onclick=function(){
         var v=document.getElementById('cl-note').value.trim(); if(!v) return;
         post({action:'client_update',token:TOKEN,code:code,note:v}).then(function(){ openClient(code); });
@@ -2194,6 +2213,8 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       if(ao) ao.onclick=function(e){ e.preventDefault(); objForm(code); };
       var at=document.getElementById('cl-addtask');
       if(at) at.onclick=function(e){ e.preventDefault(); taskForm(code); };
+      var rq=document.getElementById('cl-req');
+      if(rq) rq.onclick=function(e){ e.preventDefault(); reqForClient(code, c.name); };
       Array.prototype.forEach.call(box.querySelectorAll('.done-task'),function(a){
         a.onclick=function(e){ e.preventDefault();
           post({action:'client_task_set',token:TOKEN,task_id:a.getAttribute('data-id'),status:'done'})
@@ -2530,6 +2551,66 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     };
   }
 
+  /* Заявка за клиента прямо из его карточки: человек уже выбран,
+     вид работ — из списка или свой, объекты сначала его. */
+  function reqForClient(code, who){
+    clForm('<h3>Заявка за '+clEsc(who||code)+'</h3>'+
+      '<p class="sub">Ляжет в его карточку и в работу. Собственник объекта получит уведомление.</p>'+
+      '<div class="fgrid">'+
+      '<label class="wide">Объект<div id="q-obj"></div></label>'+
+      '<label class="wide">Что нужно<div id="q-kind"></div></label>'+
+      '<label class="wide" id="q-own-wrap" style="display:none">Своими словами'+
+      '<input id="q-own" type="text" placeholder="например: организовать трансфер из аэропорта"></label>'+
+      '</div>'+
+      '<div class="fgrid" id="q-dates" style="display:none">'+
+      '<label>Заезд<input id="q-from" type="date"></label>'+
+      '<label>Выезд<input id="q-to" type="date"></label>'+
+      '<label>Гостей<input id="q-guests" type="number" min="1" max="20"></label>'+
+      '<label>Сумма, ฿<input id="q-amount" type="number" min="0" step="1000"></label>'+
+      '</div>'+
+      '<div class="fgrid"><label class="wide">Подробности'+
+      '<textarea id="q-details" class="cmtext" rows="3" placeholder="Что именно требуется"></textarea></label></div>'+
+      '<div class="fbtns"><button type="button" class="btn" id="f-save">Оформить</button>'+
+      '<button type="button" class="btn ghost" id="f-cancel">Отмена</button></div>',
+      function(){
+        var kind=(Q_KIND&&Q_KIND.get()[0])||'';
+        if(!kind){ alert('Выберите, что нужно'); return; }
+        var own=fv('q-own');
+        if(kind==='own' && !own){ alert('Опишите, что нужно'); return; }
+        if(kind==='booking' && (!fv('q-from')||!fv('q-to'))){ alert('Укажите заезд и выезд'); return; }
+        post({action:'request_new',token:TOKEN,client_code:code,
+              kind:(kind==='own'?'other':kind),
+              property_id:(Q_OBJ&&Q_OBJ.get()[0])||null,
+              details:(kind==='own'?(own+'. '):'')+fv('q-details'),
+              date_from:fv('q-from')||null,date_to:fv('q-to')||null,
+              guests:fv('q-guests')||null,amount:fv('q-amount')||null})
+          .then(function(r){
+            if(r&&r.ok){
+              document.getElementById('cl-form').innerHTML='';
+              document.body.style.overflow='';
+              openClient(code);
+            } else alert((r&&r.error)||'Не оформилось');
+          });
+      });
+    var KINDS=REQ_KINDS.concat([{id:'own',title:'Другое — опишу сам'}]);
+    Q_KIND=pickList('q-kind',{ multi:false, placeholder:'что нужно', items:KINDS,
+      onChange:function(ids){
+        document.getElementById('q-dates').style.display=(ids[0]==='booking')?'':'none';
+        document.getElementById('q-own-wrap').style.display=(ids[0]==='own')?'':'none';
+      }});
+    Q_OBJ=pickList('q-obj',{ multi:false, placeholder:'без объекта', items:REQ_ALLOBJ });
+    post({action:'client_objects',token:TOKEN,code:code}).then(function(d){
+      var his=(d&&d.rows)||[];
+      if(!his.length) return;
+      var ids={}; his.forEach(function(x){ ids[x.id]=1; });
+      Q_OBJ=pickList('q-obj',{ multi:false, placeholder:'объекты этого человека',
+        items: his.concat(REQ_ALLOBJ.filter(function(x){ return !ids[x.id]; })
+          .map(function(x){ return {id:x.id,title:x.title,sub:x.sub+' · каталог'}; })) });
+      if(his.length===1) Q_OBJ.set([his[0].id]);
+    });
+  }
+  var Q_KIND=null, Q_OBJ=null;
+
   // рассылка: собрать список, утвердить текст, выбрать номер, отправлять порциями
   var CMP_CH=[], CMP_PICK=[];
   function renderCamp(){
@@ -2788,7 +2869,9 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   // номер правит человек, обычно достаточно дописать цифру кода страны.
   function dupesBoard(){
     var box=document.getElementById('cl-form');
-    box.innerHTML='<div class="ccard"><p class="sub">Проверяем номера…</p></div>';
+    box.innerHTML='<div class="modal"><div class="modal-back"></div><div class="modal-win">'+
+                  '<div class="ccard"><p class="sub">Проверяем номера…</p></div></div></div>';
+    document.body.style.overflow='hidden';
     post({action:'phone_issues',token:TOKEN,limit:80}).then(function(d){
       var data=(d&&d.data)||{}, rows=data.rows||[], cnt=data.counts||{};
       var WHY={broken_prefix:'обрезан код страны',short:'слишком короткий',test:'тестовый'};
@@ -2811,8 +2894,12 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         });
         h+='</table>';
       }
-      box.innerHTML=h+'</div>';
-      document.getElementById('f-cancel').onclick=function(){ box.innerHTML=''; };
+      box.innerHTML='<div class="modal"><div class="modal-back"></div><div class="modal-win">'+
+                    h+'</div></div></div>';
+      var bk2=box.querySelector('.modal-back');
+      var shut=function(){ box.innerHTML=''; document.body.style.overflow=''; };
+      if(bk2) bk2.onclick=shut;
+      document.getElementById('f-cancel').onclick=shut;
       Array.prototype.forEach.call(box.querySelectorAll('.ph-fix'),function(a){
         a.onclick=function(e){ e.preventDefault();
           var cur=a.getAttribute('data-cur'), hint=a.getAttribute('data-hint');
@@ -2830,9 +2917,13 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   // формы: завести человека, добавить объект, поставить задачу, доска задач
   function clForm(html, onSave){
     var box=document.getElementById('cl-form'); if(!box) return;
-    box.innerHTML='<div class="ccard">'+html+'</div>';
-    box.scrollIntoView({behavior:'smooth',block:'nearest'});
-    var c=document.getElementById('f-cancel'); if(c) c.onclick=function(){ box.innerHTML=''; };
+    box.innerHTML='<div class="modal"><div class="modal-back"></div>'+
+                  '<div class="modal-win"><div class="ccard">'+html+'</div></div></div>';
+    document.body.style.overflow='hidden';
+    var bk=box.querySelector('.modal-back');
+    if(bk) bk.onclick=function(){ box.innerHTML=''; document.body.style.overflow=''; };
+    var c=document.getElementById('f-cancel');
+    if(c) c.onclick=function(){ box.innerHTML=''; document.body.style.overflow=''; };
     var sv=document.getElementById('f-save'); if(sv) sv.onclick=onSave;
   }
   function fv(id){ var e=document.getElementById(id); return e?e.value.trim():''; }
@@ -2910,7 +3001,9 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   }
   function tasksBoard(){
     var box=document.getElementById('cl-form');
-    box.innerHTML='<div class="ccard"><p class="sub">Собираем задачи…</p></div>';
+    box.innerHTML='<div class="modal"><div class="modal-back"></div><div class="modal-win">'+
+                  '<div class="ccard"><p class="sub">Собираем задачи…</p></div></div></div>';
+    document.body.style.overflow='hidden';
     post({action:'client_tasks',token:TOKEN,days:90}).then(function(d){
       var t=(d&&d.tasks)||[];
       var h='<div class="ccard"><div class="chead"><h3 style="margin:0">Что горит</h3>'+
@@ -2925,8 +3018,12 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         });
         h+='</table>';
       }
-      box.innerHTML=h+'</div>';
-      document.getElementById('f-cancel').onclick=function(){ box.innerHTML=''; };
+      box.innerHTML='<div class="modal"><div class="modal-back"></div><div class="modal-win">'+
+                    h+'</div></div></div>';
+      var bk2=box.querySelector('.modal-back');
+      var shut=function(){ box.innerHTML=''; document.body.style.overflow=''; };
+      if(bk2) bk2.onclick=shut;
+      document.getElementById('f-cancel').onclick=shut;
       Array.prototype.forEach.call(box.querySelectorAll('.clrow'),function(tr){
         tr.onclick=function(){ openClient(tr.getAttribute('data-code')); };
       });
