@@ -1452,33 +1452,210 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
 
   /* Доход по месяцам столбиками: сразу видно сезонность и провалы.
      Берём закрытые отчёты по всем объектам и складываем по месяцу. */
-  function monthChart(){
+  /* Формы внесения по объекту: операция, работа, документ.
+     Открываются окном, после сохранения кабинет обновляется. */
+  function bindUkForms(){
+    Array.prototype.forEach.call(document.querySelectorAll('[data-uk]'),function(a){
+      a.onclick=function(e){
+        e.preventDefault();
+        var what=a.getAttribute('data-uk'), pid=a.getAttribute('data-pid');
+        if(what==='tx') ukTxForm(pid);
+        else if(what==='task') ukTaskForm(pid);
+        else if(what==='doc') ukDocForm(pid);
+      };
+    });
+  }
+  function ukTxForm(pid){
+    clForm('<h3>Операция по объекту</h3>'+
+      '<div class="fgrid">'+
+      '<label>Что это<select id="u-kind"><option value="expense">Расход</option>'+
+      '<option value="income">Доход</option></select></label>'+
+      '<label>Сумма, ฿<input id="u-amount" type="number" min="1" step="100"></label>'+
+      '<label>Дата<input id="u-date" type="date" value="'+new Date().toISOString().slice(0,10)+'"></label>'+
+      '<label>Статья<select id="u-cat">'+
+        ['аренда','уборка','ремонт','коммунальные','обслуживание','комиссия управления',
+         'налоги','мебель','страховка','прочее'].map(function(c){
+          return '<option value="'+c+'">'+c+'</option>'; }).join('')+
+      '</select></label>'+
+      '<label class="wide">Комментарий<input id="u-note" type="text" placeholder="за что именно"></label>'+
+      '<label class="wide">Ссылка на чек<input id="u-rec" type="text" placeholder="необязательно"></label>'+
+      '</div><div class="fbtns"><button type="button" class="btn" id="f-save">Внести</button>'+
+      '<button type="button" class="btn ghost" id="f-cancel">Отмена</button></div>',
+      function(){
+        if(!fv('u-amount')){ alert('Укажите сумму'); return; }
+        post({action:'uk_tx',token:TOKEN,property_id:pid,kind:fv('u-kind'),
+              amount:fv('u-amount'),category:fv('u-cat'),date:fv('u-date'),
+              note:fv('u-note'),receipt:fv('u-rec')}).then(function(r){
+          if(r&&r.ok){ document.getElementById('cl-form').innerHTML='';
+            document.body.style.overflow=''; loadData(); }
+          else alert((r&&r.error)||'Не сохранилось');
+        });
+      });
+  }
+  function ukTaskForm(pid){
+    clForm('<h3>Работа по объекту</h3>'+
+      '<div class="fgrid">'+
+      '<label>Что сделать<select id="u-tkind">'+
+        [['cleaning','Уборка'],['repair','Ремонт'],['check','Проверка'],
+         ['laundry','Стирка и бельё'],['pool','Бассейн'],['garden','Сад'],
+         ['other','Другое']].map(function(k){
+          return '<option value="'+k[0]+'">'+k[1]+'</option>'; }).join('')+
+      '</select></label>'+
+      '<label>Срок<input id="u-due" type="date"></label>'+
+      '<label>Ожидаемая стоимость, ฿<input id="u-cost" type="number" min="0" step="100"></label>'+
+      '<label class="wide">Подробности<input id="u-tnote" type="text" placeholder="что именно нужно"></label>'+
+      '</div><div class="fbtns"><button type="button" class="btn" id="f-save">Поставить</button>'+
+      '<button type="button" class="btn ghost" id="f-cancel">Отмена</button></div>',
+      function(){
+        post({action:'uk_task',token:TOKEN,property_id:pid,kind:fv('u-tkind'),
+              due:fv('u-due'),cost:fv('u-cost'),note:fv('u-tnote')}).then(function(r){
+          if(r&&r.ok){ document.getElementById('cl-form').innerHTML='';
+            document.body.style.overflow=''; loadData(); }
+          else alert((r&&r.error)||'Не сохранилось');
+        });
+      });
+  }
+  function ukDocForm(pid){
+    clForm('<h3>Документ по объекту</h3>'+
+      '<p class="sub">Файлы держим на Google Диске — сюда кладём ссылку. '+
+      'Так документ не потеряется и его видно всем, кому нужно.</p>'+
+      '<div class="fgrid">'+
+      '<label class="wide">Название<input id="u-dtitle" type="text" placeholder="Договор управления от 12.05"></label>'+
+      '<label class="wide">Ссылка<input id="u-durl" type="text" placeholder="https://drive.google.com/..."></label>'+
+      '<label>Вид<select id="u-dkind">'+
+        [['contract','Договор'],['act','Акт'],['report','Отчёт'],['plan','Планировка'],
+         ['invoice','Счёт'],['photo','Фото'],['other','Другое']].map(function(k){
+          return '<option value="'+k[0]+'">'+k[1]+'</option>'; }).join('')+
+      '</select></label>'+
+      '<label>Заметка<input id="u-dnote" type="text"></label>'+
+      '</div><div class="fbtns"><button type="button" class="btn" id="f-save">Добавить</button>'+
+      '<button type="button" class="btn ghost" id="f-cancel">Отмена</button></div>',
+      function(){
+        if(!fv('u-dtitle')||!fv('u-durl')){ alert('Нужны название и ссылка'); return; }
+        post({action:'uk_doc',token:TOKEN,property_id:pid,title:fv('u-dtitle'),
+              url:fv('u-durl'),kind:fv('u-dkind'),note:fv('u-dnote')}).then(function(r){
+          if(r&&r.ok){ document.getElementById('cl-form').innerHTML='';
+            document.body.style.overflow=''; loadData(); }
+          else alert((r&&r.error)||'Не сохранилось');
+        });
+      });
+  }
+
+  /* Доход по месяцам: можно выбрать период и раскрыть любой месяц —
+     видно, из чего сложился результат и какие именно были расходы. */
+  var CHART_RANGE=12, CHART_OPEN=null;
+  function allMonths(){
     var by={};
     (DATA.properties||[]).forEach(function(p){
-      (p.statements||[]).forEach(function(st){
-        var k=String(st.period||'').slice(0,7);
-        if(!/^\d{4}-\d{2}$/.test(k)) return;
-        by[k]=(by[k]||0)+(Number(st.net)||0);
+      (p.months||[]).forEach(function(m){
+        if(!by[m.month]) by[m.month]={month:m.month,income:0,expenses:0,net:0,cats:{},items:[]};
+        var b=by[m.month];
+        b.income+=Number(m.income)||0; b.expenses+=Number(m.expenses)||0;
+        b.net+=Number(m.net)||0;
+        (m.by_category||[]).forEach(function(c){
+          b.cats[c.category]=(b.cats[c.category]||0)+Number(c.amount||0); });
+        (m.items||[]).forEach(function(it){
+          b.items.push({obj:(p.name||p.id),kind:it.kind,category:it.category,
+                        amount:it.amount,date:it.date,note:it.note,receipt:it.receipt}); });
       });
+      // если операций нет, берём готовые выплаты
+      if(!(p.months||[]).length){
+        (p.statements||[]).forEach(function(st){
+          var k=String(st.period||'').slice(0,7);
+          if(!/^\d{4}-\d{2}$/.test(k)) return;
+          if(!by[k]) by[k]={month:k,income:0,expenses:0,net:0,cats:{},items:[]};
+          by[k].income+=Number(st.income)||0;
+          by[k].expenses+=Number(st.expenses)||0;
+          by[k].net+=Number(st.net)||0;
+          if(Number(st.commission)) by[k].cats['комиссия управления']=
+            (by[k].cats['комиссия управления']||0)+Number(st.commission);
+        });
+      }
     });
-    var keys=Object.keys(by).sort().slice(-12);
-    if(keys.length<2) return '';
-    var max=Math.max.apply(null, keys.map(function(k){return Math.abs(by[k]);}))||1;
-    var MON=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
-    var bars=keys.map(function(k){
-      /* высота в пикселях: проценты внутри гибкой колонки схлопывались,
-         и разные суммы рисовались одинаковыми столбиками */
-      var v=by[k], h=Math.max(4, Math.round(Math.abs(v)/max*146));
-      var m=MON[parseInt(k.slice(5,7),10)-1];
-      return '<div class="mbar" title="'+m+' '+k.slice(0,4)+': '+money(v,'THB')+'">'+
-             '<div class="mb-val">'+money(v,'THB')+'</div>'+
-             '<div class="mb-col'+(v<0?' neg':'')+'" style="height:'+h+'px"></div>'+
-             '<div class="mb-lab">'+m+'</div></div>';
+    return Object.keys(by).sort().map(function(k){return by[k];});
+  }
+  var MON=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
+  function monthName(k){ return MON[parseInt(k.slice(5,7),10)-1]+' '+k.slice(2,4); }
+  function monthChart(){
+    var all=allMonths();
+    if(!all.length) return '';
+    var rows=(CHART_RANGE==='all')?all:all.slice(-CHART_RANGE);
+    var max=Math.max.apply(null, rows.map(function(m){return Math.abs(m.net)||0;}))||1;
+    var bars=rows.map(function(m){
+      var h=Math.max(4, Math.round(Math.abs(m.net)/max*146));
+      return '<div class="mbar'+(CHART_OPEN===m.month?' on':'')+'" data-m="'+m.month+'" '+
+             'title="нажмите, чтобы раскрыть">'+
+             '<div class="mb-val">'+money(m.net,'THB')+'</div>'+
+             '<div class="mb-col'+(m.net<0?' neg':'')+'" style="height:'+h+'px"></div>'+
+             '<div class="mb-lab">'+monthName(m.month)+'</div></div>';
     }).join('');
-    var sum=keys.reduce(function(a,k){return a+by[k];},0);
-    return '<div class="card chart"><h2>Доход по месяцам</h2>'+
-      '<p class="sub">Чистый результат после расходов · за '+keys.length+' мес. — '+money(sum,'THB')+'</p>'+
-      '<div class="mchart">'+bars+'</div></div>';
+    var inc=rows.reduce(function(a,m){return a+m.income;},0);
+    var exp=rows.reduce(function(a,m){return a+m.expenses;},0);
+    var sum=rows.reduce(function(a,m){return a+m.net;},0);
+    var per=[[6,'6 мес'],[12,'12 мес'],['all','всё время']].map(function(x){
+      return '<button type="button" class="opt'+(String(CHART_RANGE)===String(x[0])?' on':'')+
+             '" data-range="'+x[0]+'">'+x[1]+'</button>';
+    }).join('');
+    return '<div class="card chart"><div class="chead"><h2 style="margin:0">Доход по месяцам</h2>'+
+      '<div class="opts tight" id="ch-range">'+per+'</div></div>'+
+      '<p class="sub">Поступило '+money(inc,'THB')+' · расходы '+money(exp,'THB')+
+      ' · на руки <b>'+money(sum,'THB')+'</b> за '+rows.length+' мес.</p>'+
+      '<div class="mchart" id="ch-bars">'+bars+'</div>'+
+      '<div id="ch-detail"></div></div>';
+  }
+  function bindChart(){
+    var rg=document.getElementById('ch-range');
+    if(rg) Array.prototype.forEach.call(rg.querySelectorAll('.opt'),function(b){
+      b.onclick=function(){ var v=b.getAttribute('data-range');
+        CHART_RANGE=(v==='all')?'all':Number(v); CHART_OPEN=null; redrawChart(); };
+    });
+    var bars=document.getElementById('ch-bars');
+    if(bars) Array.prototype.forEach.call(bars.querySelectorAll('.mbar'),function(b){
+      b.onclick=function(){ var m=b.getAttribute('data-m');
+        CHART_OPEN=(CHART_OPEN===m)?null:m; redrawChart(); };
+    });
+    drawMonthDetail();
+  }
+  function redrawChart(){
+    var host=document.querySelector('.card.chart');
+    if(!host) return;
+    var tmp=document.createElement('div'); tmp.innerHTML=monthChart();
+    host.replaceWith(tmp.firstChild);
+    bindChart();
+  }
+  function drawMonthDetail(){
+    var box=document.getElementById('ch-detail'); if(!box) return;
+    if(!CHART_OPEN){ box.innerHTML='<p class="sub">Нажмите на столбик — покажу, из чего сложился месяц.</p>'; return; }
+    var m=allMonths().filter(function(x){return x.month===CHART_OPEN;})[0];
+    if(!m){ box.innerHTML=''; return; }
+    var cats=Object.keys(m.cats).sort(function(a,b){return m.cats[b]-m.cats[a];});
+    var h='<div class="docbox"><h4 style="margin:0 0 8px">'+monthName(m.month)+' — подробно</h4>'+
+      '<div class="crow">'+
+      '<div><span class="lbl">Поступило</span>'+money(m.income,'THB')+'</div>'+
+      '<div><span class="lbl">Расходы</span>'+money(m.expenses,'THB')+'</div>'+
+      '<div><span class="lbl">Осталось</span><b>'+money(m.net,'THB')+'</b></div></div>';
+    if(cats.length){
+      h+='<h4 style="margin:12px 0 6px">Какие расходы</h4><table class="ctable inner">'+
+         '<tr><th>Статья</th><th>Сумма</th><th>Доля</th></tr>';
+      cats.forEach(function(c){
+        var pct=m.expenses?Math.round(m.cats[c]/m.expenses*100):0;
+        h+='<tr><td>'+clEsc(c)+'</td><td>'+money(m.cats[c],'THB')+'</td><td>'+pct+' %</td></tr>';
+      });
+      h+='</table>';
+    } else h+='<p class="sub">Расходов в этом месяце не записано.</p>';
+    var items=(m.items||[]).slice(0,40);
+    if(items.length){
+      h+='<h4 style="margin:12px 0 6px">Операции</h4><table class="ctable inner">'+
+         '<tr><th>Дата</th><th>Что</th><th>Объект</th><th>Сумма</th></tr>';
+      items.forEach(function(it){
+        h+='<tr><td>'+clDate(it.date)+'</td><td>'+clEsc(it.note||it.category)+
+           '</td><td class="sub">'+clEsc(it.obj||'')+'</td><td'+
+           (it.kind==='income'?'':' class="over"')+'>'+
+           (it.kind==='income'?'+':'−')+money(it.amount,'THB').replace('฿','฿ ')+'</td></tr>';
+      });
+      h+='</table>';
+    }
+    box.innerHTML=h+'</div>';
   }
 
   /* Ближайшие заезды — карточками с плашкой даты, а не строкой таблицы */
@@ -1736,6 +1913,9 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       });
       th+='</table>';
     }
+    if(DATA.owner&&DATA.owner.is_staff===true)
+      th+='<p class="sub"><a href="#" class="lnk" data-uk="tx" data-pid="'+(p.id||'')+
+          '">Внести операцию</a> — доход или расход по этому объекту.</p>';
     H+=card('Доходы и расходы периода', th, 'sec-money');
 
     // календарь
@@ -1780,6 +1960,24 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       });
       kh+='</table>';
     }
+    var tkAll=p.tasks_all||[];
+    if(tkAll.length){
+      var done=tkAll.filter(function(t){return t.status==='done';});
+      if(done.length){
+        kh+='<h4 style="margin:14px 0 6px">Уже сделано</h4><table>'+
+            '<tr><th>Когда</th><th>Работа</th><th class="r">Стоило</th></tr>';
+        done.slice(0,15).forEach(function(t){
+          kh+='<tr><td>'+dmy(t.done_at||t.due_date)+'</td><td>'+esc(KINDS[t.kind]||t.kind||'—')+
+              (t.note?'<br><span style="color:var(--dim);font-size:12px">'+esc(t.note)+'</span>':'')+
+              '</td><td class="r">'+(t.cost_thb?money(t.cost_thb,cur):'—')+'</td></tr>';
+        });
+        kh+='</table>';
+      }
+    }
+    if(DATA.owner&&DATA.owner.is_staff===true)
+      kh+='<p class="sub"><a href="#" class="lnk" data-uk="task" data-pid="'+(p.id||'')+
+          '">Поставить работу</a> — уборка, ремонт, проверка. Как отметите выполненной, '+
+          'потраченное само уйдёт в расходы.</p>';
     H+=card('Работы по объекту', kh, 'sec-service');
 
     // расходы владения
@@ -1819,6 +2017,23 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       sh+='</table>';
     }
     H+=card('История отчётов', sh, 'sec-reports');
+
+    var dcs=p.docs||[], dch='';
+    var DKIND={contract:'договор',act:'акт',report:'отчёт',plan:'планировка',
+               invoice:'счёт',photo:'фото',other:'документ'};
+    if(!dcs.length){ dch='<div class="empty">Документов пока нет.</div>'; }
+    else{
+      dch='<table><tr><th>Что</th><th>Вид</th><th>Когда</th></tr>';
+      dcs.forEach(function(d){
+        dch+='<tr><td><a href="'+d.url+'" target="_blank" rel="noopener">'+esc(d.title||'документ')+
+             '</a></td><td>'+(DKIND[d.kind]||d.kind||'—')+'</td><td>'+dmy(d.created_at)+'</td></tr>';
+      });
+      dch+='</table>';
+    }
+    if(DATA.owner&&DATA.owner.is_staff===true)
+      dch+='<p class="sub"><a href="#" class="lnk" data-uk="doc" data-pid="'+(p.id||'')+
+           '">Добавить документ</a> — ссылка на Google Диск или файл.</p>';
+    H+=card('Документы объекта', dch, 'sec-docs');
 
     $('prop').innerHTML=H;
   }
@@ -3123,6 +3338,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   var TAB_OF={
     'portfolio':'overview', 'prop-tabs':'object', 'prop':'object',
     'sec-money':'money', 'sec-calendar':'calendar', 'sec-reports':'docs',
+    'sec-docs':'docs',
     'sec-service':'service', 'sec-costs':'costs',
     'sec-edit':'object', 'sec-addobj':'actions', 'sec-request':'actions',
     'sec-myreq':'actions', 'sec-moder':'staff', 'sec-coords':'staff',
@@ -3141,7 +3357,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     });
     /* блоки финансов, броней и работ рисуются внутри карточки объекта —
        выносим их в тело кабинета сразу, иначе разделы открываются пустыми */
-    ['sec-money','sec-calendar','sec-reports','sec-service','sec-costs'].forEach(function(id){
+    ['sec-money','sec-calendar','sec-reports','sec-docs','sec-service','sec-costs'].forEach(function(id){
       var el=document.getElementById(id); if(!el) return;
       if(el.parentElement && el.parentElement.id!=='cab-body'){
         document.getElementById('cab-body').appendChild(el);
@@ -3191,7 +3407,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     document.querySelector('.wrap').classList.remove('narrow');
     var dn=document.getElementById('demo-note'); if(dn) dn.style.display = DEMO_MODE ? '' : 'none';
     show('app'); $('logout').style.display='';
-    renderPortfolio(); renderTabs(); renderProp(); renderRequests(); renderEditState(); renderModeration(); renderCoords(); renderClients(); renderBoard(); renderCamp(); renderRequestForm(); initCabNav();
+    renderPortfolio(); renderTabs(); renderProp(); renderRequests(); renderEditState(); renderModeration(); renderCoords(); renderClients(); renderBoard(); renderCamp(); renderRequestForm(); bindChart(); bindUkForms(); initCabNav();
   }
 
   /* Ответ идёт около трёх секунд — столько занимает запуск сценария на стороне
