@@ -860,6 +860,18 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
   .pill:hover{background:#fafaf4}
   .msgprev{white-space:pre-wrap;font:inherit;font-size:13px;margin:8px 0 0;padding:10px;
            background:#fff;border:1px solid var(--line);border-radius:8px;color:#3a3a34}
+  .clsplit{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:16px;margin-top:12px;align-items:start}
+  @media(max-width:900px){.clsplit{grid-template-columns:1fr}}
+  .clsplit #cl-list{max-height:640px;overflow:auto}
+  .clsplit #cl-card{position:sticky;top:12px;max-height:calc(100vh - 40px);overflow:auto}
+  .clrow.on td{background:#f2f3e6}
+  .empty{padding:24px 16px;text-align:center;border:1px dashed var(--line);border-radius:12px;background:#fcfcf8}
+  .opts.tight .opt{padding:5px 11px;font-size:12px}
+  .ccard .btn,.ccard .btn.ghost{padding:8px 14px;font-size:13px}
+  .ccard h4{margin:14px 0 5px}
+  .ccard .crow{gap:8px 14px}
+  .ccard .tline li{padding:5px 0;font-size:13px}
+  .cmfind{flex:1;min-width:0;padding:8px 12px;border:1px solid var(--line);border-radius:9px;font:inherit;background:#fff}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 </head>
@@ -1205,13 +1217,15 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
       </div>
       <div id="cl-sum" class="sub" style="margin:10px 0 0"></div>
       <div class="clbar">
-        <button type="button" class="btn ghost" id="cl-new">+ Завести человека</button>
+        <button type="button" class="btn ghost" id="cl-new">Завести человека</button>
         <button type="button" class="btn ghost" id="cl-board">Что горит</button>
         <button type="button" class="btn ghost" id="cl-dupes">Битые номера</button>
       </div>
       <div id="cl-form"></div>
-      <div id="cl-list"></div>
-      <div id="cl-card"></div>
+      <div class="clsplit">
+        <div id="cl-list"></div>
+        <div id="cl-card"><p class="sub empty">Выберите человека слева — карточка откроется здесь.</p></div>
+      </div>
     </div>
 
     <div class="card" id="sec-moder" style="display:none">
@@ -1223,6 +1237,7 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
         <button type="button" class="opt" data-v="published">Опубликованные</button>
         <button type="button" class="opt" data-v="rejected">Отклонённые</button>
       </div>
+      <div id="m-count" class="sub" style="margin:8px 0 0"></div>
       <div id="m-list"></div>
       <div class="ok" id="m-ok"></div>
       <div class="err" id="m-err"></div>
@@ -1825,6 +1840,10 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     post({action:'mod_list',token:TOKEN,status:MOD_STATUS}).then(function(d){
       if(!d||!d.ok){ box.innerHTML='<p class="sub">Не удалось загрузить заявки.</p>'; return; }
       var items=d.items||[];
+      var sm=document.getElementById('m-count');
+      if(sm) sm.textContent = items.length
+        ? ('Заявок в этом списке: '+items.length)
+        : 'Здесь пусто.';
       if(!items.length){ box.innerHTML='<p class="sub">Заявок нет.</p>'; return; }
       box.innerHTML='';
       items.forEach(function(it){ box.appendChild(subCard(it)); });
@@ -1923,7 +1942,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     if(qi) qi.onkeydown=function(e){ if(e.key==='Enter'){ CL_Q=qi.value.trim(); loadClients(); } };
     loadClients();
   }
-  var TEMP_RU={cold:'холодный',warm:'есть номер',hot:'горячий',client:'клиент',lost:'отложен'};
+  var TEMP_RU={cold:'без номера',warm:'в работе',hot:'горячий',client:'купил',lost:'отложен'};
   var SRC_RU={wa:'WhatsApp',tg:'Telegram',tg_bot:'бот в Telegram',tg_dm:'Telegram',
               ig:'Instagram',ig_direct:'директ Instagram',ig_comment:'комментарий в Instagram',
               threads:'Threads',site:'сайт',crm:'CRM',meta_ads:'реклама Meta'};
@@ -1940,16 +1959,22 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         'Всего в базе <b>'+(d.data.total||0)+'</b> · холодных '+(c.cold||0)+
         ' · с номером '+(c.warm||0)+' · клиентов '+(c.client||0);
       if(!rows.length){ box.innerHTML='<p class="sub">Никого не нашлось.</p>'; return; }
-      var h='<table class="ctable"><tr><th>Номер</th><th>Имя</th><th>Откуда</th><th>Состояние</th><th>Сделок</th><th>Задач</th><th>Последний раз</th></tr>';
+      var h='<table class="ctable"><tr><th>Кто</th><th>Откуда пришёл</th><th>Стадия</th><th>Обращений</th><th>Дел</th><th>Писали</th></tr>';
       rows.forEach(function(r){
-        h+='<tr class="clrow" data-code="'+r.code+'"><td class="mono">'+r.code+'</td><td>'+
-           clEsc(r.name||'—')+'</td><td>'+(SRC_RU[r.source]||r.source||'—')+'</td><td><span class="tmp t-'+
+        h+='<tr class="clrow" data-code="'+r.code+'"><td><b>'+clEsc(r.name||'Без имени')+'</b>'+
+           '<br><span class="sub mono">'+r.code+(r.phone?(' · '+r.phone):'')+'</span></td>'+
+           '<td>'+(SRC_RU[r.source]||r.source||'—')+'</td><td><span class="tmp t-'+
            r.temp+'">'+(TEMP_RU[r.temp]||r.temp)+'</span></td><td>'+(r.deals||0)+'</td><td>'+
            (r.open_tasks?('<b>'+r.open_tasks+'</b>'):'—')+'</td><td>'+clDate(r.last_seen_at)+'</td></tr>';
       });
       box.innerHTML=h+'</table>';
       Array.prototype.forEach.call(box.querySelectorAll('.clrow'),function(tr){
-        tr.onclick=function(){ openClient(tr.getAttribute('data-code')); };
+        tr.onclick=function(){
+          Array.prototype.forEach.call(box.querySelectorAll('.clrow'),function(x){
+            x.classList.remove('on'); });
+          tr.classList.add('on');
+          openClient(tr.getAttribute('data-code'));
+        };
       });
     });
   }
@@ -2083,11 +2108,12 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
            (c.portal_status==='requested'?' · <a href="#" class="lnk" id="cl-deny">Отказать</a>':'')+
            '</p>';
       }
-      h+='<h4>Пометка</h4><div class="clnote"><input id="cl-note" type="text" placeholder="Что важно помнить об этом человеке">'+
-         '<button type="button" class="btn" id="cl-save">Записать</button></div>'+
-         '<div class="opts" id="cl-temp">'+['cold','warm','hot','client','lost'].map(function(t){
+      h+='<h4>Стадия и пометка</h4>'+
+         '<div class="opts tight" id="cl-temp">'+['cold','warm','hot','client','lost'].map(function(t){
            return '<button type="button" class="opt'+(t===c.temp?' on':'')+'" data-v="'+t+'">'+TEMP_RU[t]+'</button>';
-         }).join('')+'</div></div>';
+         }).join('')+'</div>'+
+         '<div class="clnote"><input id="cl-note" type="text" placeholder="Что важно помнить об этом человеке">'+
+         '<button type="button" class="btn ghost" id="cl-save">Записать</button></div></div>';
       box.innerHTML=h;
       box.scrollIntoView({behavior:'smooth',block:'start'});
       document.getElementById('cl-close').onclick=function(){ box.innerHTML=''; };
@@ -2443,6 +2469,12 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     ]).then(function(res){
       CMP_CH=(res[0]&&res[0].channels)||[];
       var people=(res[1]&&res[1].rows)||[];
+      // объекты с сайта — чтобы приложить ссылку одним выбором
+      var objs=(DATA.properties||[]).map(function(pr){
+        var id=(pr.object&&pr.object.plp_property_id)||pr.property_id||'';
+        var nm=(pr.object&&pr.object.name)||pr.name||id;
+        return { name: nm, url: 'https://property-library.com/object/'+String(id).toLowerCase()+'.html' };
+      }).filter(function(x){ return x.name && x.url.indexOf('undefined')<0; });
       var TR={client:'клиент',hot:'горячий',warm:'есть номер'};
       var h='<div class="ccard"><div class="chead"><h3 style="margin:0">Новая рассылка</h3>'+
         '<button type="button" class="btn ghost" id="cmp-cancel">Отмена</button></div>'+
@@ -2463,9 +2495,22 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         'Заходить по вашему номеру, код придёт сюда же в WhatsApp:\n'+
         'https://property-library.com/owner.html\n\n'+
         'Если пришлёте договор — система соберёт график платежей и будет напоминать заранее.</textarea>'+
+        '<h4>Что приложить</h4>'+
+        '<p class="sub">Ссылку добавьте прямо в текст — она откроется у человека сразу. '+
+        'Файл лучше не слать первым сообщением: приложите ссылку на объект или расчёт.</p>'+
+        '<div class="fgrid">'+
+        '<label class="wide">Ссылка на объект или расчёт'+
+        '<select id="cm-offer"><option value="">— не добавлять —</option>'+
+        (objs.map(function(o){
+          return '<option value="'+o.url+'">'+clEsc(o.name)+'</option>'; }).join(''))+
+        '</select></label></div>'+
         '<h4>Кому отправляем</h4>'+
-        '<p class="sub">Отмечены только те, у кого номер проверен. '+
-        'Всего доступно: '+people.length+'.</p>'+
+        '<p class="sub">Отметьте галочками или вставьте номера списком — как удобнее. '+
+        'Доступно: '+people.length+'.</p>'+
+        '<div class="fgrid"><label class="wide">Вставить номера или коды'+
+        '<textarea id="cm-paste" class="cmtext" rows="3" placeholder="+66 954 143 874, 79818500758, PLP-003816 — через запятую, пробел или с новой строки"></textarea></label></div>'+
+        '<div class="fbtns"><button type="button" class="btn ghost" id="cm-addpaste">Добавить из списка</button>'+
+        '<input id="cm-find" type="text" class="cmfind" placeholder="найти по имени или номеру"></div>'+
         '<div class="peoplebox">';
       people.forEach(function(p){
         h+='<label class="pill"><input type="checkbox" class="cm-p" value="'+p.code+'"'+
@@ -2477,7 +2522,47 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       box.innerHTML=h;
       document.getElementById('cmp-cancel').onclick=function(){ box.innerHTML=''; };
       document.getElementById('cm-all').onclick=function(){
-        Array.prototype.forEach.call(box.querySelectorAll('.cm-p'),function(c){ c.checked=true; });
+        Array.prototype.forEach.call(box.querySelectorAll('.cm-p'),function(c){
+          if(c.parentElement.style.display!=='none') c.checked=true; });
+      };
+      // вставка номеров списком: отмечаем найденных, о ненайденных честно говорим
+      document.getElementById('cm-addpaste').onclick=function(){
+        var raw=document.getElementById('cm-paste').value||'';
+        var parts=raw.split(/[\s,;]+/).map(function(x){return x.trim();}).filter(Boolean);
+        if(!parts.length){ alert('Вставьте номера или коды'); return; }
+        var found=0, miss=[];
+        parts.forEach(function(v){
+          var digits=v.replace(/[^0-9]/g,'');
+          var code=v.toUpperCase();
+          var hit=people.filter(function(p){
+            return (code.indexOf('PLP-')===0 && p.code===code) ||
+                   (digits.length>=8 && p.phone && p.phone.slice(-9)===digits.slice(-9));
+          })[0];
+          if(hit){
+            var ck=box.querySelector('.cm-p[value="'+hit.code+'"]');
+            if(ck){ ck.checked=true; found++; }
+          } else miss.push(v);
+        });
+        var msg='Отметил: '+found+'.';
+        if(miss.length) msg+='\n\nНе нашёл в базе: '+miss.join(', ')+
+          '\nЭтих людей сначала заведите в разделе «Люди» — рассылка идёт только по карточкам.';
+        alert(msg);
+      };
+      // поиск по списку
+      var fnd=document.getElementById('cm-find');
+      if(fnd) fnd.oninput=function(){
+        var q=fnd.value.trim().toLowerCase();
+        Array.prototype.forEach.call(box.querySelectorAll('.pill'),function(l){
+          l.style.display = (!q || l.textContent.toLowerCase().indexOf(q)>=0) ? '' : 'none';
+        });
+      };
+      // выбранная ссылка дописывается в текст
+      var off=document.getElementById('cm-offer');
+      if(off) off.onchange=function(){
+        var ta=document.getElementById('cm-text');
+        var url=off.value;
+        if(!url) return;
+        if(ta.value.indexOf(url)<0) ta.value=ta.value.replace(/\s*$/,'')+'\n\n'+url;
       };
       document.getElementById('cm-save').onclick=function(){
         var codes=Array.prototype.filter.call(box.querySelectorAll('.cm-p'),function(c){return c.checked;})
@@ -2591,6 +2676,24 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
          (String(b['связь'] && b['связь']['исходящие_включены'])==='true'
           ? '<b>включены</b>' : 'выключены — система думает, но никому не пишет')+'.</p>';
       box.innerHTML=h;
+      // клик по показателю открывает то, что за ним стоит
+      Array.prototype.forEach.call(box.querySelectorAll('.bgo'),function(el){
+        el.onclick=function(){
+          var go=el.getAttribute('data-go'), arg=el.getAttribute('data-arg');
+          if(go==='clients'){
+            cabPage('clients'); CL_TEMP=arg||''; CL_Q='';
+            var fb=document.getElementById('cl-filter');
+            if(fb) Array.prototype.forEach.call(fb.querySelectorAll('.opt'),function(o){
+              o.classList.toggle('on', o.getAttribute('data-v')===(arg||'')); });
+            loadClients();
+          } else if(go==='phones'){ cabPage('clients'); dupesBoard(); }
+          else if(go==='tasks'){ cabPage('clients'); tasksBoard(); }
+          else if(go==='staff'){ cabPage('staff'); }
+          else if(go==='coords'){ cabPage('staff');
+            var sc=document.getElementById('sec-coords');
+            if(sc) setTimeout(function(){ sc.scrollIntoView({behavior:'smooth'}); },120); }
+        };
+      });
     });
   }
 
