@@ -852,6 +852,14 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
   .tgcode{margin-top:8px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:#fcfcf8}
   .hintbox{padding:10px 12px;border-left:3px solid var(--green);background:#fbfbf6;border-radius:0 8px 8px 0}
   .pay-ck{width:16px;height:16px;cursor:pointer}
+  .cmtext{width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid var(--line);
+          border-radius:10px;font:inherit;line-height:1.5;background:#fff;resize:vertical}
+  .peoplebox{max-height:280px;overflow:auto;border:1px solid var(--line);border-radius:10px;
+             padding:8px;display:flex;flex-direction:column;gap:4px;background:#fff}
+  .pill{display:flex;align-items:center;gap:6px;font-size:13px;padding:3px 4px;border-radius:6px;cursor:pointer}
+  .pill:hover{background:#fafaf4}
+  .msgprev{white-space:pre-wrap;font:inherit;font-size:13px;margin:8px 0 0;padding:10px;
+           background:#fff;border:1px solid var(--line);border-radius:8px;color:#3a3a34}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 </head>
@@ -1066,6 +1074,7 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
       <a data-tab="object">Объект</a>
       <a data-tab="actions">Заявки</a>
       <a data-tab="board" id="tab-board">Система</a>
+      <a data-tab="camp" id="tab-camp">Рассылка</a>
       <a data-tab="mine" id="tab-mine" style="display:none">Моя недвижимость</a>
       <a data-tab="clients" id="tab-clients">Люди</a>
       <a data-tab="staff" id="tab-staff">Модерация</a>
@@ -1109,6 +1118,19 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
       и приложите фото — за пять шагов. Мы проверим и оформим карточку.</p>
       <a href="add-property.html" style="display:inline-block;background:var(--txt);color:#fff;
          border-radius:999px;padding:12px 20px;font-size:15px;font-weight:700;text-decoration:none">Разместить объект</a>
+    </div>
+
+    <div class="card" id="sec-camp" style="display:none">
+      <h2>Рассылка</h2>
+      <p class="sub" style="margin:0 0 12px">Сообщение уходит только после вашего утверждения
+      и только порциями, которые вы отправляете вручную. Само по себе не уходит ничего.
+      Каждое сообщение записывается: кому, когда, что, дошло ли.</p>
+      <div class="clbar">
+        <button type="button" class="btn" id="cmp-new">Собрать рассылку</button>
+        <button type="button" class="btn ghost" id="cmp-refresh">Обновить</button>
+      </div>
+      <div id="cmp-form"></div>
+      <div id="cmp-list"></div>
     </div>
 
     <div class="card" id="sec-board" style="display:none">
@@ -2378,6 +2400,167 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     });
   }
 
+  // рассылка: собрать список, утвердить текст, выбрать номер, отправлять порциями
+  var CMP_CH=[], CMP_PICK=[];
+  function renderCamp(){
+    var sec=document.getElementById('sec-camp'); if(!sec) return;
+    if(!(DATA && DATA.owner && DATA.owner.is_staff===true)){ sec.remove(); return; }
+    document.getElementById('cmp-new').onclick=function(){ campForm(); };
+    document.getElementById('cmp-refresh').onclick=function(){ loadCamps(); };
+    loadCamps();
+  }
+  function loadCamps(){
+    var box=document.getElementById('cmp-list'); if(!box) return;
+    box.innerHTML='<p class="sub">Загружаем…</p>';
+    post({action:'camp_list',token:TOKEN}).then(function(d){
+      var rows=(d&&d.rows)||[];
+      if(!rows.length){ box.innerHTML='<p class="sub">Рассылок пока нет.</p>'; return; }
+      var ST={draft:'черновик',approved:'утверждена',running:'идёт',paused:'на паузе',done:'закончена'};
+      var h='<table class="ctable"><tr><th>Название</th><th>Состояние</th><th>С номера</th>'+
+            '<th>Отправлено</th><th>Ждут</th><th>Не дошло</th><th></th></tr>';
+      rows.forEach(function(c){
+        h+='<tr><td>'+clEsc(c.name)+'<br><span class="sub">'+clDate(c.created_at)+
+           ', '+clEsc(c.created_by||'')+'</span></td>'+
+           '<td><span class="tmp t-'+(c.status==='done'?'client':c.status==='running'?'hot':
+             c.status==='approved'?'warm':'cold')+'">'+(ST[c.status]||c.status)+'</span></td>'+
+           '<td class="sub">'+clEsc(c['from']||'—')+'</td>'+
+           '<td>'+(c['отправлено']||0)+' из '+(c['всего']||0)+'</td>'+
+           '<td>'+(c['ждут']||0)+'</td><td>'+(c['не дошло']||0)+'</td>'+
+           '<td><a href="#" class="lnk cmp-open" data-id="'+c.id+'">открыть</a></td></tr>';
+      });
+      box.innerHTML=h+'</table>';
+      Array.prototype.forEach.call(box.querySelectorAll('.cmp-open'),function(a){
+        a.onclick=function(e){ e.preventDefault(); campOpen(a.getAttribute('data-id')); };
+      });
+    });
+  }
+  function campForm(){
+    var box=document.getElementById('cmp-form');
+    box.innerHTML='<div class="ccard"><p class="sub">Готовим…</p></div>';
+    Promise.all([
+      post({action:'camp_channels',token:TOKEN}),
+      post({action:'camp_candidates',token:TOKEN})
+    ]).then(function(res){
+      CMP_CH=(res[0]&&res[0].channels)||[];
+      var people=(res[1]&&res[1].rows)||[];
+      var TR={client:'клиент',hot:'горячий',warm:'есть номер'};
+      var h='<div class="ccard"><div class="chead"><h3 style="margin:0">Новая рассылка</h3>'+
+        '<button type="button" class="btn ghost" id="cmp-cancel">Отмена</button></div>'+
+        '<div class="fgrid">'+
+        '<label>Название<input id="cm-name" type="text" placeholder="Приглашение в кабинет"></label>'+
+        '<label>Зачем пишем<input id="cm-purpose" type="text" placeholder="повод, чтобы было видно потом"></label>'+
+        '<label>С какого номера<select id="cm-from">'+
+          (CMP_CH.length?CMP_CH.map(function(c){
+            return '<option value="'+c.id+'|'+c.transport+'|'+clEsc(c.label)+'">'+clEsc(c.label)+'</option>';
+          }).join(''):'<option value="">нет доступных каналов</option>')+'</select></label>'+
+        '<label>Сколько в день<input id="cm-perday" type="number" value="20" min="1" max="50"></label>'+
+        '</div>'+
+        '<h4>Текст сообщения</h4>'+
+        '<p class="sub">Подстановки: <b>{имя}</b>, <b>{объект}</b>, <b>{код}</b>. '+
+        'Пишите так, будто пишете одному человеку.</p>'+
+        '<textarea id="cm-text" class="cmtext" rows="7">{имя}, здравствуйте! Это Эльнур из Property Library.\n\n'+
+        'Собрали для вас личный кабинет: там ваши объекты, графики платежей и документы в одном месте.\n'+
+        'Заходить по вашему номеру, код придёт сюда же в WhatsApp:\n'+
+        'https://property-library.com/owner.html\n\n'+
+        'Если пришлёте договор — система соберёт график платежей и будет напоминать заранее.</textarea>'+
+        '<h4>Кому отправляем</h4>'+
+        '<p class="sub">Отмечены только те, у кого номер проверен. '+
+        'Всего доступно: '+people.length+'.</p>'+
+        '<div class="peoplebox">';
+      people.forEach(function(p){
+        h+='<label class="pill"><input type="checkbox" class="cm-p" value="'+p.code+'"'+
+           (p.temp==='client'?' checked':'')+'> <span class="mono">'+p.code+'</span> '+
+           clEsc(p.name||'—')+' <span class="sub">'+(TR[p.temp]||p.temp)+'</span></label>';
+      });
+      h+='</div><div class="fbtns"><button type="button" class="btn" id="cm-save">Собрать</button>'+
+         '<button type="button" class="btn ghost" id="cm-all">Отметить всех клиентов</button></div></div>';
+      box.innerHTML=h;
+      document.getElementById('cmp-cancel').onclick=function(){ box.innerHTML=''; };
+      document.getElementById('cm-all').onclick=function(){
+        Array.prototype.forEach.call(box.querySelectorAll('.cm-p'),function(c){ c.checked=true; });
+      };
+      document.getElementById('cm-save').onclick=function(){
+        var codes=Array.prototype.filter.call(box.querySelectorAll('.cm-p'),function(c){return c.checked;})
+                   .map(function(c){return c.value;});
+        if(!codes.length){ alert('Отметьте, кому отправляем'); return; }
+        var fr=(document.getElementById('cm-from').value||'').split('|');
+        if(!fr[0]){ alert('Нет доступного номера для отправки'); return; }
+        post({action:'camp_create',token:TOKEN,
+              name:fv('cm-name')||'Рассылка',purpose:fv('cm-purpose'),
+              template:document.getElementById('cm-text').value,
+              codes:codes,channel:(fr[1]==='telegram'?'tg':'wa'),
+              from_id:fr[0],from_label:fr[2],per_day:Number(fv('cm-perday')||20)})
+          .then(function(r){
+            if(r&&r.ok){ box.innerHTML=''; loadCamps(); campOpen(r.id); }
+            else alert((r&&r.error)||'Не собралось');
+          });
+      };
+    });
+  }
+  function campOpen(id){
+    var box=document.getElementById('cmp-form');
+    box.innerHTML='<div class="ccard"><p class="sub">Открываем…</p></div>';
+    post({action:'camp_preview',token:TOKEN,id:id,limit:8}).then(function(d){
+      var data=(d&&d.data)||{}, c=data.campaign||{}, cnt=data.counts||{}, sm=data.sample||[];
+      var ST={draft:'черновик',approved:'утверждена',running:'идёт',paused:'на паузе',done:'закончена'};
+      var h='<div class="ccard"><div class="chead"><h3 style="margin:0">'+clEsc(c.name||'')+
+        ' <span class="tmp t-warm">'+(ST[c.status]||c.status)+'</span></h3>'+
+        '<button type="button" class="btn ghost" id="cmp-cancel">Закрыть</button></div>'+
+        '<div class="crow">'+
+        '<div><span class="lbl">С номера</span>'+clEsc(c.from_label||'—')+'</div>'+
+        '<div><span class="lbl">В день</span>'+(c.per_day||'—')+'</div>'+
+        '<div><span class="lbl">Собрал</span>'+clEsc(c.created_by||'—')+'</div>'+
+        '<div><span class="lbl">Утвердил</span>'+clEsc(c.approved_by||'ещё никто')+'</div>'+
+        '<div><span class="lbl">Ждут отправки</span>'+(cnt.pending||0)+'</div>'+
+        '<div><span class="lbl">Отправлено</span>'+(cnt.sent||0)+'</div>'+
+        '<div><span class="lbl">Пропущено</span>'+(cnt.skipped||0)+'</div>'+
+        '</div><h4>Как это увидят</h4>';
+      sm.forEach(function(x){
+        h+='<div class="docbox"><b class="mono">'+x.code+'</b> '+clEsc(x.name||'')+
+           ' <span class="sub">'+(x.phone||'')+'</span>'+
+           (x.status!=='pending'?' <span class="tmp t-lost">'+x.status+
+             (x.reason?': '+clEsc(x.reason):'')+'</span>':'')+
+           '<pre class="msgprev">'+clEsc(x.text||'')+'</pre></div>';
+      });
+      h+='<div class="fbtns">';
+      if(c.status==='draft'||c.status==='paused')
+        h+='<button type="button" class="btn" id="cm-ok">Утвердить текст и список</button>';
+      if(c.status==='approved'||c.status==='running')
+        h+='<button type="button" class="btn" id="cm-send">Отправить следующие 5</button>'+
+           '<button type="button" class="btn ghost" id="cm-stop">Остановить</button>';
+      h+='</div><div id="cm-log"></div></div>';
+      box.innerHTML=h;
+      document.getElementById('cmp-cancel').onclick=function(){ box.innerHTML=''; };
+      var ok=document.getElementById('cm-ok');
+      if(ok) ok.onclick=function(){
+        if(!confirm('Утвердить? После этого появится кнопка отправки — сообщения пойдут только по ней.')) return;
+        post({action:'camp_approve',token:TOKEN,id:id}).then(function(r){
+          if(r&&r.ok) campOpen(id); else alert((r&&r.error)||'Не вышло'); });
+      };
+      var sd=document.getElementById('cm-send');
+      if(sd) sd.onclick=function(){
+        if(!confirm('Отправить пятерым прямо сейчас?')) return;
+        sd.disabled=true;
+        document.getElementById('cm-log').innerHTML='<p class="sub">Отправляем, это займёт полминуты…</p>';
+        post({action:'camp_send',token:TOKEN,id:id,count:5}).then(function(r){
+          sd.disabled=false;
+          if(!r||!r.ok){ alert((r&&r.error)||'Не отправилось'); return; }
+          var lg='<p class="sub">Ушло: '+r.sent+', пропущено: '+r.skipped+
+                 ', не дошло: '+r.failed+'. Осталось: '+r['осталось']+'</p><ul class="tline">';
+          (r['подробно']||[]).forEach(function(x){
+            lg+='<li>'+x.phone+' — '+clEsc(x['итог'])+'</li>';
+          });
+          document.getElementById('cm-log').innerHTML=lg+'</ul>';
+          loadCamps();
+        });
+      };
+      var st=document.getElementById('cm-stop');
+      if(st) st.onclick=function(){
+        post({action:'camp_stop',token:TOKEN,id:id}).then(function(){ campOpen(id); loadCamps(); });
+      };
+    });
+  }
+
   // приборная панель: вся система одним экраном
   function renderBoard(){
     var sec=document.getElementById('sec-board'); if(!sec) return;
@@ -2656,7 +2839,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     'sec-service':'service', 'sec-costs':'costs',
     'sec-edit':'object', 'sec-addobj':'actions', 'sec-request':'actions',
     'sec-myreq':'actions', 'sec-moder':'staff', 'sec-coords':'staff',
-    'sec-clients':'clients', 'sec-mine':'mine', 'sec-board':'board'
+    'sec-clients':'clients', 'sec-mine':'mine', 'sec-board':'board', 'sec-camp':'camp'
   };
   function cabPage(name){
     CAB_TAB=name;
@@ -2699,16 +2882,29 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     if(tcl && !(DATA && DATA.owner && DATA.owner.is_staff===true)) tcl.remove();
     var tbd=document.getElementById('tab-board');
     if(tbd && !(DATA && DATA.owner && DATA.owner.is_staff===true)) tbd.remove();
+    var tcm=document.getElementById('tab-camp');
+    if(tcm && !(DATA && DATA.owner && DATA.owner.is_staff===true)) tcm.remove();
+
+    /* Сотруднику без собственных объектов разделы владельца показывать нечем —
+       они пустые, кнопки в них не на что нажимать. Убираем их и открываем «Систему». */
+    var noProps = !((DATA.properties||[]).length);
+    var isStaff = !!(DATA && DATA.owner && DATA.owner.is_staff===true);
+    if(isStaff && noProps){
+      ['overview','calendar','money','costs','docs','service','object','actions'].forEach(function(t){
+        var a=nav.querySelector('a[data-tab="'+t+'"]'); if(a) a.remove();
+      });
+    }
     /* всегда начинаем с обзора: запомненный раздел сбивал с толку —
        человек заходил и видел, например, одни «Заявки» */
-    cabPage('overview');
+    var first = nav.querySelector('a[data-tab]');
+    cabPage(first ? first.getAttribute('data-tab') : 'overview');
   }
 
   function draw(){
     document.querySelector('.wrap').classList.remove('narrow');
     var dn=document.getElementById('demo-note'); if(dn) dn.style.display = DEMO_MODE ? '' : 'none';
     show('app'); $('logout').style.display='';
-    renderPortfolio(); renderTabs(); renderProp(); renderRequests(); renderEditState(); renderModeration(); renderCoords(); renderClients(); renderBoard(); initCabNav();
+    renderPortfolio(); renderTabs(); renderProp(); renderRequests(); renderEditState(); renderModeration(); renderCoords(); renderClients(); renderBoard(); renderCamp(); initCabNav();
   }
 
   /* Ответ идёт около трёх секунд — столько занимает запуск сценария на стороне
