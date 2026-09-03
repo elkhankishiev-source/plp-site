@@ -36,6 +36,12 @@ function sectionPage(indexHtml,opts){
     /<div class="head-row reveal">\s*<div>\s*<span class="kicker"[^>]*>[\s\S]*?<\/p>\s*<\/div>/,
     '<div class="head-row reveal"><div>');
   picked = picked.replace(/\s+aria-labelledby="(sale|rent)-title"/, '');
+  // от заголовка остался пустой ряд со стрелками карусели — он держал
+  // лишнюю полосу пустоты и разгонял фильтры по краям
+  picked = picked.replace(
+    /<div class="head-row reveal"><div>\s*<div class="arrows">[\s\S]*?<\/div>\s*<\/div>/,
+    '');
+  picked = picked.replace(/<div class="head-row reveal"><div>\s*<\/div>/, '');
   let out=head+'\n'+intro+'\n'+picked+'\n'+tail;
   const url=SITE_BASE+'/'+opts.file;
   out=out.replace(/<title>[\s\S]*?<\/title>/,'<title>'+htmlEsc(opts.title)+'</title>');
