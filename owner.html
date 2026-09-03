@@ -872,6 +872,27 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
   .ccard .crow{gap:8px 14px}
   .ccard .tline li{padding:5px 0;font-size:13px}
   .cmfind{flex:1;min-width:0;padding:8px 12px;border:1px solid var(--line);border-radius:9px;font:inherit;background:#fff}
+  .picker{position:relative}
+  .pickbtn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;
+           padding:9px 12px;border:1px solid var(--line);border-radius:9px;background:#fff;
+           font:inherit;cursor:pointer;text-align:left;color:inherit}
+  .pickbtn.on{border-color:var(--green-deep)}
+  .pickval{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pickval.dim{color:#9a9a90}
+  .pickarr{color:#9a9a90;font-size:11px;flex:none}
+  .pickdrop{position:absolute;z-index:40;left:0;right:0;top:calc(100% + 4px);background:#fff;
+            border:1px solid var(--line);border-radius:11px;box-shadow:var(--shadow);padding:8px}
+  .picksearch{width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid var(--line);
+              border-radius:8px;font:inherit;margin-bottom:6px;background:#fff}
+  .picklist{max-height:240px;overflow:auto;display:flex;flex-direction:column;gap:2px}
+  .pickitem{display:flex;align-items:baseline;gap:8px;width:100%;padding:7px 9px;border:0;
+            background:none;font:inherit;text-align:left;border-radius:7px;cursor:pointer;color:inherit}
+  .pickitem:hover{background:#f7f8ee}
+  .pickitem.on{background:#eef0dd}
+  .pickck{flex:none;width:14px;color:var(--olive);font-weight:700}
+  .picktitle{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .picksub{flex:none;font-size:12px;color:#8b8f7c}
+  .pickempty{padding:10px;color:#8b8f7c;font-size:13px}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 </head>
@@ -1263,19 +1284,24 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
 
     <div class="card" id="sec-request">
       <h2>Оставить заявку</h2>
-      <label for="r-kind">Что нужно</label>
-      <select id="r-kind">
-        <option value="cleaning">Уборка</option>
-        <option value="repair">Ремонт или поломка</option>
-        <option value="block_dates">Заблокировать даты для себя</option>
-        <option value="payout">Вопрос по выплате</option>
-        <option value="other">Другое</option>
-      </select>
-      <label for="r-date">Желаемая дата</label>
-      <input id="r-date" type="date">
-      <label for="r-details">Подробности</label>
-      <textarea id="r-details" placeholder="Опишите, что требуется"></textarea>
-      <button id="r-send">Отправить заявку</button>
+      <p class="sub" style="margin:0 0 12px">Выберите объект и что нужно. Заявку увидим мы,
+      а по объектам под управлением — ещё и собственник.</p>
+      <div class="fgrid">
+        <label class="wide">Объект<div id="r-obj"></div></label>
+        <label class="wide">Что нужно<div id="r-kind"></div></label>
+      </div>
+      <div id="r-dates" class="fgrid" style="display:none">
+        <label>Заезд<input id="r-from" type="date"></label>
+        <label>Выезд<input id="r-to" type="date"></label>
+        <label>Гостей<input id="r-guests" type="number" min="1" max="20"></label>
+        <label>Сумма, ฿<input id="r-amount" type="number" min="0" step="1000"></label>
+      </div>
+      <div id="r-cal"></div>
+      <div class="fgrid">
+        <label class="wide">Подробности<textarea id="r-details" class="cmtext" rows="3"
+          placeholder="Что требуется, к какому сроку, важные детали"></textarea></label>
+      </div>
+      <div class="fbtns"><button type="button" class="btn" id="r-send">Отправить заявку</button></div>
       <div class="ok" id="r-ok"></div>
       <div class="err" id="r-err"></div>
     </div>
@@ -2426,6 +2452,83 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     });
   }
 
+  /* Выбор из списка: нажал — раскрылся список с поиском, выбрал — свернулся.
+     Никаких полотен на весь экран. Используется и в заявках, и в рассылке. */
+  function pickList(host, opts){
+    // opts: {items:[{id,title,sub}], multi:bool, placeholder, onChange}
+    var chosen = {}, open = false;
+    var el = (typeof host === 'string') ? document.getElementById(host) : host;
+    if(!el) return null;
+    el.classList.add('picker');
+    el.innerHTML =
+      '<button type="button" class="pickbtn"><span class="pickval"></span><span class="pickarr">▾</span></button>'+
+      '<div class="pickdrop" hidden>'+
+        '<input type="search" class="picksearch" placeholder="начните вводить">'+
+        '<div class="picklist"></div>'+
+      '</div>';
+    var btn=el.querySelector('.pickbtn'), drop=el.querySelector('.pickdrop'),
+        val=el.querySelector('.pickval'), search=el.querySelector('.picksearch'),
+        list=el.querySelector('.picklist');
+
+    function label(){
+      var ids=Object.keys(chosen);
+      if(!ids.length) return opts.placeholder || 'выбрать';
+      if(!opts.multi){
+        var it=(opts.items||[]).filter(function(x){return String(x.id)===ids[0];})[0];
+        return it ? it.title : ids[0];
+      }
+      return 'выбрано: ' + ids.length;
+    }
+    function paint(){
+      val.textContent = label();
+      val.classList.toggle('dim', !Object.keys(chosen).length);
+    }
+    function draw(){
+      var q=(search.value||'').trim().toLowerCase();
+      var rows=(opts.items||[]).filter(function(it){
+        return !q || (it.title+' '+(it.sub||'')).toLowerCase().indexOf(q)>=0; });
+      if(!rows.length){ list.innerHTML='<div class="pickempty">ничего не нашлось</div>'; return; }
+      list.innerHTML = rows.slice(0,300).map(function(it){
+        var on = !!chosen[it.id];
+        return '<button type="button" class="pickitem'+(on?' on':'')+'" data-id="'+
+          String(it.id).replace(/"/g,'&quot;')+'">'+
+          (opts.multi?'<span class="pickck">'+(on?'✓':'')+'</span>':'')+
+          '<span class="picktitle">'+clEsc(it.title)+'</span>'+
+          (it.sub?'<span class="picksub">'+clEsc(it.sub)+'</span>':'')+'</button>';
+      }).join('');
+      Array.prototype.forEach.call(list.querySelectorAll('.pickitem'),function(b){
+        b.onclick=function(){
+          var id=b.getAttribute('data-id');
+          if(opts.multi){ if(chosen[id]) delete chosen[id]; else chosen[id]=1; draw(); }
+          else { chosen={}; chosen[id]=1; toggle(false); }
+          paint();
+          if(opts.onChange) opts.onChange(Object.keys(chosen));
+        };
+      });
+    }
+    function toggle(v){
+      open = (v===undefined) ? !open : v;
+      drop.hidden = !open;
+      btn.classList.toggle('on', open);
+      if(open){ draw(); setTimeout(function(){ search.focus(); },30); }
+    }
+    btn.onclick=function(e){ e.stopPropagation(); toggle(); };
+    search.oninput=draw;
+    document.addEventListener('click',function(e){
+      if(open && !el.contains(e.target)) toggle(false);
+    });
+    paint();
+    return {
+      get: function(){ return Object.keys(chosen); },
+      set: function(ids){ chosen={}; (ids||[]).forEach(function(i){ chosen[String(i)]=1; });
+                          paint(); if(open) draw(); },
+      add: function(ids){ (ids||[]).forEach(function(i){ chosen[String(i)]=1; });
+                          paint(); if(open) draw(); },
+      clear: function(){ chosen={}; paint(); if(open) draw(); },
+      count: function(){ return Object.keys(chosen).length; }
+    };
+  }
+
   // рассылка: собрать список, утвердить текст, выбрать номер, отправлять порциями
   var CMP_CH=[], CMP_PICK=[];
   function renderCamp(){
@@ -2496,34 +2599,35 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         'https://property-library.com/owner.html\n\n'+
         'Если пришлёте договор — система соберёт график платежей и будет напоминать заранее.</textarea>'+
         '<h4>Что приложить</h4>'+
-        '<p class="sub">Ссылку добавьте прямо в текст — она откроется у человека сразу. '+
-        'Файл лучше не слать первым сообщением: приложите ссылку на объект или расчёт.</p>'+
-        '<div class="fgrid">'+
-        '<label class="wide">Ссылка на объект или расчёт'+
-        '<select id="cm-offer"><option value="">— не добавлять —</option>'+
-        (objs.map(function(o){
-          return '<option value="'+o.url+'">'+clEsc(o.name)+'</option>'; }).join(''))+
-        '</select></label></div>'+
+        '<div class="fgrid"><label class="wide">Ссылка на объект или расчёт'+
+        '<div id="cm-offer"></div></label></div>'+
         '<h4>Кому отправляем</h4>'+
-        '<p class="sub">Отметьте галочками или вставьте номера списком — как удобнее. '+
-        'Доступно: '+people.length+'.</p>'+
-        '<div class="fgrid"><label class="wide">Вставить номера или коды'+
-        '<textarea id="cm-paste" class="cmtext" rows="3" placeholder="+66 954 143 874, 79818500758, PLP-003816 — через запятую, пробел или с новой строки"></textarea></label></div>'+
-        '<div class="fbtns"><button type="button" class="btn ghost" id="cm-addpaste">Добавить из списка</button>'+
-        '<input id="cm-find" type="text" class="cmfind" placeholder="найти по имени или номеру"></div>'+
-        '<div class="peoplebox">';
-      people.forEach(function(p){
-        h+='<label class="pill"><input type="checkbox" class="cm-p" value="'+p.code+'"'+
-           (p.temp==='client'?' checked':'')+'> <span class="mono">'+p.code+'</span> '+
-           clEsc(p.name||'—')+' <span class="sub">'+(TR[p.temp]||p.temp)+'</span></label>';
-      });
-      h+='</div><div class="fbtns"><button type="button" class="btn" id="cm-save">Собрать</button>'+
-         '<button type="button" class="btn ghost" id="cm-all">Отметить всех клиентов</button></div></div>';
+        '<div class="fgrid"><label class="wide">Получатели<div id="cm-who"></div></label>'+
+        '<label class="wide">Или вставьте номера списком'+
+        '<textarea id="cm-paste" class="cmtext" rows="2" placeholder="+66 954 143 874, PLP-003816 — через запятую или с новой строки"></textarea></label></div>'+
+        '<div class="fbtns"><button type="button" class="btn ghost" id="cm-addpaste">Добавить из вставки</button>'+
+        '<button type="button" class="btn ghost" id="cm-all">Все, кто купил</button></div>';
+      h+='<div class="fbtns"><button type="button" class="btn" id="cm-save">Собрать рассылку</button></div></div>';
       box.innerHTML=h;
+
+      var pickWho=pickList('cm-who',{
+        multi:true, placeholder:'выбрать получателей',
+        items: people.map(function(p){
+          return { id:p.code, title:(p.name||'Без имени'),
+                   sub:(TR[p.temp]||p.temp)+' · '+(p.phone||'') }; })
+      });
+      var pickOffer=pickList('cm-offer',{
+        multi:false, placeholder:'не добавлять',
+        items: objs.map(function(o){ return { id:o.url, title:o.name }; }),
+        onChange:function(ids){
+          var ta=document.getElementById('cm-text'), url=ids[0];
+          if(url && ta.value.indexOf(url)<0) ta.value=ta.value.replace(/\s*$/,'')+'\n\n'+url;
+        }
+      });
+      pickWho.set(people.filter(function(p){return p.temp==='client';}).map(function(p){return p.code;}));
       document.getElementById('cmp-cancel').onclick=function(){ box.innerHTML=''; };
       document.getElementById('cm-all').onclick=function(){
-        Array.prototype.forEach.call(box.querySelectorAll('.cm-p'),function(c){
-          if(c.parentElement.style.display!=='none') c.checked=true; });
+        pickWho.add(people.filter(function(p){return p.temp==='client';}).map(function(p){return p.code;}));
       };
       // вставка номеров списком: отмечаем найденных, о ненайденных честно говорим
       document.getElementById('cm-addpaste').onclick=function(){
@@ -2538,35 +2642,17 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
             return (code.indexOf('PLP-')===0 && p.code===code) ||
                    (digits.length>=8 && p.phone && p.phone.slice(-9)===digits.slice(-9));
           })[0];
-          if(hit){
-            var ck=box.querySelector('.cm-p[value="'+hit.code+'"]');
-            if(ck){ ck.checked=true; found++; }
-          } else miss.push(v);
+          if(hit){ pickWho.add([hit.code]); found++; } else miss.push(v);
         });
-        var msg='Отметил: '+found+'.';
+        document.getElementById('cm-paste').value='';
+        var msg='Добавил: '+found+'.';
         if(miss.length) msg+='\n\nНе нашёл в базе: '+miss.join(', ')+
           '\nЭтих людей сначала заведите в разделе «Люди» — рассылка идёт только по карточкам.';
         alert(msg);
       };
-      // поиск по списку
-      var fnd=document.getElementById('cm-find');
-      if(fnd) fnd.oninput=function(){
-        var q=fnd.value.trim().toLowerCase();
-        Array.prototype.forEach.call(box.querySelectorAll('.pill'),function(l){
-          l.style.display = (!q || l.textContent.toLowerCase().indexOf(q)>=0) ? '' : 'none';
-        });
-      };
-      // выбранная ссылка дописывается в текст
-      var off=document.getElementById('cm-offer');
-      if(off) off.onchange=function(){
-        var ta=document.getElementById('cm-text');
-        var url=off.value;
-        if(!url) return;
-        if(ta.value.indexOf(url)<0) ta.value=ta.value.replace(/\s*$/,'')+'\n\n'+url;
-      };
+
       document.getElementById('cm-save').onclick=function(){
-        var codes=Array.prototype.filter.call(box.querySelectorAll('.cm-p'),function(c){return c.checked;})
-                   .map(function(c){return c.value;});
+        var codes=pickWho.get();
         if(!codes.length){ alert('Отметьте, кому отправляем'); return; }
         var fr=(document.getElementById('cm-from').value||'').split('|');
         if(!fr[0]){ alert('Нет доступного номера для отправки'); return; }
@@ -3007,7 +3093,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     document.querySelector('.wrap').classList.remove('narrow');
     var dn=document.getElementById('demo-note'); if(dn) dn.style.display = DEMO_MODE ? '' : 'none';
     show('app'); $('logout').style.display='';
-    renderPortfolio(); renderTabs(); renderProp(); renderRequests(); renderEditState(); renderModeration(); renderCoords(); renderClients(); renderBoard(); renderCamp(); initCabNav();
+    renderPortfolio(); renderTabs(); renderProp(); renderRequests(); renderEditState(); renderModeration(); renderCoords(); renderClients(); renderBoard(); renderCamp(); renderRequestForm(); initCabNav();
   }
 
   /* Ответ идёт около трёх секунд — столько занимает запуск сценария на стороне
@@ -3245,14 +3331,98 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   };
 
 
+  /* Заявка: объект и вид работ выбираются списком, для брони показываются даты
+     и календарь занятости — чтобы не просить то, что уже занято. */
+  var REQ_OBJ=null, REQ_KIND=null;
+  var REQ_KINDS=[
+    {id:'booking',  title:'Забронировать даты'},
+    {id:'cleaning', title:'Уборка'},
+    {id:'repair',   title:'Ремонт или поломка'},
+    {id:'check',    title:'Проверить объект'},
+    {id:'price',    title:'Изменить цену или условия'},
+    {id:'docs',     title:'Документы'},
+    {id:'payout',   title:'Вопрос по выплате'},
+    {id:'other',    title:'Другое'}
+  ];
+  function renderRequestForm(){
+    var host=document.getElementById('r-obj'); if(!host) return;
+    var items=(DATA.properties||[]).map(function(pr){
+      var o=pr.object||{};
+      return { id: pr.id || o.plp_property_id || '',
+               title: o.name || pr.id || 'объект',
+               sub: (o.district||'') };
+    }).filter(function(x){ return x.id; });
+    REQ_OBJ=pickList('r-obj',{ multi:false, placeholder:'выберите объект', items:items,
+      onChange:function(){ showCal(); } });
+    REQ_KIND=pickList('r-kind',{ multi:false, placeholder:'что нужно', items:REQ_KINDS,
+      onChange:function(ids){
+        var isBook = ids[0]==='booking';
+        document.getElementById('r-dates').style.display = isBook ? '' : 'none';
+        showCal();
+      } });
+  }
+  function showCal(){
+    var box=document.getElementById('r-cal'); if(!box) return;
+    var pid=(REQ_OBJ&&REQ_OBJ.get()[0])||'';
+    var kind=(REQ_KIND&&REQ_KIND.get()[0])||'';
+    if(!pid || kind!=='booking'){ box.innerHTML=''; return; }
+    box.innerHTML='<p class="sub">Смотрим занятость…</p>';
+    post({action:'calendar',token:TOKEN,property_id:pid,months:6}).then(function(d){
+      var c=(d&&d.data)||{}, busy=(c['занято']||[]).concat(c['заявки']||[]);
+      var rates=c['тарифы']||[];
+      var h='';
+      if(rates.length){
+        h+='<h4 style="margin:14px 0 6px">Цены</h4><table class="ctable inner">'+
+           '<tr><th>Сезон</th><th>За ночь</th><th>Минимум</th><th>Период</th></tr>';
+        rates.forEach(function(r){
+          h+='<tr><td>'+clEsc(r['сезон']||'—')+'</td><td>'+
+             (r['ночь']?Number(r['ночь']).toLocaleString('ru-RU')+' ฿':'—')+'</td><td>'+
+             (r['минимум_ночей']||'—')+'</td><td>'+
+             (r['с']?clDate(r['с'])+' — '+clDate(r['по']):'весь год')+'</td></tr>';
+        });
+        h+='</table>';
+      }
+      h+='<h4 style="margin:14px 0 6px">Занятые даты</h4>';
+      if(!busy.length) h+='<p class="sub">На ближайшие полгода всё свободно.</p>';
+      else {
+        h+='<ul class="tline">';
+        busy.forEach(function(b){
+          h+='<li><span class="tdate">'+clDate(b['from'])+' — '+clDate(b['to'])+'</span> '+
+             clEsc(b['кто']||'занято')+
+             (b['сумма']?(' <span class="sub">'+Number(b['сумма']).toLocaleString('ru-RU')+' ฿</span>'):'')+
+             '</li>';
+        });
+        h+='</ul>';
+      }
+      box.innerHTML=h;
+    });
+  }
   $('r-send').onclick=function(){
-    var p=(DATA.properties||[])[CUR];
-    $('r-ok').textContent=''; $('r-err').textContent='';
-    post({action:'request',token:TOKEN,kind:$('r-kind').value,details:$('r-details').value.trim(),
-          desired_date:$('r-date').value||null,property_id:p?p.id:null}).then(function(d){
-      if(d&&d.ok){ $('r-ok').textContent='Заявка принята — менеджер свяжется с вами.';
-        $('r-details').value=''; $('r-date').value=''; loadData(); }
-      else $('r-err').textContent='Не удалось отправить заявку. Попробуйте ещё раз.';
+    var ok=$('r-ok'), err=$('r-err');
+    ok.textContent=''; err.textContent='';
+    var pid=(REQ_OBJ&&REQ_OBJ.get()[0])||'';
+    var kind=(REQ_KIND&&REQ_KIND.get()[0])||'';
+    if(!kind){ err.textContent='Выберите, что нужно.'; return; }
+    if(kind==='booking' && (!$('r-from').value || !$('r-to').value)){
+      err.textContent='Для брони укажите заезд и выезд.'; return; }
+    var btn=this; btn.disabled=true;
+    post({action:'request_new',token:TOKEN,kind:kind,property_id:pid||null,
+          details:$('r-details').value.trim(),
+          date_from:$('r-from')?$('r-from').value:null,
+          date_to:$('r-to')?$('r-to').value:null,
+          guests:$('r-guests')?$('r-guests').value:null,
+          amount:$('r-amount')?$('r-amount').value:null}).then(function(d){
+      btn.disabled=false;
+      if(d&&d.ok){
+        ok.textContent='Заявка принята'+(d['объект']?(' по объекту '+d['объект']):'')+
+                       '. Мы её видим, собственник уведомлён.';
+        $('r-details').value='';
+        if($('r-from')) $('r-from').value='';
+        if($('r-to')) $('r-to').value='';
+        showCal(); loadData();
+      } else {
+        err.textContent=(d&&d.error) ? d.error : 'Не удалось отправить заявку.';
+      }
     });
   };
 
