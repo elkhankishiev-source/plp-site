@@ -898,6 +898,8 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
   .picktitle{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .picksub{flex:none;font-size:12px;color:#8b8f7c}
   .pickempty{padding:10px;color:#8b8f7c;font-size:13px}
+  .stay-go{cursor:pointer;border-radius:10px;transition:background .15s}
+  .stay-go:hover{background:#f7f8ee}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 </head>
@@ -1617,9 +1619,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       '.rep-foot{margin-top:28px;padding-top:12px;border-top:1px solid #e6e5dd;'+
       'color:#8b8f7c;font-size:12px}'+
       '@media print{body{padding:0}.rep-obj{break-inside:avoid}}'+
-      '  .stay-go{cursor:pointer;border-radius:10px;transition:background .15s}
-  .stay-go:hover{background:#f7f8ee}
-</style></head><body>'+h+'</body></html>');
+      '</style></head><body>'+h+'</body></html>');
     w.document.close();
     setTimeout(function(){ try{ w.focus(); w.print(); }catch(e){} }, 400);
   }
