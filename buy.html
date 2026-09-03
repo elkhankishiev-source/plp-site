@@ -845,7 +845,9 @@ h3{font-size:1.12rem;font-weight:700}
 <link rel="preconnect" href="https://server.arcgisonline.com" crossorigin>
 
 <style>
-.catalog .filterbar{margin-top:16px}
+.catalog{padding-top:14px}
+.catalog .filterbar{margin-top:12px}
+.catalog .container>.reveal{margin-bottom:0}
 .catalog .arrows{display:none}
 .catalog .found{margin:14px 0 4px;font-size:.92rem;color:var(--muted)}
 .catalog .found b{color:var(--ink);font-size:1.05rem}
@@ -914,15 +916,10 @@ h3{font-size:1.12rem;font-weight:700}
 </div>
 
 <main id="top">
-<section style="padding-bottom:0"><div class="container"><h1 style="font-size:clamp(28px,4.2vw,42px);margin:0 0 10px">Купить недвижимость на Пхукете</h1><p class="sub" style="max-width:62ch;margin:0">Проверенные виллы и апартаменты от застройщиков и собственников. Каждый объект смотрим лично перед тем, как показать.</p></div></section>
-<section class="catalog" id="sale" aria-labelledby="sale-title">
+<section style="padding:22px 0 0"><div class="container"><h1 style="font-size:clamp(24px,3.2vw,34px);margin:0 0 6px">Купить недвижимость на Пхукете</h1><p class="sub" style="max-width:62ch;margin:0;font-size:.95rem">Проверенные виллы и апартаменты от застройщиков и собственников. Каждый объект смотрим лично перед тем, как показать.</p></div></section>
+<section class="catalog" id="sale">
   <div class="container">
-    <div class="head-row reveal">
-      <div>
-        <span class="kicker" data-i18n="sale.lab">Продажа</span>
-        <h2 id="sale-title" data-i18n="sale.h2">Проверенные объекты в продаже</h2>
-        <p class="sub" data-i18n="sale.sub">Каждый проект проходит нашу внутреннюю проверку перед публикацией. Нажмите на карточку — внутри детали и калькулятор доходности.</p>
-      </div>
+    <div class="head-row reveal"><div>
       <div class="arrows"><button type="button" onclick="scrollCar('saleCar',-1)" aria-label="Назад">‹</button><button type="button" onclick="scrollCar('saleCar',1)" aria-label="Вперёд">›</button></div>
     </div>
     <div class="filterbar reveal" id="saleFilters">
