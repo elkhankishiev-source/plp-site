@@ -1683,6 +1683,15 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   /* Формы внесения по объекту: операция, работа, документ.
      Открываются окном, после сохранения кабинет обновляется. */
   function bindUkForms(){
+    document.querySelectorAll('.tk-done').forEach(function(a){
+      a.onclick=function(e){ e.preventDefault();
+        var cost=prompt('Сколько в итоге стоило, ฿? (пусто — как планировали)',
+                        a.getAttribute('data-cost')||'');
+        if(cost===null) return;
+        post({action:'uk_task_done',token:TOKEN,id:a.getAttribute('data-id'),cost:cost})
+          .then(function(r){ if(r&&r.ok) loadData(); else alert((r&&r.error)||'Не вышло'); });
+      };
+    });
     Array.prototype.forEach.call(document.querySelectorAll('[data-uk]'),function(a){
       a.onclick=function(e){
         e.preventDefault();
@@ -1766,6 +1775,51 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
             document.body.style.overflow=''; loadData(); }
           else alert((r&&r.error)||'Не сохранилось');
         });
+      });
+  }
+
+  /* Перенос переписки: вставляем текст экспорта WhatsApp, разбираем строки
+     вида «[12.03.2024, 14:03] Имя: текст» и кладём в историю с их датами. */
+  function histForm(code){
+    clForm('<h3>Переписка в карточку '+code+'</h3>'+
+      '<p class="sub">В WhatsApp: чат → Экспорт чата → Без медиафайлов. '+
+      'Откройте файл и вставьте сюда — даты сохраним как есть.</p>'+
+      '<div class="fgrid"><label class="wide">Текст переписки'+
+      '<textarea id="h-text" class="cmtext" rows="8" placeholder="[12.03.2024, 14:03] Константин: Здравствуйте..."></textarea></label>'+
+      '<label>Кто мы в этой переписке<input id="h-me" type="text" value="Эльнур" '+
+      'placeholder="как подписаны наши сообщения"></label></div>'+
+      '<div class="fbtns"><button type="button" class="btn" id="f-save">Разобрать и добавить</button>'+
+      '<button type="button" class="btn ghost" id="f-cancel">Отмена</button></div>',
+      function(){
+        var raw=document.getElementById('h-text').value||'';
+        var me=(fv('h-me')||'Эльнур').toLowerCase();
+        var lines=raw.split(/\r?\n/), out=[], cur=null;
+        var re=/^\[?(\d{1,2})[./](\d{1,2})[./](\d{2,4})[,.]?\s+(\d{1,2}):(\d{2})(?::\d{2})?\]?\s*[-–]?\s*([^:]{1,60}):\s*(.*)$/;
+        lines.forEach(function(l){
+          var m=re.exec(l.replace(/‎/g,''));
+          if(!m){ if(cur && l.trim()) cur.text+='\n'+l.trim(); return; }
+          var y=+m[3]; if(y<100) y+=2000;
+          var iso=y+'-'+String(+m[2]).padStart(2,'0')+'-'+String(+m[1]).padStart(2,'0')+
+                  'T'+String(+m[4]).padStart(2,'0')+':'+m[5]+':00Z';
+          if(/<Media omitted>|Медиафайл пропущен|end-to-end/i.test(m[7])) { cur=null; return; }
+          cur={ts:iso, text:m[7].trim(), channel:'wa_personal',
+               actor:(m[6].toLowerCase().indexOf(me)>=0?'manager':'client')};
+          if(cur.text) out.push(cur);
+        });
+        if(!out.length){ alert('Не нашёл сообщений. Проверьте, что это экспорт чата WhatsApp.'); return; }
+        if(!confirm('Разобрал сообщений: '+out.length+'. Период '+out[0].ts.slice(0,10)+
+                    ' — '+out[out.length-1].ts.slice(0,10)+'. Добавить в карточку?')) return;
+        var chunks=[]; for(var i=0;i<out.length;i+=200) chunks.push(out.slice(i,i+200));
+        var done=0;
+        (function next(){
+          if(!chunks.length){
+            document.getElementById('cl-form').innerHTML='';
+            document.body.style.overflow='';
+            openClient(code); return;
+          }
+          post({action:'client_history',token:TOKEN,code:code,entries:chunks.shift()})
+            .then(function(){ done++; next(); });
+        })();
       });
   }
 
@@ -2099,15 +2153,33 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       }).join('')+'</div>';
   }
 
+  /* Объект выбирается списком, а не рядом вкладок: их бывает под сотню.
+     Сначала те, чем управляем — там финансы, брони и работы. */
+  var PROP_PICK=null;
   function renderTabs(){
     var p=DATA.properties||[];
-    if(p.length<2){ $('prop-tabs').innerHTML=''; return; }
-    $('prop-tabs').innerHTML=p.map(function(x,i){
-      return '<div class="tab'+(i===CUR?' on':'')+'" data-i="'+i+'">'+esc(x.name||x.id)+'</div>';
-    }).join('');
-    Array.prototype.forEach.call($('prop-tabs').children,function(el){
-      el.onclick=function(){ CUR=+el.getAttribute('data-i'); renderTabs(); renderProp(); window.scrollTo(0,0); };
-    });
+    var host=$('prop-tabs');
+    if(!p.length){ host.innerHTML=''; return; }
+    if(p.length===1){
+      host.innerHTML='<div class="sub">Объект: <b>'+esc(p[0].name||p[0].id)+'</b></div>';
+      return;
+    }
+    var uk=p.filter(function(x){return x.relation!=='каталог';}).length;
+    host.innerHTML='<label class="wide">Объект'+
+      '<div id="prop-pick"></div></label>'+
+      '<p class="sub" style="margin:6px 0 0">В управлении: '+uk+
+      ' · в каталоге: '+(p.length-uk)+'. По каталожным объектам финансов управления нет — '+
+      'там карточка, документы и правка.</p>';
+    PROP_PICK=pickList('prop-pick',{
+      multi:false, placeholder:'выберите объект',
+      items:p.map(function(x,i){
+        return { id:String(i), title:(x.name||x.id),
+                 sub:(x.relation==='каталог'?'каталог':'в управлении')+
+                     (x.district?(' · '+x.district):'') }; }),
+      onChange:function(ids){
+        CUR=Number(ids[0])||0; renderProp(); renderObjEdit(); window.scrollTo(0,0);
+      }});
+    PROP_PICK.set([String(CUR)]);
   }
 
   // ── карточка одного объекта, по разделам ────────────────────
@@ -2186,6 +2258,10 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     // операции периода
     var tx=p.transactions||[];
     var th='<p class="sub" style="margin-bottom:10px">'+dmy(DATA.period.start)+' — '+dmy(DATA.period.end)+'</p>';
+    if(p.relation==='каталог')
+      th='<p class="sub" style="margin-bottom:10px">Этот объект в каталоге продажи, '+
+         'в управлении у нас его нет — поэтому операций по нему не будет. '+
+         'Здесь можно вести карточку, документы и заявки.</p>'+th;
     if(!tx.length){ th+='<div class="empty">Операций за этот период пока нет.</div>'; }
     else{
       th+='<table><tr><th>Дата</th><th>Операция</th><th class="r">Сумма</th></tr>';
@@ -2236,11 +2312,15 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     var tk=p.tasks||[], kh='';
     if(!tk.length){ kh='<div class="empty">Запланированных работ нет.</div>'; }
     else{
-      kh='<table><tr><th>Срок</th><th>Работа</th><th class="r">Стоимость</th></tr>';
+      var isStaff=DATA.owner&&DATA.owner.is_staff===true;
+      kh='<table><tr><th>Срок</th><th>Работа</th><th class="r">Стоимость</th>'+
+         (isStaff?'<th></th>':'')+'</tr>';
       tk.forEach(function(t){
         kh+='<tr><td>'+dmy(t.due_date)+'</td><td>'+esc(KINDS[t.kind]||t.kind||'—')+
             (t.note?'<br><span style="color:var(--dim);font-size:12px">'+esc(t.note)+'</span>':'')+
-            '</td><td class="r">'+(t.cost_thb?money(t.cost_thb,cur):'—')+'</td></tr>';
+            '</td><td class="r">'+(t.cost_thb?money(t.cost_thb,cur):'—')+'</td>'+
+            (isStaff?('<td class="r"><a href="#" class="lnk tk-done" data-id="'+(t.id||'')+
+              '" data-cost="'+(t.cost_thb||'')+'">выполнено</a></td>'):'')+'</tr>';
       });
       kh+='</table>';
     }
@@ -2640,6 +2720,9 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       } else {
         h+='<p class="sub">Документы и фото складываем на Google Диск, здесь останутся ссылки.</p>';
       }
+      h+='<h4>Перенести переписку</h4>'+
+         '<p class="sub">Экспорт чата из WhatsApp (без медиа) — вставьте текст, '+
+         'разберём по датам и добавим в историю. <a href="#" class="lnk" id="cl-hist">Вставить переписку</a></p>';
       h+='<h4>Доступ в кабинет</h4>';
       if(c.cabinet_enabled){
         h+='<p class="sub">Вход открыт. Заходит по своему номеру на /owner.html — код приходит в '+
@@ -2699,6 +2782,8 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
                 .then(function(){ openClient(code); loadClients(); }); };
           });
         }); };
+      var hst=document.getElementById('cl-hist');
+      if(hst) hst.onclick=function(e){ e.preventDefault(); histForm(code); };
       var dn=document.getElementById('cl-deny');
       if(dn) dn.onclick=function(e){ e.preventDefault();
         var why=prompt('Почему отказываем?','не квалифицирован'); if(why===null) return;
@@ -3427,7 +3512,8 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
              '<td>'+clEsc(r.name||'—')+'</td><td>'+(WHY[r.status]||r.status)+'</td>'+
              '<td class="mono">'+(r.looks_like||'—')+'</td><td>'+(r.deals||0)+'</td>'+
              '<td><a href="#" class="lnk ph-fix" data-code="'+r.code+'" data-cur="'+
-             (r.phone||'')+'" data-hint="'+(r.looks_like||'')+'">исправить</a></td></tr>';
+             (r.phone||'')+'" data-hint="'+(r.looks_like||'')+'">исправить</a><br>'+
+             '<a href="#" class="lnk ph-junk" data-code="'+r.code+'">отложить</a></td></tr>';
         });
         h+='</table>';
       }
@@ -3437,6 +3523,13 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       var shut=function(){ box.innerHTML=''; document.body.style.overflow=''; };
       if(bk2) bk2.onclick=shut;
       document.getElementById('f-cancel').onclick=shut;
+      Array.prototype.forEach.call(box.querySelectorAll('.ph-junk'),function(a){
+        a.onclick=function(e){ e.preventDefault();
+          var why=prompt('Почему откладываем этот номер?','нет в WhatsApp и Telegram');
+          if(why===null) return;
+          post({action:'phone_junk',token:TOKEN,code:a.getAttribute('data-code'),why:why})
+            .then(function(){ dupesBoard(); loadClients(); }); };
+      });
       Array.prototype.forEach.call(box.querySelectorAll('.ph-fix'),function(a){
         a.onclick=function(e){ e.preventDefault();
           var cur=a.getAttribute('data-cur'), hint=a.getAttribute('data-hint');
