@@ -1287,6 +1287,7 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
       <p class="sub" style="margin:0 0 12px">Выберите объект и что нужно. Заявку увидим мы,
       а по объектам под управлением — ещё и собственник.</p>
       <div class="fgrid">
+        <label class="wide" id="r-cl-wrap" style="display:none">Клиент<div id="r-client"></div></label>
         <label class="wide">Объект<div id="r-obj"></div></label>
         <label class="wide">Что нужно<div id="r-kind"></div></label>
       </div>
@@ -3344,22 +3345,54 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     {id:'payout',   title:'Вопрос по выплате'},
     {id:'other',    title:'Другое'}
   ];
+  var REQ_CLIENT=null, REQ_ALLOBJ=[];
   function renderRequestForm(){
     var host=document.getElementById('r-obj'); if(!host) return;
-    var items=(DATA.properties||[]).map(function(pr){
+    REQ_ALLOBJ=(DATA.properties||[]).map(function(pr){
       var o=pr.object||{};
       return { id: pr.id || o.plp_property_id || '',
                title: o.name || pr.id || 'объект',
                sub: (o.district||'') };
     }).filter(function(x){ return x.id; });
-    REQ_OBJ=pickList('r-obj',{ multi:false, placeholder:'выберите объект', items:items,
+
+    REQ_OBJ=pickList('r-obj',{ multi:false, placeholder:'выберите объект', items:REQ_ALLOBJ,
       onChange:function(){ showCal(); } });
     REQ_KIND=pickList('r-kind',{ multi:false, placeholder:'что нужно', items:REQ_KINDS,
       onChange:function(ids){
-        var isBook = ids[0]==='booking';
-        document.getElementById('r-dates').style.display = isBook ? '' : 'none';
+        document.getElementById('r-dates').style.display = (ids[0]==='booking') ? '' : 'none';
         showCal();
       } });
+
+    // сотрудник оформляет заявку за клиента: сначала человек, потом его объект
+    if(DATA.owner && DATA.owner.is_staff===true){
+      document.getElementById('r-cl-wrap').style.display='';
+      post({action:'clients',token:TOKEN,limit:300}).then(function(d){
+        var rows=(d&&d.data&&d.data.rows)||[];
+        REQ_CLIENT=pickList('r-client',{
+          multi:false, placeholder:'без клиента — просто по объекту',
+          items: rows.map(function(r){
+            return { id:r.code, title:(r.name||'Без имени'),
+                     sub:(TEMP_RU[r.temp]||r.temp)+(r.phone?(' · '+r.phone):'') }; }),
+          onChange:function(ids){ narrowObjects(ids[0]); }
+        });
+      });
+    }
+  }
+  // когда выбран человек — в списке объектов сначала его, потом остальные
+  function narrowObjects(code){
+    if(!code){ REQ_OBJ=pickList('r-obj',{multi:false,placeholder:'выберите объект',
+      items:REQ_ALLOBJ,onChange:function(){showCal();}}); return; }
+    post({action:'client_objects',token:TOKEN,code:code}).then(function(d){
+      var his=(d&&d.rows)||[];
+      var hisIds={}; his.forEach(function(x){ hisIds[x.id]=1; });
+      var items=his.map(function(x){ return {id:x.id,title:x.title,sub:x.sub}; })
+        .concat(REQ_ALLOBJ.filter(function(x){ return !hisIds[x.id]; })
+          .map(function(x){ return {id:x.id,title:x.title,sub:x.sub+' · каталог'}; }));
+      REQ_OBJ=pickList('r-obj',{ multi:false,
+        placeholder: his.length ? 'объекты этого человека' : 'выберите объект',
+        items: items, onChange:function(){ showCal(); } });
+      if(his.length===1) REQ_OBJ.set([his[0].id]);
+    });
   }
   function showCal(){
     var box=document.getElementById('r-cal'); if(!box) return;
@@ -3407,6 +3440,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       err.textContent='Для брони укажите заезд и выезд.'; return; }
     var btn=this; btn.disabled=true;
     post({action:'request_new',token:TOKEN,kind:kind,property_id:pid||null,
+          client_code:(REQ_CLIENT&&REQ_CLIENT.get()[0])||null,
           details:$('r-details').value.trim(),
           date_from:$('r-from')?$('r-from').value:null,
           date_to:$('r-to')?$('r-to').value:null,
@@ -3414,8 +3448,10 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
           amount:$('r-amount')?$('r-amount').value:null}).then(function(d){
       btn.disabled=false;
       if(d&&d.ok){
-        ok.textContent='Заявка принята'+(d['объект']?(' по объекту '+d['объект']):'')+
-                       '. Мы её видим, собственник уведомлён.';
+        ok.textContent='Заявка принята'+
+          (d['клиент']&&d['клиент']!=='—'?(' · '+d['клиент']):'')+
+          (d['объект']&&d['объект']!=='—'?(' · '+d['объект']):'')+
+          '. Она уже в карточке человека и в работе.';
         $('r-details').value='';
         if($('r-from')) $('r-from').value='';
         if($('r-to')) $('r-to').value='';
