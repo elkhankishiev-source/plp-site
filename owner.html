@@ -807,6 +807,17 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
   .clnote{display:flex;gap:8px}
   .clnote input{flex:1;min-width:0;padding:9px 12px;border:1px solid var(--line);border-radius:9px;font:inherit;background:#fff}
   @media(max-width:640px){.ctable th:nth-child(3),.ctable td:nth-child(3){display:none}}
+  .clbar{display:flex;gap:8px;margin:10px 0 0;flex-wrap:wrap}
+  .ctable.inner{font-size:13px;margin-top:6px}
+  .ctable.inner th{font-size:11px}
+  .lnk{color:#6b7a4a;text-decoration:underline;cursor:pointer}
+  .tdone{opacity:.5;text-decoration:line-through}
+  .tdate.over,td.over{color:#a33418;font-weight:600}
+  .fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-top:10px}
+  .fgrid label{display:block;font-size:12px;color:#7b7f6a}
+  .fgrid label.wide{grid-column:1/-1}
+  .fgrid input,.fgrid select{width:100%;box-sizing:border-box;margin-top:3px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font:inherit;background:#fff;color:inherit}
+  .fbtns{display:flex;gap:8px;margin-top:14px}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 </head>
@@ -1081,6 +1092,11 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
         <button type="button" class="btn ghost" id="cl-go">Найти</button>
       </div>
       <div id="cl-sum" class="sub" style="margin:10px 0 0"></div>
+      <div class="clbar">
+        <button type="button" class="btn ghost" id="cl-new">+ Завести человека</button>
+        <button type="button" class="btn ghost" id="cl-board">Что горит</button>
+      </div>
+      <div id="cl-form"></div>
       <div id="cl-list"></div>
       <div id="cl-card"></div>
     </div>
@@ -1783,6 +1799,10 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         o.classList.add('on'); CL_TEMP=o.getAttribute('data-v'); loadClients();
       };
     });
+    var nb=document.getElementById('cl-new');
+    if(nb) nb.onclick=function(){ newClientForm(); };
+    var bb=document.getElementById('cl-board');
+    if(bb) bb.onclick=function(){ tasksBoard(); };
     var go=document.getElementById('cl-go'), qi=document.getElementById('cl-q');
     if(go) go.onclick=function(){ CL_Q=qi.value.trim(); loadClients(); };
     if(qi) qi.onkeydown=function(e){ if(e.key==='Enter'){ CL_Q=qi.value.trim(); loadClients(); } };
@@ -1805,11 +1825,12 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         'Всего в базе <b>'+(d.data.total||0)+'</b> · холодных '+(c.cold||0)+
         ' · с номером '+(c.warm||0)+' · клиентов '+(c.client||0);
       if(!rows.length){ box.innerHTML='<p class="sub">Никого не нашлось.</p>'; return; }
-      var h='<table class="ctable"><tr><th>Номер</th><th>Имя</th><th>Откуда</th><th>Состояние</th><th>Последний раз</th></tr>';
+      var h='<table class="ctable"><tr><th>Номер</th><th>Имя</th><th>Откуда</th><th>Состояние</th><th>Сделок</th><th>Задач</th><th>Последний раз</th></tr>';
       rows.forEach(function(r){
         h+='<tr class="clrow" data-code="'+r.code+'"><td class="mono">'+r.code+'</td><td>'+
            clEsc(r.name||'—')+'</td><td>'+(SRC_RU[r.source]||r.source||'—')+'</td><td><span class="tmp t-'+
-           r.temp+'">'+(TEMP_RU[r.temp]||r.temp)+'</span></td><td>'+clDate(r.last_seen_at)+'</td></tr>';
+           r.temp+'">'+(TEMP_RU[r.temp]||r.temp)+'</span></td><td>'+(r.deals||0)+'</td><td>'+
+           (r.open_tasks?('<b>'+r.open_tasks+'</b>'):'—')+'</td><td>'+clDate(r.last_seen_at)+'</td></tr>';
       });
       box.innerHTML=h+'</table>';
       Array.prototype.forEach.call(box.querySelectorAll('.clrow'),function(tr){
@@ -1835,6 +1856,51 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         '<div><span class="lbl">Интерес</span>'+(INT[c.intent]||'—')+'</div>'+
         '<div><span class="lbl">Первое касание</span>'+clDate(c.first_seen_at)+'</div>'+
         '<div><span class="lbl">В amoCRM</span>'+(c.amo_lead_id?('сделка '+c.amo_lead_id):'нет')+'</div></div>';
+      var dl=k.deals||[];
+      h+='<h4>Обращения и сделки</h4>';
+      if(!dl.length){ h+='<p class="sub">В amoCRM сделок нет.</p>'; }
+      else {
+        h+='<table class="ctable inner"><tr><th>Когда</th><th>Воронка</th><th>Что</th><th>Итог</th></tr>';
+        dl.forEach(function(d){
+          var res = d.outcome==='won'?'<span class="tmp t-client">купил</span>'
+                  : d.outcome==='lost'?'<span class="tmp t-lost">не сложилось</span>'
+                  : '<span class="tmp t-warm">в работе</span>';
+          h+='<tr><td>'+clDate(d.created_on)+'</td><td>'+clEsc(d.pipeline||'—')+'</td><td>'+
+             clEsc(d.status||d.title||'—')+'</td><td>'+res+'</td></tr>';
+        });
+        h+='</table>';
+      }
+
+      var ob=k.objects||[];
+      h+='<h4>Объекты</h4>';
+      if(!ob.length){ h+='<p class="sub">Объекты не заведены. <a href="#" class="lnk" id="cl-addobj">Добавить</a></p>'; }
+      else {
+        h+='<table class="ctable inner"><tr><th>Проект</th><th>Юнит</th><th>Стадия</th><th>Управление</th><th>Сдача</th></tr>';
+        ob.forEach(function(o){
+          var UK={none:'нет',planned:'запланировано',contract:'договор',active:'ведём'};
+          h+='<tr><td>'+clEsc(o.project||o.object_id||'—')+'</td><td>'+clEsc(o.unit||'—')+'</td><td>'+
+             clEsc(o.stage||o.rel||'—')+'</td><td>'+(UK[o.uk_status]||'—')+'</td><td>'+
+             (o.handover_on?clDate(o.handover_on):'—')+'</td></tr>';
+        });
+        h+='</table><p class="sub"><a href="#" class="lnk" id="cl-addobj">Добавить объект</a></p>';
+      }
+
+      var tk=k.tasks||[];
+      h+='<h4>Что нужно сделать</h4>';
+      if(!tk.length){ h+='<p class="sub">Задач нет. <a href="#" class="lnk" id="cl-addtask">Поставить</a></p>'; }
+      else {
+        h+='<ul class="tline">';
+        tk.forEach(function(t){
+          var done=(t.status==='done'||t.status==='cancelled');
+          var over=(!done && t.due_on && t.due_on < new Date().toISOString().slice(0,10));
+          h+='<li'+(done?' class="tdone"':'')+'>'+
+             (t.due_on?('<span class="tdate'+(over?' over':'')+'">'+clDate(t.due_on)+'</span> '):'')+
+             clEsc(t.title)+(t.object?(' <span class="sub">· '+clEsc(t.object)+'</span>'):'')+
+             (done?'':' <a href="#" class="lnk done-task" data-id="'+t.task_id+'">готово</a>')+'</li>';
+        });
+        h+='</ul><p class="sub"><a href="#" class="lnk" id="cl-addtask">Поставить задачу</a></p>';
+      }
+
       var tl=k.timeline||[];
       h+='<h4>История</h4>';
       if(!tl.length){ h+='<p class="sub">Пока пусто — записи появятся с первым сообщением.</p>'; }
@@ -1868,11 +1934,127 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         var v=document.getElementById('cl-note').value.trim(); if(!v) return;
         post({action:'client_update',token:TOKEN,code:code,note:v}).then(function(){ openClient(code); });
       };
+      var ao=document.getElementById('cl-addobj');
+      if(ao) ao.onclick=function(e){ e.preventDefault(); objForm(code); };
+      var at=document.getElementById('cl-addtask');
+      if(at) at.onclick=function(e){ e.preventDefault(); taskForm(code); };
+      Array.prototype.forEach.call(box.querySelectorAll('.done-task'),function(a){
+        a.onclick=function(e){ e.preventDefault();
+          post({action:'client_task_set',token:TOKEN,task_id:a.getAttribute('data-id'),status:'done'})
+            .then(function(){ openClient(code); loadClients(); }); };
+      });
       Array.prototype.forEach.call(document.getElementById('cl-temp').querySelectorAll('.opt'),function(o){
         o.onclick=function(){
           post({action:'client_update',token:TOKEN,code:code,temp:o.getAttribute('data-v')})
             .then(function(){ openClient(code); loadClients(); });
         };
+      });
+    });
+  }
+
+
+  // формы: завести человека, добавить объект, поставить задачу, доска задач
+  function clForm(html, onSave){
+    var box=document.getElementById('cl-form'); if(!box) return;
+    box.innerHTML='<div class="ccard">'+html+'</div>';
+    box.scrollIntoView({behavior:'smooth',block:'nearest'});
+    var c=document.getElementById('f-cancel'); if(c) c.onclick=function(){ box.innerHTML=''; };
+    var sv=document.getElementById('f-save'); if(sv) sv.onclick=onSave;
+  }
+  function fv(id){ var e=document.getElementById(id); return e?e.value.trim():''; }
+  function newClientForm(){
+    clForm('<h3>Новый человек</h3>'+
+      '<p class="sub">Для тех, кого нет в CRM: личные контакты, старые знакомства.</p>'+
+      '<div class="fgrid">'+
+      '<label>Имя<input id="f-name" type="text"></label>'+
+      '<label>Телефон<input id="f-phone" type="text" placeholder="66..."></label>'+
+      '<label>Telegram id<input id="f-tg" type="text"></label>'+
+      '<label>Откуда<input id="f-src" type="text" placeholder="личный WhatsApp, рекомендация…"></label>'+
+      '<label>Интерес<select id="f-int"><option value="">—</option><option value="buy">покупка</option>'+
+      '<option value="rent">аренда</option><option value="management">управление</option>'+
+      '<option value="sell">продажа</option></select></label>'+
+      '<label class="wide">Что важно знать<input id="f-note" type="text"></label></div>'+
+      '<div class="fbtns"><button type="button" class="btn" id="f-save">Завести</button>'+
+      '<button type="button" class="btn ghost" id="f-cancel">Отмена</button></div>',
+      function(){
+        if(!fv('f-name') && !fv('f-phone')){ alert('Нужно хотя бы имя или телефон'); return; }
+        post({action:'client_add',token:TOKEN,name:fv('f-name'),phone:fv('f-phone'),tg:fv('f-tg'),
+              source:fv('f-src')||'manual',intent:fv('f-int'),note:fv('f-note')})
+          .then(function(d){
+            document.getElementById('cl-form').innerHTML='';
+            loadClients();
+            if(d&&d.ok&&d.card&&d.card.client) openClient(d.card.client.code);
+          });
+      });
+  }
+  function objForm(code){
+    clForm('<h3>Объект человека '+code+'</h3><div class="fgrid">'+
+      '<label>Проект<input id="f-proj" type="text" placeholder="Modeva"></label>'+
+      '<label>Код объекта<input id="f-oid" type="text" placeholder="PLP-MODEVA"></label>'+
+      '<label>Юнит<input id="f-unit" type="text" placeholder="A-1204"></label>'+
+      '<label>Отношение<select id="f-rel"><option value="owns">владеет</option>'+
+      '<option value="reserved">забронирован</option><option value="interest">присматривается</option>'+
+      '<option value="rents">арендует</option><option value="sold">продал</option></select></label>'+
+      '<label>Стадия<input id="f-stage" type="text" placeholder="строится, сдан, в отделке"></label>'+
+      '<label>Сдача<input id="f-hand" type="date"></label>'+
+      '<label>Куплен<input id="f-bought" type="date"></label>'+
+      '<label>Цена, ฿<input id="f-price" type="number"></label>'+
+      '<label>Управление<select id="f-uk"><option value="">—</option><option value="none">не наше</option>'+
+      '<option value="planned">запланировано</option><option value="contract">договор</option>'+
+      '<option value="active">ведём</option></select></label>'+
+      '<label class="wide">Заметка<input id="f-onote" type="text"></label></div>'+
+      '<div class="fbtns"><button type="button" class="btn" id="f-save">Сохранить</button>'+
+      '<button type="button" class="btn ghost" id="f-cancel">Отмена</button></div>',
+      function(){
+        var oid=fv('f-oid')||fv('f-proj');
+        if(!oid){ alert('Нужен проект или код объекта'); return; }
+        post({action:'client_object',token:TOKEN,code:code,object_id:oid,project:fv('f-proj'),
+              unit:fv('f-unit'),rel:fv('f-rel'),stage:fv('f-stage'),handover_on:fv('f-hand'),
+              bought_on:fv('f-bought'),price:fv('f-price'),uk_status:fv('f-uk'),note:fv('f-onote')})
+          .then(function(){ document.getElementById('cl-form').innerHTML=''; openClient(code); });
+      });
+  }
+  function taskForm(code){
+    clForm('<h3>Задача по '+code+'</h3><div class="fgrid">'+
+      '<label class="wide">Что сделать<input id="f-title" type="text" placeholder="Подготовить квартиру в Modeva к управлению"></label>'+
+      '<label>Срок<input id="f-due" type="date"></label>'+
+      '<label>Тип<select id="f-kind"><option value="uk_prep">подготовка к управлению</option>'+
+      '<option value="handover">приёмка</option><option value="payment">платёж</option>'+
+      '<option value="doc">документы</option><option value="meeting">встреча</option>'+
+      '<option value="report">отчёт</option><option value="other">другое</option></select></label>'+
+      '<label>Объект<input id="f-tobj" type="text"></label>'+
+      '<label>Кто делает<input id="f-who" type="text"></label>'+
+      '<label class="wide">Подробности<input id="f-det" type="text"></label></div>'+
+      '<div class="fbtns"><button type="button" class="btn" id="f-save">Поставить</button>'+
+      '<button type="button" class="btn ghost" id="f-cancel">Отмена</button></div>',
+      function(){
+        if(!fv('f-title')){ alert('Напишите, что сделать'); return; }
+        post({action:'client_task',token:TOKEN,code:code,title:fv('f-title'),due_on:fv('f-due'),
+              kind:fv('f-kind'),object_id:fv('f-tobj'),assignee:fv('f-who'),details:fv('f-det')})
+          .then(function(){ document.getElementById('cl-form').innerHTML=''; openClient(code); loadClients(); });
+      });
+  }
+  function tasksBoard(){
+    var box=document.getElementById('cl-form');
+    box.innerHTML='<div class="ccard"><p class="sub">Собираем задачи…</p></div>';
+    post({action:'client_tasks',token:TOKEN,days:90}).then(function(d){
+      var t=(d&&d.tasks)||[];
+      var h='<div class="ccard"><div class="chead"><h3 style="margin:0">Что горит</h3>'+
+            '<button type="button" class="btn ghost" id="f-cancel">Закрыть</button></div>';
+      if(!t.length) h+='<p class="sub">Открытых задач нет.</p>';
+      else {
+        h+='<table class="ctable inner"><tr><th>Срок</th><th>Кто</th><th>Что</th><th>Объект</th></tr>';
+        t.forEach(function(x){
+          h+='<tr class="clrow" data-code="'+x.code+'"><td'+(x.overdue?' class="over"':'')+'>'+
+             (x.due_on?clDate(x.due_on):'—')+'</td><td class="mono">'+x.code+'</td><td>'+
+             clEsc(x.title)+'</td><td>'+clEsc(x.object||'—')+'</td></tr>';
+        });
+        h+='</table>';
+      }
+      box.innerHTML=h+'</div>';
+      document.getElementById('f-cancel').onclick=function(){ box.innerHTML=''; };
+      Array.prototype.forEach.call(box.querySelectorAll('.clrow'),function(tr){
+        tr.onclick=function(){ openClient(tr.getAttribute('data-code')); };
       });
     });
   }
