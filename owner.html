@@ -900,6 +900,16 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
   .pickempty{padding:10px;color:#8b8f7c;font-size:13px}
   .stay-go{cursor:pointer;border-radius:10px;transition:background .15s}
   .stay-go:hover{background:#f7f8ee}
+  .ownmon{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#8b8f7c;margin-left:8px}
+  .ownmon input{width:60px;padding:4px 8px;border:1px solid var(--line);border-radius:7px;font:inherit}
+  .card.fold{padding-bottom:0}
+  .card.fold .foldh{display:flex;align-items:center;justify-content:space-between;gap:12px;
+    cursor:pointer;margin:0;padding:2px 0 14px;user-select:none}
+  .card.fold .foldi{flex:none;width:26px;height:26px;display:grid;place-items:center;
+    border:1px solid var(--line);border-radius:50%;font-size:15px;color:var(--olive);background:#fff}
+  .card.fold:not(.open) .foldh{padding-bottom:2px}
+  .card.fold .foldb{padding-bottom:18px}
+  .card.fold:hover .foldi{border-color:var(--green-deep)}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 </head>
@@ -1400,7 +1410,30 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   function has(v){ return v!==null && v!==undefined && v!=='' && !(Array.isArray(v)&&!v.length); }
   // строка «ключ — значение», пустые не рисуем
   function line(k,v){ return has(v) ? '<div class="row"><span>'+esc(k)+'</span><b>'+esc(v)+'</b></div>' : ''; }
-  function card(title,inner,id){ return inner ? '<div class="card"'+(id?' id="'+id+'"':'')+'><h2>'+esc(title)+'</h2>'+inner+'</div>' : ''; }
+  /* Карточка-гармошка: заголовок всегда виден, содержимое раскрывается по клику.
+     Иначе раздел объекта превращается в полотно на несколько экранов. */
+  var CARD_N=0, CARD_OPEN={};
+  function card(title,inner,id){
+    if(!inner) return '';
+    CARD_N++;
+    var key=id||('c'+CARD_N);
+    var open = (CARD_OPEN[key]!==undefined) ? CARD_OPEN[key] : (CARD_N===1);
+    return '<div class="card fold'+(open?' open':'')+'"'+(id?' id="'+id+'"':'')+' data-fold="'+key+'">'+
+           '<h2 class="foldh"><span>'+esc(title)+'</span><span class="foldi">'+(open?'−':'+')+'</span></h2>'+
+           '<div class="foldb"'+(open?'':' hidden')+'>'+inner+'</div></div>';
+  }
+  function bindFolds(){
+    document.querySelectorAll('.card.fold > .foldh').forEach(function(h){
+      h.onclick=function(){
+        var c=h.parentElement, b=c.querySelector('.foldb'),
+            key=c.getAttribute('data-fold'), open=!c.classList.contains('open');
+        c.classList.toggle('open', open);
+        b.hidden=!open;
+        c.querySelector('.foldi').textContent = open?'−':'+';
+        CARD_OPEN[key]=open;
+      };
+    });
+  }
 
   var KINDS={cleaning:'Уборка',repair:'Ремонт',maintenance:'Обслуживание',inspection:'Осмотр',
              checkin:'Заезд',checkout:'Выезд',block_dates:'Блокировка дат',payout:'Выплата',other:'Другое'};
@@ -1527,7 +1560,30 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     var props=DATA.properties||[];
     if(!props.length){ alert('Пока нет объектов, по которым делать отчёт.'); return; }
     var months=allMonths();
-    var rows=(CHART_RANGE==='all')?months:months.slice(-(CHART_RANGE||12));
+    if(!months.length){ alert('Пока нет операций, из которых собрать отчёт.'); return; }
+    // сначала спрашиваем период — отчёт всегда за то, что нужно сейчас
+    clForm('<h3>Отчёт за период</h3>'+
+      '<p class="sub">Есть данные с '+monthName(months[0].month)+' по '+
+      monthName(months[months.length-1].month)+'.</p>'+
+      '<div class="fgrid">'+
+      '<label>С месяца<select id="rp-from">'+months.map(function(m,i){
+        return '<option value="'+i+'">'+monthName(m.month)+'</option>'; }).join('')+'</select></label>'+
+      '<label>По месяц<select id="rp-to">'+months.map(function(m,i){
+        return '<option value="'+i+'"'+(i===months.length-1?' selected':'')+'>'+
+               monthName(m.month)+'</option>'; }).join('')+'</select></label>'+
+      '</div><div class="fbtns"><button type="button" class="btn" id="f-save">Собрать отчёт</button>'+
+      '<button type="button" class="btn ghost" id="f-cancel">Отмена</button></div>',
+      function(){
+        var a=Number(fv2('rp-from')), b=Number(fv2('rp-to'));
+        if(b<a){ var t=a; a=b; b=t; }
+        document.getElementById('cl-form').innerHTML='';
+        document.body.style.overflow='';
+        printReport(months.slice(a,b+1));
+      });
+  }
+  function fv2(id){ var e=document.getElementById(id); return e?e.value:''; }
+  function printReport(rows){
+    var props=DATA.properties||[];
     var inc=rows.reduce(function(a,m){return a+m.income;},0);
     var exp=rows.reduce(function(a,m){return a+m.expenses;},0);
     var net=rows.reduce(function(a,m){return a+m.net;},0);
@@ -1811,10 +1867,12 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     var inc=rows.reduce(function(a,m){return a+m.income;},0);
     var exp=rows.reduce(function(a,m){return a+m.expenses;},0);
     var sum=rows.reduce(function(a,m){return a+m.net;},0);
-    var per=[[6,'6 мес'],[12,'12 мес'],['all','всё время']].map(function(x){
+    var per=[[3,'3'],[6,'6'],[12,'12'],[24,'24'],['all','всё']].map(function(x){
       return '<button type="button" class="opt'+(String(CHART_RANGE)===String(x[0])?' on':'')+
              '" data-range="'+x[0]+'">'+x[1]+'</button>';
-    }).join('');
+    }).join('')+
+    '<span class="ownmon">свой период: <input type="number" id="ch-own" min="1" max="'+
+    all.length+'" value="'+(CHART_RANGE==='all'?all.length:CHART_RANGE)+'"> мес.</span>';
     return '<div class="card chart"><div class="chead"><h2 style="margin:0">Доход по месяцам</h2>'+
       '<div class="opts tight" id="ch-range">'+per+'</div></div>'+
       '<p class="sub">Поступило '+money(inc,'THB')+' · расходы '+money(exp,'THB')+
@@ -1828,6 +1886,11 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       b.onclick=function(){ var v=b.getAttribute('data-range');
         CHART_RANGE=(v==='all')?'all':Number(v); CHART_OPEN=null; redrawChart(); };
     });
+    var own=document.getElementById('ch-own');
+    if(own) own.onchange=function(){
+      var v=Math.max(1,Math.min(Number(own.value)||12,240));
+      CHART_RANGE=v; CHART_OPEN=null; redrawChart();
+    };
     var bars=document.getElementById('ch-bars');
     if(bars) Array.prototype.forEach.call(bars.querySelectorAll('.mbar'),function(b){
       b.onclick=function(){ var m=b.getAttribute('data-m');
@@ -2256,7 +2319,9 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
            '">Добавить документ</a> — ссылка на Google Диск или файл.</p>';
     H+=card('Документы объекта', dch, 'sec-docs');
 
+    CARD_N=0;
     $('prop').innerHTML=H;
+    bindFolds();
   }
 
   function renderEditState(){
