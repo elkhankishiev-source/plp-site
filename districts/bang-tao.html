@@ -192,7 +192,7 @@ h3{font-size:1.12rem;font-weight:700}
 .head-row{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap}
 
 /* liquid background */
-#liquid{position:fixed;inset:-10%;width:120%;height:120%;z-index:0;filter:blur(70px) saturate(1.12);opacity:.55;pointer-events:none}
+#liquid{position:fixed;inset:-10%;width:120%;height:120%;z-index:0;filter:blur(70px) saturate(1.12);opacity:.55;pointer-events:none;max-width:100vw;left:0}
 .veil{position:fixed;inset:0;z-index:1;background:radial-gradient(120% 80% at 50% 0%,rgba(247,246,241,0) 45%,rgba(247,246,241,.6) 100%);pointer-events:none}
 .stage{position:relative;z-index:2}
 
@@ -925,14 +925,7 @@ h3{font-size:1.12rem;font-weight:700}
   </div></section>
 <section id="sale" aria-labelledby="sale-title">
   <div class="container">
-    <div class="head-row reveal">
-      <div>
-        <span class="kicker" data-i18n="sale.lab">Продажа</span>
-        <h2 id="sale-title" data-i18n="sale.h2">Проверенные объекты в продаже</h2>
-        <p class="sub" data-i18n="sale.sub">Каждый проект проходит нашу внутреннюю проверку перед публикацией. Нажмите на карточку — внутри детали и калькулятор доходности.</p>
-      </div>
-      <div class="arrows"><button type="button" onclick="scrollCar('saleCar',-1)" aria-label="Назад">‹</button><button type="button" onclick="scrollCar('saleCar',1)" aria-label="Вперёд">›</button></div>
-    </div>
+    
     <div class="filterbar reveal" id="saleFilters">
       <span class="chipf on" data-facet="budget" data-val="" onclick="toggleFilter(this)" data-i18n="f.budget.all">Все бюджеты</span><span class="chipf" data-facet="budget" data-val="b1" onclick="toggleFilter(this)" data-i18n="f.b1">฿3–5 млн</span><span class="chipf" data-facet="budget" data-val="b2" onclick="toggleFilter(this)" data-i18n="f.b2">฿5–10 млн</span><span class="chipf" data-facet="budget" data-val="b3" onclick="toggleFilter(this)" data-i18n="f.b3">฿10 млн+</span><span class="chipf" data-facet="type" data-val="Вилла" onclick="toggleFilter(this)" data-i18n="f.type.villa">Вилла</span><span class="chipf" data-facet="type" data-val="Кондо" onclick="toggleFilter(this)" data-i18n="f.type.condo">Кондо</span><span class="chipf" data-facet="stage" data-val="ready" onclick="toggleFilter(this)">Готовые</span><span class="chipf" data-facet="stage" data-val="construction" onclick="toggleFilter(this)">Строятся</span><span class="chipf" data-facet="stage" data-val="presale" onclick="toggleFilter(this)">Старт продаж</span>
     </div>

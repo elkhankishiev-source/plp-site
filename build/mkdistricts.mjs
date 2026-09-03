@@ -40,7 +40,7 @@ function sections(mainHtml){
 const mStart=idx.indexOf('<main'), mOpen=idx.indexOf('>',mStart)+1, mEnd=idx.indexOf('</main>');
 const head=idx.slice(0,mOpen), tail=idx.slice(mEnd);
 const parts=sections(idx.slice(mOpen,mEnd));
-const saleHtml=(parts.find(p=>p.id==='sale')||{}).html||'';
+let saleHtml=(parts.find(p=>p.id==='sale')||{}).html||'';
 
 const outDir=path.join(ROOT,'districts');
 if(!fs.existsSync(outDir)) fs.mkdirSync(outDir,{recursive:true});
@@ -93,6 +93,11 @@ window.addEventListener('load',function(){
 });
 </script>`;
 
+  // заголовок секции дублирует H1 страницы и отодвигает объекты за экран
+  saleHtml = saleHtml.replace(
+    /<div class="head-row reveal">\s*<div>\s*<span class="kicker"[^>]*>[\s\S]*?<\/p>\s*<\/div>\s*<div class="arrows">[\s\S]*?<\/div>\s*<\/div>/, '');
+  saleHtml = saleHtml.replace(
+    /<div class="head-row reveal">\s*<div>\s*<span class="kicker"[^>]*>[\s\S]*?<\/p>\s*<\/div>/, '<div class="head-row reveal"><div>');
   let html=head+'\n'+intro+'\n'+saleHtml+'\n'+others+'\n'+tail;
   html=html.replace(/<title>[\s\S]*?<\/title>/,'<title>'+esc(title)+'</title>');
   html=html.replace(/(<meta name="description" content=")[^"]*(")/,'$1'+esc(desc)+'$2');
