@@ -45,6 +45,19 @@ let saleHtml=(parts.find(p=>p.id==='sale')||{}).html||'';
 const outDir=path.join(ROOT,'districts');
 if(!fs.existsSync(outDir)) fs.mkdirSync(outDir,{recursive:true});
 
+/* Объекты района — берём уже собранный блок PLP:OBJECT-INDEX с главной,
+   чтобы не заводить второй источник правды. Ключ — русское имя района. */
+const OI = (() => {
+  const m = {};
+  const s0 = idx.indexOf('PLP:OBJECT-INDEX:START'), s1 = idx.indexOf('PLP:OBJECT-INDEX:END');
+  if (s0 === -1 || s1 === -1) return m;
+  const blk = idx.slice(s0, s1);
+  const re = /<div class="oi-col"><h3>([^<]+)<\/h3>(<ul>[\s\S]*?<\/ul>)<\/div>/g;
+  let x;
+  while ((x = re.exec(blk))) m[x[1].trim()] = x[2];
+  return m;
+})();
+
 const fmt=n=>String(n).replace(/\B(?=(\d{3})+(?!\d))/g,' ');
 const links=D.map(d=>`<a class="chipf" href="${d.slug}.html">${esc(d.ru)}</a>`).join(' ');
 
@@ -75,6 +88,14 @@ for(const d of D){
     ${market}
   </div></section>`;
 
+  const mine = OI[d.ru]
+    ? `<section class="obj-index" style="padding:40px 0"><div class="container">
+    <h2 style="font-size:22px;margin:0 0 6px">Объекты в ${esc(d.in)}</h2>
+    <p class="sub" style="margin:0 0 18px">Проекты этого района из нашего каталога — с ценами от застройщика.</p>
+    <div class="oi-grid"><div class="oi-col">${OI[d.ru]}</div></div>
+  </div></section>`
+    : '';
+
   const others=`<section style="padding-top:0"><div class="container">
     <h2 style="font-size:20px;margin:0 0 12px">Другие районы</h2>
     <div class="filters">${links}</div>
@@ -98,7 +119,7 @@ window.addEventListener('load',function(){
     /<div class="head-row reveal">\s*<div>\s*<span class="kicker"[^>]*>[\s\S]*?<\/p>\s*<\/div>\s*<div class="arrows">[\s\S]*?<\/div>\s*<\/div>/, '');
   saleHtml = saleHtml.replace(
     /<div class="head-row reveal">\s*<div>\s*<span class="kicker"[^>]*>[\s\S]*?<\/p>\s*<\/div>/, '<div class="head-row reveal"><div>');
-  let html=head+'\n'+intro+'\n'+saleHtml+'\n'+others+'\n'+tail;
+  let html=head+'\n'+intro+'\n'+saleHtml+'\n'+mine+'\n'+others+'\n'+tail;
   html=html.replace(/<title>[\s\S]*?<\/title>/,'<title>'+esc(title)+'</title>');
   html=html.replace(/(<meta name="description" content=")[^"]*(")/,'$1'+esc(desc)+'$2');
   html=html.replace(/(<link rel="canonical" href=")[^"]*(")/,'$1'+url+'$2');
@@ -108,7 +129,7 @@ window.addEventListener('load',function(){
   // страница лежит в подпапке — ресурсы и ссылки на уровень выше
   html=html.replace(/href="#top"/g,'href="../index.html"');
   html=html.replace(/href="#(why|sale|rent|map|quiz|about|faq|do|steps|contacts)"/g,'href="../index.html#$1"');
-  html=html.replace(/(href|src)="(img\/|favicon|buy\.html|rent\.html|owner\.html|privacy\.html|rules\.html|terms\.html|index\.html)/g,'$1="../$2');
+  html=html.replace(/(href|src)="(img\/|object\/|favicon|buy\.html|rent\.html|owner\.html|privacy\.html|rules\.html|terms\.html|index\.html)/g,'$1="../$2');
   html=html.replace('</body>',autoFilter+'\n</body>');
   fs.writeFileSync(path.join(outDir,d.slug+'.html'),html);
   made.push(d.slug);
