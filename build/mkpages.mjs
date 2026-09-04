@@ -91,13 +91,20 @@ const CATALOG_CSS = `
 .catalog .arrows{display:none}
 .catalog .found{margin:14px 0 4px;font-size:.92rem;color:var(--muted)}
 .catalog .found b{color:var(--ink);font-size:1.05rem}
-/* Эльнур 05.09: карта сбоку от ленты смотрелась плохо и мешала. Ставим её
-   ПОД лентой во всю ширину — так она читается и не режет карточки. */
-.catrow{display:block;margin-top:8px}
-.catmap{margin-top:26px}
+/* Эльнур 05.09: карта сбоку мешала, а снизу — не видно подсветки при наведении.
+   Ставим её НАД лентой и делаем липкой: пока листаешь карточки, карта остаётся
+   в кадре и метка загорается на глазах. */
+.catrow{display:flex;flex-direction:column-reverse;margin-top:8px}
+.catmap{position:sticky;top:66px;z-index:12;margin:0 0 14px;
+  background:var(--bg,#F7F6F1);padding-bottom:10px}
 .catmap-h{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}
 .catmap-h b{font-size:1.05rem}
 .catmap-h span{font-size:.85rem;color:var(--muted)}
+.catmap-fold{margin-left:auto;background:none;border:0;font:inherit;font-size:.82rem;font-weight:600;
+  color:var(--muted);cursor:pointer;text-decoration:underline;padding:0}
+.catmap-fold:hover{color:var(--ink)}
+.catmap.folded .plpwrap{display:none}
+.catmap.folded{padding-bottom:0;margin-bottom:12px}
 /* Эльнур 05.09: на странице продажи объекты тоже лентой, как на главной —
    вертикальная сетка оставляла пустые места и растягивала страницу.
    Карта рядом остаётся, подсветка при прокрутке ленты работает как прежде. */
@@ -109,14 +116,17 @@ const CATALOG_CSS = `
 @media(max-width:600px){.catalog .car .prop{flex-basis:80vw;width:80vw!important}}
 .catalog .car .prop.hl{outline:2px solid var(--ink);outline-offset:2px}
 .catalog .car .prop.hl{outline:2px solid var(--ink);outline-offset:2px}
-.catmap .plpmap{height:min(60vh,560px);margin:0;border-radius:18px;overflow:hidden}
+.catmap .plpmap{height:min(30vh,260px);margin:0;border-radius:16px;overflow:hidden}
+@media(max-width:700px){.catmap{position:static;margin-bottom:14px}
+  .catmap .plpmap{height:min(34vh,260px)}}
 .catmap .plpwrap{margin:0}
 .catmap .capt{font-size:.8rem;color:var(--muted);margin:8px 0 0}
 </style>`;
 
 const CATALOG_MAP = `
 <div class="catmap">
-  <div class="catmap-h"><b>Где стоят объекты</b><span>наведите на карточку — метка подсветится</span></div>
+  <div class="catmap-h"><b>Где стоят объекты</b><span>наведите на карточку — метка подсветится</span>
+    <button type="button" class="catmap-fold" id="catmapFold" aria-label="Свернуть карту">свернуть</button></div>
   <div class="plpwrap">
     <div class="plpfilt plpview" id="plpView" style="left:12px;right:auto">
       <button type="button" data-v="map" class="on">Карта</button>
@@ -179,6 +189,20 @@ const CATALOG_JS = `
     addEventListener('load', function(){ setTimeout(pick,900); });
   })();
   window.addEventListener('load', function(){ setTimeout(sync,600); setTimeout(sync,1800); });
+  /* карту можно свернуть, если мешает — выбор запоминается */
+  (function(){
+    var box=document.querySelector('.catmap'), btn=document.getElementById('catmapFold');
+    if(!box||!btn) return;
+    try{ if(localStorage.getItem('plp_map_folded')==='1') box.classList.add('folded'); }catch(e){}
+    btn.textContent = box.classList.contains('folded') ? 'показать' : 'свернуть';
+    btn.onclick=function(){
+      var f=!box.classList.contains('folded');
+      box.classList.toggle('folded', f);
+      btn.textContent = f ? 'показать' : 'свернуть';
+      try{ localStorage.setItem('plp_map_folded', f?'1':'0'); }catch(e){}
+      if(!f && window.PLPMAP) setTimeout(function(){ try{ PLPMAP.invalidateSize(); }catch(e){} }, 60);
+    };
+  })();
 })();
 </script>`;
 
