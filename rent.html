@@ -1849,6 +1849,7 @@ function setCur(c){
   try{ applyFilters(); }catch(e){}
   try{ syncBudgetLabels(); }catch(e){}
   try{ syncPriceSlider(); }catch(e){}
+  try{ syncEntryPrice(); }catch(e){}
   try{ if(typeof syncMenuLabels==='function') syncMenuLabels(); }catch(e){}
 }
 /* Формат суммы. Каталог оперирует миллионами, аренда — десятками тысяч,
@@ -1900,6 +1901,14 @@ function syncBudgetLabels(){
     var st=BUDGET_STEPS.filter(function(x){return x.v===(o.value||o.dataset.v);})[0];
     if(st) o.textContent=budgetLabel(st);
   });
+}
+/* «Вход в рынок» на витрине — это минимальная цена каталога, а не текст.
+   Считаем из данных и показываем в выбранной валюте. */
+function syncEntryPrice(){
+  var el=document.getElementById('wsEntry'); if(!el) return;
+  var vals=(PL.PROPERTIES||[]).map(thbOf).filter(function(v){return v>0;});
+  if(!vals.length) return;
+  el.textContent=t('u.from')+' '+fmtBaht(Math.min.apply(null,vals));
 }
 function budgetOf(p){var t=thbOf(p);
   return t<5e6?'b1':t<10e6?'b2':t<15e6?'b3':t<20e6?'b4':t<25e6?'b5':t<30e6?'b6':'b7';}
@@ -2291,7 +2300,11 @@ function showLead(){
   bot(t('chat.lead'));
   var f=document.createElement('div');f.className='msg bot leadform';
   f.innerHTML='<select class="lf-goal"><option value="">'+t('lf.goal')+'</option><option value="invest">'+t('lf.goal1')+'</option><option value="live">'+t('lf.goal2')+'</option><option value="rent">'+t('lf.goal3')+'</option><option value="explore">'+t('lf.goal4')+'</option></select>'+
-    '<select class="lf-budget"><option value="">'+t('lf.budget')+'</option><option value="b1">'+t('lf.b1')+'</option><option value="b2">'+t('lf.b2')+'</option><option value="b3">'+t('lf.b3')+'</option><option value="b4">'+t('lf.b4')+'</option><option value="b56">'+t('lf.b56')+'</option><option value="rent">'+t('lf.br')+'</option></select>'+
+    '<select class="lf-budget"><option value="">'+t('lf.budget')+'</option>'+
+      BUDGET_STEPS.slice(0,3).map(function(st){return '<option value="'+st.v+'">'+budgetLabel(st)+'</option>';}).join('')+
+      '<option value="b4">'+fmtBaht(15e6)+'–'+fmtBaht(25e6)+'</option>'+
+      '<option value="b56">'+fmtBaht(25e6)+'+</option>'+
+      '<option value="rent">'+t('lf.br')+'</option></select>'+
     '<input class="lf-name" placeholder="'+t('lf.name')+'"><input class="lf-phone" placeholder="'+t('lf.contact')+'">'+
     '<select class="lf-ch"><option>WhatsApp</option><option>Telegram</option><option>Viber</option></select>'+
     '<input class="hp" tabindex="-1" autocomplete="off" placeholder="'+t('lf.hp')+'">'+
@@ -3401,7 +3414,13 @@ function renderQuiz(){
         var val=step.vals?step.vals[i]:'';
         var stored=step.vals?val:t(o);
         var on=qzAns[step.key]===stored||qzAns[step.key]===t(o)?' on':'';
-        return '<button type="button" class="qz-opt'+on+'" onclick="pickQuiz(\''+step.key+'\',\''+val.replace(/'/g,'')+'\',this)" data-label="'+t(o)+'">'+t(o)+'</button>';
+        /* ступени бюджета подписываем в выбранной валюте — иначе фильтр говорит
+           в долларах, а квиз в батах */
+        var st=(step.key==='budget') ? BUDGET_STEPS.filter(function(x){return x.v===val;})[0] : null;
+        var lab=st?budgetLabel(st):t(o);
+        if(step.key==='budget'&&val==='b56') lab=fmtBaht(25e6)+'+';
+        if(step.key==='budget'&&val==='b4')  lab=fmtBaht(15e6)+'–'+fmtBaht(25e6);
+        return '<button type="button" class="qz-opt'+on+'" data-v="'+val+'" onclick="pickQuiz(\''+step.key+'\',\''+val.replace(/'/g,'')+'\',this)" data-label="'+lab+'">'+lab+'</button>';
       }).join('')+'</div>';
     foot.innerHTML=(qzIdx>0?('<button type="button" class="qz-back" onclick="quizBack()">'+t('quiz.back')+'</button>'):'')+
       '<button type="button" class="qz-next" id="qzNext" '+(qzAns[step.key]!=null?'':'disabled')+' onclick="quizNext()">'+t('quiz.next')+'</button>';
@@ -3803,7 +3822,7 @@ window.openDistrict=openDistrict;window.closeDistrict=closeDistrict;
 applyI18n();
 renderSale();renderRent();renderMap();renderDList();renderMapReal();
 initRentDates();
-initCarDrag();observeReveals();updateTray();initFab();
+initCarDrag();observeReveals();updateTray();initFab();try{syncEntryPrice();}catch(e){}
 openFromHash(); /* шеринг-ссылка #object=<id> → открыть карточку объекта */
 addEventListener('hashchange',function(){if(isObjectHash())openFromHash();});
 
