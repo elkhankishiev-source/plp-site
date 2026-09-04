@@ -171,7 +171,10 @@ function fallbackCalc(o) {
   return {
     priceTHB, handoverTHB: priceTHB, areaM2: o.area_min || 0, mgmtPct: 20,
     maintM2Month: o.maintenance_fee_thb_sqm || 80, capexM2: 800, metersTHB: 15000,
-    capGrowthPct: o.capital_growth_pct || 5, buildYears: 0, estimated: true,
+    // Рост цены ПОСЛЕ сдачи. До сдачи он уже заложен в handoverTHB.
+    // Эльнур 04.09: на стройке проект даёт ~30–35% за 2–3 года, после сдачи 1–3% в год.
+    // Потолок 3 — страховка: если в базу опять попадёт рост за всю стройку, он сюда не пролезет.
+    capGrowthPct: Math.min(Number(o.capital_growth_pct) || 2, 3), buildYears: 0, estimated: true,
     seasons: {
       high: { rent: high, occ, months: 4 },
       shoulder: { rent: shoulder, occ, months: 2 },
