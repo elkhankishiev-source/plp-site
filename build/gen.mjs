@@ -456,6 +456,23 @@ function objectPage(o, benchmarks) {
     url,
   };
 
+  // Материалы застройщика: показываем только то, что реально заполнено в базе,
+  // и только http(s) — чтобы мусорное поле не уехало в разметку.
+  const linkOk = (u) => typeof u === 'string' && /^https?:\/\//i.test(u.trim());
+  const matLinks = [
+    { u: o.brochure_url, t: 'Сейл-кит и презентация' },
+    { u: o.floorplan_url, t: 'Планировки' },
+    { u: o.video_url, t: '3D-тур и видео' },
+    { u: o.website_url, t: 'Сайт проекта' },
+    { u: o.map_url, t: 'На карте' },
+  ].filter((x) => linkOk(x.u));
+  const materials = matLinks.length
+    ? '<section class="desc"><h2>Материалы застройщика</h2><div class="cta">' +
+      matLinks.map((x) => '<a class="btn ghost" href="' + htmlEsc(x.u.trim()) +
+        '" rel="noopener nofollow" target="_blank">' + htmlEsc(x.t) + '</a>').join('') +
+      '</div></section>'
+    : '';
+
   const chips = chipRow([
     { k: 'Тип', v: t.ru },
     { k: 'Спальни', v: beds },
@@ -541,6 +558,7 @@ footer a{color:var(--green);text-decoration:none}
   </div>
   ${usp ? '<section class="desc"><h2>Об объекте</h2><p>' + htmlEsc(usp) + '</p></section>' : ''}
   ${uspEn ? '<section class="desc" lang="en"><h2>About</h2><p>' + htmlEsc(uspEn) + '</p></section>' : ''}
+  ${materials}
   <div class="cta">
     <a class="btn wa" href="${htmlEsc(waLink)}" rel="noopener" target="_blank">WhatsApp — узнать детали</a>
     <a class="btn primary" href="${htmlEsc(backLink)}">Смотреть на сайте</a>
@@ -606,6 +624,7 @@ async function main() {
     'bedrooms,bedrooms_min,bedrooms_max,area_sqm,area_min,area_max,roi,rental_yield_pct,' +
     'capital_growth_pct,handover_date,status,stage,developer,distance_beach_m,usp,usp_en,'+
     'bedrooms_min,bedrooms_max,' +
+    'brochure_url,floorplan_url,video_url,website_url,map_url,' +
     'season_rates,occupancy_est_pct,maintenance_fee_thb_sqm,lat,lng,coord_source,last_synced_at,availability');
   const benchmarks = await sbGet(env,
     'rental_benchmarks?select=district,unit_type,disp_yield_low_pct,disp_yield_high_pct');
