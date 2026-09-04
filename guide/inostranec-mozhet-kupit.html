@@ -455,15 +455,23 @@ input.bad{border-color:#d98a84!important;background:#fff6f5}
 .pdfband h2{font-size:clamp(1.5rem,3.4vw,2.3rem)}
 .pdfband p{font-size:1rem;color:#4E3A35;margin:10px 0 18px;max-width:420px}
 .pdfband .imgs{position:relative;height:165px}
-.pdfband .imgs .pg{position:absolute;border-radius:14px;box-shadow:var(--shadow-lg);width:60%;aspect-ratio:16/11;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;overflow:hidden;font-size:.75rem;font-weight:700;color:#4E3A35}
-.pdfband .pg-cover b{font-size:.86rem;letter-spacing:.01em}
-.pdfband .pg-cover span{font-size:.7rem;font-weight:500;color:rgba(78,58,53,.62)}
-.pdfband .pg-cover img{margin-bottom:2px;border-radius:6px}
-.pdfband .pg-shot{padding:0;justify-content:flex-end}
+/* Каталог показываем как настоящую обложку: тёмная страница с нашим знаком,
+   названием и подписью, из-под неё выглядывает разворот с фото объекта. */
+.pdfband .imgs{position:relative;height:190px}
+.pdfband .imgs .pg{position:absolute;border-radius:12px;box-shadow:var(--shadow-lg);overflow:hidden}
+.pdfband .pg-cover{z-index:2;left:2%;top:6px;width:57%;aspect-ratio:3/4;max-height:178px;transform:rotate(-4deg);
+  background:linear-gradient(160deg,#3E4232,#22251C 70%);color:#fff;
+  display:flex;flex-direction:column;justify-content:space-between;padding:13px 14px;
+  border:1px solid rgba(255,255,255,.1)}
+.pdfband .pgc-top{display:flex;align-items:center;gap:7px}
+.pdfband .pgc-top em{font-style:normal;font-size:.62rem;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.72)}
+.pdfband .pgc-mid b{display:block;font-size:1.02rem;line-height:1.2;font-weight:700}
+.pdfband .pgc-mid span{display:block;font-size:.72rem;color:rgba(255,255,255,.66);margin-top:3px}
+.pdfband .pgc-bot{display:flex;flex-direction:column;gap:2px;font-size:.64rem;color:rgba(255,255,255,.55)}
+.pdfband .pgc-bot span:first-child{color:var(--green);font-weight:700}
+.pdfband .pg-shot{z-index:1;right:0;top:20px;width:48%;aspect-ratio:4/3;transform:rotate(6deg)}
 .pdfband .pg-shot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.pdfband .pg-shot .pgcap{position:relative;z-index:1;width:100%;padding:5px 0 6px;text-align:center;font-size:.7rem;font-weight:600;color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.55) 40%)}
-.pdfband .imgs .pg:nth-child(1){left:0;top:20px;transform:rotate(-5deg);background:linear-gradient(135deg,#fff,var(--green-soft))}
-.pdfband .imgs .pg:nth-child(2){right:0;top:0;width:54%;transform:rotate(5deg);background:linear-gradient(135deg,var(--green-soft),var(--taupe))}
+@media(max-width:520px){.pdfband .imgs{height:170px}.pdfband .pg-cover{width:52%}.pdfband .pg-shot{width:46%}}
 
 /* ===== rent extras ===== */
 .rentband{background:var(--ink);color:#fff;border-radius:22px;padding:26px 26px;margin-top:24px;display:grid;gap:18px;align-items:center}
@@ -647,7 +655,9 @@ input.bad{border-color:#d98a84!important;background:#fff6f5}
 .case{background:var(--paper);border-radius:var(--r);padding:18px;box-shadow:var(--shadow-sm);transition:transform .3s,box-shadow .3s}
 .case:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
 .case .top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-.case .av{width:44px;height:44px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-weight:800;flex:none}
+.case .av{width:46px;height:46px;border-radius:50%;flex:none;overflow:hidden;background:var(--green);
+  display:flex;align-items:flex-end;justify-content:center}
+.case .av svg{width:100%;height:100%;display:block}
 .case .top b{font-size:.92rem;line-height:1.3}.case .top span{font-size:.76rem;color:var(--muted);display:block;margin-top:2px}
 .case .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px}
 .case .grid b{font-size:.92rem;font-weight:700;display:block;font-variant-numeric:tabular-nums}
@@ -1169,7 +1179,7 @@ ru: {
   "sort.default":"По порядку","sort.roi":"Сначала высокая доходность","sort.cheap":"Сначала доступные","sort.rich":"Сначала дорогие",
   "noresult":"Под выбранные фильтры ничего не нашлось — сбросьте часть условий.",
   "pdf.lab":"PDF · 23 страницы","pdf.h2":"Скачать полный каталог эксклюзивных предложений",
-  "pdf.p":"Все лучшие предложения в одном PDF: цены, метражи, фото, планировки и бонусы.","pdf.cta":"Получить каталог","pdf.cover":"Каталог объектов","pdf.cover2":"Пхукет · 2026","pdf.pg2":"23 страницы",
+  "pdf.p":"Все лучшие предложения в одном PDF: цены, метражи, фото, планировки и бонусы.","pdf.cta":"Получить каталог","pdf.cover":"Каталог объектов","pdf.cover2":"Пхукет · 2026","pdf.cover3":"Property Library Phuket","pdf.cover4":"цены · планировки · рассрочка","pdf.pg2":"23 страницы",
   "rent.lab":"Аренда · 24/7","rent.h2":"Объекты, где хочется жить",
   "rent.sub":"Виллы и апартаменты на Пхукете для жизни и комфортного отдыха — аренда от месяца. Цены и условия — по запросу: оставьте заявку, подберём вариант и ответим лично. От первого касания до заселения — отдыхайте с самого начала.",
   "rent.b1t":"Запрос на аренду — 24/7","rent.b1p":"Заполните заявку — менеджер подберёт жильё под ваши даты и бюджет и ответит по условиям. Аренда только долгосрочная, от 30 дней.",
@@ -1256,6 +1266,7 @@ ru: {
   "ft.menu":"Меню","ft.buy":"Покупка","ft.contacts":"Контакты","ft.connect":"Мы на связи","ft.bot":"Консьерж в Telegram 24/7","ft.tg":"Telegram-канал","ft.terms":"Условия использования","ft.rules":"Правила бронирования и проживания","ft.policy":"Политика конфиденциальности",
   "rs.9t":"Консьерж 24/7","rs.9p":"Бот в Telegram отвечает в любое время суток, сложное сразу берёт на себя менеджер","rs.10t":"Управление жильём","rs.10p":"Если сдаёте своё: заселяем гостей, ведём календарь и показываем доход в личном кабинете","val.7":"Заботимся, а не продаём","val.8":"Эксклюзивные условия","val.9":"Консьерж на связи 24/7",
   "lf.err.empty":"Оставьте номер телефона или ник в Telegram — иначе мы не сможем ответить.","lf.err.short":"Похоже, в номере не хватает цифр. Проверьте, пожалуйста.","lf.err.bad":"Не похоже на номер, @ник или почту. Напишите так, как вам удобно ответить.",
+  "cs.5n":"Квартира для пары на пенсии","cs.5w":"Рассрочка 3 года и мебель в подарок","cs.5t":"плюс мебель ฿700 тыс","cs.5buy":"฿9,8 млн","cs.5now":"฿14,8 млн","cs.5r":"9% год","cs.6n":"Квартира, которая платит за себя","cs.6w":"Кредит застройщика 5% на 5 лет","cs.6t":"аренда кроет половину платежа","cs.6buy":"฿14 млн","cs.6now":"฿15,4 млн","cs.6r":"฿70 тыс/мес",
   "nav.pick":"Подобрать объект",
   "assist.lab":"Консультант","assist.h2":"Не уверены, что подходит именно вам?","assist.p":"Спросите Дарью прямо здесь, в чате на сайте. Она знает базу, считает доходность и сравнивает районы — отвечает сразу, в любое время. Что-то сложное передаст менеджеру.","assist.cta":"Задать вопрос в чате","assist.wa":"Подобрать за 10 минут","assist.q1s":"Что купить на 5 млн ฿?","assist.q1":"Что можно купить на 5 млн ฿?","assist.q2s":"Где выше доходность?","assist.q2":"В каком районе выше доходность аренды?","assist.q3s":"Чем Банг Тао лучше Раваи?","assist.q3":"Чем Банг Тао лучше Раваи для инвестиций?","assist.q4s":"Сколько выйдет с налогами?","assist.q4":"Какие расходы при покупке кроме цены объекта?",
   "u.from":"от","u.onreq":"цена по запросу","u.calc":"Рассчитать доходность","u.cmp":"Сравнить","u.cmpOn":"В сравнении",
@@ -1357,7 +1368,7 @@ en: {
   "sort.default":"Default order","sort.roi":"Highest yield first","sort.cheap":"Lowest price first","sort.rich":"Highest price first",
   "noresult":"Nothing matches these filters — try removing some.",
   "pdf.lab":"PDF · 23 pages","pdf.h2":"Download the full catalogue of exclusive offers",
-  "pdf.p":"All the best offers in one PDF: prices, floor areas, photos, layouts and bonuses.","pdf.cta":"Get the catalogue","pdf.cover":"Property catalogue","pdf.cover2":"Phuket · 2026","pdf.pg2":"23 pages",
+  "pdf.p":"All the best offers in one PDF: prices, floor areas, photos, layouts and bonuses.","pdf.cta":"Get the catalogue","pdf.cover":"Property catalogue","pdf.cover2":"Phuket · 2026","pdf.cover3":"Property Library Phuket","pdf.cover4":"prices · layouts · instalments","pdf.pg2":"23 pages",
   "rent.lab":"Rent · 24/7","rent.h2":"Homes you want to live in",
   "rent.sub":"Villas and apartments in Phuket for living and long stays — monthly rentals and longer. Prices and terms on request: leave an enquiry, we will match a home and reply personally. From first touch to move-in — relax from day one.",
   "rent.b1t":"Rental enquiry — 24/7","rent.b1p":"Fill in the form — a manager will match a home to your dates and budget and reply with terms. Long-term rentals only, from 30 days.",
@@ -1444,6 +1455,7 @@ en: {
   "ft.menu":"Menu","ft.buy":"Buy","ft.contacts":"Contacts","ft.connect":"Stay in touch","ft.bot":"Telegram concierge 24/7","ft.tg":"Telegram channel","ft.terms":"Terms of use","ft.rules":"Booking and stay rules","ft.policy":"Privacy policy",
   "rs.9t":"Concierge 24/7","rs.9p":"The Telegram bot answers any time of day; anything complex goes straight to a manager","rs.10t":"Property management","rs.10p":"If you rent yours out: we check guests in, keep the calendar and show the income in your account","val.7":"We care, we do not sell","val.8":"Exclusive terms","val.9":"Concierge on call 24/7",
   "lf.err.empty":"Leave a phone number or a Telegram handle — otherwise we cannot reply.","lf.err.short":"That number looks too short. Please check it.","lf.err.bad":"That is not a phone number, an @handle or an email. Write the way you would like us to reply.",
+  "cs.5n":"A flat for a retired couple","cs.5w":"Three-year instalments and furniture included","cs.5t":"plus ฿700k of furniture","cs.5buy":"฿9.8M","cs.5now":"฿14.8M","cs.5r":"9%/yr","cs.6n":"A flat that pays for itself","cs.6w":"Developer credit at 5% over five years","cs.6t":"rent covers half the payment","cs.6buy":"฿14M","cs.6now":"฿15.4M","cs.6r":"฿70k/mo",
   "nav.pick":"Find me a property",
   "assist.lab":"Assistant","assist.h2":"Not sure what suits you?","assist.p":"Ask Daria right here, in the chat on this page. She knows the catalogue, works out the yield and compares districts — answers straight away, any time. Anything complex goes to a manager.","assist.cta":"Ask in the chat","assist.wa":"Find me a match in 10 minutes","assist.q1s":"What can I get for ฿5M?","assist.q1":"What can I buy for ฿5 million?","assist.q2s":"Where is the yield higher?","assist.q2":"Which district has the higher rental yield?","assist.q3s":"Bang Tao or Rawai?","assist.q3":"Why is Bang Tao better than Rawai for investment?","assist.q4s":"What about taxes?","assist.q4":"What costs come on top of the price?",
   "u.from":"from","u.onreq":"price on request","u.calc":"Calculate the yield","u.cmp":"Compare","u.cmpOn":"Comparing",
