@@ -3395,8 +3395,11 @@ addEventListener('hashchange',function(){if(isObjectHash())openFromHash();});
         duration_ms: Date.now() - T0,
       });
       try {
-        if (final && navigator.sendBeacon) navigator.sendBeacon(URL_, new Blob([body], { type: 'application/json' }));
-        else fetch(URL_, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body, keepalive: true });
+        /* text/plain обязателен: sendBeacon умеет только CORS-безопасные типы,
+           с application/json он требует предварительный запрос и молча отваливается.
+           На стороне n8n тело в таком случае приходит строкой и разбирается там. */
+        if (final && navigator.sendBeacon) navigator.sendBeacon(URL_, new Blob([body], { type: 'text/plain' }));
+        else fetch(URL_, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: body, keepalive: true });
       } catch (e) {}
     }
 
