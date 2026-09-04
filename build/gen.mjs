@@ -317,6 +317,9 @@ function buildCatalog(objects, benchmarks, preserve) {
       photos: Array.isArray(o.gallery_urls) ? o.gallery_urls.slice(0, 8) : null,
       // Планировки: человек выбирает тип и сразу видит его площадь и спальни.
       units: Array.isArray(o.unit_types) ? o.unit_types.slice(0, 12) : null,
+      // Ход стройки и разделы снимков — показываем, если застройщик их дал.
+      progress: o.build_progress || null,
+      groups: Array.isArray(o.photo_groups) ? o.photo_groups : null,
       developer: shortDev(o.developer) || null,
       developerFull: o.developer || null,
       calc: withFacts(keep.calc || fallbackCalc(o), o),
@@ -777,7 +780,7 @@ async function main() {
     'bedrooms_min,bedrooms_max,' +
     'brochure_url,floorplan_url,video_url,website_url,map_url,' +
     'season_rates,occupancy_est_pct,maintenance_fee_thb_sqm,lat,lng,coord_source,last_synced_at,availability,' +
-    'first_payment,payment_plan,payment_schedule,main_image_url,gallery_urls,unit_types');
+    'first_payment,payment_plan,payment_schedule,main_image_url,gallery_urls,unit_types,build_progress,photo_groups');
   const benchmarks = await sbGet(env,
     'rental_benchmarks?select=district,unit_type,disp_yield_low_pct,disp_yield_high_pct');
 
