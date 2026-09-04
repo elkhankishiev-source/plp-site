@@ -1793,7 +1793,9 @@ function renderSale(){
       '<div class="trow"><h3>'+p.title+(p.developer?' <small class="dev">('+p.developer+')</small>':'')+'</h3>'+stageBadge(p)+statusBadge(propStatus(p))+'</div>'+
       '<p class="desc">'+loc(p.desc)+'</p>'+
       '<div class="price"><span>'+t('u.from')+'</span> '+fmtBaht(thbOf(p))+priceAge(p)+'</div>'+
-      '<div class="meta"><span>🛏 '+p.beds+'</span><span>◫ '+areaOf(p)+'</span><span>📅 '+loc(p.deadline)+'</span>'+
+      '<div class="meta"><span>🛏 '+p.beds+'</span><span>◫ '+areaOf(p)+'</span>'+
+        /* срок сдачи известен не у всех: пустая иконка календаря выглядела браком */
+        (loc(p.deadline)?'<span>📅 '+loc(p.deadline)+'</span>':'')+
         (p.beachM!=null?'<span>🌊 '+(p.beachM>=1000?(p.beachM/1000).toFixed(1).replace('.0','')+' км':p.beachM+' м')+' до моря</span>':'')+'</div>'+
       '<div class="ccalc">📈 '+t('u.calc')+'</div>'+
       '<div class="pid">'+p.property_id+'</div></div></div>';
