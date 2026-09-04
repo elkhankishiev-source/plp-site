@@ -198,6 +198,19 @@ function fallbackCalc(o) {
   };
 }
 
+// Короткое имя застройщика для карточки. В базе поле развёрнутое, с юридическим
+// названием и регистрационным номером — в карточке это нечитаемая простыня.
+// Ничего не выдумываем: только отрезаем служебные хвосты от того, что уже есть.
+function shortDev(dev) {
+  if (!dev) return '';
+  let d = String(dev).split(' — ')[0].split(' – ')[0].trim();
+  // скобки с реквизитами, годами и адресами выбрасываем, короткий бренд оставляем
+  d = d.replace(/\s*\(([^)]*)\)/g, (m, inner) =>
+    (/\d/.test(inner) || inner.length > 12) ? '' : ' (' + inner.trim() + ')');
+  d = d.replace(/\s*\b(Public Company Limited|Co\.,? ?Ltd\.?|Company Limited|PCL|PLC)\b\.?/gi, '');
+  return d.replace(/[\s,;]+$/, '').trim();
+}
+
 // Факты из базы кладём поверх сохранённого calc: срок стройки, первый взнос,
 // план застройщика и потолок роста — это данные, а не ручная настройка витрины.
 // Всё остальное в calc (сезоны, расходы) правится руками и переживает пересборку.
@@ -297,7 +310,8 @@ function buildCatalog(objects, benchmarks, preserve) {
       avail: (function(){ var m=/(\d+)/.exec(o.availability || ''); return m ? +m[1] : null; })(),
       beach: o.beach || null,
       beachM: (o.distance_beach_m === 0 || o.distance_beach_m) ? o.distance_beach_m : null,
-      developer: o.developer || null,
+      developer: shortDev(o.developer) || null,
+      developerFull: o.developer || null,
       calc: withFacts(keep.calc || fallbackCalc(o), o),
     };
   });
@@ -641,6 +655,7 @@ a{color:inherit}
 .wrap{max-width:920px;margin:0 auto;padding:0 20px}
 header.top{padding:18px 0;border-bottom:1px solid var(--line)}
 .brand{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:600;letter-spacing:.02em;color:var(--green)}
+.brand img{display:block;border-radius:6px}
 .brand small{color:var(--muted);font-weight:400}
 .hero{position:relative;border-radius:var(--r);overflow:hidden;margin:24px 0;border:1px solid var(--line);background:var(--card)}
 .hero img{display:block;width:100%;height:auto;max-height:520px;object-fit:cover}
@@ -669,7 +684,7 @@ footer a{color:var(--green);text-decoration:none}
 </style>
 </head>
 <body>
-<header class="top"><div class="wrap"><a class="brand" href="../">Property Library Phuket <small>· недвижимость на Пхукете</small></a></div></header>
+<header class="top"><div class="wrap"><a class="brand" href="../" aria-label="Property Library — на главную"><img src="../img/brand/plp-mark-ink.png" alt="" width="24" height="24">Property Library Phuket <small>· недвижимость на Пхукете</small></a></div></header>
 <main class="wrap">
   <div class="hero">
     <img src="../img/${htmlEsc(pid)}.jpg" alt="${htmlEsc(o.name)}" loading="lazy">
