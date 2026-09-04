@@ -400,6 +400,61 @@ function emitNetyieldBlock(netyield) {
     MARK_NY_END;
 }
 
+/* Список всех объектов обычными ссылками.
+   28 страниц object/*.html были сиротами: на них не вело ни одной ссылки ни из
+   HTML, ни из JS — только карта сайта. Для поиска это худшее, что может быть:
+   внутренние ссылки и есть главный сигнал важности страницы. Блок статический,
+   скрипты его не перерисовывают, поэтому ссылки видны и роботу, и человеку. */
+const MARK_OI_START = '<!-- PLP:OBJECT-INDEX:START — сгенерировано build/gen.mjs, вручную не править -->';
+const MARK_OI_END = '<!-- PLP:OBJECT-INDEX:END -->';
+
+function writeObjectIndex(html, objects) {
+  const byDistrict = new Map();
+  for (const o of objects) {
+    if (!o.plp_property_id) continue;
+    const d = (o.district || 'Пхукет').trim();
+    if (!byDistrict.has(d)) byDistrict.set(d, []);
+    byDistrict.get(d).push(o);
+  }
+  if (!byDistrict.size) { console.error('[gen] Список объектов пуст — блок ссылок не тронут.'); return html; }
+
+  const districts = [...byDistrict.keys()].sort((a, b) => a.localeCompare(b, 'ru'));
+  let total = 0;
+  const cols = districts.map((d) => {
+    const items = byDistrict.get(d)
+      .sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''), 'ru'))
+      .map((o) => {
+        total++;
+        const href = 'object/' + slugOf(o.plp_property_id) + '.html';
+        const price = o.price_from_thb ? ' — от ' + fmtBahtShort(Number(o.price_from_thb)) : '';
+        return '<li><a href="' + href + '">' + htmlEsc(o.name || o.plp_property_id) + '</a>' + htmlEsc(price) + '</li>';
+      }).join('');
+    return '<div class="oi-col"><h3>' + htmlEsc(DISTRICT_RU[d] || d) + '</h3><ul>' + items + '</ul></div>';
+  }).join('');
+
+  const block = MARK_OI_START + '\n' +
+    '<section class="obj-index" id="all-objects"><div class="container">' +
+    '<h2>Объекты в каталоге</h2>' +
+    '<p class="sub">Все проекты, с которыми мы работаем, — с ценами от застройщика и условиями рассрочки.</p>' +
+    '<div class="oi-grid">' + cols + '</div>' +
+    '</div></section>\n' + MARK_OI_END;
+
+  const s = html.indexOf(MARK_OI_START);
+  const e = html.indexOf(MARK_OI_END);
+  if (s === -1 || e === -1 || e < s) {
+    console.error('[gen] Маркеры PLP:OBJECT-INDEX не найдены — блок ссылок не вставлен.');
+    return html;
+  }
+  console.log('[gen] блок ссылок на объекты:', total, 'ссылок,', districts.length, 'районов');
+  return html.slice(0, s) + block + html.slice(e + MARK_OI_END.length);
+}
+
+function fmtBahtShort(n) {
+  if (!n || !isFinite(n)) return '';
+  return n >= 1e6 ? (n / 1e6).toFixed(n % 1e6 === 0 ? 0 : 1).replace('.', ',') + ' млн ฿'
+                  : Math.round(n / 1000) + ' тыс. ฿';
+}
+
 function writeNetyield(html, netyield) {
   const block = emitNetyieldBlock(netyield);
   const s = html.indexOf(MARK_NY_START);
@@ -696,6 +751,7 @@ async function main() {
   } else {
     console.error('[gen] rental_benchmarks пуст — PL.NETYIELD не тронут (fail-closed).');
   }
+  html = writeObjectIndex(html, objects);
   fs.writeFileSync(INDEX, html);
   console.log('[gen] index.html: каталог продажи', catalog.length, '+ аренда', rentList.length, 'обновлены');
 
