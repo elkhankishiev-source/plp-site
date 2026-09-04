@@ -3321,8 +3321,11 @@ addEventListener('hashchange',function(){if(isObjectHash())openFromHash();});
    одно исполнение n8n на посетителя, а не на каждый клик. */
 (function () {
   try {
-    if (!window.fetch || typeof LEAD_ENDPOINT !== 'string') return;
-    var URL_ = LEAD_ENDPOINT.replace('/site-lead', '/site-events');
+    if (!window.fetch) return;
+    /* Адрес задан явно: LEAD_ENDPOINT объявлена внутри замыкания и в глобальной
+       области недоступна — на этом трекер молча не запускался. Ключ тот же, что
+       у site-lead, и он и так виден в исходнике страницы. */
+    var URL_ = 'https://proplib.app.n8n.cloud/webhook/site-events?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7';
     var T0 = Date.now(), EV = [], SENT = false;
 
     var sid;
