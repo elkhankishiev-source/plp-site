@@ -1674,9 +1674,16 @@ function statusBadge(s){return '<span class="stbadge st-'+s+'">'+t('st.'+s)+'</s
 /* 30.08 канон №38: «Готов» берём из данных (stage='Ready'), а НЕ считаем из даты сдачи.
    Расчёт по дате помечал готовыми объекты, которые по данным ещё строятся. */
 function propStatus(p){return (p.status==='available'&&p.ready===true)?'ready':p.status;}
-function thumbDiv(p,cls){return '<div class="thumb '+(p.grad||'g1')+' '+(cls||'')+'">'+t('ph.object')+picPhoto(p).replace('pic-photo','thumb-photo')+'</div>';}
+function thumbDiv(p,cls){return '<div class="thumb '+(p.grad||'g1')+' '+(cls||'')+'">'+t('ph.object')+picPhoto(p,false).replace('pic-photo','thumb-photo')+'</div>';}
 /* реальное фото объекта поверх градиента; onerror → откат на градиент */
-function picPhoto(p){return p&&p.img?'<img class="pic-photo" src="'+p.img+'" alt="'+((p.title||'').replace(/"/g,'&quot;'))+'" onerror="this.remove()">':'';}
+/* В карточке грузим лёгкое превью (~46 КБ), полный снимок — только на странице
+   объекта и в окне. Раньше каталог тянул 9 МБ и открывался вечность. */
+function picPhoto(p,full){
+  if(!p||!p.img) return '';
+  var src = full ? p.img : p.img.replace('img/','img/thumb/');
+  return '<img class="pic-photo" src="'+src+'" loading="lazy" decoding="async" alt="'+
+    ((p.title||'').replace(/"/g,'&quot;'))+'" onerror="this.remove()">';
+}
 
 /* ===== SALE RENDER ===== */
 /* Цена в карточке — минимальная из прайса застройщика на дату сверки.
@@ -2060,7 +2067,7 @@ function openProp(pid){
   var p=PL.byId[pid];if(!p||p.soon)return;currentPid=pid;
   var img=document.getElementById('pmImg');
   img.className='pm-img '+(p.grad||'g1');
-  img.innerHTML=picPhoto(p).replace('pic-photo','pm-photo')+'<span>'+t('ph.object')+'</span><div class="pm-badges"><span class="pm-tag">'+loc(p.loc)+'</span><span class="pm-roi">'+(p.funnel==='sale'?(p.roi!=null?('ROI '+roiRange(p)):t('u.calc')):t('book.title'))+'</span></div>';
+  img.innerHTML=picPhoto(p,true).replace('pic-photo','pm-photo')+'<span>'+t('ph.object')+'</span><div class="pm-badges"><span class="pm-tag">'+loc(p.loc)+'</span><span class="pm-roi">'+(p.funnel==='sale'?(p.roi!=null?('ROI '+roiRange(p)):t('u.calc')):t('book.title'))+'</span></div>';
   document.getElementById('pmTitle').textContent=p.title;
   document.getElementById('pmDesc').textContent=loc(p.desc);
   var _pid=document.getElementById('pmPid');
