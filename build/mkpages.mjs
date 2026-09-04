@@ -148,6 +148,24 @@ const CATALOG_JS = `
     var card=e.target.closest && e.target.closest('.catalog .car .prop');
     if(card && window.PLP_HIGHLIGHT) window.PLP_HIGHLIGHT(null);
   });
+  /* Эльнур 04.09, как у Malina: объект подсвечивается на карте сам, при прокрутке.
+     Ведём карточку, которая ближе всего к середине экрана — без наведения мышью. */
+  (function(){
+    var last=null, tick=null;
+    function pick(){
+      tick=null;
+      var mid=innerHeight/2, best=null, bestD=1e9;
+      document.querySelectorAll('.catalog .car .prop[data-pid]').forEach(function(el){
+        var r=el.getBoundingClientRect();
+        if(r.bottom<0||r.top>innerHeight) return;
+        var d=Math.abs((r.top+r.bottom)/2-mid);
+        if(d<bestD){ bestD=d; best=el.dataset.pid; }
+      });
+      if(best!==last){ last=best; if(window.PLP_HIGHLIGHT) window.PLP_HIGHLIGHT(best); }
+    }
+    addEventListener('scroll', function(){ if(!tick) tick=requestAnimationFrame(pick); }, {passive:true});
+    addEventListener('load', function(){ setTimeout(pick,900); });
+  })();
   window.addEventListener('load', function(){ setTimeout(sync,600); setTimeout(sync,1800); });
 })();
 </script>`;
