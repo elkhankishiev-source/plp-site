@@ -371,6 +371,8 @@ html,body{overflow-x:clip;max-width:100%}
 .prop.booked{opacity:.5;filter:grayscale(.5);pointer-events:none;position:relative}
 .prop.booked .pic::after{content:attr(data-busy);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(10,10,10,.55);color:#fff;font-weight:700;font-size:.9rem;text-align:center;padding:12px;border-radius:inherit}
 .chipf{background:rgba(255,255,255,.85);border:1px solid rgba(10,10,10,.07);border-radius:999px;padding:9px 15px;font-size:.84rem;font-weight:600;cursor:pointer;transition:border-color .2s,background .2s,transform .15s;user-select:none}
+.lf-err{display:none;font-size:.78rem;color:#b8433b;margin:4px 2px 0;line-height:1.4}
+input.bad{border-color:#d98a84!important;background:#fff6f5}
 .chipf.off{opacity:.42;cursor:default;font-weight:500}
 .chipf.off:hover{border-color:rgba(10,10,10,.07);background:rgba(255,255,255,.85)}
 .chipf:hover{border-color:var(--ink)}
@@ -657,13 +659,17 @@ html,body{overflow-x:clip;max-width:100%}
 @media(min-width:768px){.final{padding:56px 48px}}
 .final .sub{color:rgba(255,255,255,.7);margin:12px auto 0}
 .final-cta{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:24px}
-.footer{padding:40px 0 26px;border-top:1px solid rgba(10,10,10,.07);margin-top:40px;background:var(--paper)}
-.footer-grid{display:grid;gap:28px}
-@media(min-width:800px){.footer-grid{grid-template-columns:1.4fr 1fr 1fr 1fr}}
-.footer h3{font-size:.8rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:14px}
-.footer li{margin-bottom:10px;font-size:.92rem}
+.footer{padding:32px 0 20px;border-top:1px solid rgba(10,10,10,.07);margin-top:40px;background:var(--paper)}
+/* На телефоне подвал был простынёй в один столбец: четыре блока подряд.
+   Ставим их в две колонки — высота падает вдвое, читаемость не страдает. */
+.footer-grid{display:grid;gap:20px 22px;grid-template-columns:repeat(2,1fr)}
+.footer-grid>:first-child{grid-column:1/-1}
+@media(min-width:800px){.footer-grid{grid-template-columns:1.4fr 1fr 1fr 1fr;gap:28px}
+  .footer-grid>:first-child{grid-column:auto}}
+.footer h3{font-size:.8rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:10px}
+.footer li{margin-bottom:7px;font-size:.9rem;line-height:1.4}
 .footer a:hover{text-decoration:underline}
-.footer-bottom{margin-top:28px;padding-top:18px;border-top:1px solid rgba(10,10,10,.07);display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;font-size:.82rem;color:var(--muted)}
+.footer-bottom{margin-top:20px;padding-top:14px;border-top:1px solid rgba(10,10,10,.07);display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;font-size:.82rem;color:var(--muted)}
 
 /* ===== chat widget ===== */
 .fab{position:fixed;right:20px;bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:70;display:flex;align-items:center;gap:8px;background:var(--ink);color:#fff;border-radius:999px;padding:8px 15px 8px 8px;box-shadow:0 12px 32px rgba(20,18,14,.28);font-weight:600;font-size:.8rem;transition:transform .2s,box-shadow .2s}
@@ -1160,7 +1166,7 @@ ru: {
   "map.lab":"География","map.h2":"Район решает половину вопроса",
   "map.sub":"Один и тот же бюджет в разных частях острова даёт разную жизнь и разную доходность. Нажмите на метку или карточку района.",
   "map.badge":"14 районов · объекты из базы","map.island":"Пхукет",
-  "d.yield":"ориентир доходности","d.beach":"до пляжа","d.count":"объектов в базе","d.who":"Кому подходит: ",
+  "d.yield":"ориентир доходности","d.beach":"до пляжа на машине","d.count":"объектов в базе","d.who":"Кому подходит: ",
   "d.none":"Сейчас в открытой базе нет объектов в этом районе — подберём под запрос.","d.cta":"Подобрать объект: ","d.inbase":" в базе · ",
   "quiz.lab":"Подбор за 10 минут","quiz.h2":"Пройдите квиз — пришлём подборку под ваши задачи",
   "quiz.sub":"8 коротких шагов: цель, бюджет, район, тип, спальни и сроки. В конце соберём контакт и сразу покажем подходящий объект.",
@@ -1226,6 +1232,7 @@ ru: {
   "cta.b1":"Оставить заявку","cta.b2":"Написать в WhatsApp","cta.b3":"Перейти в Telegram-бот",
   "ft.tag":"Мы уже выбрали Пхукет, поможем и вам. Все под ключ — от первого звонка до заезда.",
   "ft.menu":"Меню","ft.buy":"Покупка","ft.contacts":"Контакты","ft.connect":"Мы на связи","ft.bot":"Консьерж в Telegram 24/7","ft.tg":"Telegram-канал","ft.terms":"Условия использования","ft.rules":"Правила бронирования и проживания","ft.policy":"Политика конфиденциальности",
+  "lf.err.empty":"Оставьте номер телефона или ник в Telegram — иначе мы не сможем ответить.","lf.err.short":"Похоже, в номере не хватает цифр. Проверьте, пожалуйста.","lf.err.bad":"Не похоже на номер, @ник или почту. Напишите так, как вам удобно ответить.",
   "assist.lab":"Консультант","assist.h2":"Не уверены, что подходит именно вам?","assist.p":"Спросите Дарью прямо здесь, в чате на сайте. Она знает базу, считает доходность и сравнивает районы — отвечает сразу, в любое время. Что-то сложное передаст менеджеру.","assist.cta":"Задать вопрос в чате","assist.wa":"Удобнее в WhatsApp","assist.q1s":"Что купить на 5 млн ฿?","assist.q1":"Что можно купить на 5 млн ฿?","assist.q2s":"Где выше доходность?","assist.q2":"В каком районе выше доходность аренды?","assist.q3s":"Чем Банг Тао лучше Раваи?","assist.q3":"Чем Банг Тао лучше Раваи для инвестиций?","assist.q4s":"Сколько выйдет с налогами?","assist.q4":"Какие расходы при покупке кроме цены объекта?",
   "u.from":"от","u.onreq":"цена по запросу","u.calc":"Рассчитать доходность","u.cmp":"Сравнить","u.cmpOn":"В сравнении",
   "u.roinote":"Ориентировочно; потенциал зависит от объекта, стратегии и управления — рассчитаем индивидуально",
@@ -1345,7 +1352,7 @@ en: {
   "map.lab":"Geography","map.h2":"The area is half the decision",
   "map.sub":"The same budget in different parts of the island buys a different life and a different yield. Tap a marker or an area card.",
   "map.badge":"14 areas · properties from our base","map.island":"Phuket",
-  "d.yield":"yield guideline","d.beach":"to the beach","d.count":"properties in base","d.who":"Best suited for: ",
+  "d.yield":"yield guideline","d.beach":"to the beach by car","d.count":"properties in base","d.who":"Best suited for: ",
   "d.none":"No open listings here right now — we will match one on request.","d.cta":"Find a property in ","d.inbase":" in base · ",
   "quiz.lab":"Matched in 10 minutes","quiz.h2":"Take the quiz — we will send a personal shortlist",
   "quiz.sub":"8 short steps: goal, budget, area, type, bedrooms and timing. At the end we take your contact and instantly show a matching property.",
@@ -1411,6 +1418,7 @@ en: {
   "cta.b1":"Leave a request","cta.b2":"Message on WhatsApp","cta.b3":"Open the Telegram bot",
   "ft.tag":"We already chose Phuket — let us help you. Full service, from the first call to move-in.",
   "ft.menu":"Menu","ft.buy":"Buy","ft.contacts":"Contacts","ft.connect":"Stay in touch","ft.bot":"Telegram concierge 24/7","ft.tg":"Telegram channel","ft.terms":"Terms of use","ft.rules":"Booking and stay rules","ft.policy":"Privacy policy",
+  "lf.err.empty":"Leave a phone number or a Telegram handle — otherwise we cannot reply.","lf.err.short":"That number looks too short. Please check it.","lf.err.bad":"That is not a phone number, an @handle or an email. Write the way you would like us to reply.",
   "assist.lab":"Assistant","assist.h2":"Not sure what suits you?","assist.p":"Ask Daria right here, in the chat on this page. She knows the catalogue, works out the yield and compares districts — answers straight away, any time. Anything complex goes to a manager.","assist.cta":"Ask in the chat","assist.wa":"Prefer WhatsApp","assist.q1s":"What can I get for ฿5M?","assist.q1":"What can I buy for ฿5 million?","assist.q2s":"Where is the yield higher?","assist.q2":"Which district has the higher rental yield?","assist.q3s":"Bang Tao or Rawai?","assist.q3":"Why is Bang Tao better than Rawai for investment?","assist.q4s":"What about taxes?","assist.q4":"What costs come on top of the price?",
   "u.from":"from","u.onreq":"price on request","u.calc":"Calculate the yield","u.cmp":"Compare","u.cmpOn":"Comparing",
   "u.roinote":"Indicative; potential depends on the unit, strategy and management — we calculate it individually",
@@ -1628,13 +1636,25 @@ try{
 /* ===== REVEAL ON SCROLL ===== */
 var io=null;
 if('IntersectionObserver' in window){
-  io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target);}});},{threshold:.1});
+  /* threshold:.1 требовал показать 10% ПЛОЩАДИ блока. Каталог высотой ~14700px
+     столько не покажет никогда — 10% это 1470px при экране 844px, — и весь
+     список объектов навсегда оставался прозрачным: «пустой экран» на buy.html.
+     Считаем по факту входа в вид, а не по доле площади. */
+  io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target);}});},{threshold:0,rootMargin:'0px 0px -8% 0px'});
 }
 function observeReveals(){
   document.querySelectorAll('.reveal:not(.visible)').forEach(function(el){
     if(io)io.observe(el);else el.classList.add('visible');
   });
 }
+/* Страховка: контент не должен зависеть от анимации. Если через 2 секунды
+   блок в поле зрения всё ещё прозрачен — показываем его без анимации. */
+setTimeout(function(){
+  document.querySelectorAll('.reveal:not(.visible)').forEach(function(el){
+    var r=el.getBoundingClientRect();
+    if(r.top < innerHeight && r.bottom > 0) el.classList.add('visible');
+  });
+},2000);
 
 /* ===== HELPERS ===== */
 function fmtUSD(n){return '$'+Math.round(n).toLocaleString('en-US');}
@@ -1834,6 +1854,27 @@ var LEAD_ENDPOINT='https://proplib.app.n8n.cloud/webhook/site-lead?key=ee8efec5c
 var CHAT_ENDPOINT='https://proplib.app.n8n.cloud/webhook/site-chat?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7';
 var AVAIL_ENDPOINT='https://proplib.app.n8n.cloud/webhook/check-availability?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7';
 function escHtml(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+/* Проверка контакта перед отправкой. Раньше её не было: человек мог ввести
+   «12» или «телеграм» — форма отвечала «спасибо», а заявка до нас не доходила.
+   Не придираемся к формату номера (страны разные), проверяем только смысл:
+   либо это телефон с достаточным числом цифр, либо @ник, либо почта. */
+function contactProblem(v){
+  v=String(v||'').trim();
+  if(!v) return t('lf.err.empty');
+  if(/^@?[a-zA-Z][a-zA-Z0-9_]{4,31}$/.test(v.replace(/^https?:\/\/(t\.me|telegram\.me)\//i,'@'))) return '';
+  if(/^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/.test(v)) return '';
+  var digits=v.replace(/\D/g,'');
+  if(digits.length>=9 && digits.length<=15 && /^[+\d][\d\s()\-.]*$/.test(v)) return '';
+  if(digits.length && digits.length<9) return t('lf.err.short');
+  return t('lf.err.bad');
+}
+/* показываем ошибку прямо под полем и подсвечиваем его */
+function markBadContact(input,msg){
+  var box=input.parentNode.querySelector('.lf-err');
+  if(!box){ box=document.createElement('div'); box.className='lf-err'; input.parentNode.insertBefore(box,input.nextSibling); }
+  box.textContent=msg||''; box.style.display=msg?'block':'none';
+  input.classList.toggle('bad',!!msg);
+}
 var pendingIntent=null; /* клик по объекту/сравнению/району до сбора контакта — переносим в след. заявку */
 function pushLead(p){
   var src=getSource();
@@ -1999,6 +2040,9 @@ function showLead(){
     if(hp.value.trim()){f.remove();return;}
     if(Date.now()-renderedAt<1500){bot(t('lf.wait'));return;}
     if(send.disabled)return;
+    var cin=f.querySelector('.lf-phone'), prob=contactProblem(cin.value);
+    if(prob){ markBadContact(cin,prob); cin.focus(); return; }
+    markBadContact(cin,'');
     var funnel=(goal.value==='rent'||lastTopic==='rent')?'rent':'sale';
     var lead=pushLead({funnel:funnel,name:f.querySelector('.lf-name').value.trim(),contact:f.querySelector('.lf-phone').value.trim(),channel:f.querySelector('.lf-ch').value,consent:true,goal:lastTopic||'chat',qual_goal:goal.value,qual_budget:budget.value,lead_summary:lastLeadSummary});
     f.remove();me(t('lead.sent'));var gv=goal.value,bv=budget.value;
@@ -2940,6 +2984,9 @@ function submitQuiz(){
   if(document.getElementById('qzHp').value.trim()){closeQuiz();return;}
   if(Date.now()-qzRenderedAt<1200)return;
   if(!document.getElementById('qzOk').checked)return;
+  var cin=document.getElementById('qzContact'), prob=contactProblem(cin.value);
+  if(prob){ markBadContact(cin,prob); cin.focus(); return; }
+  markBadContact(cin,'');
   var qzSend=document.getElementById('qzSend');if(qzSend)qzSend.disabled=true; // анти-дубль пока идёт сеть
   var m=quizMatch();
   var lead=pushLead({

@@ -617,7 +617,10 @@ function objectPage(o, benchmarks) {
     { k: 'Сдача', v: dl.ru },
     { k: 'Доходность', v: o.roi ? '~' + o.roi + '%/год' : '' },
     { k: 'До пляжа', v: distBeach },
-    { k: 'Застройщик', v: o.developer },
+    { k: 'Застройщик', v: shortDev(o.developer) },
+    // Полное юридическое название — отдельной строкой и только если оно
+    // действительно длиннее короткого: реквизиты нужны, но не вместо имени.
+    { k: 'Юридическое лицо', v: (o.developer && shortDev(o.developer) !== String(o.developer).trim()) ? o.developer : '' },
   ]);
 
   return `<!doctype html>
