@@ -64,6 +64,18 @@ p.text{margin:0;font-size:.94rem;line-height:1.6}
 .shots img{width:100%;height:100%;object-fit:cover;border-radius:11px;display:block;min-height:96px}
 .shots img:first-child{grid-row:span 2;min-height:210px}
 @media(max-width:560px){.shots{grid-template-columns:1fr 1fr}.shots img:first-child{grid-column:span 2;grid-row:auto}}
+.picked{display:flex;align-items:baseline;gap:10px;background:rgba(210,213,179,.28);
+  border-radius:12px;padding:11px 14px;margin-bottom:18px}
+.picked span{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--green-deep)}
+.picked b{font-size:.98rem}
+.buy{display:flex;flex-direction:column;gap:7px}
+.buyrow{display:flex;align-items:baseline;gap:10px;background:#fff;border:1px solid var(--line);
+  border-radius:11px;padding:10px 13px}
+.buyrow b{font-size:.92rem;flex:0 0 auto}
+.buyrow span{font-size:.83rem;color:var(--muted);flex:1 1 auto}
+.buyrow u{text-decoration:none;font-weight:700;font-size:.9rem;font-variant-numeric:tabular-nums}
+.hint{margin:9px 0 0;font-size:.78rem;color:var(--muted);line-height:1.45}
+@media(max-width:520px){.buyrow{flex-wrap:wrap;gap:4px 10px}.buyrow span{flex:1 0 100%}}
 .msg{max-width:520px;margin:14vh auto;text-align:center;padding:0 20px}
 .msg h1{font-size:1.3rem;margin-bottom:10px}
 .msg p{color:var(--muted);font-size:.94rem}
@@ -135,6 +147,30 @@ p.text{margin:0;font-size:.94rem;line-height:1.6}
     if(o.beach_m!=null) cells.push([(o.beach_m>=1000?(o.beach_m/1000).toFixed(1).replace('.0','')+' км':o.beach_m+' м'),'до пляжа']);
     if(o.roi!=null && on('yield')) cells.push(['~'+o.roi+'%','ориентир доходности']);
 
+    /* Сотрудник мог выбрать конкретный тип — тогда он идёт первой строкой. */
+    var pickedUnit=(d.custom&&d.custom.unit)?String(d.custom.unit):'';
+
+    /* Что вообще можно купить в проекте: планировки застройщика или тиры прайса. */
+    var buyRows=[];
+    /* цену «от» к названной планировке берём из прайса по числу спален */
+    var fromByBeds={};
+    (Array.isArray(o.tiers)?o.tiers:[]).forEach(function(t){
+      if(t.bedrooms==null||!t.price_from_thb) return;
+      if(!fromByBeds[t.bedrooms]||t.price_from_thb<fromByBeds[t.bedrooms]) fromByBeds[t.bedrooms]=t.price_from_thb;
+    });
+    (Array.isArray(o.units)?o.units:[]).forEach(function(u){
+      var pf=u.from||u.price_from||fromByBeds[u.beds];
+      buyRows.push([u.name||'', [u.area?('от '+u.area+' м²'):'', u.beds!=null?(u.beds+' сп.'):'']
+        .filter(Boolean).join(' · '), pf?('от '+baht(pf)):'']);
+    });
+    if(!buyRows.length) (Array.isArray(o.tiers)?o.tiers:[]).forEach(function(t){
+      var b=t.bedrooms;
+      buyRows.push([
+        b===0?'Студия':(b+(b===1?' спальня':b<5?' спальни':' спален')),
+        t.area_sqm?('от '+t.area_sqm+' м²'):'',
+        t.price_from_thb?('от '+baht(t.price_from_thb)):'']);
+    });
+
     var who=d.client_name?('Для '+esc(d.client_name)):'Персональное предложение';
     var exp=dt(d.expires_at);
 
@@ -154,8 +190,15 @@ p.text{margin:0;font-size:.94rem;line-height:1.6}
             [o.photo].concat((o.photos||[]).filter(function(u){return u!==o.photo;})).slice(0,5)
               .map(function(u,i){ return '<img src="'+esc(u)+'" alt="" loading="'+(i?'lazy':'eager')+'">'; }).join('')+
             '</div>'):'')+
+          (pickedUnit?('<div class="picked"><span>предлагаем</span><b>'+esc(pickedUnit)+'</b></div>'):'')+
           (on('specs')&&cells.length?('<div class="row">'+cells.map(function(c){
             return '<div class="cell"><b>'+esc(c[0])+'</b><span>'+esc(c[1])+'</span></div>';}).join('')+'</div>'):'')+
+          (on('specs')&&buyRows.length?('<h2>Что можно купить</h2><div class="buy">'+
+            buyRows.map(function(r){
+              return '<div class="buyrow"><b>'+esc(r[0])+'</b><span>'+esc(r[1])+'</span>'+
+                     (r[2]?('<u>'+esc(r[2])+'</u>'):'')+'</div>';
+            }).join('')+'</div>'+
+            '<p class="hint">Наличие и цены подтверждаем на дату брони — у застройщика они меняются.</p>'):'')+
           (on('about')&&o.usp?('<h2>Об объекте</h2><p class="text">'+esc(o.usp)+'</p>'):'')+
           (on('payment')&&o.payment_plan?('<h2>Условия оплаты</h2><div class="plan">'+esc(o.payment_plan)+'</div>'):'')+
           (on('map')&&o.lat&&o.lng?('<h2>На карте</h2><p class="text"><a href="https://www.google.com/maps?q='+
