@@ -986,7 +986,6 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
       </div>
 
       <button id="send-code">Войти</button>
-      <a class="alt" id="see-demo">Посмотреть, как выглядит кабинет</a>
       <div class="err" id="gate-err"></div>
 
     </div>
@@ -4008,14 +4007,10 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     show('gate');
   }
   if($('to-reg-top')) $('to-reg-top').onclick=function(){ gateStep('reg'); };
-  if($('see-demo')) $('see-demo').onclick=function(){
-    // демо — настоящий аккаунт с настоящими данными в базе, а не подставленные цифры
-    show('loading');
-    post({action:'login',login:'demo',password:'PlpDemo2026'}).then(function(d){
-      if(d&&d.ok){ TOKEN=d.token; DEMO_MODE=true; loadData(); }
-      else { gateStep('phone'); $('gate-err').textContent='Пример временно недоступен.'; }
-    }).catch(function(){ gateStep('phone'); $('gate-err').textContent='Нет связи с сервером.'; });
-  };
+    /* Демо-вход убран из клиентского кабинета 05.09 по решению Эльнура:
+     клиент должен видеть свой кабинет, а не витрину. Аккаунт demo в базе
+     остался — сотрудник входит обычной формой, пароль в публичный файл
+     больше не зашит. */
   if($('to-pass-2')) $('to-pass-2').onclick=function(){ gateStep('pass'); };
   if($('to-login')) $('to-login').onclick=function(){ gateStep('phone'); };
 
