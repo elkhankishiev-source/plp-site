@@ -2390,8 +2390,23 @@ function calcFromData(c){
 /* ===== SALE FILTERS / SEARCH / SORT ===== */
 var activeFilter={budget:'',loc:new Set(),type:new Set(),stage:new Set(),beds:new Set()};
 var saleQuery='',favOnly=false;
+/* Панель уже свёрнута в меню? Разворачиваем обратно, чтобы пересобрать её
+   заново. Без этого чипы районов, созданные после группировки, ложились в
+   корень панели полотном мимо выпадающих списков. */
+function ungroupFilters(bar){
+  if(!bar || !bar.dataset.grouped) return;
+  var chips=Array.prototype.slice.call(bar.querySelectorAll('.chipf'));
+  var rest=Array.prototype.slice.call(bar.children).filter(function(e){
+    return !e.classList.contains('fmenu') && !e.classList.contains('fbtn-reset');
+  });
+  bar.innerHTML='';
+  chips.forEach(function(c){ bar.appendChild(c); });
+  rest.forEach(function(e){ bar.appendChild(e); });
+  delete bar.dataset.grouped; bar.classList.remove('fbar-menus');
+}
 function buildLocChips(){
   var bar=document.getElementById('saleFilters');if(!bar)return;
+  ungroupFilters(bar);
   bar.querySelectorAll('[data-facet="loc"]').forEach(function(c){c.remove();});
   var seen=new Map();PL.PROPERTIES.forEach(function(p){seen.set(p.loc.ru,loc(p.loc));});
   var anchor=bar.querySelector('[data-facet="type"]');
@@ -2450,6 +2465,8 @@ function rentBedsMatch(p,val){
 function buildRentChips(){
   var bar=document.getElementById('rentFilters');if(!bar)return;
   bar.innerHTML='';
+  /* строим заново — значит и сворачивать в меню надо заново */
+  delete bar.dataset.grouped; bar.classList.remove('fbar-menus');
   function group(labelKey,parent){
     var host=parent||bar;
     var g=document.createElement('div');g.className='rf-group';
@@ -2617,9 +2634,14 @@ function groupRentMenus(){
     wrap.appendChild(btn); wrap.appendChild(pan); bar.appendChild(wrap);
     btn.onclick=function(e){ e.stopPropagation(); wrap.classList.toggle('open'); closeOthers(wrap); };
     pan.addEventListener('click', function(){ setTimeout(syncMenuLabels, 30); });
+    pan.addEventListener('change', function(){ setTimeout(syncMenuLabels, 30); });
   });
-  extra.forEach(function(e){ bar.appendChild(e); });
-  document.addEventListener('click', function(){ closeOthers(null); });
+  extra.forEach(function(e){
+    /* спойлер «Больше фильтров» опустел — его группы уехали в меню */
+    if(e.classList.contains('rf-more') && !e.querySelector('.chipf')) return;
+    bar.appendChild(e);
+  });
+  wireCloseOnOutside();
   syncMenuLabels();
 }
 
@@ -2642,6 +2664,8 @@ function buildFilterMenus(barId){
     var pan=document.createElement('div'); pan.className='fpan';
     own.forEach(function(c){ pan.appendChild(c); });
     if(m.extra) m.extra.forEach(function(x){
+      /* чип уже вернулся из прошлой сборки — второй раз не создаём */
+      if(own.some(function(o){ return o.dataset.val===x.v; })) return;
       var c=document.createElement('span');
       c.className='chipf'; c.dataset.facet=m.key; c.dataset.val=x.v; c.textContent=x.t;
       c.onclick=function(){ toggleFilter(c); };
@@ -2654,8 +2678,15 @@ function buildFilterMenus(barId){
   reset.type='button'; reset.className='fbtn fbtn-reset'; reset.textContent='Сбросить';
   reset.onclick=function(){ resetAllFilters(barId); };
   bar.appendChild(reset);
-  document.addEventListener('click', function(){ closeOthers(null); });
+  wireCloseOnOutside();
   syncMenuLabels();
+}
+/* один общий слушатель на документ — панель пересобирается при каждом рендере,
+   и без этого флага слушатели копились бы с каждым разом */
+var closeWired=false;
+function wireCloseOnOutside(){
+  if(closeWired) return; closeWired=true;
+  document.addEventListener('click', function(){ closeOthers(null); });
 }
 function closeOthers(keep){
   document.querySelectorAll('.fmenu.open').forEach(function(w){ if(w!==keep) w.classList.remove('open'); });
@@ -2667,6 +2698,11 @@ function syncMenuLabels(){
     w.querySelectorAll('.chipf.on').forEach(function(c){
       if(f==='budget' && c.dataset.val==='') return;
       out.push(c.textContent.trim());
+    });
+    /* удобства аренды — чекбоксы, а не чипы: их выбор тоже показываем на кнопке */
+    w.querySelectorAll('.rf-check input:checked').forEach(function(i){
+      var lab=i.parentNode.querySelector('span');
+      out.push(lab?lab.textContent.trim():'✓');
     });
     var v=w.querySelector('.fb-v');
     v.textContent = out.length ? (out.length>2 ? out.length+' выбрано' : out.join(', ')) : '';
