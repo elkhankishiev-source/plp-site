@@ -60,6 +60,10 @@ p.text{margin:0;font-size:.94rem;line-height:1.6}
 .btn.ghost{background:transparent;color:var(--ink);border:1px solid rgba(10,10,10,.16)}
 .cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
 
+.shots{display:grid;gap:8px;grid-template-columns:2fr 1fr 1fr;margin-bottom:20px}
+.shots img{width:100%;height:100%;object-fit:cover;border-radius:11px;display:block;min-height:96px}
+.shots img:first-child{grid-row:span 2;min-height:210px}
+@media(max-width:560px){.shots{grid-template-columns:1fr 1fr}.shots img:first-child{grid-column:span 2;grid-row:auto}}
 .msg{max-width:520px;margin:14vh auto;text-align:center;padding:0 20px}
 .msg h1{font-size:1.3rem;margin-bottom:10px}
 .msg p{color:var(--muted);font-size:.94rem}
@@ -111,6 +115,9 @@ p.text{margin:0;font-size:.94rem;line-height:1.6}
 
   function render(d){
     var o=d.object||{};
+    /* сотрудник отметил, что показывать: пусто — показываем всё */
+    var B=Array.isArray(d.blocks)&&d.blocks.length?d.blocks:null;
+    function on(k){ return !B || B.indexOf(k)>=0; }
     var price=baht(o.price_from);
     var area=(o.area_min&&o.area_max&&o.area_min!==o.area_max)?(o.area_min+'–'+o.area_max+' м²')
              :(o.area_min?o.area_min+' м²':null);
@@ -118,13 +125,15 @@ p.text{margin:0;font-size:.94rem;line-height:1.6}
              :(o.beds_min?String(o.beds_min):null);
     var hand=dt(o.handover);
     var cells=[];
-    if(price) cells.push(['от '+price,'цена от застройщика']);
+    if(price) cells.push(['от '+price,
+      (o.list_price && o.price_from && Number(o.price_from)<Number(o.list_price))
+        ? 'ваша цена, прайс '+baht(o.list_price) : 'цена от застройщика']);
     if(area)  cells.push([area,'площадь']);
     if(beds)  cells.push([beds,'спальни']);
     if(hand)  cells.push([hand,'срок сдачи']);
     else if(o.stage) cells.push([esc(o.stage).slice(0,28),'стадия']);
     if(o.beach_m!=null) cells.push([(o.beach_m>=1000?(o.beach_m/1000).toFixed(1).replace('.0','')+' км':o.beach_m+' м'),'до пляжа']);
-    if(o.roi!=null) cells.push(['~'+o.roi+'%','ориентир доходности']);
+    if(o.roi!=null && on('yield')) cells.push(['~'+o.roi+'%','ориентир доходности']);
 
     var who=d.client_name?('Для '+esc(d.client_name)):'Персональное предложение';
     var exp=dt(d.expires_at);
@@ -141,10 +150,16 @@ p.text{margin:0;font-size:.94rem;line-height:1.6}
             (o.developer?(' · '+esc(o.developer)):'')+'</p>'+
         '</div>'+
         '<div class="body">'+
-          (cells.length?('<div class="row">'+cells.map(function(c){
+          (on('gallery')&&o.photo?('<div class="shots">'+
+            [o.photo].concat((o.photos||[]).filter(function(u){return u!==o.photo;})).slice(0,5)
+              .map(function(u,i){ return '<img src="'+esc(u)+'" alt="" loading="'+(i?'lazy':'eager')+'">'; }).join('')+
+            '</div>'):'')+
+          (on('specs')&&cells.length?('<div class="row">'+cells.map(function(c){
             return '<div class="cell"><b>'+esc(c[0])+'</b><span>'+esc(c[1])+'</span></div>';}).join('')+'</div>'):'')+
-          (o.usp?('<h2>Об объекте</h2><p class="text">'+esc(o.usp)+'</p>'):'')+
-          (o.payment_plan?('<h2>Условия оплаты</h2><div class="plan">'+esc(o.payment_plan)+'</div>'):'')+
+          (on('about')&&o.usp?('<h2>Об объекте</h2><p class="text">'+esc(o.usp)+'</p>'):'')+
+          (on('payment')&&o.payment_plan?('<h2>Условия оплаты</h2><div class="plan">'+esc(o.payment_plan)+'</div>'):'')+
+          (on('map')&&o.lat&&o.lng?('<h2>На карте</h2><p class="text"><a href="https://www.google.com/maps?q='+
+            o.lat+','+o.lng+'" target="_blank" rel="noopener">Открыть расположение</a></p>'):'')+
           (d.note?('<h2>От менеджера</h2><p class="text">'+esc(d.note)+'</p>'):'')+
           '<div class="note">Цены и наличие подтверждаем на дату сделки: у застройщика они меняются. '+
             'Расчёт доходности — прогноз, не гарантия.</div>'+
