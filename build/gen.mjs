@@ -168,19 +168,54 @@ function fallbackCalc(o) {
   const high = sr.high_thb_month || 0, low = sr.low_thb_month || 0;
   const shoulder = high && low ? Math.round((high + low) / 2) : (high || low || 0);
   const occ = o.occupancy_est_pct || 70;
+  // Сколько осталось строить — из даты сдачи. Раньше стояло 0, и график платежей
+  // ставил все взносы на сегодня. Сдан или дата неизвестна → 0 (рассрочки нет).
+  let buildYears = 0;
+  if (o.handover_date) {
+    const months = (new Date(o.handover_date) - new Date()) / (1000 * 60 * 60 * 24 * 30.44);
+    buildYears = months > 0 ? Math.round((months / 12) * 10) / 10 : 0;
+  }
+  // Первый взнос — как у застройщика, а не выдуманные 30%.
+  const downPct = Number(o.first_payment) > 0 ? Number(o.first_payment) : undefined;
+
   return {
     priceTHB, handoverTHB: priceTHB, areaM2: o.area_min || 0, mgmtPct: 20,
     maintM2Month: o.maintenance_fee_thb_sqm || 80, capexM2: 800, metersTHB: 15000,
     // Рост цены ПОСЛЕ сдачи. До сдачи он уже заложен в handoverTHB.
     // Эльнур 04.09: на стройке проект даёт ~30–35% за 2–3 года, после сдачи 1–3% в год.
     // Потолок 3 — страховка: если в базу опять попадёт рост за всю стройку, он сюда не пролезет.
-    capGrowthPct: Math.min(Number(o.capital_growth_pct) || 2, 3), buildYears: 0, estimated: true,
+    capGrowthPct: Math.min(Number(o.capital_growth_pct) || 2, 3), buildYears,
+    downPct,
+    // План застройщика — дословно из базы. Не разбираем на строки: формулировки у всех
+    // разные, любой разбор — выдумка. Таблица рядом остаётся прикидкой.
+    paymentPlan: o.payment_plan || o.payment_schedule || '',
+    estimated: true,
     seasons: {
       high: { rent: high, occ, months: 4 },
       shoulder: { rent: shoulder, occ, months: 2 },
       low: { rent: low, occ, months: 6 },
     },
   };
+}
+
+// Факты из базы кладём поверх сохранённого calc: срок стройки, первый взнос,
+// план застройщика и потолок роста — это данные, а не ручная настройка витрины.
+// Всё остальное в calc (сезоны, расходы) правится руками и переживает пересборку.
+function withFacts(calc, o) {
+  const c = Object.assign({}, calc);
+  let buildYears = 0;
+  if (o.handover_date) {
+    const months = (new Date(o.handover_date) - new Date()) / (1000 * 60 * 60 * 24 * 30.44);
+    buildYears = months > 0 ? Math.round((months / 12) * 10) / 10 : 0;
+  }
+  c.buildYears = buildYears;
+  if (Number(o.first_payment) > 0) c.downPct = Number(o.first_payment);
+  c.paymentPlan = o.payment_plan || o.payment_schedule || '';
+  // Сдан по-настоящему — только stage='Ready' (канон №38). Если стройка идёт,
+  // а дата сдачи в базе уже прошла — это устаревшая дата, а не сданный объект.
+  c.ready = o.stage === 'Ready';
+  c.capGrowthPct = Math.min(Number(o.capital_growth_pct) || c.capGrowthPct || 2, 3);
+  return c;
 }
 
 // ----------------------------------------------- парсинг текущего PL.PROPERTIES
@@ -263,7 +298,7 @@ function buildCatalog(objects, benchmarks, preserve) {
       beach: o.beach || null,
       beachM: (o.distance_beach_m === 0 || o.distance_beach_m) ? o.distance_beach_m : null,
       developer: o.developer || null,
-      calc: keep.calc || fallbackCalc(o),
+      calc: withFacts(keep.calc || fallbackCalc(o), o),
     };
   });
 }
@@ -712,7 +747,8 @@ async function main() {
     'capital_growth_pct,handover_date,status,stage,developer,distance_beach_m,usp,usp_en,'+
     'bedrooms_min,bedrooms_max,' +
     'brochure_url,floorplan_url,video_url,website_url,map_url,' +
-    'season_rates,occupancy_est_pct,maintenance_fee_thb_sqm,lat,lng,coord_source,last_synced_at,availability');
+    'season_rates,occupancy_est_pct,maintenance_fee_thb_sqm,lat,lng,coord_source,last_synced_at,availability,' +
+    'first_payment,payment_plan,payment_schedule');
   const benchmarks = await sbGet(env,
     'rental_benchmarks?select=district,unit_type,disp_yield_low_pct,disp_yield_high_pct');
 
