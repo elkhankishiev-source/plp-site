@@ -1,0 +1,516 @@
+{
+ "updated": "2026-09-04",
+ "items": [
+  {
+   "id": "INTAKE-BOTANICA",
+   "name": "The GENS by Botanica, у Blue Tree",
+   "district": "Банг Тао",
+   "type": "Кондо",
+   "price_from": 5458000,
+   "units": []
+  },
+  {
+   "id": "INTAKE-CHAMPACA",
+   "name": "Mono Champaca, Таланг",
+   "district": "Таланг",
+   "type": "Вилла",
+   "price_from": 17900000,
+   "units": []
+  },
+  {
+   "id": "PLP-ADORA",
+   "name": "The Title Adora Rawai",
+   "district": "Равай",
+   "type": "Кондо",
+   "price_from": 5332000,
+   "units": [
+    {
+     "name": "1 спальня",
+     "beds": 1,
+     "area": 43,
+     "from": 5332000
+    },
+    {
+     "name": "2 спальни",
+     "beds": 2,
+     "area": 81,
+     "from": 11664000
+    }
+   ]
+  },
+  {
+   "id": "PLP-BALCONY",
+   "name": "The BALCONY Nai Yang",
+   "district": "Най Янг",
+   "type": "Кондо",
+   "price_from": 6087270,
+   "units": [
+    {
+     "name": "1 спальня",
+     "beds": 1,
+     "area": 33,
+     "from": 6087270
+    },
+    {
+     "name": "2 спальни",
+     "beds": 2,
+     "area": 50.64,
+     "from": 8916810
+    }
+   ]
+  },
+  {
+   "id": "PLP-BIANCANA",
+   "name": "The Title Biancana Surin",
+   "district": "Сурин",
+   "type": "Кондо",
+   "price_from": 6235950,
+   "units": [
+    {
+     "name": "1 спальня",
+     "beds": 1,
+     "area": 33,
+     "from": 6235950
+    },
+    {
+     "name": "2 спальни",
+     "beds": 2,
+     "area": 62,
+     "from": 12493900
+    }
+   ]
+  },
+  {
+   "id": "PLP-CASADEMONTE",
+   "name": "The Title Casa De Monte",
+   "district": "Ко Кео",
+   "type": "Вилла",
+   "price_from": 11779000,
+   "units": [
+    {
+     "name": "3 спальни",
+     "beds": 3,
+     "area": 297,
+     "from": 30276000
+    },
+    {
+     "name": "4 спальни",
+     "beds": 4,
+     "area": 424,
+     "from": 42343000
+    }
+   ]
+  },
+  {
+   "id": "PLP-CIELO",
+   "name": "The Title Cielo Rawai",
+   "district": "Равай",
+   "type": "Кондо",
+   "price_from": 6191000,
+   "units": [
+    {
+     "area": 31,
+     "beds": 1,
+     "name": "1 Bedroom",
+     "note": "31–51 м²",
+     "from": 6191000
+    },
+    {
+     "area": 51,
+     "beds": 1,
+     "name": "1 Bedroom Plus",
+     "note": "51–61 м²",
+     "from": 6191000
+    },
+    {
+     "area": 69,
+     "beds": 2,
+     "name": "2 Bedroom",
+     "note": "69–148 м²",
+     "from": 11304000
+    }
+   ]
+  },
+  {
+   "id": "PLP-CORALINA",
+   "name": "The Title Coralina Kamala",
+   "district": "Камала",
+   "type": "Кондо",
+   "price_from": 4767552,
+   "units": [
+    {
+     "name": "1 спальня",
+     "beds": 1,
+     "area": 31,
+     "from": 4767552
+    },
+    {
+     "name": "2 спальни",
+     "beds": 2,
+     "area": 64,
+     "from": 9379584
+    },
+    {
+     "name": "3 спальни",
+     "beds": 3,
+     "area": 128,
+     "from": 21217248
+    }
+   ]
+  },
+  {
+   "id": "PLP-EDEN",
+   "name": "Gardens of Eden",
+   "district": "Банг Тао",
+   "type": "Кондо",
+   "price_from": 7800000,
+   "units": []
+  },
+  {
+   "id": "PLP-ESTELLA",
+   "name": "The Title Villa Estella Naiyang",
+   "district": "Най Янг",
+   "type": "Вилла",
+   "price_from": 22418000,
+   "units": [
+    {
+     "name": "3 спальни",
+     "beds": 3,
+     "area": 265,
+     "from": 18600000
+    }
+   ]
+  },
+  {
+   "id": "PLP-HALO1",
+   "name": "The Title Halo 1 Naiyang",
+   "district": "Най Янг",
+   "type": "Кондо",
+   "price_from": 5137480,
+   "units": [
+    {
+     "name": "1 спальня",
+     "beds": 1,
+     "area": 36,
+     "from": 3850000
+    },
+    {
+     "name": "2 спальни",
+     "beds": 2,
+     "area": 59,
+     "from": 7500000
+    }
+   ]
+  },
+  {
+   "id": "PLP-HERITAGE",
+   "name": "The Title Heritage Bang-Tao",
+   "district": "Банг Тао",
+   "type": "Кондо",
+   "price_from": 5525730,
+   "units": [
+    {
+     "name": "1 спальня",
+     "beds": 1,
+     "area": 35.8,
+     "from": 5525730
+    },
+    {
+     "name": "2 спальни",
+     "beds": 2,
+     "area": 64.68,
+     "from": 11002068
+    },
+    {
+     "name": "3 спальни",
+     "beds": 3,
+     "area": 122.04,
+     "from": 20887146
+    }
+   ]
+  },
+  {
+   "id": "PLP-KATABELLO",
+   "name": "The Title Katabello",
+   "district": "Ката",
+   "type": "Кондо",
+   "price_from": 4256000,
+   "units": [
+    {
+     "name": "1 спальня",
+     "beds": 1,
+     "area": 28,
+     "from": 4256000
+    },
+    {
+     "name": "2 спальни",
+     "beds": 2,
+     "area": 121,
+     "from": 17666000
+    },
+    {
+     "name": "3 спальни",
+     "beds": 3,
+     "area": 100,
+     "from": 13300000
+    }
+   ]
+  },
+  {
+   "id": "PLP-KIRARA",
+   "name": "The Title Villa Kirara Bang-Tao",
+   "district": "Банг Тао",
+   "type": "Вилла",
+   "price_from": 29020000,
+   "units": [
+    {
+     "area": 328,
+     "beds": 3,
+     "name": "AURA",
+     "note": "2+1 спальни, участок 270–352 м², бассейн 3,65×15",
+     "from": 36100000
+    },
+    {
+     "area": 305,
+     "beds": 3,
+     "name": "SELENE",
+     "note": "участок 412–494 м², бассейн 3,7×10",
+     "from": 36100000
+    },
+    {
+     "area": 406,
+     "beds": 3,
+     "name": "MYRRHA",
+     "note": "участок 505–707 м², бассейн 3×12, руфтоп",
+     "from": 36100000
+    },
+    {
+     "area": 496,
+     "beds": 4,
+     "name": "LYRA",
+     "note": "участок 705–762 м², бассейн 2,75×15",
+     "from": 64960000
+    },
+    {
+     "area": 660,
+     "beds": 4,
+     "name": "XENIA",
+     "note": "участок 1132–1208 м², бассейн 3×12 и детский",
+     "from": 64960000
+    }
+   ]
+  },
+  {
+   "id": "PLP-LEGENDARY",
+   "name": "The Title Legendary Bang-Tao",
+   "district": "Банг Тао",
+   "type": "Кондо",
+   "price_from": 6679500,
+   "units": [
+    {
+     "name": "1 спальня",
+     "beds": 1,
+     "area": 42.9,
+     "from": 6679500
+    },
+    {
+     "name": "2 спальни",
+     "beds": 2,
+     "area": 85.3,
+     "from": 12886300
+    }
+   ]
+  },
+  {
+   "id": "PLP-LIBERTY",
+   "name": "The Liberty by Wallaya Villas",
+   "district": "Банг Тао",
+   "type": "Кондо",
+   "price_from": 8235000,
+   "units": [
+    {
+     "name": "1 спальня",
+     "beds": 1,
+     "area": 61,
+     "from": 8235000
+    },
+    {
+     "name": "2 спальни",
+     "beds": 2,
+     "area": 96,
+     "from": 12960000
+    }
+   ]
+  },
+  {
+   "id": "PLP-MODEVA",
+   "name": "The Modeva Bang-Tao",
+   "district": "Банг Тао",
+   "type": "Кондо",
+   "price_from": 4750200,
+   "units": [
+    {
+     "area": 41,
+     "beds": 1,
+     "name": "1 Bedroom",
+     "from": 4750200
+    },
+    {
+     "area": 55,
+     "beds": 1,
+     "name": "1 Bedroom Plus",
+     "from": 4750200
+    },
+    {
+     "area": 65,
+     "beds": 2,
+     "name": "2 Bedroom",
+     "from": 14418720
+    },
+    {
+     "area": 93,
+     "beds": 2,
+     "name": "2 Bedroom Plus",
+     "from": 14418720
+    },
+    {
+     "area": 112,
+     "beds": 2,
+     "name": "2 Bedroom Duplex",
+     "from": 14418720
+    },
+    {
+     "area": 146,
+     "beds": 3,
+     "name": "3 Bedroom Duplex",
+     "from": 22192000
+    },
+    {
+     "area": 96,
+     "beds": 2,
+     "name": "Penthouse 2BR",
+     "from": 14418720
+    },
+    {
+     "area": 138,
+     "beds": 3,
+     "name": "Penthouse 3BR",
+     "from": 22192000
+    }
+   ]
+  },
+  {
+   "id": "PLP-PEYLAA",
+   "name": "PEYLAA Phuket, Autograph Collection Residences",
+   "district": "Банг Тао",
+   "type": "Кондо",
+   "price_from": 7900000,
+   "units": [
+    {
+     "name": "1 спальня",
+     "beds": 1,
+     "area": 45.57,
+     "from": 7900000
+    },
+    {
+     "name": "2 спальни",
+     "beds": 2,
+     "area": 83.56,
+     "from": 14325000
+    }
+   ]
+  },
+  {
+   "id": "PLP-SERENITY",
+   "name": "The Title Serenity Naiyang",
+   "district": "Най Янг",
+   "type": "Кондо",
+   "price_from": 5221467,
+   "units": [
+    {
+     "name": "1 спальня",
+     "beds": 1,
+     "area": 36.35,
+     "from": 5221467
+    },
+    {
+     "name": "2 спальни",
+     "beds": 2,
+     "area": 56.45,
+     "from": 8108715
+    },
+    {
+     "name": "3 спальни",
+     "beds": 3,
+     "area": 112.55,
+     "from": 13826768
+    }
+   ]
+  },
+  {
+   "id": "PLP-SIERRA",
+   "name": "The Title Sierra",
+   "district": "Банг Тао",
+   "type": "Кондо",
+   "price_from": 2906700,
+   "units": [
+    {
+     "name": "1 спальня",
+     "beds": 1,
+     "area": 28.4,
+     "from": 2906700
+    },
+    {
+     "name": "2 спальни",
+     "beds": 2,
+     "area": 55.7,
+     "from": 6523800
+    }
+   ]
+  },
+  {
+   "id": "PLP-SUNHILLS-LAYAN",
+   "name": "SUN HILLS Layan",
+   "district": "Лаян",
+   "type": "Кондо",
+   "price_from": 3312500,
+   "units": []
+  },
+  {
+   "id": "PLP-VIVANA",
+   "name": "The Title Vivana Kamala",
+   "district": "Камала",
+   "type": "Кондо",
+   "price_from": 4232629,
+   "units": [
+    {
+     "name": "1 спальня",
+     "beds": 1,
+     "area": 33,
+     "from": 4232629
+    },
+    {
+     "name": "2 спальни",
+     "beds": 2,
+     "area": 60,
+     "from": 7990467
+    }
+   ]
+  },
+  {
+   "id": "PLP-VIVI",
+   "name": "The Title VIVI",
+   "district": "Банг Тао",
+   "type": "Кондо",
+   "price_from": 3500000,
+   "units": [
+    {
+     "name": "1 спальня",
+     "beds": 1,
+     "area": 27,
+     "from": 3500000
+    }
+   ]
+  }
+ ]
+}
