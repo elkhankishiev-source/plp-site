@@ -471,31 +471,31 @@ function writeObjectIndex(html, objects) {
   }
   if (!byDistrict.size) { console.error('[gen] Список объектов пуст — блок ссылок не тронут.'); return html; }
 
-  const districts = [...byDistrict.keys()].sort((a, b) => a.localeCompare(b, 'ru'));
-  let total = 0;
-  const cols = districts.map((d) => {
-    const items = byDistrict.get(d)
-      .sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''), 'ru'))
-      .map((o) => {
-        total++;
-        const href = 'object/' + slugOf(o.plp_property_id) + '.html';
-        const price = o.price_from_thb ? ' — от ' + fmtBahtShort(Number(o.price_from_thb)) : '';
-        return '<li><a href="' + href + '">' + htmlEsc(o.name || o.plp_property_id) + '</a>' + htmlEsc(price) + '</li>';
-      }).join('');
-    // Одна строка — один район, раскрывается в список объектов. Полотном из
-    // девяти колонок этот блок читать было невозможно.
-    const n = byDistrict.get(d).length;
-    return '<details class="oi-row"><summary><span class="oi-d">' + htmlEsc(DISTRICT_RU[d] || d) +
-      '</span><span class="oi-n">' + n + '</span></summary><ul>' + items + '</ul></details>';
+  // Эльнур 04.09: не «район → внутри объекты», а просто один выезжающий список,
+  // строка = объект. Разбивка по районам читалась как полотно.
+  const all = [];
+  for (const list of byDistrict.values()) all.push(...list);
+  all.sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''), 'ru'));
+  const total = all.length;
+  const rows = all.map((o) => {
+    const href = 'object/' + slugOf(o.plp_property_id) + '.html';
+    const price = o.price_from_thb ? fmtBahtShort(Number(o.price_from_thb)) : '';
+    const d = DISTRICT_RU[(o.district || '').trim()] || o.district || '';
+    return '<li><a href="' + href + '">' + htmlEsc(o.name || o.plp_property_id) + '</a>' +
+      '<span class="oi-d">' + htmlEsc(d) + '</span>' +
+      (price ? '<span class="oi-p">' + htmlEsc(price) + '</span>' : '') + '</li>';
   }).join('');
 
   const block = MARK_OI_START + '\n' +
     '<section class="obj-index" id="all-objects"><div class="container">' +
-    '<h2>Объекты в каталоге</h2>' +
-    '<p class="sub">Все проекты, с которыми мы работаем, — с ценами от застройщика и условиями рассрочки. ' +
-    'Нажмите район, чтобы раскрыть список.</p>' +
-    '<div class="oi-list">' + cols + '</div>' +
+    '<details class="oi-box"><summary><b>Объекты в каталоге</b>' +
+    '<span class="oi-n">' + total + '</span></summary>' +
+    '<p class="sub">Все проекты, с которыми мы работаем, — с ценами от застройщика ' +
+    'и условиями рассрочки.</p>' +
+    '<ul class="oi-list">' + rows + '</ul></details>' +
     '</div></section>\n' + MARK_OI_END;
+
+  console.log('[gen] блок ссылок на объекты:', total, 'ссылок одним списком');
 
   const s = html.indexOf(MARK_OI_START);
   const e = html.indexOf(MARK_OI_END);
@@ -503,7 +503,6 @@ function writeObjectIndex(html, objects) {
     console.error('[gen] Маркеры PLP:OBJECT-INDEX не найдены — блок ссылок не вставлен.');
     return html;
   }
-  console.log('[gen] блок ссылок на объекты:', total, 'ссылок,', districts.length, 'районов');
   return html.slice(0, s) + block + html.slice(e + MARK_OI_END.length);
 }
 
