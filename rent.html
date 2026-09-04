@@ -3263,7 +3263,7 @@ addEventListener('hashchange',function(){if(isObjectHash())openFromHash();});
        области недоступна — на этом трекер молча не запускался. Ключ тот же, что
        у site-lead, и он и так виден в исходнике страницы. */
     var URL_ = 'https://proplib.app.n8n.cloud/webhook/site-events?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7';
-    var T0 = Date.now(), EV = [], SENT = false;
+    var T0 = Date.now(), EV = [], SENT = false, hit50 = false, hit90 = false;
 
     var sid;
     try {
@@ -3285,8 +3285,20 @@ addEventListener('hashchange',function(){if(isObjectHash())openFromHash();});
       });
     } catch (e) {}
 
+    function depth() {
+      try {
+        var h = document.documentElement;
+        return (h.scrollTop + innerHeight) / Math.max(h.scrollHeight, 1) * 100;
+      } catch (e) { return 0; }
+    }
+
     function send(final) {
       if (SENT || !EV.length) return;
+      /* Глубину считаем ещё и здесь: события прокрутки иногда не долетают
+         (быстрый уход, программная прокрутка), а метрика нужна всегда. */
+      var p = depth();
+      if (!hit50 && p >= 50) { hit50 = true; add('scroll50'); }
+      if (!hit90 && p >= 90) { hit90 = true; add('scroll90'); }
       if (final) SENT = true;
       var body = JSON.stringify({
         session_id: sid, page: location.pathname, referrer: document.referrer || '',
@@ -3306,10 +3318,8 @@ addEventListener('hashchange',function(){if(isObjectHash())openFromHash();});
 
     add('view');
 
-    var hit50 = false, hit90 = false;
     addEventListener('scroll', function () {
-      var h = document.documentElement;
-      var p = (h.scrollTop + innerHeight) / Math.max(h.scrollHeight, 1) * 100;
+      var p = depth();
       if (!hit50 && p >= 50) { hit50 = true; add('scroll50'); }
       if (!hit90 && p >= 90) { hit90 = true; add('scroll90'); }
     }, { passive: true });
