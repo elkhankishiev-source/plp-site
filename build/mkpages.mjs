@@ -93,9 +93,16 @@ const CATALOG_CSS = `
 .catalog .found b{color:var(--ink);font-size:1.05rem}
 .catrow{display:grid;grid-template-columns:minmax(0,1fr) 420px;gap:22px;align-items:start;margin-top:8px}
 @media(max-width:1080px){.catrow{grid-template-columns:1fr}.catmap{display:none}}
-.catalog .car{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:18px;
-  overflow:visible;padding:2px;cursor:default;scroll-snap-type:none}
-.catalog .car .prop{width:auto!important;min-width:0;scroll-snap-align:none;flex:none}
+/* Эльнур 05.09: на странице продажи объекты тоже лентой, как на главной —
+   вертикальная сетка оставляла пустые места и растягивала страницу.
+   Карта рядом остаётся, подсветка при прокрутке ленты работает как прежде. */
+.catalog .car{display:flex;gap:16px;overflow-x:auto;padding:2px 2px 10px;
+  scroll-snap-type:x proximity;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.catalog .car::-webkit-scrollbar{display:none}
+.catalog .car .prop{flex:0 0 290px;width:290px!important;min-width:0;scroll-snap-align:start}
+.catalog .arrows{display:flex!important}
+@media(max-width:600px){.catalog .car .prop{flex-basis:80vw;width:80vw!important}}
+.catalog .car .prop.hl{outline:2px solid var(--ink);outline-offset:2px}
 .catalog .car .prop.hl{outline:2px solid var(--ink);outline-offset:2px}
 .catmap{position:sticky;top:88px}
 .catmap .plpmap{height:calc(100vh - 168px);max-height:760px;margin:0}
