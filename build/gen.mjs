@@ -467,14 +467,19 @@ function writeObjectIndex(html, objects) {
         const price = o.price_from_thb ? ' — от ' + fmtBahtShort(Number(o.price_from_thb)) : '';
         return '<li><a href="' + href + '">' + htmlEsc(o.name || o.plp_property_id) + '</a>' + htmlEsc(price) + '</li>';
       }).join('');
-    return '<div class="oi-col"><h3>' + htmlEsc(DISTRICT_RU[d] || d) + '</h3><ul>' + items + '</ul></div>';
+    // Одна строка — один район, раскрывается в список объектов. Полотном из
+    // девяти колонок этот блок читать было невозможно.
+    const n = byDistrict.get(d).length;
+    return '<details class="oi-row"><summary><span class="oi-d">' + htmlEsc(DISTRICT_RU[d] || d) +
+      '</span><span class="oi-n">' + n + '</span></summary><ul>' + items + '</ul></details>';
   }).join('');
 
   const block = MARK_OI_START + '\n' +
     '<section class="obj-index" id="all-objects"><div class="container">' +
     '<h2>Объекты в каталоге</h2>' +
-    '<p class="sub">Все проекты, с которыми мы работаем, — с ценами от застройщика и условиями рассрочки.</p>' +
-    '<div class="oi-grid">' + cols + '</div>' +
+    '<p class="sub">Все проекты, с которыми мы работаем, — с ценами от застройщика и условиями рассрочки. ' +
+    'Нажмите район, чтобы раскрыть список.</p>' +
+    '<div class="oi-list">' + cols + '</div>' +
     '</div></section>\n' + MARK_OI_END;
 
   const s = html.indexOf(MARK_OI_START);

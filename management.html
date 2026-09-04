@@ -371,6 +371,8 @@ html,body{overflow-x:clip;max-width:100%}
 .prop.booked{opacity:.5;filter:grayscale(.5);pointer-events:none;position:relative}
 .prop.booked .pic::after{content:attr(data-busy);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(10,10,10,.55);color:#fff;font-weight:700;font-size:.9rem;text-align:center;padding:12px;border-radius:inherit}
 .chipf{background:rgba(255,255,255,.85);border:1px solid rgba(10,10,10,.07);border-radius:999px;padding:9px 15px;font-size:.84rem;font-weight:600;cursor:pointer;transition:border-color .2s,background .2s,transform .15s;user-select:none}
+.chipf.off{opacity:.42;cursor:default;font-weight:500}
+.chipf.off:hover{border-color:rgba(10,10,10,.07);background:rgba(255,255,255,.85)}
 .chipf:hover{border-color:var(--ink)}
 .chipf:active{transform:scale(.97)}
 .chipf.on{background:var(--green);border-color:transparent;font-weight:700}
@@ -885,13 +887,21 @@ html,body{overflow-x:clip;max-width:100%}
 .obj-index{padding:56px 0;background:#fafaf7;border-top:1px solid #ececE4}
 .obj-index h2{margin:0 0 6px;font-size:26px}
 .obj-index .sub{margin:0 0 26px;color:#6b6b63;max-width:640px}
-.oi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:22px 28px}
-.oi-col h3{margin:0 0 8px;font-size:14px;letter-spacing:.04em;text-transform:uppercase;color:#8a8a80}
-.oi-col ul{margin:0;padding:0;list-style:none}
-.oi-col li{margin:0 0 7px;font-size:14px;line-height:1.45;color:#6b6b63}
-.oi-col a{color:#2b2b26;text-decoration:none;border-bottom:1px solid rgba(0,0,0,.14)}
-.oi-col a:hover{border-bottom-color:currentColor}
-@media(max-width:600px){.obj-index{padding:40px 0}.oi-grid{gap:18px}}
+.oi-list{max-width:720px;border-top:1px solid #e6e6de}
+.oi-row{border-bottom:1px solid #e6e6de}
+.oi-row>summary{display:flex;align-items:center;gap:10px;padding:14px 2px;cursor:pointer;
+  list-style:none;font-size:15px;color:#2b2b26;transition:color .15s}
+.oi-row>summary::-webkit-details-marker{display:none}
+.oi-row>summary::after{content:'▾';margin-left:auto;color:#a8a89c;font-size:12px;transition:transform .18s}
+.oi-row[open]>summary::after{transform:rotate(180deg)}
+.oi-row>summary:hover{color:#000}
+.oi-d{font-weight:500}
+.oi-n{font-size:12px;color:#8a8a80;background:#f0f0e8;border-radius:10px;padding:1px 8px}
+.oi-row ul{margin:0;padding:0 0 14px;list-style:none}
+.oi-row li{margin:0 0 8px;font-size:14px;line-height:1.45;color:#6b6b63;padding-left:2px}
+.oi-row a{color:#2b2b26;text-decoration:none;border-bottom:1px solid rgba(0,0,0,.14)}
+.oi-row a:hover{border-bottom-color:currentColor}
+@media(max-width:600px){.obj-index{padding:40px 0}.oi-row>summary{padding:13px 2px}}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.6.0/maplibre-gl.min.css">
@@ -1315,7 +1325,7 @@ ru: {
   "rent.dates.busy":"Занято на эти даты","rent.dates.none":"На выбранные даты свободных вариантов нет — оставьте запрос, подберём альтернативу.",
   "rent.dates.err":"Не удалось проверить доступность — показываем все варианты. Уточните даты в заявке.",
   "rent.f.district":"Район","rent.f.beds":"Спальни","rent.f.type":"Тип","rent.f.amen":"Удобства","rent.f.reset":"Сбросить фильтры","rent.f.more":"Больше фильтров",
-  "rent.beds.4":"4+",
+  "rent.f.nofree":"Сейчас нет свободных предложений в этом районе — напишите, подберём.","rent.beds.4":"4+",
   "rent.am.pool":"Бассейн","rent.am.beach":"У моря / 1-я линия","rent.am.parking":"Парковка","rent.am.gym":"Спортзал","rent.am.pets":"Можно с питомцами",
   "rent.am.soft":"удобства уточняются",
   "rent.noresult":"По выбранным фильтрам ничего не нашлось — измените условия или сбросьте фильтры.",
@@ -1499,7 +1509,7 @@ en: {
   "rent.dates.busy":"Booked for these dates","rent.dates.none":"No homes available for the selected dates — leave an enquiry and we will find an alternative.",
   "rent.dates.err":"Couldn't check availability — showing all homes. Confirm your dates in the enquiry.",
   "rent.f.district":"Area","rent.f.beds":"Bedrooms","rent.f.type":"Type","rent.f.amen":"Amenities","rent.f.reset":"Reset filters","rent.f.more":"More filters",
-  "rent.beds.4":"4+",
+  "rent.f.nofree":"No rentals available here right now — message us and we will find one.","rent.beds.4":"4+",
   "rent.am.pool":"Pool","rent.am.beach":"Beachfront","rent.am.parking":"Parking","rent.am.gym":"Gym","rent.am.pets":"Pet-friendly",
   "rent.am.soft":"amenities to be confirmed",
   "rent.noresult":"Nothing matches the selected filters — adjust or reset them.",
@@ -2568,9 +2578,28 @@ function buildRentChips(){
     s.onclick=function(){var set=activeRent[f];if(set.has(val))set.delete(val);else set.add(val);s.classList.toggle('on');applyRentFilters();};
     row.appendChild(s);
   }
-  /* НА ВИДУ: район — из данных */
+  /* НА ВИДУ: район. Показываем ВСЕ районы, где мы работаем, а не только те три,
+     где сегодня есть свободная аренда: иначе список выглядит куцым и человек
+     думает, что остров у нас кончается. Районы без предложений — неактивные,
+     с честной подписью, а не обманкой. */
   var locs=new Map();PL.RENTALS.forEach(function(p){locs.set(p.loc.ru,loc(p.loc));});
-  if(locs.size){var rl=group('rent.f.district');locs.forEach(function(label,val){chip(rl,'loc',val,label);});}
+  var all=new Map(locs);
+  (PL.PROPERTIES||[]).forEach(function(p){ if(!all.has(p.loc.ru)) all.set(p.loc.ru,loc(p.loc)); });
+  if(all.size){
+    var rl=group('rent.f.district');
+    var keys=Array.from(all.keys()).sort(function(a,b){
+      var ea=locs.has(a), eb=locs.has(b);          /* сначала те, где есть что снять */
+      if(ea!==eb) return ea?-1:1;
+      return String(all.get(a)).localeCompare(String(all.get(b)),'ru');
+    });
+    keys.forEach(function(val){
+      if(locs.has(val)){ chip(rl,'loc',val,all.get(val)); return; }
+      var s=document.createElement('span');
+      s.className='chipf off'; s.textContent=all.get(val);
+      s.title=t('rent.f.nofree');
+      rl.appendChild(s);
+    });
+  }
   /* НА ВИДУ: спальни — фикс. набор 1/2/3/4+ */
   var rb=group('rent.f.beds');
   ['1','2','3'].forEach(function(v){chip(rb,'beds',v,v);});
