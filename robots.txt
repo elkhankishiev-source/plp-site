@@ -10,4 +10,4 @@ Disallow: /owner.html
 # черновик новой главной — в поиск не пускаем
 Disallow: /draft.html
 
-Sitemap: https://elkhankishiev-source.github.io/plp-site/sitemap.xml
+Sitemap: https://property-library.com/sitemap.xml
