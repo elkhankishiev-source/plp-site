@@ -3350,6 +3350,92 @@ addEventListener('hashchange',function(){if(isObjectHash())openFromHash();});
 <script src="https://cdn.jsdelivr.net/npm/@maplibre/maplibre-gl-leaflet@0.1.0/leaflet-maplibre-gl.js" defer
   onload="try{renderMapReal();}catch(e){}"></script>
 <script>window.addEventListener("load",function(){try{renderMapReal();}catch(e){}});</script>
+<script>
+/* Обезличенная аналитика: без неё нельзя сказать, конвертит сайт или нет.
+   Ни телефонов, ни имён, ни почт — только событие, страница и источник.
+   Копим события в памяти и шлём ОДИН раз при уходе со страницы: так это
+   одно исполнение n8n на посетителя, а не на каждый клик. */
+(function () {
+  try {
+    if (!window.fetch || typeof LEAD_ENDPOINT !== 'string') return;
+    var URL_ = LEAD_ENDPOINT.replace('/site-lead', '/site-events');
+    var T0 = Date.now(), EV = [], SENT = false;
+
+    var sid;
+    try {
+      sid = sessionStorage.getItem('plp_sid');
+      if (!sid) { sid = Math.random().toString(36).slice(2) + Date.now().toString(36); sessionStorage.setItem('plp_sid', sid); }
+    } catch (e) { sid = 'nostore-' + Date.now().toString(36); }
+
+    function add(name, extra) {
+      if (EV.length >= 60) return;
+      var o = { e: String(name).slice(0, 40), t: Date.now() - T0 };
+      if (extra) o.v = String(extra).slice(0, 80);
+      EV.push(o);
+    }
+
+    var utm = {};
+    try {
+      new URLSearchParams(location.search).forEach(function (v, k) {
+        if (/^utm_|^gclid$|^yclid$|^fbclid$/.test(k)) utm[k] = String(v).slice(0, 80);
+      });
+    } catch (e) {}
+
+    function send(final) {
+      if (SENT || !EV.length) return;
+      if (final) SENT = true;
+      var body = JSON.stringify({
+        session_id: sid, page: location.pathname, referrer: document.referrer || '',
+        utm: Object.keys(utm).length ? utm : null, events: EV.slice(),
+        device: (innerWidth < 700 ? 'mobile' : (innerWidth < 1100 ? 'tablet' : 'desktop')),
+        lang: (document.documentElement.lang || navigator.language || '').slice(0, 8),
+        duration_ms: Date.now() - T0,
+      });
+      try {
+        if (final && navigator.sendBeacon) navigator.sendBeacon(URL_, new Blob([body], { type: 'application/json' }));
+        else fetch(URL_, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body, keepalive: true });
+      } catch (e) {}
+    }
+
+    add('view');
+
+    var hit50 = false, hit90 = false;
+    addEventListener('scroll', function () {
+      var h = document.documentElement;
+      var p = (h.scrollTop + innerHeight) / Math.max(h.scrollHeight, 1) * 100;
+      if (!hit50 && p >= 50) { hit50 = true; add('scroll50'); }
+      if (!hit90 && p >= 90) { hit90 = true; add('scroll90'); }
+    }, { passive: true });
+
+    /* Что именно нажали — по этому и считается конверсия воронки */
+    addEventListener('click', function (ev) {
+      try {
+        var el = ev.target.closest ? ev.target.closest('a,button') : null;
+        if (!el) return;
+        var href = (el.getAttribute('href') || '');
+        if (/wa\.me|whatsapp/i.test(href)) return add('cta_whatsapp');
+        if (/t\.me/i.test(href)) return add('cta_telegram');
+        if (/^object\//.test(href)) return add('object_open', href.replace('object/', '').replace('.html', ''));
+        if (/owner\.html/.test(href)) return add('cta_cabinet');
+        var txt = (el.textContent || '').trim().slice(0, 40).toLowerCase();
+        if (/заявк|консультац|связ|подобрать|получить/.test(txt)) add('cta_lead', txt);
+        else if (/каталог|подборк|pdf/.test(txt)) add('cta_catalog', txt);
+        else if (/расчит|рассчит|калькул|доходност/.test(txt)) add('cta_calc', txt);
+      } catch (e) {}
+    }, true);
+
+    /* Отправленная заявка — главное событие, шлём сразу, не дожидаясь ухода */
+    if (typeof window.openChat === 'function') {
+      var _oc = window.openChat;
+      window.openChat = function () { add('chat_open', arguments[0]); try { return _oc.apply(this, arguments); } finally { send(false); } };
+    }
+    addEventListener('submit', function () { add('form_submit'); send(false); }, true);
+
+    addEventListener('pagehide', function () { send(true); });
+    document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') send(true); });
+  } catch (e) {}
+})();
+</script>
 
 <script>
 /* Каталог и карта — одно целое: карта показывает то, что осталось после фильтров,
