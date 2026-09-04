@@ -2671,6 +2671,12 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         });
         h+='</ul><p class="sub"><a href="#" class="lnk" id="cl-addtask">Поставить задачу</a></p>';
       }
+      /* Закрытый оффер: собираем страницу под этого человека и объект.
+         Ссылка живёт ограниченное время, на странице стоит наш водяной знак. */
+      h+='<h4>Персональное предложение</h4>'+
+         '<p class="sub"><a href="#" class="lnk" id="cl-offer">Собрать оффер по объекту</a>'+
+         ' · <a href="#" class="lnk" id="cl-offers">показать выданные</a></p>'+
+         '<div id="cl-offerbox"></div>';
 
       var fx=k.facts||{};
       var fk=Object.keys(fx);
@@ -2805,6 +2811,10 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       if(at) at.onclick=function(e){ e.preventDefault(); taskForm(code); };
       var rq=document.getElementById('cl-req');
       if(rq) rq.onclick=function(e){ e.preventDefault(); reqForClient(code, c.name); };
+      var of=document.getElementById('cl-offer');
+      if(of) of.onclick=function(e){ e.preventDefault(); offerForm(code); };
+      var ol=document.getElementById('cl-offers');
+      if(ol) ol.onclick=function(e){ e.preventDefault(); offersShow(); };
       Array.prototype.forEach.call(box.querySelectorAll('.done-task'),function(a){
         a.onclick=function(e){ e.preventDefault();
           post({action:'client_task_set',token:TOKEN,task_id:a.getAttribute('data-id'),status:'done'})
@@ -3647,6 +3657,51 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
               bought_on:fv('f-bought'),price:fv('f-price'),uk_status:fv('f-uk'),note:fv('f-onote')})
           .then(function(){ document.getElementById('cl-form').innerHTML=''; openClient(code); });
       });
+  }
+  /* Оффер под клиента: объект, срок жизни ссылки и записка от себя.
+     Ссылка личная, на странице стоит наш водяной знак. */
+  function offerForm(code){
+    clForm('<h3>Предложение для '+code+'</h3><div class="fgrid">'+
+      '<label class="wide">ID объекта<input id="o-obj" type="text" placeholder="PLP-CORALINA"></label>'+
+      '<label>Ссылка живёт<select id="o-days">'+
+        '<option value="3">3 дня</option><option value="7" selected>7 дней</option>'+
+        '<option value="14">14 дней</option><option value="30">30 дней</option></select></label>'+
+      '<label class="wide">Записка клиенту<input id="o-note" type="text" placeholder="Необязательно"></label>'+
+      '</div><p class="sub">ID объекта виден в его карточке на сайте, внизу.</p>'+
+      '<div class="fbtns"><button type="button" class="btn" id="f-save">Собрать ссылку</button>'+
+      '<button type="button" class="btn ghost" id="f-cancel">Отмена</button></div>',
+      function(){
+        var pid=(fv('o-obj')||'').trim().toUpperCase();
+        if(!pid){ alert('Укажите ID объекта'); return; }
+        post({action:'client_offer',token:TOKEN,code:code,property_id:pid,
+              days:Number(fv('o-days'))||7,note:fv('o-note')})
+          .then(function(r){
+            if(!r||!r.ok||!r.offer){ alert((r&&r.error)||'Не получилось собрать оффер'); return; }
+            var f=document.getElementById('cl-form');
+            if(f){ f.innerHTML=''; document.body.style.overflow=''; }
+            var url=r.offer.url||('https://property-library.com/offer.html#'+r.offer.token);
+            var box=document.getElementById('cl-offerbox');
+            if(box) box.innerHTML='<div class="crow" style="margin-top:8px"><div>'+
+              '<span class="lbl">Ссылка для клиента (скопирована)</span>'+
+              '<a href="'+clEsc(url)+'" target="_blank" rel="noopener">'+clEsc(url)+'</a></div></div>';
+            try{ navigator.clipboard.writeText(url); }catch(e){}
+          });
+      });
+  }
+  function offersShow(){
+    post({action:'client_offers',token:TOKEN,limit:30}).then(function(r){
+      var box=document.getElementById('cl-offerbox'); if(!box) return;
+      var list=(r&&r.offers)||[];
+      if(!list.length){ box.innerHTML='<p class="sub">Пока ни одного предложения не выдавали.</p>'; return; }
+      box.innerHTML='<ul class="tlist">'+list.map(function(o){
+        var url='https://property-library.com/offer.html#'+o.token;
+        return '<li>'+clEsc(o.object_name||o.property_id)+
+          (o.client_name?(' <span class="sub">· '+clEsc(o.client_name)+'</span>'):'')+
+          ' <span class="sub">· открывали '+(o.opened_count||0)+'</span> '+
+          (o.alive?('<a href="'+clEsc(url)+'" target="_blank" rel="noopener" class="lnk">открыть</a>')
+                 :'<span class="sub">· не действует</span>')+'</li>';
+      }).join('')+'</ul>';
+    });
   }
   function taskForm(code){
     clForm('<h3>Задача по '+code+'</h3><div class="fgrid">'+
