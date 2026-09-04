@@ -418,6 +418,17 @@ section[id],div[id^="q"],[id="about"],[id="steps"],[id="faq"]{scroll-margin-top:
 .mdot{width:16px;height:4px;border-radius:2px;padding:0;border:0;cursor:pointer;
   background:rgba(255,255,255,.5);box-shadow:0 1px 2px rgba(0,0,0,.2);transition:background .15s,width .15s}
 .mdot.on{background:#fff;width:22px}
+.pm-count{position:absolute;left:12px;bottom:12px;z-index:2;background:rgba(16,15,12,.62);color:#fff;
+  border-radius:999px;padding:4px 10px;font-size:.74rem;font-weight:600;backdrop-filter:blur(6px)}
+.simi{margin-top:20px;padding-top:16px;border-top:1px solid rgba(10,10,10,.08)}
+.simi-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.simi-c{display:flex;flex-direction:column;gap:3px;align-items:flex-start;text-align:left;background:#fff;
+  border:1px solid rgba(10,10,10,.09);border-radius:12px;padding:8px;cursor:pointer;font:inherit;
+  transition:border-color .15s,transform .15s}
+.simi-c:hover{border-color:rgba(10,10,10,.28);transform:translateY(-2px)}
+.simi-c i{display:block;width:100%;height:66px;border-radius:8px;background:#eceadf;background-size:cover;background-position:center;margin-bottom:4px}
+.simi-c b{font-size:.8rem;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.simi-c span{font-size:.72rem;color:var(--muted)}
 .units{margin:14px 0 4px}
 .units-h{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:8px}
 .units-row{display:flex;flex-wrap:wrap;gap:7px}
@@ -1351,7 +1362,7 @@ ru: {
   "lf.err.empty":"Оставьте номер телефона или ник в Telegram — иначе мы не сможем ответить.","lf.err.short":"Похоже, в номере не хватает цифр. Проверьте, пожалуйста.","lf.err.bad":"Не похоже на номер, @ник или почту. Напишите так, как вам удобно ответить.",
   "cs.5n":"Квартира для пары на пенсии","cs.5w":"Рассрочка 3 года и мебель в подарок","cs.5t":"плюс мебель ฿700 тыс","cs.5buy":"฿9,8 млн","cs.5now":"฿14,8 млн","cs.5r":"9% год","cs.6n":"Квартира, которая платит за себя","cs.6w":"Кредит застройщика 5% на 5 лет","cs.6t":"аренда кроет половину платежа","cs.6buy":"฿14 млн","cs.6now":"฿15,4 млн","cs.6r":"฿70 тыс/мес",
   "u.wa":"Написать в WhatsApp","wa.hi":"Здравствуйте! Интересует объект:","wa.hi2":"Здравствуйте! Хочу подобрать объект на Пхукете.","wa.price":"Цена на сайте:","wa.dates":"Даты:","wa.link":"Ссылка:","wa.seen":"Смотрел на сайте:",
-  "nav.pick":"Подобрать объект","f.any":"Любая цена","f.reset":"сбросить","u.upto":"до","u.units":"Планировки","stay.wait":"Считаем…","stay.nights":"ночей","stay.pernight":" за ночь","stay.off":"скидка за срок","stay.none":"Цена на эти даты — по запросу. Оставьте заявку, ответим точной суммой в течение дня.",
+  "nav.pick":"Подобрать объект","f.any":"Любая цена","f.reset":"сбросить","u.upto":"до","u.units":"Планировки","u.similar":"Похожие объекты","stay.wait":"Считаем…","stay.nights":"ночей","stay.pernight":" за ночь","stay.off":"скидка за срок","stay.none":"Цена на эти даты — по запросу. Оставьте заявку, ответим точной суммой в течение дня.",
   "assist.lab":"Консультант","assist.h2":"Не уверены, что подходит именно вам?","assist.p":"Спросите Дарью прямо здесь, в чате на сайте. Она знает базу, считает доходность и сравнивает районы — отвечает сразу, в любое время. Что-то сложное передаст менеджеру.","assist.cta":"Задать вопрос в чате","assist.wa":"Подобрать за 10 минут","assist.q1s":"Что купить на 5 млн ฿?","assist.q1":"Что можно купить на 5 млн ฿?","assist.q2s":"Где выше доходность?","assist.q2":"В каком районе выше доходность аренды?","assist.q3s":"Чем Банг Тао лучше Раваи?","assist.q3":"Чем Банг Тао лучше Раваи для инвестиций?","assist.q4s":"Сколько выйдет с налогами?","assist.q4":"Какие расходы при покупке кроме цены объекта?",
   "u.from":"от","u.onreq":"цена по запросу","u.calc":"Рассчитать доходность","u.cmp":"Сравнить","u.cmpOn":"В сравнении",
   "u.roinote":"Ориентировочно; потенциал зависит от объекта, стратегии и управления — рассчитаем индивидуально",
@@ -1536,7 +1547,7 @@ en: {
   "lf.err.empty":"Leave a phone number or a Telegram handle — otherwise we cannot reply.","lf.err.short":"That number looks too short. Please check it.","lf.err.bad":"That is not a phone number, an @handle or an email. Write the way you would like us to reply.",
   "cs.5n":"A flat for a retired couple","cs.5w":"Three-year instalments and furniture included","cs.5t":"plus ฿700k of furniture","cs.5buy":"฿9.8M","cs.5now":"฿14.8M","cs.5r":"9%/yr","cs.6n":"A flat that pays for itself","cs.6w":"Developer credit at 5% over five years","cs.6t":"rent covers half the payment","cs.6buy":"฿14M","cs.6now":"฿15.4M","cs.6r":"฿70k/mo",
   "u.wa":"Message on WhatsApp","wa.hi":"Hello! I am interested in:","wa.hi2":"Hello! I would like help choosing a property in Phuket.","wa.price":"Price on the site:","wa.dates":"Dates:","wa.link":"Link:","wa.seen":"Viewed on the site:",
-  "nav.pick":"Find me a property","f.any":"Any price","f.reset":"reset","u.upto":"up to","u.units":"Unit types","stay.wait":"Calculating…","stay.nights":"nights","stay.pernight":" per night","stay.off":"length-of-stay discount","stay.none":"Price for these dates is on request. Leave a request and we will come back with the exact figure the same day.",
+  "nav.pick":"Find me a property","f.any":"Any price","f.reset":"reset","u.upto":"up to","u.units":"Unit types","u.similar":"Similar properties","stay.wait":"Calculating…","stay.nights":"nights","stay.pernight":" per night","stay.off":"length-of-stay discount","stay.none":"Price for these dates is on request. Leave a request and we will come back with the exact figure the same day.",
   "assist.lab":"Assistant","assist.h2":"Not sure what suits you?","assist.p":"Ask Daria right here, in the chat on this page. She knows the catalogue, works out the yield and compares districts — answers straight away, any time. Anything complex goes to a manager.","assist.cta":"Ask in the chat","assist.wa":"Find me a match in 10 minutes","assist.q1s":"What can I get for ฿5M?","assist.q1":"What can I buy for ฿5 million?","assist.q2s":"Where is the yield higher?","assist.q2":"Which district has the higher rental yield?","assist.q3s":"Bang Tao or Rawai?","assist.q3":"Why is Bang Tao better than Rawai for investment?","assist.q4s":"What about taxes?","assist.q4":"What costs come on top of the price?",
   "u.from":"from","u.onreq":"price on request","u.calc":"Calculate the yield","u.cmp":"Compare","u.cmpOn":"Comparing",
   "u.roinote":"Indicative; potential depends on the unit, strategy and management — we calculate it individually",
@@ -1944,6 +1955,26 @@ function miniStrip(p){
 /* Планировки. Эльнур 05.09: у проекта бывает 6–8 типов, и человек должен
    выбрать свой, а не гадать по диапазону «31–148 м²». Нажал тип — характеристики
    подставились в шапку карточки. */
+/* Похожие объекты — как у соседей по рынку: человек не уходит в поиск, а
+   смотрит рядом стоящее. Берём тот же район, иначе близкую цену. */
+function similarHTML(p){
+  if(!p||p.funnel!=='sale') return '';
+  var price=thbOf(p)||0;
+  var pool=(PL.PROPERTIES||[]).filter(function(x){ return x.property_id!==p.property_id && x.status!=='sold'; });
+  var same=pool.filter(function(x){ return x.loc.ru===p.loc.ru; });
+  var near=pool.filter(function(x){ var v=thbOf(x)||0; return price&&v&&Math.abs(v-price)/price<0.45; });
+  var list=[];
+  same.concat(near).forEach(function(x){ if(list.indexOf(x)<0&&list.length<4) list.push(x); });
+  if(!list.length) return '';
+  return '<div class="simi"><div class="units-h">'+t('u.similar')+'</div><div class="simi-row">'+
+    list.map(function(x){
+      var pic=x.photo||x.img||'';
+      return '<button type="button" class="simi-c" onclick="openProp(\''+x.property_id+'\')">'+
+        (pic?('<i style="background-image:url('+pic+')"></i>'):'<i class="nopic"></i>')+
+        '<b>'+escHTML(x.title)+'</b>'+
+        '<span>'+escHTML(loc(x.loc))+' · '+fmtBaht(thbOf(x))+'</span></button>';
+    }).join('')+'</div></div>';
+}
 function unitsHTML(p){
   var u=(p&&p.units)||[];
   if(!u.length) return '';
@@ -2524,7 +2555,10 @@ function openProp(pid){
   try{ viewedPush(p); }catch(e){}
   var img=document.getElementById('pmImg');
   img.className='pm-img '+(p.grad||'g1');
-  img.innerHTML=picPhoto(p,true).replace('pic-photo','pm-photo')+'<span>'+t('ph.object')+'</span><div class="pm-badges"><span class="pm-tag">'+loc(p.loc)+'</span><span class="pm-roi">'+(p.funnel==='sale'?(p.roi!=null?('ROI '+roiRange(p)):t('u.calc')):t('book.title'))+'</span></div>';
+  var _n=((p.photos&&p.photos.length)||(p.photo||p.img?1:0));
+  img.innerHTML=picPhoto(p,true).replace('pic-photo','pm-photo')+
+    (_n>1?('<span class="pm-count">🖼 '+_n+'</span>'):'')+
+    '<span>'+t('ph.object')+'</span><div class="pm-badges"><span class="pm-tag">'+loc(p.loc)+'</span><span class="pm-roi">'+(p.funnel==='sale'?(p.roi!=null?('ROI '+roiRange(p)):t('u.calc')):t('book.title'))+'</span></div>';
   /* Главное фото крупным, под ним ряд миниатюр; клик по снимку открывает крупно. */
   img.style.cursor='zoom-in';
   img.onclick=function(e){ if(e.target.closest('.pm-badges')) return; openLightbox(pid, 0); };
@@ -2551,7 +2585,8 @@ function openProp(pid){
     document.getElementById('pmCta').innerHTML=
       '<button type="button" class="btn btn-primary btn-block" onclick="leadFromModal(\''+pid+'\',\'kp\')">'+t('u.kp')+'</button>'+
       '<button type="button" class="btn btn-green btn-block" onclick="leadFromModal(\''+pid+'\',\'view\')">'+t('u.view')+'</button>'+
-      '<button type="button" class="btn btn-ghost btn-block" onclick="waFromModal(\''+pid+'\')">'+t('u.wa')+'</button>';
+      '<button type="button" class="btn btn-ghost btn-block" onclick="waFromModal(\''+pid+'\')">'+t('u.wa')+'</button>'+
+      similarHTML(p);
   }else{
     stEl.style.display='none';
     document.getElementById('pmPrice').innerHTML='<span>'+t('u.onreq')+'</span>';
