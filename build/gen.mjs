@@ -311,6 +311,10 @@ function buildCatalog(objects, benchmarks, preserve) {
       avail: (function(){ var m=/(\d+)/.exec(o.availability || ''); return m ? +m[1] : null; })(),
       beach: o.beach || null,
       beachM: (o.distance_beach_m === 0 || o.distance_beach_m) ? o.distance_beach_m : null,
+      // Снимки из хранилища: первый идёт обложкой, остальные — лентой в карточке.
+      // Локальные img/<ID>.jpg остаются запасным вариантом для старых объектов.
+      photo: o.main_image_url || null,
+      photos: Array.isArray(o.gallery_urls) ? o.gallery_urls.slice(0, 8) : null,
       developer: shortDev(o.developer) || null,
       developerFull: o.developer || null,
       calc: withFacts(keep.calc || fallbackCalc(o), o),
@@ -771,7 +775,7 @@ async function main() {
     'bedrooms_min,bedrooms_max,' +
     'brochure_url,floorplan_url,video_url,website_url,map_url,' +
     'season_rates,occupancy_est_pct,maintenance_fee_thb_sqm,lat,lng,coord_source,last_synced_at,availability,' +
-    'first_payment,payment_plan,payment_schedule');
+    'first_payment,payment_plan,payment_schedule,main_image_url,gallery_urls');
   const benchmarks = await sbGet(env,
     'rental_benchmarks?select=district,unit_type,disp_yield_low_pct,disp_yield_high_pct');
 
