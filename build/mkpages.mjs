@@ -91,8 +91,13 @@ const CATALOG_CSS = `
 .catalog .arrows{display:none}
 .catalog .found{margin:14px 0 4px;font-size:.92rem;color:var(--muted)}
 .catalog .found b{color:var(--ink);font-size:1.05rem}
-.catrow{display:grid;grid-template-columns:minmax(0,1fr) 420px;gap:22px;align-items:start;margin-top:8px}
-@media(max-width:1080px){.catrow{grid-template-columns:1fr}.catmap{display:none}}
+/* Эльнур 05.09: карта сбоку от ленты смотрелась плохо и мешала. Ставим её
+   ПОД лентой во всю ширину — так она читается и не режет карточки. */
+.catrow{display:block;margin-top:8px}
+.catmap{margin-top:26px}
+.catmap-h{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}
+.catmap-h b{font-size:1.05rem}
+.catmap-h span{font-size:.85rem;color:var(--muted)}
 /* Эльнур 05.09: на странице продажи объекты тоже лентой, как на главной —
    вертикальная сетка оставляла пустые места и растягивала страницу.
    Карта рядом остаётся, подсветка при прокрутке ленты работает как прежде. */
@@ -104,14 +109,14 @@ const CATALOG_CSS = `
 @media(max-width:600px){.catalog .car .prop{flex-basis:80vw;width:80vw!important}}
 .catalog .car .prop.hl{outline:2px solid var(--ink);outline-offset:2px}
 .catalog .car .prop.hl{outline:2px solid var(--ink);outline-offset:2px}
-.catmap{position:sticky;top:88px}
-.catmap .plpmap{height:calc(100vh - 168px);max-height:760px;margin:0}
+.catmap .plpmap{height:min(60vh,560px);margin:0;border-radius:18px;overflow:hidden}
 .catmap .plpwrap{margin:0}
 .catmap .capt{font-size:.8rem;color:var(--muted);margin:8px 0 0}
 </style>`;
 
 const CATALOG_MAP = `
 <div class="catmap">
+  <div class="catmap-h"><b>Где стоят объекты</b><span>наведите на карточку — метка подсветится</span></div>
   <div class="plpwrap">
     <div class="plpfilt plpview" id="plpView" style="left:12px;right:auto">
       <button type="button" data-v="map" class="on">Карта</button>
