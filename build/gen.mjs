@@ -335,7 +335,19 @@ function buildCatalog(objects, benchmarks, preserve) {
    иначе — тиры прайса (по одной строке на тип спальни, цена «от»). */
 function unitsOf(o) {
   const named = Array.isArray(o.unit_types) ? o.unit_types.slice(0, 12) : [];
-  const tiers = Array.isArray(o.price_tiers) ? o.price_tiers : [];
+  // Тиры приходят от разных застройщиков в двух видах: с числом спален или с
+  // подписью типа «Studio / 1BR / 2BR», цена — price_from_thb либо price_thb.
+  // Приводим к одному виду, иначе половина проектов остаётся без планировок.
+  const tiers = (Array.isArray(o.price_tiers) ? o.price_tiers : []).map(t => {
+    let b = t.bedrooms;
+    if (b == null && t.type) {
+      const s = String(t.type).toLowerCase();
+      const m = /(\d+)\s*(br|bed)/.exec(s);
+      b = /studio/.test(s) ? 0 : (m ? +m[1] : null);
+    }
+    return Object.assign({}, t, { bedrooms: b,
+      price_from_thb: t.price_from_thb || t.price_thb || null });
+  }).filter(t => t.bedrooms != null);
   const priceByBeds = {};
   for (const t of tiers) {
     const b = t.bedrooms;
@@ -343,10 +355,14 @@ function unitsOf(o) {
     if (!priceByBeds[b] || t.price_from_thb < priceByBeds[b]) priceByBeds[b] = t.price_from_thb;
   }
   if (named.length) {
-    // к названным планировкам подставляем цену «от» из прайса по числу спален
+    // Цену «от» из прайса подставляем только там, где планировка с таким числом
+    // спален одна. Иначе AURA, SELENE и MYRRHA получали одинаковый ценник —
+    // это цена группы «3 спальни», а не конкретного типа.
+    const perBeds = {};
+    for (const u of named) perBeds[u.beds] = (perBeds[u.beds] || 0) + 1;
     return named.map(u => {
       const from = priceByBeds[u.beds];
-      return from ? Object.assign({}, u, { from }) : u;
+      return (from && perBeds[u.beds] === 1) ? Object.assign({}, u, { from }) : u;
     });
   }
   if (!tiers.length) return null;

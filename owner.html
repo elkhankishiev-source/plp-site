@@ -3728,6 +3728,8 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     wireOfferPickers();
   }
   /* Выпадающие списки в форме оффера: объект → его планировки. */
+  /* даёт открыть конструктор оффера из проверок, не заходя в кабинет */
+  window.__offerFormDraw=function(code){ offerCatalog().then(function(){ offerFormDraw(code); }); };
   function wireOfferPickers(){
     window.__offerUnit='';
     var items=(OFFER_CAT||[]).map(function(o){

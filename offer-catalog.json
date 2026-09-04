@@ -112,15 +112,13 @@
      "area": 31,
      "beds": 1,
      "name": "1 Bedroom",
-     "note": "31–51 м²",
-     "from": 6191000
+     "note": "31–51 м²"
     },
     {
      "area": 51,
      "beds": 1,
      "name": "1 Bedroom Plus",
-     "note": "51–61 м²",
-     "from": 6191000
+     "note": "51–61 м²"
     },
     {
      "area": 69,
@@ -267,36 +265,31 @@
      "area": 328,
      "beds": 3,
      "name": "AURA",
-     "note": "2+1 спальни, участок 270–352 м², бассейн 3,65×15",
-     "from": 36100000
+     "note": "2+1 спальни, участок 270–352 м², бассейн 3,65×15"
     },
     {
      "area": 305,
      "beds": 3,
      "name": "SELENE",
-     "note": "участок 412–494 м², бассейн 3,7×10",
-     "from": 36100000
+     "note": "участок 412–494 м², бассейн 3,7×10"
     },
     {
      "area": 406,
      "beds": 3,
      "name": "MYRRHA",
-     "note": "участок 505–707 м², бассейн 3×12, руфтоп",
-     "from": 36100000
+     "note": "участок 505–707 м², бассейн 3×12, руфтоп"
     },
     {
      "area": 496,
      "beds": 4,
      "name": "LYRA",
-     "note": "участок 705–762 м², бассейн 2,75×15",
-     "from": 64960000
+     "note": "участок 705–762 м², бассейн 2,75×15"
     },
     {
      "area": 660,
      "beds": 4,
      "name": "XENIA",
-     "note": "участок 1132–1208 м², бассейн 3×12 и детский",
-     "from": 64960000
+     "note": "участок 1132–1208 м², бассейн 3×12 и детский"
     }
    ]
   },
@@ -352,50 +345,42 @@
     {
      "area": 41,
      "beds": 1,
-     "name": "1 Bedroom",
-     "from": 4750200
+     "name": "1 Bedroom"
     },
     {
      "area": 55,
      "beds": 1,
-     "name": "1 Bedroom Plus",
-     "from": 4750200
+     "name": "1 Bedroom Plus"
     },
     {
      "area": 65,
      "beds": 2,
-     "name": "2 Bedroom",
-     "from": 14418720
+     "name": "2 Bedroom"
     },
     {
      "area": 93,
      "beds": 2,
-     "name": "2 Bedroom Plus",
-     "from": 14418720
+     "name": "2 Bedroom Plus"
     },
     {
      "area": 112,
      "beds": 2,
-     "name": "2 Bedroom Duplex",
-     "from": 14418720
+     "name": "2 Bedroom Duplex"
     },
     {
      "area": 146,
      "beds": 3,
-     "name": "3 Bedroom Duplex",
-     "from": 22192000
+     "name": "3 Bedroom Duplex"
     },
     {
      "area": 96,
      "beds": 2,
-     "name": "Penthouse 2BR",
-     "from": 14418720
+     "name": "Penthouse 2BR"
     },
     {
      "area": 138,
      "beds": 3,
-     "name": "Penthouse 3BR",
-     "from": 22192000
+     "name": "Penthouse 3BR"
     }
    ]
   },
@@ -474,7 +459,26 @@
    "district": "Лаян",
    "type": "Кондо",
    "price_from": 3312500,
-   "units": []
+   "units": [
+    {
+     "name": "Студия",
+     "beds": 0,
+     "area": 26.5,
+     "from": 3312500
+    },
+    {
+     "name": "1 спальня",
+     "beds": 1,
+     "area": 42.5,
+     "from": 5100000
+    },
+    {
+     "name": "2 спальни",
+     "beds": 2,
+     "area": 53,
+     "from": 6750000
+    }
+   ]
   },
   {
    "id": "PLP-VIVANA",

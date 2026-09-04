@@ -158,8 +158,12 @@ p.text{margin:0;font-size:.94rem;line-height:1.6}
       if(t.bedrooms==null||!t.price_from_thb) return;
       if(!fromByBeds[t.bedrooms]||t.price_from_thb<fromByBeds[t.bedrooms]) fromByBeds[t.bedrooms]=t.price_from_thb;
     });
+    /* та же оговорка, что и на сайте: одинаковую цену нескольким планировкам
+       с равным числом спален не приписываем — это цена группы, не типа */
+    var perBeds={};
+    (Array.isArray(o.units)?o.units:[]).forEach(function(u){ perBeds[u.beds]=(perBeds[u.beds]||0)+1; });
     (Array.isArray(o.units)?o.units:[]).forEach(function(u){
-      var pf=u.from||u.price_from||fromByBeds[u.beds];
+      var pf=u.from||u.price_from||(perBeds[u.beds]===1?fromByBeds[u.beds]:null);
       buyRows.push([u.name||'', [u.area?('от '+u.area+' м²'):'', u.beds!=null?(u.beds+' сп.'):'']
         .filter(Boolean).join(' · '), pf?('от '+baht(pf)):'']);
     });
