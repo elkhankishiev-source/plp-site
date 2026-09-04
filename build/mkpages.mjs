@@ -166,7 +166,9 @@ function asCatalog(html, carId){
 
 const idx=fs.readFileSync(path.join(ROOT,'index.html'),'utf8');
 const pages=[
- {file:'buy.html',self:'sale',sections:['sale',8,9],catalogCar:'saleCar',
+ // 'all-objects' — список объектов ссылками: на странице покупки он нужен и людям,
+ // и поиску (иначе страницы object/*.html остаются без внутренних ссылок).
+ {file:'buy.html',self:'sale',sections:['sale',8,9,'all-objects'],catalogCar:'saleCar',
   h1:'Купить недвижимость на Пхукете',
   intro:'Проверенные виллы и апартаменты от застройщиков и собственников. Каждый объект смотрим лично перед тем, как показать.',
   title:'Купить недвижимость на Пхукете — виллы и апартаменты | Property Library',

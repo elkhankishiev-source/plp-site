@@ -877,6 +877,18 @@ html,body{overflow-x:clip;max-width:100%}
   .curswitch{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:#fff}
   .curswitch button{border:0;background:none;padding:6px 13px;font:inherit;font-weight:600;cursor:pointer;color:var(--muted);line-height:1}
   .curswitch button.on{background:var(--green);color:var(--ink)}
+/* Список всех объектов ссылками — блок статический, скрипты его не трогают.
+   Нужен и людям (быстро увидеть весь каталог), и поиску (внутренние ссылки). */
+.obj-index{padding:56px 0;background:#fafaf7;border-top:1px solid #ececE4}
+.obj-index h2{margin:0 0 6px;font-size:26px}
+.obj-index .sub{margin:0 0 26px;color:#6b6b63;max-width:640px}
+.oi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:22px 28px}
+.oi-col h3{margin:0 0 8px;font-size:14px;letter-spacing:.04em;text-transform:uppercase;color:#8a8a80}
+.oi-col ul{margin:0;padding:0;list-style:none}
+.oi-col li{margin:0 0 7px;font-size:14px;line-height:1.45;color:#6b6b63}
+.oi-col a{color:#2b2b26;text-decoration:none;border-bottom:1px solid rgba(0,0,0,.14)}
+.oi-col a:hover{border-bottom-color:currentColor}
+@media(max-width:600px){.obj-index{padding:40px 0}.oi-grid{gap:18px}}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.6.0/maplibre-gl.min.css">
@@ -1341,6 +1353,10 @@ html,body{overflow-x:clip;max-width:100%}
     </div>
   </div>
 </div>
+
+<!-- PLP:OBJECT-INDEX:START — сгенерировано build/gen.mjs, вручную не править -->
+<section class="obj-index" id="all-objects"><div class="container"><h2>Объекты в каталоге</h2><p class="sub">Все проекты, с которыми мы работаем, — с ценами от застройщика и условиями рассрочки.</p><div class="oi-grid"><div class="oi-col"><h3>Банг Тао</h3><ul><li><a href="object/eden.html">Gardens of Eden</a> — от 7,8 млн ฿</li><li><a href="object/peylaa.html">PEYLAA Phuket, Autograph Collection Residences</a> — от 7,9 млн ฿</li><li><a href="object/intake-botanica.html">The GENS by Botanica, у Blue Tree</a> — от 5,5 млн ฿</li><li><a href="object/liberty.html">The Liberty by Wallaya Villas</a> — от 8,2 млн ฿</li><li><a href="object/modeva.html">The Modeva Bang-Tao</a> — от 4,8 млн ฿</li><li><a href="object/heritage.html">The Title Heritage Bang-Tao</a> — от 5,5 млн ฿</li><li><a href="object/legendary.html">The Title Legendary Bang-Tao</a> — от 6,7 млн ฿</li><li><a href="object/sierra.html">The Title Sierra</a> — от 2,9 млн ฿</li><li><a href="object/kirara.html">The Title Villa Kirara Bang-Tao</a> — от 29,0 млн ฿</li><li><a href="object/vivi.html">The Title VIVI</a> — от 3,5 млн ฿</li></ul></div><div class="oi-col"><h3>Камала</h3><ul><li><a href="object/coralina.html">The Title Coralina Kamala</a> — от 4,8 млн ฿</li><li><a href="object/vivana.html">The Title Vivana Kamala</a> — от 4,2 млн ฿</li></ul></div><div class="oi-col"><h3>Ката</h3><ul><li><a href="object/katabello.html">The Title Katabello</a> — от 4,3 млн ฿</li></ul></div><div class="oi-col"><h3>Ко Кео</h3><ul><li><a href="object/casademonte.html">The Title Casa De Monte</a> — от 11,8 млн ฿</li></ul></div><div class="oi-col"><h3>Лаян</h3><ul><li><a href="object/sunhills-layan.html">SUN HILLS Layan</a> — от 3,3 млн ฿</li></ul></div><div class="oi-col"><h3>Най Янг</h3><ul><li><a href="object/balcony.html">The BALCONY Nai Yang</a> — от 6,1 млн ฿</li><li><a href="object/halo1.html">The Title Halo 1 Naiyang</a> — от 5,1 млн ฿</li><li><a href="object/serenity.html">The Title Serenity Naiyang</a> — от 5,2 млн ฿</li><li><a href="object/estella.html">The Title Villa Estella Naiyang</a> — от 22,4 млн ฿</li></ul></div><div class="oi-col"><h3>Равай</h3><ul><li><a href="object/adora.html">The Title Adora Rawai</a> — от 5,3 млн ฿</li><li><a href="object/cielo.html">The Title Cielo Rawai</a> — от 6,2 млн ฿</li></ul></div><div class="oi-col"><h3>Сурин</h3><ul><li><a href="object/biancana.html">The Title Biancana Surin</a> — от 6,2 млн ฿</li></ul></div><div class="oi-col"><h3>Таланг</h3><ul><li><a href="object/intake-champaca.html">Mono Champaca, Таланг</a> — от 17,9 млн ฿</li></ul></div></div></div></section>
+<!-- PLP:OBJECT-INDEX:END -->
 
 <!-- ===== FOOTER ===== -->
 <footer class="footer" id="contacts">
