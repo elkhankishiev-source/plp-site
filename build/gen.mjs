@@ -316,7 +316,11 @@ function buildCatalog(objects, benchmarks, preserve) {
       photo: o.main_image_url || null,
       photos: Array.isArray(o.gallery_urls) ? o.gallery_urls.slice(0, 8) : null,
       // Планировки: человек выбирает тип и сразу видит его площадь и спальни.
-      units: Array.isArray(o.unit_types) ? o.unit_types.slice(0, 12) : null,
+      // Где застройщик не давал названий планировок, берём тиры из прайса
+      // (минимальная цена на каждый тип спальни) — Эльнур 05.09: «продаётся
+      // проект, а что там можно купить». Цены и площади — из price_tiers,
+      // ничего не досочиняем.
+      units: unitsOf(o),
       // Ход стройки и разделы снимков — показываем, если застройщик их дал.
       progress: o.build_progress || null,
       groups: Array.isArray(o.photo_groups) ? o.photo_groups : null,
@@ -325,6 +329,40 @@ function buildCatalog(objects, benchmarks, preserve) {
       calc: withFacts(keep.calc || fallbackCalc(o), o),
     };
   });
+}
+
+/* Что можно купить в проекте: сначала именованные планировки застройщика,
+   иначе — тиры прайса (по одной строке на тип спальни, цена «от»). */
+function unitsOf(o) {
+  const named = Array.isArray(o.unit_types) ? o.unit_types.slice(0, 12) : [];
+  const tiers = Array.isArray(o.price_tiers) ? o.price_tiers : [];
+  const priceByBeds = {};
+  for (const t of tiers) {
+    const b = t.bedrooms;
+    if (b == null || !t.price_from_thb) continue;
+    if (!priceByBeds[b] || t.price_from_thb < priceByBeds[b]) priceByBeds[b] = t.price_from_thb;
+  }
+  if (named.length) {
+    // к названным планировкам подставляем цену «от» из прайса по числу спален
+    return named.map(u => {
+      const from = priceByBeds[u.beds];
+      return from ? Object.assign({}, u, { from }) : u;
+    });
+  }
+  if (!tiers.length) return null;
+  const byBeds = new Map();
+  for (const t of tiers) {
+    const b = t.bedrooms;
+    if (b == null) continue;
+    const cur = byBeds.get(b);
+    if (!cur || (t.price_from_thb && t.price_from_thb < cur.price_from_thb)) byBeds.set(b, t);
+  }
+  return [...byBeds.entries()].sort((a, c) => a[0] - c[0]).map(([b, t]) => ({
+    name: b === 0 ? 'Студия' : b + (b === 1 ? ' спальня' : b < 5 ? ' спальни' : ' спален'),
+    beds: b,
+    area: t.area_sqm || null,
+    from: t.price_from_thb || null,
+  }));
 }
 
 function emitCatalogBlock(catalog) {
@@ -409,6 +447,13 @@ function buildRentals(objects, preserve) {
       included: S(o.rent_included),
       excluded: S(o.rent_excluded),
       rules: S(o.rent_rules),
+      // 05.09: у аренды на витрине не было ни одного снимка — поля просто не
+      // доезжали из базы. Теперь галерея, разделы и планировки тянутся так же,
+      // как у продажи.
+      photo: o.main_image_url || null,
+      photos: Array.isArray(o.gallery_urls) ? o.gallery_urls.slice(0, 8) : null,
+      groups: Array.isArray(o.photo_groups) ? o.photo_groups : null,
+      units: unitsOf(o),
     };
   });
 }
@@ -780,7 +825,7 @@ async function main() {
     'bedrooms_min,bedrooms_max,' +
     'brochure_url,floorplan_url,video_url,website_url,map_url,' +
     'season_rates,occupancy_est_pct,maintenance_fee_thb_sqm,lat,lng,coord_source,last_synced_at,availability,' +
-    'first_payment,payment_plan,payment_schedule,main_image_url,gallery_urls,unit_types,build_progress,photo_groups');
+    'first_payment,payment_plan,payment_schedule,main_image_url,gallery_urls,unit_types,price_tiers,build_progress,photo_groups');
   const benchmarks = await sbGet(env,
     'rental_benchmarks?select=district,unit_type,disp_yield_low_pct,disp_yield_high_pct');
 
@@ -789,7 +834,8 @@ async function main() {
   const rentals = await sbGet(env,
     'objects?select=plp_property_id,name,district,beach,purpose,type,bedrooms,bedrooms_min,' +
     'bedrooms_max,area_sqm,area_min,area_max,min_stay,deposit,rent_included,rent_excluded,' +
-    'rent_rules,amenities,usp,usp_en,distance_beach_m,on_site,lat,lng,coord_source,last_synced_at' +
+    'rent_rules,amenities,usp,usp_en,distance_beach_m,on_site,lat,lng,coord_source,last_synced_at,' +
+    'main_image_url,gallery_urls,photo_groups,unit_types,price_tiers' +
     '&and=(or(purpose.eq.' + encodeURIComponent('аренда') + ',purpose.eq.rent),' +
     'on_site.eq.true)&order=plp_property_id');
 
@@ -866,6 +912,20 @@ async function main() {
   // 3) sitemap
   fs.writeFileSync(SITEMAP, sitemap(objects));
   console.log('[gen] sitemap.xml обновлён');
+
+  // 4) короткий список для конструктора оффера в кабинете: чтобы сотрудник
+  //    выбирал объект и тип юнита из списка, а не вбивал ID руками.
+  const offerCat = objects.map(o => ({
+    id: o.plp_property_id,
+    name: o.name,
+    district: DISTRICT_RU[o.district || ''] || o.district || '',
+    type: typeLabel(o.type).ru,
+    price_from: o.price_from_thb || null,
+    units: unitsOf(o) || [],
+  })).filter(x => x.id && x.name);
+  fs.writeFileSync(path.join(ROOT, 'offer-catalog.json'),
+    JSON.stringify({ updated: new Date().toISOString().slice(0, 10), items: offerCat }, null, 1));
+  console.log('[gen] offer-catalog.json:', offerCat.length, 'объектов для конструктора оффера');
 
   console.log('[gen] Готово.');
 }

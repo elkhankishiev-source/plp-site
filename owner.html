@@ -3662,9 +3662,26 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   }
   /* Оффер под клиента: объект, срок жизни ссылки и записка от себя.
      Ссылка личная, на странице стоит наш водяной знак. */
+  /* Каталог для конструктора оффера: собирается вместе с сайтом (offer-catalog.json),
+     чтобы сотрудник выбирал объект и тип юнита из списка, а не помнил ID наизусть. */
+  var OFFER_CAT=null;
+  function offerCatalog(){
+    if(OFFER_CAT) return Promise.resolve(OFFER_CAT);
+    return fetch('offer-catalog.json',{cache:'no-cache'})
+      .then(function(r){ return r.json(); })
+      .then(function(d){ OFFER_CAT=(d&&d.items)||[]; return OFFER_CAT; })
+      .catch(function(){ OFFER_CAT=[]; return OFFER_CAT; });
+  }
   function offerForm(code){
+    offerCatalog().then(function(){ offerFormDraw(code); });
+  }
+  function offerFormDraw(code){
     clForm('<h3>Предложение для '+code+'</h3><div class="fgrid">'+
+      '<label class="wide">Объект<div id="o-pick"></div>'+
+        '<span class="sub">Если объекта нет в списке — впишите его ID вручную ниже.</span></label>'+
       '<label class="wide">ID объекта<input id="o-obj" type="text" placeholder="PLP-CORALINA"></label>'+
+      '<label class="wide">Что предлагаем <span class="sub">(планировка или тип — необязательно)</span>'+
+        '<div id="o-unit"></div></label>'+
       '<label>Ссылка живёт<select id="o-days">'+
         '<option value="3">3 дня</option><option value="7" selected>7 дней</option>'+
         '<option value="14">14 дней</option><option value="30">30 дней</option></select></label>'+
@@ -3687,12 +3704,13 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       '<button type="button" class="btn ghost" id="f-cancel">Отмена</button></div>',
       function(){
         var pid=(fv('o-obj')||'').trim().toUpperCase();
-        if(!pid){ alert('Укажите ID объекта'); return; }
+        if(!pid){ alert('Выберите объект'); return; }
         var blocks=[];
         Array.prototype.forEach.call(document.querySelectorAll('.ob:checked'),function(c){ blocks.push(c.value); });
         post({action:'client_offer',token:TOKEN,code:code,property_id:pid,
               days:Number(fv('o-days'))||7,note:fv('o-note'),
               blocks:blocks,
+              unit:(window.__offerUnit||''),
               price:(fv('o-price')||'').replace(/[^0-9]/g,''),
               terms:fv('o-terms')})
           .then(function(r){
@@ -3707,6 +3725,53 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
             try{ navigator.clipboard.writeText(url); }catch(e){}
           });
       });
+    wireOfferPickers();
+  }
+  /* Выпадающие списки в форме оффера: объект → его планировки. */
+  function wireOfferPickers(){
+    window.__offerUnit='';
+    var items=(OFFER_CAT||[]).map(function(o){
+      return { id:o.id, title:o.name,
+               sub:[o.district,o.type,(o.price_from?('от '+Math.round(o.price_from/100000)/10+' млн ฿'):'')]
+                     .filter(Boolean).join(' · ') };
+    });
+    var unitPick=null;
+    pickList('o-pick',{
+      multi:false, placeholder:'выбрать объект', items:items,
+      onChange:function(ids){
+        var id=ids[0]||'';
+        var f=document.getElementById('o-obj'); if(f) f.value=id;
+        var o=(OFFER_CAT||[]).filter(function(x){return x.id===id;})[0];
+        var units=(o&&o.units)||[];
+        window.__offerUnit='';
+        var host=document.getElementById('o-unit'); if(!host) return;
+        if(!units.length){
+          host.innerHTML='<span class="sub">по этому объекту планировок в базе пока нет</span>';
+          return;
+        }
+        host.innerHTML='';
+        unitPick=pickList(host,{
+          multi:false, placeholder:'весь проект',
+          items:units.map(function(u,i){
+            var t=[u.area?('от '+u.area+' м²'):'', u.beds!=null?(u.beds+' сп.'):'',
+                   u.from?('от '+Math.round(u.from/100000)/10+' млн ฿'):''].filter(Boolean).join(' · ');
+            return { id:String(i), title:(u.name||('Тип '+(i+1))), sub:t };
+          }),
+          onChange:function(uids){
+            var u=units[Number(uids[0])];
+            /* в оффер уходит строкой: название типа плюс площадь и цена «от» */
+            window.__offerUnit = u ? [u.name||'', u.area?('от '+u.area+' м²'):'',
+              u.beds!=null?(u.beds+' сп.'):'', u.from?('от '+fmtB(u.from)):'']
+              .filter(Boolean).join(' · ') : '';
+          }
+        });
+      }
+    });
+  }
+  function fmtB(n){
+    n=Number(n)||0;
+    return n>=1e6 ? ('฿'+(n/1e6).toFixed(n%1e6?1:0).replace('.',',')+' млн')
+                  : ('฿'+Math.round(n).toLocaleString('ru-RU'));
   }
   function offersShow(){
     post({action:'client_offers',token:TOKEN,limit:30}).then(function(r){
