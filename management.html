@@ -459,6 +459,18 @@ section[id],div[id^="q"],[id="about"],[id="steps"],[id="faq"]{scroll-margin-top:
 .unit.on{border-color:var(--green-deep,#5F6242);box-shadow:0 0 0 1px var(--green-deep,#5F6242) inset}
 .unit-note{margin-top:8px;font-size:.8rem;color:var(--muted);line-height:1.45}
 /* Карточка района: миниатюра слева, текст справа; снимок подрастает при наведении */
+.mapobjs{display:flex;flex-direction:column;gap:6px;height:min(700px,80vh);overflow-y:auto;padding-right:4px}
+@media(max-width:900px){.mapobjs{height:auto;max-height:60vh}}
+.mapobjs::-webkit-scrollbar{width:6px}
+.mapobjs::-webkit-scrollbar-thumb{background:rgba(10,10,10,.16);border-radius:999px}
+.mobj{display:flex;align-items:center;gap:10px;text-align:left;background:#fff;border:1px solid rgba(10,10,10,.08);
+  border-radius:12px;padding:7px 9px;cursor:pointer;font:inherit;transition:border-color .15s,transform .12s}
+.mobj:hover,.mobj.on{border-color:var(--green-deep,#5F6242);transform:translateX(2px)}
+.mobj i{flex:0 0 auto;width:52px;height:40px;border-radius:8px;background:#eceadf;background-size:cover;background-position:center}
+.mobj span{display:flex;flex-direction:column;gap:2px;min-width:0}
+.mobj b{font-size:.83rem;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.mobj u{font-size:.73rem;color:var(--muted);text-decoration:none}
+.dcol-n{font-size:.75rem;color:var(--muted);font-weight:600;margin-left:6px}
 .dcard{display:flex;align-items:center;gap:11px;text-align:left}
 .dcard .dtxt{display:flex;flex-direction:column;gap:2px;min-width:0}
 .dpic{flex:0 0 auto;width:0;height:44px;border-radius:9px;background-size:cover;background-position:center;
@@ -625,8 +637,6 @@ input.bad{border-color:#d98a84!important;background:#fff6f5}
 .serv-card p{font-size:.8rem;color:var(--muted);margin-top:6px;line-height:1.4}
 
 /* ===== map / districts ===== */
-.maprow{display:grid;gap:20px;margin-top:20px;align-items:stretch}
-@media(min-width:900px){.maprow{grid-template-columns:minmax(0,1fr) minmax(0,1.05fr)}}
 .mapbox{border-radius:22px;overflow:hidden;box-shadow:var(--shadow-sm);background:linear-gradient(160deg,#e7ecea,#dfe6e2);position:relative;min-height:420px}
 .mapbox svg{width:100%;height:100%;display:block;min-height:420px}
 .mapbox .island{fill:var(--green-soft);stroke:var(--green-deep);stroke-width:1.5}
@@ -685,6 +695,7 @@ input.bad{border-color:#d98a84!important;background:#fff6f5}
 .stg-presale{background:#E9E4D2;color:#6b5f3a}
 .stg-resale{background:#E4EBDD;color:#3f6b34}
 .mark-hl .plp-pin{background:var(--green,#D2D5B3);color:var(--ink);transform:translate(-50%,calc(-100% - 13px)) scale(1.12);z-index:600}
+.mark-hl .plp-cluster{background:var(--green,#D2D5B3);color:var(--ink);transform:translate(-50%,-50%) scale(1.18);z-index:600}
 /* несколько объектов рядом — одна метка со счётчиком, раскрывается по клику */
 .plp-cluster{background:#fff;color:var(--ink);border:2px solid var(--ink);border-radius:999px;
   min-width:34px;height:34px;display:flex;align-items:center;justify-content:center;
@@ -699,7 +710,11 @@ input.bad{border-color:#d98a84!important;background:#fff6f5}
 .plp-pop .go{display:inline-block;margin-top:8px;font-weight:700;font-size:12.5px;color:var(--ink)}
 .plp-pop a{display:inline-block;margin-top:6px;font-weight:700;color:var(--ink)}
 /* карта и список районов стоят рядом: так остров крупнее, а карточки компактнее */
-.maprow{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;align-items:start;margin-top:20px}
+/* Эльнур 05.09: карта тут, где есть место — справа; слева прокручиваемый
+   список объектов. Список районов убран: он и так есть в фильтрах. */
+.maprow{display:grid;grid-template-columns:340px minmax(0,1fr);gap:18px;align-items:start;margin-top:20px}
+@media(min-width:901px){.maprow>.plpwrap{grid-column:2;grid-row:1;margin-top:0}
+  .maprow>.dcol{grid-column:1;grid-row:1}}
 .dcol-t{margin:0 0 10px;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 .dcol .dgrid{max-height:min(700px,80vh);overflow-y:auto;padding-right:4px}
 @media(max-width:900px){.maprow{grid-template-columns:1fr}
@@ -1436,7 +1451,7 @@ ru: {
   "rent.upt":"Понравился остров?","rent.upp":"Многие наши гости после аренды решают стать владельцами — подберём объект для покупки под вашу задачу и бюджет.",
   "rent.upcta":"Смотреть объекты в продаже","rent.upquiz":"Подобрать за 10 минут",
   "map.lab":"География","map.h2":"Район решает половину вопроса",
-  "map.sub":"Один и тот же бюджет в разных частях острова даёт разную жизнь и разную доходность. Нажмите на метку или карточку района.",
+  "map.sub":"Один и тот же бюджет в разных частях острова даёт разную жизнь и разную доходность. Наведите на объект в списке — увидите его на карте.",
   "map.badge":"14 районов · объекты из базы","map.island":"Пхукет",
   "d.yield":"ориентир доходности","d.beach":"до пляжа на машине","d.count":"объектов в базе","d.who":"Кому подходит: ",
   "d.none":"Сейчас в открытой базе нет объектов в этом районе — подберём под запрос.","d.cta":"Подобрать объект: ","d.inbase":" в базе · ",
@@ -1503,7 +1518,7 @@ ru: {
   "lf.err.empty":"Оставьте номер телефона или ник в Telegram — иначе мы не сможем ответить.","lf.err.short":"Похоже, в номере не хватает цифр. Проверьте, пожалуйста.","lf.err.bad":"Не похоже на номер, @ник или почту. Напишите так, как вам удобно ответить.",
   "cs.5n":"Квартира для пары на пенсии","cs.5w":"Рассрочка 3 года и мебель в подарок","cs.5t":"плюс мебель ฿700 тыс","cs.5buy":"฿9,8 млн","cs.5now":"฿14,8 млн","cs.5r":"9% год","cs.6n":"Квартира, которая платит за себя","cs.6w":"Кредит застройщика 5% на 5 лет","cs.6t":"аренда кроет половину платежа","cs.6buy":"฿14 млн","cs.6now":"฿15,4 млн","cs.6r":"฿70 тыс/мес",
   "u.wa":"Написать в WhatsApp","wa.hi":"Здравствуйте! Интересует объект:","wa.hi2":"Здравствуйте! Хочу подобрать объект на Пхукете.","wa.price":"Цена на сайте:","wa.dates":"Даты:","wa.link":"Ссылка:","wa.seen":"Смотрел на сайте:",
-  "nav.pick":"Подобрать объект","f.any":"Любая цена","f.reset":"сбросить","u.upto":"до","u.units":"Планировки","u.similar":"Похожие объекты","u.allphotos":"Все","u.progress":"Ход строительства","u.progressAll":"общая готовность по данным застройщика","stay.wait":"Считаем…","stay.nights":"ночей","stay.pernight":" за ночь","stay.off":"скидка за срок","stay.none":"Цена на эти даты — по запросу. Оставьте заявку, ответим точной суммой в течение дня.",
+  "nav.pick":"Подобрать объект","f.any":"Любая цена","f.reset":"сбросить","u.upto":"до","map.list":"Объекты на карте","u.units":"Планировки","u.similar":"Похожие объекты","u.allphotos":"Все","u.progress":"Ход строительства","u.progressAll":"общая готовность по данным застройщика","stay.wait":"Считаем…","stay.nights":"ночей","stay.pernight":" за ночь","stay.off":"скидка за срок","stay.none":"Цена на эти даты — по запросу. Оставьте заявку, ответим точной суммой в течение дня.",
   "assist.lab":"Консультант","assist.h2":"Не уверены, что подходит именно вам?","assist.p":"Спросите Дарью прямо здесь, в чате на сайте. Она знает базу, считает доходность и сравнивает районы — отвечает сразу, в любое время. Что-то сложное передаст менеджеру.","assist.cta":"Задать вопрос в чате","assist.wa":"Подобрать за 10 минут","assist.q1s":"Что купить на 5 млн ฿?","assist.q1":"Что можно купить на 5 млн ฿?","assist.q2s":"Где выше доходность?","assist.q2":"В каком районе выше доходность аренды?","assist.q3s":"Чем Банг Тао лучше Раваи?","assist.q3":"Чем Банг Тао лучше Раваи для инвестиций?","assist.q4s":"Сколько выйдет с налогами?","assist.q4":"Какие расходы при покупке кроме цены объекта?",
   "u.from":"от","u.onreq":"цена по запросу","u.calc":"Рассчитать доходность","u.cmp":"Сравнить","u.cmpOn":"В сравнении",
   "u.roinote":"Ориентировочно; потенциал зависит от объекта, стратегии и управления — рассчитаем индивидуально",
@@ -1621,7 +1636,7 @@ en: {
   "rent.upt":"Fell in love with the island?","rent.upp":"Many of our guests decide to become owners after renting — we will match a property to buy for your goal and budget.",
   "rent.upcta":"Browse properties for sale","rent.upquiz":"Get matched in 10 minutes",
   "map.lab":"Geography","map.h2":"The area is half the decision",
-  "map.sub":"The same budget in different parts of the island buys a different life and a different yield. Tap a marker or an area card.",
+  "map.sub":"The same budget in different parts of the island buys a different life and a different yield. Hover a property in the list to find it on the map.",
   "map.badge":"14 areas · properties from our base","map.island":"Phuket",
   "d.yield":"yield guideline","d.beach":"to the beach by car","d.count":"properties in base","d.who":"Best suited for: ",
   "d.none":"No open listings here right now — we will match one on request.","d.cta":"Find a property in ","d.inbase":" in base · ",
@@ -1688,7 +1703,7 @@ en: {
   "lf.err.empty":"Leave a phone number or a Telegram handle — otherwise we cannot reply.","lf.err.short":"That number looks too short. Please check it.","lf.err.bad":"That is not a phone number, an @handle or an email. Write the way you would like us to reply.",
   "cs.5n":"A flat for a retired couple","cs.5w":"Three-year instalments and furniture included","cs.5t":"plus ฿700k of furniture","cs.5buy":"฿9.8M","cs.5now":"฿14.8M","cs.5r":"9%/yr","cs.6n":"A flat that pays for itself","cs.6w":"Developer credit at 5% over five years","cs.6t":"rent covers half the payment","cs.6buy":"฿14M","cs.6now":"฿15.4M","cs.6r":"฿70k/mo",
   "u.wa":"Message on WhatsApp","wa.hi":"Hello! I am interested in:","wa.hi2":"Hello! I would like help choosing a property in Phuket.","wa.price":"Price on the site:","wa.dates":"Dates:","wa.link":"Link:","wa.seen":"Viewed on the site:",
-  "nav.pick":"Find me a property","f.any":"Any price","f.reset":"reset","u.upto":"up to","u.units":"Unit types","u.similar":"Similar properties","u.allphotos":"All","u.progress":"Construction progress","u.progressAll":"overall readiness per the developer","stay.wait":"Calculating…","stay.nights":"nights","stay.pernight":" per night","stay.off":"length-of-stay discount","stay.none":"Price for these dates is on request. Leave a request and we will come back with the exact figure the same day.",
+  "nav.pick":"Find me a property","f.any":"Any price","f.reset":"reset","u.upto":"up to","map.list":"Properties on the map","u.units":"Unit types","u.similar":"Similar properties","u.allphotos":"All","u.progress":"Construction progress","u.progressAll":"overall readiness per the developer","stay.wait":"Calculating…","stay.nights":"nights","stay.pernight":" per night","stay.off":"length-of-stay discount","stay.none":"Price for these dates is on request. Leave a request and we will come back with the exact figure the same day.",
   "assist.lab":"Assistant","assist.h2":"Not sure what suits you?","assist.p":"Ask Daria right here, in the chat on this page. She knows the catalogue, works out the yield and compares districts — answers straight away, any time. Anything complex goes to a manager.","assist.cta":"Ask in the chat","assist.wa":"Find me a match in 10 minutes","assist.q1s":"What can I get for ฿5M?","assist.q1":"What can I buy for ฿5 million?","assist.q2s":"Where is the yield higher?","assist.q2":"Which district has the higher rental yield?","assist.q3s":"Bang Tao or Rawai?","assist.q3":"Why is Bang Tao better than Rawai for investment?","assist.q4s":"What about taxes?","assist.q4":"What costs come on top of the price?",
   "u.from":"from","u.onreq":"price on request","u.calc":"Calculate the yield","u.cmp":"Compare","u.cmpOn":"Comparing",
   "u.roinote":"Indicative; potential depends on the unit, strategy and management — we calculate it individually",
@@ -3882,10 +3897,10 @@ var DPAGE={'Банг Тао':'bang-tao','Лаян':'layan','Сурин':'surin',
            'Равай':'rawai','Раваи':'rawai','Ката':'kata','Най Янг':'nai-yang','Ко Кео':'koh-kaew'};
 /* живая карта: метки стоят по координатам объектов из базы.
    Объекты без координат на карту не попадают — лучше пусто, чем ложная точка. */
-var PLPMAP=null, PLPLAYER=null, PLPFILTER='all', PLPTILES=null, PLPVIEW='map', PLPMARKS={};
+var PLPMAP=null, PLPLAYER=null, PLPFILTER='all', PLPTILES=null, PLPVIEW='map', PLPMARKS={}, PLPFALLBACK=null;
 function renderMapReal(){
   var box=document.getElementById('plpMap'); if(!box||!window.L) return;
-  var all=PL.PROPERTIES.filter(function(p){return p.lat&&p.lng;});
+  var all=[].concat(PL.PROPERTIES,PL.RENTALS).filter(function(p){return p.lat&&p.lng;});
   if(!all.length){ box.style.display='none'; return; }
 
   if(!PLPMAP){
@@ -3894,12 +3909,32 @@ function renderMapReal(){
     L.control.zoom({position:'topright'}).addTo(PLPMAP);
     /* Два слоя без ключа и без оплаты: обычная карта и снимки со спутника.
        CARTO пробовали — без API-ключа он штампует поверх «API KEY REQUIRED». */
+    /* Векторный слой требует WebGL. Где его нет (старое железо, отключён в
+       настройках), maplibre падает с ошибкой — и раньше вместе с ним ломалась
+       вся настройка карты: кнопки «Продажа / Аренда» оставались без обработчиков.
+       Теперь при сбое просто берём обычные тайлы. */
+    function rasterLayer(){
+      return L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
+        maxZoom:19, attribution:'© OpenStreetMap'});
+    }
+    function hasWebGL(){
+      try{
+        var c=document.createElement('canvas');
+        return !!(window.WebGLRenderingContext &&
+                  (c.getContext('webgl')||c.getContext('experimental-webgl')));
+      }catch(e){ return false; }
+    }
+    function baseLayer(){
+      if(window.L && L.maplibreGL && hasWebGL()){
+        try{
+          return L.maplibreGL({ style:'https://tiles.openfreemap.org/styles/liberty',
+            attribution:'© OpenMapTiles, © OpenStreetMap' });
+        }catch(e){}
+      }
+      return rasterLayer();
+    }
     PLPTILES = {
-      map: (window.L && L.maplibreGL)
-        ? L.maplibreGL({ style:'https://tiles.openfreemap.org/styles/liberty', attribution:'© OpenMapTiles, © OpenStreetMap' })
-        /* если векторный движок не загрузился — обычные тайлы, лишь бы карта была */
-        : L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
-            maxZoom:19, attribution:'© OpenStreetMap'}),
+      map: baseLayer(),
       sat: L.layerGroup([
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{
           maxZoom:19, attribution:'Esri, Maxar, Earthstar Geographics'}),
@@ -3908,14 +3943,25 @@ function renderMapReal(){
           maxZoom:19, opacity:.9})
       ])
     };
-    PLPTILES.map.addTo(PLPMAP);
+    try{ PLPTILES.map.addTo(PLPMAP); }
+    catch(e){ PLPTILES.map = rasterLayer(); PLPTILES.map.addTo(PLPMAP); }
+    /* Если векторный слой всё-таки сорвётся уже на ходу (так бывает, когда
+       WebGL формально есть, но не работает), меняем его на растровый и
+       перерисовываем — иначе карта остаётся без меток и без фильтров. */
+    PLPFALLBACK=function(){
+      if(PLPVIEW!=='map' || PLPTILES.__raster) return false;
+      try{ PLPMAP.removeLayer(PLPTILES.map); }catch(e){}
+      PLPTILES.map=rasterLayer(); PLPTILES.__raster=true;
+      PLPTILES.map.addTo(PLPMAP);
+      return true;
+    };
     PLPMAP.attributionControl.setPrefix('');
     /* колесо прокручивает страницу, карта масштабируется по Ctrl или после клика —
        иначе карта перехватывает прокрутку и по ней невозможно проехать */
     PLPMAP.on('click', function(){ PLPMAP.scrollWheelZoom.enable(); });
     PLPMAP.on('mouseout', function(){ PLPMAP.scrollWheelZoom.disable(); });
     PLPMAP.on('zoomend', function(){
-      drawPins(true);
+      safeDraw(true);
       var rb=document.getElementById('plpReset');
       if(rb) rb.style.display = PLPMAP.getZoom() > 11 ? '' : 'none';
     });
@@ -3939,12 +3985,21 @@ function renderMapReal(){
     if(fb) Array.prototype.forEach.call(fb.querySelectorAll('button'),function(b){
       b.onclick=function(){
         Array.prototype.forEach.call(fb.querySelectorAll('button'),function(x){x.classList.remove('on');});
-        b.classList.add('on'); PLPFILTER=b.getAttribute('data-f'); drawPins();
+        b.classList.add('on'); PLPFILTER=b.getAttribute('data-f'); safeDraw();
+        /* список рядом с картой держим в том же наборе, что и метки */
+        window.__mapFilter=PLPFILTER;
+        try{ renderMapObjs(PLPFILTER); }catch(e){}
       };
     });
   }
-  drawPins();
-  renderMapReal.__draw=drawPins;
+  safeDraw();
+  renderMapReal.__draw=safeDraw;
+
+  /* один раз пробуем ещё, уже на растровых тайлах */
+  function safeDraw(keepView){
+    try{ drawPins(keepView); }
+    catch(e){ if(PLPFALLBACK && PLPFALLBACK()) { try{ drawPins(keepView); }catch(e2){} } }
+  }
 
   function drawPins(keepView){
     var pts=all.filter(function(p){
@@ -3983,6 +4038,9 @@ function renderMapReal(){
         c.bindPopup(popupMany(g),{maxWidth:260,minWidth:236});
         c.on('mouseover', function(){ if(!('ontouchstart' in window)) this.openPopup(); });
         c.addTo(PLPLAYER);
+        /* Соседей карта слепила в одну метку. Чтобы наведение на карточку в списке
+           всё равно что-то подсвечивало, каждый объект группы смотрит на эту метку. */
+        g.forEach(function(x){ PLPMARKS[x.property_id]=c; });
       } else {
         var isRent=p.funnel==='rent';
         var m=L.marker(ll,{icon:L.divIcon({className:'plp-icon',
@@ -4016,7 +4074,7 @@ function renderMapReal(){
 
     var note=document.getElementById('plpNote');
     if(note){
-      var hidden=PL.PROPERTIES.length-all.length;
+      var hidden=PL.PROPERTIES.length+PL.RENTALS.length-all.length;
       note.textContent='На карте '+pts.length+' объект'+plural(pts.length)+'. Нажмите метку — откроется карточка.'+
         (hidden>0 ? ' Ещё '+hidden+' — без точного адреса, они в каталоге.' : '');
     }
@@ -4081,16 +4139,49 @@ function renderMapReal(){
 window.drawPinsExternal=function(){ try{ if(PLPMAP) renderMapReal.__draw && renderMapReal.__draw(true); }catch(e){} };
 /* подсветка метки при наведении на карточку в списке */
 window.PLP_HIGHLIGHT=function(pid){
+  /* Слитая метка стоит сразу за нескольких объектов, поэтому сначала находим
+     нужную, а гасим все остальные — иначе она сама себя и погасит. */
+  var want = pid && PLPMARKS[pid] && PLPMARKS[pid].getElement && PLPMARKS[pid].getElement();
   Object.keys(PLPMARKS).forEach(function(k){
     var el=PLPMARKS[k].getElement && PLPMARKS[k].getElement();
-    if(el) el.classList.toggle('mark-hl', !!pid && k===pid);
+    if(el && el!==want) el.classList.remove('mark-hl');
   });
+  if(want) want.classList.add('mark-hl');
   if(pid && PLPMARKS[pid] && PLPMAP){
     var ll=PLPMARKS[pid].getLatLng();
     if(!PLPMAP.getBounds().contains(ll)) PLPMAP.panTo(ll,{animate:true,duration:.4});
   }
 };
 
+/* Список объектов рядом с картой: наводишь — метка загорается, нажимаешь —
+   открывается карточка. Работает вместе с фильтрами «Все / Продажа / Аренда». */
+function renderMapObjs(filter){
+  var host=document.getElementById('mapObjs'); if(!host) return;
+  var f=filter||(window.__mapFilter||'all');
+  var list=[].concat(PL.PROPERTIES, PL.RENTALS).filter(function(p){
+    if(!p.lat||!p.lng||p.soon) return false;
+    if(f==='sale') return p.funnel==='sale';
+    if(f==='rent') return p.funnel==='rent';
+    return true;
+  });
+  var cnt=document.getElementById('mapCount');
+  if(cnt) cnt.textContent=list.length;
+  host.innerHTML=list.map(function(p){
+    var pic=p.photo||p.img||'';
+    return '<button type="button" class="mobj" data-pid="'+p.property_id+'">'+
+      (pic?('<i style="background-image:url('+pic+')"></i>'):'<i class="nopic"></i>')+
+      '<span><b>'+escHTML(p.title)+'</b>'+
+      '<u>'+escHTML(loc(p.loc))+(p.funnel==='sale'?(' · '+fmtBaht(thbOf(p))):'')+'</u></span></button>';
+  }).join('');
+  Array.prototype.forEach.call(host.querySelectorAll('.mobj'),function(el){
+    var pid=el.dataset.pid;
+    el.addEventListener('mouseenter',function(){
+      if(window.PLP_HIGHLIGHT) window.PLP_HIGHLIGHT(pid);
+      Array.prototype.forEach.call(host.children,function(x){ x.classList.toggle('on', x===el); });
+    });
+    el.addEventListener('click',function(){ openProp(pid); });
+  });
+}
 function renderDList(){
   var list=document.getElementById('dList');if(!list)return;
   list.innerHTML=PL.DISTRICTS.map(function(d,i){
@@ -4209,7 +4300,7 @@ window.openDistrict=openDistrict;window.closeDistrict=closeDistrict;
 applyI18n();
 renderSale();renderRent();renderMap();renderDList();renderMapReal();
 initRentDates();
-initCarDrag();initCarHint();observeReveals();updateTray();initFab();try{syncEntryPrice();}catch(e){}
+initCarDrag();initCarHint();observeReveals();updateTray();initFab();try{renderMapObjs('all');}catch(e){}try{syncEntryPrice();}catch(e){}
 openFromHash(); /* шеринг-ссылка #object=<id> → открыть карточку объекта */
 addEventListener('hashchange',function(){if(isObjectHash())openFromHash();});
 
