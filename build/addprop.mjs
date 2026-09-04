@@ -41,6 +41,22 @@ const body=`
       ${lab('Что хотите')}${chips('ap-goal',['Сдавать через вас','Продать','Посчитать доходность'])}
       ${lab('Ожидаемая цена или ставка, ฿')}${inp('ap-price','Например, 24500000 или 165000 в месяц')}
       <p class="sub" style="font-size:13px;margin-top:8px">Точную цену обсудим — сейчас достаточно ориентира.</p>
+
+      <div id="ap-nightly" hidden style="margin-top:18px;padding-top:16px;border-top:1px solid rgba(10,10,10,.08)">
+        <h3 style="font-size:16px;margin:0 0 4px">Стоимость проживания</h3>
+        <p class="sub" style="font-size:13px;margin:0 0 12px">Заполните сетку — и сайт сам посчитает цену на любые даты
+        со скидкой за срок. Без неё придётся каждый раз уточнять вручную.</p>
+        <div class="ap-row3">
+          ${lab('Высокий сезон, ฿/ночь<span class="ap-hint">декабрь–апрель</span>')}${inp('ap-nh','18000')}
+          ${lab('Средний, ฿/ночь<span class="ap-hint">май–июль</span>')}${inp('ap-ns','13000')}
+          ${lab('Низкий, ฿/ночь<span class="ap-hint">август–ноябрь</span>')}${inp('ap-nl','9000')}
+        </div>
+        <div class="ap-row3" style="margin-top:12px">
+          ${lab('Скидка от 7 ночей, %')}${inp('ap-d7','10')}
+          ${lab('Скидка от 30 ночей, %')}${inp('ap-d30','25')}
+          ${lab('Минимальный срок, ночей')}${inp('ap-min','3')}
+        </div>
+      </div>
     </div>
 
     <div class="ap-step" data-step="3" hidden>
@@ -109,6 +125,7 @@ const body=`
   var SB=${JSON.stringify(SB)}, ANON=${JSON.stringify(ANON)};
   var API='https://proplib.app.n8n.cloud/webhook/uk-owner';
   var g=function(id){return document.getElementById(id);};
+  var num=function(id){var e=g(id); return e?(parseInt(String(e.value).replace(/[^0-9]/g,''),10)||0):0;};
   var step=1, MAXSTEP=5, files=[], ref='obj-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7);
 
   ['ap-kind','ap-beds','ap-area','ap-stage','ap-goal','ap-via'].forEach(function(id){
@@ -119,6 +136,11 @@ const body=`
         var was=c.classList.contains('on');
         Array.prototype.forEach.call(box.querySelectorAll('.chipf'),function(x){x.classList.remove('on');});
         if(!was) c.classList.add('on');
+        /* сетка цен нужна только тем, кто сдаёт: продавцу её показывать незачем */
+        if(id==='ap-goal'){
+          var sell=/Продать/.test(pick('ap-goal')||'');
+          var nb=g('ap-nightly'); if(nb) nb.hidden = sell || !pick('ap-goal');
+        }
       };
     });
   });
@@ -224,6 +246,10 @@ const body=`
       price_thb:(g('ap-price').value.replace(/[^0-9]/g,'')||null),
       address:g('ap-address').value.trim(), description:g('ap-desc').value.trim(),
       amenities:g('ap-amen').value.trim(),
+      /* сетка цен: по ней сайт считает стоимость на любые даты */
+      nightly:{high:num('ap-nh'), shoulder:num('ap-ns'), low:num('ap-nl')},
+      discounts:[{nights:7,off:num('ap-d7')},{nights:30,off:num('ap-d30')}].filter(function(d){return d.off>0;}),
+      min_stay:num('ap-min'),
       media:files.filter(function(f){return f.done;}).map(function(f){return {url:f.url,type:f.type,name:f.name};})
     })}).then(function(r){return r.json();}).then(function(d){
       btn.disabled=false; btn.textContent='Отправить объект';
@@ -249,6 +275,10 @@ const body=`
 let html=head+'\n'+body+'\n'+tail;
 const url=SITE+'/add-property.html';
 const title='Разместить объект на Пхукете — сдать или продать через Property Library';
+const extraCss=`
+.ap-row3{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.ap-hint{display:block;font-weight:400;font-size:11.5px;color:var(--muted);margin-top:2px}
+`;
 const desc='Расскажите об объекте и приложите фото — проверим, оформим карточку и опубликуем. Управление арендой, отчёты и выплаты в личном кабинете.';
 html=html.replace(/<title>[\s\S]*?<\/title>/,'<title>'+esc(title)+'</title>');
 html=html.replace(/(<meta name="description" content=")[^"]*(")/,'$1'+esc(desc)+'$2');
@@ -257,6 +287,7 @@ html=html.replace(/(<meta property="og:url" content=")[^"]*(")/,'$1'+url+'$2');
 html=html.replace(/(<meta property="og:title" content=")[^"]*(")/,'$1'+esc(title)+'$2');
 html=html.replace(/(<meta property="og:description" content=")[^"]*(")/,'$1'+esc(desc)+'$2');
 html=html.replace(/href="#top"/g,'href="index.html"');
+html=html.replace('</style>', extraCss+'</style>');
 html=html.replace(/href="#(why|sale|rent|map|quiz|about|faq|do|steps|contacts)"/g,'href="index.html#$1"');
 fs.writeFileSync(path.join(ROOT,'add-property.html'), html);
 console.log('add-property.html собран:', html.length, 'байт');
