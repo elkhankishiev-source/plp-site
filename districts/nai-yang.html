@@ -407,13 +407,12 @@ section[id],div[id^="q"],[id="about"],[id="steps"],[id="faq"]{scroll-margin-top:
 .prng-track{position:relative;height:26px}
 .prng-track::before{content:'';position:absolute;left:0;right:0;top:11px;height:4px;border-radius:2px;background:rgba(10,10,10,.12)}
 .prng-fill{position:absolute;top:11px;height:4px;border-radius:2px;background:var(--green-deep,#5F6242)}
-.prng-track input[type=range]{position:absolute;left:0;top:0;width:100%;height:26px;margin:0;
-  background:none;-webkit-appearance:none;appearance:none;pointer-events:none}
-.prng-track input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;pointer-events:auto;
-  width:18px;height:18px;border-radius:50%;background:#fff;border:2px solid var(--green-deep,#5F6242);
-  box-shadow:0 2px 6px rgba(20,18,14,.22);cursor:grab}
-.prng-track input[type=range]::-moz-range-thumb{pointer-events:auto;width:18px;height:18px;border-radius:50%;
-  background:#fff;border:2px solid var(--green-deep,#5F6242);box-shadow:0 2px 6px rgba(20,18,14,.22);cursor:grab}
+.prng-track{touch-action:none;cursor:pointer}
+.prng-h{position:absolute;top:4px;width:20px;height:20px;margin-left:-10px;padding:0;border-radius:50%;
+  background:#fff;border:2px solid var(--green-deep,#5F6242);box-shadow:0 2px 6px rgba(20,18,14,.22);
+  cursor:grab;touch-action:none;z-index:2}
+.prng-h:active{cursor:grabbing;transform:scale(1.08)}
+.prng-h:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .prng-ends{display:flex;justify-content:space-between;font-size:.7rem;color:var(--muted);margin-top:2px}
 .fmenu[data-facet="budget"] .fpan{min-width:290px}
 @media(max-width:700px){.fmenu[data-facet="budget"] .fpan{min-width:0}}
@@ -460,7 +459,49 @@ section[id],div[id^="q"],[id="about"],[id="steps"],[id="faq"]{scroll-margin-top:
 .unit.on{border-color:var(--green-deep,#5F6242);box-shadow:0 0 0 1px var(--green-deep,#5F6242) inset}
 .unit-note{margin-top:8px;font-size:.8rem;color:var(--muted);line-height:1.45}
 /* Карточка района: миниатюра слева, текст справа; снимок подрастает при наведении */
-.mapobjs{display:flex;flex-direction:column;gap:8px;height:min(620px,76vh);overflow-y:auto;padding-right:6px}
+/* Блок «Районы»: бюджет сверху, карточки районов слева, карта справа,
+   лента объектов выбранного района — под ними во всю ширину. */
+.zbud{background:#fff;border:1px solid rgba(10,10,10,.08);border-radius:14px;padding:13px 15px 15px;margin-bottom:12px}
+.zbud-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:12px}
+.zbud-h span{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.zbud-h b{font-size:.95rem;font-variant-numeric:tabular-nums}
+.zbud-n{margin:9px 0 0;font-size:.8rem;color:var(--muted)}
+.zones{display:flex;flex-direction:column;gap:8px;max-height:min(520px,64vh);overflow-y:auto;padding-right:6px}
+.zones::-webkit-scrollbar{width:6px}
+.zones::-webkit-scrollbar-thumb{background:rgba(10,10,10,.16);border-radius:999px}
+.zone{display:grid;grid-template-columns:64px minmax(0,1fr) auto;align-items:center;gap:12px;
+  background:#fff;border:1px solid rgba(10,10,10,.08);border-radius:14px;padding:9px 12px;
+  cursor:pointer;font:inherit;text-align:left;transition:border-color .15s,box-shadow .15s,transform .12s}
+.zone:hover{border-color:var(--green-deep,#5F6242);box-shadow:var(--shadow-sm);transform:translateX(2px)}
+.zone.on{border-color:var(--ink);background:var(--warm,#EFEEE7)}
+.zone.dim{opacity:.5}
+.zone i{width:64px;height:52px;border-radius:10px;background:#eceadf;background-size:cover;background-position:center}
+.zone .z-b{display:flex;flex-direction:column;gap:2px;min-width:0}
+.zone b{font-size:.95rem;line-height:1.2}
+.zone u{text-decoration:none;font-size:.76rem;color:var(--muted)}
+.zone em{font-style:normal;font-size:.82rem;font-weight:800}
+.zone .z-m{display:flex;flex-direction:column;align-items:flex-end;gap:3px;text-align:right}
+.z-y{font-size:.78rem;font-weight:800;color:var(--green-deep,#5F6242)}
+.z-be,.z-r{font-size:.7rem;color:var(--muted)}
+.zpick{margin-top:16px}
+.zpick-h{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;flex-wrap:wrap}
+.zpick-h b{font-size:1.05rem}
+.zpick-h span{display:block;font-size:.78rem;color:var(--muted);margin-top:2px}
+.zpick-x{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;background:none;border:0;
+  font:inherit;font-size:.82rem;font-weight:700;color:var(--olive);cursor:pointer;padding:0}
+.zpick-car{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;scroll-snap-type:x proximity}
+.zprop{flex:0 0 200px;scroll-snap-align:start;display:flex;flex-direction:column;gap:3px;text-align:left;
+  background:#fff;border:1px solid rgba(10,10,10,.08);border-radius:14px;padding:9px;cursor:pointer;font:inherit;
+  transition:border-color .15s,box-shadow .15s}
+.zprop:hover{border-color:var(--green-deep,#5F6242);box-shadow:var(--shadow-sm)}
+.zprop i{display:block;height:110px;border-radius:10px;background:#eceadf;background-size:cover;background-position:center;margin-bottom:5px}
+.zprop b{font-size:.86rem;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.zprop u{text-decoration:none;font-size:.73rem;color:var(--muted)}
+.zprop em{font-style:normal;font-size:.85rem;font-weight:800}
+.zprop s{text-decoration:none;font-size:.68rem;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.zprop.out{opacity:.62}
+@media(max-width:900px){.zones{max-height:none;overflow:visible}}
+
 @media(max-width:900px){.mapobjs{height:auto;max-height:60vh}}
 .mapobjs::-webkit-scrollbar{width:6px}
 .mapobjs::-webkit-scrollbar-thumb{background:rgba(10,10,10,.16);border-radius:999px}
@@ -1353,7 +1394,7 @@ ru: {
   "rent.upt":"Понравился остров?","rent.upp":"Многие наши гости после аренды решают стать владельцами — подберём объект для покупки под вашу задачу и бюджет.",
   "rent.upcta":"Смотреть объекты в продаже","rent.upquiz":"Подобрать за 10 минут",
   "map.lab":"География","map.h2":"Район решает половину вопроса",
-  "map.sub":"Один и тот же бюджет в разных частях острова даёт разную жизнь и разную доходность. Наведите на объект в списке — увидите его на карте.",
+  "map.sub":"Один и тот же бюджет в разных частях острова даёт разную жизнь и разную доходность. Двигайте бюджет — увидите, где на эти деньги есть что выбрать.",
   "map.badge":"14 районов · объекты из базы","map.island":"Пхукет",
   "d.yield":"ориентир доходности","d.beach":"до пляжа на машине","d.count":"объектов в базе","d.who":"Кому подходит: ",
   "d.none":"Сейчас в открытой базе нет объектов в этом районе — подберём под запрос.","d.cta":"Подобрать объект: ","d.inbase":" в базе · ",
@@ -1420,7 +1461,7 @@ ru: {
   "lf.err.empty":"Оставьте номер телефона или ник в Telegram — иначе мы не сможем ответить.","lf.err.short":"Похоже, в номере не хватает цифр. Проверьте, пожалуйста.","lf.err.bad":"Не похоже на номер, @ник или почту. Напишите так, как вам удобно ответить.",
   "cs.5n":"Квартира для пары на пенсии","cs.5w":"Рассрочка 3 года и мебель в подарок","cs.5t":"плюс мебель ฿700 тыс","cs.5buy":"฿9,8 млн","cs.5now":"฿14,8 млн","cs.5r":"9% год","cs.6n":"Квартира, которая платит за себя","cs.6w":"Кредит застройщика 5% на 5 лет","cs.6t":"аренда кроет половину платежа","cs.6buy":"฿14 млн","cs.6now":"฿15,4 млн","cs.6r":"฿70 тыс/мес",
   "u.wa":"Написать в WhatsApp","wa.hi":"Здравствуйте! Интересует объект:","wa.hi2":"Здравствуйте! Хочу подобрать объект на Пхукете.","wa.price":"Цена на сайте:","wa.dates":"Даты:","wa.link":"Ссылка:","wa.seen":"Смотрел на сайте:",
-  "nav.pick":"Подобрать объект","f.any":"Любая цена","f.reset":"сбросить","u.upto":"до","map.list":"Объекты на карте","u.units":"Что можно купить","u.similar":"Похожие объекты","u.allphotos":"Все","u.progress":"Ход строительства","u.progressAll":"общая готовность по данным застройщика","stay.wait":"Считаем…","stay.nights":"ночей","stay.pernight":" за ночь","stay.off":"скидка за срок","stay.none":"Цена на эти даты — по запросу. Оставьте заявку, ответим точной суммой в течение дня.",
+  "nav.pick":"Подобрать объект","f.any":"Любая цена","f.reset":"сбросить","u.upto":"до","map.list":"Объекты на карте","zone.budget":"Ваш бюджет","zone.all":"все районы","u.units":"Что можно купить","u.similar":"Похожие объекты","u.allphotos":"Все","u.progress":"Ход строительства","u.progressAll":"общая готовность по данным застройщика","stay.wait":"Считаем…","stay.nights":"ночей","stay.pernight":" за ночь","stay.off":"скидка за срок","stay.none":"Цена на эти даты — по запросу. Оставьте заявку, ответим точной суммой в течение дня.",
   "assist.lab":"Консультант","assist.h2":"Не уверены, что подходит именно вам?","assist.p":"Спросите Дарью прямо здесь, в чате на сайте. Она знает базу, считает доходность и сравнивает районы — отвечает сразу, в любое время. Что-то сложное передаст менеджеру.","assist.cta":"Задать вопрос в чате","assist.wa":"Подобрать за 10 минут","assist.q1s":"Что купить на 5 млн ฿?","assist.q1":"Что можно купить на 5 млн ฿?","assist.q2s":"Где выше доходность?","assist.q2":"В каком районе выше доходность аренды?","assist.q3s":"Чем Банг Тао лучше Раваи?","assist.q3":"Чем Банг Тао лучше Раваи для инвестиций?","assist.q4s":"Сколько выйдет с налогами?","assist.q4":"Какие расходы при покупке кроме цены объекта?",
   "u.from":"от","u.onreq":"цена по запросу","u.calc":"Рассчитать доходность","u.cmp":"Сравнить","u.cmpOn":"В сравнении",
   "u.roinote":"Ориентировочно; потенциал зависит от объекта, стратегии и управления — рассчитаем индивидуально",
@@ -1538,7 +1579,7 @@ en: {
   "rent.upt":"Fell in love with the island?","rent.upp":"Many of our guests decide to become owners after renting — we will match a property to buy for your goal and budget.",
   "rent.upcta":"Browse properties for sale","rent.upquiz":"Get matched in 10 minutes",
   "map.lab":"Geography","map.h2":"The area is half the decision",
-  "map.sub":"The same budget in different parts of the island buys a different life and a different yield. Hover a property in the list to find it on the map.",
+  "map.sub":"The same budget in different parts of the island buys a different life and a different yield. Move the budget slider to see where it actually buys something.",
   "map.badge":"14 areas · properties from our base","map.island":"Phuket",
   "d.yield":"yield guideline","d.beach":"to the beach by car","d.count":"properties in base","d.who":"Best suited for: ",
   "d.none":"No open listings here right now — we will match one on request.","d.cta":"Find a property in ","d.inbase":" in base · ",
@@ -1605,7 +1646,7 @@ en: {
   "lf.err.empty":"Leave a phone number or a Telegram handle — otherwise we cannot reply.","lf.err.short":"That number looks too short. Please check it.","lf.err.bad":"That is not a phone number, an @handle or an email. Write the way you would like us to reply.",
   "cs.5n":"A flat for a retired couple","cs.5w":"Three-year instalments and furniture included","cs.5t":"plus ฿700k of furniture","cs.5buy":"฿9.8M","cs.5now":"฿14.8M","cs.5r":"9%/yr","cs.6n":"A flat that pays for itself","cs.6w":"Developer credit at 5% over five years","cs.6t":"rent covers half the payment","cs.6buy":"฿14M","cs.6now":"฿15.4M","cs.6r":"฿70k/mo",
   "u.wa":"Message on WhatsApp","wa.hi":"Hello! I am interested in:","wa.hi2":"Hello! I would like help choosing a property in Phuket.","wa.price":"Price on the site:","wa.dates":"Dates:","wa.link":"Link:","wa.seen":"Viewed on the site:",
-  "nav.pick":"Find me a property","f.any":"Any price","f.reset":"reset","u.upto":"up to","map.list":"Properties on the map","u.units":"What you can buy","u.similar":"Similar properties","u.allphotos":"All","u.progress":"Construction progress","u.progressAll":"overall readiness per the developer","stay.wait":"Calculating…","stay.nights":"nights","stay.pernight":" per night","stay.off":"length-of-stay discount","stay.none":"Price for these dates is on request. Leave a request and we will come back with the exact figure the same day.",
+  "nav.pick":"Find me a property","f.any":"Any price","f.reset":"reset","u.upto":"up to","map.list":"Properties on the map","zone.budget":"Your budget","zone.all":"all areas","u.units":"What you can buy","u.similar":"Similar properties","u.allphotos":"All","u.progress":"Construction progress","u.progressAll":"overall readiness per the developer","stay.wait":"Calculating…","stay.nights":"nights","stay.pernight":" per night","stay.off":"length-of-stay discount","stay.none":"Price for these dates is on request. Leave a request and we will come back with the exact figure the same day.",
   "assist.lab":"Assistant","assist.h2":"Not sure what suits you?","assist.p":"Ask Daria right here, in the chat on this page. She knows the catalogue, works out the yield and compares districts — answers straight away, any time. Anything complex goes to a manager.","assist.cta":"Ask in the chat","assist.wa":"Find me a match in 10 minutes","assist.q1s":"What can I get for ฿5M?","assist.q1":"What can I buy for ฿5 million?","assist.q2s":"Where is the yield higher?","assist.q2":"Which district has the higher rental yield?","assist.q3s":"Bang Tao or Rawai?","assist.q3":"Why is Bang Tao better than Rawai for investment?","assist.q4s":"What about taxes?","assist.q4":"What costs come on top of the price?",
   "u.from":"from","u.onreq":"price on request","u.calc":"Calculate the yield","u.cmp":"Compare","u.cmpOn":"Comparing",
   "u.roinote":"Indicative; potential depends on the unit, strategy and management — we calculate it individually",
@@ -3455,58 +3496,118 @@ function buildPriceSlider(bar){
   if(!vals.length) return;
   var lo=Math.floor(Math.min.apply(null,vals)/1e6), hi=Math.ceil(Math.max.apply(null,vals)/1e6);
   if(hi<=lo) hi=lo+1;
+
+  /* Эльнур 05.09: «бегунки должны передвигаться». Два наложенных input[type=range]
+     ловили нажатие через раз — ручка под ручкой, а по самой полосе клик вообще
+     не проходил. Здесь свои ручки на pointer-событиях: тянутся мышью и пальцем,
+     нажатие по полосе подводит ближайшую ручку, стрелки двигают с клавиатуры. */
   var box=document.createElement('div');
   box.className='prng';
   box.innerHTML=
     '<div class="prng-val"><span id="prngOut">'+t('f.any')+'</span>'+
       '<button type="button" class="prng-clr" id="prngClr">'+t('f.reset')+'</button></div>'+
-    '<div class="prng-track"><div class="prng-fill" id="prngFill"></div>'+
-      '<input type="range" id="prngA" min="'+lo+'" max="'+hi+'" step="1" value="'+lo+'">'+
-      '<input type="range" id="prngB" min="'+lo+'" max="'+hi+'" step="1" value="'+hi+'"></div>'+
+    '<div class="prng-track" id="prngTrack">'+
+      '<div class="prng-fill" id="prngFill"></div>'+
+      '<button type="button" class="prng-h" id="prngA" aria-label="Цена от"></button>'+
+      '<button type="button" class="prng-h" id="prngB" aria-label="Цена до"></button>'+
+    '</div>'+
     '<div class="prng-ends"><span>'+fmtBaht(lo*1e6)+'</span><span>'+fmtBaht(hi*1e6)+'</span></div>';
   wrap.insertBefore(box, wrap.firstChild);
 
-  var a=box.querySelector('#prngA'), b=box.querySelector('#prngB');
-  var out=box.querySelector('#prngOut'), fill=box.querySelector('#prngFill');
-  function paint(){
-    var ends=box.querySelectorAll('.prng-ends span');
-    if(ends.length===2){ ends[0].textContent=fmtBaht(lo*1e6); ends[1].textContent=fmtBaht(hi*1e6); }
-    var x=Math.min(+a.value,+b.value), y=Math.max(+a.value,+b.value);
-    fill.style.left=((x-lo)/(hi-lo)*100)+'%';
-    fill.style.right=(100-(y-lo)/(hi-lo)*100)+'%';
+  var track=box.querySelector('#prngTrack'), fill=box.querySelector('#prngFill'),
+      hA=box.querySelector('#prngA'), hB=box.querySelector('#prngB'),
+      out=box.querySelector('#prngOut');
+  var A=lo, B=hi;
+
+  function pct(v){ return (v-lo)/(hi-lo)*100; }
+  function draw(){
+    var x=Math.min(A,B), y=Math.max(A,B);
+    fill.style.left=pct(x)+'%'; fill.style.right=(100-pct(y))+'%';
+    hA.style.left=pct(A)+'%'; hB.style.left=pct(B)+'%';
     var full=(x===lo && y===hi);
     out.textContent = full ? t('f.any') : (fmtBaht(x*1e6)+' — '+fmtBaht(y*1e6));
+    return full;
+  }
+  function paint(){
+    var full=draw();
+    var x=Math.min(A,B), y=Math.max(A,B);
     priceRange = full ? null : {from:x*1e6, to:y*1e6};
     /* ручной диапазон отменяет выбранную ступень — иначе они спорят */
-    if(!full){ activeFilter.budget=''; 
+    if(!full){ activeFilter.budget='';
       bar.querySelectorAll('[data-facet="budget"].chipf').forEach(function(c){c.classList.remove('on');}); }
     applyFilters(); if(typeof syncMenuLabels==='function') syncMenuLabels();
   }
-  a.oninput=b.oninput=paint;
-  /* пока ручку тянут, панель не должна схлопываться от ухода курсора */
-  var menu=box.closest('.fmenu');
-  [a,b].forEach(function(el){
-    el.addEventListener('pointerdown',function(){ if(menu) menu.classList.add('hold','open'); });
+
+  var drag=null;
+  function valueAt(clientX){
+    var r=track.getBoundingClientRect();
+    if(!r.width) return A;
+    var k=(clientX-r.left)/r.width;
+    return Math.round(lo + Math.max(0,Math.min(1,k))*(hi-lo));
+  }
+  function grab(e){
+    var v=valueAt(e.clientX);
+    /* ближняя ручка; если обе в одной точке — решаем по стороне нажатия */
+    drag = (Math.abs(v-A)===Math.abs(v-B)) ? (v<A?'a':'b')
+                                           : (Math.abs(v-A)<Math.abs(v-B)?'a':'b');
+    move(e);
+    try{ track.setPointerCapture(e.pointerId); }catch(err){}
+    var menu=box.closest('.fmenu');
+    if(menu) menu.classList.add('hold','open');
+    e.preventDefault();
+  }
+  function move(e){
+    if(!drag) return;
+    var v=valueAt(e.clientX);
+    if(drag==='a') A=v; else B=v;
+    paint();
+  }
+  function drop(e){
+    if(!drag) return;
+    drag=null;
+    try{ track.releasePointerCapture(e.pointerId); }catch(err){}
+    var menu=box.closest('.fmenu');
+    if(menu) menu.classList.remove('hold');
+  }
+  track.addEventListener('pointerdown', grab);
+  track.addEventListener('pointermove', move);
+  track.addEventListener('pointerup', drop);
+  track.addEventListener('pointercancel', drop);
+  /* панель фильтра закрывается по клику вне — нажатие на бегунок к ней не относится */
+  track.addEventListener('click', function(e){ e.stopPropagation(); });
+
+  [[hA,'a'],[hB,'b']].forEach(function(pair){
+    pair[0].addEventListener('keydown', function(e){
+      var d = (e.key==='ArrowRight'||e.key==='ArrowUp') ? 1
+            : (e.key==='ArrowLeft'||e.key==='ArrowDown') ? -1 : 0;
+      if(!d) return;
+      e.preventDefault();
+      if(pair[1]==='a') A=Math.max(lo,Math.min(hi,A+d)); else B=Math.max(lo,Math.min(hi,B+d));
+      paint();
+    });
   });
-  addEventListener('pointerup',function(){ if(menu) menu.classList.remove('hold'); });
+
   /* даём внешнему коду перерисовать подписи бегунка при смене валюты */
-  window.syncPriceSlider=paint;
+  window.syncPriceSlider=function(){
+    var ends=box.querySelectorAll('.prng-ends span');
+    if(ends.length===2){ ends[0].textContent=fmtBaht(lo*1e6); ends[1].textContent=fmtBaht(hi*1e6); }
+    draw();
+  };
   box.querySelector('#prngClr').onclick=function(e){
-    e.stopPropagation(); a.value=lo; b.value=hi; paint();
+    e.stopPropagation(); A=lo; B=hi; paint();
   };
   /* нажали ступень — двигаем ручки к её границам */
   bar.querySelectorAll('.fmenu[data-facet="budget"] .chipf').forEach(function(c){
     c.addEventListener('click',function(){
-      var B={'':[lo,hi],b1:[lo,5],b2:[5,10],b3:[10,15],b4:[15,20],b5:[20,25],b6:[25,30],b7:[30,hi]};
-      var r=B[c.dataset.val]||[lo,hi];
-      a.value=Math.max(lo,r[0]); b.value=Math.min(hi,r[1]);
-      var x=Math.min(+a.value,+b.value), y=Math.max(+a.value,+b.value);
-      fill.style.left=((x-lo)/(hi-lo)*100)+'%';
-      fill.style.right=(100-(y-lo)/(hi-lo)*100)+'%';
-      out.textContent=(c.dataset.val==='')?t('f.any'):(fmtBaht(x*1e6)+' — '+fmtBaht(y*1e6));
+      var G={'':[lo,hi],b1:[lo,5],b2:[5,10],b3:[10,15],b4:[15,20],b5:[20,25],b6:[25,30],b7:[30,hi]};
+      var r=G[c.dataset.val]||[lo,hi];
+      A=Math.max(lo,r[0]); B=Math.min(hi,r[1]);
+      draw();
+      if(c.dataset.val==='') out.textContent=t('f.any');
       priceRange=null; /* ступень фильтрует сама, диапазон не дублируем */
     },true);
   });
+  draw();
 }
 function closeOthers(keep){
   document.querySelectorAll('.fmenu.open').forEach(function(w){ if(w!==keep) w.classList.remove('open'); });
@@ -4042,6 +4143,20 @@ function renderMapReal(){
 
 /* каталог просит карту перерисоваться после фильтров */
 window.drawPinsExternal=function(){ try{ if(PLPMAP) renderMapReal.__draw && renderMapReal.__draw(true); }catch(e){} };
+/* подсветка сразу нескольких меток: наводим на район — горят все его объекты */
+window.PLP_HIGHLIGHT_MANY=function(ids){
+  var want={};
+  (ids||[]).forEach(function(id){
+    var m=PLPMARKS[id];
+    var el=m && m.getElement && m.getElement();
+    if(el) want[el.__zk=(el.__zk||Math.random())]=el;
+  });
+  Object.keys(PLPMARKS).forEach(function(k){
+    var el=PLPMARKS[k].getElement && PLPMARKS[k].getElement();
+    if(el && !(el.__zk in want)) el.classList.remove('mark-hl');
+  });
+  Object.keys(want).forEach(function(k){ want[k].classList.add('mark-hl'); });
+};
 /* подсветка метки при наведении на карточку в списке */
 window.PLP_HIGHLIGHT=function(pid){
   /* Слитая метка стоит сразу за нескольких объектов, поэтому сначала находим
@@ -4057,6 +4172,192 @@ window.PLP_HIGHLIGHT=function(pid){
     if(!PLPMAP.getBounds().contains(ll)) PLPMAP.panTo(ll,{animate:true,duration:.4});
   }
 };
+
+/* ===== БЛОК «РАЙОНЫ»: бюджет → где что можно купить =====
+   Эльнур 05.09: «блок бестолковый, сделай что-то классное». Смысл блока —
+   ответить на главный вопрос покупателя: «на мои деньги — где именно?».
+   Двигаешь бюджет, районы пересчитываются: сколько вариантов, с какой цены
+   начинается вход, какая доходность. Выбрал район — карта летит туда, снизу
+   лента его объектов. */
+var ZB={lo:0,hi:0,a:0,b:0}, ZONE_SEL=null;
+/* «1 объект / 2 объекта / 5 объектов» — без этого счётчики читаются коряво */
+function plural(n, one, few, many){
+  var a=n%10, b=n%100;
+  if(a===1 && b!==11) return one;
+  if(a>=2 && a<=4 && (b<10||b>=20)) return few;
+  return many;
+}
+
+function zoneList(){
+  return PL.DISTRICTS.filter(function(d){ return distProps(d.ru).length; });
+}
+function zoneSale(nameRu){
+  return PL.PROPERTIES.filter(function(p){ return p.loc&&p.loc.ru===nameRu; });
+}
+function zoneRent(nameRu){
+  return PL.RENTALS.filter(function(p){ return !p.soon && p.loc && p.loc.ru===nameRu; });
+}
+function inBudget(p){
+  var v=thbOf(p)/1e6;
+  return v>=ZB.a-0.0001 && v<=ZB.b+0.0001;
+}
+function zonePic(nameRu){
+  var all=zoneSale(nameRu).concat(zoneRent(nameRu));
+  for(var i=0;i<all.length;i++){ if(all[i].photo) return all[i].photo; }
+  for(var j=0;j<all.length;j++){ if(all[j].img) return all[j].img; }
+  return '';
+}
+
+function buildZoneBudget(){
+  var track=document.getElementById('zbudTrack'); if(!track) return;
+  var vals=(PL.PROPERTIES||[]).map(thbOf).filter(function(v){return v>0;});
+  if(!vals.length) return;
+  ZB.lo=Math.floor(Math.min.apply(null,vals)/1e6);
+  ZB.hi=Math.ceil(Math.max.apply(null,vals)/1e6);
+  if(ZB.hi<=ZB.lo) ZB.hi=ZB.lo+1;
+  ZB.a=ZB.lo; ZB.b=ZB.hi;
+  var fill=document.getElementById('zbudFill'),
+      hA=document.getElementById('zbudA'), hB=document.getElementById('zbudB'),
+      out=document.getElementById('zbudOut');
+  function pct(v){ return (v-ZB.lo)/(ZB.hi-ZB.lo)*100; }
+  function draw(){
+    var x=Math.min(ZB.a,ZB.b), y=Math.max(ZB.a,ZB.b);
+    ZB.a=x; ZB.b=y;
+    fill.style.left=pct(x)+'%'; fill.style.right=(100-pct(y))+'%';
+    hA.style.left=pct(x)+'%'; hB.style.left=pct(y)+'%';
+    out.textContent=fmtBaht(x*1e6)+' — '+fmtBaht(y*1e6);
+  }
+  var drag=null;
+  function valueAt(clientX){
+    var r=track.getBoundingClientRect(); if(!r.width) return ZB.a;
+    var k=(clientX-r.left)/r.width;
+    return Math.round(ZB.lo + Math.max(0,Math.min(1,k))*(ZB.hi-ZB.lo));
+  }
+  function move(e){
+    if(!drag) return;
+    var v=valueAt(e.clientX);
+    if(drag==='a') ZB.a=v; else ZB.b=v;
+    draw(); renderZones();
+  }
+  track.addEventListener('pointerdown',function(e){
+    var v=valueAt(e.clientX);
+    drag=(Math.abs(v-ZB.a)===Math.abs(v-ZB.b)) ? (v<ZB.a?'a':'b')
+                                               : (Math.abs(v-ZB.a)<Math.abs(v-ZB.b)?'a':'b');
+    move(e);
+    try{ track.setPointerCapture(e.pointerId); }catch(err){}
+    e.preventDefault();
+  });
+  track.addEventListener('pointermove',move);
+  ['pointerup','pointercancel'].forEach(function(ev){
+    track.addEventListener(ev,function(e){
+      drag=null; try{ track.releasePointerCapture(e.pointerId); }catch(err){}
+    });
+  });
+  [[hA,'a'],[hB,'b']].forEach(function(pair){
+    pair[0].addEventListener('keydown',function(e){
+      var d=(e.key==='ArrowRight'||e.key==='ArrowUp')?1:(e.key==='ArrowLeft'||e.key==='ArrowDown')?-1:0;
+      if(!d) return; e.preventDefault();
+      if(pair[1]==='a') ZB.a=Math.max(ZB.lo,Math.min(ZB.hi,ZB.a+d));
+      else ZB.b=Math.max(ZB.lo,Math.min(ZB.hi,ZB.b+d));
+      draw(); renderZones();
+    });
+  });
+  window.syncZoneBudget=draw;
+  draw();
+}
+
+function renderZones(){
+  var host=document.getElementById('zones'); if(!host) return;
+  var x=document.getElementById('zpickX');
+  if(x && !x.__wired){ x.__wired=1; x.onclick=function(){ zoneOpen(ZONE_SEL); }; }
+  var zones=zoneList().map(function(d){
+    var sale=zoneSale(d.ru), rent=zoneRent(d.ru);
+    var fit=sale.filter(inBudget);
+    var prices=sale.map(thbOf).filter(function(v){return v>0;});
+    return { d:d, sale:sale, rent:rent, fit:fit,
+             from: prices.length?Math.min.apply(null,prices):null };
+  });
+  /* сначала районы, где в бюджете есть что смотреть */
+  zones.sort(function(a,b){
+    if(!!b.fit.length - !!a.fit.length) return (b.fit.length?1:0)-(a.fit.length?1:0);
+    if(b.fit.length!==a.fit.length) return b.fit.length-a.fit.length;
+    return (a.from||1e12)-(b.from||1e12);
+  });
+  var totalFit=zones.reduce(function(n,z){return n+z.fit.length;},0);
+  var zonesFit=zones.filter(function(z){return z.fit.length;}).length;
+  var note=document.getElementById('zbudNote');
+  if(note) note.textContent = totalFit
+    ? (totalFit+' '+plural(totalFit,'объект','объекта','объектов')+' в '+zonesFit+' '+
+       plural(zonesFit,'районе','районах','районах'))
+    : 'в этом бюджете вариантов нет — расширьте рамки';
+
+  host.innerHTML=zones.map(function(z){
+    var pic=zonePic(z.d.ru);
+    var on=(ZONE_SEL===z.d.ru);
+    return '<button type="button" class="zone'+(z.fit.length?'':' dim')+(on?' on':'')+'" data-z="'+
+      escHTML(z.d.ru)+'">'+
+      (pic?('<i style="background-image:url('+pic+')"></i>'):'<i></i>')+
+      '<span class="z-b">'+
+        '<b>'+escHTML(dName(z.d))+'</b>'+
+        '<u>'+(z.fit.length
+                ? (z.fit.length+' '+plural(z.fit.length,'объект','объекта','объектов')+' в бюджете')
+                : (z.sale.length?'вне бюджета':'только аренда'))+'</u>'+
+        '<em>'+(z.from?(t('u.from')+' '+fmtBaht(z.from)):'по запросу')+'</em>'+
+      '</span>'+
+      '<span class="z-m">'+
+        (z.d.yield?('<span class="z-y">'+escHTML(z.d.yield)+'</span>'):'')+
+        '<span class="z-be">'+escHTML(loc(z.d.beach))+' до пляжа</span>'+
+        (z.rent.length?('<span class="z-r">аренда: '+z.rent.length+'</span>'):'')+
+      '</span></button>';
+  }).join('');
+
+  Array.prototype.forEach.call(host.querySelectorAll('.zone'),function(el){
+    var name=el.dataset.z;
+    el.addEventListener('mouseenter',function(){ zoneHover(name); });
+    el.addEventListener('click',function(){ zoneOpen(name); });
+  });
+}
+
+/* наведение на район — подсвечиваем его объекты на карте */
+function zoneHover(nameRu){
+  var ids=zoneSale(nameRu).concat(zoneRent(nameRu)).map(function(p){return p.property_id;});
+  if(window.PLP_HIGHLIGHT_MANY) window.PLP_HIGHLIGHT_MANY(ids);
+}
+
+function zoneOpen(nameRu){
+  ZONE_SEL=(ZONE_SEL===nameRu)?null:nameRu;
+  renderZones();
+  var box=document.getElementById('zpick');
+  if(!ZONE_SEL){ if(box) box.hidden=true; resetMapView(); return; }
+  var d=null; PL.DISTRICTS.forEach(function(x){ if(x.ru===nameRu) d=x; });
+  var sale=zoneSale(nameRu), rent=zoneRent(nameRu);
+  var fit=sale.filter(inBudget), rest=sale.filter(function(p){return fit.indexOf(p)<0;});
+  var list=fit.concat(rest, rent);
+  document.getElementById('zpickName').textContent=d?dName(d):nameRu;
+  document.getElementById('zpickMeta').textContent=
+    [ (d&&d.yield)?('доходность '+d.yield):'', sale.length?(sale.length+' в продаже'):'',
+      rent.length?(rent.length+' в аренде'):'', (d?loc(d.who):'') ].filter(Boolean).join(' · ');
+  var car=document.getElementById('zpickCar');
+  car.innerHTML=list.map(function(p){
+    var pic=p.photo||p.img||'';
+    var out=(p.funnel==='sale' && fit.indexOf(p)<0);
+    return '<button type="button" class="zprop'+(out?' out':'')+'" data-pid="'+p.property_id+'">'+
+      '<i style="'+(pic?('background-image:url('+pic+')'):'')+'"></i>'+
+      '<b>'+escHTML(p.title)+'</b>'+
+      '<u>'+escHTML(loc(p.type))+(p.beds?(' · '+escHTML(p.beds)+' сп.'):'')+'</u>'+
+      '<em>'+(p.funnel==='sale'?(t('u.from')+' '+fmtBaht(thbOf(p))):t('u.onreq'))+'</em>'+
+      (out?'<s>вне бюджета</s>':'')+'</button>';
+  }).join('');
+  Array.prototype.forEach.call(car.querySelectorAll('.zprop'),function(el){
+    el.addEventListener('click',function(){ openProp(el.dataset.pid); });
+    el.addEventListener('mouseenter',function(){
+      if(window.PLP_HIGHLIGHT) window.PLP_HIGHLIGHT(el.dataset.pid);
+    });
+  });
+  if(box){ box.hidden=false; }
+  focusDistrict(nameRu);
+  try{ initCarHint(); }catch(e){}
+}
 
 /* Список объектов рядом с картой: наводишь — метка загорается, нажимаешь —
    открывается карточка. Работает вместе с фильтрами «Все / Продажа / Аренда». */
@@ -4207,7 +4508,7 @@ window.openDistrict=openDistrict;window.closeDistrict=closeDistrict;
 applyI18n();
 renderSale();renderRent();renderMap();renderDList();renderMapReal();
 initRentDates();
-initCarDrag();initCarHint();observeReveals();updateTray();initFab();try{renderMapObjs('all');}catch(e){}try{syncEntryPrice();}catch(e){}
+initCarDrag();initCarHint();observeReveals();updateTray();initFab();try{buildZoneBudget();renderZones();}catch(e){}try{syncEntryPrice();}catch(e){}
 openFromHash(); /* шеринг-ссылка #object=<id> → открыть карточку объекта */
 addEventListener('hashchange',function(){if(isObjectHash())openFromHash();});
 
