@@ -52,10 +52,17 @@ const body=`
           ${lab('Низкий, ฿/ночь<span class="ap-hint">август–ноябрь</span>')}${inp('ap-nl','9000')}
         </div>
         <div class="ap-row3" style="margin-top:12px">
-          ${lab('Скидка от 7 ночей, %')}${inp('ap-d7','10')}
-          ${lab('Скидка от 30 ночей, %')}${inp('ap-d30','25')}
-          ${lab('Минимальный срок, ночей')}${inp('ap-min','3')}
+          ${lab('Скидка от 3 ночей, %')}${inp('ap-d3','')}
+          ${lab('Скидка от 7 ночей, %')}${inp('ap-d7','')}
+          ${lab('Скидка от 14 ночей, %')}${inp('ap-d14','')}
         </div>
+        <div class="ap-row3" style="margin-top:12px">
+          ${lab('Скидка от 30 ночей, %')}${inp('ap-d30','')}
+          ${lab('Скидка от 90 ночей, %')}${inp('ap-d90','')}
+          ${lab('Минимальный срок, ночей')}${inp('ap-min','')}
+        </div>
+        <p class="sub" style="font-size:12.5px;margin-top:8px">Заполняйте только те ступени, которые у вас есть —
+        пустые не показываем. Считаем всегда по самой выгодной для гостя.</p>
       </div>
     </div>
 
@@ -248,7 +255,8 @@ const body=`
       amenities:g('ap-amen').value.trim(),
       /* сетка цен: по ней сайт считает стоимость на любые даты */
       nightly:{high:num('ap-nh'), shoulder:num('ap-ns'), low:num('ap-nl')},
-      discounts:[{nights:7,off:num('ap-d7')},{nights:30,off:num('ap-d30')}].filter(function(d){return d.off>0;}),
+      discounts:[{nights:3,off:num('ap-d3')},{nights:7,off:num('ap-d7')},{nights:14,off:num('ap-d14')},
+                 {nights:30,off:num('ap-d30')},{nights:90,off:num('ap-d90')}].filter(function(d){return d.off>0;}),
       min_stay:num('ap-min'),
       media:files.filter(function(f){return f.done;}).map(function(f){return {url:f.url,type:f.type,name:f.name};})
     })}).then(function(r){return r.json();}).then(function(d){
