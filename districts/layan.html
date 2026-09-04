@@ -568,9 +568,9 @@ input.bad{border-color:#d98a84!important;background:#fff6f5}
 .pdfband .imgs{position:relative;height:165px}
 /* Каталог показываем как настоящую обложку: тёмная страница с нашим знаком,
    названием и подписью, из-под неё выглядывает разворот с фото объекта. */
-.pdfband .imgs{position:relative;height:190px}
+.pdfband .imgs{position:relative;height:200px;min-width:0}
 .pdfband .imgs .pg{position:absolute;border-radius:12px;box-shadow:var(--shadow-lg);overflow:hidden}
-.pdfband .pg-cover{z-index:2;left:8%;top:10px;width:53%;aspect-ratio:3/4;max-height:170px;transform:rotate(-5deg);
+.pdfband .pg-cover{z-index:2;left:4%;top:14px;width:50%;aspect-ratio:3/4;max-height:172px;transform:rotate(-4deg);
   background:linear-gradient(160deg,#3E4232,#22251C 70%);color:#fff;
   display:flex;flex-direction:column;justify-content:space-between;padding:13px 14px;
   border:1px solid rgba(255,255,255,.1)}
@@ -580,11 +580,12 @@ input.bad{border-color:#d98a84!important;background:#fff6f5}
 .pdfband .pgc-mid span{display:block;font-size:.72rem;color:rgba(255,255,255,.66);margin-top:3px}
 .pdfband .pgc-bot{display:flex;flex-direction:column;gap:2px;font-size:.64rem;color:rgba(255,255,255,.55)}
 .pdfband .pgc-bot span:first-child{color:var(--green);font-weight:700}
-.pdfband .pg-shot{z-index:1;right:6%;top:34px;width:46%;aspect-ratio:4/3;transform:rotate(7deg)}
+.pdfband .pg-shot{z-index:1;right:2%;top:30px;width:52%;aspect-ratio:4/3;transform:rotate(5deg)}
 .pdfband .pg-shot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-@media(max-width:520px){.pdfband .imgs{height:172px}
-  .pdfband .pg-cover{left:4%;width:56%;max-height:158px}
-  .pdfband .pg-shot{right:2%;width:48%}}
+
+@media(max-width:520px){.pdfband .imgs{height:176px;max-width:300px}
+  .pdfband .pg-cover{width:54%;max-height:156px}
+  .pdfband .pg-shot{width:54%}}
 
 /* ===== rent extras ===== */
 .rentband{background:var(--ink);color:#fff;border-radius:22px;padding:26px 26px;margin-top:24px;display:grid;gap:18px;align-items:center}
@@ -762,7 +763,12 @@ input.bad{border-color:#d98a84!important;background:#fff6f5}
 .serv4 .t{position:relative;z-index:2;padding:18px;color:#fff}
 .serv4 h4{font-size:1rem;font-weight:700}
 .serv4 p{font-size:.78rem;color:rgba(255,255,255,.85);margin-top:6px;line-height:1.4}
-.cases{display:grid;gap:12px;margin-top:22px;grid-template-columns:repeat(auto-fit,minmax(232px,1fr))}
+/* Кейсы лентой: сеткой они смотрелись то пусто, то громоздко. */
+.cases{display:flex;gap:12px;margin-top:22px;overflow-x:auto;padding:2px 2px 10px;
+  scroll-snap-type:x proximity;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.cases::-webkit-scrollbar{display:none}
+.cases .case{flex:0 0 246px;scroll-snap-align:start}
+@media(max-width:600px){.cases .case{flex-basis:78vw}}
 
 
 .case{background:var(--paper);border-radius:var(--r);padding:14px;box-shadow:var(--shadow-sm);transition:transform .3s,box-shadow .3s}
@@ -2205,8 +2211,8 @@ function scrollCar(id,dir){
 /* Полоса прокрутки под лентой: без неё не видно, что объекты листаются вбок,
    и человек уходит, решив, что их всего три. Эльнур 05.09. */
 function initCarHint(){
-  ['saleCar','rentCar'].forEach(function(id){
-    var car=document.getElementById(id); if(!car) return;
+  ['saleCar','rentCar','.cases'].forEach(function(id){
+    var car=document.getElementById(id)||document.querySelector(id); if(!car) return;
     var wrap=car.closest('.carwrap')||car.parentNode;
     if(!wrap || wrap.querySelector('.carbar')) return;
     var bar=document.createElement('div'); bar.className='carbar';

@@ -418,7 +418,7 @@ section[id],div[id^="q"],[id="about"],[id="steps"],[id="faq"]{scroll-margin-top:
 .mdot{width:16px;height:4px;border-radius:2px;padding:0;border:0;cursor:pointer;
   background:rgba(255,255,255,.5);box-shadow:0 1px 2px rgba(0,0,0,.2);transition:background .15s,width .15s}
 .mdot.on{background:#fff;width:22px}
-.pm-count{position:absolute;left:12px;bottom:12px;z-index:2;background:rgba(16,15,12,.62);color:#fff;
+.pm-count{position:absolute;right:12px;top:12px;z-index:2;background:rgba(16,15,12,.62);color:#fff;
   border-radius:999px;padding:4px 10px;font-size:.74rem;font-weight:600;backdrop-filter:blur(6px)}
 .simi{margin-top:20px;padding-top:16px;border-top:1px solid rgba(10,10,10,.08)}
 .simi-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
@@ -466,14 +466,23 @@ section[id],div[id^="q"],[id="about"],[id="steps"],[id="faq"]{scroll-margin-top:
 .lb-c{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.7);
   font-size:.8rem;font-variant-numeric:tabular-nums}
 @media(max-width:700px){.lbox{padding:52px 12px}.lb-p{left:6px}.lb-n{right:6px}}
-.pm-thumbs{display:flex;gap:7px;padding:9px 10px 3px;overflow-x:auto;scrollbar-width:none;background:var(--paper)}
-.pm-thumbs::-webkit-scrollbar{display:none}
-.pdot{flex:0 0 auto;width:74px;height:54px;border-radius:9px;overflow:hidden;padding:0;cursor:pointer;
-  border:2px solid transparent;background:#eceadf;transition:border-color .15s,opacity .15s;opacity:.72}
+.pm-thumbs{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:8px;padding:10px;background:var(--paper)}
+.pdot{position:relative;height:78px;border-radius:10px;overflow:hidden;padding:0;cursor:pointer;
+  border:2px solid transparent;background:#eceadf;transition:border-color .15s,opacity .15s;opacity:.82}
 .pdot img{width:100%;height:100%;object-fit:cover;display:block}
 .pdot:hover{opacity:1}
 .pdot.on{border-color:var(--green-deep,#5F6242);opacity:1}
-@media(max-width:600px){.pdot{width:62px;height:46px}}
+.pdot.more::after{content:'';position:absolute;inset:0;background:rgba(16,15,12,.5)}
+.pdot em{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  color:#fff;font-style:normal;font-weight:700;font-size:.92rem;z-index:1}
+@media(max-width:600px){.pdot{height:62px}}
+.pm-nav{position:absolute;top:50%;transform:translateY(-50%);z-index:2;width:38px;height:38px;
+  border:0;border-radius:50%;background:rgba(255,255,255,.9);color:var(--ink);font-size:22px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(20,18,14,.18);
+  opacity:0;transition:opacity .18s}
+.pm-img:hover .pm-nav{opacity:1}
+.pm-nav.prev{left:12px} .pm-nav.next{right:12px}
+@media(max-width:899px){.pm-nav{opacity:1;width:34px;height:34px}}
 .lf-err{display:none;font-size:.78rem;color:#b8433b;margin:4px 2px 0;line-height:1.4}
 input.bad{border-color:#d98a84!important;background:#fff6f5}
 .chipf.off{opacity:.42;cursor:default;font-weight:500}
@@ -559,9 +568,9 @@ input.bad{border-color:#d98a84!important;background:#fff6f5}
 .pdfband .imgs{position:relative;height:165px}
 /* Каталог показываем как настоящую обложку: тёмная страница с нашим знаком,
    названием и подписью, из-под неё выглядывает разворот с фото объекта. */
-.pdfband .imgs{position:relative;height:190px}
+.pdfband .imgs{position:relative;height:200px;min-width:0}
 .pdfband .imgs .pg{position:absolute;border-radius:12px;box-shadow:var(--shadow-lg);overflow:hidden}
-.pdfband .pg-cover{z-index:2;left:8%;top:10px;width:53%;aspect-ratio:3/4;max-height:170px;transform:rotate(-5deg);
+.pdfband .pg-cover{z-index:2;left:4%;top:14px;width:50%;aspect-ratio:3/4;max-height:172px;transform:rotate(-4deg);
   background:linear-gradient(160deg,#3E4232,#22251C 70%);color:#fff;
   display:flex;flex-direction:column;justify-content:space-between;padding:13px 14px;
   border:1px solid rgba(255,255,255,.1)}
@@ -571,11 +580,12 @@ input.bad{border-color:#d98a84!important;background:#fff6f5}
 .pdfband .pgc-mid span{display:block;font-size:.72rem;color:rgba(255,255,255,.66);margin-top:3px}
 .pdfband .pgc-bot{display:flex;flex-direction:column;gap:2px;font-size:.64rem;color:rgba(255,255,255,.55)}
 .pdfband .pgc-bot span:first-child{color:var(--green);font-weight:700}
-.pdfband .pg-shot{z-index:1;right:6%;top:34px;width:46%;aspect-ratio:4/3;transform:rotate(7deg)}
+.pdfband .pg-shot{z-index:1;right:2%;top:30px;width:52%;aspect-ratio:4/3;transform:rotate(5deg)}
 .pdfband .pg-shot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-@media(max-width:520px){.pdfband .imgs{height:172px}
-  .pdfband .pg-cover{left:4%;width:56%;max-height:158px}
-  .pdfband .pg-shot{right:2%;width:48%}}
+
+@media(max-width:520px){.pdfband .imgs{height:176px;max-width:300px}
+  .pdfband .pg-cover{width:54%;max-height:156px}
+  .pdfband .pg-shot{width:54%}}
 
 /* ===== rent extras ===== */
 .rentband{background:var(--ink);color:#fff;border-radius:22px;padding:26px 26px;margin-top:24px;display:grid;gap:18px;align-items:center}
@@ -753,7 +763,12 @@ input.bad{border-color:#d98a84!important;background:#fff6f5}
 .serv4 .t{position:relative;z-index:2;padding:18px;color:#fff}
 .serv4 h4{font-size:1rem;font-weight:700}
 .serv4 p{font-size:.78rem;color:rgba(255,255,255,.85);margin-top:6px;line-height:1.4}
-.cases{display:grid;gap:12px;margin-top:22px;grid-template-columns:repeat(auto-fit,minmax(232px,1fr))}
+/* Кейсы лентой: сеткой они смотрелись то пусто, то громоздко. */
+.cases{display:flex;gap:12px;margin-top:22px;overflow-x:auto;padding:2px 2px 10px;
+  scroll-snap-type:x proximity;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.cases::-webkit-scrollbar{display:none}
+.cases .case{flex:0 0 246px;scroll-snap-align:start}
+@media(max-width:600px){.cases .case{flex-basis:78vw}}
 
 
 .case{background:var(--paper);border-radius:var(--r);padding:14px;box-shadow:var(--shadow-sm);transition:transform .3s,box-shadow .3s}
@@ -2017,10 +2032,13 @@ function pickUnit(btn,pidEnc,i){
 function photoStrip(p){
   var list=(p&&p.photos)||[];
   if(list.length<2) return '';
-  return list.map(function(u,i){
-      return '<button type="button" class="pdot'+(i?'':' on')+'" data-i="'+i+'" '+
+  var show=list.slice(0,5), more=list.length-show.length;
+  return show.map(function(u,i){
+      var last=(i===show.length-1 && more>0);
+      return '<button type="button" class="pdot'+(i?'':' on')+(last?' more':'')+'" data-i="'+i+'" '+
              'onclick="swapPhoto(this,\''+encodeURIComponent(u)+'\','+i+')" aria-label="Фото '+(i+1)+'">'+
-             '<img src="'+u+'" loading="lazy" decoding="async" alt=""></button>';
+             '<img src="'+u+'" loading="lazy" decoding="async" alt="">'+
+             (last?('<em>+'+more+'</em>'):'')+'</button>';
     }).join('');
 }
 /* Просмотрщик: клик по главному фото или по миниатюре открывает снимок крупно,
@@ -2082,6 +2100,22 @@ addEventListener('keydown',function(e){
   if(e.key==='ArrowLeft') stepLightbox(-1);
   if(e.key==='ArrowRight') stepLightbox(1);
 });
+/* Стрелки прямо на снимке: листаем, не открывая просмотрщик. */
+function stepMain(d){
+  var p=PL.byId[currentPid]; if(!p) return;
+  var list=(p.photos&&p.photos.length)?p.photos:(p.photo?[p.photo]:[]);
+  if(list.length<2) return;
+  var strip=document.getElementById('pmThumbs');
+  var cur=0;
+  if(strip){ var on=strip.querySelector('.pdot.on'); cur=on?(+on.dataset.i||0):0; }
+  var next=(cur+d+list.length)%list.length;
+  var im=document.querySelector('.pm-photo'); if(im) im.src=list[next];
+  var c=document.getElementById('pmCount'); if(c) c.textContent=(next+1)+' / '+list.length;
+  if(strip){
+    var btns=strip.querySelectorAll('.pdot');
+    Array.prototype.forEach.call(btns,function(b){ b.classList.toggle('on', (+b.dataset.i)===next); });
+  }
+}
 function swapPhoto(btn,url,idx){
   var wrap=btn.closest('.pm-media')||btn.closest('.prop');
   var box=wrap?wrap.querySelector('.pm-img, .pic'):null;
@@ -2093,6 +2127,10 @@ function swapPhoto(btn,url,idx){
   }
   var strip=btn.parentNode;
   Array.prototype.forEach.call(strip.children,function(b){ b.classList.toggle('on', b===btn); });
+  var p=PL.byId[currentPid];
+  var total=(p&&p.photos&&p.photos.length)||1;
+  var c=document.getElementById('pmCount');
+  if(c&&idx!=null) c.textContent=(idx+1)+' / '+total;
 }
 
 /* ===== SALE RENDER ===== */
@@ -2172,8 +2210,8 @@ function scrollCar(id,dir){
 /* Полоса прокрутки под лентой: без неё не видно, что объекты листаются вбок,
    и человек уходит, решив, что их всего три. Эльнур 05.09. */
 function initCarHint(){
-  ['saleCar','rentCar'].forEach(function(id){
-    var car=document.getElementById(id); if(!car) return;
+  ['saleCar','rentCar','.cases'].forEach(function(id){
+    var car=document.getElementById(id)||document.querySelector(id); if(!car) return;
     var wrap=car.closest('.carwrap')||car.parentNode;
     if(!wrap || wrap.querySelector('.carbar')) return;
     var bar=document.createElement('div'); bar.className='carbar';
@@ -2568,7 +2606,9 @@ function openProp(pid){
   img.className='pm-img '+(p.grad||'g1');
   var _n=((p.photos&&p.photos.length)||(p.photo||p.img?1:0));
   img.innerHTML=picPhoto(p,true).replace('pic-photo','pm-photo')+
-    (_n>1?('<span class="pm-count">🖼 '+_n+'</span>'):'')+
+    (_n>1?('<span class="pm-count" id="pmCount">1 / '+_n+'</span>'+
+           '<button type="button" class="pm-nav prev" onclick="event.stopPropagation();stepMain(-1)" aria-label="Назад">‹</button>'+
+           '<button type="button" class="pm-nav next" onclick="event.stopPropagation();stepMain(1)" aria-label="Вперёд">›</button>'):'')+
     '<span>'+t('ph.object')+'</span><div class="pm-badges"><span class="pm-tag">'+loc(p.loc)+'</span><span class="pm-roi">'+(p.funnel==='sale'?(p.roi!=null?('ROI '+roiRange(p)):t('u.calc')):t('book.title'))+'</span></div>';
   /* Главное фото крупным, под ним ряд миниатюр; клик по снимку открывает крупно. */
   img.style.cursor='zoom-in';
@@ -3955,7 +3995,7 @@ window.checkAvailability=checkAvailability;window.resetAvailability=resetAvailab
 window.scrollCar=scrollCar;window.toggleFilter=toggleFilter;window.onSaleSearch=onSaleSearch;window.setSaleSort=setSaleSort;window.toggleFavOnly=toggleFavOnly;
 window.setCur=setCur;   /* кнопка валюты вызывается из разметки — без экспорта не работала */
 window.toggleFav=toggleFav;window.toggleCmp=toggleCmp;window.openCompare=openCompare;window.closeCompare=closeCompare;window.cmpLead=cmpLead;window.favLead=favLead;
-window.openProp=openProp;window.waFromModal=waFromModal;window.swapPhoto=swapPhoto;window.pickUnit=pickUnit;window.openLightbox=openLightbox;window.closeLightbox=closeLightbox;window.closeProp=closeProp;window.leadFromModal=leadFromModal;window.askVerdict=askVerdict;window.shareProp=shareProp;
+window.openProp=openProp;window.waFromModal=waFromModal;window.swapPhoto=swapPhoto;window.pickUnit=pickUnit;window.openLightbox=openLightbox;window.stepMain=stepMain;window.closeLightbox=closeLightbox;window.closeProp=closeProp;window.leadFromModal=leadFromModal;window.askVerdict=askVerdict;window.shareProp=shareProp;
 window.openDistrict=openDistrict;window.closeDistrict=closeDistrict;
 
 /* ===== INIT ===== */
