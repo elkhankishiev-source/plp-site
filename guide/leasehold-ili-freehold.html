@@ -877,6 +877,18 @@ html,body{overflow-x:clip;max-width:100%}
   .curswitch{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:#fff}
   .curswitch button{border:0;background:none;padding:6px 13px;font:inherit;font-weight:600;cursor:pointer;color:var(--muted);line-height:1}
   .curswitch button.on{background:var(--green);color:var(--ink)}
+/* Список всех объектов ссылками — блок статический, скрипты его не трогают.
+   Нужен и людям (быстро увидеть весь каталог), и поиску (внутренние ссылки). */
+.obj-index{padding:56px 0;background:#fafaf7;border-top:1px solid #ececE4}
+.obj-index h2{margin:0 0 6px;font-size:26px}
+.obj-index .sub{margin:0 0 26px;color:#6b6b63;max-width:640px}
+.oi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:22px 28px}
+.oi-col h3{margin:0 0 8px;font-size:14px;letter-spacing:.04em;text-transform:uppercase;color:#8a8a80}
+.oi-col ul{margin:0;padding:0;list-style:none}
+.oi-col li{margin:0 0 7px;font-size:14px;line-height:1.45;color:#6b6b63}
+.oi-col a{color:#2b2b26;text-decoration:none;border-bottom:1px solid rgba(0,0,0,.14)}
+.oi-col a:hover{border-bottom-color:currentColor}
+@media(max-width:600px){.obj-index{padding:40px 0}.oi-grid{gap:18px}}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.6.0/maplibre-gl.min.css">
