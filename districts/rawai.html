@@ -233,6 +233,10 @@ html,body{overflow-x:clip;max-width:100%}
 }
 
 /* ===== header ===== */
+/* Шапка липкая, поэтому переход по якорю прятал верх раздела под ней —
+   у разделов свой отступ прокрутки. */
+section[id],div[id^="q"],[id="about"],[id="steps"],[id="faq"]{scroll-margin-top:86px}
+@media(max-width:700px){section[id]{scroll-margin-top:72px}}
 .header{
   position:sticky;top:0;z-index:50;
   background:rgba(247,246,241,.88);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
@@ -425,6 +429,25 @@ html,body{overflow-x:clip;max-width:100%}
 .unit:hover{border-color:rgba(10,10,10,.28)}
 .unit.on{border-color:var(--green-deep,#5F6242);box-shadow:0 0 0 1px var(--green-deep,#5F6242) inset}
 .unit-note{margin-top:8px;font-size:.8rem;color:var(--muted);line-height:1.45}
+.carbar{height:4px;border-radius:999px;background:rgba(10,10,10,.08);margin:12px auto 0;
+  max-width:min(520px,86%);position:relative;overflow:hidden}
+.carbar i{position:absolute;top:0;bottom:0;background:var(--green-deep,#5F6242);border-radius:999px;
+  transition:left .12s linear,width .12s linear;opacity:.72}
+.lbox{position:fixed;inset:0;z-index:200;background:rgba(16,15,12,.94);display:none;
+  align-items:center;justify-content:center;padding:38px 60px}
+.lbox.open{display:flex}
+.lbox img{max-width:100%;max-height:100%;object-fit:contain;border-radius:10px;display:block}
+.lbox button{position:absolute;background:rgba(255,255,255,.12);border:0;color:#fff;cursor:pointer;
+  border-radius:999px;width:44px;height:44px;font-size:26px;line-height:1;display:flex;
+  align-items:center;justify-content:center;transition:background .15s}
+.lbox button:hover{background:rgba(255,255,255,.24)}
+.lb-x{top:18px;right:18px}
+.lb-p{left:14px;top:50%;transform:translateY(-50%)}
+.lb-n{right:14px;top:50%;transform:translateY(-50%)}
+.lbox.single .lb-p,.lbox.single .lb-n,.lbox.single .lb-c{display:none}
+.lb-c{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.7);
+  font-size:.8rem;font-variant-numeric:tabular-nums}
+@media(max-width:700px){.lbox{padding:52px 12px}.lb-p{left:6px}.lb-n{right:6px}}
 .pm-thumbs{display:flex;gap:7px;padding:9px 10px 3px;overflow-x:auto;scrollbar-width:none;background:var(--paper)}
 .pm-thumbs::-webkit-scrollbar{display:none}
 .pdot{flex:0 0 auto;width:74px;height:54px;border-radius:9px;overflow:hidden;padding:0;cursor:pointer;
@@ -712,10 +735,10 @@ input.bad{border-color:#d98a84!important;background:#fff6f5}
 .serv4 .t{position:relative;z-index:2;padding:18px;color:#fff}
 .serv4 h4{font-size:1rem;font-weight:700}
 .serv4 p{font-size:.78rem;color:rgba(255,255,255,.85);margin-top:6px;line-height:1.4}
-.cases{display:grid;gap:14px;margin-top:26px}
-@media(min-width:640px){.cases{grid-template-columns:repeat(2,1fr)}}
-@media(min-width:1000px){.cases{grid-template-columns:repeat(4,1fr)}}
-.case{background:var(--paper);border-radius:var(--r);padding:18px;box-shadow:var(--shadow-sm);transition:transform .3s,box-shadow .3s}
+.cases{display:grid;gap:12px;margin-top:22px;grid-template-columns:repeat(auto-fit,minmax(232px,1fr))}
+
+
+.case{background:var(--paper);border-radius:var(--r);padding:14px;box-shadow:var(--shadow-sm);transition:transform .3s,box-shadow .3s}
 .case:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
 .case .top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
 .case .av{width:34px;height:34px;border-radius:50%;flex:none;overflow:hidden;
@@ -1647,7 +1670,7 @@ PL.PROPERTIES=[
 PL.RENTALS=[
   {"property_id":"PLP-ESTELLA-A24","title":"Villa Estella","funnel":"rent","grad":"g1","loc":{"ru":"Най Янг","en":"Nai Yang"},"type":{"ru":"Вилла","en":"Villa"},"beds":"3","bmin":3,"bmax":3,"area":"265 м²","tag":{"ru":"","en":""},"desc":{"ru":"Вилла в Най Янге — тихий север острова рядом с нацпарком. Условия и стоимость по запросу.","en":"Villa at Villa Estella, Nai Yang — the quiet north of the island by the national park. Terms and price on request."},"lat":8.08336,"lng":98.2998,"coordOk":true,"min_stay":null,"deposit":null,"amenities":"","beach_m":null,"included":"Обслуживание объекта управляющей компанией: уборка, инженерные системы, порядок на территории. Бассейн и территория комплекса, парковка. Подача уведомления TM30 в иммиграционное бюро за арендатора.","excluded":"Электричество, вода и интернет — при длительной аренде оплачиваются арендатором напрямую поставщикам по счётчикам. Уборка сверх графика, трансфер, страхование личного имущества.","rules":"Длительная аренда: депозит — три месяца аренды, вносится до заселения; аренда — ежемесячно не позднее пятого числа. Показания счётчиков и отчёт управляющая компания передаёт раз в месяц. Режим тишины 22:00–08:00, правила комплекса имеют приоритет. Курение в помещениях запрещено, животные и субаренда — только по письменному согласованию. Ремонт для поддержания объекта — за счёт собственника; о поломке сообщите менеджеру, аварии вне очереди. Депозит возвращается после осмотра за вычетом подтверждённых удержаний, каждое подтверждаем фото или актом. Время заезда и выезда и точные условия закрепляет договор аренды — он имеет приоритет. Полные правила: property-library.com/rules.html"},
   {"property_id":"PLP-LEGENDARY-RENT","title":"The Title Legendary","funnel":"rent","grad":"g2","loc":{"ru":"Банг Тао","en":"Bang Tao"},"type":{"ru":"Кондо","en":"Condo"},"beds":"Studio–2","bmin":0,"bmax":2,"area":"31–94 м²","tag":{"ru":"","en":""},"desc":{"ru":"Аренда в комплексе «The Title Legendary Bang-Tao», Bang Tao. Условия и точная стоимость — по запросу.","en":"Rental at \"The Title Legendary Bang-Tao\", Bang Tao. Terms and exact price on request."},"lat":7.99155,"lng":98.29787,"coordOk":true,"min_stay":null,"deposit":null,"amenities":"","beach_m":null,"included":"Обслуживание объекта управляющей компанией: уборка, инженерные системы, порядок на территории. Бассейн и территория комплекса, парковка. Подача уведомления TM30 в иммиграционное бюро за арендатора.","excluded":"Электричество, вода и интернет — при длительной аренде оплачиваются арендатором напрямую поставщикам по счётчикам. Уборка сверх графика, трансфер, страхование личного имущества.","rules":"Длительная аренда: депозит — три месяца аренды, вносится до заселения; аренда — ежемесячно не позднее пятого числа. Показания счётчиков и отчёт управляющая компания передаёт раз в месяц. Режим тишины 22:00–08:00, правила комплекса имеют приоритет. Курение в помещениях запрещено, животные и субаренда — только по письменному согласованию. Ремонт для поддержания объекта — за счёт собственника; о поломке сообщите менеджеру, аварии вне очереди. Депозит возвращается после осмотра за вычетом подтверждённых удержаний, каждое подтверждаем фото или актом. Время заезда и выезда и точные условия закрепляет договор аренды — он имеет приоритет. Полные правила: property-library.com/rules.html"},
-  {"property_id":"PLP-MANOR-S14","title":"Manor","funnel":"rent","grad":"g3","loc":{"ru":"Таланг","en":"Thalang"},"type":{"ru":"Кондо","en":"Condo"},"beds":"1–3","bmin":1,"bmax":3,"area":"","tag":{"ru":"","en":""},"desc":{"ru":"Апартаменты в резиденции Manor, Таланг — под управлением Property Library. Условия и стоимость по запросу.","en":"Apartment at Manor residence, Thalang — managed by Property Library. Terms and price on request."},"lat":null,"lng":null,"coordOk":false,"min_stay":null,"deposit":null,"amenities":"","beach_m":null,"included":"Обслуживание объекта управляющей компанией: уборка, инженерные системы, порядок на территории. Бассейн и территория комплекса, парковка. Подача уведомления TM30 в иммиграционное бюро за арендатора.","excluded":"Электричество, вода и интернет — при длительной аренде оплачиваются арендатором напрямую поставщикам по счётчикам. Уборка сверх графика, трансфер, страхование личного имущества.","rules":"Длительная аренда: депозит — три месяца аренды, вносится до заселения; аренда — ежемесячно не позднее пятого числа. Показания счётчиков и отчёт управляющая компания передаёт раз в месяц. Режим тишины 22:00–08:00, правила комплекса имеют приоритет. Курение в помещениях запрещено, животные и субаренда — только по письменному согласованию. Ремонт для поддержания объекта — за счёт собственника; о поломке сообщите менеджеру, аварии вне очереди. Депозит возвращается после осмотра за вычетом подтверждённых удержаний, каждое подтверждаем фото или актом. Время заезда и выезда и точные условия закрепляет договор аренды — он имеет приоритет. Полные правила: property-library.com/rules.html"},
+  {"property_id":"PLP-MANOR-S14","title":"Manor","funnel":"rent","grad":"g3","loc":{"ru":"Таланг","en":"Thalang"},"type":{"ru":"Вилла","en":"Villa"},"beds":"1–3","bmin":1,"bmax":3,"area":"","tag":{"ru":"","en":""},"desc":{"ru":"Вилла Manor S14 в Таланге — под управлением Property Library: заселение гостей, обслуживание, отчёт собственнику. Условия и стоимость по запросу.","en":"Apartment at Manor residence, Thalang — managed by Property Library. Terms and price on request."},"lat":null,"lng":null,"coordOk":false,"min_stay":null,"deposit":null,"amenities":"","beach_m":null,"included":"Обслуживание объекта управляющей компанией: уборка, инженерные системы, порядок на территории. Бассейн и территория комплекса, парковка. Подача уведомления TM30 в иммиграционное бюро за арендатора.","excluded":"Электричество, вода и интернет — при длительной аренде оплачиваются арендатором напрямую поставщикам по счётчикам. Уборка сверх графика, трансфер, страхование личного имущества.","rules":"Длительная аренда: депозит — три месяца аренды, вносится до заселения; аренда — ежемесячно не позднее пятого числа. Показания счётчиков и отчёт управляющая компания передаёт раз в месяц. Режим тишины 22:00–08:00, правила комплекса имеют приоритет. Курение в помещениях запрещено, животные и субаренда — только по письменному согласованию. Ремонт для поддержания объекта — за счёт собственника; о поломке сообщите менеджеру, аварии вне очереди. Депозит возвращается после осмотра за вычетом подтверждённых удержаний, каждое подтверждаем фото или актом. Время заезда и выезда и точные условия закрепляет договор аренды — он имеет приоритет. Полные правила: property-library.com/rules.html"},
   {"property_id":"PLP-MODEVA-RENT","title":"The Modeva","funnel":"rent","grad":"g1","loc":{"ru":"Банг Тао","en":"Bang Tao"},"type":{"ru":"Кондо","en":"Condo"},"beds":"1–3","bmin":1,"bmax":3,"area":"29–148 м²","tag":{"ru":"","en":""},"desc":{"ru":"Аренда в комплексе «The Modeva Bang-Tao», Bang Tao. Условия и точная стоимость — по запросу.","en":"Rental at \"The Modeva Bang-Tao\", Bang Tao. Terms and exact price on request."},"lat":7.99113,"lng":98.29633,"coordOk":true,"min_stay":null,"deposit":null,"amenities":"","beach_m":null,"included":"Обслуживание объекта управляющей компанией: уборка, инженерные системы, порядок на территории. Бассейн и территория комплекса, парковка. Подача уведомления TM30 в иммиграционное бюро за арендатора.","excluded":"Электричество, вода и интернет — при длительной аренде оплачиваются арендатором напрямую поставщикам по счётчикам. Уборка сверх графика, трансфер, страхование личного имущества.","rules":"Длительная аренда: депозит — три месяца аренды, вносится до заселения; аренда — ежемесячно не позднее пятого числа. Показания счётчиков и отчёт управляющая компания передаёт раз в месяц. Режим тишины 22:00–08:00, правила комплекса имеют приоритет. Курение в помещениях запрещено, животные и субаренда — только по письменному согласованию. Ремонт для поддержания объекта — за счёт собственника; о поломке сообщите менеджеру, аварии вне очереди. Депозит возвращается после осмотра за вычетом подтверждённых удержаний, каждое подтверждаем фото или актом. Время заезда и выезда и точные условия закрепляет договор аренды — он имеет приоритет. Полные правила: property-library.com/rules.html"},
   {"property_id":"PLP-QABALAH","title":"Villa Qabalah","funnel":"rent","grad":"g2","loc":{"ru":"Банг Тао","en":"Bang Tao"},"type":{"ru":"Вилла","en":"Villa"},"beds":"1–3","bmin":1,"bmax":3,"area":"","tag":{"ru":"","en":""},"desc":{"ru":"Вилла Qabalah в Банг Тао — главный арендный район острова. Условия и стоимость по запросу.","en":"Villa Qabalah in Bang Tao — the island's main rental district. Terms and price on request."},"lat":7.99761,"lng":98.32731,"coordOk":true,"min_stay":null,"deposit":null,"amenities":"Приватный бассейн, rooftop garden, устойчивый дизайн (3 типа: Moss 2BR, Fern 3BR, Pine 4BR)","beach_m":null,"included":"Обслуживание объекта управляющей компанией: уборка, инженерные системы, порядок на территории. Бассейн и территория комплекса, парковка. Подача уведомления TM30 в иммиграционное бюро за арендатора.","excluded":"Электричество, вода и интернет — при длительной аренде оплачиваются арендатором напрямую поставщикам по счётчикам. Уборка сверх графика, трансфер, страхование личного имущества.","rules":"Длительная аренда: депозит — три месяца аренды, вносится до заселения; аренда — ежемесячно не позднее пятого числа. Показания счётчиков и отчёт управляющая компания передаёт раз в месяц. Режим тишины 22:00–08:00, правила комплекса имеют приоритет. Курение в помещениях запрещено, животные и субаренда — только по письменному согласованию. Ремонт для поддержания объекта — за счёт собственника; о поломке сообщите менеджеру, аварии вне очереди. Депозит возвращается после осмотра за вычетом подтверждённых удержаний, каждое подтверждаем фото или актом. Время заезда и выезда и точные условия закрепляет договор аренды — он имеет приоритет. Полные правила: property-library.com/rules.html"}
 ];
@@ -1959,15 +1982,78 @@ function photoStrip(p){
   if(list.length<2) return '';
   return list.map(function(u,i){
       return '<button type="button" class="pdot'+(i?'':' on')+'" data-i="'+i+'" '+
-             'onclick="swapPhoto(this,\''+encodeURIComponent(u)+'\')" aria-label="Фото '+(i+1)+'">'+
+             'onclick="swapPhoto(this,\''+encodeURIComponent(u)+'\','+i+')" aria-label="Фото '+(i+1)+'">'+
              '<img src="'+u+'" loading="lazy" decoding="async" alt=""></button>';
     }).join('');
 }
-function swapPhoto(btn,url){
-  var box=btn.closest('.pm-img')||btn.closest('.pic');
-  if(!box) return;
-  var img=box.querySelector('img.pm-photo, img.pic-photo');
-  if(img) img.src=decodeURIComponent(url);
+/* Просмотрщик: клик по главному фото или по миниатюре открывает снимок крупно,
+   листается стрелками, колесом и пальцем. Эльнур 05.09: «миниатюры должны
+   раскрываться». */
+var LB={list:[],i:0};
+function openLightbox(pid,idx){
+  var p=PL.byId[pid]; if(!p) return;
+  var list=(p.photos&&p.photos.length)?p.photos.slice():(p.photo?[p.photo]:(p.img?[p.img]:[]));
+  if(!list.length) return;
+  LB.list=list; LB.i=Math.max(0,Math.min(idx||0,list.length-1));
+  var box=document.getElementById('lightbox');
+  if(!box){
+    box=document.createElement('div'); box.id='lightbox'; box.className='lbox';
+    box.innerHTML='<button type="button" class="lb-x" aria-label="Закрыть">×</button>'+
+      '<button type="button" class="lb-p" aria-label="Назад">‹</button>'+
+      '<img id="lbImg" alt="">'+
+      '<button type="button" class="lb-n" aria-label="Вперёд">›</button>'+
+      '<div class="lb-c" id="lbCount"></div>';
+    document.body.appendChild(box);
+    box.querySelector('.lb-x').onclick=closeLightbox;
+    box.querySelector('.lb-p').onclick=function(e){e.stopPropagation();stepLightbox(-1);};
+    box.querySelector('.lb-n').onclick=function(e){e.stopPropagation();stepLightbox(1);};
+    box.onclick=function(e){ if(e.target===box) closeLightbox(); };
+    /* свайп пальцем */
+    var x0=null;
+    box.addEventListener('touchstart',function(e){ x0=e.touches[0].clientX; },{passive:true});
+    box.addEventListener('touchend',function(e){
+      if(x0==null) return;
+      var dx=e.changedTouches[0].clientX-x0; x0=null;
+      if(Math.abs(dx)>44) stepLightbox(dx<0?1:-1);
+    },{passive:true});
+  }
+  paintLightbox();
+  box.classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function paintLightbox(){
+  var im=document.getElementById('lbImg'), c=document.getElementById('lbCount');
+  if(im) im.src=LB.list[LB.i];
+  if(c) c.textContent=(LB.i+1)+' / '+LB.list.length;
+  var box=document.getElementById('lightbox');
+  if(box) box.classList.toggle('single', LB.list.length<2);
+}
+function stepLightbox(d){
+  if(!LB.list.length) return;
+  LB.i=(LB.i+d+LB.list.length)%LB.list.length;
+  paintLightbox();
+}
+function closeLightbox(){
+  var box=document.getElementById('lightbox');
+  if(box) box.classList.remove('open');
+  document.body.style.overflow=document.getElementById('propModal').classList.contains('open')?'hidden':'';
+}
+addEventListener('keydown',function(e){
+  var box=document.getElementById('lightbox');
+  if(!box||!box.classList.contains('open')) return;
+  if(e.key==='Escape') closeLightbox();
+  if(e.key==='ArrowLeft') stepLightbox(-1);
+  if(e.key==='ArrowRight') stepLightbox(1);
+});
+function swapPhoto(btn,url,idx){
+  var wrap=btn.closest('.pm-media')||btn.closest('.prop');
+  var box=wrap?wrap.querySelector('.pm-img, .pic'):null;
+  /* повторный клик по уже выбранной миниатюре — открываем крупно */
+  if(btn.classList.contains('on') && currentPid && idx!=null){ openLightbox(currentPid, idx); return; }
+  if(box){
+    var img=box.querySelector('img.pm-photo, img.pic-photo');
+    if(img) img.src=decodeURIComponent(url);
+  }
   var strip=btn.parentNode;
   Array.prototype.forEach.call(strip.children,function(b){ b.classList.toggle('on', b===btn); });
 }
@@ -2045,6 +2131,29 @@ function scrollCar(id,dir){
   var card=null;el.querySelectorAll('.prop').forEach(function(c){if(!card&&c.style.display!=='none')card=c;});
   var step=(card&&card.offsetWidth?card.offsetWidth:340)+20; /* шаг = ширина карточки + gap */
   el.scrollBy({left:dir*step,behavior:'smooth'});
+}
+/* Полоса прокрутки под лентой: без неё не видно, что объекты листаются вбок,
+   и человек уходит, решив, что их всего три. Эльнур 05.09. */
+function initCarHint(){
+  ['saleCar','rentCar'].forEach(function(id){
+    var car=document.getElementById(id); if(!car) return;
+    var wrap=car.closest('.carwrap')||car.parentNode;
+    if(!wrap || wrap.querySelector('.carbar')) return;
+    var bar=document.createElement('div'); bar.className='carbar';
+    bar.innerHTML='<i></i>'; wrap.appendChild(bar);
+    var fill=bar.querySelector('i');
+    function paint(){
+      var vis=car.clientWidth, all=car.scrollWidth;
+      if(all<=vis+8){ bar.style.display='none'; return; }
+      bar.style.display='';
+      var w=Math.max(14, vis/all*100);
+      fill.style.width=w+'%';
+      fill.style.left=(car.scrollLeft/(all-vis)*(100-w))+'%';
+    }
+    car.addEventListener('scroll',function(){ requestAnimationFrame(paint); },{passive:true});
+    addEventListener('resize',paint);
+    setTimeout(paint,300); setTimeout(paint,1200);
+  });
 }
 function initCarDrag(){
   document.querySelectorAll('.car').forEach(function(car){
@@ -2418,13 +2527,14 @@ var currentPid=null;
 function openProp(pid){
   var p=PL.byId[pid];if(!p||p.soon)return;currentPid=pid;
   try{ viewedPush(p); }catch(e){}
-  /* Главное фото крупным, под ним ряд миниатюр — как на нормальных витринах.
-     Раньше миниатюры лежали поверх снимка и закрывали его нижнюю часть. */
-  var th=document.getElementById('pmThumbs');
-  if(th){ th.innerHTML=photoStrip(p); th.style.display=th.innerHTML?'':'none'; }
   var img=document.getElementById('pmImg');
   img.className='pm-img '+(p.grad||'g1');
   img.innerHTML=picPhoto(p,true).replace('pic-photo','pm-photo')+'<span>'+t('ph.object')+'</span><div class="pm-badges"><span class="pm-tag">'+loc(p.loc)+'</span><span class="pm-roi">'+(p.funnel==='sale'?(p.roi!=null?('ROI '+roiRange(p)):t('u.calc')):t('book.title'))+'</span></div>';
+  /* Главное фото крупным, под ним ряд миниатюр; клик по снимку открывает крупно. */
+  img.style.cursor='zoom-in';
+  img.onclick=function(e){ if(e.target.closest('.pm-badges')) return; openLightbox(pid, 0); };
+  var th=document.getElementById('pmThumbs');
+  if(th){ th.innerHTML=photoStrip(p); th.style.display=th.innerHTML?'':'none'; }
   document.getElementById('pmTitle').textContent=p.title;
   document.getElementById('pmDesc').textContent=loc(p.desc);
   var _pid=document.getElementById('pmPid');
@@ -3799,14 +3909,14 @@ window.checkAvailability=checkAvailability;window.resetAvailability=resetAvailab
 window.scrollCar=scrollCar;window.toggleFilter=toggleFilter;window.onSaleSearch=onSaleSearch;window.setSaleSort=setSaleSort;window.toggleFavOnly=toggleFavOnly;
 window.setCur=setCur;   /* кнопка валюты вызывается из разметки — без экспорта не работала */
 window.toggleFav=toggleFav;window.toggleCmp=toggleCmp;window.openCompare=openCompare;window.closeCompare=closeCompare;window.cmpLead=cmpLead;window.favLead=favLead;
-window.openProp=openProp;window.waFromModal=waFromModal;window.swapPhoto=swapPhoto;window.pickUnit=pickUnit;window.closeProp=closeProp;window.leadFromModal=leadFromModal;window.askVerdict=askVerdict;window.shareProp=shareProp;
+window.openProp=openProp;window.waFromModal=waFromModal;window.swapPhoto=swapPhoto;window.pickUnit=pickUnit;window.openLightbox=openLightbox;window.closeLightbox=closeLightbox;window.closeProp=closeProp;window.leadFromModal=leadFromModal;window.askVerdict=askVerdict;window.shareProp=shareProp;
 window.openDistrict=openDistrict;window.closeDistrict=closeDistrict;
 
 /* ===== INIT ===== */
 applyI18n();
 renderSale();renderRent();renderMap();renderDList();renderMapReal();
 initRentDates();
-initCarDrag();observeReveals();updateTray();initFab();try{syncEntryPrice();}catch(e){}
+initCarDrag();initCarHint();observeReveals();updateTray();initFab();try{syncEntryPrice();}catch(e){}
 openFromHash(); /* шеринг-ссылка #object=<id> → открыть карточку объекта */
 addEventListener('hashchange',function(){if(isObjectHash())openFromHash();});
 
