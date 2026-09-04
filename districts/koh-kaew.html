@@ -351,11 +351,19 @@ html,body{overflow-x:clip;max-width:100%}
 @media(max-width:700px){.fpan{left:auto;right:0;min-width:min(78vw,260px)}}
 /* На телефоне тринадцать чипов вставали в пять строк и отодвигали объекты
    за пределы экрана. Делаем одну прокручиваемую строку. */
+/* На телефоне фильтры были одной прокручиваемой строкой: «Спальни» и «Стадия»
+   уезжали за край, и человек про них просто не знал. Теперь переносим на строки —
+   видны все сразу. Кнопки чуть компактнее, чтобы влезали по две-три в ряд. */
 @media(max-width:700px){
-  .filterbar{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;
-    margin-left:-14px;margin-right:-14px;padding:2px 14px 6px;scroll-snap-type:x proximity}
-  .filterbar::-webkit-scrollbar{display:none}
-  .filterbar .chipf{flex:0 0 auto;scroll-snap-align:start}
+  .filterbar{flex-wrap:wrap;overflow:visible;gap:8px;margin:14px 0 0;padding:0}
+  .filterbar .chipf{flex:0 0 auto}
+  .fbar-menus{gap:8px}
+  .fbtn{padding:9px 13px;font-size:.82rem;gap:5px}
+  .fbtn .fb-v{max-width:9ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .filterbar{position:relative}
+  .fmenu{position:static}
+  /* список раскрывается на всю ширину экрана, а не убегает за правый край */
+  .fpan{left:0;right:0;width:auto;max-width:none;max-height:52vh;overflow:auto}
 }
 .datefilter{margin-top:20px;background:var(--card,rgba(255,255,255,.06));border:1px solid rgba(10,10,10,.08);border-radius:16px;padding:16px 18px}
 .df-fields{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
