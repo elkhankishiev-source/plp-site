@@ -455,7 +455,13 @@ input.bad{border-color:#d98a84!important;background:#fff6f5}
 .pdfband h2{font-size:clamp(1.5rem,3.4vw,2.3rem)}
 .pdfband p{font-size:1rem;color:#4E3A35;margin:10px 0 18px;max-width:420px}
 .pdfband .imgs{position:relative;height:165px}
-.pdfband .imgs .pg{position:absolute;border-radius:14px;box-shadow:var(--shadow-lg);width:60%;aspect-ratio:16/11;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:rgba(10,10,10,.5)}
+.pdfband .imgs .pg{position:absolute;border-radius:14px;box-shadow:var(--shadow-lg);width:60%;aspect-ratio:16/11;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;overflow:hidden;font-size:.75rem;font-weight:700;color:#4E3A35}
+.pdfband .pg-cover b{font-size:.86rem;letter-spacing:.01em}
+.pdfband .pg-cover span{font-size:.7rem;font-weight:500;color:rgba(78,58,53,.62)}
+.pdfband .pg-cover img{margin-bottom:2px;border-radius:6px}
+.pdfband .pg-shot{padding:0;justify-content:flex-end}
+.pdfband .pg-shot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.pdfband .pg-shot .pgcap{position:relative;z-index:1;width:100%;padding:5px 0 6px;text-align:center;font-size:.7rem;font-weight:600;color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.55) 40%)}
 .pdfband .imgs .pg:nth-child(1){left:0;top:20px;transform:rotate(-5deg);background:linear-gradient(135deg,#fff,var(--green-soft))}
 .pdfband .imgs .pg:nth-child(2){right:0;top:0;width:54%;transform:rotate(5deg);background:linear-gradient(135deg,var(--green-soft),var(--taupe))}
 
@@ -1137,7 +1143,7 @@ ru: {
   "sort.default":"По порядку","sort.roi":"Сначала высокая доходность","sort.cheap":"Сначала доступные","sort.rich":"Сначала дорогие",
   "noresult":"Под выбранные фильтры ничего не нашлось — сбросьте часть условий.",
   "pdf.lab":"PDF · 23 страницы","pdf.h2":"Скачать полный каталог эксклюзивных предложений",
-  "pdf.p":"Все лучшие предложения в одном PDF: цены, метражи, фото, планировки и бонусы.","pdf.cta":"Получить каталог","pdf.pg":"каталог PDF","pdf.pg2":"23 стр.",
+  "pdf.p":"Все лучшие предложения в одном PDF: цены, метражи, фото, планировки и бонусы.","pdf.cta":"Получить каталог","pdf.cover":"Каталог объектов","pdf.cover2":"Пхукет · 2026","pdf.pg2":"23 страницы",
   "rent.lab":"Аренда · 24/7","rent.h2":"Объекты, где хочется жить",
   "rent.sub":"Виллы и апартаменты на Пхукете для жизни и комфортного отдыха — аренда от месяца. Цены и условия — по запросу: оставьте заявку, подберём вариант и ответим лично. От первого касания до заселения — отдыхайте с самого начала.",
   "rent.b1t":"Запрос на аренду — 24/7","rent.b1p":"Заполните заявку — менеджер подберёт жильё под ваши даты и бюджет и ответит по условиям. Аренда только долгосрочная, от 30 дней.",
@@ -1324,7 +1330,7 @@ en: {
   "sort.default":"Default order","sort.roi":"Highest yield first","sort.cheap":"Lowest price first","sort.rich":"Highest price first",
   "noresult":"Nothing matches these filters — try removing some.",
   "pdf.lab":"PDF · 23 pages","pdf.h2":"Download the full catalogue of exclusive offers",
-  "pdf.p":"All the best offers in one PDF: prices, floor areas, photos, layouts and bonuses.","pdf.cta":"Get the catalogue","pdf.pg":"PDF catalogue","pdf.pg2":"23 pages",
+  "pdf.p":"All the best offers in one PDF: prices, floor areas, photos, layouts and bonuses.","pdf.cta":"Get the catalogue","pdf.cover":"Property catalogue","pdf.cover2":"Phuket · 2026","pdf.pg2":"23 pages",
   "rent.lab":"Rent · 24/7","rent.h2":"Homes you want to live in",
   "rent.sub":"Villas and apartments in Phuket for living and long stays — monthly rentals and longer. Prices and terms on request: leave an enquiry, we will match a home and reply personally. From first touch to move-in — relax from day one.",
   "rent.b1t":"Rental enquiry — 24/7","rent.b1p":"Fill in the form — a manager will match a home to your dates and budget and reply with terms. Long-term rentals only, from 30 days.",
