@@ -1,0 +1,63 @@
+# Проверка перед выкаткой. Сайт публикуется прямым push в main, промежуточной
+# сборки нет — значит сломанный скрипт уезжает к клиентам сразу. Раньше это
+# ловилось только тем, что вручную запускали node --check; забыл один раз —
+# и на сайте мёртвый каталог. Теперь ловит GitHub.
+name: Проверка сайта
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Синтаксис встроенных скриптов
+        run: |
+          set -e
+          python3 - <<'PY'
+          import re, io, os, sys
+          pages = ['index.html','buy.html','rent.html','management.html','add-property.html','owner.html','admin.html']
+          pages += ['districts/'+f for f in sorted(os.listdir('districts'))] if os.path.isdir('districts') else []
+          pages += ['object/'+f for f in sorted(os.listdir('object'))] if os.path.isdir('object') else []
+          os.makedirs('.check', exist_ok=True)
+          n = 0
+          for p in pages:
+              if not os.path.exists(p): continue
+              s = io.open(p, encoding='utf-8').read()
+              js = ''.join(m.group(1) for m in re.finditer(
+                  r'<script(?![^>]*(?:src=|ld\+json))[^>]*>(.*?)</script>', s, re.S))
+              if not js.strip(): continue
+              out = '.check/' + p.replace('/', '__') + '.js'
+              io.open(out, 'w', encoding='utf-8').write(js)
+              n += 1
+          print('страниц со скриптами:', n)
+          PY
+          for f in .check/*.js; do node --check "$f" || { echo "❌ сломан: $f"; exit 1; }; done
+          echo "✅ скрипты всех страниц целы"
+
+      - name: Сборочные скрипты
+        run: for f in build/*.mjs; do node --check "$f" || exit 1; done
+
+      - name: Структурная целостность
+        run: |
+          set -e
+          fail=0
+          grep -q 'href="object/' index.html || { echo "❌ на главной нет ссылок на объекты"; fail=1; }
+          grep -q 'og:image:width' index.html || { echo "❌ нет размеров og:image — мессенджеры не покажут превью"; fail=1; }
+          grep -q 'property-library.com/sitemap.xml' robots.txt || { echo "❌ в robots.txt чужая карта сайта"; fail=1; }
+          grep -q '<loc>' sitemap.xml || { echo "❌ карта сайта пуста"; fail=1; }
+          test -f 404.html || { echo "❌ нет страницы 404"; fail=1; }
+          if grep -rlE 'service_role|SUPABASE_SERVICE_KEY[[:space:]]*=[[:space:]]*ey' --include='*.html' . | grep -q .; then
+            echo "❌ в HTML попал сервисный ключ"; fail=1
+          fi
+          [ "$fail" = "0" ] && echo "✅ структура в порядке"
+          exit $fail
