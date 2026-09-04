@@ -182,9 +182,9 @@ function fallbackCalc(o) {
     priceTHB, handoverTHB: priceTHB, areaM2: o.area_min || 0, mgmtPct: 20,
     maintM2Month: o.maintenance_fee_thb_sqm || 80, capexM2: 800, metersTHB: 15000,
     // Рост цены ПОСЛЕ сдачи. До сдачи он уже заложен в handoverTHB.
-    // Эльнур 04.09: на стройке проект даёт ~30–35% за 2–3 года, после сдачи 1–3% в год.
-    // Потолок 3 — страховка: если в базу опять попадёт рост за всю стройку, он сюда не пролезет.
-    capGrowthPct: Math.min(Number(o.capital_growth_pct) || 2, 3), buildYears,
+    // Эльнур 04.09: на стройке проект даёт ~30–35% за 2–3 года, после сдачи 1–5% в год.
+    // Потолок 5 — страховка: если в базу опять попадёт рост за всю стройку, он сюда не пролезет.
+    capGrowthPct: Math.min(Number(o.capital_growth_pct) || 3, 5), buildYears,
     downPct,
     // План застройщика — дословно из базы. Не разбираем на строки: формулировки у всех
     // разные, любой разбор — выдумка. Таблица рядом остаётся прикидкой.
@@ -227,7 +227,8 @@ function withFacts(calc, o) {
   // Сдан по-настоящему — только stage='Ready' (канон №38). Если стройка идёт,
   // а дата сдачи в базе уже прошла — это устаревшая дата, а не сданный объект.
   c.ready = o.stage === 'Ready';
-  c.capGrowthPct = Math.min(Number(o.capital_growth_pct) || c.capGrowthPct || 2, 3);
+  // Потолок 5 — канон Эльнура 04.09: после сдачи 1–5% в год.
+  c.capGrowthPct = Math.min(Number(o.capital_growth_pct) || c.capGrowthPct || 3, 5);
   return c;
 }
 
