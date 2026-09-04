@@ -32,6 +32,28 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const INDEX = path.join(ROOT, 'index.html');
 const OBJDIR = path.join(ROOT, 'object');
+
+/* Размеры JPEG без внешних зависимостей: идём по маркерам до SOF.
+   Нужны для og:image:width/height — без них WhatsApp не рисует превью. */
+function jpegSize(file) {
+  try {
+    const b = fs.readFileSync(file);
+    if (b.length < 4 || b[0] !== 0xFF || b[1] !== 0xD8) return null;
+    let i = 2;
+    while (i + 9 < b.length) {
+      if (b[i] !== 0xFF) { i++; continue; }
+      const m = b[i + 1];
+      if (m === 0xD8 || m === 0x01 || (m >= 0xD0 && m <= 0xD7)) { i += 2; continue; }
+      if (m === 0xDA) break;                       // начались данные — SOF уже прошли
+      const len = b.readUInt16BE(i + 2);
+      if (m >= 0xC0 && m <= 0xCF && m !== 0xC4 && m !== 0xC8 && m !== 0xCC) {
+        return { h: b.readUInt16BE(i + 5), w: b.readUInt16BE(i + 7) };
+      }
+      i += 2 + len;
+    }
+  } catch (e) { /* нет файла — просто не выводим размеры */ }
+  return null;
+}
 const SITEMAP = path.join(ROOT, 'sitemap.xml');
 
 const SITE_BASE = 'https://property-library.com';
@@ -419,6 +441,9 @@ function objectPage(o, benchmarks) {
   const slug = slugOf(pid);
   const url = SITE_BASE + '/object/' + slug + '.html';
   const img = SITE_BASE + '/img/' + pid + '.jpg';
+  // Реальные размеры картинки: WhatsApp без og:image:width/height часто вообще
+  // не рисует превью, а соврать нельзя — высота у карточек разная (674…1167).
+  const imgDim = jpegSize(path.join(ROOT, 'img', pid + '.jpg'));
   const en = o.district || o.beach || '';
   const ru = DISTRICT_RU[en] || en;
   const t = typeLabel(o.type);
@@ -498,6 +523,10 @@ function objectPage(o, benchmarks) {
 <meta property="og:description" content="${htmlEsc(metaDesc)}">
 <meta property="og:url" content="${htmlEsc(url)}">
 <meta property="og:image" content="${htmlEsc(img)}">
+<meta property="og:image:secure_url" content="${htmlEsc(img)}">
+<meta property="og:image:type" content="image/jpeg">${imgDim ? `
+<meta property="og:image:width" content="${imgDim.w}">
+<meta property="og:image:height" content="${imgDim.h}">` : ''}
 <meta property="og:image:alt" content="${htmlEsc(o.name)}">
 <meta property="og:locale" content="ru_RU">
 <meta name="twitter:card" content="summary_large_image">
