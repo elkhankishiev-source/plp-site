@@ -910,6 +910,9 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
   .card.fold:not(.open) .foldh{padding-bottom:2px}
   .card.fold .foldb{padding-bottom:18px}
   .card.fold:hover .foldi{border-color:var(--green-deep)}
+.ofb{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:6px}
+.ofb label{display:inline-flex;align-items:center;gap:6px;font-weight:500;font-size:13px}
+.ofb input{margin:0}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 </head>
@@ -3666,15 +3669,33 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       '<label>Ссылка живёт<select id="o-days">'+
         '<option value="3">3 дня</option><option value="7" selected>7 дней</option>'+
         '<option value="14">14 дней</option><option value="30">30 дней</option></select></label>'+
+      '<label class="wide">Что показать в оффере'+
+        '<span class="ofb">'+
+          '<label><input type="checkbox" class="ob" value="about" checked> описание</label>'+
+          '<label><input type="checkbox" class="ob" value="specs" checked> характеристики</label>'+
+          '<label><input type="checkbox" class="ob" value="payment" checked> график оплаты</label>'+
+          '<label><input type="checkbox" class="ob" value="gallery" checked> фото</label>'+
+          '<label><input type="checkbox" class="ob" value="yield"> доходность</label>'+
+          '<label><input type="checkbox" class="ob" value="map"> карта</label>'+
+        '</span></label>'+
+      '<label class="wide">Своя цена, ฿ <span class="sub">(пусто — прайс застройщика)</span>'+
+        '<input id="o-price" type="text" placeholder="Например, 5 900 000"></label>'+
+      '<label class="wide">Свои условия оплаты <span class="sub">(пусто — как у застройщика)</span>'+
+        '<input id="o-terms" type="text" placeholder="Бронь 100к, далее 25% × 4, рассрочка 0%"></label>'+
       '<label class="wide">Записка клиенту<input id="o-note" type="text" placeholder="Необязательно"></label>'+
-      '</div><p class="sub">ID объекта виден в его карточке на сайте, внизу.</p>'+
+      '</div><p class="sub">ID объекта виден в его карточке на сайте, внизу. Ссылка личная, на странице стоит наш знак.</p>'+
       '<div class="fbtns"><button type="button" class="btn" id="f-save">Собрать ссылку</button>'+
       '<button type="button" class="btn ghost" id="f-cancel">Отмена</button></div>',
       function(){
         var pid=(fv('o-obj')||'').trim().toUpperCase();
         if(!pid){ alert('Укажите ID объекта'); return; }
+        var blocks=[];
+        Array.prototype.forEach.call(document.querySelectorAll('.ob:checked'),function(c){ blocks.push(c.value); });
         post({action:'client_offer',token:TOKEN,code:code,property_id:pid,
-              days:Number(fv('o-days'))||7,note:fv('o-note')})
+              days:Number(fv('o-days'))||7,note:fv('o-note'),
+              blocks:blocks,
+              price:(fv('o-price')||'').replace(/[^0-9]/g,''),
+              terms:fv('o-terms')})
           .then(function(r){
             if(!r||!r.ok||!r.offer){ alert((r&&r.error)||'Не получилось собрать оффер'); return; }
             var f=document.getElementById('cl-form');
