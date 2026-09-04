@@ -380,6 +380,24 @@ html,body{overflow-x:clip;max-width:100%}
 .prop.booked{opacity:.5;filter:grayscale(.5);pointer-events:none;position:relative}
 .prop.booked .pic::after{content:attr(data-busy);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(10,10,10,.55);color:#fff;font-weight:700;font-size:.9rem;text-align:center;padding:12px;border-radius:inherit}
 .chipf{background:rgba(255,255,255,.85);border:1px solid rgba(10,10,10,.07);border-radius:999px;padding:9px 15px;font-size:.84rem;font-weight:600;cursor:pointer;transition:border-color .2s,background .2s,transform .15s;user-select:none}
+/* Бегунок цены: две ручки на одной дорожке, между ними закрашенный отрезок. */
+.prng{width:100%;padding:2px 4px 10px;margin-bottom:6px;border-bottom:1px solid rgba(10,10,10,.07)}
+.prng-val{display:flex;align-items:center;gap:10px;font-size:.82rem;font-weight:700;margin-bottom:10px}
+.prng-clr{margin-left:auto;background:none;border:0;padding:0;font:inherit;font-size:.74rem;font-weight:600;
+  color:var(--muted);cursor:pointer;text-decoration:underline}
+.prng-track{position:relative;height:26px}
+.prng-track::before{content:'';position:absolute;left:0;right:0;top:11px;height:4px;border-radius:2px;background:rgba(10,10,10,.12)}
+.prng-fill{position:absolute;top:11px;height:4px;border-radius:2px;background:var(--green-deep,#5F6242)}
+.prng-track input[type=range]{position:absolute;left:0;top:0;width:100%;height:26px;margin:0;
+  background:none;-webkit-appearance:none;appearance:none;pointer-events:none}
+.prng-track input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;pointer-events:auto;
+  width:18px;height:18px;border-radius:50%;background:#fff;border:2px solid var(--green-deep,#5F6242);
+  box-shadow:0 2px 6px rgba(20,18,14,.22);cursor:grab}
+.prng-track input[type=range]::-moz-range-thumb{pointer-events:auto;width:18px;height:18px;border-radius:50%;
+  background:#fff;border:2px solid var(--green-deep,#5F6242);box-shadow:0 2px 6px rgba(20,18,14,.22);cursor:grab}
+.prng-ends{display:flex;justify-content:space-between;font-size:.7rem;color:var(--muted);margin-top:2px}
+.fmenu[data-facet="budget"] .fpan{min-width:290px}
+@media(max-width:700px){.fmenu[data-facet="budget"] .fpan{min-width:0}}
 .pstrip{position:absolute;left:10px;right:10px;bottom:10px;z-index:3;display:flex;gap:6px;
   overflow-x:auto;scrollbar-width:none;padding:2px}
 .pstrip::-webkit-scrollbar{display:none}
@@ -1279,7 +1297,7 @@ ru: {
   "lf.err.empty":"Оставьте номер телефона или ник в Telegram — иначе мы не сможем ответить.","lf.err.short":"Похоже, в номере не хватает цифр. Проверьте, пожалуйста.","lf.err.bad":"Не похоже на номер, @ник или почту. Напишите так, как вам удобно ответить.",
   "cs.5n":"Квартира для пары на пенсии","cs.5w":"Рассрочка 3 года и мебель в подарок","cs.5t":"плюс мебель ฿700 тыс","cs.5buy":"฿9,8 млн","cs.5now":"฿14,8 млн","cs.5r":"9% год","cs.6n":"Квартира, которая платит за себя","cs.6w":"Кредит застройщика 5% на 5 лет","cs.6t":"аренда кроет половину платежа","cs.6buy":"฿14 млн","cs.6now":"฿15,4 млн","cs.6r":"฿70 тыс/мес",
   "u.wa":"Написать в WhatsApp","wa.hi":"Здравствуйте! Интересует объект:","wa.hi2":"Здравствуйте! Хочу подобрать объект на Пхукете.","wa.price":"Цена на сайте:","wa.dates":"Даты:","wa.link":"Ссылка:","wa.seen":"Смотрел на сайте:",
-  "nav.pick":"Подобрать объект",
+  "nav.pick":"Подобрать объект","f.any":"Любая цена","f.reset":"сбросить",
   "assist.lab":"Консультант","assist.h2":"Не уверены, что подходит именно вам?","assist.p":"Спросите Дарью прямо здесь, в чате на сайте. Она знает базу, считает доходность и сравнивает районы — отвечает сразу, в любое время. Что-то сложное передаст менеджеру.","assist.cta":"Задать вопрос в чате","assist.wa":"Подобрать за 10 минут","assist.q1s":"Что купить на 5 млн ฿?","assist.q1":"Что можно купить на 5 млн ฿?","assist.q2s":"Где выше доходность?","assist.q2":"В каком районе выше доходность аренды?","assist.q3s":"Чем Банг Тао лучше Раваи?","assist.q3":"Чем Банг Тао лучше Раваи для инвестиций?","assist.q4s":"Сколько выйдет с налогами?","assist.q4":"Какие расходы при покупке кроме цены объекта?",
   "u.from":"от","u.onreq":"цена по запросу","u.calc":"Рассчитать доходность","u.cmp":"Сравнить","u.cmpOn":"В сравнении",
   "u.roinote":"Ориентировочно; потенциал зависит от объекта, стратегии и управления — рассчитаем индивидуально",
@@ -1464,7 +1482,7 @@ en: {
   "lf.err.empty":"Leave a phone number or a Telegram handle — otherwise we cannot reply.","lf.err.short":"That number looks too short. Please check it.","lf.err.bad":"That is not a phone number, an @handle or an email. Write the way you would like us to reply.",
   "cs.5n":"A flat for a retired couple","cs.5w":"Three-year instalments and furniture included","cs.5t":"plus ฿700k of furniture","cs.5buy":"฿9.8M","cs.5now":"฿14.8M","cs.5r":"9%/yr","cs.6n":"A flat that pays for itself","cs.6w":"Developer credit at 5% over five years","cs.6t":"rent covers half the payment","cs.6buy":"฿14M","cs.6now":"฿15.4M","cs.6r":"฿70k/mo",
   "u.wa":"Message on WhatsApp","wa.hi":"Hello! I am interested in:","wa.hi2":"Hello! I would like help choosing a property in Phuket.","wa.price":"Price on the site:","wa.dates":"Dates:","wa.link":"Link:","wa.seen":"Viewed on the site:",
-  "nav.pick":"Find me a property",
+  "nav.pick":"Find me a property","f.any":"Any price","f.reset":"reset",
   "assist.lab":"Assistant","assist.h2":"Not sure what suits you?","assist.p":"Ask Daria right here, in the chat on this page. She knows the catalogue, works out the yield and compares districts — answers straight away, any time. Anything complex goes to a manager.","assist.cta":"Ask in the chat","assist.wa":"Find me a match in 10 minutes","assist.q1s":"What can I get for ฿5M?","assist.q1":"What can I buy for ฿5 million?","assist.q2s":"Where is the yield higher?","assist.q2":"Which district has the higher rental yield?","assist.q3s":"Bang Tao or Rawai?","assist.q3":"Why is Bang Tao better than Rawai for investment?","assist.q4s":"What about taxes?","assist.q4":"What costs come on top of the price?",
   "u.from":"from","u.onreq":"price on request","u.calc":"Calculate the yield","u.cmp":"Compare","u.cmpOn":"Comparing",
   "u.roinote":"Indicative; potential depends on the unit, strategy and management — we calculate it individually",
@@ -1852,7 +1870,7 @@ function priceAge(p){
 function renderSale(){
   var car=document.getElementById('saleCar');if(!car)return;
   car.innerHTML=PL.PROPERTIES.map(function(p){
-    return '<div class="prop" data-pid="'+p.property_id+'" data-loc="'+p.loc.ru+'" data-budget="'+budgetOf(p)+'" data-type="'+p.type.ru+'" data-stage="'+(p.stage_key||'')+'" data-bmin="'+(p.bmin!=null?p.bmin:'')+'" data-bmax="'+(p.bmax!=null?p.bmax:'')+'" onclick="openProp(\''+p.property_id+'\')">'+
+    return '<div class="prop" data-pid="'+p.property_id+'" data-loc="'+p.loc.ru+'" data-budget="'+budgetOf(p)+'" data-thb="'+thbOf(p)+'" data-type="'+p.type.ru+'" data-stage="'+(p.stage_key||'')+'" data-bmin="'+(p.bmin!=null?p.bmin:'')+'" data-bmax="'+(p.bmax!=null?p.bmax:'')+'" onclick="openProp(\''+p.property_id+'\')">'+
       '<div class="pic '+p.grad+'">'+picPhoto(p)+'<span>'+t('ph.object')+'</span><span class="tag">'+loc(p.loc)+'</span>'+(p.roi!=null?'<span class="roi">ROI '+roiRange(p)+'</span>':'')+
       '<button type="button" class="fav" onclick="event.stopPropagation();toggleFav(\''+p.property_id+'\')" aria-label="В избранное">♡</button>'+
       '<button type="button" class="cmpb" onclick="event.stopPropagation();toggleCmp(\''+p.property_id+'\')">'+t('u.cmp')+'</button></div>'+
@@ -2925,6 +2943,7 @@ function buildFilterMenus(barId){
     wrap.appendChild(btn); wrap.appendChild(pan); bar.appendChild(wrap);
     btn.onclick=function(e){ e.stopPropagation(); wrap.classList.toggle('open'); closeOthers(wrap); };
   });
+  try{ buildPriceSlider(bar); }catch(e){}
   var reset=document.createElement('button');
   reset.type='button'; reset.className='fbtn fbtn-reset'; reset.textContent='Сбросить';
   reset.onclick=function(){ resetAllFilters(barId); };
@@ -2938,6 +2957,60 @@ var closeWired=false;
 function wireCloseOnOutside(){
   if(closeWired) return; closeWired=true;
   document.addEventListener('click', function(){ closeOthers(null); });
+}
+/* Бегунок цены. Эльнур 05.09: ступени оставляем — по ним удобно попасть сразу,
+   а кто хочет точнее, тот докручивает ручками. Ступень и бегунок связаны:
+   нажал ступень — ручки встали, подвинул ручки — ступень погасла. */
+var priceRange=null; /* {from,to} в батах, null = без ограничения */
+function buildPriceSlider(bar){
+  var wrap=bar.querySelector('.fmenu[data-facet="budget"] .fpan');
+  if(!wrap || wrap.querySelector('.prng')) return;
+  var vals=(PL.PROPERTIES||[]).map(thbOf).filter(function(v){return v>0;});
+  if(!vals.length) return;
+  var lo=Math.floor(Math.min.apply(null,vals)/1e6), hi=Math.ceil(Math.max.apply(null,vals)/1e6);
+  if(hi<=lo) hi=lo+1;
+  var box=document.createElement('div');
+  box.className='prng';
+  box.innerHTML=
+    '<div class="prng-val"><span id="prngOut">'+t('f.any')+'</span>'+
+      '<button type="button" class="prng-clr" id="prngClr">'+t('f.reset')+'</button></div>'+
+    '<div class="prng-track"><div class="prng-fill" id="prngFill"></div>'+
+      '<input type="range" id="prngA" min="'+lo+'" max="'+hi+'" step="1" value="'+lo+'">'+
+      '<input type="range" id="prngB" min="'+lo+'" max="'+hi+'" step="1" value="'+hi+'"></div>'+
+    '<div class="prng-ends"><span>'+fmtBaht(lo*1e6)+'</span><span>'+fmtBaht(hi*1e6)+'</span></div>';
+  wrap.insertBefore(box, wrap.firstChild);
+
+  var a=box.querySelector('#prngA'), b=box.querySelector('#prngB');
+  var out=box.querySelector('#prngOut'), fill=box.querySelector('#prngFill');
+  function paint(){
+    var x=Math.min(+a.value,+b.value), y=Math.max(+a.value,+b.value);
+    fill.style.left=((x-lo)/(hi-lo)*100)+'%';
+    fill.style.right=(100-(y-lo)/(hi-lo)*100)+'%';
+    var full=(x===lo && y===hi);
+    out.textContent = full ? t('f.any') : (fmtBaht(x*1e6)+' — '+fmtBaht(y*1e6));
+    priceRange = full ? null : {from:x*1e6, to:y*1e6};
+    /* ручной диапазон отменяет выбранную ступень — иначе они спорят */
+    if(!full){ activeFilter.budget=''; 
+      bar.querySelectorAll('[data-facet="budget"].chipf').forEach(function(c){c.classList.remove('on');}); }
+    applyFilters(); if(typeof syncMenuLabels==='function') syncMenuLabels();
+  }
+  a.oninput=b.oninput=paint;
+  box.querySelector('#prngClr').onclick=function(e){
+    e.stopPropagation(); a.value=lo; b.value=hi; paint();
+  };
+  /* нажали ступень — двигаем ручки к её границам */
+  bar.querySelectorAll('.fmenu[data-facet="budget"] .chipf').forEach(function(c){
+    c.addEventListener('click',function(){
+      var B={'':[lo,hi],b1:[lo,5],b2:[5,10],b3:[10,15],b4:[15,20],b5:[20,25],b6:[25,30],b7:[30,hi]};
+      var r=B[c.dataset.val]||[lo,hi];
+      a.value=Math.max(lo,r[0]); b.value=Math.min(hi,r[1]);
+      var x=Math.min(+a.value,+b.value), y=Math.max(+a.value,+b.value);
+      fill.style.left=((x-lo)/(hi-lo)*100)+'%';
+      fill.style.right=(100-(y-lo)/(hi-lo)*100)+'%';
+      out.textContent=(c.dataset.val==='')?t('f.any'):(fmtBaht(x*1e6)+' — '+fmtBaht(y*1e6));
+      priceRange=null; /* ступень фильтрует сама, диапазон не дублируем */
+    },true);
+  });
 }
 function closeOthers(keep){
   document.querySelectorAll('.fmenu.open').forEach(function(w){ if(w!==keep) w.classList.remove('open'); });
@@ -2961,6 +3034,8 @@ function syncMenuLabels(){
   });
 }
 function resetAllFilters(barId){
+  priceRange=null;
+  var _c=document.getElementById('prngClr'); if(_c) _c.click();
   activeFilter.budget=''; activeFilter.loc.clear(); activeFilter.type.clear();
   activeFilter.stage.clear(); activeFilter.beds.clear();
   document.querySelectorAll('#'+barId+' .chipf').forEach(function(c){
@@ -2980,6 +3055,11 @@ function applyFilters(){
   var shown=0,q=(saleQuery||'').trim().toLowerCase();
   document.querySelectorAll('#saleCar .prop').forEach(function(pEl){
     var okB=!activeFilter.budget||pEl.dataset.budget===activeFilter.budget;
+    /* точный диапазон с бегунка — поверх ступеней */
+    if(okB && priceRange){
+      var _p=+pEl.dataset.thb||0;
+      okB = _p>=priceRange.from && _p<=priceRange.to;
+    }
     var okL=activeFilter.loc.size===0||activeFilter.loc.has(pEl.dataset.loc);
     var okT=activeFilter.type.size===0||activeFilter.type.has(pEl.dataset.type);
     var okS=activeFilter.stage.size===0||activeFilter.stage.has(pEl.dataset.stage);
