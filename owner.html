@@ -1195,6 +1195,10 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
       <p class="sub" style="margin:0 0 12px">Что происходит прямо сейчас: люди, сайт, работа, связь.
       Обновляется при каждом заходе.</p>
       <div id="board-body"></div>
+      <h4 style="margin:20px 0 8px">Истина системы</h4>
+      <p class="sub" style="margin:0 0 10px">Правила записаны в системе, и она сама проверяет,
+      что живёт по ним. Не «мы договорились», а «сверено с данными».</p>
+      <div id="canon-body"><button type="button" class="btn ghost" id="canon-go">Сверить</button></div>
     </div>
 
     <div class="card" id="sec-mine" style="display:none">
@@ -3197,6 +3201,41 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   }
   var Q_KIND=null, Q_OBJ=null;
 
+  // сверка канона: правило → проверка по данным → сходится или нет
+  function renderCanon(){
+    var b=document.getElementById('canon-go'); if(!b) return;
+    b.onclick=function(){
+      var box=document.getElementById('canon-body');
+      box.innerHTML='<p class="sub">Сверяем…</p>';
+      post({action:'canon',token:TOKEN}).then(function(d){
+        if(!d||!d.ok){ box.innerHTML='<p class="sub">Не удалось сверить.</p>'; return; }
+        var a=(d.аудит)||{}, rules=(a.правила)||[];
+        var bad=rules.filter(function(r){ return !r.ok; }).length;
+        var h='<p class="sub">Проверено правил: <b>'+(a.проверено||rules.length)+'</b>'+
+              (bad? (' · <span class="over">расходится: '+bad+'</span>')
+                  : ' · <b>всё сходится</b>')+'</p>'+
+              '<table class="ctable inner"><tr><th></th><th>Правило</th><th>Что в системе</th></tr>';
+        rules.sort(function(x,y){ return (x.ok?1:0)-(y.ok?1:0); }).forEach(function(r){
+          h+='<tr><td>'+(r.ok?'✅':'❌')+'</td><td class="mono">'+clEsc(r['канон'])+
+             '</td><td'+(r.ok?'':' class="over"')+'>'+clEsc(r['итог'])+'</td></tr>';
+        });
+        h+='</table>';
+        var sv=(d.свод)||[];
+        if(sv.length){
+          var iron=sv.filter(function(x){return x.severity==='iron';}).length;
+          h+='<p class="sub" style="margin-top:10px">Всего правил в системе: '+sv.length+
+             ', из них железных: '+iron+'. Их читает мозг при каждом ответе клиенту.</p>';
+        }
+        h+='<div class="fbtns"><button type="button" class="btn ghost" id="canon-go2">Сверить заново</button></div>';
+        box.innerHTML=h;
+        document.getElementById('canon-go2').onclick=function(){
+          box.innerHTML='<button type="button" class="btn ghost" id="canon-go">Сверить</button>';
+          renderCanon(); document.getElementById('canon-go').click();
+        };
+      });
+    };
+  }
+
   // рассылка: собрать список, утвердить текст, выбрать номер, отправлять порциями
   var CMP_CH=[], CMP_PICK=[];
   function renderCamp(){
@@ -3822,7 +3861,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     document.querySelector('.wrap').classList.remove('narrow');
     var dn=document.getElementById('demo-note'); if(dn) dn.style.display = DEMO_MODE ? '' : 'none';
     show('app'); $('logout').style.display='';
-    renderPortfolio(); renderTabs(); renderProp(); renderRequests(); renderEditState(); renderModeration(); renderCoords(); renderClients(); renderBoard(); renderCamp(); renderRequestForm(); bindChart(); bindUkForms(); bindStays(); renderObjEdit(); initCabNav();
+    renderPortfolio(); renderTabs(); renderProp(); renderRequests(); renderEditState(); renderModeration(); renderCoords(); renderClients(); renderBoard(); renderCamp(); renderRequestForm(); bindChart(); bindUkForms(); bindStays(); renderObjEdit(); renderCanon(); initCabNav();
   }
 
   /* Ответ идёт около трёх секунд — столько занимает запуск сценария на стороне
