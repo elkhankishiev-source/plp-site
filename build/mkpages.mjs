@@ -211,9 +211,11 @@ function asCatalog(html, carId){
   const openIdx = html.indexOf('<div class="car" id="'+carId+'"></div>');
   if(openIdx < 0) return html;
 
+  // Эльнур 05.09: липкая карта над лентой мешает. Карта живёт в разделе
+  // «Районы» на главной, где ей есть где развернуться; в каталоге — только лента.
   let out = html.replace('<div class="car" id="'+carId+'"></div>',
     '<p class="found" id="found"></p>'+
-    '<div class="catrow"><div><div class="car" id="'+carId+'"></div></div>'+CATALOG_MAP+'</div>');
+    '<div class="catrow"><div><div class="car" id="'+carId+'"></div></div></div>');
   out = out.replace(/<section id="(sale|rent)"/, '<section class="catalog" id="$1"');
   return out;
 }
