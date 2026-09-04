@@ -618,6 +618,7 @@ input.bad{border-color:#d98a84!important;background:#fff6f5}
 .val::before{content:"✓";color:var(--espresso);margin-right:8px;font-weight:800}
 .about-grid{display:grid;gap:28px;align-items:center}
 @media(min-width:900px){.about-grid{grid-template-columns:1fr 1.2fr;gap:60px}}
+.about-photo .person-photo{object-position:50% 5%}
 .about-photo{position:relative;overflow:hidden;aspect-ratio:4/5;border-radius:24px;box-shadow:var(--shadow);background:linear-gradient(160deg,var(--green-soft),var(--green) 55%,var(--green-deep));display:flex;align-items:flex-end;justify-content:center}
 .about-photo .ph-label{margin:0 auto 20px;background:rgba(255,255,255,.8);border-radius:999px;padding:8px 18px;font-size:.85rem;font-weight:600;color:var(--muted)}
 .metrics{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}
@@ -681,6 +682,20 @@ input.bad{border-color:#d98a84!important;background:#fff6f5}
 /* ===== chat widget ===== */
 .fab{position:fixed;right:20px;bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:70;display:flex;align-items:center;gap:8px;background:var(--ink);color:#fff;border-radius:999px;padding:8px 15px 8px 8px;box-shadow:0 12px 32px rgba(20,18,14,.28);font-weight:600;font-size:.8rem;transition:transform .2s,box-shadow .2s}
 .fab:hover{transform:translateY(-2px)}
+/* Виджет можно свернуть до значка: разворачивается кликом по нему же.
+   Выбор запоминается в браузере посетителя, чтобы не сворачивать каждый раз. */
+.fabwrap{position:fixed;right:20px;bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:70}
+.fabwrap .fab{position:static;right:auto;bottom:auto}
+.fabmin{position:absolute;top:-7px;right:-7px;width:21px;height:21px;border-radius:50%;
+  border:1px solid rgba(255,255,255,.22);background:var(--ink);color:#fff;font-size:14px;line-height:1;
+  cursor:pointer;padding:0;opacity:0;transition:opacity .18s;display:flex;align-items:center;justify-content:center}
+.fabwrap:hover .fabmin,.fabmin:focus-visible{opacity:1}
+.fabwrap.min .fabmin{display:none}
+.fabwrap.min .fab{padding:9px;gap:0}
+.fabwrap.min .fabtxt{display:none}
+.fabwrap.min .dot{position:absolute;top:2px;right:2px;margin:0}
+.fabwrap.min .fab{position:relative}
+@media(max-width:600px){.fabmin{opacity:1}}
 .fab .av{width:27px;height:27px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;color:var(--ink);font-weight:800}
 .fab .av img{width:16px;height:16px;object-fit:contain;display:block}
 .chathead .av img{width:20px;height:20px;object-fit:contain;display:block}
@@ -949,7 +964,7 @@ input.bad{border-color:#d98a84!important;background:#fff6f5}
         <button type="button" data-l="en" onclick="setLang('en')">EN</button>
       </div>
       <a class="btn btn-ghost btn-cab" href="owner.html" data-i18n="nav.cabinet">Кабинет</a>
-      <a class="btn btn-green" href="https://wa.me/66955492587" target="_blank" rel="noopener">WhatsApp</a>
+      <button type="button" class="btn btn-green" onclick="openQuiz()" data-i18n="nav.pick">Подобрать объект</button>
       <button type="button" class="burger" aria-label="Меню" onclick="toggleNav(true)"><i></i><i></i><i></i></button>
     </div>
   </div>
@@ -973,7 +988,7 @@ input.bad{border-color:#d98a84!important;background:#fff6f5}
       <button type="button" data-l="en" onclick="setLang('en')">EN</button>
     </div>
     <a href="owner.html" onclick="toggleNav(false)" data-i18n="nav.cabinet">Кабинет владельца</a>
-    <a class="mwa" href="https://wa.me/66955492587" target="_blank" rel="noopener">WhatsApp · +66 95-549-2587</a>
+    <button type="button" class="mwa" onclick="toggleNav(false);openQuiz()" data-i18n="nav.pick">Подобрать объект</button>
   </div>
 </div>
 
@@ -1122,7 +1137,7 @@ input.bad{border-color:#d98a84!important;background:#fff6f5}
 </div><!-- /stage -->
 
 <!-- ===== CHAT WIDGET ===== -->
-<button type="button" class="fab" id="fab" onclick="openChat('hi')"><span class="av"><img src="img/brand/plp-mark-ink.png" alt="" width="20" height="20"></span> <span data-i18n="chat.fab">Дарья · на связи</span> <span class="dot"></span></button>
+<div class="fabwrap" id="fabWrap"><button type="button" class="fab" id="fab" onclick="openChat('hi')"><span class="av"><img src="img/brand/plp-mark-ink.png" alt="" width="20" height="20"></span><span class="fabtxt" data-i18n="chat.fab">Дарья · на связи</span><span class="dot"></span></button><button type="button" class="fabmin" id="fabMin" onclick="event.stopPropagation();toggleFab()" aria-label="Свернуть" title="Свернуть">×</button></div>
 <div class="chatwin" id="chatwin" role="dialog" aria-label="Чат с менеджером">
   <div class="chathead">
     <span class="av"><img src="img/brand/plp-mark-ink.png" alt="" width="20" height="20"></span>
@@ -1232,8 +1247,8 @@ ru: {
   "why.1t":"Высокая доходность","why.1p":"Потенциал доходности 6–12% годовых — в зависимости от объекта и стратегии.",
   "why.2t":"Здоровая экология","why.2p":"Чистый воздух, море и природа без тяжёлой промышленности.",
   "why.3t":"Международное образование","why.3p":"Школы мирового уровня — UWC, BISP, Headstart — рядом с домом.",
-  "why.4t":"Стабильный рост","why.4p":"На стройке проект прибавляет около 30–35% за 2–3 года. После сдачи рост спокойнее — 1–3% в год.",
-  "why.s1k":"за 2–3 года стройки · после сдачи 1–3% в год","why.s2k":"годовых на аренде","why.s3v":"от ฿3.9 млн","why.s3k":"вход в рынок острова","why.s4v":"12 мес","why.s4k":"спрос на аренду круглый год",
+  "why.4t":"Стабильный рост","why.4p":"На стройке проект прибавляет около 30–35% за 2–3 года. После сдачи рост спокойнее — 1–5% в год.",
+  "why.s1k":"за 2–3 года стройки · после сдачи 1–5% в год","why.s2k":"годовых на аренде","why.s3v":"от ฿3.9 млн","why.s3k":"вход в рынок острова","why.s4v":"12 мес","why.s4k":"спрос на аренду круглый год",
   "why.src":"По данным анализа рынка Пхукета, 2026 — динамика зависит от района и проекта; точные цифры покажем на конкретных объектах.",
   "sale.lab":"Продажа","sale.h2":"Проверенные объекты в продаже",
   "sale.sub":"Каждый проект проходит нашу внутреннюю проверку перед публикацией. Нажмите на карточку — внутри детали и калькулятор доходности.",
@@ -1287,11 +1302,11 @@ ru: {
   "do.6t":"Удалённое оформление","do.6p":"Купить или арендовать можно за тысячи километров.",
   "val.lab":"Наши ценности","val.h2":"Почему с нами спокойно",
   "val.1":"Честно и на равных","val.2":"Без давления","val.3":"Простым языком","val.4":"На стороне клиента","val.5":"Сервис до и после сделки","val.6":"Прозрачные цифры",
-  "who.lab":"Основатель и директор","who.h2":"Здравствуйте! Меня зовут Эльнур Ханкишиев",
+  "who.lab":"Основатель","who.h2":"Здравствуйте! Меня зовут Эльнур Ханкишиев",
   "who.p1":"В 2011 году я впервые оказался на Пхукете — и сразу почувствовал, что это место особенное. Несколько раз я возвращался сюда снова и снова, пока однажды не решил остаться.",
   "who.p2":"Более 5 лет я помогаю другим людям сделать этот остров своим домом — так же, как когда-то сделал это сам. Вам не придётся разбираться в рынке, переговорах и документах — мы всё объясним простыми словами и пройдём с вами путь до ключей в руках.",
   "who.m1":"реализованных проектов","who.m2v":"450+ млн ฿","who.m2":"помог инвестировать за год","who.m3":"средняя доходность — прогноз, не гарантия","who.m4v":"5+ лет","who.m4":"в сфере недвижимости",
-  "who.cta":"Задать вопрос в WhatsApp",
+  "who.cta":"Задать вопрос",
   "steps.lab":"Пошаговый процесс","steps.h2":"Сопровождаем на каждом этапе",
   "st.1t":"Знакомство","st.1p":"Уточняем цели и подбираем релевантные варианты.",
   "st.2t":"Просмотр объектов","st.2p":"Организуем трансфер и сопровождаем лично или онлайн.",
@@ -1325,12 +1340,13 @@ ru: {
   "faq.6a":"Для наших клиентов услуги бесплатны. Мы — аккредитованные официальные представители застройщиков и независимые эксперты рынка. Вы получаете эксклюзивные предложения до старта открытых продаж, персональные условия, юридическое сопровождение сделки и управление арендой после покупки.",
   "cta.h2":"Поможем выбрать, купить и переехать",
   "cta.p":"Оставьте заявку — ответим в течение 5 минут в рабочее время и бесплатно проконсультируем, чтобы подобрать лучший вариант для покупки или аренды.",
-  "cta.b1":"Оставить заявку","cta.b2":"Написать в WhatsApp","cta.b3":"Перейти в Telegram-бот",
+  "cta.b1":"Оставить заявку","cta.b2":"Подобрать за 10 минут","cta.b3":"Перейти в Telegram-бот",
   "ft.tag":"Мы уже выбрали Пхукет, поможем и вам. Все под ключ — от первого звонка до заезда.",
   "ft.menu":"Меню","ft.buy":"Покупка","ft.contacts":"Контакты","ft.connect":"Мы на связи","ft.bot":"Консьерж в Telegram 24/7","ft.tg":"Telegram-канал","ft.terms":"Условия использования","ft.rules":"Правила бронирования и проживания","ft.policy":"Политика конфиденциальности",
   "rs.9t":"Консьерж 24/7","rs.9p":"Бот в Telegram отвечает в любое время суток, сложное сразу берёт на себя менеджер","rs.10t":"Управление жильём","rs.10p":"Если сдаёте своё: заселяем гостей, ведём календарь и показываем доход в личном кабинете","val.7":"Заботимся, а не продаём","val.8":"Эксклюзивные условия","val.9":"Консьерж на связи 24/7",
   "lf.err.empty":"Оставьте номер телефона или ник в Telegram — иначе мы не сможем ответить.","lf.err.short":"Похоже, в номере не хватает цифр. Проверьте, пожалуйста.","lf.err.bad":"Не похоже на номер, @ник или почту. Напишите так, как вам удобно ответить.",
-  "assist.lab":"Консультант","assist.h2":"Не уверены, что подходит именно вам?","assist.p":"Спросите Дарью прямо здесь, в чате на сайте. Она знает базу, считает доходность и сравнивает районы — отвечает сразу, в любое время. Что-то сложное передаст менеджеру.","assist.cta":"Задать вопрос в чате","assist.wa":"Удобнее в WhatsApp","assist.q1s":"Что купить на 5 млн ฿?","assist.q1":"Что можно купить на 5 млн ฿?","assist.q2s":"Где выше доходность?","assist.q2":"В каком районе выше доходность аренды?","assist.q3s":"Чем Банг Тао лучше Раваи?","assist.q3":"Чем Банг Тао лучше Раваи для инвестиций?","assist.q4s":"Сколько выйдет с налогами?","assist.q4":"Какие расходы при покупке кроме цены объекта?",
+  "nav.pick":"Подобрать объект",
+  "assist.lab":"Консультант","assist.h2":"Не уверены, что подходит именно вам?","assist.p":"Спросите Дарью прямо здесь, в чате на сайте. Она знает базу, считает доходность и сравнивает районы — отвечает сразу, в любое время. Что-то сложное передаст менеджеру.","assist.cta":"Задать вопрос в чате","assist.wa":"Подобрать за 10 минут","assist.q1s":"Что купить на 5 млн ฿?","assist.q1":"Что можно купить на 5 млн ฿?","assist.q2s":"Где выше доходность?","assist.q2":"В каком районе выше доходность аренды?","assist.q3s":"Чем Банг Тао лучше Раваи?","assist.q3":"Чем Банг Тао лучше Раваи для инвестиций?","assist.q4s":"Сколько выйдет с налогами?","assist.q4":"Какие расходы при покупке кроме цены объекта?",
   "u.from":"от","u.onreq":"цена по запросу","u.calc":"Рассчитать доходность","u.cmp":"Сравнить","u.cmpOn":"В сравнении",
   "u.roinote":"Ориентировочно; потенциал зависит от объекта, стратегии и управления — рассчитаем индивидуально",
   "u.view":"Записаться на показ","u.podborka":"Получить подборку","u.kp":"Получить КП",
@@ -1419,8 +1435,8 @@ en: {
   "why.1t":"High yield","why.1p":"Yield potential of 6–12% a year — depending on the property and strategy.",
   "why.2t":"Healthy environment","why.2p":"Clean air, sea and nature with no heavy industry.",
   "why.3t":"International education","why.3p":"World-class schools — UWC, BISP, Headstart — next door.",
-  "why.4t":"Steady growth","why.4p":"During construction a project adds about 30–35% over 2–3 years. After handover growth settles at 1–3% a year.",
-  "why.s1k":"over 2–3 years of construction · 1–3% a year after handover","why.s2k":"a year on rentals","why.s3v":"from ฿3.9M","why.s3k":"market entry point","why.s4v":"12 mo","why.s4k":"rental demand all year round",
+  "why.4t":"Steady growth","why.4p":"During construction a project adds about 30–35% over 2–3 years. After handover growth settles at 1–5% a year.",
+  "why.s1k":"over 2–3 years of construction · 1–5% a year after handover","why.s2k":"a year on rentals","why.s3v":"from ฿3.9M","why.s3k":"market entry point","why.s4v":"12 mo","why.s4k":"rental demand all year round",
   "why.src":"Based on Phuket market analysis, 2026 — dynamics depend on the area and project; we will show exact figures on specific properties.",
   "sale.lab":"For sale","sale.h2":"Verified properties for sale",
   "sale.sub":"Every project passes our internal check before publication. Open a card to see details and the yield calculator.",
@@ -1474,11 +1490,11 @@ en: {
   "do.6t":"Remote purchase","do.6p":"Buy or rent from thousands of kilometres away.",
   "val.lab":"Our values","val.h2":"Why it feels safe with us",
   "val.1":"Honest and as equals","val.2":"No pressure","val.3":"Plain language","val.4":"On the client's side","val.5":"Service before and after the deal","val.6":"Transparent numbers",
-  "who.lab":"Founder and director","who.h2":"Hello! My name is Elnur Khankishiev",
+  "who.lab":"Founder","who.h2":"Hello! My name is Elnur Khankishiev",
   "who.p1":"In 2011 I first came to Phuket — and immediately felt this place was special. I kept coming back until one day I decided to stay.",
   "who.p2":"For more than 5 years I have been helping people make this island their home — just as I once did myself. You will not need to figure out the market, negotiations or paperwork — we explain everything in plain words and walk with you all the way to the keys.",
   "who.m1":"projects realized","who.m2v":"450+ mln ฿","who.m2":"invested with my help in a year","who.m3":"average yield — a forecast, not a guarantee","who.m4v":"5+ years","who.m4":"in real estate",
-  "who.cta":"Ask a question on WhatsApp",
+  "who.cta":"Ask a question",
   "steps.lab":"Step by step","steps.h2":"With you at every stage",
   "st.1t":"Introduction","st.1p":"We clarify your goals and select relevant options.",
   "st.2t":"Viewings","st.2p":"We arrange transfers and accompany you in person or online.",
@@ -1512,12 +1528,13 @@ en: {
   "faq.6a":"Our services are free for clients. We are accredited official representatives of developers and independent market experts. You get exclusive offers before public launch, personal terms, legal support of the deal and rental management after purchase.",
   "cta.h2":"We will help you choose, buy and move",
   "cta.p":"Leave a request — we will reply within 5 minutes during working hours and consult you for free to find the best option to buy or rent.",
-  "cta.b1":"Leave a request","cta.b2":"Message on WhatsApp","cta.b3":"Open the Telegram bot",
+  "cta.b1":"Leave a request","cta.b2":"Find me a match in 10 minutes","cta.b3":"Open the Telegram bot",
   "ft.tag":"We already chose Phuket — let us help you. Full service, from the first call to move-in.",
   "ft.menu":"Menu","ft.buy":"Buy","ft.contacts":"Contacts","ft.connect":"Stay in touch","ft.bot":"Telegram concierge 24/7","ft.tg":"Telegram channel","ft.terms":"Terms of use","ft.rules":"Booking and stay rules","ft.policy":"Privacy policy",
   "rs.9t":"Concierge 24/7","rs.9p":"The Telegram bot answers any time of day; anything complex goes straight to a manager","rs.10t":"Property management","rs.10p":"If you rent yours out: we check guests in, keep the calendar and show the income in your account","val.7":"We care, we do not sell","val.8":"Exclusive terms","val.9":"Concierge on call 24/7",
   "lf.err.empty":"Leave a phone number or a Telegram handle — otherwise we cannot reply.","lf.err.short":"That number looks too short. Please check it.","lf.err.bad":"That is not a phone number, an @handle or an email. Write the way you would like us to reply.",
-  "assist.lab":"Assistant","assist.h2":"Not sure what suits you?","assist.p":"Ask Daria right here, in the chat on this page. She knows the catalogue, works out the yield and compares districts — answers straight away, any time. Anything complex goes to a manager.","assist.cta":"Ask in the chat","assist.wa":"Prefer WhatsApp","assist.q1s":"What can I get for ฿5M?","assist.q1":"What can I buy for ฿5 million?","assist.q2s":"Where is the yield higher?","assist.q2":"Which district has the higher rental yield?","assist.q3s":"Bang Tao or Rawai?","assist.q3":"Why is Bang Tao better than Rawai for investment?","assist.q4s":"What about taxes?","assist.q4":"What costs come on top of the price?",
+  "nav.pick":"Find me a property",
+  "assist.lab":"Assistant","assist.h2":"Not sure what suits you?","assist.p":"Ask Daria right here, in the chat on this page. She knows the catalogue, works out the yield and compares districts — answers straight away, any time. Anything complex goes to a manager.","assist.cta":"Ask in the chat","assist.wa":"Find me a match in 10 minutes","assist.q1s":"What can I get for ฿5M?","assist.q1":"What can I buy for ฿5 million?","assist.q2s":"Where is the yield higher?","assist.q2":"Which district has the higher rental yield?","assist.q3s":"Bang Tao or Rawai?","assist.q3":"Why is Bang Tao better than Rawai for investment?","assist.q4s":"What about taxes?","assist.q4":"What costs come on top of the price?",
   "u.from":"from","u.onreq":"price on request","u.calc":"Calculate the yield","u.cmp":"Compare","u.cmpOn":"Comparing",
   "u.roinote":"Indicative; potential depends on the unit, strategy and management — we calculate it individually",
   "u.view":"Book a viewing","u.podborka":"Get a shortlist","u.kp":"Get the offer",
@@ -2088,7 +2105,7 @@ function askAssistant(q){
 }
 function openChat(ctx){
   document.getElementById('chatwin').classList.add('open');
-  document.getElementById('fab').style.display='none';
+  (document.getElementById('fabWrap')||document.getElementById('fab')).style.display='none';
   var fld=document.getElementById('chatField');if(fld&&innerWidth>760)fld.focus();
   if(ctx==='rentreq'&&chatStarted){lastTopic='rent';botT(t('chat.rentreq'),500);setTimeout(function(){offerLead(true);},2200);return;}
   if(chatStarted)return;
@@ -2247,7 +2264,7 @@ function aiCards(ids){
 }
 function closeChatToProp(pid){closeChat();openProp(pid);}
 function clearChat(){chatHist=[];leadShown=false;chatStarted=false;userMsgs=0;lastTopic=null;lastLeadSummary=null;saveHist();cb.innerHTML='';openChat('reset');}
-function closeChat(){document.getElementById('chatwin').classList.remove('open');document.getElementById('fab').style.display='flex';}
+function closeChat(){document.getElementById('chatwin').classList.remove('open');var w=document.getElementById('fabWrap');if(w)w.style.display='block';else document.getElementById('fab').style.display='flex';}
 
 /* ===== MOBILE NAV ===== */
 function toggleNav(open){document.getElementById('mnav').classList.toggle('open',open);document.body.style.overflow=open?'hidden':'';}
@@ -2406,6 +2423,23 @@ function calcHTML(p){
     rentGrp+expGrp+oneGrp+exitGrp+instGrp+fxGrp+'</details>'+
     '<div class="calc-out" id="calcOut"></div>'+
     '<div class="tnote">'+t('calc.note')+'</div></div>';
+}
+/* Виджет Дарьи: свернуть до значка и обратно. Свёрнутый разворачивается
+   кликом по себе, поэтому кнопку чата в этом состоянии не открываем. */
+function toggleFab(){
+  var w=document.getElementById('fabWrap'); if(!w) return;
+  var min=!w.classList.contains('min');
+  w.classList.toggle('min',min);
+  try{ localStorage.setItem('plp_fab_min', min?'1':'0'); }catch(e){}
+}
+function initFab(){
+  var w=document.getElementById('fabWrap'), b=document.getElementById('fab');
+  if(!w||!b) return;
+  var min=false; try{ min=localStorage.getItem('plp_fab_min')==='1'; }catch(e){}
+  if(min) w.classList.add('min');
+  b.addEventListener('click',function(e){
+    if(w.classList.contains('min')){ e.stopPropagation(); toggleFab(); }
+  },true);
 }
 /* Текст из базы в разметку — только экранированным. */
 function escHTML(x){return String(x==null?'':x).replace(/[&<>"]/g,function(ch){
@@ -3430,7 +3464,7 @@ addEventListener('keydown',function(e){
 /* ===== EXPORT (inline handlers) ===== */
 window.setLang=setLang;window.toggleNav=toggleNav;
 window.openQuiz=openQuiz;window.closeQuiz=closeQuiz;window.quizNext=quizNext;window.quizBack=quizBack;window.pickQuiz=pickQuiz;
-window.t=t;window.renderMapReal=renderMapReal;window.openChat=openChat;window.closeChat=closeChat;window.clearChat=clearChat;window.sendFree=sendFree;window.closeChatToProp=closeChatToProp;window.askAssistant=askAssistant;
+window.t=t;window.toggleFab=toggleFab;window.renderMapReal=renderMapReal;window.openChat=openChat;window.closeChat=closeChat;window.clearChat=clearChat;window.sendFree=sendFree;window.closeChatToProp=closeChatToProp;window.askAssistant=askAssistant;
 window.openRentRequest=openRentRequest;window.requestService=requestService;
 window.checkAvailability=checkAvailability;window.resetAvailability=resetAvailability;window.resetRentFilters=resetRentFilters;window.pushLead=pushLead;
 window.scrollCar=scrollCar;window.toggleFilter=toggleFilter;window.onSaleSearch=onSaleSearch;window.setSaleSort=setSaleSort;window.toggleFavOnly=toggleFavOnly;
@@ -3443,7 +3477,7 @@ window.openDistrict=openDistrict;window.closeDistrict=closeDistrict;
 applyI18n();
 renderSale();renderRent();renderMap();renderDList();renderMapReal();
 initRentDates();
-initCarDrag();observeReveals();updateTray();
+initCarDrag();observeReveals();updateTray();initFab();
 openFromHash(); /* шеринг-ссылка #object=<id> → открыть карточку объекта */
 addEventListener('hashchange',function(){if(isObjectHash())openFromHash();});
 
