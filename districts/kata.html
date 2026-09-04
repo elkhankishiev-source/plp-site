@@ -381,6 +381,18 @@ html,body{overflow-x:clip;max-width:100%}
 .prop.booked .pic::after{content:attr(data-busy);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(10,10,10,.55);color:#fff;font-weight:700;font-size:.9rem;text-align:center;padding:12px;border-radius:inherit}
 .chipf{background:rgba(255,255,255,.85);border:1px solid rgba(10,10,10,.07);border-radius:999px;padding:9px 15px;font-size:.84rem;font-weight:600;cursor:pointer;transition:border-color .2s,background .2s,transform .15s;user-select:none}
 /* Бегунок цены: две ручки на одной дорожке, между ними закрашенный отрезок. */
+.stay{margin-top:12px;padding:12px;background:#fff;border:1px solid rgba(10,10,10,.08);border-radius:13px}
+.stay-f{display:flex;gap:10px;flex-wrap:wrap}
+.stay-f label{flex:1 1 130px;display:flex;flex-direction:column;gap:4px;font-size:.72rem;font-weight:600;color:var(--muted)}
+.stay-f input{border:1px solid rgba(10,10,10,.12);border-radius:9px;padding:8px 10px;font:inherit;font-size:.86rem}
+.stay-out{margin-top:10px;min-height:1px}
+.stay-sum{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.stay-sum b{font-size:1.18rem;font-variant-numeric:tabular-nums}
+.stay-sum span{font-size:.78rem;color:var(--muted)}
+.stay-off{margin-top:4px;font-size:.8rem;color:var(--green-deep,#5F6242);font-weight:700}
+.stay-off s{color:var(--muted);font-weight:500;margin-left:6px}
+.stay-none{font-size:.82rem;color:var(--muted);line-height:1.45}
+.stay-wait{font-size:.8rem;color:var(--muted)}
 .prng{width:100%;padding:2px 4px 10px;margin-bottom:6px;border-bottom:1px solid rgba(10,10,10,.07)}
 .prng-val{display:flex;align-items:center;gap:10px;font-size:.82rem;font-weight:700;margin-bottom:10px}
 .prng-clr{margin-left:auto;background:none;border:0;padding:0;font:inherit;font-size:.74rem;font-weight:600;
@@ -1286,7 +1298,7 @@ ru: {
   "lf.err.empty":"Оставьте номер телефона или ник в Telegram — иначе мы не сможем ответить.","lf.err.short":"Похоже, в номере не хватает цифр. Проверьте, пожалуйста.","lf.err.bad":"Не похоже на номер, @ник или почту. Напишите так, как вам удобно ответить.",
   "cs.5n":"Квартира для пары на пенсии","cs.5w":"Рассрочка 3 года и мебель в подарок","cs.5t":"плюс мебель ฿700 тыс","cs.5buy":"฿9,8 млн","cs.5now":"฿14,8 млн","cs.5r":"9% год","cs.6n":"Квартира, которая платит за себя","cs.6w":"Кредит застройщика 5% на 5 лет","cs.6t":"аренда кроет половину платежа","cs.6buy":"฿14 млн","cs.6now":"฿15,4 млн","cs.6r":"฿70 тыс/мес",
   "u.wa":"Написать в WhatsApp","wa.hi":"Здравствуйте! Интересует объект:","wa.hi2":"Здравствуйте! Хочу подобрать объект на Пхукете.","wa.price":"Цена на сайте:","wa.dates":"Даты:","wa.link":"Ссылка:","wa.seen":"Смотрел на сайте:",
-  "nav.pick":"Подобрать объект","f.any":"Любая цена","f.reset":"сбросить",
+  "nav.pick":"Подобрать объект","f.any":"Любая цена","f.reset":"сбросить","stay.wait":"Считаем…","stay.nights":"ночей","stay.pernight":" за ночь","stay.off":"скидка за срок","stay.none":"По этим датам цену уточним у собственника — оставьте запрос, ответим с точной суммой.",
   "assist.lab":"Консультант","assist.h2":"Не уверены, что подходит именно вам?","assist.p":"Спросите Дарью прямо здесь, в чате на сайте. Она знает базу, считает доходность и сравнивает районы — отвечает сразу, в любое время. Что-то сложное передаст менеджеру.","assist.cta":"Задать вопрос в чате","assist.wa":"Подобрать за 10 минут","assist.q1s":"Что купить на 5 млн ฿?","assist.q1":"Что можно купить на 5 млн ฿?","assist.q2s":"Где выше доходность?","assist.q2":"В каком районе выше доходность аренды?","assist.q3s":"Чем Банг Тао лучше Раваи?","assist.q3":"Чем Банг Тао лучше Раваи для инвестиций?","assist.q4s":"Сколько выйдет с налогами?","assist.q4":"Какие расходы при покупке кроме цены объекта?",
   "u.from":"от","u.onreq":"цена по запросу","u.calc":"Рассчитать доходность","u.cmp":"Сравнить","u.cmpOn":"В сравнении",
   "u.roinote":"Ориентировочно; потенциал зависит от объекта, стратегии и управления — рассчитаем индивидуально",
@@ -1471,7 +1483,7 @@ en: {
   "lf.err.empty":"Leave a phone number or a Telegram handle — otherwise we cannot reply.","lf.err.short":"That number looks too short. Please check it.","lf.err.bad":"That is not a phone number, an @handle or an email. Write the way you would like us to reply.",
   "cs.5n":"A flat for a retired couple","cs.5w":"Three-year instalments and furniture included","cs.5t":"plus ฿700k of furniture","cs.5buy":"฿9.8M","cs.5now":"฿14.8M","cs.5r":"9%/yr","cs.6n":"A flat that pays for itself","cs.6w":"Developer credit at 5% over five years","cs.6t":"rent covers half the payment","cs.6buy":"฿14M","cs.6now":"฿15.4M","cs.6r":"฿70k/mo",
   "u.wa":"Message on WhatsApp","wa.hi":"Hello! I am interested in:","wa.hi2":"Hello! I would like help choosing a property in Phuket.","wa.price":"Price on the site:","wa.dates":"Dates:","wa.link":"Link:","wa.seen":"Viewed on the site:",
-  "nav.pick":"Find me a property","f.any":"Any price","f.reset":"reset",
+  "nav.pick":"Find me a property","f.any":"Any price","f.reset":"reset","stay.wait":"Calculating…","stay.nights":"nights","stay.pernight":" per night","stay.off":"length-of-stay discount","stay.none":"We will confirm the price for these dates with the owner — leave a request and we will come back with the exact figure.",
   "assist.lab":"Assistant","assist.h2":"Not sure what suits you?","assist.p":"Ask Daria right here, in the chat on this page. She knows the catalogue, works out the yield and compares districts — answers straight away, any time. Anything complex goes to a manager.","assist.cta":"Ask in the chat","assist.wa":"Find me a match in 10 minutes","assist.q1s":"What can I get for ฿5M?","assist.q1":"What can I buy for ฿5 million?","assist.q2s":"Where is the yield higher?","assist.q2":"Which district has the higher rental yield?","assist.q3s":"Bang Tao or Rawai?","assist.q3":"Why is Bang Tao better than Rawai for investment?","assist.q4s":"What about taxes?","assist.q4":"What costs come on top of the price?",
   "u.from":"from","u.onreq":"price on request","u.calc":"Calculate the yield","u.cmp":"Compare","u.cmpOn":"Comparing",
   "u.roinote":"Indicative; potential depends on the unit, strategy and management — we calculate it individually",
@@ -1782,15 +1794,22 @@ function setCur(c){
   try{ renderRent(); }catch(e){}
   try{ applyFilters(); }catch(e){}
 }
+/* Формат суммы. Каталог оперирует миллионами, аренда — десятками тысяч,
+   поэтому мелкие суммы показываем точно, а не округляем до «1 тыс». */
 function fmtBaht(thb){
   var n=Math.round(thb||0);
+  function grp(x){ try{ return x.toLocaleString(PL.lang==='en'?'en-US':'ru-RU'); }catch(e){ return String(x); } }
   if(PL.cur==='usd'){
     var u=n/RATE;
     if(u>=1e6) return '$'+(Math.round(u/1e5)/10).toFixed(1).replace(/\.0$/,'')+(PL.lang==='en'?'M':' млн');
-    return '$'+Math.round(u/1000)+(PL.lang==='en'?'K':' тыс');
+    if(u>=10000) return '$'+Math.round(u/1000)+(PL.lang==='en'?'K':' тыс');
+    return '$'+grp(Math.round(u));
   }
-  var s=(Math.round(n/1e5)/10).toFixed(1).replace(/\.0$/,'');
-  return '฿'+s+(PL.lang==='en'?'M':' млн');
+  if(n>=1e6){
+    var s=(Math.round(n/1e5)/10).toFixed(1).replace(/\.0$/,'');
+    return '฿'+s+(PL.lang==='en'?'M':' млн');
+  }
+  return '฿'+grp(n);
 }
 function fmtMoney(v){var n=Number(v);if(!isFinite(n))return String(v);try{return new Intl.NumberFormat(PL.lang==='en'?'en-US':'ru-RU').format(n)+' ฿';}catch(e){return n+' ฿';}}
 function areaOf(p){var a=(p&&p.area)||'';return PL.lang==='en'?a.replace(/м²/g,'m²'):a;}
@@ -2314,6 +2333,12 @@ function openProp(pid){
     document.getElementById('pmTool').innerHTML=
       rentDetailsHTML(p)+
       '<div class="toolbox"><div class="th">✉️ '+t('book.title')+'<span class="pid">'+p.property_id+'</span></div>'+
+      /* Считаем стоимость проживания прямо здесь: выбрал даты — увидел цену
+         со скидкой за срок, как на нормальных сервисах бронирования. */
+      '<div class="stay"><div class="stay-f">'+
+        '<label>'+t('rent.dates.in')+'<input type="date" id="stayIn"></label>'+
+        '<label>'+t('rent.dates.out')+'<input type="date" id="stayOut"></label></div>'+
+        '<div class="stay-out" id="stayOutBox"></div></div>'+
       '<div class="tnote">'+t('rent.b1p')+'</div>'+
       '<button type="button" class="btn btn-primary btn-block" id="bReq" style="margin-top:10px">'+t('u.req2')+'</button></div>'+
       '<details class="calc-more" style="margin-top:14px"><summary>📈 '+t('calc.any')+'</summary><div style="margin-top:10px">'+calcHTML({property_id:p.property_id,calc:CALC_DEFAULTS})+'</div></details>';
@@ -2408,7 +2433,41 @@ function rentDetailsHTML(p){
   if(!rows)return '';
   return '<div class="rentdetails">'+rows+'</div>';
 }
+/* Расчёт проживания по датам: сетку цен и скидки за срок считает база. */
+function wireStay(p){
+  var a=document.getElementById('stayIn'), b=document.getElementById('stayOut'),
+      box=document.getElementById('stayOutBox');
+  if(!a||!b||!box) return;
+  var today=new Date().toISOString().slice(0,10);
+  a.min=today; b.min=today;
+  if(rentSelDates&&rentSelDates.check_in){ a.value=rentSelDates.check_in; b.value=rentSelDates.check_out||''; }
+  function ask(){
+    if(!a.value||!b.value||b.value<=a.value){ box.innerHTML=''; return; }
+    box.innerHTML='<span class="stay-wait">'+t('stay.wait')+'</span>';
+    fetch('https://proplib.app.n8n.cloud/webhook/uk-owner',{method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'stay_quote',property_id:p.property_id,from:a.value,to:b.value})})
+      .then(function(r){return r.json();})
+      .then(function(d){
+        if(!d||!d.ok){
+          /* сетки по объекту ещё нет — честно говорим и ведём к менеджеру */
+          box.innerHTML='<div class="stay-none">'+t('stay.none')+'</div>';
+          return;
+        }
+        rentSelDates={check_in:a.value,check_out:b.value,from:a.value,to:b.value};
+        box.innerHTML=
+          '<div class="stay-sum"><b>'+fmtBaht(d.total)+'</b>'+
+          '<span>'+d.nights+' '+t('stay.nights')+' · '+fmtBaht(d.avg_night)+t('stay.pernight')+'</span></div>'+
+          (d.discount_pct>0?('<div class="stay-off">−'+d.discount_pct+'% '+t('stay.off')+
+             ' <s>'+fmtBaht(d.gross)+'</s></div>'):'');
+      })
+      .catch(function(){ box.innerHTML='<div class="stay-none">'+t('stay.none')+'</div>'; });
+  }
+  a.onchange=b.onchange=ask;
+  if(a.value&&b.value) ask();
+}
 function wireBooking(p){
+  try{ wireStay(p); }catch(e){}
   var req=document.getElementById('bReq');if(!req)return;
   req.onclick=function(){
     var note2=rentSelDates?('Даты: '+rentSelDates.check_in+' → '+rentSelDates.check_out):null;
