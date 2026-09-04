@@ -380,7 +380,7 @@ input.bad{border-color:#d98a84!important;background:#fff6f5}
 .chipf:active{transform:scale(.97)}
 .chipf.on{background:var(--green);border-color:transparent;font-weight:700}
 /* ===== rent filters (район/спальни/тип/удобства/сброс) ===== */
-#rentFilters{flex-direction:column;align-items:stretch;gap:0;margin-top:18px}
+#rentFilters{flex-direction:row;flex-wrap:wrap;align-items:center;gap:10px;margin-top:18px}
 .rf-group{display:flex;flex-direction:column;gap:8px;margin-top:14px}
 .rf-group:first-child{margin-top:0}
 .rf-label{font-size:.72rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted,#8a8f7a)}
@@ -648,10 +648,10 @@ input.bad{border-color:#d98a84!important;background:#fff6f5}
 .case:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
 .case .top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
 .case .av{width:44px;height:44px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-weight:800;flex:none}
-.case .top b{font-size:.95rem}.case .top span{font-size:.78rem;color:var(--muted);display:block}
-.case .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.case .grid b{font-size:1.05rem;font-weight:800;display:block}
-.case .grid span{font-size:.72rem;color:var(--muted)}
+.case .top b{font-size:.92rem;line-height:1.3}.case .top span{font-size:.76rem;color:var(--muted);display:block;margin-top:2px}
+.case .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px}
+.case .grid b{font-size:.92rem;font-weight:700;display:block;font-variant-numeric:tabular-nums}
+.case .grid span{font-size:.7rem;color:var(--muted);line-height:1.3}
 
 /* ===== faq ===== */
 .faq-list{margin-top:24px;max-width:820px}
@@ -918,21 +918,21 @@ input.bad{border-color:#d98a84!important;background:#fff6f5}
 .obj-index{padding:56px 0;background:#fafaf7;border-top:1px solid #ececE4}
 .obj-index h2{margin:0 0 6px;font-size:26px}
 .obj-index .sub{margin:0 0 26px;color:#6b6b63;max-width:640px}
-.oi-list{max-width:720px;border-top:1px solid #e6e6de}
-.oi-row{border-bottom:1px solid #e6e6de}
-.oi-row>summary{display:flex;align-items:center;gap:10px;padding:14px 2px;cursor:pointer;
-  list-style:none;font-size:15px;color:#2b2b26;transition:color .15s}
-.oi-row>summary::-webkit-details-marker{display:none}
-.oi-row>summary::after{content:'▾';margin-left:auto;color:#a8a89c;font-size:12px;transition:transform .18s}
-.oi-row[open]>summary::after{transform:rotate(180deg)}
-.oi-row>summary:hover{color:#000}
-.oi-d{font-weight:500}
+.oi-box{max-width:760px;border:1px solid #e6e6de;border-radius:14px;background:#fff}
+.oi-box>summary{display:flex;align-items:center;gap:10px;padding:16px 18px;cursor:pointer;list-style:none;font-size:15px}
+.oi-box>summary::-webkit-details-marker{display:none}
+.oi-box>summary::after{content:'▾';margin-left:auto;color:#a8a89c;font-size:12px;transition:transform .18s}
+.oi-box[open]>summary::after{transform:rotate(180deg)}
+.oi-box .sub{margin:0;padding:0 18px 4px;font-size:.86rem}
 .oi-n{font-size:12px;color:#8a8a80;background:#f0f0e8;border-radius:10px;padding:1px 8px}
-.oi-row ul{margin:0;padding:0 0 14px;list-style:none}
-.oi-row li{margin:0 0 8px;font-size:14px;line-height:1.45;color:#6b6b63;padding-left:2px}
-.oi-row a{color:#2b2b26;text-decoration:none;border-bottom:1px solid rgba(0,0,0,.14)}
-.oi-row a:hover{border-bottom-color:currentColor}
-@media(max-width:600px){.obj-index{padding:40px 0}.oi-row>summary{padding:13px 2px}}
+.oi-list{margin:0;padding:6px 0 10px;list-style:none;max-height:min(60vh,520px);overflow:auto}
+.oi-list li{display:flex;align-items:baseline;gap:10px;padding:8px 18px;font-size:14px;line-height:1.4;border-top:1px solid #f2f2ec}
+.oi-list li:first-child{border-top:0}
+.oi-list a{color:#2b2b26;text-decoration:none;border-bottom:1px solid rgba(0,0,0,.14)}
+.oi-list a:hover{border-bottom-color:currentColor}
+.oi-list .oi-d{color:#8a8a80;font-size:12.5px}
+.oi-list .oi-p{margin-left:auto;color:#6b6b63;font-size:13px;white-space:nowrap;font-variant-numeric:tabular-nums}
+@media(max-width:600px){.obj-index{padding:40px 0}.oi-list li{padding:9px 14px}.oi-box>summary{padding:14px}}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.6.0/maplibre-gl.min.css">
@@ -1343,8 +1343,8 @@ ru: {
   "sale.lab":"Продажа","sale.h2":"Проверенные объекты в продаже",
   "sale.sub":"Каждый проект проходит нашу внутреннюю проверку перед публикацией. Нажмите на карточку — внутри детали и калькулятор доходности.",
   "sale.search":"Поиск: район, название, ID…",
-  "f.budget.all":"Все бюджеты","f.b1":"฿3–5 млн","f.b2":"฿5–10 млн","f.b3":"฿10 млн+","f.type.villa":"Вилла","f.type.condo":"Кондо","f.favs":"♥ Избранное",
-  "lf.b1":"฿3–5 млн","lf.b2":"฿5–10 млн","lf.b3":"฿10 млн+",
+  "f.budget.all":"Все бюджеты","f.b1":"฿3–5 млн","f.b2":"฿5–10 млн","f.b3":"฿10–15 млн","f.b4":"฿15–20 млн","f.b5":"฿20–25 млн","f.b6":"฿25–30 млн","f.b7":"฿30 млн+","f.type.villa":"Вилла","f.type.condo":"Кондо","f.favs":"♥ Избранное",
+  "lf.b1":"฿3–5 млн","lf.b2":"฿5–10 млн","lf.b3":"฿10–15 млн","lf.b4":"฿15–25 млн","lf.b56":"฿25 млн+",
   "sort.default":"По порядку","sort.roi":"Сначала высокая доходность","sort.cheap":"Сначала доступные","sort.rich":"Сначала дорогие",
   "noresult":"Под выбранные фильтры ничего не нашлось — сбросьте часть условий.",
   "pdf.lab":"PDF · 23 страницы","pdf.h2":"Скачать полный каталог эксклюзивных предложений",
@@ -1375,7 +1375,7 @@ ru: {
   "quiz.done.t":"Спасибо! Заявка принята","quiz.done.p":"Специалист свяжется с вами в течение 5 минут в рабочее время и пришлёт персональную подборку. Продолжить можно в чате с Дарьей или в Telegram.","quiz.done.close":"Закрыть",
   "quiz.err.t":"Не удалось отправить","quiz.err.p":"Похоже, пропала связь. Напишите нам напрямую в WhatsApp — ответим лично и подберём вариант.",
   "q.1":"Какая у вас цель?","q.1a":"Инвестиции и доходность","q.1b":"Для жизни и переезда","q.1c":"Аренда от месяца","q.1d":"Пока изучаю рынок",
-  "q.2":"На какой бюджет ориентируетесь?","q.2a":"฿3–5 млн","q.2b":"฿5–10 млн","q.2c":"฿10 млн и выше","q.2d":"Интересует аренда",
+  "q.2":"На какой бюджет ориентируетесь?","q.2a":"฿3–5 млн","q.2b":"฿5–10 млн","q.2c":"฿10–15 млн","q.2e":"฿15–25 млн","q.2f":"฿25 млн и выше","q.2d":"Интересует аренда",
   "q.3":"Какой район интересен?","q.3a":"Банг Тао / Лагуна","q.3b":"Лаян / Сурин","q.3c":"Ката / Карон","q.3d":"Равай / Найхарн","q.3e":"Патонг","q.3f":"Север: Най Янг / Май Кхао","q.3g":"Пхукет-таун","q.3h":"Доверюсь вашему совету",
   "q.4":"Какой тип объекта?","q.4a":"Кондо / апартаменты","q.4b":"Вилла","q.4c":"Таунхаус","q.4d":"Пока не определился",
   "q.5":"Сколько спален?","q.5a":"Студия / 1","q.5b":"2 спальни","q.5c":"3 и больше","q.5d":"Не принципиально",
@@ -1531,8 +1531,8 @@ en: {
   "sale.lab":"For sale","sale.h2":"Verified properties for sale",
   "sale.sub":"Every project passes our internal check before publication. Open a card to see details and the yield calculator.",
   "sale.search":"Search: area, name, ID…",
-  "f.budget.all":"All budgets","f.b1":"฿3–5M","f.b2":"฿5–10M","f.b3":"฿10M+","f.type.villa":"Villa","f.type.condo":"Condo","f.favs":"♥ Favourites",
-  "lf.b1":"฿3–5M","lf.b2":"฿5–10M","lf.b3":"฿10M+",
+  "f.budget.all":"All budgets","f.b1":"฿3–5M","f.b2":"฿5–10M","f.b3":"฿10–15M","f.b4":"฿15–20M","f.b5":"฿20–25M","f.b6":"฿25–30M","f.b7":"฿30M+","f.type.villa":"Villa","f.type.condo":"Condo","f.favs":"♥ Favourites",
+  "lf.b1":"฿3–5M","lf.b2":"฿5–10M","lf.b3":"฿10–15M","lf.b4":"฿15–25M","lf.b56":"฿25M+",
   "sort.default":"Default order","sort.roi":"Highest yield first","sort.cheap":"Lowest price first","sort.rich":"Highest price first",
   "noresult":"Nothing matches these filters — try removing some.",
   "pdf.lab":"PDF · 23 pages","pdf.h2":"Download the full catalogue of exclusive offers",
@@ -1563,7 +1563,7 @@ en: {
   "quiz.done.t":"Thank you! Request received","quiz.done.p":"A specialist will contact you within 5 minutes during working hours with a personal shortlist. You can also continue in the chat with Daria or on Telegram.","quiz.done.close":"Close",
   "quiz.err.t":"Couldn't send","quiz.err.p":"Looks like the connection dropped. Message us directly on WhatsApp — we'll reply personally and find you a match.",
   "q.1":"What is your goal?","q.1a":"Investment and yield","q.1b":"Living and relocation","q.1c":"Renting from a month","q.1d":"Just exploring",
-  "q.2":"What budget do you have in mind?","q.2a":"฿3–5M","q.2b":"฿5–10M","q.2c":"฿10M and above","q.2d":"Interested in renting",
+  "q.2":"What budget do you have in mind?","q.2a":"฿3–5M","q.2b":"฿5–10M","q.2c":"฿10–15M","q.2e":"฿15–25M","q.2f":"฿25M and above","q.2d":"Interested in renting",
   "q.3":"Which area interests you?","q.3a":"Bang Tao / Laguna","q.3b":"Layan / Surin","q.3c":"Kata / Karon","q.3d":"Rawai / Naiharn","q.3e":"Patong","q.3f":"North: Nai Yang / Mai Khao","q.3g":"Phuket Town","q.3h":"I trust your advice",
   "q.4":"What type of property?","q.4a":"Condo / apartments","q.4b":"Villa","q.4c":"Townhouse","q.4d":"Not sure yet",
   "q.5":"How many bedrooms?","q.5a":"Studio / 1","q.5b":"2 bedrooms","q.5c":"3 and more","q.5d":"Does not matter",
@@ -1941,7 +1941,10 @@ function fmtBaht(thb){
 function fmtMoney(v){var n=Number(v);if(!isFinite(n))return String(v);try{return new Intl.NumberFormat(PL.lang==='en'?'en-US':'ru-RU').format(n)+' ฿';}catch(e){return n+' ฿';}}
 function areaOf(p){var a=(p&&p.area)||'';return PL.lang==='en'?a.replace(/м²/g,'m²'):a;}
 /* бюджет-бакет по РЕАЛЬНОЙ THB-цене: b1<฿5млн, b2<฿10млн, b3 ฿10млн+ */
-function budgetOf(p){var thb=thbOf(p);return thb<5e6?'b1':thb<10e6?'b2':'b3';}
+/* Шкала бюджета. Эльнур 04.09: «более 10 млн» — слишком грубо, дробим выше.
+   Пороги в батах: до 5 / 5–10 / 10–15 / 15–20 / 20–25 / 25–30 / 30+. */
+function budgetOf(p){var t=thbOf(p);
+  return t<5e6?'b1':t<10e6?'b2':t<15e6?'b3':t<20e6?'b4':t<25e6?'b5':t<30e6?'b6':'b7';}
 function statusBadge(s){return '<span class="stbadge st-'+s+'">'+t('st.'+s)+'</span>';}
 /* 30.08 канон №38: «Готов» берём из данных (stage='Ready'), а НЕ считаем из даты сдачи.
    Расчёт по дате помечал готовыми объекты, которые по данным ещё строятся. */
@@ -2082,6 +2085,35 @@ function markBadContact(input,msg){
   box.textContent=msg||''; box.style.display=msg?'block':'none';
   input.classList.toggle('bad',!!msg);
 }
+/* Журнал просмотров. Менеджер не должен переспрашивать, что человек смотрел:
+   к каждой заявке прикладываем последние открытые объекты, выбранные даты
+   аренды и цену, которую человек видел на сайте. Живёт в браузере посетителя,
+   уходит только вместе с его же заявкой. */
+var VIEWED_KEY='plp_viewed';
+function viewedList(){
+  try{ return JSON.parse(localStorage.getItem(VIEWED_KEY)||'[]'); }catch(e){ return []; }
+}
+function viewedPush(p){
+  if(!p||!p.property_id) return;
+  var list=viewedList().filter(function(v){ return v.id!==p.property_id; });
+  list.unshift({
+    id:p.property_id, title:p.title,
+    loc:(p.loc&&p.loc.ru)||'', type:(p.type&&p.type.ru)||'',
+    price:p.funnel==='sale'?fmtBaht(thbOf(p)):null,
+    kind:p.funnel, at:new Date().toISOString().slice(0,16).replace('T',' ')
+  });
+  try{ localStorage.setItem(VIEWED_KEY, JSON.stringify(list.slice(0,12))); }catch(e){}
+}
+/* Человеко-читаемая сводка — её видит менеджер в карточке CRM. */
+function viewedSummary(){
+  var list=viewedList(); if(!list.length) return null;
+  var lines=list.slice(0,5).map(function(v){
+    return '• '+v.title+(v.loc?(' · '+v.loc):'')+(v.price?(' · '+v.price):'')+' ('+v.at+')';
+  });
+  var d=(typeof rentSelDates!=='undefined'&&rentSelDates)?rentSelDates:null;
+  if(d&&d.from&&d.to) lines.push('• даты аренды: '+d.from+' — '+d.to);
+  return 'Смотрел на сайте:\n'+lines.join('\n');
+}
 var pendingIntent=null; /* клик по объекту/сравнению/району до сбора контакта — переносим в след. заявку */
 function pushLead(p){
   var src=getSource();
@@ -2094,6 +2126,12 @@ function pushLead(p){
     name:p.name||null,contact:p.contact||null,
     consent:!!p.consent,
     qualified:!!(p.contact&&(p.goal||p.budget||p.property_id)),
+    /* контекст: что человек смотрел, какие даты выбрал и по какой ссылке пришёл —
+       чтобы менеджер не переспрашивал то, что уже известно */
+    viewed:viewedList().slice(0,5),
+    viewed_summary:viewedSummary(),
+    dates:(typeof rentSelDates!=='undefined'&&rentSelDates)?rentSelDates:null,
+    page_url:location.href,
     lang:PL.lang,payload:p
   },src);
   lead.__send=sendLead(lead,p); // Promise: resolve при HTTP 200 (best-effort бэкенд), reject при сбое сети
@@ -2230,7 +2268,7 @@ function showLead(){
   bot(t('chat.lead'));
   var f=document.createElement('div');f.className='msg bot leadform';
   f.innerHTML='<select class="lf-goal"><option value="">'+t('lf.goal')+'</option><option value="invest">'+t('lf.goal1')+'</option><option value="live">'+t('lf.goal2')+'</option><option value="rent">'+t('lf.goal3')+'</option><option value="explore">'+t('lf.goal4')+'</option></select>'+
-    '<select class="lf-budget"><option value="">'+t('lf.budget')+'</option><option value="b1">'+t('lf.b1')+'</option><option value="b2">'+t('lf.b2')+'</option><option value="b3">'+t('lf.b3')+'</option><option value="rent">'+t('lf.br')+'</option></select>'+
+    '<select class="lf-budget"><option value="">'+t('lf.budget')+'</option><option value="b1">'+t('lf.b1')+'</option><option value="b2">'+t('lf.b2')+'</option><option value="b3">'+t('lf.b3')+'</option><option value="b4">'+t('lf.b4')+'</option><option value="b56">'+t('lf.b56')+'</option><option value="rent">'+t('lf.br')+'</option></select>'+
     '<input class="lf-name" placeholder="'+t('lf.name')+'"><input class="lf-phone" placeholder="'+t('lf.contact')+'">'+
     '<select class="lf-ch"><option>WhatsApp</option><option>Telegram</option><option>Viber</option></select>'+
     '<input class="hp" tabindex="-1" autocomplete="off" placeholder="'+t('lf.hp')+'">'+
@@ -2363,6 +2401,7 @@ function toggleNav(open){document.getElementById('mnav').classList.toggle('open'
 var currentPid=null;
 function openProp(pid){
   var p=PL.byId[pid];if(!p||p.soon)return;currentPid=pid;
+  try{ viewedPush(p); }catch(e){}
   var img=document.getElementById('pmImg');
   img.className='pm-img '+(p.grad||'g1');
   img.innerHTML=picPhoto(p,true).replace('pic-photo','pm-photo')+'<span>'+t('ph.object')+'</span><div class="pm-badges"><span class="pm-tag">'+loc(p.loc)+'</span><span class="pm-roi">'+(p.funnel==='sale'?(p.roi!=null?('ROI '+roiRange(p)):t('u.calc')):t('book.title'))+'</span></div>';
@@ -2530,6 +2569,17 @@ function initFab(){
   b.addEventListener('click',function(e){
     if(w.classList.contains('min')){ e.stopPropagation(); toggleFab(); }
   },true);
+  /* Эльнур 04.09: сворачивать по наведению, а не кликом. Свёрнутый разворачивается
+     наведением обратно — курсор на нём и так, клик открывает чат как прежде. */
+  var t=null;
+  w.addEventListener('mouseenter',function(){
+    clearTimeout(t);
+    if(w.classList.contains('min')) w.classList.remove('min');
+  });
+  w.addEventListener('mouseleave',function(){
+    clearTimeout(t);
+    t=setTimeout(function(){ w.classList.add('min'); },900);
+  });
 }
 /* Текст из базы в разметку — только экранированным. */
 function escHTML(x){return String(x==null?'':x).replace(/[&<>"]/g,function(ch){
@@ -2603,7 +2653,7 @@ function wireCalc(p){
       '<div class="row"><span>'+t('calc.gross')+'</span><b>'+fmtTHB(gross)+'</b></div>'+
       '<div class="row"><span>'+t('calc.expenses')+'</span><b>−'+fmtTHB(expenses)+'</b></div>'+
       '<div class="row"><span>'+t('calc.grossyield')+'</span><b>'+grossY.toFixed(1)+'%</b></div>'+
-      '<details class="calc-more"><summary>'+t('calc.schedttl')+' &#9662;</summary>'+schedHTML(handover,num('cDown'),num('cSt1'),num('cSt2'),num('cSt3'),build,(p.calc||{}).paymentPlan,(p.calc||{}).ready||p.ready)+'</details>'+
+      '<details class="calc-more"><summary>'+t('calc.schedttl')+' &#9662;</summary>'+schedHTML(handover,num('cDown'),num('cSt1'),num('cSt2'),num('cSt3'),build,((p&&p.calc)||{}).paymentPlan,((p&&p.calc)||{}).ready||(p&&p.ready))+'</details>'+
       '<div class="ai-verdict" id="aiVerdict"><button type="button" class="ai-ask" onclick="askVerdict()">'+t('calc.ask')+'</button></div>';
     window.__calcSnapshot={pid:p&&p.property_id,gross:gross,expenses:expenses,net:net,grossY:grossY,netY:netY,payback:payback,roi5:roi5,fullInc:fullInc,horizon:horizon,price:price,handover:handover,mgmt:mgmt,build:build,mode:mode};
   }
@@ -3144,7 +3194,7 @@ function favLead(){var ids=Array.from(FAVS).join(', ');pushLead({funnel:'sale',g
 /* ===== QUIZ (8 шагов → лид) ===== */
 var QUIZ_STEPS=[
   {key:'goal',q:'q.1',opts:['q.1a','q.1b','q.1c','q.1d'],vals:['invest','live','rent','explore']},
-  {key:'budget',q:'q.2',opts:['q.2a','q.2b','q.2c','q.2d'],vals:['b1','b2','b3','rent']},
+  {key:'budget',q:'q.2',opts:['q.2a','q.2b','q.2c','q.2e','q.2f','q.2d'],vals:['b1','b2','b3','b4','b56','rent']},
   {key:'area',q:'q.3',opts:['q.3a','q.3b','q.3c','q.3d','q.3e','q.3f','q.3g','q.3h']},
   {key:'type',q:'q.4',opts:['q.4a','q.4b','q.4c','q.4d'],vals:['Кондо','Вилла','Таунхаус','']},
   {key:'beds',q:'q.5',opts:['q.5a','q.5b','q.5c','q.5d']},
@@ -3159,7 +3209,11 @@ function quizMatch(){
   var b=qzAns.budget,ty=qzAns.type;
   if(b==='rent'||qzAns.goal==='rent')return PL.RENTALS[0]||PL.PROPERTIES[0];
   var pool=PL.PROPERTIES.filter(function(p){return p.status!=='sold';});
-  if(b){var pb=pool.filter(function(p){return budgetOf(p)===b;});if(pb.length)pool=pb;}
+  /* в формах ступени сведены крупнее, чем в фильтре: b4 = 15–25, b56 = 25+ */
+  var GROUP={b4:['b4','b5'],b56:['b6','b7']};
+  if(b){var want=GROUP[b]||[b];
+    var pb=pool.filter(function(p){return want.indexOf(budgetOf(p))>=0;});
+    if(pb.length)pool=pb;}
   if(ty){var pt=pool.filter(function(p){return p.type.ru===ty;});if(pt.length)pool=pt;}
   return pool[0]||PL.PROPERTIES[0];
 }
