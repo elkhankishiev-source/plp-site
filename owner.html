@@ -1070,6 +1070,7 @@ a.lnk,.lnk{color:var(--olive)}
   font-size:.85rem;background:var(--paper);border:1px solid rgba(var(--ink-rgb),.07)}
 .cal-e{background:transparent;border-color:transparent}
 .cal-d.busy{background:var(--green);color:var(--on-green);font-weight:700;border-color:transparent}
+.hintline{margin:0 0 10px;font-size:.78rem;color:var(--muted);line-height:1.45}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 </head>
@@ -1283,8 +1284,8 @@ a.lnk,.lnk{color:var(--olive)}
     <div id="cab-nav" class="cab-nav" aria-label="Разделы кабинета">
       <a data-tab="overview" class="on">Обзор</a>
       <a data-tab="calendar">Бронирования</a>
-      <a data-tab="money">Финансы</a>
-      <a data-tab="costs">Расходы</a>
+      <a data-tab="money">Деньги по месяцам</a>
+      <a data-tab="costs">Расходы на содержание</a>
       <a data-tab="docs">Документы</a>
       <a data-tab="service">Обслуживание</a>
       <a data-tab="object">Объект</a>
@@ -1884,6 +1885,46 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
 
   /* Формы внесения по объекту: операция, работа, документ.
      Открываются окном, после сохранения кабинет обновляется. */
+  /* Своя бронь: календарь занятости у нас собственный, данные лежат в нашей
+     базе (rental_guests). Пересечение дат отсекает сама база. */
+  function ukBookForm(pid, pre){
+    pre=pre||{};
+    var objs=(DATA.properties||[]).map(function(x){ return {id:x.id, name:(x.name||x.id)}; });
+    clForm('<h3>'+(pre.booking_id?'Правка брони':'Новая бронь')+'</h3><div class="fgrid">'+
+      '<label class="wide">Объект<select id="b-obj">'+objs.map(function(o){
+         return '<option value="'+clEsc(o.id)+'"'+((o.id===pid)?' selected':'')+'>'+clEsc(o.name)+'</option>';}).join('')+'</select></label>'+
+      '<label>Заезд<input id="b-in" type="date" value="'+(pre.check_in||'')+'"></label>'+
+      '<label>Выезд<input id="b-out" type="date" value="'+(pre.check_out||'')+'"></label>'+
+      '<label class="wide">Гость<input id="b-guest" type="text" value="'+clEsc(pre.guest_name||'')+'" placeholder="Имя"></label>'+
+      '<label>Телефон<input id="b-phone" type="text" value="'+clEsc(pre.guest_phone||'')+'" placeholder="66..."></label>'+
+      '<label>Сумма, ฿<input id="b-sum" type="number" value="'+(pre.amount_thb||'')+'"></label>'+
+      '<label>Канал<select id="b-ch">'+
+        ['direct:напрямую','airbnb:Airbnb','booking:Booking','agent:агент','owner:собственник']
+        .map(function(x){var v=x.split(':');
+          return '<option value="'+v[0]+'"'+((pre.channel===v[0])?' selected':'')+'>'+v[1]+'</option>';}).join('')+
+      '</select></label>'+
+      '<label>Статус<select id="b-st">'+
+        ['upcoming:ожидается','checked_in:проживает','checked_out:выехал','hold:бронь','cancelled:отменена']
+        .map(function(x){var v=x.split(':');
+          return '<option value="'+v[0]+'"'+((pre.status===v[0])?' selected':'')+'>'+v[1]+'</option>';}).join('')+
+      '</select></label>'+
+      '<label class="wide">Заметка<input id="b-note" type="text" value="'+clEsc(pre.notes||'')+'"></label>'+
+      '</div><div class="fbtns"><button type="button" class="btn" id="f-save">Сохранить</button>'+
+      '<button type="button" class="btn ghost" id="f-cancel">Отмена</button></div>',
+      function(){
+        post({action:'uk_booking_save',token:TOKEN,
+              property_id:fv('b-obj'),check_in:fv('b-in'),check_out:fv('b-out'),
+              guest:fv('b-guest'),phone:fv('b-phone'),amount:fv('b-sum'),
+              channel:fv('b-ch'),status:fv('b-st'),note:fv('b-note'),
+              booking_id:pre.booking_id||''})
+          .then(function(r){
+            if(r&&r.ok){ var f=document.getElementById('cl-form');
+              if(f){ f.innerHTML=''; document.body.style.overflow=''; }
+              loadData();
+            } else alert((r&&r.error)||'Не получилось сохранить бронь');
+          });
+      });
+  }
   function bindUkForms(){
     /* Действия по объекту (операция, работа, документ) вешаем на документ:
        разделы перерисовываются, и привязка к узлам терялась — ссылки выглядели
@@ -1907,7 +1948,8 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         if(uk){
           e.preventDefault();
           var what=uk.getAttribute('data-uk'), pid=uk.getAttribute('data-pid');
-          if(what==='tx') ukTxForm(pid);
+          if(what==='book') ukBookForm(pid);
+          else if(what==='tx') ukTxForm(pid);
           else if(what==='task') ukTaskForm(pid);
           else if(what==='doc') ukDocForm(pid);
         }
@@ -2574,7 +2616,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     if(DATA.owner&&DATA.owner.is_staff===true)
       th+='<p class="sub"><a href="#" class="lnk" data-uk="tx" data-pid="'+(p.id||'')+
           '">Внести операцию</a> — доход или расход по этому объекту.</p>';
-    H+=card('Доходы и расходы периода', th, 'sec-money');
+    H+=card('Доходы и расходы периода', '<p class="hintline">Что сюда попадает: деньги, которые пришли и ушли по объекту за период — аренда, уборки, ремонт, комиссии. Постоянные платежи владения — в разделе «Расходы на содержание».</p>'+th, 'sec-money');
 
     // календарь: сетка месяца + список заездов
     var bk=p.bookings||[], bh='';
@@ -2592,6 +2634,9 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       });
       bh+='</table>';
     }
+    if(DATA.owner&&DATA.owner.is_staff===true)
+      bh+='<p class="sub"><a href="#" class="lnk" data-uk="book" data-pid="'+(p.id||'')+
+          '">Поставить бронь</a> — даты, гость, сумма и канал. Пересечение дат система не пропустит.</p>';
     H+=card('Календарь заездов', bh, 'sec-calendar');
 
     // ставки
@@ -2651,7 +2696,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     ch+=line('Депозит брони',has(co.booking_deposit_thb)?money(co.booking_deposit_thb,'THB'):null);
     ch+=line('Налоги',co.taxes_note);
     ch+=line('Общая территория',co.common_area_fee_note);
-    H+=card('Расходы владения', ch, 'sec-costs');
+    H+=card('Расходы на содержание', '<p class="hintline">Это не операции, а ставки владения: фонд капремонта, обслуживание за м², сборы и налоги. Фактические траты за период — в разделе «Деньги по месяцам».</p>'+ch, 'sec-costs');
 
     // договор
     var dh='';
