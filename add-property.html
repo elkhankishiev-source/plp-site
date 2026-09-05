@@ -1371,6 +1371,13 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
   .toolbar .chipf{flex:0 0 auto}
 }
 
+/* наведение только там, где есть мышь: на телефоне hover залипал после нажатия
+   и кнопка оставалась светлой плашкой со светлым текстом */
+@media (hover:none){
+  .chipf:hover,.fbtn:hover,.btn:hover,.zone:hover,.mobj:hover,.prop:hover{
+    background:inherit;color:inherit;transform:none}
+}
+
 .ap-row3{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
 .ap-hint{display:block;font-weight:400;font-size:11.5px;color:var(--muted);margin-top:2px}
 </style>
