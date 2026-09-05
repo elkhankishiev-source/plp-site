@@ -269,7 +269,12 @@ html,body{overflow-x:clip;max-width:100%}
 .btn-block{width:100%}
 
 /* reveal on scroll */
-.reveal{opacity:0;transform:translateY(24px);transition:opacity .8s cubic-bezier(.16,1,.3,1),transform .8s cubic-bezier(.16,1,.3,1)}
+.reveal{opacity:0;transform:translateY(14px);transition:opacity 1s ease-out,transform 1s ease-out}
+@media(max-width:900px),(prefers-reduced-motion:reduce){
+  /* Эльнур 05.09: «фон мигает, а не переливается» — на телефоне блоки
+     показываем сразу, без появления. */
+  .reveal{opacity:1!important;transform:none!important;transition:none}
+}
 .reveal.visible{opacity:1;transform:none}
 @media(prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
@@ -316,7 +321,7 @@ section[id],div[id^="q"],[id="about"],[id="steps"],[id="faq"]{scroll-margin-top:
 .mnav.open .sheet{transform:none}
 .mnav .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
 .mnav .top b{color:#fff;font-size:.95rem}
-.mnav .sheet a{color:rgba(var(--glass-rgb),.85);font-size:1.05rem;font-weight:600;padding:12px;border-radius:11px}
+.mnav .sheet a{color:rgba(255,255,255,.85);font-size:1.05rem;font-weight:600;padding:12px;border-radius:11px}
 .mnav .sheet a:active{background:rgba(var(--glass-rgb),.08)}
 .mnav .xx{background:rgba(var(--glass-rgb),.12);color:#fff;width:38px;height:38px;border-radius:50%;font-size:1.2rem}
 .mnav .mlang{display:flex;gap:8px;margin:8px 4px 4px}
@@ -585,7 +590,7 @@ section[id],div[id^="q"],[id="about"],[id="steps"],[id="faq"]{scroll-margin-top:
 .lb-p{left:14px;top:50%;transform:translateY(-50%)}
 .lb-n{right:14px;top:50%;transform:translateY(-50%)}
 .lbox.single .lb-p,.lbox.single .lb-n,.lbox.single .lb-c{display:none}
-.lb-c{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);color:rgba(var(--glass-rgb),.7);
+.lb-c{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.7);
   font-size:.8rem;font-variant-numeric:tabular-nums}
 @media(max-width:700px){.lbox{padding:52px 12px}.lb-p{left:6px}.lb-n{right:6px}}
 .pm-tabs{display:flex;gap:6px;padding:10px 10px 0;background:var(--paper);overflow-x:auto;scrollbar-width:none}
@@ -704,10 +709,10 @@ input.bad{border-color:#d98a84!important;background:var(--paper)6f5}
   display:flex;flex-direction:column;justify-content:space-between;padding:13px 14px;
   border:1px solid rgba(var(--glass-rgb),.1)}
 .pdfband .pgc-top{display:flex;align-items:center;gap:7px}
-.pdfband .pgc-top em{font-style:normal;font-size:.62rem;letter-spacing:.09em;text-transform:uppercase;color:rgba(var(--glass-rgb),.72)}
+.pdfband .pgc-top em{font-style:normal;font-size:.62rem;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.72)}
 .pdfband .pgc-mid b{display:block;font-size:1.02rem;line-height:1.2;font-weight:700}
-.pdfband .pgc-mid span{display:block;font-size:.72rem;color:rgba(var(--glass-rgb),.66);margin-top:3px}
-.pdfband .pgc-bot{display:flex;flex-direction:column;gap:2px;font-size:.64rem;color:rgba(var(--glass-rgb),.55)}
+.pdfband .pgc-mid span{display:block;font-size:.72rem;color:rgba(255,255,255,.66);margin-top:3px}
+.pdfband .pgc-bot{display:flex;flex-direction:column;gap:2px;font-size:.64rem;color:rgba(255,255,255,.55)}
 .pdfband .pgc-bot span:first-child{color:var(--green);font-weight:700}
 .pdfband .pg-shot{z-index:1;right:2%;top:30px;width:52%;aspect-ratio:4/3;transform:rotate(5deg)}
 .pdfband .pg-shot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
@@ -720,7 +725,7 @@ input.bad{border-color:#d98a84!important;background:var(--paper)6f5}
 .rentband{background:var(--ink-block);color:var(--on-ink);border-radius:22px;padding:26px 26px;margin-top:24px;display:grid;gap:18px;align-items:center}
 @media(min-width:900px){.rentband{grid-template-columns:1.2fr .8fr;padding:30px 40px}}
 .rentband h3{font-size:clamp(1.25rem,2.6vw,1.7rem);font-weight:800}
-.rentband p{color:rgba(var(--glass-rgb),.72);font-size:.95rem;margin-top:10px;max-width:480px}
+.rentband p{color:rgba(255,255,255,.72);font-size:.95rem;margin-top:10px;max-width:480px}
 .rentband .cta{display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-start}
 .serv-grid{display:grid;gap:12px;margin-top:24px;grid-template-columns:repeat(2,1fr)}
 @media(min-width:900px){.serv-grid{grid-template-columns:repeat(4,1fr)}}
@@ -853,10 +858,10 @@ input.bad{border-color:#d98a84!important;background:var(--paper)6f5}
 @media(min-width:900px){.quizband{grid-template-columns:1.1fr .9fr;padding:32px 40px}}
 .quizband .kicker{color:var(--green)}
 .quizband h2{font-size:clamp(1.5rem,3vw,2.1rem)}
-.quizband p{color:rgba(var(--glass-rgb),.72);font-size:1rem;margin:10px 0 18px;max-width:480px}
+.quizband p{color:rgba(255,255,255,.72);font-size:1rem;margin:10px 0 18px;max-width:480px}
 .qprev{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .qcell{background:rgba(var(--glass-rgb),.07);border:1px solid rgba(var(--glass-rgb),.12);border-radius:14px;padding:14px}
-.qcell .k{font-size:.73rem;text-transform:uppercase;letter-spacing:.05em;color:rgba(var(--glass-rgb),.5);font-weight:700}
+.qcell .k{font-size:.73rem;text-transform:uppercase;letter-spacing:.05em;color:rgba(255,255,255,.5);font-weight:700}
 .qcell .v{font-size:.85rem;font-weight:600;margin-top:6px}
 
 /* ===== advantages / values / steps / services / cases ===== */
@@ -896,12 +901,12 @@ input.bad{border-color:#d98a84!important;background:var(--paper)6f5}
 .serv4 .c .sc{position:absolute;inset:0;background:linear-gradient(180deg,rgba(var(--ink-rgb),0) 30%,rgba(var(--ink-rgb),.72))}
 .serv4 .t{position:relative;z-index:2;padding:18px;color:#fff}
 .serv4 h4{font-size:1rem;font-weight:700}
-.serv4 p{font-size:.78rem;color:rgba(var(--glass-rgb),.85);margin-top:6px;line-height:1.4}
+.serv4 p{font-size:.78rem;color:rgba(255,255,255,.85);margin-top:6px;line-height:1.4}
 /* Кейсы лентой: сеткой они смотрелись то пусто, то громоздко. */
 .cases{display:flex;gap:12px;margin-top:22px;overflow-x:auto;padding:2px 2px 10px;
-  scroll-snap-type:x proximity;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  scroll-snap-type:x mandatory;scroll-padding-left:2px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .cases::-webkit-scrollbar{display:none}
-.cases .case{flex:0 0 246px;scroll-snap-align:start}
+.cases .case{flex:0 0 246px;scroll-snap-align:start;scroll-snap-stop:always}
 @media(max-width:600px){.cases .case{flex-basis:78vw}}
 
 
@@ -928,7 +933,7 @@ input.bad{border-color:#d98a84!important;background:var(--paper)6f5}
 /* ===== final cta / footer ===== */
 .final{background:var(--ink-block);color:var(--on-ink);border-radius:28px;padding:40px 24px;text-align:center}
 @media(min-width:768px){.final{padding:56px 48px}}
-.final .sub{color:rgba(var(--glass-rgb),.7);margin:12px auto 0}
+.final .sub{color:rgba(255,255,255,.7);margin:12px auto 0}
 .final-cta{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:24px}
 .footer{padding:32px 0 20px;border-top:1px solid rgba(var(--ink-rgb),.07);margin-top:40px;background:var(--paper)}
 /* На телефоне подвал был простынёй в один столбец: четыре блока подряд.
@@ -971,7 +976,7 @@ input.bad{border-color:#d98a84!important;background:var(--paper)6f5}
 .chathead{background:var(--ink-block);color:var(--on-ink);padding:15px;display:flex;align-items:center;gap:12px}
 .chathead .av{width:40px;height:40px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;color:var(--on-green);font-weight:800;flex:none}
 .chathead b{font-size:.92rem}
-.chathead .st2{font-size:.74rem;color:rgba(var(--glass-rgb),.6);display:flex;align-items:center;gap:6px}
+.chathead .st2{font-size:.74rem;color:rgba(255,255,255,.6);display:flex;align-items:center;gap:6px}
 .chathead .st2 .dot{width:7px;height:7px;border-radius:50%;background:#5fce8f}
 .chathead .x,.chathead .clr{background:rgba(var(--glass-rgb),.12);color:#fff;border-radius:50%;cursor:pointer}
 .chathead .x{margin-left:auto;width:30px;height:30px;font-size:1rem}
@@ -1255,6 +1260,62 @@ select option{background:var(--paper);color:var(--ink)}
 
 /* стрелки не должны выезжать за край экрана на телефоне */
 @media(max-width:700px){.carnav{right:14px}}
+
+/* Меню и другие всегда-тёмные панели: плашки внутри них тоже фиксированные */
+.mnav .sheet a{color:rgba(255,255,255,.88)}
+.mnav .sheet a:active{background:rgba(255,255,255,.09)}
+.mnav .xx{background:rgba(255,255,255,.12);color:#fff}
+.mnav .mlang button{background:rgba(255,255,255,.09);color:#fff}
+.mnav .mlang button.on{background:var(--green);color:var(--on-green)}
+/* Название в шапке: светло-зелёное на тёмном фоне «засвечено» — берём основной цвет */
+.logo,.logo .lname,.logo .lname span{color:var(--ink)}
+
+/* Кнопка в две строки: обещание крупно, условие мелко — вместо отдельной
+   подписи рядом (Эльнур 05.09). */
+.btn-2l{flex-direction:column;gap:2px;line-height:1.15;padding-top:10px;padding-bottom:10px}
+.btn-2l b{font-weight:700}
+.btn-2l small{font-size:.7rem;font-weight:600;opacity:.62;letter-spacing:.01em}
+/* светлая кнопка на тёмной секции — фиксированная, не зависит от темы */
+.btn-light{background:#fff;color:#14150F;border:0}
+.btn-light:hover{background:#f2f2ec}
+
+/* Карточка района раскрывается на месте: объекты выезжают из-под неё,
+   повторное нажатие сворачивает (Эльнур 05.09). */
+.zwrap{background:var(--paper);border:1px solid rgba(var(--ink-rgb),.08);border-radius:14px;overflow:hidden;
+  transition:border-color .15s,box-shadow .15s}
+.zwrap.open{border-color:var(--ink);box-shadow:var(--shadow-sm)}
+.zwrap .zone{width:100%;background:none;border:0;border-radius:0;box-shadow:none;transform:none}
+.zwrap .zone:hover{transform:none;box-shadow:none}
+.zwrap.open .zone{background:var(--warm)}
+.z-chev{font-size:.8rem;color:var(--muted);margin-top:2px}
+.zbody{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.zwrap.open .zbody{max-height:520px;padding:0 10px 10px}
+.zmeta{margin:2px 2px 8px;font-size:.78rem;color:var(--muted)}
+.zwrap .zpick-car{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px}
+.zwrap .zprop{flex:0 0 168px}
+.zwrap .zprop i{height:96px}
+
+/* На телефоне правая колонка карточки района уезжала за экран — переносим
+   доходность и расстояние под название. */
+@media(max-width:700px){
+  .zone{grid-template-columns:58px minmax(0,1fr);gap:10px;padding:9px 10px}
+  .zone i{width:58px;height:46px}
+  .zone .z-m{grid-column:2;flex-direction:row;flex-wrap:wrap;align-items:center;
+    justify-content:flex-start;gap:4px 10px;text-align:left;margin-top:2px}
+  .z-chev{margin-left:auto}
+  .zbud-h{flex-wrap:wrap;gap:4px}
+  .zbud-h b{font-size:.9rem}
+}
+
+/* Хвосты: элементы со своей светлой заливкой не должны наследовать светлый
+   текст от тёмной секции. */
+.btn-light,.btn-light *{color:#14150F!important}
+.oi-n{color:var(--on-green)}
+.chev{color:var(--on-green)}
+.faq-q .chev,.faq .chev{color:var(--on-green)}
+
+/* пока открыто меню, виджет чата не должен перекрывать нижнюю кнопку */
+body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.6.0/maplibre-gl.min.css">
@@ -1298,15 +1359,12 @@ select option{background:var(--paper);color:var(--ink)}
 <div class="mnav" id="mnav" onclick="if(event.target===this)toggleNav(false)">
   <div class="sheet">
     <div class="top"><b data-i18n="nav.menu">Меню</b><button type="button" class="xx" onclick="toggleNav(false)" aria-label="Закрыть">×</button></div>
-    <a href="index.html#why" onclick="toggleNav(false)" data-i18n="nav.why">Почему Пхукет</a>
     <a href="buy.html" data-i18n="nav.sale">Продажа</a>
     <a href="rent.html" data-i18n="nav.rent">Аренда</a>
     <a href="index.html#map" onclick="toggleNav(false)" data-i18n="nav.map">Районы</a>
     <a href="management.html">Управление</a>
-    <a href="index.html#quiz" onclick="toggleNav(false)" data-i18n="nav.quiz">Подбор</a>
-    <a href="index.html#about" onclick="toggleNav(false)" data-i18n="nav.about">О нас</a>
-    <a href="index.html#faq" onclick="toggleNav(false)" data-i18n="nav.faq">FAQ</a>
     <a href="add-property.html">Разместить объект</a>
+    <a href="index.html#about" onclick="toggleNav(false)" data-i18n="nav.about">О нас</a>
     <div class="mlang">
       <button type="button" data-l="ru" class="on" onclick="setLang('ru')">RU</button>
       <button type="button" data-l="en" onclick="setLang('en')">EN</button>
@@ -1379,7 +1437,7 @@ select option{background:var(--paper);color:var(--ink)}
     <div class="rentband reveal">
       <div>
         <h3 data-i18n="rent.b1t">Запрос на аренду — 24/7</h3>
-        <p data-i18n="rent.b1p">Заполните заявку — менеджер подберёт жильё под ваши даты и бюджет и ответит по условиям. Аренда только долгосрочная, от 30 дней.</p>
+        <p data-i18n="rent.b1p">Заполните заявку — подберём жильё под ваши даты и бюджет и ответим по условиям.</p>
       </div>
       <div class="cta">
         <button type="button" class="btn btn-green" onclick="openRentRequest()" data-i18n="rent.b1cta">Оставить запрос</button>
@@ -1410,7 +1468,7 @@ select option{background:var(--paper);color:var(--ink)}
       </div>
       <div class="cta">
         <a class="btn btn-primary" href="index.html#sale" data-i18n="rent.upcta">Смотреть объекты в продаже</a>
-        <button type="button" class="btn" style="background:#fff" onclick="openQuiz()" data-i18n="rent.upquiz">Подобрать за 10 минут</button>
+        <button type="button" class="btn btn-light btn-2l" onclick="openQuiz()"><b data-i18n="rent.upquiz">Подобрать за 10 минут</b><small data-i18n="cta.free">бесплатная консультация</small></button>
       </div>
     </div>
   </div>
@@ -1576,7 +1634,7 @@ ru: {
   "nav.why":"Пхукет","nav.sale":"Продажа","nav.rent":"Аренда","nav.map":"Районы","nav.quiz":"Подбор","nav.about":"О нас","nav.faq":"FAQ","nav.menu":"Меню",
   "hero.h1":"Мы уже выбрали Пхукет — поможем и&nbsp;вам",
   "hero.lead":"Подберем недвижимость для покупки или аренды, оформим сделку, поможем с визой и обустройством. Все под ключ — от первого звонка до заезда.",
-  "hero.cta1":"Подобрать за 10 минут","hero.cta2":"Смотреть объекты",
+  "cta.free":"бесплатная консультация","hero.cta1":"Подобрать за 10 минут","hero.cta2":"Смотреть объекты",
   "hero.note":"Бесплатная консультация","hero.float":"Ответим в течение 5 минут",
   "ph.elnur":"фото Эльнура","ph.object":"фото скоро",
   "trust.1v":"5+ лет","trust.1k":"В сфере инвестиционной недвижимости","trust.2k":"Реализованных проектов","trust.3v":"450+ млн ฿","trust.3k":"Помогли инвестировать за год","trust.4k":"Средняя доходность — прогноз, не гарантия",
@@ -1599,7 +1657,7 @@ ru: {
   "pdf.p":"Все лучшие предложения в одном PDF: цены, метражи, фото, планировки и бонусы.","pdf.cta":"Получить каталог","pdf.cover":"Каталог объектов","pdf.cover2":"Пхукет · 2026","pdf.cover3":"Property Library Phuket","pdf.cover4":"цены · планировки · рассрочка","pdf.pg2":"23 страницы",
   "rent.lab":"Аренда · 24/7","rent.h2":"Объекты, где хочется жить",
   "rent.sub":"Виллы и апартаменты на Пхукете для жизни и комфортного отдыха — аренда от месяца. Цены и условия — по запросу: оставьте заявку, подберём вариант и ответим лично. От первого касания до заселения — отдыхайте с самого начала.",
-  "rent.b1t":"Запрос на аренду — 24/7","rent.b1p":"Заполните заявку — менеджер подберёт жильё под ваши даты и бюджет и ответит по условиям. Аренда только долгосрочная, от 30 дней.",
+  "rent.b1t":"Запрос на аренду — 24/7","rent.b1p":"Заполните заявку — подберём жильё под ваши даты и бюджет и ответим по условиям.",
   "rent.b1cta":"Оставить запрос","rent.b1tg":"Консьерж в Telegram",
   "rent.servlab":"Аренда с заботой","rent.servh2":"Организуем всё и даже больше","rent.servsub":"Мы не сдаём ключи и не исчезаем. Остаёмся рядом: организуем, подскажем, решим — от встречи в аэропорту до продления визы.",
   "rs.1t":"Бронирование","rs.1p":"Подбираем и бронируем жильё без лишней волокиты",
@@ -1761,7 +1819,7 @@ en: {
   "nav.why":"Phuket","nav.sale":"Buy","nav.rent":"Rent","nav.map":"Areas","nav.quiz":"Matchmaker","nav.about":"About","nav.faq":"FAQ","nav.menu":"Menu",
   "hero.h1":"We already chose Phuket — let us help&nbsp;you",
   "hero.lead":"We find property to buy or rent, handle the deal, help with visas and settling in. Full service — from the first call to move-in.",
-  "hero.cta1":"Get matched in 10 minutes","hero.cta2":"Browse properties",
+  "cta.free":"free consultation","hero.cta1":"Get matched in 10 minutes","hero.cta2":"Browse properties",
   "hero.note":"Free consultation","hero.float":"We reply within 5 minutes",
   "ph.elnur":"photo of Elnur","ph.object":"photo soon",
   "trust.1v":"5+ years","trust.1k":"In investment real estate","trust.2k":"Projects realized","trust.3v":"450+ mln ฿","trust.3k":"Invested with our help in a year","trust.4k":"Average yield — a forecast, not a guarantee",
@@ -4659,7 +4717,8 @@ function renderZones(){
   host.innerHTML=zones.map(function(z){
     var pic=zonePic(z.d.ru);
     var on=(ZONE_SEL===z.d.ru);
-    return '<button type="button" class="zone'+(z.fit.length?'':' dim')+(on?' on':'')+'" data-z="'+
+    return '<div class="zwrap'+(on?' open':'')+'" data-zw="'+escHTML(z.d.ru)+'">'+
+      '<button type="button" class="zone'+(z.fit.length?'':' dim')+(on?' on':'')+'" data-z="'+
       escHTML(z.d.ru)+'">'+
       (pic?('<i style="background-image:url('+pic+')"></i>'):'<i></i>')+
       '<span class="z-b">'+
@@ -4673,7 +4732,10 @@ function renderZones(){
         (z.d.yield?('<span class="z-y">'+escHTML(z.d.yield)+'</span>'):'')+
         '<span class="z-be">'+escHTML(loc(z.d.beach))+' до пляжа</span>'+
         (z.rent.length?('<span class="z-r">аренда: '+z.rent.length+'</span>'):'')+
-      '</span></button>';
+        '<span class="z-chev">'+(on?'▴':'▾')+'</span>'+
+      '</span></button>'+
+      '<div class="zbody">'+(on?zoneBodyHTML(z.d.ru):'')+'</div>'+
+      '</div>';
   }).join('');
 
   Array.prototype.forEach.call(host.querySelectorAll('.zone'),function(el){
@@ -4689,37 +4751,40 @@ function zoneHover(nameRu){
   if(window.PLP_HIGHLIGHT_MANY) window.PLP_HIGHLIGHT_MANY(ids);
 }
 
-function zoneOpen(nameRu){
-  ZONE_SEL=(ZONE_SEL===nameRu)?null:nameRu;
-  renderZones();
-  var box=document.getElementById('zpick');
-  if(!ZONE_SEL){ if(box) box.hidden=true; resetMapView(); return; }
-  var d=null; PL.DISTRICTS.forEach(function(x){ if(x.ru===nameRu) d=x; });
+/* содержимое раскрытой карточки района: его объекты лентой */
+function zoneBodyHTML(nameRu){
   var sale=zoneSale(nameRu), rent=zoneRent(nameRu);
   var fit=sale.filter(inBudget), rest=sale.filter(function(p){return fit.indexOf(p)<0;});
   var list=fit.concat(rest, rent);
-  document.getElementById('zpickName').textContent=d?dName(d):nameRu;
-  document.getElementById('zpickMeta').textContent=
-    [ (d&&d.yield)?('доходность '+d.yield):'', sale.length?(sale.length+' в продаже'):'',
-      rent.length?(rent.length+' в аренде'):'', (d?loc(d.who):'') ].filter(Boolean).join(' · ');
-  var car=document.getElementById('zpickCar');
-  car.innerHTML=list.map(function(p){
-    var pic=p.photo||p.img||'';
-    var out=(p.funnel==='sale' && fit.indexOf(p)<0);
-    return '<button type="button" class="zprop'+(out?' out':'')+'" data-pid="'+p.property_id+'">'+
-      '<i style="'+(pic?('background-image:url('+pic+')'):'')+'"></i>'+
-      '<b>'+escHTML(p.title)+'</b>'+
-      '<u>'+escHTML(loc(p.type))+(p.beds?(' · '+escHTML(p.beds)+' сп.'):'')+'</u>'+
-      '<em>'+(p.funnel==='sale'?(t('u.from')+' '+fmtBaht(thbOf(p))):t('u.onreq'))+'</em>'+
-      (out?'<s>вне бюджета</s>':'')+'</button>';
-  }).join('');
-  Array.prototype.forEach.call(car.querySelectorAll('.zprop'),function(el){
-    el.addEventListener('click',function(){ openProp(el.dataset.pid); });
-    el.addEventListener('mouseenter',function(){
-      if(window.PLP_HIGHLIGHT) window.PLP_HIGHLIGHT(el.dataset.pid);
+  var d=null; PL.DISTRICTS.forEach(function(x){ if(x.ru===nameRu) d=x; });
+  var meta=[(d&&d.yield)?('доходность '+d.yield):'', (d?loc(d.who):'')].filter(Boolean).join(' · ');
+  return (meta?('<p class="zmeta">'+escHTML(meta)+'</p>'):'')+
+    '<div class="car zpick-car">'+list.map(function(p){
+      var pic=p.photo||p.img||'';
+      var out=(p.funnel==='sale' && fit.indexOf(p)<0);
+      return '<button type="button" class="zprop'+(out?' out':'')+'" data-pid="'+p.property_id+'">'+
+        '<i style="'+(pic?('background-image:url('+pic+')'):'')+'"></i>'+
+        '<b>'+escHTML(p.title)+'</b>'+
+        '<u>'+escHTML(loc(p.type))+(p.beds?(' · '+escHTML(p.beds)+' сп.'):'')+'</u>'+
+        '<em>'+(p.funnel==='sale'?(t('u.from')+' '+fmtBaht(thbOf(p))):t('u.onreq'))+'</em>'+
+        (out?'<s>вне бюджета</s>':'')+'</button>';
+    }).join('')+'</div>';
+}
+function zoneOpen(nameRu){
+  ZONE_SEL=(ZONE_SEL===nameRu)?null:nameRu;
+  renderZones();
+  if(!ZONE_SEL){ resetMapView(); return; }
+  /* объекты района открылись прямо в карточке — вешаем на них действия */
+  var wrap=document.querySelector('.zwrap[data-zw="'+nameRu.replace(/"/g,'')+'"]');
+  var car=wrap&&wrap.querySelector('.zpick-car');
+  if(car){
+    Array.prototype.forEach.call(car.querySelectorAll('.zprop'),function(el){
+      el.addEventListener('click',function(e){ e.stopPropagation(); openProp(el.dataset.pid); });
+      el.addEventListener('mouseenter',function(){
+        if(window.PLP_HIGHLIGHT) window.PLP_HIGHLIGHT(el.dataset.pid);
+      });
     });
-  });
-  if(box){ box.hidden=false; }
+  }
   focusDistrict(nameRu);
   try{ initCarHint(); }catch(e){}
 }
