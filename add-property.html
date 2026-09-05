@@ -442,7 +442,7 @@ section[id],div[id^="q"],[id="about"],[id="steps"],[id="faq"]{scroll-margin-top:
 .rd-row b{font-size:.74rem;text-transform:uppercase;letter-spacing:.03em;color:var(--muted,#8a8f7a);font-weight:700}
 .prop.booked{opacity:.5;filter:grayscale(.5);pointer-events:none;position:relative}
 .prop.booked .pic::after{content:attr(data-busy);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(var(--ink-rgb),.55);color:#fff;font-weight:700;font-size:.9rem;text-align:center;padding:12px;border-radius:inherit}
-.chipf{background:rgba(var(--glass-rgb),.85);border:1px solid rgba(var(--ink-rgb),.07);border-radius:999px;padding:9px 15px;font-size:.84rem;font-weight:600;cursor:pointer;transition:border-color .2s,background .2s,transform .15s;user-select:none}
+.chipf{white-space:nowrap;background:rgba(var(--glass-rgb),.85);border:1px solid rgba(var(--ink-rgb),.07);border-radius:999px;padding:9px 15px;font-size:.84rem;font-weight:600;cursor:pointer;transition:border-color .2s,background .2s,transform .15s;user-select:none}
 /* Бегунок цены: две ручки на одной дорожке, между ними закрашенный отрезок. */
 .stay{margin-top:12px;padding:12px;background:var(--paper);border:1px solid rgba(var(--ink-rgb),.08);border-radius:13px}
 .stay-f{display:flex;gap:10px;flex-wrap:wrap}
@@ -1453,17 +1453,17 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
   <div class="ap-card">
     <div class="ap-step" data-step="1">
       <h2 style="font-size:20px;margin:0 0 4px">Что у вас за объект</h2>
-      <label style="display:block;color:#5c5c54;font-size:13px;margin:18px 0 6px">Тип</label><div class="filters" id="ap-kind"><span class="chipf" data-v="Вилла">Вилла</span><span class="chipf" data-v="Кондо">Кондо</span><span class="chipf" data-v="Дом">Дом</span><span class="chipf" data-v="Таунхаус">Таунхаус</span><span class="chipf" data-v="Участок">Участок</span></div>
-      <label style="display:block;color:#5c5c54;font-size:13px;margin:18px 0 6px">Спален</label><div class="filters" id="ap-beds"><span class="chipf" data-v="Студия">Студия</span><span class="chipf" data-v="1">1</span><span class="chipf" data-v="2">2</span><span class="chipf" data-v="3">3</span><span class="chipf" data-v="4 и больше">4 и больше</span></div>
-      <label style="display:block;color:#5c5c54;font-size:13px;margin:18px 0 6px">Район</label><div class="filters" id="ap-area"><span class="chipf" data-v="Банг Тао">Банг Тао</span><span class="chipf" data-v="Лаян">Лаян</span><span class="chipf" data-v="Сурин">Сурин</span><span class="chipf" data-v="Камала">Камала</span><span class="chipf" data-v="Раваи">Раваи</span><span class="chipf" data-v="Най Харн">Най Харн</span><span class="chipf" data-v="Ката">Ката</span><span class="chipf" data-v="Патонг">Патонг</span><span class="chipf" data-v="Другой">Другой</span></div>
-      <label style="display:block;color:#5c5c54;font-size:13px;margin:18px 0 6px">Площадь, м²</label><input id="ap-area-sqm" type="text" placeholder="Например, 320" style="width:100%;border:1px solid #e7e5dc;border-radius:14px;padding:12px 14px;font-size:15px;font-family:inherit">
+      <label style="display:block;color:var(--muted);font-size:13px;margin:18px 0 6px">Тип</label><div class="filters" id="ap-kind"><span class="chipf" data-v="Вилла">Вилла</span><span class="chipf" data-v="Кондо">Кондо</span><span class="chipf" data-v="Дом">Дом</span><span class="chipf" data-v="Таунхаус">Таунхаус</span><span class="chipf" data-v="Участок">Участок</span></div>
+      <label style="display:block;color:var(--muted);font-size:13px;margin:18px 0 6px">Спален</label><div class="filters" id="ap-beds"><span class="chipf" data-v="Студия">Студия</span><span class="chipf" data-v="1">1</span><span class="chipf" data-v="2">2</span><span class="chipf" data-v="3">3</span><span class="chipf" data-v="4 и больше">4 и больше</span></div>
+      <label style="display:block;color:var(--muted);font-size:13px;margin:18px 0 6px">Район</label><div class="filters" id="ap-area"><span class="chipf" data-v="Банг Тао">Банг Тао</span><span class="chipf" data-v="Лаян">Лаян</span><span class="chipf" data-v="Сурин">Сурин</span><span class="chipf" data-v="Камала">Камала</span><span class="chipf" data-v="Раваи">Раваи</span><span class="chipf" data-v="Най Харн">Най Харн</span><span class="chipf" data-v="Ката">Ката</span><span class="chipf" data-v="Патонг">Патонг</span><span class="chipf" data-v="Другой">Другой</span></div>
+      <label style="display:block;color:var(--muted);font-size:13px;margin:18px 0 6px">Площадь, м²</label><input id="ap-area-sqm" type="text" placeholder="Например, 320" style="width:100%;border:1px solid var(--line,rgba(var(--ink-rgb),.12));border-radius:14px;padding:12px 14px;font-size:15px;font-family:inherit;background:var(--paper);color:var(--ink)">
     </div>
 
     <div class="ap-step" data-step="2" hidden>
       <h2 style="font-size:20px;margin:0 0 4px">Готовность и цель</h2>
-      <label style="display:block;color:#5c5c54;font-size:13px;margin:18px 0 6px">Объект готов?</label><div class="filters" id="ap-stage"><span class="chipf" data-v="Готов">Готов</span><span class="chipf" data-v="Строится">Строится</span><span class="chipf" data-v="Уже сдаётся">Уже сдаётся</span></div>
-      <label style="display:block;color:#5c5c54;font-size:13px;margin:18px 0 6px">Что хотите</label><div class="filters" id="ap-goal"><span class="chipf" data-v="Сдавать через вас">Сдавать через вас</span><span class="chipf" data-v="Продать">Продать</span><span class="chipf" data-v="Посчитать доходность">Посчитать доходность</span></div>
-      <label style="display:block;color:#5c5c54;font-size:13px;margin:18px 0 6px">Ожидаемая цена или ставка, ฿</label><input id="ap-price" type="text" placeholder="Например, 24500000 или 165000 в месяц" style="width:100%;border:1px solid #e7e5dc;border-radius:14px;padding:12px 14px;font-size:15px;font-family:inherit">
+      <label style="display:block;color:var(--muted);font-size:13px;margin:18px 0 6px">Объект готов?</label><div class="filters" id="ap-stage"><span class="chipf" data-v="Готов">Готов</span><span class="chipf" data-v="Строится">Строится</span><span class="chipf" data-v="Уже сдаётся">Уже сдаётся</span></div>
+      <label style="display:block;color:var(--muted);font-size:13px;margin:18px 0 6px">Что хотите</label><div class="filters" id="ap-goal"><span class="chipf" data-v="Сдавать через вас">Сдавать через вас</span><span class="chipf" data-v="Продать">Продать</span><span class="chipf" data-v="Посчитать доходность">Посчитать доходность</span></div>
+      <label style="display:block;color:var(--muted);font-size:13px;margin:18px 0 6px">Ожидаемая цена или ставка, ฿</label><input id="ap-price" type="text" placeholder="Например, 24500000 или 165000 в месяц" style="width:100%;border:1px solid var(--line,rgba(var(--ink-rgb),.12));border-radius:14px;padding:12px 14px;font-size:15px;font-family:inherit;background:var(--paper);color:var(--ink)">
       <p class="sub" style="font-size:13px;margin-top:8px">Точную цену обсудим — сейчас достаточно ориентира.</p>
 
       <div id="ap-nightly" hidden style="margin-top:18px;padding-top:16px;border-top:1px solid rgba(10,10,10,.08)">
@@ -1471,19 +1471,19 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
         <p class="sub" style="font-size:13px;margin:0 0 12px">Заполните сетку — и сайт сам посчитает цену на любые даты
         со скидкой за срок. Без неё придётся каждый раз уточнять вручную.</p>
         <div class="ap-row3">
-          <label style="display:block;color:#5c5c54;font-size:13px;margin:18px 0 6px">Высокий сезон, ฿/ночь&lt;span class=&quot;ap-hint&quot;&gt;декабрь–апрель&lt;/span&gt;</label><input id="ap-nh" type="text" placeholder="18000" style="width:100%;border:1px solid #e7e5dc;border-radius:14px;padding:12px 14px;font-size:15px;font-family:inherit">
-          <label style="display:block;color:#5c5c54;font-size:13px;margin:18px 0 6px">Средний, ฿/ночь&lt;span class=&quot;ap-hint&quot;&gt;май–июль&lt;/span&gt;</label><input id="ap-ns" type="text" placeholder="13000" style="width:100%;border:1px solid #e7e5dc;border-radius:14px;padding:12px 14px;font-size:15px;font-family:inherit">
-          <label style="display:block;color:#5c5c54;font-size:13px;margin:18px 0 6px">Низкий, ฿/ночь&lt;span class=&quot;ap-hint&quot;&gt;август–ноябрь&lt;/span&gt;</label><input id="ap-nl" type="text" placeholder="9000" style="width:100%;border:1px solid #e7e5dc;border-radius:14px;padding:12px 14px;font-size:15px;font-family:inherit">
+          <label style="display:block;color:var(--muted);font-size:13px;margin:18px 0 6px">Высокий сезон, ฿/ночь&lt;span class=&quot;ap-hint&quot;&gt;декабрь–апрель&lt;/span&gt;</label><input id="ap-nh" type="text" placeholder="18000" style="width:100%;border:1px solid var(--line,rgba(var(--ink-rgb),.12));border-radius:14px;padding:12px 14px;font-size:15px;font-family:inherit;background:var(--paper);color:var(--ink)">
+          <label style="display:block;color:var(--muted);font-size:13px;margin:18px 0 6px">Средний, ฿/ночь&lt;span class=&quot;ap-hint&quot;&gt;май–июль&lt;/span&gt;</label><input id="ap-ns" type="text" placeholder="13000" style="width:100%;border:1px solid var(--line,rgba(var(--ink-rgb),.12));border-radius:14px;padding:12px 14px;font-size:15px;font-family:inherit;background:var(--paper);color:var(--ink)">
+          <label style="display:block;color:var(--muted);font-size:13px;margin:18px 0 6px">Низкий, ฿/ночь&lt;span class=&quot;ap-hint&quot;&gt;август–ноябрь&lt;/span&gt;</label><input id="ap-nl" type="text" placeholder="9000" style="width:100%;border:1px solid var(--line,rgba(var(--ink-rgb),.12));border-radius:14px;padding:12px 14px;font-size:15px;font-family:inherit;background:var(--paper);color:var(--ink)">
         </div>
         <div class="ap-row3" style="margin-top:12px">
-          <label style="display:block;color:#5c5c54;font-size:13px;margin:18px 0 6px">Скидка от 3 ночей, %</label><input id="ap-d3" type="text" placeholder="" style="width:100%;border:1px solid #e7e5dc;border-radius:14px;padding:12px 14px;font-size:15px;font-family:inherit">
-          <label style="display:block;color:#5c5c54;font-size:13px;margin:18px 0 6px">Скидка от 7 ночей, %</label><input id="ap-d7" type="text" placeholder="" style="width:100%;border:1px solid #e7e5dc;border-radius:14px;padding:12px 14px;font-size:15px;font-family:inherit">
-          <label style="display:block;color:#5c5c54;font-size:13px;margin:18px 0 6px">Скидка от 14 ночей, %</label><input id="ap-d14" type="text" placeholder="" style="width:100%;border:1px solid #e7e5dc;border-radius:14px;padding:12px 14px;font-size:15px;font-family:inherit">
+          <label style="display:block;color:var(--muted);font-size:13px;margin:18px 0 6px">Скидка от 3 ночей, %</label><input id="ap-d3" type="text" placeholder="" style="width:100%;border:1px solid var(--line,rgba(var(--ink-rgb),.12));border-radius:14px;padding:12px 14px;font-size:15px;font-family:inherit;background:var(--paper);color:var(--ink)">
+          <label style="display:block;color:var(--muted);font-size:13px;margin:18px 0 6px">Скидка от 7 ночей, %</label><input id="ap-d7" type="text" placeholder="" style="width:100%;border:1px solid var(--line,rgba(var(--ink-rgb),.12));border-radius:14px;padding:12px 14px;font-size:15px;font-family:inherit;background:var(--paper);color:var(--ink)">
+          <label style="display:block;color:var(--muted);font-size:13px;margin:18px 0 6px">Скидка от 14 ночей, %</label><input id="ap-d14" type="text" placeholder="" style="width:100%;border:1px solid var(--line,rgba(var(--ink-rgb),.12));border-radius:14px;padding:12px 14px;font-size:15px;font-family:inherit;background:var(--paper);color:var(--ink)">
         </div>
         <div class="ap-row3" style="margin-top:12px">
-          <label style="display:block;color:#5c5c54;font-size:13px;margin:18px 0 6px">Скидка от 30 ночей, %</label><input id="ap-d30" type="text" placeholder="" style="width:100%;border:1px solid #e7e5dc;border-radius:14px;padding:12px 14px;font-size:15px;font-family:inherit">
-          <label style="display:block;color:#5c5c54;font-size:13px;margin:18px 0 6px">Скидка от 90 ночей, %</label><input id="ap-d90" type="text" placeholder="" style="width:100%;border:1px solid #e7e5dc;border-radius:14px;padding:12px 14px;font-size:15px;font-family:inherit">
-          <label style="display:block;color:#5c5c54;font-size:13px;margin:18px 0 6px">Минимальный срок, ночей</label><input id="ap-min" type="text" placeholder="" style="width:100%;border:1px solid #e7e5dc;border-radius:14px;padding:12px 14px;font-size:15px;font-family:inherit">
+          <label style="display:block;color:var(--muted);font-size:13px;margin:18px 0 6px">Скидка от 30 ночей, %</label><input id="ap-d30" type="text" placeholder="" style="width:100%;border:1px solid var(--line,rgba(var(--ink-rgb),.12));border-radius:14px;padding:12px 14px;font-size:15px;font-family:inherit;background:var(--paper);color:var(--ink)">
+          <label style="display:block;color:var(--muted);font-size:13px;margin:18px 0 6px">Скидка от 90 ночей, %</label><input id="ap-d90" type="text" placeholder="" style="width:100%;border:1px solid var(--line,rgba(var(--ink-rgb),.12));border-radius:14px;padding:12px 14px;font-size:15px;font-family:inherit;background:var(--paper);color:var(--ink)">
+          <label style="display:block;color:var(--muted);font-size:13px;margin:18px 0 6px">Минимальный срок, ночей</label><input id="ap-min" type="text" placeholder="" style="width:100%;border:1px solid var(--line,rgba(var(--ink-rgb),.12));border-radius:14px;padding:12px 14px;font-size:15px;font-family:inherit;background:var(--paper);color:var(--ink)">
         </div>
         <p class="sub" style="font-size:12.5px;margin-top:8px">Заполняйте только те ступени, которые у вас есть —
         пустые не показываем. Считаем всегда по самой выгодной для гостя.</p>
@@ -1505,16 +1505,16 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
 
     <div class="ap-step" data-step="4" hidden>
       <h2 style="font-size:20px;margin:0 0 4px">Опишите объект</h2>
-      <label style="display:block;color:#5c5c54;font-size:13px;margin:18px 0 6px">Название комплекса и адрес</label><input id="ap-address" type="text" placeholder="Например: Laguna Park 2, вилла 14/3" style="width:100%;border:1px solid #e7e5dc;border-radius:14px;padding:12px 14px;font-size:15px;font-family:inherit">
-      <label style="display:block;color:#5c5c54;font-size:13px;margin:18px 0 6px">Описание</label><textarea id="ap-desc" placeholder="Что важно знать: планировка, вид, ремонт, чем хорош район" style="width:100%;min-height:92px;border:1px solid #e7e5dc;border-radius:14px;padding:12px 14px;font-size:15px;font-family:inherit"></textarea>
-      <label style="display:block;color:#5c5c54;font-size:13px;margin:18px 0 6px">Что есть в доме</label><textarea id="ap-amen" placeholder="Бассейн, барбекю, парковка, охрана, стиральная машина, генератор" style="width:100%;min-height:92px;border:1px solid #e7e5dc;border-radius:14px;padding:12px 14px;font-size:15px;font-family:inherit"></textarea>
+      <label style="display:block;color:var(--muted);font-size:13px;margin:18px 0 6px">Название комплекса и адрес</label><input id="ap-address" type="text" placeholder="Например: Laguna Park 2, вилла 14/3" style="width:100%;border:1px solid var(--line,rgba(var(--ink-rgb),.12));border-radius:14px;padding:12px 14px;font-size:15px;font-family:inherit;background:var(--paper);color:var(--ink)">
+      <label style="display:block;color:var(--muted);font-size:13px;margin:18px 0 6px">Описание</label><textarea id="ap-desc" placeholder="Что важно знать: планировка, вид, ремонт, чем хорош район" style="width:100%;min-height:92px;border:1px solid var(--line,rgba(var(--ink-rgb),.12));border-radius:14px;padding:12px 14px;font-size:15px;font-family:inherit;background:var(--paper);color:var(--ink)"></textarea>
+      <label style="display:block;color:var(--muted);font-size:13px;margin:18px 0 6px">Что есть в доме</label><textarea id="ap-amen" placeholder="Бассейн, барбекю, парковка, охрана, стиральная машина, генератор" style="width:100%;min-height:92px;border:1px solid var(--line,rgba(var(--ink-rgb),.12));border-radius:14px;padding:12px 14px;font-size:15px;font-family:inherit;background:var(--paper);color:var(--ink)"></textarea>
     </div>
 
     <div class="ap-step" data-step="5" hidden>
       <h2 style="font-size:20px;margin:0 0 4px">Как с вами связаться</h2>
-      <label style="display:block;color:#5c5c54;font-size:13px;margin:18px 0 6px">Как к вам обращаться</label><input id="ap-name" type="text" placeholder="Например, Александр" style="width:100%;border:1px solid #e7e5dc;border-radius:14px;padding:12px 14px;font-size:15px;font-family:inherit">
-      <label style="display:block;color:#5c5c54;font-size:13px;margin:18px 0 6px">Телефон</label><input id="ap-phone" type="tel" placeholder="+66 95 123 4567" style="width:100%;border:1px solid #e7e5dc;border-radius:14px;padding:12px 14px;font-size:15px;font-family:inherit">
-      <label style="display:block;color:#5c5c54;font-size:13px;margin:18px 0 6px">Где удобнее общаться</label><div class="filters" id="ap-via"><span class="chipf" data-v="WhatsApp">WhatsApp</span><span class="chipf" data-v="Telegram">Telegram</span><span class="chipf" data-v="Звонок">Звонок</span></div>
+      <label style="display:block;color:var(--muted);font-size:13px;margin:18px 0 6px">Как к вам обращаться</label><input id="ap-name" type="text" placeholder="Например, Александр" style="width:100%;border:1px solid var(--line,rgba(var(--ink-rgb),.12));border-radius:14px;padding:12px 14px;font-size:15px;font-family:inherit;background:var(--paper);color:var(--ink)">
+      <label style="display:block;color:var(--muted);font-size:13px;margin:18px 0 6px">Телефон</label><input id="ap-phone" type="tel" placeholder="+66 95 123 4567" style="width:100%;border:1px solid var(--line,rgba(var(--ink-rgb),.12));border-radius:14px;padding:12px 14px;font-size:15px;font-family:inherit;background:var(--paper);color:var(--ink)">
+      <label style="display:block;color:var(--muted);font-size:13px;margin:18px 0 6px">Где удобнее общаться</label><div class="filters" id="ap-via"><span class="chipf" data-v="WhatsApp">WhatsApp</span><span class="chipf" data-v="Telegram">Telegram</span><span class="chipf" data-v="Звонок">Звонок</span></div>
       <div class="ap-sum" id="ap-sum"></div>
     </div>
 
@@ -1529,11 +1529,11 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
 
 <style>
 .ap-steps{display:flex;gap:8px;flex-wrap:wrap;margin:22px 0 16px}
-.ap-steps span{font-size:12.5px;color:var(--muted);border:1px solid rgba(10,10,10,.1);
+.ap-steps span{font-size:12.5px;color:var(--muted);border:1px solid rgba(var(--ink-rgb),.12);
   border-radius:999px;padding:6px 12px;white-space:nowrap}
-.ap-steps span.on{background:var(--ink);color:#fff;border-color:var(--ink);font-weight:600}
+.ap-steps span.on{background:var(--ink-block);color:var(--on-ink);border-color:var(--ink-block);font-weight:600}
 .ap-steps span.done{background:var(--green-soft);border-color:var(--green);color:var(--ink)}
-.ap-card{background:#fff;border:1px solid #e7e5dc;border-radius:24px;padding:clamp(20px,3vw,30px)}
+.ap-card{background:var(--paper);border:1px solid var(--line,rgba(var(--ink-rgb),.1));border-radius:24px;padding:clamp(20px,3vw,30px)}
 .ap-nav{display:flex;gap:10px;margin-top:24px}
 .ap-nav .btn{flex:0 0 auto}
 .ap-drop{border:2px dashed #d8d5c9;border-radius:18px;padding:28px;text-align:center;cursor:pointer;
