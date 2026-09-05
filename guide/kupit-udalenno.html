@@ -1316,6 +1316,26 @@ select option{background:var(--paper);color:var(--ink)}
 
 /* пока открыто меню, виджет чата не должен перекрывать нижнюю кнопку */
 body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
+
+/* Бургер: полоски брали цвет тёмной плашки и в тёмной теме исчезали. */
+.burger i{background:var(--ink)}
+.burger{background:rgba(var(--glass-rgb),.8);border-color:rgba(var(--ink-rgb),.14)}
+
+/* блок условий оплаты в карточке объекта */
+.payplan{margin:16px 0 4px;padding:13px 14px;background:var(--paper);border:1px solid rgba(var(--ink-rgb),.08);border-radius:13px}
+.paysteps{margin:8px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:5px}
+.paysteps li{font-size:.86rem;line-height:1.45}
+.paytxt{margin:8px 0 0;font-size:.86rem;line-height:1.5}
+.payplan .tnote{margin-top:9px}
+/* на телефоне цена и курс в калькуляторе не помещались в строку */
+@media(max-width:700px){
+  .calc-price-lead .prow{flex-wrap:wrap}
+  .calc-price-lead .prow .usd{flex:1 0 100%;margin-top:4px}
+}
+.calc-kpi .kpi.wide{grid-column:1/-1;text-align:left}
+.calc-kpi .kpi.wide .kl{font-size:.78rem;line-height:1.4}
+.payplan .th{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.payplan .th .pid{margin-left:auto}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.6.0/maplibre-gl.min.css">
@@ -1681,7 +1701,7 @@ ru: {
   "calc.furn":"Мебельный пакет, ฿","calc.reg":"Регистрация/сбор, ฿","calc.sink":"Фонд капремонта, ฿",
   "calc.horizon":"Горизонт, лет","calc.exit":"Комиссия при перепродаже, %",
   "calc.down":"Первый взнос, %","calc.st1":"Этап стройки 1, %","calc.st2":"Этап стройки 2, %","calc.st3":"Этап стройки 3, %","calc.rate":"Курс, ฿/$",
-  "calc.fullinc":"Полный доход за {n} лет","calc.capgain":"Прирост стоимости за {n} лет","calc.disc":"Скидка, %","calc.discp":"Со скидкой: {b} (≈ ${u})","calc.schedttl":"График платежей",
+  "calc.fullinc":"Полный доход за {n} лет","calc.capgain":"Прирост стоимости за {n} лет","calc.disc":"Скидка, %","calc.discp":"Со скидкой: {b} (≈ ${u})","calc.norates":"впишите ставку аренды в «Ещё параметры» — посчитаем доходность","calc.schedttl":"График платежей","pay.title":"Условия оплаты","pay.first":"первый взнос","pay.note":"График подтверждаем у застройщика на дату брони — он может сдвигаться вслед за стройкой.",
   "calc.sc.pay":"Платёж","calc.sc.date":"Дата","calc.sc.pct":"%","calc.sc.amt":"Сумма","calc.sc.down":"Первый взнос","calc.sc.stage":"Этап","calc.sc.keys":"Ключи","calc.sc.total":"Итого",
   "calc.schednote":"Прикидка по срокам стройки. Точные даты — в договоре застройщика.","calc.schedwarn":"Сумма этапов больше цены — уменьшите проценты.","calc.schedplan":"График застройщика","calc.schedready":"Объект сдан — рассрочки на стройку нет, расчёт при передаче.","calc.schednodate":"Срок сдачи уточняется у застройщика — сроки взносов даём по договору.",
   "v.strong":"СИЛЬНОЕ","v.risks":"РИСКИ","v.total":"ИТОГ","v.fi":"с учётом роста полный доход ~{r}% за {n} лет","v.fi.hi":" — это сильный совокупный результат","v.fi.lo":" — основной вклад даёт рост цены, а не аренда",
@@ -1866,7 +1886,7 @@ en: {
   "calc.furn":"Furniture package, ฿","calc.reg":"Registration/fees, ฿","calc.sink":"Sinking fund, ฿",
   "calc.horizon":"Horizon, yrs","calc.exit":"Resale commission, %",
   "calc.down":"Down payment, %","calc.st1":"Construction stage 1, %","calc.st2":"Construction stage 2, %","calc.st3":"Construction stage 3, %","calc.rate":"Rate, ฿/$",
-  "calc.fullinc":"Total return over {n} yrs","calc.capgain":"Capital growth over {n} yrs","calc.disc":"Discount, %","calc.discp":"Discounted: {b} (≈ ${u})","calc.schedttl":"Payment schedule",
+  "calc.fullinc":"Total return over {n} yrs","calc.capgain":"Capital growth over {n} yrs","calc.disc":"Discount, %","calc.discp":"Discounted: {b} (≈ ${u})","calc.norates":"enter a rental rate under More settings and we will compute the yield","calc.schedttl":"Payment schedule","pay.title":"Payment terms","pay.first":"first payment","pay.note":"We confirm the schedule with the developer on the booking date — it can shift with construction.",
   "calc.sc.pay":"Payment","calc.sc.date":"Date","calc.sc.pct":"%","calc.sc.amt":"Amount","calc.sc.down":"Down payment","calc.sc.stage":"Stage","calc.sc.keys":"Keys","calc.sc.total":"Total",
   "calc.schednote":"An estimate based on construction timing. Exact dates are in the developer contract.","calc.schedwarn":"Stages exceed the price — reduce the percentages.","calc.schedplan":"Developer schedule","calc.schedready":"The property is finished — no construction installments, payment at transfer.","calc.schednodate":"The handover date is being confirmed with the developer — instalment dates come from the contract.",
   "v.strong":"STRONG","v.risks":"RISKS","v.total":"BOTTOM LINE","v.fi":"with growth, total return is ~{r}% over {n} yrs","v.fi.hi":" — a strong combined result","v.fi.lo":" — most of it comes from price growth, not rent",
@@ -2992,11 +3012,11 @@ function openProp(pid){
     stEl.style.display='';var _ps=propStatus(p);stEl.className='stbadge st-'+_ps;stEl.textContent=t('st.'+_ps);
     document.getElementById('pmPrice').innerHTML='<span>'+t('u.from')+'</span> '+fmtBaht(thbOf(p));
     document.getElementById('pmSpecs').innerHTML=
-      '<div class="sp"><b>'+areaOf(p)+'</b><span>'+t('u.area')+'</span></div>'+
-      '<div class="sp"><b>'+p.beds+'</b><span>'+t('u.beds')+'</span></div>'+
-      '<div class="sp"><b>'+loc(p.deadline)+'</b><span>'+t('u.deadline')+'</span></div>'+
+      (areaOf(p)?('<div class="sp"><b>'+areaOf(p)+'</b><span>'+t('u.area')+'</span></div>'):'')+
+      (p.beds?('<div class="sp"><b>'+p.beds+'</b><span>'+t('u.beds')+'</span></div>'):'')+
+      (loc(p.deadline)?('<div class="sp"><b>'+loc(p.deadline)+'</b><span>'+t('u.deadline')+'</span></div>'):'')+
       (p.roi!=null?'<div class="sp"><b>'+roiRange(p)+'</b><span>ROI</span></div><div class="sp" style="grid-column:1/-1;border-top:0;padding-top:0"><span style="font-size:.72rem;color:var(--muted);line-height:1.5">'+t('u.roinote')+'</span></div>':'');
-    document.getElementById('pmTool').innerHTML=unitsHTML(p)+progressHTML(p)+calcHTML(p);
+    document.getElementById('pmTool').innerHTML=unitsHTML(p)+payPlanHTML(p)+progressHTML(p)+calcHTML(p);
     wireCalc(p);
     document.getElementById('pmCta').innerHTML=
       '<button type="button" class="btn btn-primary btn-block" onclick="leadFromModal(\''+pid+'\',\'kp\')">'+t('u.kp')+'</button>'+
@@ -3158,6 +3178,20 @@ function wireBooking(p){
     if(chatStarted){setTimeout(function(){note('amoCRM · '+t('book.title')+' · '+p.property_id+(note2?(' · '+note2):''));},300);}
   };
 }
+/* Условия оплаты и рассрочка — на виду, а не под спойлером калькулятора:
+   это первый вопрос покупателя после цены (Эльнур 05.09). */
+function payPlanHTML(p){
+  var c=(p&&p.calc)||{}, txt=(c.paymentPlan||'').trim();
+  if(!txt) return '';
+  /* «25% при контракте → 25% …» разбиваем на шаги, чтобы читалось глазами */
+  var parts=txt.split(/\s*(?:→|\||;)\s*/).map(function(x){return x.trim();}).filter(Boolean);
+  var steps=(parts.length>2)
+    ? '<ol class="paysteps">'+parts.map(function(x){return '<li>'+escHTML(x)+'</li>';}).join('')+'</ol>'
+    : '<p class="paytxt">'+escHTML(txt)+'</p>';
+  return '<div class="payplan"><div class="th">🧾 '+t('pay.title')+
+    (c.downPct?('<span class="pid">'+t('pay.first')+' '+c.downPct+'%</span>'):'')+'</div>'+
+    steps+'<p class="tnote">'+t('pay.note')+'</p></div>';
+}
 function calcHTML(p){
   var c=p.calc,S=c.seasons;
   function d(v,dflt){return v!=null?v:dflt;}
@@ -3289,10 +3323,15 @@ function wireCalc(p){
     if(dout)dout.textContent=disc>0?tpl('calc.discp',{b:fmtTHB(price),u:Math.round(price/rate).toLocaleString('en-US')}):'';
     var pre=document.getElementById('cDiscPre');
     if(pre)pre.querySelectorAll('button').forEach(function(b){b.classList.toggle('on',+b.dataset.v===disc);});
-    document.getElementById('calcKpi').innerHTML=
-      '<div class="kpi"><div class="kv">'+fmtTHB(net)+'</div><div class="kl">'+t('calc.netyr')+'</div></div>'+
-      '<div class="kpi"><div class="kv">'+netY.toFixed(1)+'%</div><div class="kl">'+t('calc.netyield')+'</div></div>'+
-      '<div class="kpi"><div class="kv">'+(payback>0?payback.toFixed(1)+' '+t('calc.years'):'—')+'</div><div class="kl">'+t('calc.payback')+'</div></div>';
+    /* Ставок аренды по объекту может не быть — тогда расчёт уходил в минус и
+       на витрине висело «฿-15 000 чистыми/год». Пока ставки не вписаны,
+       показываем прочерк и просим их указать (Эльнур 05.09). */
+    var noRates = !(gross>0);
+    document.getElementById('calcKpi').innerHTML= noRates
+      ? '<div class="kpi wide"><div class="kv">—</div><div class="kl">'+t('calc.norates')+'</div></div>'
+      : ('<div class="kpi"><div class="kv">'+fmtTHB(net)+'</div><div class="kl">'+t('calc.netyr')+'</div></div>'+
+         '<div class="kpi"><div class="kv">'+netY.toFixed(1)+'%</div><div class="kl">'+t('calc.netyield')+'</div></div>'+
+         '<div class="kpi"><div class="kv">'+(payback>0?payback.toFixed(1)+' '+t('calc.years'):'—')+'</div><div class="kl">'+t('calc.payback')+'</div></div>');
     document.getElementById('calcOut').innerHTML=
       '<div class="big"><span class="k">'+tpl('calc.fullinc',{n:horizon})+'</span><span class="v">'+fmtTHB(fullInc)+'</span></div>'+
       '<div class="row grow" style="margin-top:6px"><span>'+tpl('calc.capgain',{n:horizon})+'</span><b>+'+fmtTHB(capGain)+'</b></div>'+
