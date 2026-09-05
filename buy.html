@@ -380,7 +380,7 @@ section[id],div[id^="q"],[id="about"],[id="steps"],[id="faq"]{scroll-margin-top:
 .why-card p{font-size:.88rem;color:var(--muted);margin-top:7px;line-height:1.45}
 .wstats{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:18px}
 @media(min-width:768px){.wstats{grid-template-columns:repeat(4,1fr)}}
-.ws{background:var(--green-soft);border-radius:16px;padding:16px 20px}
+.ws{background:var(--green-soft);border-radius:16px;padding:16px 20px;color:var(--ink)}
 .ws b{font-size:1.4rem;font-weight:800;letter-spacing:-.02em;display:block}
 .ws span{font-size:.78rem;color:var(--muted);line-height:1.35}
 .wsrc{font-size:.75rem;color:var(--muted);margin:12px 2px 0}
@@ -442,7 +442,7 @@ section[id],div[id^="q"],[id="about"],[id="steps"],[id="faq"]{scroll-margin-top:
 .rd-row b{font-size:.74rem;text-transform:uppercase;letter-spacing:.03em;color:var(--muted,#8a8f7a);font-weight:700}
 .prop.booked{opacity:.5;filter:grayscale(.5);pointer-events:none;position:relative}
 .prop.booked .pic::after{content:attr(data-busy);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(var(--ink-rgb),.55);color:#fff;font-weight:700;font-size:.9rem;text-align:center;padding:12px;border-radius:inherit}
-.chipf{background:rgba(var(--glass-rgb),.85);border:1px solid rgba(var(--ink-rgb),.07);border-radius:999px;padding:9px 15px;font-size:.84rem;font-weight:600;cursor:pointer;transition:border-color .2s,background .2s,transform .15s;user-select:none}
+.chipf{white-space:nowrap;background:rgba(var(--glass-rgb),.85);border:1px solid rgba(var(--ink-rgb),.07);border-radius:999px;padding:9px 15px;font-size:.84rem;font-weight:600;cursor:pointer;transition:border-color .2s,background .2s,transform .15s;user-select:none}
 /* Бегунок цены: две ручки на одной дорожке, между ними закрашенный отрезок. */
 .stay{margin-top:12px;padding:12px;background:var(--paper);border:1px solid rgba(var(--ink-rgb),.08);border-radius:13px}
 .stay-f{display:flex;gap:10px;flex-wrap:wrap}
@@ -786,7 +786,7 @@ input.bad{border-color:#d98a84!important;background:var(--paper)6f5}
 .plp-pin.approx{border-style:dashed;opacity:.92}
 .prop .price .pdate{display:block;font-size:.75rem;font-weight:500;color:var(--muted);margin-top:3px;letter-spacing:0}
 .prop .price .pdate.av{color:var(--olive)}
-.prop .price .pdate.av.few{color:#8f4b3a;font-weight:700}
+.prop .price .pdate.av.few{color:var(--warn-ink,#8f4b3a);font-weight:700}
 .stg{display:inline-block;font-size:.73rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;
   border-radius:999px;padding:3px 9px;margin-right:6px;white-space:nowrap;vertical-align:middle}
 .stg-ready{background:var(--green,#D2D5B3);color:var(--on-green)}
@@ -872,7 +872,7 @@ input.bad{border-color:#d98a84!important;background:var(--paper)6f5}
 @media(min-width:1000px){.adv{grid-template-columns:repeat(3,1fr)}}
 .adv .c{background:var(--paper);border-radius:var(--r);padding:20px;box-shadow:var(--shadow-sm);transition:transform .3s cubic-bezier(.16,1,.3,1),box-shadow .3s}
 .adv .c:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
-.adv .ic{width:44px;height:44px;border-radius:13px;background:var(--green);display:flex;align-items:center;justify-content:center;margin-bottom:11px;font-size:1.15rem}
+.adv .ic{width:44px;height:44px;border-radius:13px;background:var(--green);color:var(--on-green);display:flex;align-items:center;justify-content:center;margin-bottom:11px;font-size:1.15rem}
 .adv h4{font-size:1rem;font-weight:700}
 .adv p{font-size:.85rem;color:var(--muted);margin-top:7px;line-height:1.45}
 .values{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
@@ -1168,7 +1168,7 @@ input.bad{border-color:#d98a84!important;background:var(--paper)6f5}
 .qz-next{margin-left:auto;background:var(--ink-block);color:var(--on-ink);border-radius:12px;height:48px;padding:0 26px;font-weight:700;font-size:.92rem}
 .qz-next:disabled{opacity:.4;cursor:not-allowed}
 .qz-done{text-align:center;padding:14px 6px}
-.qz-done .ic{width:64px;height:64px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:1.8rem}
+.qz-done .ic{width:64px;height:64px;border-radius:50%;background:var(--green);color:var(--on-green);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:1.8rem}
 .qz-done h3{font-size:1.3rem;font-weight:800}
 .qz-done p{color:var(--muted);font-size:.92rem;line-height:1.5;margin:10px auto 0;max-width:380px}
 .thumb{display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;color:rgba(var(--ink-rgb),.4);position:relative;overflow:hidden}
@@ -1199,9 +1199,9 @@ input.bad{border-color:#d98a84!important;background:var(--paper)6f5}
 .oi-box .sub{margin:0;padding:0 18px 4px;font-size:.86rem}
 .oi-n{font-size:12px;color:var(--muted);background:#f0f0e8;border-radius:10px;padding:1px 8px}
 .oi-list{margin:0;padding:6px 0 10px;list-style:none;max-height:min(60vh,520px);overflow:auto}
-.oi-list li{display:flex;align-items:baseline;gap:10px;padding:8px 18px;font-size:14px;line-height:1.4;border-top:1px solid #f2f2ec}
+.oi-list li{display:flex;align-items:baseline;gap:10px;padding:8px 18px;font-size:14px;line-height:1.4;border-top:1px solid rgba(var(--ink-rgb),.08)}
 .oi-list li:first-child{border-top:0}
-.oi-list a{color:#2b2b26;text-decoration:none;border-bottom:1px solid rgba(0,0,0,.14)}
+.oi-list a{color:var(--ink);text-decoration:none;border-bottom:1px solid rgba(var(--ink-rgb),.22)}
 .oi-list a:hover{border-bottom-color:currentColor}
 .oi-list .oi-d{color:var(--muted);font-size:12.5px}
 .oi-list .oi-p{margin-left:auto;color:var(--muted);font-size:13px;white-space:nowrap;font-variant-numeric:tabular-nums}
@@ -1226,6 +1226,10 @@ select option{background:var(--paper);color:var(--ink)}
 /* На зелёной заливке текст всегда тёмный — в любой теме */
 .pdfband,.pdfband *:not(.btn):not(.pg):not(.pg *){color:var(--on-green)}
 .rentband,.rentband *:not(.btn){color:var(--on-ink)}
+/* тот же блок, но на светло-зелёной заливке — текст тёмный в любой теме */
+.rentband.on-green{background:var(--green)}
+.rentband.on-green,.rentband.on-green *:not(.btn){color:var(--on-green)}
+.rentband.on-green p{color:rgba(20,21,15,.78)}
 /* мелкие подписи внутри тёмных секций всегда светлые */
 .quizband .k,.quizband .val,.final .ic,.final .chev,.rentband .sub{color:var(--on-ink)}
 
@@ -1237,8 +1241,12 @@ select option{background:var(--paper);color:var(--ink)}
 .assist-box .btn-primary{background:var(--ink-block);color:var(--on-ink)}
 .assist-box .btn-ghost{border-color:rgba(20,21,15,.4);color:var(--on-green)}
 .assist-box .chipf{background:rgba(255,255,255,.78);border-color:transparent;color:var(--on-green)}
+/* Эти плашки залиты --green-soft, а он в тёмной теме темнеет вместе с фоном:
+   тёмный текст на них исчезал. Текст следует теме, а не заливке. */
 .ws,.ws *,.qz-match,.qz-match *,.calc-kpi .kpi,.calc-kpi .kpi *,.avr,.avr *,
-.cmp-grid .cv.win,.st-available{color:var(--on-green)}
+.cmp-grid .cv.win{color:var(--ink)}
+.ws span,.avr .ak,.calc-kpi .kpi .kl{color:var(--muted)}
+.st-available{color:var(--on-green)}
 .g1,.g2,.g3,.g4{color:var(--on-green)}
 
 /* Стрелки листания — в правом верхнем углу прямо над лентой (Эльнур 05.09).
@@ -1377,6 +1385,14 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
   .chipf:hover,.fbtn:hover,.btn:hover,.zone:hover,.mobj:hover,.prop:hover{
     background:inherit;color:inherit;transform:none}
 }
+
+/* «мало осталось» кирпичным цветом тонуло в тёмной теме */
+:root{--warn-ink:#8f4b3a}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){--warn-ink:#e2a08f} }
+:root[data-theme="dark"]{--warn-ink:#e2a08f}
+/* подпись карты всегда на своей светлой подложке */
+.leaflet-control-attribution{background:rgba(255,255,255,.86)!important;color:#333!important}
+.leaflet-control-attribution a{color:#0b6bcb!important}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.6.0/maplibre-gl.min.css">

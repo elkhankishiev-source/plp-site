@@ -11,9 +11,9 @@ const head=idx.slice(0,mOpen), tail=idx.slice(mEnd);
 
 const chips=(id,arr)=>`<div class="filters" id="${id}">`+
   arr.map(v=>`<span class="chipf" data-v="${esc(v)}">${esc(v)}</span>`).join('')+`</div>`;
-const lab=t=>`<label style="display:block;color:#5c5c54;font-size:13px;margin:18px 0 6px">${esc(t)}</label>`;
-const inp=(id,ph,type='text')=>`<input id="${id}" type="${type}" placeholder="${esc(ph)}" style="width:100%;border:1px solid #e7e5dc;border-radius:14px;padding:12px 14px;font-size:15px;font-family:inherit">`;
-const ta=(id,ph)=>`<textarea id="${id}" placeholder="${esc(ph)}" style="width:100%;min-height:92px;border:1px solid #e7e5dc;border-radius:14px;padding:12px 14px;font-size:15px;font-family:inherit"></textarea>`;
+const lab=t=>`<label style="display:block;color:var(--muted);font-size:13px;margin:18px 0 6px">${esc(t)}</label>`;
+const inp=(id,ph,type='text')=>`<input id="${id}" type="${type}" placeholder="${esc(ph)}" style="width:100%;border:1px solid var(--line,rgba(var(--ink-rgb),.12));border-radius:14px;padding:12px 14px;font-size:15px;font-family:inherit;background:var(--paper);color:var(--ink)">`;
+const ta=(id,ph)=>`<textarea id="${id}" placeholder="${esc(ph)}" style="width:100%;min-height:92px;border:1px solid var(--line,rgba(var(--ink-rgb),.12));border-radius:14px;padding:12px 14px;font-size:15px;font-family:inherit;background:var(--paper);color:var(--ink)"></textarea>`;
 
 const body=`
 <section style="padding-bottom:0"><div class="container" style="max-width:820px">
