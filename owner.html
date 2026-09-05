@@ -990,6 +990,17 @@ button#send-code,button#send-code-2,button#do-login,button#do-reg{
 .opt{color:var(--ink)}
 .bcell.bgo{cursor:pointer}
 .bcell.bgo:hover{border-color:var(--olive)}
+
+/* карточка «с сайта» внутри объекта в кабинете */
+.sitecard{margin-top:12px;padding:12px 13px;background:var(--warm);border-radius:13px}
+.sc-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+  font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.sc-h b{font-size:.95rem;color:var(--ink);letter-spacing:0;text-transform:none}
+.sc-us{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 6px}
+.sc-u{background:var(--paper);border:1px solid rgba(var(--ink-rgb),.08);border-radius:10px;
+  padding:6px 10px;font-size:.8rem}
+.sc-u i{font-style:normal;color:var(--muted)}
+.sc-u u{text-decoration:none;font-weight:700}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 </head>
@@ -2302,17 +2313,54 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   }
 
   // ── карточка одного объекта, по разделам ────────────────────
+  /* Данные объекта с сайта: цена, типы и ссылка на карточку — чтобы в кабинете
+     не заводить их второй раз (Эльнур 05.09: «инфа уже наполнена на сайте,
+     дальше она подтягивается везде»). */
+  var SITE_CAT=null;
+  function siteCatalog(){
+    if(SITE_CAT) return Promise.resolve(SITE_CAT);
+    return fetch('offer-catalog.json',{cache:'no-cache'}).then(function(r){return r.json();})
+      .then(function(d){ SITE_CAT=(d&&d.items)||[]; return SITE_CAT; })
+      .catch(function(){ SITE_CAT=[]; return SITE_CAT; });
+  }
+  function fmtB(n){
+    n=Number(n)||0;
+    return n>=1e6 ? ('฿'+(n/1e6).toFixed(n%1e6?1:0).replace('.',',')+' млн')
+                  : ('฿'+Math.round(n).toLocaleString('ru-RU'));
+  }
+  function renderSiteCard(p){
+    var box=document.getElementById('site-card'); if(!box||!p) return;
+    var pid=String(p.property_id||p.plp_property_id||p.id||'').toUpperCase();
+    if(!pid) return;
+    siteCatalog().then(function(items){
+      var o=items.filter(function(x){ return String(x.id).toUpperCase()===pid; })[0];
+      if(!o){ box.innerHTML=''; return; }
+      var units=(o.units||[]).slice(0,4).map(function(u){
+        return '<span class="sc-u"><b>'+esc(u.name||'')+'</b>'+
+          (u.area?(' <i>от '+u.area+' м²</i>'):'')+
+          (u.from?(' <u>от '+fmtB(u.from)+'</u>'):'')+'</span>';
+      }).join('');
+      box.innerHTML='<div class="sitecard"><div class="sc-h">С сайта'+
+        (o.price_from?('<b>от '+fmtB(o.price_from)+'</b>'):'')+'</div>'+
+        '<p class="sub">'+esc([o.district,o.type].filter(Boolean).join(' · '))+'</p>'+
+        (units?('<div class="sc-us">'+units+'</div>'):'')+
+        '<a class="lnk" href="index.html#object='+encodeURIComponent(pid)+'" target="_blank" rel="noopener">Открыть карточку на сайте</a>'+
+        '</div>';
+    });
+  }
   function renderProp(){
     var p=(DATA.properties||[])[CUR];
     if(!p){ $('prop').innerHTML='<div class="card"><p class="sub">Объекты не привязаны. Обратитесь к менеджеру.</p></div>'; return; }
     var c=p.contract||{}, cur=c.currency||'THB', H='';
+    setTimeout(function(){ try{ renderSiteCard(p); }catch(e){} },0);
 
     // шапка
     var bits=[];
     if(p.district) bits.push(p.district);
     if(p.bedrooms) bits.push('спален: '+p.bedrooms);
     if(p.stage) bits.push(p.stage);
-    H+='<div class="card"><h1>'+esc(p.name||p.id)+'</h1><p class="sub">'+esc(bits.join(' · ')||p.id)+'</p></div>';
+    H+='<div class="card"><h1>'+esc(p.name||p.id)+'</h1><p class="sub">'+esc(bits.join(' · ')||p.id)+'</p>'+
+        '<div id="site-card"></div></div>';
 
     // выплата по объекту
     var closed=(p.statements||[]).filter(function(s){return s.status&&s.status!=='draft';});
@@ -2323,9 +2371,12 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
          ? (last.status==='draft'?'Черновик — сумма может измениться.':'Отчёт закрыт и утверждён.')
          : 'Первый отчёт будет сформирован '+dmy((DATA.period||{}).end)+'.')+'</div></div>';
 
+    /* у нового объекта показателей периода может ещё не быть — раньше на этом
+       падала вся вкладка «Объект» */
+    var curp=p.current||{};
     H+='<div class="grid">'+
-       '<div class="metric"><div class="k">Доход периода</div><div class="v pos">'+money(p.current.income,cur)+'</div></div>'+
-       '<div class="metric"><div class="k">Расходы периода</div><div class="v neg">'+money(p.current.expenses,cur)+'</div></div>'+
+       '<div class="metric"><div class="k">Доход периода</div><div class="v pos">'+money(curp.income||0,cur)+'</div></div>'+
+       '<div class="metric"><div class="k">Расходы периода</div><div class="v neg">'+money(curp.expenses||0,cur)+'</div></div>'+
        '</div>';
 
     // фото и материалы
@@ -3720,7 +3771,14 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
 
   // формы: завести человека, добавить объект, поставить задачу, доска задач
   function clForm(html, onSave){
-    var box=document.getElementById('cl-form'); if(!box) return;
+    var box=document.getElementById('cl-form');
+    /* Окно живёт в разделе клиентов; когда его на странице нет (например,
+       открываем подробности заезда с обзора), создаём контейнер на лету —
+       раньше нажатие просто не давало ничего (Эльнур 05.09). */
+    if(!box){
+      box=document.createElement('div'); box.id='cl-form';
+      document.body.appendChild(box);
+    }
     box.innerHTML='<div class="modal"><div class="modal-back"></div>'+
                   '<div class="modal-win"><div class="ccard">'+html+'</div></div></div>';
     document.body.style.overflow='hidden';
