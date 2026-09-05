@@ -1370,6 +1370,13 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
   .toolbar .curswitch{flex:0 0 auto}
   .toolbar .chipf{flex:0 0 auto}
 }
+
+/* наведение только там, где есть мышь: на телефоне hover залипал после нажатия
+   и кнопка оставалась светлой плашкой со светлым текстом */
+@media (hover:none){
+  .chipf:hover,.fbtn:hover,.btn:hover,.zone:hover,.mobj:hover,.prop:hover{
+    background:inherit;color:inherit;transform:none}
+}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.6.0/maplibre-gl.min.css">
