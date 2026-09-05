@@ -1001,6 +1001,49 @@ button#send-code,button#send-code-2,button#do-login,button#do-reg{
   padding:6px 10px;font-size:.8rem}
 .sc-u i{font-style:normal;color:var(--muted)}
 .sc-u u{text-decoration:none;font-weight:700}
+
+/* ===== каркас кабинета: контекст сверху, меню списком ===== */
+.cab-ctx{background:var(--paper);border:1px solid rgba(var(--ink-rgb),.08);border-radius:14px;
+  padding:12px 14px;margin-bottom:12px}
+.ctx-row{display:grid;gap:10px}
+@media(min-width:760px){.ctx-row{grid-template-columns:1fr 1fr}}
+.ctx-f{display:block}
+.ctx-f>span{display:block;font-size:.68rem;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:5px}
+.ctx-note{margin:9px 0 0;font-size:.8rem;color:var(--muted)}
+.nav-n{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;
+  padding:0 6px;margin-left:8px;border-radius:999px;background:var(--green);color:var(--on-green);
+  font-size:.72rem;font-weight:800}
+.bellbtn{position:relative;display:inline-flex;align-items:center;justify-content:center;
+  width:34px;height:34px;border-radius:11px;border:1px solid rgba(var(--ink-rgb),.14);
+  background:var(--paper);font-size:15px;cursor:pointer}
+.bell-n{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;padding:0 5px;
+  border-radius:999px;background:#c0392b;color:#fff;font-size:.68rem;font-weight:800;
+  display:inline-flex;align-items:center;justify-content:center}
+@media(max-width:900px){
+  /* меню — вертикальный список; выбранный раздел раскрывается под своим пунктом */
+  .cab-nav{display:flex;flex-direction:column;gap:6px;overflow:visible}
+  .cab-nav a{display:flex;align-items:center;justify-content:space-between;
+    background:var(--paper);border:1px solid rgba(var(--ink-rgb),.08);border-radius:13px;
+    padding:13px 14px;font-weight:600}
+  .cab-nav a.on{border-color:var(--ink);background:var(--warm)}
+  .cab-nav a.on::after{content:'▴';color:var(--muted);margin-left:8px}
+  .cab-nav a:not(.on)::after{content:'▾';color:var(--muted);margin-left:8px}
+  #cab-body{margin:8px 0 10px}
+}
+
+/* Модерация: список свёрнутых карточек, детали — по нажатию */
+.msub.fold{padding:0;overflow:hidden}
+.msub-h{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;
+  border:0;padding:12px 14px;cursor:pointer;font:inherit;color:var(--ink);margin:0}
+.ms-t{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+.ms-t b{font-size:.92rem;line-height:1.25}
+.ms-t u{text-decoration:none;font-size:.76rem;color:var(--muted)}
+.ms-s{font-size:.72rem;color:var(--muted);white-space:nowrap}
+.ms-c{color:var(--muted);transition:transform .2s}
+.msub.open .ms-c{transform:rotate(180deg)}
+.msub-b{display:none;padding:0 14px 14px}
+.msub.open .msub-b{display:block}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 </head>
@@ -1016,6 +1059,7 @@ button#send-code,button#send-code-2,button#do-login,button#do-reg{
       <a href="index.html#about" data-i18n="nav.about">О нас</a>
     </nav>
     <div class="htools">
+      <button type="button" class="bellbtn" id="bellBtn" aria-label="Уведомления">🔔<span class="bell-n" id="bellN" hidden>0</span></button>
       <button type="button" class="themebtn" id="themeBtn" onclick="cycleTheme()"
               aria-label="Оформление: системное, светлое, тёмное"><span id="themeIco">◐</span></button>
       <a class="btn btn-ghost btn-cab on" href="owner.html" data-i18n="nav.cabinet">Кабинет</a>
@@ -1203,6 +1247,13 @@ button#send-code,button#send-code-2,button#do-login,button#do-reg{
   <div id="loading" class="card"><p class="sub">Загружаем данные…</p></div>
 
   <div id="app" style="display:none">
+    <div id="cab-ctx" class="cab-ctx" hidden>
+      <div class="ctx-row">
+        <label class="ctx-f" id="ctx-lead-w"><span>Человек</span><div id="ctx-lead"></div></label>
+        <label class="ctx-f"><span>Объект</span><div id="ctx-obj"></div></label>
+      </div>
+      <p class="ctx-note" id="ctx-note"></p>
+    </div>
     <div id="cab-nav" class="cab-nav" aria-label="Разделы кабинета">
       <a data-tab="overview" class="on">Обзор</a>
       <a data-tab="calendar">Бронирования</a>
@@ -2633,8 +2684,24 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       items.forEach(function(it){ box.appendChild(subCard(it)); });
     });
   }
+  /* Эльнур 05.09: «модерация — огромные полотна, нужен порядок: список с
+     информативным заголовком, нажал — раскрылась детальная информация». */
   function subCard(it){
-    var d=document.createElement('div'); d.className='msub';
+    var d=document.createElement('div'); d.className='msub fold';
+    var head=document.createElement('button');
+    head.type='button'; head.className='msub-h';
+    var when0=String(it.created_at||'').slice(0,10).split('-').reverse().join('.');
+    var st = it.status==='published' ? 'опубликован'
+           : it.status==='rejected' ? 'отклонён'
+           : it.status==='in_review' ? 'в работе' : 'новая';
+    head.innerHTML='<span class="ms-t"><b>'+esc(it.address || ((it.kind||'Объект')+(it.district?' · '+it.district:'')))+'</b>'+
+      '<u>'+esc(it.name||'—')+(it.phone?(' · '+esc(it.phone)):'')+' · '+when0+'</u></span>'+
+      '<span class="ms-s">'+st+'</span><span class="ms-c">▾</span>';
+    head.onclick=function(){ d.classList.toggle('open'); };
+    d.appendChild(head);
+    var body=document.createElement('div'); body.className='msub-b';
+    d.appendChild(body);
+    d=body;   /* дальше карточка наполняет тело — снаружи виден только заголовок */
     var media=Array.isArray(it.media)?it.media:[];
     var when=String(it.created_at||'').slice(0,10).split('-').reverse().join('.');
     var tag = it.status==='published' ? '<span class="tag">опубликован</span>'
@@ -2653,7 +2720,6 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
              :'<input data-k="'+k+'" value="'+esc(val||'')+'">')+'</div>';
     }
     d.innerHTML =
-      '<h3>'+esc(it.address || ((it.kind||'Объект')+(it.district?' · '+it.district:'')))+tag+'</h3>'+
       '<p class="meta">'+esc(it.name||'—')+' · '+esc(it.phone||'')+
         (it.contact_via?' · '+esc(it.contact_via):'')+' · '+when+' · заявка '+esc(it.ref)+'</p>'+
       gal+
@@ -2699,7 +2765,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         });
       };
     });
-    return d;
+    return d.parentElement || d;   /* наружу отдаём свёрнутую карточку целиком */
   }
 
 
@@ -3469,7 +3535,10 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         '<label>Зачем пишем<input id="cm-purpose" type="text" placeholder="повод, чтобы было видно потом"></label>'+
         '<label>С какого номера<select id="cm-from">'+
           (CMP_CH.length?CMP_CH.map(function(c){
-            return '<option value="'+c.id+'|'+c.transport+'|'+clEsc(c.label)+'">'+clEsc(c.label)+'</option>';
+            /* Эльнур 05.09: у номера должно быть имя — понятно, от кого письмо */
+            var who=[c.owner_name,c.person,c.name].filter(Boolean)[0]||'';
+            var lab=clEsc(c.label)+(who?(' — '+clEsc(who)):'');
+            return '<option value="'+c.id+'|'+c.transport+'|'+clEsc(c.label)+'">'+lab+'</option>';
           }).join(''):'<option value="">нет доступных каналов</option>')+'</select></label>'+
         '<label>Сколько в день<input id="cm-perday" type="number" value="20" min="1" max="50"></label>'+
         '</div>'+
@@ -4121,6 +4190,99 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     'sec-myreq':'actions', 'sec-moder':'staff', 'sec-coords':'staff',
     'sec-clients':'clients', 'sec-mine':'mine', 'sec-board':'board', 'sec-camp':'camp'
   };
+  /* ===== КОНТЕКСТ РАБОТЫ: человек → его объект =====
+     Эльнур 05.09: «сотрудник заходит, выбирает лида, выбирает его объект — и мы
+     работаем с конкретной информацией». Выбор живёт наверху и виден всегда. */
+  var CTX={lead:null, leadName:'', obj:null};
+  function ctxIsStaff(){ return !!(DATA && DATA.owner && DATA.owner.is_staff===true); }
+  function ctxObjects(){
+    return (DATA && DATA.properties || []).map(function(p,i){
+      return { id:String(i), title:(p.name||p.id||'Объект'),
+               sub:[p.district,p.unit].filter(Boolean).join(' · ') };
+    });
+  }
+  function renderCtx(){
+    var box=document.getElementById('cab-ctx'); if(!box) return;
+    box.hidden=false;
+    var lw=document.getElementById('ctx-lead-w');
+    if(lw) lw.style.display = ctxIsStaff() ? '' : 'none';
+    /* объект: у владельца это его объекты, у сотрудника — объекты выбранного человека */
+    var host=document.getElementById('ctx-obj');
+    if(host && !host.__built){
+      host.__built=1;
+      pickList(host,{ multi:false, placeholder:'все объекты', items:ctxObjects(),
+        onChange:function(ids){
+          CTX.obj=ids.length?Number(ids[0]):null;
+          if(CTX.obj!=null){ CUR=CTX.obj; }
+          ctxNote();
+          try{ renderProp(); renderPortfolio(); }catch(e){}
+        }});
+    }
+    if(ctxIsStaff()){
+      var lh=document.getElementById('ctx-lead');
+      if(lh && !lh.__built){
+        lh.__built=1;
+        /* список людей подтягиваем тем же запросом, что и раздел «Люди» */
+        post({action:'clients_list',token:TOKEN,limit:300}).then(function(d){
+          var rows=(d&&(d.rows||d.clients))||[];
+          pickList(lh,{ multi:false, placeholder:'найти по имени или номеру',
+            items:rows.map(function(c){
+              return { id:String(c.code||c.client_code||c.id||''),
+                       title:(c.name||'Без имени'),
+                       sub:[c.phone,c.temp].filter(Boolean).join(' · ') };
+            }),
+            onChange:function(ids){
+              CTX.lead=ids[0]||null;
+              var it=rows.filter(function(c){return String(c.code||c.client_code||c.id)===CTX.lead;})[0];
+              CTX.leadName=it?(it.name||''):'';
+              ctxNote();
+            }});
+        }).catch(function(){});
+      }
+    }
+    ctxNote();
+  }
+  function ctxNote(){
+    var n=document.getElementById('ctx-note'); if(!n) return;
+    var parts=[];
+    if(ctxIsStaff()) parts.push(CTX.lead?('человек: '+(CTX.leadName||CTX.lead)):'человек не выбран');
+    var p=(DATA.properties||[])[CTX.obj!=null?CTX.obj:CUR];
+    parts.push(p?('объект: '+(p.name||p.id)):'объект не выбран');
+    n.textContent=parts.join(' · ');
+  }
+
+  /* ===== СЧЁТЧИКИ И КОЛОКОЛЬЧИК =====
+     Цифра рядом с разделом — сколько там ждёт внимания. Колокольчик — сумма. */
+  function cabCounts(){
+    var c={};
+    var props=DATA.properties||[];
+    var reqs=0, works=0, docs=0, stays=0;
+    props.forEach(function(p){
+      reqs+=((p.requests||[]).filter(function(r){return !r.done_at;})).length;
+      works+=((p.services||p.works||[]).filter(function(w){return w.status && w.status!=='done';})).length;
+      docs+=(p.documents||p.docs||[]).length ? 0 : 0;
+      (p.bookings||[]).forEach(function(b){ if(b.status==='upcoming') stays++; });
+    });
+    if(reqs) c.actions=reqs;
+    if(works) c.service=works;
+    if(stays) c.calendar=stays;
+    if(DATA.moderation && DATA.moderation.length) c.staff=DATA.moderation.length;
+    return c;
+  }
+  function paintCounts(){
+    var c=cabCounts(), total=0;
+    var nav=document.getElementById('cab-nav'); if(!nav) return;
+    Array.prototype.forEach.call(nav.querySelectorAll(':scope > a[data-tab]'),function(a){
+      var t=a.getAttribute('data-tab'), n=c[t]||0;
+      var b=a.querySelector('.nav-n');
+      if(!b){ b=document.createElement('span'); b.className='nav-n'; a.appendChild(b); }
+      b.textContent=n||''; b.hidden=!n;
+      total+=n;
+    });
+    var bell=document.getElementById('bellN');
+    if(bell){ bell.textContent=total||''; bell.hidden=!total; }
+  }
+
   function cabPage(name){
     CAB_TAB=name;
     var body=document.getElementById('cab-body'); if(!body) return;
@@ -4141,8 +4303,21 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       }
       el.style.display=(TAB_OF[id]===name)?'':'none';
     });
+    var body2=document.getElementById('cab-body');
+    if(body2) body2.hidden=false;
     var nav=document.getElementById('cab-nav');
-    if(nav) Array.prototype.forEach.call(nav.querySelectorAll('a[data-tab]'), function(a){
+    if(nav && body2 && window.matchMedia && window.matchMedia('(max-width:900px)').matches){
+      /* на телефоне содержимое раздела встаёт сразу под его пунктом */
+      var act=nav.querySelector('a[data-tab="'+name+'"]');
+      if(act && act.nextSibling!==body2 && act.parentElement===nav){
+        nav.parentElement.insertBefore(body2, act.nextSibling ? null : null);
+        act.insertAdjacentElement('afterend', body2);
+      }
+    } else if(body2 && body2.parentElement && body2.parentElement.id==='cab-nav'){
+      /* на большом экране возвращаем тело под список */
+      nav.parentElement.insertBefore(body2, nav.nextSibling);
+    }
+    if(nav) Array.prototype.forEach.call(nav.querySelectorAll(':scope > a[data-tab]'), function(a){
       a.classList.toggle('on', a.getAttribute('data-tab')===name);
     });
     try{ if(PLPMAP_OWNER) setTimeout(function(){ COMAP && COMAP.invalidateSize(); },80); }catch(e){}
@@ -4153,9 +4328,21 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
 
   function initCabNav(){
     var nav=document.getElementById('cab-nav'); if(!nav) return;
-    Array.prototype.forEach.call(nav.querySelectorAll('a[data-tab]'), function(a){
-      a.onclick=function(e){ e.preventDefault(); cabPage(a.getAttribute('data-tab')); };
+    /* Эльнур 05.09: вертикальный список — нажал, детали выехали под пунктом;
+       нажал ещё раз — свернулись. Та же механика, что у районов на сайте. */
+    Array.prototype.forEach.call(nav.querySelectorAll(':scope > a[data-tab]'), function(a){
+      a.onclick=function(e){
+        e.preventDefault();
+        var t=a.getAttribute('data-tab');
+        if(CAB_TAB===t && !document.getElementById('cab-body').hidden){
+          document.getElementById('cab-body').hidden=true;
+          a.classList.remove('on');
+          return;
+        }
+        cabPage(t);
+      };
     });
+    try{ renderCtx(); paintCounts(); }catch(e){}
     var staff=document.getElementById('tab-staff');
     if(staff && !(DATA && DATA.owner && DATA.owner.is_staff===true)) staff.remove();
     var tcl=document.getElementById('tab-clients');
