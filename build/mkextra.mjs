@@ -58,7 +58,7 @@ const mgmt=`<section style="padding-bottom:0"><div class="container">
 
 <section style="padding-top:26px"><div class="container">
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px">
-    ${services.map(s=>`<div style="background:#fff;border:1px solid #e7e5dc;border-radius:18px;padding:18px 20px">
+    ${services.map(s=>`<div style="background:var(--paper);border:1px solid var(--line,rgba(var(--ink-rgb),.1));border-radius:18px;padding:18px 20px">
       <h3 style="margin:0 0 6px;font-size:17px">${esc(s[0])}</h3>
       <p class="sub" style="margin:0;font-size:15px">${esc(s[1])}</p></div>`).join('')}
   </div>
@@ -69,10 +69,10 @@ const mgmt=`<section style="padding-bottom:0"><div class="container">
 <section style="padding-top:26px"><div class="container">
   <h2 style="font-size:clamp(22px,3vw,28px);margin:0 0 14px">Сколько это стоит</h2>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px">
-    <div style="background:#fff;border:1px solid #e7e5dc;border-radius:18px;padding:18px 20px">
+    <div style="background:var(--paper);border:1px solid var(--line,rgba(var(--ink-rgb),.1));border-radius:18px;padding:18px 20px">
       <div style="font-size:30px;font-weight:800">20%</div>
       <div class="sub" style="font-size:14px">от дохода · короткие сроки</div></div>
-    <div style="background:#fff;border:1px solid #e7e5dc;border-radius:18px;padding:18px 20px">
+    <div style="background:var(--paper);border:1px solid var(--line,rgba(var(--ink-rgb),.1));border-radius:18px;padding:18px 20px">
       <div style="font-size:30px;font-weight:800">15%</div>
       <div class="sub" style="font-size:14px">от дохода · договор на год</div></div>
     <div style="background:#1a1c12;border:1px solid #D2D5B3;border-radius:18px;padding:18px 20px;color:#EDEDE9">
@@ -97,12 +97,12 @@ const mgmt=`<section style="padding-bottom:0"><div class="container">
 </div></section>
 
 <section id="list-property" style="padding-top:26px"><div class="container">
-  <div style="background:#fff;border:1px solid #e7e5dc;border-radius:24px;padding:clamp(20px,3vw,32px);max-width:760px">
+  <div style="background:var(--paper);border:1px solid var(--line,rgba(var(--ink-rgb),.1));border-radius:24px;padding:clamp(20px,3vw,32px);max-width:760px">
     <span class="kicker">Свой объект</span>
     <h2 style="font-size:clamp(22px,3vw,30px);margin:6px 0 8px">Разместить свой объект</h2>
     <p class="sub" style="margin:0 0 18px">Пять коротких шагов: расскажите об объекте и приложите фото.
     Мы проверим материалы, оформим карточку и опубликуем. Регистрация не нужна.</p>
-    <ol style="margin:0 0 22px;padding-left:20px;color:#5c5c54;font-size:15px;line-height:1.9">
+    <ol style="margin:0 0 22px;padding-left:20px;color:var(--muted);font-size:15px;line-height:1.9">
       <li>Тип, район, спальни</li>
       <li>Готовность и на что рассчитываете</li>
       <li>Фото и видео — можно перетащить сразу пачкой</li>
@@ -137,7 +137,7 @@ for(const f of faq){
     <p class="kicker">Справочник покупателя</p>
     <h1 style="font-size:clamp(26px,3.8vw,38px);margin:0 0 16px">${esc(f.q)}</h1>
     <p style="font-size:18px;line-height:1.7;margin:0 0 20px">${esc(f.a)}</p>
-    <div style="background:#E9EBD9;border-radius:18px;padding:18px 20px;margin:24px 0">
+    <div style="background:var(--green-soft);border-radius:18px;padding:18px 20px;margin:24px 0">
       <p style="margin:0 0 12px;font-size:15px">Разберём вашу ситуацию бесплатно — ответим за пять минут в рабочее время.</p>
       <div class="hero-cta" style="margin:0">
         <a class="btn btn-primary" href="https://wa.me/66955492587" target="_blank" rel="noopener">Спросить в WhatsApp</a>

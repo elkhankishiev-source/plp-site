@@ -69,15 +69,15 @@ for(const d of D){
 
   const market = d.m2 ? `
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-top:24px">
-      <div style="background:#fff;border:1px solid #e7e5dc;border-radius:18px;padding:16px 18px">
+      <div style="background:var(--paper);border:1px solid var(--line,rgba(var(--ink-rgb),.1));border-radius:18px;padding:16px 18px">
         <div style="font-size:26px;font-weight:800;letter-spacing:-.01em">฿${fmt(d.m2)}</div>
-        <div style="color:#5c5c54;font-size:13px;margin-top:2px">за м² · медиана</div></div>
-      <div style="background:#fff;border:1px solid #e7e5dc;border-radius:18px;padding:16px 18px">
+        <div style="color:var(--muted);font-size:13px;margin-top:2px">за м² · медиана</div></div>
+      <div style="background:var(--paper);border:1px solid var(--line,rgba(var(--ink-rgb),.1));border-radius:18px;padding:16px 18px">
         <div style="font-size:26px;font-weight:800;letter-spacing:-.01em">+${d.yoy}%</div>
-        <div style="color:#5c5c54;font-size:13px;margin-top:2px">рост цены за год</div></div>
-      <div style="background:#fff;border:1px solid #e7e5dc;border-radius:18px;padding:16px 18px">
+        <div style="color:var(--muted);font-size:13px;margin-top:2px">рост цены за год</div></div>
+      <div style="background:var(--paper);border:1px solid var(--line,rgba(var(--ink-rgb),.1));border-radius:18px;padding:16px 18px">
         <div style="font-size:26px;font-weight:800;letter-spacing:-.01em">${d.yld}%</div>
-        <div style="color:#5c5c54;font-size:13px;margin-top:2px">доходность аренды</div></div>
+        <div style="color:var(--muted);font-size:13px;margin-top:2px">доходность аренды</div></div>
     </div>
     <p class="sub" style="font-size:14px;margin-top:10px">Источник: ${esc(d.src)}. Цифры по рынку района — ориентир, не гарантия по конкретному объекту.</p>` : '';
 
