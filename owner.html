@@ -1094,10 +1094,8 @@ a.lnk,.lnk{color:var(--olive)}
 }
 
 /* ИИ-чат кабинета */
-.cabfab{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom));z-index:70;
-  display:inline-flex;align-items:center;gap:8px;width:auto;margin:0;padding:12px 16px;border-radius:999px;
-  background:var(--ink-block);color:var(--on-ink);box-shadow:var(--shadow);font-size:14px}
-.cabfab span{font-weight:700}
+
+
 .cabchat{position:fixed;right:14px;bottom:calc(76px + env(safe-area-inset-bottom));z-index:71;
   width:min(380px,calc(100vw - 28px));max-height:min(70vh,560px);display:flex;flex-direction:column;
   background:var(--paper);border:1px solid rgba(var(--ink-rgb),.12);border-radius:18px;overflow:hidden;
@@ -1116,7 +1114,17 @@ a.lnk,.lnk{color:var(--olive)}
 .cc-f input{flex:1;margin:0;padding:10px 12px;border-radius:12px;border:1px solid rgba(var(--ink-rgb),.14);
   background:var(--paper);color:var(--ink);font:inherit}
 .cc-f button{width:44px;margin:0;padding:0;border-radius:12px;font-size:18px}
-@media(max-width:700px){ .cabfab span{display:none} .cabfab{padding:12px 14px} }
+@media(max-width:700px){   }
+
+/* Кнопка чата — как на сайте: тёмная пилюля с логотипом и живой точкой */
+.fab{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom));z-index:70;
+  display:inline-flex;align-items:center;gap:9px;width:auto;margin:0;padding:9px 16px 9px 9px;
+  border-radius:999px;background:var(--ink-block);color:var(--on-ink);box-shadow:var(--shadow);font-size:14px}
+.fab .fab-ic{width:34px;height:34px;border-radius:50%;background:var(--green);
+  display:inline-flex;align-items:center;justify-content:center}
+.fab .fabtxt{font-weight:700}
+.fab .fab-dot{width:9px;height:9px;border-radius:50%;background:#5fce8f;box-shadow:0 0 0 3px rgba(95,206,143,.25)}
+@media(max-width:700px){ .fab .fabtxt{display:none} .fab{padding:8px} }
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 </head>
@@ -1143,9 +1151,11 @@ a.lnk,.lnk{color:var(--olive)}
 </header>
 <!-- ИИ-чат кабинета: тот же консультант, что на сайте, но знает, кто вошёл и
      по какому объекту вопрос. Ответ на месте, сложное уходит менеджеру. -->
-<button type="button" class="cabfab" id="cabFab" aria-label="Спросить">💬<span>Спросить</span></button>
+<button type="button" class="fab" id="cabFab" aria-label="Спросить Дарью">
+  <span class="fab-ic"><img src="img/brand/plp-mark-ink.png" alt="" width="22" height="22"></span>
+  <span class="fabtxt">Дарья · на связи</span><span class="fab-dot"></span></button>
 <div class="cabchat" id="cabChat" hidden>
-  <div class="cc-h"><b>Помощник PLP</b>
+  <div class="cc-h"><b>Дарья</b>
     <span id="cc-ctx" class="cc-ctx"></span>
     <button type="button" class="cc-x" id="ccClose" aria-label="Закрыть">×</button></div>
   <div class="cc-b" id="ccBody"></div>
@@ -2260,12 +2270,18 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
           CHART_OPEN=(CHART_OPEN===m)?null:m; redrawChart(); return; }
         var cn=t.closest && t.closest('.cal-nav');
         if(cn){
-          var g=document.querySelector('.cal-g');
+          var wrap=cn.closest('.cal');
+          var g=wrap?wrap.querySelector('.cal-g'):null;
           var base=(g&&g.getAttribute('data-key'))||null;
           var dt=base?new Date(base+'-01T00:00:00'):new Date();
           dt.setMonth(dt.getMonth()+Number(cn.getAttribute('data-cal')));
           CAL_M=dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0');
-          try{ renderProp(); cabPage(CAB_TAB); }catch(e){}
+          /* перерисовываем только сетку — раздел остаётся открытым */
+          var p=(DATA.properties||[])[CTX.obj!=null?CTX.obj:CUR]||{};
+          if(wrap){
+            var tmp=document.createElement('div'); tmp.innerHTML=monthGrid(p.bookings||[]);
+            wrap.replaceWith(tmp.firstChild);
+          }
           return;
         }
         var stay=t.closest && t.closest('.stay-go');
@@ -4024,6 +4040,23 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   }
 
   // формы: завести человека, добавить объект, поставить задачу, доска задач
+  /* Прокрутка страницы не должна залипать: любое закрытие окна её возвращает,
+     плюс страховка — если окна нет, замораживать нечего (Эльнур 05.09:
+     «когда окошко всплывает, страница больше не крутится»). */
+  function unfreeze(){
+    var f=document.getElementById('cl-form');
+    if(!f || !f.innerHTML.trim()) document.body.style.overflow='';
+  }
+  if(!document.__unfreezeWired){
+    document.__unfreezeWired=1;
+    setInterval(unfreeze, 800);
+    document.addEventListener('keydown',function(e){
+      if(e.key!=='Escape') return;
+      var f=document.getElementById('cl-form');
+      if(f && f.innerHTML.trim()){ f.innerHTML=''; document.body.style.overflow=''; }
+      var c=document.getElementById('cabChat'); if(c) c.hidden=true;
+    });
+  }
   function clForm(html, onSave){
     var box=document.getElementById('cl-form');
     /* Окно живёт в разделе клиентов; когда его на странице нет (например,
@@ -4408,7 +4441,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       if(lh && !lh.__built){
         lh.__built=1;
         /* список людей подтягиваем тем же запросом, что и раздел «Люди» */
-        post({action:'clients_list',token:TOKEN,limit:300}).then(function(d){
+        post({action:'clients',token:TOKEN,limit:300}).then(function(d){
           var rows=(d&&(d.rows||d.clients))||[];
           pickList(lh,{ multi:false, placeholder:'выбрать: имя или номер',
             items:rows.map(function(c){
@@ -4510,8 +4543,8 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     box.hidden=false;
     var c=document.getElementById('cc-ctx'); if(c) c.textContent=ccCtxText();
     if(!CC_HIST.length){
-      ccAdd('bot','Здравствуйте! Я помощник PLP. Спрошу по вашему объекту, отвечу по отчётам, '+
-                  'бронированиям и работам. Если нужно вмешательство — передам менеджеру.');
+      ccAdd('bot','Здравствуйте! Это Дарья. Отвечу по вашему объекту: отчёты, брони, работы. '+
+                  'Если нужно вмешательство — передам менеджеру.');
     }
     var inp=document.getElementById('ccInput'); if(inp) inp.focus();
   }
