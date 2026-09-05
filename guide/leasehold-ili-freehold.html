@@ -1353,6 +1353,23 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
 /* закрытое меню не должно висеть слоем поверх страницы */
 .mnav{display:none}
 .mnav.open{display:block}
+
+/* Панель фильтров аренды уезжала вбок: кнопки и «Сбросить» оказывались за краем
+   экрана — Эльнур 05.09 «фильтры не видно, они плавают». Ведём себя как в
+   продаже: переносим по строкам, ничего не прячем. */
+#rentFilters,#saleFilters,.filterbar,.fbar-menus{
+  flex-wrap:wrap!important;overflow:visible!important;row-gap:8px}
+#rentFilters .fbtn-reset,#saleFilters .fbtn-reset{margin-left:0}
+
+/* Панель поиска и сортировки на телефоне уезжала за край — переносим и её. */
+@media(max-width:700px){
+  .toolbar{flex-wrap:wrap;gap:8px}
+  .toolbar .search{flex:1 1 100%;min-width:0}
+  .toolbar .search input{width:100%}
+  .toolbar select{flex:1 1 60%;min-width:0}
+  .toolbar .curswitch{flex:0 0 auto}
+  .toolbar .chipf{flex:0 0 auto}
+}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.6.0/maplibre-gl.min.css">
@@ -3567,7 +3584,7 @@ function buildRentChips(){
   /* сброс фильтров (на виду; даты сбрасываются отдельной кнопкой) */
   /* кнопка та же, что в продаже: одинаковая система — одинаковые органы управления */
   var rs=document.createElement('button');
-  rs.type='button'; rs.className='fbtn fbtn-reset'; rs.textContent=t('f.reset');
+  rs.type='button'; rs.className='fbtn fbtn-reset'; rs.textContent='Сбросить';
   rs.onclick=resetRentFilters; bar.appendChild(rs);
 }
 function resetRentFilters(){
