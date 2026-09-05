@@ -321,6 +321,8 @@ function buildCatalog(objects, benchmarks, preserve) {
       // проект, а что там можно купить». Цены и площади — из price_tiers,
       // ничего не досочиняем.
       units: unitsOf(o),
+      // Витрина «горячие предложения»: порядок задаём вручную в базе (hot_rank).
+      hot: (o.hot_rank === 0 || o.hot_rank) ? Number(o.hot_rank) : null,
       // Ход стройки и разделы снимков — показываем, если застройщик их дал.
       progress: o.build_progress || null,
       groups: Array.isArray(o.photo_groups) ? o.photo_groups : null,
@@ -910,7 +912,7 @@ async function main() {
     'bedrooms_min,bedrooms_max,' +
     'brochure_url,floorplan_url,video_url,website_url,map_url,' +
     'season_rates,occupancy_est_pct,maintenance_fee_thb_sqm,lat,lng,coord_source,last_synced_at,availability,' +
-    'first_payment,payment_plan,payment_schedule,main_image_url,gallery_urls,unit_types,price_tiers,build_progress,photo_groups');
+    'first_payment,payment_plan,payment_schedule,main_image_url,gallery_urls,unit_types,price_tiers,build_progress,photo_groups,hot_rank');
   const benchmarks = await sbGet(env,
     'rental_benchmarks?select=district,unit_type,disp_yield_low_pct,disp_yield_high_pct');
 
