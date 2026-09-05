@@ -722,7 +722,9 @@ label{display:block;color:var(--dim);font-size:13px;margin:12px 0 5px}
 input::placeholder,textarea::placeholder{color:var(--dim);opacity:.55}
 input,select,textarea{width:100%;background:var(--paper);border:1px solid var(--line);color:var(--txt);border-radius:14px;padding:11px 13px;font-size:15px;font-family:inherit}
 textarea{min-height:76px;resize:vertical}
-button{background:var(--txt);color:#fff;border:0;border-radius:999px;padding:12px 18px;font-size:15px;font-weight:700;cursor:pointer;margin-top:14px;width:100%}
+/* Кнопки красились цветом текста (--txt): в тёмной теме он светлеет и надпись
+   пропадала — это и есть «засвет» почти в каждом разделе (Эльнур 05.09). */
+button{background:var(--ink-block);color:var(--on-ink);border:0;border-radius:999px;padding:12px 18px;font-size:15px;font-weight:700;cursor:pointer;margin-top:14px;width:100%}
 button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt);font-weight:700}
 .alt{display:block;text-align:center;color:var(--dim);font-size:14px;margin-top:14px;
      text-decoration:none;border-bottom:1px dotted var(--dim);width:fit-content;margin-left:auto;margin-right:auto;cursor:pointer}
@@ -1011,9 +1013,7 @@ button#send-code,button#send-code-2,button#do-login,button#do-reg{
 .ctx-f>span{display:block;font-size:.68rem;letter-spacing:.09em;text-transform:uppercase;
   color:var(--muted);margin-bottom:5px}
 .ctx-note{margin:9px 0 0;font-size:.8rem;color:var(--muted)}
-.nav-n{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;
-  padding:0 6px;margin-left:8px;border-radius:999px;background:var(--green);color:var(--on-green);
-  font-size:.72rem;font-weight:800}
+.nav-n{margin-left:8px;color:var(--olive);font-size:.82rem;font-weight:800}
 .bellbtn{position:relative;display:inline-flex;align-items:center;justify-content:center;
   width:34px;height:34px;border-radius:11px;border:1px solid rgba(var(--ink-rgb),.14);
   background:var(--paper);font-size:15px;cursor:pointer}
@@ -1044,6 +1044,32 @@ button#send-code,button#send-code-2,button#do-login,button#do-reg{
 .msub.open .ms-c{transform:rotate(180deg)}
 .msub-b{display:none;padding:0 14px 14px}
 .msub.open .msub-b{display:block}
+
+/* добивка: пустые состояния, аватарки и второстепенные кнопки */
+.empty{color:var(--muted)}
+.ava{background:var(--green);color:var(--on-green)}
+button.ghost,.btn.ghost{background:transparent;color:var(--ink);border:1px solid rgba(var(--ink-rgb),.3)}
+.opt{background:transparent;color:var(--ink)}
+.opt.on{background:var(--green);color:var(--on-green)}
+a.lnk,.lnk{color:var(--olive)}
+
+.bell-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.bell-row{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;
+  background:var(--paper);border:1px solid rgba(var(--ink-rgb),.1);border-radius:12px;
+  padding:12px 14px;margin:0;color:var(--ink);font-weight:600}
+.bell-row b{color:var(--olive)}
+
+/* календарь занятости */
+.cal{margin-bottom:12px}
+.cal-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.cal-nav{width:34px;height:34px;padding:0;margin:0;border-radius:10px;background:var(--paper);
+  color:var(--ink);border:1px solid rgba(var(--ink-rgb),.12);font-size:16px}
+.cal-w,.cal-g{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-w span{font-size:.68rem;color:var(--muted);text-align:center;text-transform:uppercase;letter-spacing:.06em}
+.cal-d,.cal-e{display:flex;align-items:center;justify-content:center;height:34px;border-radius:9px;
+  font-size:.85rem;background:var(--paper);border:1px solid rgba(var(--ink-rgb),.07)}
+.cal-e{background:transparent;border-color:transparent}
+.cal-d.busy{background:var(--green);color:var(--on-green);font-weight:700;border-color:transparent}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 </head>
@@ -1249,7 +1275,7 @@ button#send-code,button#send-code-2,button#do-login,button#do-reg{
   <div id="app" style="display:none">
     <div id="cab-ctx" class="cab-ctx" hidden>
       <div class="ctx-row">
-        <label class="ctx-f" id="ctx-lead-w"><span>Человек</span><div id="ctx-lead"></div></label>
+        <label class="ctx-f" id="ctx-lead-w"><span>Лид / клиент компании</span><div id="ctx-lead"></div></label>
         <label class="ctx-f"><span>Объект</span><div id="ctx-obj"></div></label>
       </div>
       <p class="ctx-note" id="ctx-note"></p>
@@ -1270,7 +1296,7 @@ button#send-code,button#send-code-2,button#do-login,button#do-reg{
       <a data-tab="staff" id="tab-staff">Модерация</a>
     </div>
     <div id="cab-body">
-    <div id="demo-note" style="display:none;background:#E9EBD9;border:1px solid #D2D5B3;border-radius:14px;
+    <div id="demo-note" style="display:none;background:var(--green-soft);color:var(--on-green);border:1px solid var(--green);border-radius:14px;
          padding:12px 16px;margin-bottom:14px;font-size:14px">
       <b>Это пример.</b> Так кабинет выглядит, когда объект уже работает: цифры и брони вымышленные.
       <a href="owner.html" style="color:var(--acc)">Вернуться ко входу</a>
@@ -2055,7 +2081,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
 
   /* Доход по месяцам: можно выбрать период и раскрыть любой месяц —
      видно, из чего сложился результат и какие именно были расходы. */
-  var CHART_RANGE=12, CHART_OPEN=null;
+  var CHART_RANGE=6, CHART_OPEN=null;   /* по умолчанию полгода — Эльнур 05.09 */
   function allMonths(){
     var by={};
     (DATA.properties||[]).forEach(function(p){
@@ -2131,6 +2157,16 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         var bar=t.closest && t.closest('.mbar');
         if(bar){ var m=bar.getAttribute('data-m');
           CHART_OPEN=(CHART_OPEN===m)?null:m; redrawChart(); return; }
+        var cn=t.closest && t.closest('.cal-nav');
+        if(cn){
+          var g=document.querySelector('.cal-g');
+          var base=(g&&g.getAttribute('data-key'))||null;
+          var dt=base?new Date(base+'-01T00:00:00'):new Date();
+          dt.setMonth(dt.getMonth()+Number(cn.getAttribute('data-cal')));
+          CAL_M=dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0');
+          try{ renderProp(); cabPage(CAB_TAB); }catch(e){}
+          return;
+        }
         var stay=t.closest && t.closest('.stay-go');
         if(stay){ openStay(Number(stay.getAttribute('data-i'))); return; }
       });
@@ -2409,6 +2445,37 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         '</div>';
     });
   }
+  /* Календарь месяца: занятые дни закрашены, свободные видно сразу
+     (Эльнур 05.09: «должен быть полноценный календарь с датами и деталями»). */
+  var CAL_M=null;
+  function monthGrid(bookings){
+    var now=CAL_M?new Date(CAL_M+'-01T00:00:00'):new Date();
+    var y=now.getFullYear(), m=now.getMonth();
+    var first=new Date(y,m,1), start=(first.getDay()+6)%7, days=new Date(y,m+1,0).getDate();
+    var busy={};
+    (bookings||[]).forEach(function(b){
+      if(!b.check_in) return;
+      var a=new Date(b.check_in+'T00:00:00'), z=b.check_out?new Date(b.check_out+'T00:00:00'):a;
+      for(var d=new Date(a); d<=z; d.setDate(d.getDate()+1)){
+        if(d.getFullYear()===y && d.getMonth()===m) busy[d.getDate()]=b;
+      }
+    });
+    var MN=['январь','февраль','март','апрель','май','июнь','июль','август','сентябрь','октябрь','ноябрь','декабрь'];
+    var key=y+'-'+String(m+1).padStart(2,'0');
+    var cells='';
+    for(var i=0;i<start;i++) cells+='<span class="cal-e"></span>';
+    for(var d2=1; d2<=days; d2++){
+      var b=busy[d2];
+      cells+='<span class="cal-d'+(b?' busy':'')+'"'+(b?(' title="'+esc(b.guest_name||'занято')+'"'):'')+'>'+d2+'</span>';
+    }
+    return '<div class="cal"><div class="cal-h">'+
+      '<button type="button" class="cal-nav" data-cal="-1">‹</button>'+
+      '<b>'+MN[m]+' '+y+'</b>'+
+      '<button type="button" class="cal-nav" data-cal="1">›</button></div>'+
+      '<div class="cal-w"><span>пн</span><span>вт</span><span>ср</span><span>чт</span><span>пт</span><span>сб</span><span>вс</span></div>'+
+      '<div class="cal-g" data-key="'+key+'">'+cells+'</div>'+
+      '<p class="sub" style="margin:8px 0 0">Закрашенные дни заняты. Нажмите заезд ниже — покажу детали.</p></div>';
+  }
   function renderProp(){
     var p=(DATA.properties||[])[CUR];
     if(!p){ $('prop').innerHTML='<div class="card"><p class="sub">Объекты не привязаны. Обратитесь к менеджеру.</p></div>'; return; }
@@ -2509,13 +2576,14 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
           '">Внести операцию</a> — доход или расход по этому объекту.</p>';
     H+=card('Доходы и расходы периода', th, 'sec-money');
 
-    // календарь
+    // календарь: сетка месяца + список заездов
     var bk=p.bookings||[], bh='';
-    if(!bk.length){ bh='<div class="empty">Заездов пока нет.</div>'; }
+    bh+=monthGrid(bk);
+    if(!bk.length){ bh+='<div class="empty">Заездов пока нет. Как появится бронь — она встанет в сетку.</div>'; }
     else{
       var BST={upcoming:'ожидается',checked_in:'проживает',checked_out:'выехал',
                cancelled:'отменена',hold:'бронь',pending:'ждёт оплаты',paid:'оплачена'};
-      bh='<table><tr><th>Заезд</th><th>Выезд</th><th>Гость</th><th class="r">Сумма</th><th class="r">Статус</th></tr>';
+      bh+='<table><tr><th>Заезд</th><th>Выезд</th><th>Гость</th><th class="r">Сумма</th><th class="r">Статус</th></tr>';
       bk.forEach(function(g){
         bh+='<tr><td>'+dmy(g.check_in)+'</td><td>'+dmy(g.check_out)+'</td>'+
             '<td>'+esc(g.guest_name||'—')+'</td>'+
@@ -3349,6 +3417,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     }
     function draw(){
       var q=(search.value||'').trim().toLowerCase();
+      /* пустая строка — показываем весь список, ввод сужает его */
       var rows=(opts.items||[]).filter(function(it){
         return !q || (it.title+' '+(it.sub||'')).toLowerCase().indexOf(q)>=0; });
       if(!rows.length){ list.innerHTML='<div class="pickempty">ничего не нашлось</div>'; return; }
@@ -3376,7 +3445,9 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       btn.classList.toggle('on', open);
       if(open){ draw(); setTimeout(function(){ search.focus(); },30); }
     }
-    btn.onclick=function(e){ e.stopPropagation(); toggle(); };
+    btn.onclick=function(e){
+      /* открываем со всем списком — человек видит, из чего выбирает */
+      if(!open){ search.value=''; draw(); } e.stopPropagation(); toggle(); };
     search.oninput=draw;
     document.addEventListener('click',function(e){
       if(open && !el.contains(e.target)) toggle(false);
@@ -4235,7 +4306,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         /* список людей подтягиваем тем же запросом, что и раздел «Люди» */
         post({action:'clients_list',token:TOKEN,limit:300}).then(function(d){
           var rows=(d&&(d.rows||d.clients))||[];
-          pickList(lh,{ multi:false, placeholder:'найти по имени или номеру',
+          pickList(lh,{ multi:false, placeholder:'выбрать: имя или номер',
             items:rows.map(function(c){
               return { id:String(c.code||c.client_code||c.id||''),
                        title:(c.name||'Без имени'),
@@ -4279,6 +4350,26 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     if(DATA.moderation && DATA.moderation.length) c.staff=DATA.moderation.length;
     return c;
   }
+  /* Колокольчик показывает, что именно ждёт внимания, и ведёт в нужный раздел. */
+  function bellOpen(){
+    var c=cabCounts();
+    var names={calendar:'Бронирования',actions:'Заявки',service:'Обслуживание',staff:'Модерация'};
+    var rows=Object.keys(c).map(function(k){
+      return '<button type="button" class="bell-row" data-go="'+k+'">'+
+             '<span>'+(names[k]||k)+'</span><b>'+c[k]+'</b></button>';
+    }).join('');
+    clForm('<h3>Что ждёт внимания</h3>'+
+      (rows?('<div class="bell-list">'+rows+'</div>')
+           :'<p class="sub">Ничего нового — всё разобрано.</p>')+
+      '<div class="fbtns"><button type="button" class="btn ghost" id="f-cancel">Закрыть</button></div>');
+    Array.prototype.forEach.call(document.querySelectorAll('.bell-row'),function(b){
+      b.onclick=function(){
+        var box=document.getElementById('cl-form');
+        if(box){ box.innerHTML=''; document.body.style.overflow=''; }
+        cabPage(b.getAttribute('data-go'));
+      };
+    });
+  }
   function paintCounts(){
     var c=cabCounts(), total=0;
     var nav=document.getElementById('cab-nav'); if(!nav) return;
@@ -4307,7 +4398,12 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     /* блоки финансов, броней и работ рисуются внутри карточки объекта —
        выносим их в тело кабинета сразу, иначе разделы открываются пустыми */
     ['sec-money','sec-calendar','sec-reports','sec-docs','sec-service','sec-costs'].forEach(function(id){
-      var el=document.getElementById(id); if(!el) return;
+      /* Карточка объекта рисуется заново при каждом обновлении, а её блоки
+         переезжают в тело кабинета — старые копии оставались и раздел
+         показывался дважды (Эльнур 05.09). Держим ровно одну. */
+      var all=document.querySelectorAll('[id="'+id+'"]');
+      var el=all[all.length-1]; if(!el) return;
+      for(var k=0;k<all.length-1;k++){ if(all[k]!==el) all[k].remove(); }
       if(el.parentElement && el.parentElement.id!=='cab-body'){
         document.getElementById('cab-body').appendChild(el);
       }
@@ -4353,6 +4449,8 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       };
     });
     try{ renderCtx(); paintCounts(); }catch(e){}
+    var bell=document.getElementById('bellBtn');
+    if(bell && !bell.__wired){ bell.__wired=1; bell.onclick=function(){ bellOpen(); }; }
     var staff=document.getElementById('tab-staff');
     if(staff && !(DATA && DATA.owner && DATA.owner.is_staff===true)) staff.remove();
     var tcl=document.getElementById('tab-clients');
