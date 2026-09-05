@@ -1349,6 +1349,10 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
 /* подсветка полей, которые надо заполнить, чтобы получить расчёт */
 .calc-inputs.needfill .fld input{border-color:rgba(184,134,59,.55)}
 .calc-inputs.needfill .fld label{color:#b8863b}
+
+/* закрытое меню не должно висеть слоем поверх страницы */
+.mnav{display:none}
+.mnav.open{display:block}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.6.0/maplibre-gl.min.css">
