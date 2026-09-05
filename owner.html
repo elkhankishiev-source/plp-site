@@ -246,7 +246,7 @@ h3{font-size:1.12rem;font-weight:700}
 .df-fld{display:flex;flex-direction:column;gap:5px;font-size:.78rem;font-weight:600;color:var(--muted,#8a8f7a)}
 .df-fld input[type=date]{font:inherit;font-size:.9rem;font-weight:500;color:inherit;background:rgba(var(--glass-rgb),.9);border:1px solid rgba(var(--ink-rgb),.12);border-radius:10px;padding:10px 12px;min-width:150px;cursor:pointer}
 .df-status{margin-top:12px;font-size:.82rem;color:var(--muted,#8a8f7a);line-height:1.5}
-.df-status.err{color:#c0392b}
+.df-status.err{color:var(--bad)}
 .df-status.ok{color:var(--olive,#5F6242);font-weight:600}
 .df-status.loading::after{content:"";display:inline-block;width:13px;height:13px;margin-left:8px;vertical-align:-2px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:dfspin .7s linear infinite}
 @keyframes dfspin{to{transform:rotate(360deg)}}
@@ -313,8 +313,8 @@ h3{font-size:1.12rem;font-weight:700}
 .st-available{background:var(--green-soft);color:#4E3A35}
 .st-ready{background:#dce7cf;color:#33501f}.st-available::before{background:#3f9d5e}
 .st-reserved{background:#f3ead2;color:#7a5d22}.st-reserved::before{background:#d39a2b}
-.st-sold{background:#eee;color:#777}.st-sold::before{background:#999}
-.st-soon{background:#eceadf;color:#807c74}.st-soon::before{background:#a8a39a}
+.st-sold{background:var(--warm);color:var(--muted)}.st-sold::before{background:#999}
+.st-soon{background:var(--warm);color:#807c74}.st-soon::before{background:#a8a39a}
 .prop .fav,.prop .cmpb{position:absolute;z-index:3;cursor:pointer;transition:transform .2s,background .2s;backdrop-filter:blur(8px)}
 .prop .fav{bottom:10px;left:10px;width:34px;height:34px;border-radius:50%;background:rgba(var(--glass-rgb),.86);font-size:1rem;line-height:1;display:flex;align-items:center;justify-content:center}
 .prop .fav:hover{transform:scale(1.1)}
@@ -527,7 +527,7 @@ h3{font-size:1.12rem;font-weight:700}
 .cw{background:var(--paper);border-radius:22px;max-width:920px;width:100%;max-height:88vh;overflow:auto;box-shadow:var(--shadow-lg)}
 .chd{position:sticky;top:0;background:var(--paper);display:flex;justify-content:space-between;align-items:center;gap:14px;padding:20px 24px;border-bottom:1px solid rgba(var(--ink-rgb),.08);z-index:2}
 .chd h3{font-size:1.2rem;font-weight:800}
-.cx{background:#eceadf;width:34px;height:34px;border-radius:50%;font-size:1.1rem;line-height:1;flex:none}
+.cx{background:var(--warm);width:34px;height:34px;border-radius:50%;font-size:1.1rem;line-height:1;flex:none}
 .cmp-body{padding:20px 24px 24px}
 .cmp-foot{padding:0 24px 24px}
 .cmp-grid{display:grid;gap:1px;background:rgba(var(--ink-rgb),.1);border:1px solid rgba(var(--ink-rgb),.1);border-radius:14px;overflow:hidden}
@@ -627,7 +627,7 @@ h3{font-size:1.12rem;font-weight:700}
 .qz-top{padding:20px 24px 14px;border-bottom:1px solid rgba(var(--ink-rgb),.08)}
 .qz-top .row{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .qz-top .step{font-family:ui-monospace,Menlo,monospace;font-size:.75rem;color:var(--olive);font-weight:700}
-.qz-bar{height:6px;background:#eceadf;border-radius:999px;margin-top:12px;overflow:hidden}
+.qz-bar{height:6px;background:var(--warm);border-radius:999px;margin-top:12px;overflow:hidden}
 .qz-bar i{display:block;height:100%;background:var(--ink-block);border-radius:999px;transition:width .35s cubic-bezier(.16,1,.3,1)}
 .qz-body{padding:24px;overflow-y:auto}
 .qz-q{font-weight:800;font-size:1.3rem;letter-spacing:-.02em}
@@ -657,7 +657,12 @@ h3{font-size:1.12rem;font-weight:700}
 /* ── дополнения кабинета ── */
 /* палитра совпадает с сайтом: кабинет — его продолжение, а не отдельный продукт */
 :root{--card:var(--paper);--txt:var(--ink);--dim:var(--muted);
-      --acc:var(--olive);--bad:#8f4b3a}
+      --acc:var(--olive);--bad:#8f4b3a;--good:#3f6b34}
+/* в тёмной теме тёмно-зелёный и кирпичный сливались с фоном — берём светлее */
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){--bad:#e2a08f;--good:#9dcb98}
+}
+:root[data-theme="dark"]{--bad:#e2a08f;--good:#9dcb98}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--txt);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
 .wrap{max-width:840px;margin:0 auto;padding:28px 16px 56px}
@@ -701,7 +706,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}
 th{text-align:left;color:var(--dim);font-weight:600;font-size:12px;text-transform:uppercase;padding:6px 6px 6px 0}
 td{padding:8px 6px 8px 0;border-top:1px solid var(--line);vertical-align:top}
 td.r,th.r{text-align:right}
-.pos{color:#3f6b34}.neg{color:var(--bad)}
+.pos{color:var(--good)}.neg{color:var(--bad)}
 .chip{display:inline-block;background:var(--warm);color:var(--acc);font-size:11px;padding:1px 7px;border-radius:6px;margin-left:6px}
 .chip.grey{background:#1e1e1c;color:var(--dim)}
 .photo{width:100%;border-radius:12px;display:block;margin-bottom:12px}
@@ -730,7 +735,7 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
 .msub h3{margin:0 0 2px;font-size:16.5px}
 .msub .meta{color:var(--dim);font-size:13px;margin:0 0 10px}
 .msub .gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px;margin:10px 0}
-.msub .gal a{display:block;aspect-ratio:1;border-radius:10px;overflow:hidden;background:#f1f0ea}
+.msub .gal a{display:block;aspect-ratio:1;border-radius:10px;overflow:hidden;background:var(--warm)}
 .msub .gal img{width:100%;height:100%;object-fit:cover;display:block}
 .msub .gal .vid{display:flex;align-items:center;justify-content:center;height:100%;font-size:12px;color:var(--dim)}
 .msub .f{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:10px}
@@ -768,18 +773,20 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
 .stats2 .v{font-size:20px}
 .dyn{font-size:15px;font-weight:700}
 .dyn.up{color:var(--acc,#5F6242)}
-.dyn.down{color:#8f4b3a}
+.dyn.down{color:var(--bad)}
 .chart h2{margin-bottom:2px}
-.mchart{display:flex;align-items:flex-end;gap:6px;margin-top:18px;padding-top:22px}
-.mbar{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;position:relative}
+.mchart{display:flex;align-items:flex-end;gap:6px;margin-top:18px;padding-top:22px;
+  height:200px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.mbar{flex:1 0 auto;min-width:40px;display:flex;flex-direction:column;justify-content:flex-end;
+  align-items:center;position:relative;height:100%}
 .mb-col{width:100%;max-width:44px;background:var(--acc,#5F6242);border-radius:8px 8px 3px 3px;
   transition:opacity .2s;min-height:3px}
 .mbar:hover .mb-col{opacity:.75}
 .mb-col.neg{background:#c98b7a}
-.mb-val{position:absolute;top:-4px;left:0;right:0;text-align:center;font-size:10.5px;color:var(--dim);
-  opacity:0;transition:opacity .2s;white-space:nowrap}
-.mbar:hover .mb-val{opacity:1}
-.mb-lab{font-size:11px;color:var(--dim);margin-top:7px}
+.mb-val{position:absolute;top:-4px;left:0;right:0;text-align:center;font-size:10.5px;color:var(--muted);
+  opacity:.85;transition:opacity .2s;white-space:nowrap}
+.mbar:hover .mb-val,.mbar.on .mb-val{opacity:1}
+.mb-lab{font-size:11px;color:var(--dim);margin-top:7px;white-space:nowrap}
 .stay{display:flex;align-items:center;gap:14px;padding:12px 0;border-top:1px solid var(--line)}
 .stay:first-of-type{border-top:0}
 .st-date{flex:0 0 46px;text-align:center;background:var(--warm);border-radius:12px;padding:7px 0}
@@ -827,7 +834,7 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
 .cab-nav a{display:block;padding:8px 12px;border-radius:10px;color:var(--dim);font-size:14.5px;
   text-decoration:none;cursor:pointer;white-space:nowrap}
 
-.cab-nav a.on{background:var(--txt);color:#fff;font-weight:600}
+.cab-nav a.on{background:var(--ink-block);color:var(--on-ink);font-weight:600}
 @media(max-width:999px){
   .cab-nav{flex-direction:row;overflow-x:auto;gap:6px;padding-bottom:6px;-webkit-overflow-scrolling:touch}
   .cab-nav .cab-group{display:none}
@@ -836,10 +843,10 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
   .clsearch{display:flex;gap:8px;margin:10px 0 0}
   .clsearch input{flex:1;min-width:0;padding:9px 12px;border:1px solid var(--line);border-radius:9px;font:inherit;background:var(--paper)}
   .ctable{width:100%;border-collapse:collapse;margin-top:12px;font-size:14px}
-  .ctable th{text-align:left;font-weight:600;color:#7b7f6a;padding:7px 8px;border-bottom:1px solid var(--line);font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+  .ctable th{text-align:left;font-weight:600;color:var(--muted);padding:7px 8px;border-bottom:1px solid var(--line);font-size:12px;text-transform:uppercase;letter-spacing:.04em}
   .ctable td{padding:9px 8px;border-bottom:1px solid #f0f0ea}
   .clrow{cursor:pointer}
-  .clrow:hover td{background:#fafaf4}
+  .clrow:hover td{background:var(--warm)}
   .mono{font-variant-numeric:tabular-nums;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px}
   .mono.big{font-size:16px;font-weight:600}
   .tmp{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;white-space:nowrap}
@@ -848,53 +855,53 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
   .t-hot{background:#fde4de;color:#a33418}
   .t-client{background:#e4f1e2;color:#2f6b30}
   .t-lost{background:#f0f0ec;color:#83837a}
-  .ccard{margin-top:16px;padding:16px;border:1px solid var(--line);border-radius:12px;background:#fcfcf8}
+  .ccard{margin-top:16px;padding:16px;border:1px solid var(--line);border-radius:12px;background:var(--warm)}
   .chead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:6px}
   .ccard h3{margin:2px 0 12px}
-  .ccard h4{margin:16px 0 6px;font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:#7b7f6a}
+  .ccard h4{margin:16px 0 6px;font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
   .crow{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px 16px}
-  .crow .lbl{display:block;font-size:12px;color:#8b8f7c;margin-bottom:1px}
+  .crow .lbl{display:block;font-size:12px;color:var(--muted);margin-bottom:1px}
   .tline{list-style:none;padding:0;margin:0}
   .tline li{padding:6px 0;border-bottom:1px solid #f0f0ea;font-size:14px}
-  .tdate{color:#8b8f7c;font-variant-numeric:tabular-nums;margin-right:6px}
+  .tdate{color:var(--muted);font-variant-numeric:tabular-nums;margin-right:6px}
   .clnote{display:flex;gap:8px}
   .clnote input{flex:1;min-width:0;padding:9px 12px;border:1px solid var(--line);border-radius:9px;font:inherit;background:var(--paper)}
   @media(max-width:640px){.ctable th:nth-child(3),.ctable td:nth-child(3){display:none}}
   .clbar{display:flex;gap:8px;margin:10px 0 0;flex-wrap:wrap}
   .ctable.inner{font-size:13px;margin-top:6px}
   .ctable.inner th{font-size:11px}
-  .lnk{color:#6b7a4a;text-decoration:underline;cursor:pointer}
+  .lnk{color:var(--olive);text-decoration:underline;cursor:pointer}
   .tdone{opacity:.5;text-decoration:line-through}
   .tdate.over,td.over{color:#a33418;font-weight:600}
   .fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-top:10px}
-  .fgrid label{display:block;font-size:12px;color:#7b7f6a}
+  .fgrid label{display:block;font-size:12px;color:var(--muted)}
   .fgrid label.wide{grid-column:1/-1}
   .fgrid input,.fgrid select{width:100%;box-sizing:border-box;margin-top:3px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font:inherit;background:var(--paper);color:inherit}
   .fbtns{display:flex;gap:8px;margin-top:14px}
   .ogrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:12px}
-  .obox{padding:14px;border:1px solid var(--line);border-radius:12px;background:#fcfcf8}
+  .obox{padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--warm)}
   .obox h3{margin:0 0 8px;font-size:16px}
   .sub.warn{color:#a33418}
   .bgroup{margin-bottom:18px}
-  .bgroup h4{margin:0 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:#7b7f6a}
+  .bgroup h4{margin:0 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
   .bgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:10px}
-  .bcell{padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#fcfcf8}
+  .bcell{padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--warm)}
   .bcell.bwarn{border-color:#e0b8a8;background:#fdf5f2}
   .bnum{display:block;font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.1}
-  .blbl{display:block;font-size:12px;color:#8b8f7c;margin-top:3px}
+  .blbl{display:block;font-size:12px;color:var(--muted);margin-top:3px}
   .upbox{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-  .docbox{margin:8px 0 0;padding:12px;border:1px solid var(--line);border-radius:10px;background:#fcfcf8}
-  .tgcode{margin-top:8px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:#fcfcf8}
-  .hintbox{padding:10px 12px;border-left:3px solid var(--green);background:#fbfbf6;border-radius:0 8px 8px 0}
+  .docbox{margin:8px 0 0;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--warm)}
+  .tgcode{margin-top:8px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--warm)}
+  .hintbox{padding:10px 12px;border-left:3px solid var(--green);background:var(--warm);border-radius:0 8px 8px 0}
   .pay-ck{width:16px;height:16px;cursor:pointer}
   .cmtext{width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid var(--line);
           border-radius:10px;font:inherit;line-height:1.5;background:var(--paper);resize:vertical}
   .peoplebox{max-height:280px;overflow:auto;border:1px solid var(--line);border-radius:10px;
              padding:8px;display:flex;flex-direction:column;gap:4px;background:var(--paper)}
   .pill{display:flex;align-items:center;gap:6px;font-size:13px;padding:3px 4px;border-radius:6px;cursor:pointer}
-  .pill:hover{background:#fafaf4}
+  .pill:hover{background:var(--warm)}
   .msgprev{white-space:pre-wrap;font:inherit;font-size:13px;margin:8px 0 0;padding:10px;
-           background:var(--paper);border:1px solid var(--line);border-radius:8px;color:#3a3a34}
+           background:var(--paper);border:1px solid var(--line);border-radius:8px;color:var(--ink)}
   .modal[hidden]{display:none}
   .modal{position:fixed;inset:0;z-index:200;display:flex;align-items:flex-start;justify-content:center;padding:28px 16px}
   .modal-back{position:absolute;inset:0;background:rgba(20,18,14,.42);backdrop-filter:blur(2px)}
@@ -904,7 +911,7 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
   .modal-win .chead{position:sticky;top:0;background:var(--paper);padding:4px 0 10px;margin:0 0 4px;z-index:2}
   @media(max-width:640px){.modal{padding:0}.modal-win{max-height:100vh;border-radius:0}
     .modal-win .ccard{padding:16px 14px}}
-  .clrow.on td{background:#f2f3e6}
+  .clrow.on td{background:var(--green-soft)}
   .empty{background:var(--warm);color:var(--muted);border-radius:12px;padding:14px}
   .opts.tight .opt{padding:5px 11px;font-size:12px}
   .ccard .btn,.ccard .btn.ghost{padding:8px 14px;font-size:13px}
@@ -918,8 +925,8 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
            font:inherit;cursor:pointer;text-align:left;color:inherit}
   .pickbtn.on{border-color:var(--green-deep)}
   .pickval{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .pickval.dim{color:#9a9a90}
-  .pickarr{color:#9a9a90;font-size:11px;flex:none}
+  .pickval.dim{color:var(--muted)}
+  .pickarr{color:var(--muted);font-size:11px;flex:none}
   .pickdrop{position:absolute;z-index:40;left:0;right:0;top:calc(100% + 4px);background:var(--paper);
             border:1px solid var(--line);border-radius:11px;box-shadow:var(--shadow);padding:8px}
   .picksearch{width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid var(--line);
@@ -927,15 +934,15 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
   .picklist{max-height:240px;overflow:auto;display:flex;flex-direction:column;gap:2px}
   .pickitem{display:flex;align-items:baseline;gap:8px;width:100%;padding:7px 9px;border:0;
             background:none;font:inherit;text-align:left;border-radius:7px;cursor:pointer;color:inherit}
-  .pickitem:hover{background:#f7f8ee}
-  .pickitem.on{background:#eef0dd}
+  .pickitem:hover{background:var(--warm)}
+  .pickitem.on{background:var(--green-soft)}
   .pickck{flex:none;width:14px;color:var(--olive);font-weight:700}
   .picktitle{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .picksub{flex:none;font-size:12px;color:#8b8f7c}
-  .pickempty{padding:10px;color:#8b8f7c;font-size:13px}
+  .picksub{flex:none;font-size:12px;color:var(--muted)}
+  .pickempty{padding:10px;color:var(--muted);font-size:13px}
   .stay-go{cursor:pointer;border-radius:10px;transition:background .15s}
-  .stay-go:hover{background:#f7f8ee}
-  .ownmon{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#8b8f7c;margin-left:8px}
+  .stay-go:hover{background:var(--warm)}
+  .ownmon{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);margin-left:8px}
   .ownmon input{width:60px;padding:4px 8px;border:1px solid var(--line);border-radius:7px;font:inherit}
   .card.fold{padding-bottom:0}
   .card.fold .foldh{display:flex;align-items:center;justify-content:space-between;gap:12px;
@@ -1197,6 +1204,48 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
 .cal-sel{display:flex;gap:6px;align-items:center}
 .cal-sel select{margin:0;padding:6px 8px;border-radius:10px;font-size:14px;font-weight:700;
   background:var(--paper);color:var(--ink);border:1px solid rgba(var(--ink-rgb),.14);width:auto}
+
+/* ===== раздел «Система»: плашки были прибиты к светлым литералам ===== */
+.bgroup h4{color:var(--muted)}
+.bcell{background:var(--warm);border-color:rgba(var(--ink-rgb),.1);color:var(--ink)}
+.bcell.bwarn{background:rgba(192,57,43,.12);border-color:rgba(192,57,43,.35)}
+.bnum{color:var(--ink)}
+.blbl{color:var(--muted)}
+.bcell.bwarn .bnum{color:#e2a08f}
+@media (hover:hover) and (pointer:fine){ .bcell.bgo:hover{border-color:var(--olive)} }
+
+/* Эльнур 05.09: «по всей Системе засветы». Цветные плашки статусов больше не
+   светят белым в тёмной теме: тон задаём полупрозрачным по фону страницы. */
+.t-cold,.t-warm,.t-hot,.t-client,.t-lost,
+.st-ready,.st-reserved,.st-sold,.st-soon,
+.coitem .st.exact,.coitem .st.approx,.coitem .st.none{
+  background:color-mix(in srgb, currentColor 14%, var(--paper));
+  border:1px solid color-mix(in srgb, currentColor 28%, transparent)}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .t-cold{color:#8fb3d9} :root:not([data-theme="light"]) .t-warm{color:#d9b473}
+  :root:not([data-theme="light"]) .t-hot{color:#e2a08f}  :root:not([data-theme="light"]) .t-client{color:#9dcb98}
+  :root:not([data-theme="light"]) .t-lost{color:var(--muted)}
+  :root:not([data-theme="light"]) .st-ready{color:#9dcb98} :root:not([data-theme="light"]) .st-reserved{color:#d9b473}
+  :root:not([data-theme="light"]) .st-sold{color:var(--muted)} :root:not([data-theme="light"]) .st-soon{color:var(--muted)}
+  :root:not([data-theme="light"]) .coitem .st.exact{color:#9dcb98}
+  :root:not([data-theme="light"]) .coitem .st.approx{color:#d9b473}
+  :root:not([data-theme="light"]) .coitem .st.none{color:#e2a08f}
+}
+:root[data-theme="dark"] .t-cold{color:#8fb3d9} :root[data-theme="dark"] .t-warm{color:#d9b473}
+:root[data-theme="dark"] .t-hot{color:#e2a08f}  :root[data-theme="dark"] .t-client{color:#9dcb98}
+:root[data-theme="dark"] .t-lost{color:var(--muted)}
+:root[data-theme="dark"] .st-ready{color:#9dcb98} :root[data-theme="dark"] .st-reserved{color:#d9b473}
+:root[data-theme="dark"] .st-sold{color:var(--muted)} :root[data-theme="dark"] .st-soon{color:var(--muted)}
+:root[data-theme="dark"] .coitem .st.exact{color:#9dcb98}
+:root[data-theme="dark"] .coitem .st.approx{color:#d9b473}
+:root[data-theme="dark"] .coitem .st.none{color:#e2a08f}
+
+/* короткое сообщение вместо системного alert: браузер телефона его не гасит */
+.saybox{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:9999;
+  max-width:min(92vw,520px);background:var(--ink-block);color:var(--on-ink);
+  border-radius:14px;padding:12px 16px;font-size:14px;line-height:1.35;
+  box-shadow:0 12px 34px rgba(0,0,0,.35);opacity:0;transition:opacity .18s}
+.saybox.on{opacity:1}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 </head>
@@ -1482,7 +1531,7 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
       <h2>Добавить ещё объект</h2>
       <p class="sub" style="margin:0 0 14px">Есть другая недвижимость? Заполните короткую анкету
       и приложите фото — за пять шагов. Мы проверим и оформим карточку.</p>
-      <a href="add-property.html" style="display:inline-block;background:var(--txt);color:#fff;
+      <a href="add-property.html" style="display:inline-block;background:var(--ink-block);color:var(--on-ink);
          border-radius:999px;padding:12px 20px;font-size:15px;font-weight:700;text-decoration:none">Разместить объект</a>
     </div>
 
@@ -1903,9 +1952,9 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
      Печать браузера сохраняет в PDF — отдельная библиотека не нужна. */
   function buildReport(){
     var props=DATA.properties||[];
-    if(!props.length){ alert('Пока нет объектов, по которым делать отчёт.'); return; }
+    if(!props.length){ say('Пока нет объектов, по которым делать отчёт.'); return; }
     var months=allMonths();
-    if(!months.length){ alert('Пока нет операций, из которых собрать отчёт.'); return; }
+    if(!months.length){ say('Пока нет операций, из которых собрать отчёт.'); return; }
     // сначала спрашиваем период — отчёт всегда за то, что нужно сейчас
     clForm('<h3>Отчёт за период</h3>'+
       '<p class="sub">Есть данные с '+monthName(months[0].month)+' по '+
@@ -1998,7 +2047,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
        'Отчёт сформирован из данных кабинета. Вопросы — вашему менеджеру.</p></div>';
 
     var w=window.open('','_blank');
-    if(!w){ alert('Браузер заблокировал окно отчёта — разрешите всплывающие окна.'); return; }
+    if(!w){ say('Браузер заблокировал окно отчёта — разрешите всплывающие окна.'); return; }
     w.document.write('<!doctype html><html lang="ru"><head><meta charset="utf-8">'+
       '<title>Отчёт — Property Library Phuket</title><style>'+
       'body{font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif;color:#14120e;margin:0;padding:32px;background:#fff}'+
@@ -2063,7 +2112,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
             if(r&&r.ok){ var f=document.getElementById('cl-form');
               if(f){ f.innerHTML=''; document.body.style.overflow=''; }
               loadData();
-            } else alert((r&&r.error)||'Не получилось сохранить бронь');
+            } else say((r&&r.error)||'Не получилось сохранить бронь');
           });
       });
   }
@@ -2079,11 +2128,24 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         var done=t.closest && t.closest('.tk-done');
         if(done){
           e.preventDefault();
-          var cost=prompt('Сколько в итоге стоило, ฿? (пусто — как планировали)',
-                          done.getAttribute('data-cost')||'');
-          if(cost===null) return;
-          post({action:'uk_task_done',token:TOKEN,id:done.getAttribute('data-id'),cost:cost})
-            .then(function(r){ if(r&&r.ok) loadData(); else alert((r&&r.error)||'Не вышло'); });
+          /* было системное окно prompt: на телефоне часто гасится браузером и
+             выглядит как мёртвая ссылка. Спрашиваем в своей форме. */
+          var id=done.getAttribute('data-id'), cost0=done.getAttribute('data-cost')||'';
+          clForm('<h3>Работа выполнена</h3>'+
+            '<p class="sub">Сколько в итоге стоило? Оставьте пустым — запишем как планировали.</p>'+
+            '<div class="fgrid"><label class="wide">Стоимость, ฿'+
+            '<input id="f-cost" type="number" inputmode="numeric" value="'+clEsc(cost0)+'"></label></div>'+
+            '<div class="fbtns"><button type="button" class="btn" id="f-save">Записать</button>'+
+            '<button type="button" class="btn ghost" id="f-cancel">Отмена</button></div>',
+            function(){
+              var b=document.getElementById('f-save'); if(b){ b.disabled=true; b.textContent='…'; }
+              post({action:'uk_task_done',token:TOKEN,id:id,cost:fv('f-cost')})
+                .then(function(r){
+                  var f=document.getElementById('cl-form');
+                  if(f){ f.innerHTML=''; document.body.style.overflow=''; }
+                  if(r&&r.ok) loadData(); else say('Не вышло: '+((r&&r.error)||'ошибка'));
+                });
+            });
           return;
         }
         var uk=t.closest && t.closest('[data-uk]');
@@ -2115,13 +2177,13 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       '</div><div class="fbtns"><button type="button" class="btn" id="f-save">Внести</button>'+
       '<button type="button" class="btn ghost" id="f-cancel">Отмена</button></div>',
       function(){
-        if(!fv('u-amount')){ alert('Укажите сумму'); return; }
+        if(!fv('u-amount')){ say('Укажите сумму'); return; }
         post({action:'uk_tx',token:TOKEN,property_id:pid,kind:fv('u-kind'),
               amount:fv('u-amount'),category:fv('u-cat'),date:fv('u-date'),
               note:fv('u-note'),receipt:fv('u-rec')}).then(function(r){
           if(r&&r.ok){ document.getElementById('cl-form').innerHTML='';
             document.body.style.overflow=''; loadData(); }
-          else alert((r&&r.error)||'Не сохранилось');
+          else say((r&&r.error)||'Не сохранилось');
         });
       });
   }
@@ -2144,7 +2206,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
               due:fv('u-due'),cost:fv('u-cost'),note:fv('u-tnote')}).then(function(r){
           if(r&&r.ok){ document.getElementById('cl-form').innerHTML='';
             document.body.style.overflow=''; loadData(); }
-          else alert((r&&r.error)||'Не сохранилось');
+          else say((r&&r.error)||'Не сохранилось');
         });
       });
   }
@@ -2164,12 +2226,12 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       '</div><div class="fbtns"><button type="button" class="btn" id="f-save">Добавить</button>'+
       '<button type="button" class="btn ghost" id="f-cancel">Отмена</button></div>',
       function(){
-        if(!fv('u-dtitle')||!fv('u-durl')){ alert('Нужны название и ссылка'); return; }
+        if(!fv('u-dtitle')||!fv('u-durl')){ say('Нужны название и ссылка'); return; }
         post({action:'uk_doc',token:TOKEN,property_id:pid,title:fv('u-dtitle'),
               url:fv('u-durl'),kind:fv('u-dkind'),note:fv('u-dnote')}).then(function(r){
           if(r&&r.ok){ document.getElementById('cl-form').innerHTML='';
             document.body.style.overflow=''; loadData(); }
-          else alert((r&&r.error)||'Не сохранилось');
+          else say((r&&r.error)||'Не сохранилось');
         });
       });
   }
@@ -2202,7 +2264,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
                actor:(m[6].toLowerCase().indexOf(me)>=0?'manager':'client')};
           if(cur.text) out.push(cur);
         });
-        if(!out.length){ alert('Не нашёл сообщений. Проверьте, что это экспорт чата WhatsApp.'); return; }
+        if(!out.length){ say('Не нашёл сообщений. Проверьте, что это экспорт чата WhatsApp.'); return; }
         if(!confirm('Разобрал сообщений: '+out.length+'. Период '+out[0].ts.slice(0,10)+
                     ' — '+out[out.length-1].ts.slice(0,10)+'. Добавить в карточку?')) return;
         var chunks=[]; for(var i=0;i<out.length;i+=200) chunks.push(out.slice(i,i+200));
@@ -2255,7 +2317,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
               due:r.co||r.ci,note:note+' · '+r.who}).then(function(x){
           document.getElementById('cl-form').innerHTML='';
           document.body.style.overflow='';
-          if(x&&x.ok) loadData(); else alert((x&&x.error)||'Не получилось');
+          if(x&&x.ok) loadData(); else say((x&&x.error)||'Не получилось');
         });
       };
     };
@@ -2270,6 +2332,9 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     var by={};
     (DATA.properties||[]).forEach(function(p){
       (p.months||[]).forEach(function(m){
+        /* строка без месяца роняла весь обзор: график падал и вместе с ним
+           уходили привязки нажатий. Такие строки просто пропускаем. */
+        if(!m || !/^\d{4}-\d{2}/.test(String(m.month||''))) return;
         if(!by[m.month]) by[m.month]={month:m.month,income:0,expenses:0,net:0,cats:{},items:[]};
         var b=by[m.month];
         b.income+=Number(m.income)||0; b.expenses+=Number(m.expenses)||0;
@@ -2370,7 +2435,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
             .then(function(r){
               if(r&&r.ok){ loadData(); }
               else { ok.disabled=false; ok.textContent='Подтвердить';
-                     alert((r&&r.error)||'Не получилось подтвердить'); }
+                     say((r&&r.error)||'Не получилось подтвердить'); }
             });
           return;
         }
@@ -3022,7 +3087,14 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     head.innerHTML='<span class="ms-t"><b>'+esc(it.address || ((it.kind||'Объект')+(it.district?' · '+it.district:'')))+'</b>'+
       '<u>'+esc(it.name||'—')+(it.phone?(' · '+esc(it.phone)):'')+' · '+when0+'</u></span>'+
       '<span class="ms-s">'+st+'</span><span class="ms-c">▾</span>';
-    head.onclick=function(){ d.classList.toggle('open'); };
+    /* карточку держим отдельной ссылкой: ниже d становится телом, и обработчик
+       на замыкании раскрывал бы тело вместо самой карточки — заявки не нажимались */
+    var wrap=d;
+    head.onclick=function(){
+      var op=!wrap.classList.contains('open');
+      wrap.classList.toggle('open', op);
+      if(op) setTimeout(function(){ cabScrollTo(wrap); },30);
+    };
     d.appendChild(head);
     var body=document.createElement('div'); body.className='msub-b';
     d.appendChild(body);
@@ -3090,7 +3162,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         });
       };
     });
-    return d.parentElement || d;   /* наружу отдаём свёрнутую карточку целиком */
+    return wrap;   /* наружу отдаём свёрнутую карточку целиком */
   }
 
 
@@ -3324,7 +3396,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         var ch=/^\+?[0-9 ()-]{8,}$/.test(v)?'wa':'tg';
         post({action:'client_link',token:TOKEN,code:code,channel:ch,handle:v.trim()})
           .then(function(r){ if(r&&r.ok){ openClient(code); loadClients(); }
-                             else alert((r&&r.error)||'Не получилось'); }); };
+                             else say((r&&r.error)||'Не получилось'); }); };
       var sm=document.getElementById('cl-sim');
       if(sm) sm.onclick=function(e){ e.preventDefault();
         var box=document.getElementById('cl-simbox');
@@ -3359,8 +3431,8 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       var pp=document.getElementById('cl-portal');
       if(pp) pp.onclick=function(e){ e.preventDefault();
         post({action:'client_portal',token:TOKEN,code:code}).then(function(r){
-          if(r&&r.ok) alert('Готово. Вход по номеру '+r.login+', код придёт в '+r.channel+'.');
-          else alert((r&&r.error)||'Не получилось открыть доступ.');
+          if(r&&r.ok) say('Готово. Вход по номеру '+r.login+', код придёт в '+r.channel+'.');
+          else say((r&&r.error)||'Не получилось открыть доступ.');
           openClient(code); }); };
       var ao=document.getElementById('cl-addobj');
       if(ao) ao.onclick=function(e){ e.preventDefault(); objForm(code); };
@@ -3446,7 +3518,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       if(ub) ub.onclick=function(){ fi.click(); };
       if(fi) fi.onchange=function(){
         var f=fi.files && fi.files[0]; if(!f) return;
-        if(f.size > 20*1024*1024){ alert('Файл больше 20 МБ — пришлите поменьше'); return; }
+        if(f.size > 20*1024*1024){ say('Файл больше 20 МБ — пришлите поменьше'); return; }
         document.getElementById('my-upname').textContent='Отправляем «'+f.name+'»…';
         ub.disabled=true;
         var rd=new FileReader();
@@ -3502,7 +3574,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         if(fv('my-email')) patch.email=fv('my-email');
         if(fv('my-phone2')) patch.phone_extra=fv('my-phone2');
         if(fv('my-note')) patch.note=fv('my-note');
-        if(!Object.keys(patch).length){ alert('Нечего сохранять'); return; }
+        if(!Object.keys(patch).length){ say('Нечего сохранять'); return; }
         ms.disabled=true;
         post({action:'my_update',token:TOKEN,patch:patch}).then(function(r){
           ms.disabled=false;
@@ -3515,7 +3587,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       var sb=document.getElementById('my-send');
       if(sb) sb.onclick=function(){
         var t=document.getElementById('my-text').value.trim();
-        if(!t){ alert('Напишите, что нужно'); return; }
+        if(!t){ say('Напишите, что нужно'); return; }
         sb.disabled=true;
         post({action:'my_request',token:TOKEN,kind:document.getElementById('my-kind').value,text:t})
           .then(function(r){
@@ -3574,7 +3646,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
               index:Number(ck.getAttribute('data-i')),paid:ck.checked})
           .then(function(r){ ck.disabled=false;
             if(r&&r.ok) loadMine(); else { ck.checked=!ck.checked;
-              alert((r&&r.error)||'Не сохранилось'); } });
+              say((r&&r.error)||'Не сохранилось'); } });
       };
     });
   }
@@ -3626,7 +3698,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       bn.onclick=function(){ bn.disabled=true;
         post({action:'my_doc_confirm',token:TOKEN,doc_id:bn.getAttribute('data-id')})
           .then(function(r){ bn.disabled=false;
-            if(r&&r.ok) loadMine(); else alert((r&&r.error)||'Не сохранилось'); });
+            if(r&&r.ok) loadMine(); else say((r&&r.error)||'Не сохранилось'); });
       };
     });
   }
@@ -3734,10 +3806,10 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       '<button type="button" class="btn ghost" id="f-cancel">Отмена</button></div>',
       function(){
         var kind=(Q_KIND&&Q_KIND.get()[0])||'';
-        if(!kind){ alert('Выберите, что нужно'); return; }
+        if(!kind){ say('Выберите, что нужно'); return; }
         var own=fv('q-own');
-        if(kind==='own' && !own){ alert('Опишите, что нужно'); return; }
-        if(kind==='booking' && (!fv('q-from')||!fv('q-to'))){ alert('Укажите заезд и выезд'); return; }
+        if(kind==='own' && !own){ say('Опишите, что нужно'); return; }
+        if(kind==='booking' && (!fv('q-from')||!fv('q-to'))){ say('Укажите заезд и выезд'); return; }
         post({action:'request_new',token:TOKEN,client_code:code,
               kind:(kind==='own'?'other':kind),
               property_id:(Q_OBJ&&Q_OBJ.get()[0])||null,
@@ -3749,7 +3821,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
               document.getElementById('cl-form').innerHTML='';
               document.body.style.overflow='';
               openClient(code);
-            } else alert((r&&r.error)||'Не оформилось');
+            } else say((r&&r.error)||'Не оформилось');
           });
       });
     var KINDS=REQ_KINDS.concat([{id:'own',title:'Другое — опишу сам'}]);
@@ -3919,7 +3991,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       if(fb) fb.onclick=function(){ fi.click(); };
       if(fi) fi.onchange=function(){
         var f=fi.files&&fi.files[0]; if(!f) return;
-        if(f.size>15*1024*1024){ alert('Файл больше 15 МБ — WhatsApp такой не пропустит'); return; }
+        if(f.size>15*1024*1024){ say('Файл больше 15 МБ — WhatsApp такой не пропустит'); return; }
         var nm=document.getElementById('cm-filename');
         nm.textContent='загружаем «'+f.name+'»…';
         var safe=f.name.replace(/[^a-zA-Z0-9._-]/g,'_').slice(-60);
@@ -3948,7 +4020,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       document.getElementById('cm-addpaste').onclick=function(){
         var raw=document.getElementById('cm-paste').value||'';
         var parts=raw.split(/[\s,;]+/).map(function(x){return x.trim();}).filter(Boolean);
-        if(!parts.length){ alert('Вставьте номера или коды'); return; }
+        if(!parts.length){ say('Вставьте номера или коды'); return; }
         var found=0, miss=[];
         parts.forEach(function(v){
           var digits=v.replace(/[^0-9]/g,'');
@@ -3963,14 +4035,14 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         var msg='Добавил: '+found+'.';
         if(miss.length) msg+='\n\nНе нашёл в базе: '+miss.join(', ')+
           '\nЭтих людей сначала заведите в разделе «Люди» — рассылка идёт только по карточкам.';
-        alert(msg);
+        say(msg);
       };
 
       document.getElementById('cm-save').onclick=function(){
         var codes=pickWho.get();
-        if(!codes.length){ alert('Отметьте, кому отправляем'); return; }
+        if(!codes.length){ say('Отметьте, кому отправляем'); return; }
         var fr=(document.getElementById('cm-from').value||'').split('|');
-        if(!fr[0]){ alert('Нет доступного номера для отправки'); return; }
+        if(!fr[0]){ say('Нет доступного номера для отправки'); return; }
         post({action:'camp_create',token:TOKEN,
               name:fv('cm-name')||'Рассылка',purpose:fv('cm-purpose'),
               template:document.getElementById('cm-text').value,
@@ -3979,7 +4051,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
               attach_url:ATTACH.url,attach_name:ATTACH.name})
           .then(function(r){
             if(r&&r.ok){ box.innerHTML=''; loadCamps(); campOpen(r.id); }
-            else alert((r&&r.error)||'Не собралось');
+            else say((r&&r.error)||'Не собралось');
           });
       };
     });
@@ -4022,7 +4094,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       if(ok) ok.onclick=function(){
         if(!confirm('Утвердить? После этого появится кнопка отправки — сообщения пойдут только по ней.')) return;
         post({action:'camp_approve',token:TOKEN,id:id}).then(function(r){
-          if(r&&r.ok) campOpen(id); else alert((r&&r.error)||'Не вышло'); });
+          if(r&&r.ok) campOpen(id); else say((r&&r.error)||'Не вышло'); });
       };
       var sd=document.getElementById('cm-send');
       if(sd) sd.onclick=function(){
@@ -4031,7 +4103,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         document.getElementById('cm-log').innerHTML='<p class="sub">Отправляем, это займёт полминуты…</p>';
         post({action:'camp_send',token:TOKEN,id:id,count:5}).then(function(r){
           sd.disabled=false;
-          if(!r||!r.ok){ alert((r&&r.error)||'Не отправилось'); return; }
+          if(!r||!r.ok){ say((r&&r.error)||'Не отправилось'); return; }
           var lg='<p class="sub">Ушло: '+r.sent+', пропущено: '+r.skipped+
                  ', не дошло: '+r.failed+'. Осталось: '+r['осталось']+'</p><ul class="tline">';
           (r['подробно']||[]).forEach(function(x){
@@ -4160,7 +4232,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
           post({action:'phone_fix',token:TOKEN,code:a.getAttribute('data-code'),phone:v})
             .then(function(r){
               if(r&&r.ok){ dupesBoard(); loadClients(); }
-              else alert((r&&r.error)||'Не сохранилось'); });
+              else say((r&&r.error)||'Не сохранилось'); });
         };
       });
     });
@@ -4184,6 +4256,17 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       var c=document.getElementById('cabChat'); if(c) c.hidden=true;
     });
   }
+  /* Ответ пользователю без системного окна: alert на телефоне часто
+     проглатывается браузером, и действие выглядело как несработавшее. */
+  var SAY_T=null;
+  function say(msg){
+    var b=document.getElementById('__say');
+    if(!b){ b=document.createElement('div'); b.id='__say'; b.className='saybox'; document.body.appendChild(b); }
+    b.textContent=String(msg);
+    requestAnimationFrame(function(){ b.classList.add('on'); });
+    clearTimeout(SAY_T);
+    SAY_T=setTimeout(function(){ b.classList.remove('on'); },4000);
+  }
   function clForm(html, onSave){
     var box=document.getElementById('cl-form');
     /* Окно живёт в разделе клиентов; когда его на странице нет (например,
@@ -4193,6 +4276,10 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       box=document.createElement('div'); box.id='cl-form';
       document.body.appendChild(box);
     }
+    /* Эльнур 05.09: «колокольчик не жмётся». Контейнер окна лежал внутри
+       раздела «Люди»: при другом открытом разделе он скрыт (display:none),
+       и окно рисовалось в невидимом месте. Держим его прямо в теле страницы. */
+    if(box.parentElement !== document.body) document.body.appendChild(box);
     box.innerHTML='<div class="modal"><div class="modal-back"></div>'+
                   '<div class="modal-win"><div class="ccard">'+html+'</div></div></div>';
     document.body.style.overflow='hidden';
@@ -4218,7 +4305,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       '<div class="fbtns"><button type="button" class="btn" id="f-save">Завести</button>'+
       '<button type="button" class="btn ghost" id="f-cancel">Отмена</button></div>',
       function(){
-        if(!fv('f-name') && !fv('f-phone')){ alert('Нужно хотя бы имя или телефон'); return; }
+        if(!fv('f-name') && !fv('f-phone')){ say('Нужно хотя бы имя или телефон'); return; }
         post({action:'client_add',token:TOKEN,name:fv('f-name'),phone:fv('f-phone'),tg:fv('f-tg'),
               source:fv('f-src')||'manual',intent:fv('f-int'),note:fv('f-note')})
           .then(function(d){
@@ -4248,7 +4335,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       '<button type="button" class="btn ghost" id="f-cancel">Отмена</button></div>',
       function(){
         var oid=fv('f-oid')||fv('f-proj');
-        if(!oid){ alert('Нужен проект или код объекта'); return; }
+        if(!oid){ say('Нужен проект или код объекта'); return; }
         post({action:'client_object',token:TOKEN,code:code,object_id:oid,project:fv('f-proj'),
               unit:fv('f-unit'),rel:fv('f-rel'),stage:fv('f-stage'),handover_on:fv('f-hand'),
               bought_on:fv('f-bought'),price:fv('f-price'),uk_status:fv('f-uk'),note:fv('f-onote')})
@@ -4299,7 +4386,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       '<button type="button" class="btn ghost" id="f-cancel">Отмена</button></div>',
       function(){
         var pid=(fv('o-obj')||'').trim().toUpperCase();
-        if(!pid){ alert('Выберите объект'); return; }
+        if(!pid){ say('Выберите объект'); return; }
         var blocks=[];
         Array.prototype.forEach.call(document.querySelectorAll('.ob:checked'),function(c){ blocks.push(c.value); });
         post({action:'client_offer',token:TOKEN,code:code,property_id:pid,
@@ -4309,7 +4396,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
               price:(fv('o-price')||'').replace(/[^0-9]/g,''),
               terms:fv('o-terms')})
           .then(function(r){
-            if(!r||!r.ok||!r.offer){ alert((r&&r.error)||'Не получилось собрать оффер'); return; }
+            if(!r||!r.ok||!r.offer){ say((r&&r.error)||'Не получилось собрать оффер'); return; }
             var f=document.getElementById('cl-form');
             if(f){ f.innerHTML=''; document.body.style.overflow=''; }
             var url=r.offer.url||('https://property-library.com/offer.html#'+r.offer.token);
@@ -4399,7 +4486,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       '<div class="fbtns"><button type="button" class="btn" id="f-save">Поставить</button>'+
       '<button type="button" class="btn ghost" id="f-cancel">Отмена</button></div>',
       function(){
-        if(!fv('f-title')){ alert('Напишите, что сделать'); return; }
+        if(!fv('f-title')){ say('Напишите, что сделать'); return; }
         post({action:'client_task',token:TOKEN,code:code,title:fv('f-title'),due_on:fv('f-due'),
               kind:fv('f-kind'),object_id:fv('f-tobj'),assignee:fv('f-who'),details:fv('f-det')})
           .then(function(){ document.getElementById('cl-form').innerHTML=''; openClient(code); loadClients(); });
@@ -4799,7 +4886,20 @@ window.openChat=openChat;window.closeChat=closeChat;window.clearChat=clearChat;w
     });
     try{ if(PLPMAP_OWNER) setTimeout(function(){ COMAP && COMAP.invalidateSize(); },80); }catch(e){}
     if(name==='staff' && COMAP) setTimeout(function(){ try{COMAP.invalidateSize();}catch(e){} },120);
-    window.scrollTo({top:0,behavior:'smooth'});
+    /* Эльнур 05.09: «нажимаю на любую кнопку — всё идёт вверх, а должно
+       спускаться вниз». Ведём взгляд к раскрытому разделу, а не в начало
+       страницы: на телефоне — к самому пункту, на большом экране — к телу. */
+    var target = (window.matchMedia && window.matchMedia('(max-width:900px)').matches)
+      ? (nav && nav.querySelector('a[data-tab="'+name+'"]')) : body2;
+    cabScrollTo(target || body2);
+  }
+  /* прокрутка под липкую шапку: элемент встаёт сразу под ней, а не под неё */
+  function cabScrollTo(el){
+    if(!el || !el.getBoundingClientRect) return;
+    var hd=document.querySelector('.header');
+    var pad=(hd?hd.getBoundingClientRect().height:68)+10;
+    var y=el.getBoundingClientRect().top+window.pageYOffset-pad;
+    window.scrollTo({top:Math.max(0,y),behavior:'smooth'});
   }
   var PLPMAP_OWNER=null;
 
