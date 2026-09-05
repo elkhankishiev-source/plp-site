@@ -1859,24 +1859,34 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   /* Формы внесения по объекту: операция, работа, документ.
      Открываются окном, после сохранения кабинет обновляется. */
   function bindUkForms(){
-    document.querySelectorAll('.tk-done').forEach(function(a){
-      a.onclick=function(e){ e.preventDefault();
-        var cost=prompt('Сколько в итоге стоило, ฿? (пусто — как планировали)',
-                        a.getAttribute('data-cost')||'');
-        if(cost===null) return;
-        post({action:'uk_task_done',token:TOKEN,id:a.getAttribute('data-id'),cost:cost})
-          .then(function(r){ if(r&&r.ok) loadData(); else alert((r&&r.error)||'Не вышло'); });
-      };
-    });
-    Array.prototype.forEach.call(document.querySelectorAll('[data-uk]'),function(a){
-      a.onclick=function(e){
-        e.preventDefault();
-        var what=a.getAttribute('data-uk'), pid=a.getAttribute('data-pid');
-        if(what==='tx') ukTxForm(pid);
-        else if(what==='task') ukTaskForm(pid);
-        else if(what==='doc') ukDocForm(pid);
-      };
-    });
+    /* Действия по объекту (операция, работа, документ) вешаем на документ:
+       разделы перерисовываются, и привязка к узлам терялась — ссылки выглядели
+       живыми, но ничего не делали (Эльнур 05.09: «работы по объекту и ничего
+       не функционирует»). */
+    if(!document.__ukDelegated){
+      document.__ukDelegated=1;
+      document.addEventListener('click',function(e){
+        var t=e.target;
+        var done=t.closest && t.closest('.tk-done');
+        if(done){
+          e.preventDefault();
+          var cost=prompt('Сколько в итоге стоило, ฿? (пусто — как планировали)',
+                          done.getAttribute('data-cost')||'');
+          if(cost===null) return;
+          post({action:'uk_task_done',token:TOKEN,id:done.getAttribute('data-id'),cost:cost})
+            .then(function(r){ if(r&&r.ok) loadData(); else alert((r&&r.error)||'Не вышло'); });
+          return;
+        }
+        var uk=t.closest && t.closest('[data-uk]');
+        if(uk){
+          e.preventDefault();
+          var what=uk.getAttribute('data-uk'), pid=uk.getAttribute('data-pid');
+          if(what==='tx') ukTxForm(pid);
+          else if(what==='task') ukTaskForm(pid);
+          else if(what==='doc') ukDocForm(pid);
+        }
+      });
+    }
   }
   function ukTxForm(pid){
     clForm('<h3>Операция по объекту</h3>'+
