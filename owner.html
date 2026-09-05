@@ -826,7 +826,7 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
   margin:12px 0 6px;font-weight:700}
 .cab-nav a{display:block;padding:8px 12px;border-radius:10px;color:var(--dim);font-size:14.5px;
   text-decoration:none;cursor:pointer;white-space:nowrap}
-.cab-nav a:hover{background:#efeee7;color:var(--txt)}
+
 .cab-nav a.on{background:var(--txt);color:#fff;font-weight:600}
 @media(max-width:999px){
   .cab-nav{flex-direction:row;overflow-x:auto;gap:6px;padding-bottom:6px;-webkit-overflow-scrolling:touch}
@@ -1176,6 +1176,27 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
 .okbtn{width:auto;margin:0;padding:6px 12px;border-radius:999px;font-size:12.5px;font-weight:700;
   background:var(--green);color:var(--on-green)}
 .okbtn:disabled{opacity:.6}
+
+.bell-row span{display:flex;flex-direction:column;gap:2px;text-align:left;min-width:0}
+.bell-row b{font-size:.9rem}
+.bell-row u{text-decoration:none;font-size:.76rem;color:var(--muted)}
+.bell-row i{font-style:normal;color:var(--muted);margin-left:auto}
+
+/* месяцы без данных в графике */
+.mbar.empty .mb-col{background:rgba(var(--ink-rgb),.12)}
+.mbar.empty .mb-val{opacity:.35}
+.sub .dim{color:var(--muted);font-size:.92em}
+
+/* ===== наведение только для мыши ===== */
+@media (hover:hover) and (pointer:fine){
+  .cab-nav a:hover{background:var(--warm);color:var(--ink)}
+}
+.cab-nav a.on{background:var(--warm)!important;color:var(--ink)!important;border-color:var(--ink)}
+.cab-nav a:active{background:var(--warm);color:var(--ink)}
+
+.cal-sel{display:flex;gap:6px;align-items:center}
+.cal-sel select{margin:0;padding:6px 8px;border-radius:10px;font-size:14px;font-weight:700;
+  background:var(--paper);color:var(--ink);border:1px solid rgba(var(--ink-rgb),.14);width:auto}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 </head>
@@ -1405,7 +1426,7 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
     <div id="cab-nav" class="cab-nav" aria-label="Разделы кабинета">
       <a data-tab="overview" class="on">Обзор</a>
       <a data-tab="calendar">Бронирования</a>
-      <a data-tab="money">Деньги по месяцам</a>
+      <a data-tab="money">Финансы</a>
       <a data-tab="costs">Расходы на содержание</a>
       <a data-tab="docs">Документы</a>
       <a data-tab="service">Обслуживание</a>
@@ -2281,11 +2302,26 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     var all=allMonths();
     if(!all.length) return '';
     var rows=(CHART_RANGE==='all')?all:all.slice(-CHART_RANGE);
+    /* Эльнур 05.09: «нажал 12 — тишина». Данных было всего за 4 месяца, и
+       график не менялся. Дополняем период пустыми месяцами: видно, что выбор
+       применился, и видно, где данных ещё нет. */
+    var want=(CHART_RANGE==='all')?rows.length:Number(CHART_RANGE)||rows.length;
+    var real=rows.length;
+    if(want>rows.length && rows.length){
+      var first=rows[0].month, y=+first.slice(0,4), m=+first.slice(5,7);
+      var pad=[];
+      for(var k=want-rows.length;k>0;k--){
+        var mm=m-k, yy=y;
+        while(mm<1){ mm+=12; yy--; }
+        pad.push({month:yy+'-'+String(mm).padStart(2,'0'),income:0,expenses:0,net:0,cats:{},items:[],empty:true});
+      }
+      rows=pad.concat(rows);
+    }
     var max=Math.max.apply(null, rows.map(function(m){return Math.abs(m.net)||0;}))||1;
     var bars=rows.map(function(m){
-      var h=Math.max(4, Math.round(Math.abs(m.net)/max*146));
-      return '<div class="mbar'+(CHART_OPEN===m.month?' on':'')+'" data-m="'+m.month+'" '+
-             'title="нажмите, чтобы раскрыть">'+
+      var h=m.empty?4:Math.max(4, Math.round(Math.abs(m.net)/max*146));
+      return '<div class="mbar'+(CHART_OPEN===m.month?' on':'')+(m.empty?' empty':'')+'" data-m="'+m.month+'" '+
+             'title="'+(m.empty?'данных за этот месяц нет':'нажмите, чтобы раскрыть')+'">'+
              '<div class="mb-val">'+money(m.net,'THB')+'</div>'+
              '<div class="mb-col'+(m.net<0?' neg':'')+'" style="height:'+h+'px"></div>'+
              '<div class="mb-lab">'+monthName(m.month)+'</div></div>';
@@ -2302,7 +2338,9 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     return '<div class="card chart"><div class="chead"><h2 style="margin:0">Доход по месяцам</h2>'+
       '<div class="opts tight" id="ch-range">'+per+'</div></div>'+
       '<p class="sub">Поступило '+money(inc,'THB')+' · расходы '+money(exp,'THB')+
-      ' · на руки <b>'+money(sum,'THB')+'</b> за '+rows.length+' мес.</p>'+
+      ' · на руки <b>'+money(sum,'THB')+'</b> за '+real+' мес.'+
+      ((want>real)?(' <span class="dim">данные есть за '+real+' из '+want+' — остальные месяцы пока пустые</span>'):'')+
+      '</p>'+
       '<div class="mchart" id="ch-bars">'+bars+'</div>'+
       '<div id="ch-detail"></div></div>';
   }
@@ -2356,7 +2394,17 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         if(stay){ openStay(Number(stay.getAttribute('data-i'))); return; }
       });
       document.addEventListener('change',function(e){
-        if(e.target && e.target.id==='ch-own'){
+        var t2=e.target;
+        if(t2 && (t2.classList.contains('cal-m') || t2.classList.contains('cal-y'))){
+          var wrap=t2.closest('.cal');
+          var mSel=wrap.querySelector('.cal-m'), ySel=wrap.querySelector('.cal-y');
+          CAL_M=ySel.value+'-'+String(Number(mSel.value)+1).padStart(2,'0');
+          var p2=(DATA.properties||[])[CTX.obj!=null?CTX.obj:CUR]||{};
+          var tmp=document.createElement('div'); tmp.innerHTML=monthGrid(p2.bookings||[]);
+          wrap.replaceWith(tmp.firstChild);
+          return;
+        }
+        if(t2 && t2.id==='ch-own'){
           var v=Math.max(1,Math.min(Number(e.target.value)||12,240));
           CHART_RANGE=v; CHART_OPEN=null; redrawChart();
         }
@@ -2653,9 +2701,15 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       var b=busy[d2];
       cells+='<span class="cal-d'+(b?' busy':'')+'"'+(b?(' title="'+esc(b.guest_name||'занято')+'"'):'')+'>'+d2+'</span>';
     }
+    var yNow=new Date().getFullYear();
+    var years=''; for(var yy=yNow-1; yy<=yNow+3; yy++)
+      years+='<option value="'+yy+'"'+(yy===y?' selected':'')+'>'+yy+'</option>';
+    var months=''; for(var mi=0; mi<12; mi++)
+      months+='<option value="'+mi+'"'+(mi===m?' selected':'')+'>'+MN[mi]+'</option>';
     return '<div class="cal"><div class="cal-h">'+
       '<button type="button" class="cal-nav" data-cal="-1">‹</button>'+
-      '<b>'+MN[m]+' '+y+'</b>'+
+      '<span class="cal-sel"><select class="cal-m">'+months+'</select>'+
+      '<select class="cal-y">'+years+'</select></span>'+
       '<button type="button" class="cal-nav" data-cal="1">›</button></div>'+
       '<div class="cal-w"><span>пн</span><span>вт</span><span>ср</span><span>чт</span><span>пт</span><span>сб</span><span>вс</span></div>'+
       '<div class="cal-g" data-key="'+key+'">'+cells+'</div>'+
@@ -2844,7 +2898,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     ch+=line('Депозит брони',has(co.booking_deposit_thb)?money(co.booking_deposit_thb,'THB'):null);
     ch+=line('Налоги',co.taxes_note);
     ch+=line('Общая территория',co.common_area_fee_note);
-    H+=card('Расходы на содержание', '<p class="hintline">Это не операции, а ставки владения: фонд капремонта, обслуживание за м², сборы и налоги. Фактические траты за период — в разделе «Деньги по месяцам».</p>'+ch, 'sec-costs');
+    H+=card('Расходы на содержание', '<p class="hintline">Это не операции, а ставки владения: фонд капремонта, обслуживание за м², сборы и налоги. Фактические траты за период — в разделе «Финансы».</p>'+ch, 'sec-costs');
 
     // договор
     var dh='';
@@ -4515,7 +4569,10 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         lh.__built=1;
         /* список людей подтягиваем тем же запросом, что и раздел «Люди» */
         post({action:'clients',token:TOKEN,limit:300}).then(function(d){
-          var rows=(d&&(d.rows||d.clients))||[];
+          /* сценарий отдаёт список в поле data */
+          var rows=(d&&(d.data||d.rows||d.clients))||[];
+          if(rows && rows.rows) rows=rows.rows;
+          if(!Array.isArray(rows)) rows=[];
           pickList(lh,{ multi:false, placeholder:'выбрать: имя или номер',
             items:rows.map(function(c){
               return { id:String(c.code||c.client_code||c.id||''),
@@ -4563,16 +4620,46 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     return c;
   }
   /* Колокольчик показывает, что именно ждёт внимания, и ведёт в нужный раздел. */
+  /* Что именно ждёт внимания — не просто цифра, а список событий. */
+  function bellItems(){
+    var out=[];
+    (DATA.properties||[]).forEach(function(p){
+      var obj=p.name||p.id||'объект';
+      (p.bookings||[]).forEach(function(b){
+        if(b.status==='hold')
+          out.push({tab:'calendar',t:'Бронь ждёт подтверждения',s:obj+' · '+dmy(b.check_in)+
+                    (b.check_out?(' — '+dmy(b.check_out)):'')+(b.guest_name?(' · '+b.guest_name):'')});
+        else if(b.status==='upcoming')
+          out.push({tab:'calendar',t:'Скоро заезд',s:obj+' · '+dmy(b.check_in)+(b.guest_name?(' · '+b.guest_name):'')});
+      });
+      (p.requests||[]).forEach(function(r){
+        if(!r.done_at) out.push({tab:'actions',t:'Заявка без ответа',s:obj+' · '+(r.kind||r.title||'запрос')});
+      });
+      (p.services||p.works||[]).forEach(function(w){
+        if(w.status && w.status!=='done')
+          out.push({tab:'service',t:'Работа не закрыта',s:obj+' · '+(w.kind||'работа')+
+                    (w.due_date?(' до '+dmy(w.due_date)):'')});
+      });
+    });
+    (DATA.moderation||[]).forEach(function(m){
+      out.push({tab:'staff',t:'Заявка с сайта на модерации',s:(m.address||m.name||'новый объект')});
+    });
+    return out;
+  }
   function bellOpen(){
-    var c=cabCounts();
-    var names={calendar:'Бронирования',actions:'Заявки',service:'Обслуживание',staff:'Модерация'};
-    var rows=Object.keys(c).map(function(k){
-      return '<button type="button" class="bell-row" data-go="'+k+'">'+
-             '<span>'+(names[k]||k)+'</span><b>'+c[k]+'</b></button>';
+    var items=bellItems();
+    /* одно событие — сразу ведём туда, без лишнего окна */
+    if(items.length===1){ cabPage(items[0].tab); return; }
+    if(!items.length){
+      clForm('<h3>Уведомления</h3><p class="sub">Ничего нового — всё разобрано.</p>'+
+             '<div class="fbtns"><button type="button" class="btn ghost" id="f-cancel">Закрыть</button></div>');
+      return;
+    }
+    var rows=items.slice(0,20).map(function(it){
+      return '<button type="button" class="bell-row" data-go="'+it.tab+'">'+
+             '<span><b>'+clEsc(it.t)+'</b><u>'+clEsc(it.s)+'</u></span><i>→</i></button>';
     }).join('');
-    clForm('<h3>Что ждёт внимания</h3>'+
-      (rows?('<div class="bell-list">'+rows+'</div>')
-           :'<p class="sub">Ничего нового — всё разобрано.</p>')+
+    clForm('<h3>Что ждёт внимания</h3><div class="bell-list">'+rows+'</div>'+
       '<div class="fbtns"><button type="button" class="btn ghost" id="f-cancel">Закрыть</button></div>');
     Array.prototype.forEach.call(document.querySelectorAll('.bell-row'),function(b){
       b.onclick=function(){
@@ -4592,8 +4679,9 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       b.textContent=n||''; b.hidden=!n;
       total+=n;
     });
+    var n=0; try{ n=bellItems().length; }catch(e){ n=total; }
     var bell=document.getElementById('bellN');
-    if(bell){ bell.textContent=total||''; bell.hidden=!total; }
+    if(bell){ bell.textContent=n||''; bell.hidden=!n; }
   }
 
 
