@@ -136,12 +136,21 @@ p.text{margin:0;font-size:.94rem;line-height:1.6}
     var beds=(o.beds_min&&o.beds_max&&o.beds_min!==o.beds_max)?(o.beds_min+'–'+o.beds_max)
              :(o.beds_min?String(o.beds_min):null);
     var hand=dt(o.handover);
+    /* Если менеджер выбрал конкретный тип, показываем ЕГО площадь и спальни —
+       чтобы клиент видел параметры того, что предлагают, а не всего проекта. */
+    var uArea=null, uBeds=null;
+    if(pickedUnit){
+      var ma=/(\d+[.,]?\d*)\s*м²/.exec(pickedUnit);
+      var mb=/(\d+)\s*сп\./.exec(pickedUnit);
+      if(ma) uArea='от '+ma[1].replace('.',',')+' м²';
+      if(mb) uBeds=mb[1];
+    }
     var cells=[];
     if(price) cells.push(['от '+price,
       (o.list_price && o.price_from && Number(o.price_from)<Number(o.list_price))
         ? 'ваша цена, прайс '+baht(o.list_price) : 'цена от застройщика']);
-    if(area)  cells.push([area,'площадь']);
-    if(beds)  cells.push([beds,'спальни']);
+    if(uArea||area)  cells.push([uArea||area,'площадь']);
+    if(uBeds||beds)  cells.push([uBeds||beds,'спальни']);
     if(hand)  cells.push([hand,'срок сдачи']);
     else if(o.stage) cells.push([esc(o.stage).slice(0,28),'стадия']);
     if(o.beach_m!=null) cells.push([(o.beach_m>=1000?(o.beach_m/1000).toFixed(1).replace('.0','')+' км':o.beach_m+' м'),'до пляжа']);
