@@ -1190,7 +1190,7 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
       <button type="button" class="themebtn" id="themeBtn" onclick="cycleTheme()"
               aria-label="Оформление: системное, светлое, тёмное"><span id="themeIco">◐</span></button>
       <a class="btn btn-ghost btn-cab on" href="owner.html" data-i18n="nav.cabinet">Кабинет</a>
-      <a class="btn btn-green" href="https://wa.me/66955492587" target="_blank" rel="noopener">WhatsApp</a>
+      <button type="button" class="btn btn-green" onclick="openChat('header')">Спросить Дарью</button>
       <button type="button" class="burger" aria-label="Меню" onclick="toggleNav(true)"><i></i><i></i><i></i></button>
     </div>
   </div>
@@ -1220,8 +1220,8 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
     <a href="management.html">Управление</a>
     <a href="add-property.html">Разместить объект</a>
     <a href="index.html#about" onclick="toggleNav(false)" data-i18n="nav.about">О нас</a>
-    <a href="owner.html" onclick="toggleNav(false)" data-i18n="nav.cabinet">Кабинет владельца</a>
-    <a class="mwa" href="https://wa.me/66955492587" target="_blank" rel="noopener">WhatsApp · +66 95-549-2587</a>
+    <a href="owner.html" onclick="toggleNav(false)" data-i18n="nav.cabinet">Кабинет</a>
+    <button type="button" class="mwa" onclick="toggleNav(false);openChat('menu')">Спросить Дарью</button>
   </div>
 </div>
 <div class="wrap">
