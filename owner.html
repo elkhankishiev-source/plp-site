@@ -475,7 +475,7 @@ h3{font-size:1.12rem;font-weight:700}
 .chathead .x{margin-left:auto;width:30px;height:30px;font-size:1rem}
 .chathead .clr{width:30px;height:30px;font-size:.85rem;margin-left:auto}
 .chathead .x{margin-left:8px}
-.chatbody{padding:16px;display:flex;flex-direction:column;gap:10px;height:340px;overflow-y:auto;background:#faf9f5}
+.chatbody{padding:16px;display:flex;flex-direction:column;gap:10px;height:340px;overflow-y:auto;background:var(--warm)}
 .botnote{font-size:.7rem;color:var(--muted);text-align:center;padding:2px 10px;line-height:1.4}
 .msg{max-width:86%;font-size:.88rem;line-height:1.45;padding:10px 13px;border-radius:14px;animation:msgin .3s cubic-bezier(.16,1,.3,1)}
 @keyframes msgin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
@@ -1157,7 +1157,7 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
 .chathead .x{margin-left:auto;width:30px;height:30px;font-size:1rem}
 .chathead .clr{width:30px;height:30px;font-size:.85rem;margin-left:auto}
 .chathead .x{margin-left:8px}
-.chatbody{padding:16px;display:flex;flex-direction:column;gap:10px;height:340px;overflow-y:auto;background:#faf9f5}
+.chatbody{padding:16px;display:flex;flex-direction:column;gap:10px;height:340px;overflow-y:auto;background:var(--warm)}
 .chatbody{height:50vh}
 .chatinput{display:flex;gap:8px;padding:12px;border-top:1px solid rgba(var(--ink-rgb),.08);background:var(--paper)}
 .chatinput input{flex:1;height:44px;border:1.5px solid rgba(var(--ink-rgb),.12);border-radius:999px;padding:0 16px;font-size:.88rem;outline:none}
@@ -1171,6 +1171,11 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
 .msg.typing i:nth-child(2){animation-delay:.18s}
 .msg.typing i:nth-child(3){animation-delay:.36s}
 .msg.chat-cards{background:none;border:none;padding:0;max-width:100%;align-self:stretch;display:flex;flex-direction:column;gap:8px}
+
+/* подтверждение брони прямо в списке заездов */
+.okbtn{width:auto;margin:0;padding:6px 12px;border-radius:999px;font-size:12.5px;font-weight:700;
+  background:var(--green);color:var(--on-green)}
+.okbtn:disabled{opacity:.6}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 </head>
@@ -1190,7 +1195,7 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
       <button type="button" class="themebtn" id="themeBtn" onclick="cycleTheme()"
               aria-label="Оформление: системное, светлое, тёмное"><span id="themeIco">◐</span></button>
       <a class="btn btn-ghost btn-cab on" href="owner.html" data-i18n="nav.cabinet">Кабинет</a>
-      <button type="button" class="btn btn-green" onclick="openChat('header')">Спросить Дарью</button>
+      <button type="button" class="btn btn-green" onclick="openChat('hi')">Дарья · на связи</button>
       <button type="button" class="burger" aria-label="Меню" onclick="toggleNav(true)"><i></i><i></i><i></i></button>
     </div>
   </div>
@@ -1221,7 +1226,7 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
     <a href="add-property.html">Разместить объект</a>
     <a href="index.html#about" onclick="toggleNav(false)" data-i18n="nav.about">О нас</a>
     <a href="owner.html" onclick="toggleNav(false)" data-i18n="nav.cabinet">Кабинет</a>
-    <button type="button" class="mwa" onclick="toggleNav(false);openChat('menu')">Спросить Дарью</button>
+    <button type="button" class="mwa" onclick="toggleNav(false);openChat('hi')">Дарья · на связи</button>
   </div>
 </div>
 <div class="wrap">
@@ -2315,6 +2320,22 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         var bar=t.closest && t.closest('.mbar');
         if(bar){ var m=bar.getAttribute('data-m');
           CHART_OPEN=(CHART_OPEN===m)?null:m; redrawChart(); return; }
+        var ok=t.closest && t.closest('.okbtn');
+        if(ok){
+          e.preventDefault();
+          ok.disabled=true; ok.textContent='…';
+          post({action:'uk_booking_save',token:TOKEN,
+                property_id:ok.getAttribute('data-pid'),
+                check_in:ok.getAttribute('data-in'),
+                check_out:ok.getAttribute('data-out'),
+                status:'upcoming', booking_id:ok.getAttribute('data-ok')})
+            .then(function(r){
+              if(r&&r.ok){ loadData(); }
+              else { ok.disabled=false; ok.textContent='Подтвердить';
+                     alert((r&&r.error)||'Не получилось подтвердить'); }
+            });
+          return;
+        }
         var cn=t.closest && t.closest('.cal-nav');
         if(cn){
           var wrap=cn.closest('.cal');
@@ -2749,10 +2770,15 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
                cancelled:'отменена',hold:'бронь',pending:'ждёт оплаты',paid:'оплачена'};
       bh+='<table><tr><th>Заезд</th><th>Выезд</th><th>Гость</th><th class="r">Сумма</th><th class="r">Статус</th></tr>';
       bk.forEach(function(g){
+        /* удержание подтверждается одним нажатием — Эльнур 05.09 */
+        var act = (g.status==='hold' && DATA.owner && DATA.owner.is_staff===true && g.booking_id)
+          ? ('<button type="button" class="okbtn" data-ok="'+esc(g.booking_id)+'" '+
+             'data-pid="'+esc(p.id||'')+'" data-in="'+esc(g.check_in||'')+'" data-out="'+esc(g.check_out||'')+'">Подтвердить</button>')
+          : esc(BST[g.status]||g.status||'—');
         bh+='<tr><td>'+dmy(g.check_in)+'</td><td>'+dmy(g.check_out)+'</td>'+
             '<td>'+esc(g.guest_name||'—')+'</td>'+
             '<td class="r">'+(g.amount_thb?money(g.amount_thb,cur):'—')+'</td>'+
-            '<td class="r">'+esc(BST[g.status]||g.status||'—')+'</td></tr>';
+            '<td class="r">'+act+'</td></tr>';
       });
       bh+='</table>';
     }
@@ -4599,10 +4625,9 @@ function openChat(){
   var fw=document.getElementById('fabWrap'); if(fw) fw.style.display='none';
   if(!chatStarted){
     chatStarted=true;
-    var p=(typeof DATA!=='undefined' && DATA && DATA.properties || [])[
-          (typeof CTX!=='undefined' && CTX.obj!=null) ? CTX.obj : (typeof CUR!=='undefined'?CUR:0)] || {};
-    chatMsg('bot','Здравствуйте! Это Дарья. Отвечу по объекту' +
-      (p.name?(' «'+p.name+'»'):'') + ': отчёты, брони, работы. Если нужно вмешательство — передам менеджеру.');
+    /* то же приветствие, что на сайте — без привязки к случайному объекту */
+    chatMsg('bot','Здравствуйте! Я Дарья, менеджер Property Library из команды Эльнура. '+
+                  'Помогу с покупкой, арендой и любым вопросом по Пхукету. Что вам интересно?');
   }
   var f=document.getElementById('chatField'); if(f && innerWidth>760) f.focus();
 }
