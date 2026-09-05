@@ -149,15 +149,9 @@ const CATALOG_JS = `
     });
     return out;
   }
-  function countFound(){
-    var box=document.getElementById('found');
-    if(!box) return;
-    var n=visiblePids().length;
-    var w=(n%10===1&&n%100!==11)?'объект':((n%10>=2&&n%10<=4&&(n%100<10||n%100>20))?'объекта':'объектов');
-    box.innerHTML='<b>'+n+'</b> '+w+' по вашим фильтрам';
-  }
+  /* счётчик найденного пишет сам сайт (#saleFound / #rentFound) — здесь только карта */
   window.PLP_MAP_FILTER=function(){ return visiblePids(); };
-  function sync(){ countFound(); if(window.renderMapReal){ try{ window.PLPMAP && window.drawPinsExternal && window.drawPinsExternal(); }catch(e){} } }
+  function sync(){ if(window.renderMapReal){ try{ window.PLPMAP && window.drawPinsExternal && window.drawPinsExternal(); }catch(e){} } }
 
   /* каталог зовёт нас после каждой фильтрации — обновляем счётчик и карту */
   window.PLP_AFTER_FILTER=function(){ setTimeout(sync, 20); };
@@ -214,7 +208,7 @@ function asCatalog(html, carId){
   // Эльнур 05.09: липкая карта над лентой мешает. Карта живёт в разделе
   // «Районы» на главной, где ей есть где развернуться; в каталоге — только лента.
   let out = html.replace('<div class="car" id="'+carId+'"></div>',
-    '<p class="found" id="found"></p>'+
+    /* счётчик найденного теперь общий (#saleFound из index.html) — второй не нужен */
     '<div class="catrow"><div><div class="car" id="'+carId+'"></div></div></div>');
   out = out.replace(/<section id="(sale|rent)"/, '<section class="catalog" id="$1"');
   return out;

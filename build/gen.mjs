@@ -680,6 +680,30 @@ function objectPage(o, benchmarks) {
       '</div></section>'
     : '';
 
+  // Галерея, планировки и ход стройки — те же данные, что и в карточке на сайте.
+  const gallery = Array.isArray(o.gallery_urls) ? o.gallery_urls.filter(u => /^https?:/.test(u)).slice(0, 8) : [];
+  const heroSrc = o.main_image_url || (gallery[0] || ('../img/' + pid + '.jpg'));
+  const shots = gallery.length > 1
+    ? '<div class="shots">' + gallery.map((u, i) =>
+        '<button type="button" class="' + (i ? '' : 'on') + '" data-src="' + htmlEsc(u) + '" aria-label="Фото ' + (i + 1) + '">' +
+        '<img src="' + htmlEsc(u) + '" alt="" loading="lazy" decoding="async"></button>').join('') + '</div>'
+    : '';
+  const unitList = unitsOf(o) || [];
+  const unitsBlock = unitList.length
+    ? '<section class="desc"><h2>Что можно купить</h2><div class="units">' +
+      unitList.map(u => '<div class="unitc"><b>' + htmlEsc(u.name || 'Тип') + '</b>' +
+        '<span>' + [u.area ? ('от ' + u.area + ' м²') : '', (u.beds != null ? u.beds + ' сп.' : '')].filter(Boolean).join(' · ') + '</span>' +
+        (u.from ? '<u>от ' + new Intl.NumberFormat('ru-RU').format(u.from) + ' ฿</u>' : '') + '</div>').join('') +
+      '</div></section>'
+    : '';
+  const bp = o.build_progress && Array.isArray(o.build_progress.photos) ? o.build_progress : null;
+  const progressBlock = bp && bp.photos.length
+    ? '<section class="desc"><h2>Ход строительства' + (bp.as_of ? ' <small style="font-weight:400;color:var(--muted)">' + htmlEsc(bp.as_of) + '</small>' : '') + '</h2>' +
+      '<div class="prgs">' + bp.photos.slice(0, 6).map(u => '<img src="' + htmlEsc(u) + '" alt="" loading="lazy" decoding="async">').join('') + '</div>' +
+      (bp.source ? '<p style="font-size:13px;color:var(--muted);margin-top:8px">' + htmlEsc(bp.source) + '</p>' : '') +
+      '</section>'
+    : '';
+
   const chips = chipRow([
     { k: 'Тип', v: t.ru },
     { k: 'Спальни', v: beds },
@@ -720,49 +744,65 @@ function objectPage(o, benchmarks) {
 <meta name="twitter:image" content="${htmlEsc(img)}">
 <script type="application/ld+json">${jsonLdSafe(ld)}</script>
 <style>
-:root{--green:#D2D5B3;--green-deep:#A9AE7F;--olive:#5F6242;--ink:#0A0A0A;--paper:#14150f;--bg:#0c0d09;--card:#191a12;--line:#2c2e22;--muted:#b9bca6;--text:#ecefe0;--r:20px}
+/* Эльнур 05.09: сайт — единая система. Страница объекта живёт в тех же
+   цветах и с тем же набором блоков, что и карточка на сайте. */
+:root{--green:#D2D5B3;--green-deep:#5F6242;--olive:#5F6242;--ink:#22251C;--paper:#FBFBF7;
+  --bg:#F4F4EE;--card:#FBFBF7;--line:#E6E6DE;--muted:#6B6B63;--text:#22251C;--r:20px}
 *{box-sizing:border-box}
 html,body{margin:0}
 body{background:var(--bg);color:var(--text);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
 a{color:inherit}
 .wrap{max-width:920px;margin:0 auto;padding:0 20px}
 header.top{padding:18px 0;border-bottom:1px solid var(--line)}
-.brand{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:600;letter-spacing:.02em;color:var(--green)}
+.brand{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:600;letter-spacing:.02em;color:var(--ink)}
 .brand img{display:block;border-radius:6px}
 .brand small{color:var(--muted);font-weight:400}
 .hero{position:relative;border-radius:var(--r);overflow:hidden;margin:24px 0;border:1px solid var(--line);background:var(--card)}
 .hero img{display:block;width:100%;height:auto;max-height:520px;object-fit:cover}
-.hero .badge{position:absolute;top:14px;left:14px;background:rgba(12,13,9,.72);backdrop-filter:blur(6px);color:var(--green);padding:7px 13px;border-radius:999px;font-size:13px;border:1px solid var(--line)}
+.hero .badge{position:absolute;top:14px;left:14px;background:rgba(16,15,12,.62);backdrop-filter:blur(6px);color:#fff;padding:7px 13px;border-radius:999px;font-size:13px;border:0}
+/* галерея как в карточке: крупный кадр, под ним миниатюры */
+.shots{display:flex;gap:8px;overflow-x:auto;margin:-8px 0 22px;padding-bottom:6px}
+.shots button{flex:0 0 96px;height:68px;padding:0;border:2px solid transparent;border-radius:10px;overflow:hidden;background:#eceadf;cursor:pointer}
+.shots button.on{border-color:var(--green-deep)}
+.shots img{width:100%;height:100%;object-fit:cover;display:block}
+.units{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.unitc{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:10px 13px;min-width:150px}
+.unitc b{display:block;font-size:14px}
+.unitc span{display:block;font-size:12px;color:var(--muted);margin-top:2px}
+.unitc u{display:block;text-decoration:none;font-weight:700;font-size:13px;margin-top:3px}
+.prgs{display:flex;gap:8px;overflow-x:auto;margin-top:10px;padding-bottom:6px}
+.prgs img{flex:0 0 190px;height:130px;object-fit:cover;border-radius:11px;display:block}
 h1{font-size:clamp(24px,4vw,34px);line-height:1.2;margin:8px 0 4px}
 .loc{color:var(--muted);margin:0 0 14px}
-.price{font-size:clamp(22px,3.5vw,30px);font-weight:700;color:var(--green)}
+.price{font-size:clamp(22px,3.5vw,30px);font-weight:700;color:var(--ink)}
 .price small{display:block;font-size:13px;font-weight:400;color:var(--muted);margin-top:2px}
 .chips{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0}
 .chip{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 14px;min-width:120px}
 .chip .k{display:block;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
 .chip .v{display:block;font-weight:600;margin-top:2px}
 .yield{margin:22px 0;padding:18px 20px;border:1px solid var(--line);border-radius:var(--r);background:linear-gradient(180deg,rgba(210,213,179,.08),rgba(210,213,179,.02))}
-.yield .num{font-size:26px;font-weight:700;color:var(--green)}
+.yield .num{font-size:26px;font-weight:700;color:var(--green-deep)}
 .yield .lbl{color:var(--muted);font-size:14px}
 section.desc{margin:26px 0}
-section.desc h2{font-size:18px;margin:0 0 10px;color:var(--green)}
+section.desc h2{font-size:18px;margin:0 0 10px;color:var(--ink)}
 section.desc p{color:var(--text);opacity:.94;white-space:pre-line}
 .cta{display:flex;flex-wrap:wrap;gap:12px;margin:28px 0}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 22px;border-radius:14px;font-weight:600;text-decoration:none;border:1px solid var(--line);cursor:pointer}
-.btn.wa{background:#25D366;color:#04220f;border-color:#25D366}
+.btn.wa{background:#25D366;color:#0b2b18;border-color:#25D366}
 .btn.primary{background:var(--green);color:var(--ink);border-color:var(--green)}
 .btn.ghost{background:transparent;color:var(--text)}
 footer{border-top:1px solid var(--line);margin-top:40px;padding:22px 0 40px;color:var(--muted);font-size:14px}
-footer a{color:var(--green);text-decoration:none}
+footer a{color:var(--green-deep);text-decoration:none}
 </style>
 </head>
 <body>
 <header class="top"><div class="wrap"><a class="brand" href="../" aria-label="Property Library — на главную"><img src="../img/brand/plp-mark-ink.png" alt="" width="24" height="24">Property Library Phuket <small>· недвижимость на Пхукете</small></a></div></header>
 <main class="wrap">
   <div class="hero">
-    <img src="../img/${htmlEsc(pid)}.jpg" alt="${htmlEsc(o.name)}" loading="lazy">
+    <img id="mainShot" src="${htmlEsc(heroSrc)}" alt="${htmlEsc(o.name)}" loading="lazy">
     <div class="badge">${htmlEsc(t.ru)} · ${htmlEsc(ru)}</div>
   </div>
+  ${shots}
   <h1>${htmlEsc(o.name)}</h1>
   <p class="loc">${htmlEsc(ru)}, Пхукет${distBeach ? ' · ' + htmlEsc(distBeach) : ''}</p>
   ${priceFmt ? '<div class="price">от ' + htmlEsc(priceFmt) + '<small>стартовая цена застройщика</small></div>' : ''}
@@ -771,15 +811,30 @@ footer a{color:var(--green);text-decoration:none}
     <div class="num">${yr.low}${DASH}${yr.high}%</div>
     <div class="lbl">Ориентир доходности по району (${htmlEsc(ru)}, ${htmlEsc(t.ru.toLowerCase())}) — потенциал при активном управлении. Индивидуально, раскрывается со специалистом.</div>
   </div>
+  ${unitsBlock}
+  ${progressBlock}
   ${usp ? '<section class="desc"><h2>Об объекте</h2><p>' + htmlEsc(usp) + '</p></section>' : ''}
   ${uspEn ? '<section class="desc" lang="en"><h2>About</h2><p>' + htmlEsc(uspEn) + '</p></section>' : ''}
   ${materials}
   <div class="cta">
     <a class="btn wa" href="${htmlEsc(waLink)}" rel="noopener" target="_blank">WhatsApp — узнать детали</a>
-    <a class="btn primary" href="${htmlEsc(backLink)}">Смотреть на сайте</a>
-    <a class="btn ghost" href="${htmlEsc(backLink)}">Рассчитать доходность на сайте</a>
+    <a class="btn primary" href="${htmlEsc(backLink)}">Открыть карточку на сайте</a>
+    <a class="btn ghost" href="${htmlEsc(backLink)}">Рассчитать доходность</a>
   </div>
 </main>
+<script>
+/* миниатюры листают главный кадр — как в карточке на сайте */
+(function(){
+  var main=document.getElementById('mainShot');
+  var strip=document.querySelector('.shots');
+  if(!main||!strip) return;
+  strip.addEventListener('click',function(e){
+    var b=e.target.closest('button'); if(!b) return;
+    main.src=b.dataset.src;
+    Array.prototype.forEach.call(strip.children,function(x){ x.classList.toggle('on',x===b); });
+  });
+})();
+</script>
 <footer><div class="wrap">Property Library Phuket · <a href="https://wa.me/${WA}" rel="noopener" target="_blank">WhatsApp +66 95 549 2587</a> · <a href="../">на главную</a><br>Данные носят справочный характер и не являются офертой.</div></footer>
 </body>
 </html>
