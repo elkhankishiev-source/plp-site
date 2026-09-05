@@ -4136,7 +4136,10 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
               'без_кода_страны':['phones',''],'короткие':['phones',''],'длинные':['phones',''],
               'тестовые':['phones',''],'дубли':['phones',''],
               'заявок_на_модерации':['moderation',''],'без_точки':['coords',''],'точка_неточная':['coords',''],
-              'просрочено':['tasks',''],'задач':['tasks',''],'сотрудников':['staff','']};
+              'просрочено':['tasks',''],'задач':['tasks',''],'сотрудников':['staff',''],
+              'задач_открыто':['tasks',''],'на_неделе':['tasks',''],
+              'выполнено_всего':['tasks',''],'выполнено_за_неделю':['tasks',''],
+              'работ_по_объектам_открыто':['service',''],'работ_по_объектам_выполнено':['service','']};
       function group(title, obj, marks){
         var h='<div class="bgroup"><h4>'+title+'</h4><div class="bgrid">';
         Object.keys(obj||{}).forEach(function(k){
@@ -4173,6 +4176,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
           } else if(go==='phones'){ cabPage('clients'); dupesBoard(); }
           else if(go==='tasks'){ cabPage('clients'); tasksBoard(); }
           else if(go==='staff'){ cabPage('staff'); }
+          else if(go==='service'){ cabPage('service'); }
           else if(go==='coords'){ cabPage('staff');
             var sc=document.getElementById('sec-coords');
             if(sc) setTimeout(function(){ sc.scrollIntoView({behavior:'smooth'}); },120); }
