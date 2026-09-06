@@ -47,7 +47,7 @@
 <meta property="og:site_name" content="Property Library Phuket">
 <meta property="og:title" content="Личный кабинет — Property Library Phuket">
 <meta property="og:description" content="Ваши объекты, отчёты, документы и заявки в одном месте. Вход по номеру телефона — код придёт в WhatsApp или Telegram.">
-<meta property="og:url" content="https://property-library.com/owner.html">
+<meta property="og:url" content="https://property-library.com/owner">
 <meta property="og:image" content="https://property-library.com/img/og-cabinet.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -60,6 +60,21 @@
 <link rel="icon" href="/img/brand/plp-mark.png">
 <style>
 html{background:var(--bg);overscroll-behavior-y:none}
+/* PLP:ANTIFLICKER */
+/* Мигание фона на телефоне — сводная защита. Эльнур 06.09: «фон в мобильной
+   версии везде мигает, ищи по всем страницам». Три источника:
+   1) размытие фона (backdrop-filter) под липкими элементами — браузер
+      перерисовывает весь экран на каждом кадре прокрутки;
+   2) долгое проявление блоков при прокрутке;
+   3) отложенные картинки без фона — на их месте на миг светится подложка. */
+@media(max-width:900px){
+  .header,#toTop,.badge,.pm-tag,.car .tag,.btn-glass,.hero-float,.fbtn,.chipf,
+  .modal-overlay,.mnav,.sheet,.pm-card,.toolbox{
+    backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+  .reveal{transition-duration:.35s!important}
+}
+.pic-photo,.thumb-photo,.prgs img,.simi-c i,.pm-img img{background-color:var(--warm,#EFEEE7)}
+/* PLP:ANTIFLICKER */
 /* ── стили сайта: кабинет — его продолжение, а не отдельная страница ── */
 
 :root{
@@ -1166,7 +1181,7 @@ html,body{overflow-x:clip;overflow-y:visible;height:auto;-webkit-overflow-scroll
 .empty{background:var(--warm);color:var(--muted);border-radius:12px;padding:14px}
 .cab-nav a,.cab-nav a:visited{color:var(--ink)}
 .cab-nav a.on{background:var(--warm);color:var(--ink);font-weight:700}
-a[href="add-property.html"],a.lnk{color:var(--olive)}
+a[href="/add-property"],a.lnk{color:var(--olive)}
 
 /* подсказка о демо: в тёмной теме плашка темнеет — текст должен светлеть вместе с ней */
 #demo-note{background:var(--warm)!important;border-color:rgba(var(--ink-rgb),.14)!important;color:var(--ink)!important}
@@ -1513,6 +1528,59 @@ body{background:var(--bg)}
   .prop,.zone,.mobj,.zprop{transition:none}
 }
 
+
+/* Язык и оформление: на телефоне живут в бургере, в шапке остаются только на
+   широком экране. Иначе шапка сайта и шапка кабинета расходятся, а тумблер
+   языка в кабинете «плывёт» (Эльнур 06.09). */
+.mnav .mtools{display:flex;align-items:center;gap:10px;margin:14px 0 4px;flex-wrap:wrap}
+.mnav .mlang{display:inline-flex;flex-wrap:nowrap;border:1px solid rgba(var(--ink-rgb),.16);
+  border-radius:999px;overflow:hidden;height:34px;background:var(--paper)}
+.mnav .mlang button{border:0;background:transparent;color:var(--ink);font:inherit;font-size:.78rem;
+  font-weight:700;letter-spacing:.02em;padding:0 12px;height:100%;cursor:pointer}
+.mnav .mlang button.on{background:var(--green);color:var(--on-green)}
+.mnav .mtheme{display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 14px;
+  border:1px solid rgba(var(--ink-rgb),.16);border-radius:999px;background:var(--paper);
+  color:var(--ink);font:inherit;font-size:.78rem;font-weight:700;cursor:pointer}
+.mnav .mtheme span:first-child{font-size:.95rem;line-height:1}
+
+
+
+/* Шапка обязана выглядеть одинаково на сайте и в кабинете. Здесь заданы все
+   размеры и цвета явно — локальные правила страниц наследовали случайные
+   значения (padding от чипа-метки, цвет от кнопки), и шапки расходились. */
+.header .logo{color:var(--ink);line-height:1.2}
+.header .logo .chip{padding:0;margin:0;display:flex;align-items:center;justify-content:center;
+  background:var(--green);flex:none}
+.header .logo .chip img{width:24px;height:auto;display:block}
+.header .lname{line-height:1.5;font-size:.98rem;font-weight:800;letter-spacing:-.01em}
+.header .themebtn{padding:0;width:34px;height:34px;display:inline-flex;align-items:center;
+  justify-content:center;font-size:.95rem;border-radius:11px}
+.header .burger{font-size:16px;color:var(--ink);padding:0}
+:root[data-theme="dark"] .header .logo,:root[data-theme="dark"] .header .lname,
+:root:not([data-theme="light"]) .header .logo,:root:not([data-theme="light"]) .header .lname{color:#F4F6EA}
+:root[data-theme="light"] .header .logo,:root[data-theme="light"] .header .lname{color:var(--ink)}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]) .header .logo,:root:not([data-theme="dark"]) .header .lname{color:var(--ink)}
+}
+.header .logo .lname>span{color:var(--olive)}
+
+/* внутри значка только картинка — цвет текста делаем нейтральным,
+   иначе он наследуется по-разному и шапки формально расходятся */
+.header .logo .chip{color:transparent!important}
+/* половинки тумблера одинаковой ширины: иначе жирная подсветка текущего места
+   двигает всю шапку на пару пикселей и сайт с кабинетом «не совпадают» */
+.header .swch{width:164px;box-sizing:border-box}
+.header .swch>a,.header .swch>b{flex:1 1 0;min-width:0;text-align:center}
+
+/* мобильное меню: язык и оформление стоят рядом, кнопка не растягивается
+   на всю ширину, как остальные пункты меню */
+.mnav .mtools .mtheme,.mnav .mtools .mlang{width:auto;flex:0 0 auto}
+/* На телефоне язык и оформление живут только в бургере — правило идёт
+   последним, иначе размеры шапки его перебивают. */
+@media(max-width:600px){
+  .header .lang,.header .themebtn{display:none!important}
+}
+
 /* PLP:UI:END */
 </style>
 <!-- Leaflet подгружается только при открытии раздела с картой: см. ensureLeaflet() -->
@@ -1521,13 +1589,13 @@ body{background:var(--bg)}
 <!-- PLP:HEADER:START -->
 <header class="header">
   <div class="container header-inner">
-    <a class="logo" href="index.html" aria-label="Property Library — на главную"><span class="chip"><img src="img/brand/plp-mark-ink.png" alt="Property Library Phuket" width="24"></span><span class="lname">Property <span>Library</span></span></a>
+    <a class="logo" href="/" aria-label="Property Library — на главную"><span class="chip"><img src="img/brand/plp-mark-ink.png" alt="Property Library Phuket" width="24"></span><span class="lname">Property <span>Library</span></span></a>
     <nav class="nav" aria-label="Основное меню">
-      <a href="buy.html" data-i18n="nav.sale">Продажа</a>
-      <a href="rent.html" data-i18n="nav.rent">Аренда</a>
-      <a href="index.html#map" data-i18n="nav.map">Районы</a>
-      <a href="management.html">Управление</a>
-      <a href="index.html#about" data-i18n="nav.about">О нас</a>
+      <a href="/buy" data-i18n="nav.sale">Продажа</a>
+      <a href="/rent" data-i18n="nav.rent">Аренда</a>
+      <a href="/#map" data-i18n="nav.map">Районы</a>
+      <a href="/management">Управление</a>
+      <a href="/#about" data-i18n="nav.about">О нас</a>
     </nav>
     <div class="htools">
       <div class="lang" role="group" aria-label="Язык">
@@ -1538,7 +1606,7 @@ body{background:var(--bg)}
       <button type="button" class="themebtn" id="themeBtn" onclick="cycleTheme()"
               aria-label="Оформление: системное, светлое, тёмное"><span id="themeIco">◐</span></button>
       <span class="swch" role="group" aria-label="Сайт или кабинет">
-        <a href="index.html">Сайт</a><b>Кабинет</b>
+        <a href="/">Сайт</a><b>Кабинет</b>
       </span>
       <button type="button" class="burger" aria-label="Меню" onclick="toggleNav(true)"><i></i><i></i><i></i></button>
     </div>
@@ -1565,17 +1633,24 @@ body{background:var(--bg)}
 <div class="mnav" id="mnav" onclick="if(event.target===this)toggleNav(false)">
   <div class="sheet">
     <div class="top"><b data-i18n="nav.menu">Меню</b><button type="button" class="xx" onclick="toggleNav(false)" aria-label="Закрыть">×</button></div>
-    <a href="buy.html" data-i18n="nav.sale">Продажа</a>
-    <a href="rent.html" data-i18n="nav.rent">Аренда</a>
+    <a href="/buy" data-i18n="nav.sale">Продажа</a>
+    <a href="/rent" data-i18n="nav.rent">Аренда</a>
     <a href="#map" onclick="toggleNav(false)" data-i18n="nav.map">Районы</a>
-    <a href="management.html">Управление</a>
-    <a href="add-property.html">Разместить объект</a>
+    <a href="/management">Управление</a>
+    <a href="/add-property">Разместить объект</a>
     <a href="#about" onclick="toggleNav(false)" data-i18n="nav.about">О нас</a>
-    <div class="mlang">
-      <button type="button" data-l="ru" class="on" onclick="setLang('ru')">RU</button>
-      <button type="button" data-l="en" onclick="setLang('en')">EN</button>
+    <!-- Эльнур 06.09: язык и оформление на телефоне живут здесь, одинаково
+         на сайте и в кабинете. В шапке их на узком экране нет. -->
+    <div class="mtools">
+      <div class="mlang" role="group" aria-label="Язык">
+        <button type="button" data-l="ru" class="on" onclick="setLang('ru')">RU</button>
+        <button type="button" data-l="en" onclick="setLang('en')">EN</button>
+      </div>
+      <button type="button" class="mtheme" onclick="cycleTheme()" aria-label="Оформление">
+        <span id="mThemeIco">◐</span><span data-i18n="nav.theme">Оформление</span>
+      </button>
     </div>
-    <a href="index.html" onclick="toggleNav(false)">На сайт</a>
+    <a href="/" onclick="toggleNav(false)">На сайт</a>
     <button type="button" class="mwa" onclick="toggleNav(false);openChat('hi')" data-i18n="nav.chat">Чат с консультантом</button>
   </div>
 </div>
@@ -1822,7 +1897,7 @@ body{background:var(--bg)}
     <div id="demo-note" style="display:none;background:var(--green-soft);color:var(--on-green);border:1px solid var(--green);border-radius:14px;
          padding:12px 16px;margin-bottom:14px;font-size:14px">
       <b>Это пример.</b> Так кабинет выглядит, когда объект уже работает: цифры и брони вымышленные.
-      <a href="owner.html" style="color:var(--acc)">Вернуться ко входу</a>
+      <a href="/owner" style="color:var(--acc)">Вернуться ко входу</a>
     </div>
     <div id="portfolio"></div>
     <div class="tabs" id="prop-tabs"></div>
@@ -1862,7 +1937,7 @@ body{background:var(--bg)}
       <h2>Добавить ещё объект</h2>
       <p class="sub" style="margin:0 0 14px">Есть другая недвижимость? Заполните короткую анкету
       и приложите фото — за пять шагов. Мы проверим и оформим карточку.</p>
-      <a href="add-property.html" style="display:inline-block;background:var(--ink-block);color:var(--on-ink);
+      <a href="/add-property" style="display:inline-block;background:var(--ink-block);color:var(--on-ink);
          border-radius:999px;padding:12px 20px;font-size:15px;font-weight:700;text-decoration:none">Разместить объект</a>
     </div>
 
@@ -2040,13 +2115,13 @@ body{background:var(--bg)}
     <div class="footer-grid">
       <div>
         <a class="logo" href="#top"><span class="chip"><img src="img/brand/plp-mark-ink.png" alt="Property Library Phuket" width="24"></span><span>Property <span>Library</span></span></a>
-        <p class="sub" style="font-size:.92rem;margin-top:12px" data-i18n="ft.tag">Мы уже выбрали Пхукет, поможем и вам. Все под ключ — от первого звонка до заезда.</p>
+        <p class="sub" style="font-size:.92rem;margin-top:12px" data-i18n="ft.tag">Мы уже выбрали Пхукет, поможем и вам. Все под ключ — от первого звонка до заезда и получения дохода.</p>
       </div>
       <div>
         <h3 data-i18n="ft.menu">Меню</h3>
         <ul>
           <li><a href="#sale" data-i18n="ft.buy">Покупка</a></li>
-          <li><a href="rent.html" data-i18n="nav.rent">Аренда</a></li>
+          <li><a href="/rent" data-i18n="nav.rent">Аренда</a></li>
           <li><a href="#map" data-i18n="nav.map">Районы</a></li>
           <li><a href="#about" data-i18n="nav.about">О нас</a></li>
           <li><a href="#faq">FAQ</a></li>
@@ -2071,9 +2146,9 @@ body{background:var(--bg)}
     </div>
     <div class="footer-bottom">
       <span data-i18n="ft.copy">Property Library Phuket © 2022</span>
-      <a href="privacy.html" data-i18n="ft.policy">Политика конфиденциальности</a>
-      <a href="rules.html" data-i18n="ft.rules">Правила бронирования и проживания</a>
-      <a href="terms.html" data-i18n="ft.terms">Условия использования</a>
+      <a href="/privacy" data-i18n="ft.policy">Политика конфиденциальности</a>
+      <a href="/rules" data-i18n="ft.rules">Правила бронирования и проживания</a>
+      <a href="/terms" data-i18n="ft.terms">Условия использования</a>
     </div>
   </div>
 </footer>
@@ -2089,9 +2164,12 @@ function themeNow(){
 }
 function paintThemeBtn(){
   var ico=document.getElementById('themeIco'), b=document.getElementById('themeBtn');
-  if(!ico||!b) return;
   var v=themeNow();
-  ico.textContent = v==='light' ? '☀' : v==='dark' ? '☾' : '◐';
+  var sym = v==='light' ? '☀' : v==='dark' ? '☾' : '◐';
+  /* тот же значок в бургере — на телефоне переключатель живёт там */
+  var mIco=document.getElementById('mThemeIco'); if(mIco) mIco.textContent=sym;
+  if(!ico||!b) return;
+  ico.textContent = sym;
   b.title = v==='light' ? 'Светлое оформление' : v==='dark' ? 'Тёмное оформление' : 'Как в системе';
   var dark = v==='dark' || (v==='system' && window.matchMedia &&
              window.matchMedia('(prefers-color-scheme: dark)').matches);
@@ -3299,7 +3377,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         (o.price_from?('<b>от '+fmtB(o.price_from)+'</b>'):'')+'</div>'+
         '<p class="sub">'+esc([o.district,o.type].filter(Boolean).join(' · '))+'</p>'+
         (units?('<div class="sc-us">'+units+'</div>'):'')+
-        '<a class="lnk" href="index.html#object='+encodeURIComponent(pid)+'" target="_blank" rel="noopener">Открыть карточку на сайте</a>'+
+        '<a class="lnk" href="/#object='+encodeURIComponent(pid)+'" target="_blank" rel="noopener">Открыть карточку на сайте</a>'+
         '</div>';
     });
   }
@@ -4221,7 +4299,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       '<li><b>Удаление.</b> Напишите нам — удалим документы и закроем кабинет. Без объяснений.</li>'+
       '<li><b>Уведомления.</b> Пишем только по делу: разобрали документ, подходит платёж, '+
       'готов отчёт. Не чаще трёх раз в неделю и не ночью. Отключить можно в любой момент.</li>'+
-      '</ul><p class="sub">Подробно — в <a class="lnk" href="/privacy.html" target="_blank" '+
+      '</ul><p class="sub">Подробно — в <a class="lnk" href="/privacy" target="_blank" '+
       'rel="noopener">политике конфиденциальности</a>.</p></div>';
   }
 
@@ -4571,7 +4649,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         '<textarea id="cm-text" class="cmtext" rows="7">{имя}, здравствуйте! Это Эльнур из Property Library.\n\n'+
         'Собрали для вас личный кабинет: там ваши объекты, графики платежей и документы в одном месте.\n'+
         'Заходить по вашему номеру, код придёт сюда же в WhatsApp:\n'+
-        'https://property-library.com/owner.html\n\n'+
+        'https://property-library.com/owner\n\n'+
         'Если пришлёте договор — система соберёт график платежей и будет напоминать заранее.</textarea>'+
         '<h4>Что приложить</h4>'+
         '<div class="fgrid"><label class="wide">Ссылка на объект или расчёт'+
@@ -5047,7 +5125,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
             if(!r||!r.ok||!r.offer){ say((r&&r.error)||'Не получилось собрать оффер'); return; }
             var f=document.getElementById('cl-form');
             if(f){ f.innerHTML=''; document.body.style.overflow=''; }
-            var url=r.offer.url||('https://property-library.com/offer.html#'+r.offer.token);
+            var url=r.offer.url||('https://property-library.com/offer#'+r.offer.token);
             var box=document.getElementById('cl-offerbox');
             if(box) box.innerHTML='<div class="crow" style="margin-top:8px"><div>'+
               '<span class="lbl">Ссылка для клиента (скопирована)</span>'+
@@ -5111,7 +5189,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       var list=(r&&r.offers)||[];
       if(!list.length){ box.innerHTML='<p class="sub">Пока ни одного предложения не выдавали.</p>'; return; }
       box.innerHTML='<ul class="tlist">'+list.map(function(o){
-        var url='https://property-library.com/offer.html#'+o.token;
+        var url='https://property-library.com/offer#'+o.token;
         return '<li>'+clEsc(o.object_name||o.property_id)+
           (o.client_name?(' <span class="sub">· '+clEsc(o.client_name)+'</span>'):'')+
           ' <span class="sub">· открывали '+(o.opened_count||0)+'</span> '+

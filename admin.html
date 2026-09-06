@@ -33,6 +33,21 @@
 <title>PLP · Админка УК</title>
 <style>
 html{background:var(--ink);overscroll-behavior-y:none}
+/* PLP:ANTIFLICKER */
+/* Мигание фона на телефоне — сводная защита. Эльнур 06.09: «фон в мобильной
+   версии везде мигает, ищи по всем страницам». Три источника:
+   1) размытие фона (backdrop-filter) под липкими элементами — браузер
+      перерисовывает весь экран на каждом кадре прокрутки;
+   2) долгое проявление блоков при прокрутке;
+   3) отложенные картинки без фона — на их месте на миг светится подложка. */
+@media(max-width:900px){
+  .header,#toTop,.badge,.pm-tag,.car .tag,.btn-glass,.hero-float,.fbtn,.chipf,
+  .modal-overlay,.mnav,.sheet,.pm-card,.toolbox{
+    backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+  .reveal{transition-duration:.35s!important}
+}
+.pic-photo,.thumb-photo,.prgs img,.simi-c i,.pm-img img{background-color:var(--warm,#EFEEE7)}
+/* PLP:ANTIFLICKER */
 :root{
   --green:#D2D5B3; --green-deep:#A9AE7F; --olive:#5F6242;
   --ink:#0A0A0A; --panel:#141414; --panel-2:#1c1c1a;
@@ -104,6 +119,7 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
 .sect{display:none}
 .sect.on{display:block}
 .note-frame{background:rgba(210,213,179,.06);border:1px dashed var(--line);border-radius:12px;padding:12px 14px;font-size:.82rem;color:var(--muted);margin-top:12px}
+
 </style>
 </head>
 <body>

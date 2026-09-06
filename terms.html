@@ -31,6 +31,21 @@
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <style>
 html{background:var(--bg);overscroll-behavior-y:none}
+/* PLP:ANTIFLICKER */
+/* Мигание фона на телефоне — сводная защита. Эльнур 06.09: «фон в мобильной
+   версии везде мигает, ищи по всем страницам». Три источника:
+   1) размытие фона (backdrop-filter) под липкими элементами — браузер
+      перерисовывает весь экран на каждом кадре прокрутки;
+   2) долгое проявление блоков при прокрутке;
+   3) отложенные картинки без фона — на их месте на миг светится подложка. */
+@media(max-width:900px){
+  .header,#toTop,.badge,.pm-tag,.car .tag,.btn-glass,.hero-float,.fbtn,.chipf,
+  .modal-overlay,.mnav,.sheet,.pm-card,.toolbox{
+    backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+  .reveal{transition-duration:.35s!important}
+}
+.pic-photo,.thumb-photo,.prgs img,.simi-c i,.pm-img img{background-color:var(--warm,#EFEEE7)}
+/* PLP:ANTIFLICKER */
 :root{--bg:#0A0A0A;--card:#141414;--line:#262626;--ink:#EDEDE6;--muted:#9a9a90;--accent:#D2D5B3}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--ink);font:16px/1.65 "Manrope",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding:0}
@@ -48,6 +63,7 @@ ul{padding-left:22px}
 .co{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:18px 0;font-size:14px;color:var(--muted)}
 .co b{color:var(--ink)}
 [data-lang]{display:none}
+
 </style></head><body>
 <div class="wrap">
 <div class="top">
@@ -86,7 +102,7 @@ ul{padding-left:22px}
 <p>В чате отвечает консультант нашей команды с использованием автоматизации. Ответы носят информационный характер и не заменяют консультацию и договор. Не отправляйте в чат паспортные данные, реквизиты карт и другие чувствительные сведения.</p>
 
 <h2>6. Заявки и обратная связь</h2>
-<p>Оставляя заявку, вы подтверждаете, что указанные контакты принадлежат вам и вы согласны на связь по ним. Обработка персональных данных описана в <a href="privacy.html" style="color:var(--accent)">Политике конфиденциальности</a>. Порядок аренды — в <a href="rules.html" style="color:var(--accent)">Правилах бронирования и проживания</a>.</p>
+<p>Оставляя заявку, вы подтверждаете, что указанные контакты принадлежат вам и вы согласны на связь по ним. Обработка персональных данных описана в <a href="/privacy" style="color:var(--accent)">Политике конфиденциальности</a>. Порядок аренды — в <a href="/rules" style="color:var(--accent)">Правилах бронирования и проживания</a>.</p>
 
 <h2>7. Материалы сайта</h2>
 <ul>
@@ -136,7 +152,7 @@ ul{padding-left:22px}
 <p>The chat is answered by a member of our team with the help of automation. Replies are informational and do not replace a consultation or an agreement. Please do not send passport details, card numbers or other sensitive data in the chat.</p>
 
 <h2>6. Enquiries and contact</h2>
-<p>By submitting an enquiry you confirm the contact details are yours and that you agree to be contacted. Personal data handling is described in our <a href="privacy.html" style="color:var(--accent)">Privacy Policy</a>. Rental terms are in the <a href="rules.html" style="color:var(--accent)">Booking and stay rules</a>.</p>
+<p>By submitting an enquiry you confirm the contact details are yours and that you agree to be contacted. Personal data handling is described in our <a href="/privacy" style="color:var(--accent)">Privacy Policy</a>. Rental terms are in the <a href="/rules" style="color:var(--accent)">Booking and stay rules</a>.</p>
 
 <h2>7. Site materials</h2>
 <ul>
