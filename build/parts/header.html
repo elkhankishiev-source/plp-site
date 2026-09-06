@@ -1,0 +1,26 @@
+<header class="header">
+  <div class="container header-inner">
+    <a class="logo" href="index.html" aria-label="Property Library — на главную"><span class="chip"><img src="img/brand/plp-mark-ink.png" alt="Property Library Phuket" width="24"></span><span class="lname">Property <span>Library</span></span></a>
+    <nav class="nav" aria-label="Основное меню">
+      <a href="buy.html" data-i18n="nav.sale">Продажа</a>
+      <a href="rent.html" data-i18n="nav.rent">Аренда</a>
+      <a href="index.html#map" data-i18n="nav.map">Районы</a>
+      <a href="management.html">Управление</a>
+      <a href="index.html#about" data-i18n="nav.about">О нас</a>
+    </nav>
+    <div class="htools">
+      <div class="lang" role="group" aria-label="Язык">
+        <button type="button" data-l="ru" class="on" onclick="setLang('ru')">RU</button>
+        <button type="button" data-l="en" onclick="setLang('en')">EN</button>
+      </div>
+      <button type="button" class="bellbtn" id="bellBtn" aria-label="Уведомления" hidden>🔔<span class="bell-n" id="bellN" hidden>0</span></button>
+      <button type="button" class="themebtn" id="themeBtn" onclick="cycleTheme()"
+              aria-label="Оформление: системное, светлое, тёмное"><span id="themeIco">◐</span></button>
+      <span class="swch" role="group" aria-label="Сайт или кабинет">
+        <!--SWITCH-->
+      </span>
+      <button type="button" class="btn btn-green" onclick="openChat('hi')" data-i18n="nav.chat">Чат с консультантом</button>
+      <button type="button" class="burger" aria-label="Меню" onclick="toggleNav(true)"><i></i><i></i><i></i></button>
+    </div>
+  </div>
+</header>

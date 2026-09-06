@@ -1,0 +1,17 @@
+<div class="mnav" id="mnav" onclick="if(event.target===this)toggleNav(false)">
+  <div class="sheet">
+    <div class="top"><b data-i18n="nav.menu">Меню</b><button type="button" class="xx" onclick="toggleNav(false)" aria-label="Закрыть">×</button></div>
+    <a href="buy.html" data-i18n="nav.sale">Продажа</a>
+    <a href="rent.html" data-i18n="nav.rent">Аренда</a>
+    <a href="#map" onclick="toggleNav(false)" data-i18n="nav.map">Районы</a>
+    <a href="management.html">Управление</a>
+    <a href="add-property.html">Разместить объект</a>
+    <a href="#about" onclick="toggleNav(false)" data-i18n="nav.about">О нас</a>
+    <div class="mlang">
+      <button type="button" data-l="ru" class="on" onclick="setLang('ru')">RU</button>
+      <button type="button" data-l="en" onclick="setLang('en')">EN</button>
+    </div>
+    <!--MNAV-LINK-->
+    <button type="button" class="mwa" onclick="toggleNav(false);openChat('hi')" data-i18n="nav.chat">Чат с консультантом</button>
+  </div>
+</div>
