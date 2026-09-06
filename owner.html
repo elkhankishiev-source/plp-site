@@ -1680,6 +1680,31 @@ body{background:var(--bg)}
   padding:14px;border:1.5px dashed rgba(var(--ink-rgb),.22);border-radius:14px;background:var(--warm)}
 .upzone .sub{flex:1 1 240px;margin:0;font-size:.82rem}
 
+/* Строка ввода чата: поле сжимается, кнопки не уезжают за край — на телефоне
+   при наборе «улетала» кнопка отправки (Эльнур 07.09). */
+.chatinput{flex-wrap:nowrap;align-items:center}
+.chatinput input{flex:1 1 auto;min-width:0}
+.chatinput .mic,.chatinput .s{flex:0 0 auto}
+.chatinput .mic{width:44px;height:44px;border-radius:50%;font-size:1.05rem;
+  background:var(--warm);border:1px solid rgba(var(--ink-rgb),.14);color:var(--ink);cursor:pointer}
+.chatinput .mic.rec{background:#c0392b;color:#fff;border-color:transparent;animation:micpulse 1.1s infinite}
+@keyframes micpulse{0%,100%{box-shadow:0 0 0 0 rgba(192,57,43,.5)}50%{box-shadow:0 0 0 8px rgba(192,57,43,0)}}
+
+/* Мобильное меню: шторка шире и плотнее — раньше слева торчал контент, между
+   пунктами были провалы, и меню выглядело «коротким» (Эльнур 07.09). */
+.mnav .sheet{width:min(92vw,360px);padding:18px 16px 16px;gap:2px}
+.mnav .sheet>a{padding:11px 12px;font-size:1rem}
+.mnav .top{margin-bottom:6px}
+/* В кабинете меню даёт ещё и разделы самого кабинета — иначе оно повторяет сайт
+   и на телефоне бесполезно. */
+.mnav .mgroup{margin:14px 0 4px;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;
+  color:rgba(255,255,255,.45);font-weight:700;padding:0 12px}
+.mnav .msec{display:grid;gap:2px}
+.mnav .msec button{width:100%;text-align:left;background:transparent;border:0;margin:0;
+  color:rgba(255,255,255,.85);font:inherit;font-size:.95rem;font-weight:600;
+  padding:10px 12px;border-radius:11px;cursor:pointer}
+.mnav .msec button.on{background:rgba(255,255,255,.12);color:#fff}
+
 /* PLP:UI:END */
 </style>
 <!-- Leaflet подгружается только при открытии раздела с картой: см. ensureLeaflet() -->
@@ -1723,7 +1748,12 @@ body{background:var(--bg)}
   </div>
   <div class="chatbody" id="chatbody"></div>
   <div class="chatinput">
-    <input id="chatField" data-i18n-ph="chat.placeholder" placeholder="Напишите сообщение…" onkeydown="if(event.key==='Enter')sendFree()">
+    <input id="chatField" type="text" name="plp-message" enterkeyhint="send"
+           autocomplete="off" autocorrect="on" autocapitalize="sentences" spellcheck="true"
+           data-lpignore="true" data-form-type="other"
+           data-i18n-ph="chat.placeholder" placeholder="Напишите сообщение…"
+           onkeydown="if(event.key==='Enter')sendFree()">
+    <button type="button" class="mic" id="chatMic" onclick="chatVoice()" aria-label="Сказать голосом" hidden>🎤</button>
     <button type="button" class="s" onclick="sendFree()" aria-label="Отправить">↑</button>
   </div>
 </div>
@@ -2322,6 +2352,35 @@ function setLang(l){
   applyI18n();
 }
 try{ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',applyI18n); else applyI18n(); }catch(e){}
+/* Голосовой ввод в чате кабинета: распознаёт сам браузер, запись никуда не уходит.
+   Кнопки нет там, где браузер этого не умеет (Эльнур 07.09). */
+var CHAT_REC=null;
+function chatVoice(){
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  var btn=document.getElementById('chatMic'), fld=document.getElementById('chatField');
+  if(!SR||!btn||!fld) return;
+  if(CHAT_REC){ try{ CHAT_REC.stop(); }catch(e){} return; }
+  var r=new SR();
+  r.lang=(typeof CAB_LANG!=='undefined' && CAB_LANG==='en')?'en-US':'ru-RU';
+  r.interimResults=true; r.continuous=false;
+  var base=fld.value ? (fld.value.replace(/\s+$/,'')+' ') : '';
+  r.onstart=function(){ CHAT_REC=r; btn.classList.add('rec'); };
+  r.onresult=function(e){
+    var txt='';
+    for(var i=e.resultIndex;i<e.results.length;i++) txt+=e.results[i][0].transcript;
+    fld.value=base+txt;
+  };
+  r.onerror=function(){};
+  r.onend=function(){ CHAT_REC=null; btn.classList.remove('rec'); fld.focus(); };
+  try{ r.start(); }catch(e){ CHAT_REC=null; btn.classList.remove('rec'); }
+}
+(function(){
+  try{
+    if(window.SpeechRecognition||window.webkitSpeechRecognition){
+      var b=document.getElementById('chatMic'); if(b) b.hidden=false;
+    }
+  }catch(e){}
+})();
 function setTheme(v){
   try{ if(v==='system') localStorage.removeItem('pl_theme'); else localStorage.setItem('pl_theme',v); }catch(e){}
   if(v==='system') document.documentElement.removeAttribute('data-theme');
@@ -2334,7 +2393,31 @@ setTimeout(function(){ try{ paintThemeBtn(); }catch(e){} },0);
 
 /* Меню открывается классом open (как на сайте) — из-за "on" панель не
    появлялась, а прокрутка страницы оставалась заблокированной. */
+/* В кабинете мобильное меню показывает и разделы кабинета: на телефоне это
+   единственная быстрая навигация, без неё меню просто повторяет сайт. */
+function fillNavSections(){
+  var nav=document.getElementById('cab-nav'), sheet=document.querySelector('#mnav .sheet');
+  if(!nav||!sheet) return;
+  var links=[].slice.call(nav.querySelectorAll('a[data-tab]'));
+  if(!links.length) return;
+  var old=sheet.querySelector('.mgroup'), oldBox=sheet.querySelector('.msec');
+  if(old) old.remove();
+  if(oldBox) oldBox.remove();
+  var ttl=document.createElement('div'); ttl.className='mgroup'; ttl.textContent='Разделы кабинета';
+  var box=document.createElement('div'); box.className='msec';
+  links.forEach(function(a){
+    var b=document.createElement('button'); b.type='button';
+    b.textContent=(a.textContent||'').trim();
+    b.className=a.classList.contains('on')?'on':'';
+    b.onclick=function(){ toggleNav(false); a.click(); };
+    box.appendChild(b);
+  });
+  var anchor=sheet.querySelector('.mtools');
+  sheet.insertBefore(ttl, anchor||null);
+  sheet.insertBefore(box, anchor||null);
+}
 function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.toggle("open",!!v);
+  if(v){ try{ fillNavSections(); }catch(e){} }
   document.body.style.overflow=v?"hidden":"";}
 (function(){
   var API='https://proplib.app.n8n.cloud/webhook/uk-owner';
