@@ -1691,7 +1691,7 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
           '<p class="sub" style="margin:0 0 14px">Менеджер посмотрит материалы, оформит карточку и свяжется с вами. '+
           'Обычно это занимает один рабочий день.</p>'+
           '<div class="hero-cta" style="margin:0"><a class="btn btn-primary" href="index.html">На главную</a>'+
-          '<a class="btn btn-ghost" href="https://wa.me/66955492587" target="_blank" rel="noopener">Написать в WhatsApp</a></div>';
+          '<a class="btn btn-ghost" href="'+BOT_LINK+'?start=object" target="_blank" rel="noopener">Написать в Telegram</a></div>';
         window.scrollTo({top:0,behavior:'smooth'});
       } else { g('ap-err').textContent='Не отправилось. Напишите нам в WhatsApp — примем объект вручную.'; }
     }).catch(function(){
@@ -1981,8 +1981,8 @@ ru: {
   "chat.offerBtn":"Оставить контакт",
   "chat.lead":"Заполните пару полей — и я передам вашу заявку менеджеру. Ответим в течение 5 минут в рабочее время.",
   "chat.thanks":"Спасибо! Заявка у нас. Продолжим в выбранном мессенджере — я напишу первой. Если удобнее сейчас — WhatsApp +66 95-549-2587 или Telegram-бот @elnurphuket_bot.",
-  "chat.neterr":"Не смогла отправить заявку — кажется, пропала связь. Напишите мне напрямую: <a href=\"https://wa.me/66955492587\" target=\"_blank\" rel=\"noopener\" style=\"color:#1a7f4b;font-weight:600\">WhatsApp +66 95-549-2587</a> — отвечу лично.",
-  "chat.aifail":"Кажется, у меня пропала связь и я не расслышала. Напишите мне напрямую: <a href=\"https://wa.me/66955492587\" target=\"_blank\" rel=\"noopener\" style=\"color:#1a7f4b;font-weight:600\">WhatsApp +66 95-549-2587</a> — отвечу лично и по делу.",
+  "chat.neterr":"Не смогла отправить заявку — кажется, пропала связь. Напишите мне в <a href=\"https://t.me/elnurphuket_bot\" target=\"_blank\" rel=\"noopener\" style=\"color:#1a7f4b;font-weight:600\">консьерж-бот в Telegram</a> — там я на связи и всё увижу.",
+  "chat.aifail":"Кажется, у меня пропала связь и я не расслышала. Напишите мне в <a href=\"https://t.me/elnurphuket_bot\" target=\"_blank\" rel=\"noopener\" style=\"color:#1a7f4b;font-weight:600\">консьерж-бот в Telegram</a> — отвечу там же, по делу.",
   "chat.rentreq":"Запрос на аренду принят. Подберу вариант под ваши даты и отвечу по условиям — оставьте контакт, чтобы я могла написать лично.",
   "lead.sent":"Заявка отправлена",
   "lf.goal":"Ваша цель…","lf.goal1":"Инвестиции","lf.goal2":"Для жизни","lf.goal3":"Аренда от месяца","lf.goal4":"Пока изучаю",
@@ -2166,8 +2166,8 @@ en: {
   "chat.offerBtn":"Leave contact",
   "chat.lead":"Fill in a few fields and I will pass your request to a manager. We reply within 5 minutes during working hours.",
   "chat.thanks":"Thank you! We have your request. We will continue in your chosen messenger — I will write first. If it is easier right now: WhatsApp +66 95-549-2587 or Telegram bot @elnurphuket_bot.",
-  "chat.neterr":"I couldn't send your request — the connection seems to have dropped. Message me directly: <a href=\"https://wa.me/66955492587\" target=\"_blank\" rel=\"noopener\" style=\"color:#1a7f4b;font-weight:600\">WhatsApp +66 95-549-2587</a> — I'll reply personally.",
-  "chat.aifail":"It seems my connection dropped and I missed that. Message me directly: <a href=\"https://wa.me/66955492587\" target=\"_blank\" rel=\"noopener\" style=\"color:#1a7f4b;font-weight:600\">WhatsApp +66 95-549-2587</a> — I'll reply personally and to the point.",
+  "chat.neterr":"I couldn't send your request — the connection seems to have dropped. Message me in the <a href=\"https://t.me/elnurphuket_bot\" target=\"_blank\" rel=\"noopener\" style=\"color:#1a7f4b;font-weight:600\">Telegram concierge</a> — I am there and will see it.",
+  "chat.aifail":"It seems my connection dropped and I missed that. Message me in the <a href=\"https://t.me/elnurphuket_bot\" target=\"_blank\" rel=\"noopener\" style=\"color:#1a7f4b;font-weight:600\">Telegram concierge</a> — I will answer there, to the point.",
   "chat.rentreq":"Rental enquiry received. I will match a home to your dates and reply with terms — leave a contact so I can write to you personally.",
   "lead.sent":"Request sent",
   "lf.goal":"Your goal…","lf.goal1":"Investment","lf.goal2":"For living","lf.goal3":"Rent from a month","lf.goal4":"Just exploring",
@@ -4492,7 +4492,7 @@ function submitQuiz(){
     document.getElementById('qzBar').style.width='100%';
   }).catch(function(){
     document.getElementById('qzBody').innerHTML='<div class="qz-done"><div class="ic">!</div><h3>'+t('quiz.err.t')+'</h3><p>'+t('quiz.err.p')+'</p>'+
-      '<div style="margin-top:18px"><a class="btn btn-green btn-block" href="https://wa.me/66955492587" target="_blank" rel="noopener">WhatsApp · +66 95-549-2587</a></div></div>';
+      '<div style="margin-top:18px"><a class="btn btn-green btn-block" href="https://t.me/elnurphuket_bot?start=quiz" target="_blank" rel="noopener">Открыть консьержа в Telegram</a></div></div>';
     document.getElementById('qzFoot').innerHTML='<button type="button" class="qz-back" onclick="closeQuiz()">'+t('quiz.done.close')+'</button>';
     if(qzSend)qzSend.disabled=false;
   });

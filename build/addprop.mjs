@@ -267,7 +267,7 @@ const body=`
           '<p class="sub" style="margin:0 0 14px">Менеджер посмотрит материалы, оформит карточку и свяжется с вами. '+
           'Обычно это занимает один рабочий день.</p>'+
           '<div class="hero-cta" style="margin:0"><a class="btn btn-primary" href="index.html">На главную</a>'+
-          '<a class="btn btn-ghost" href="https://wa.me/66955492587" target="_blank" rel="noopener">Написать в WhatsApp</a></div>';
+          '<a class="btn btn-ghost" href="https://t.me/elnurphuket_bot?start=object" target="_blank" rel="noopener">Написать в Telegram</a></div>';
         window.scrollTo({top:0,behavior:'smooth'});
       } else { g('ap-err').textContent='Не отправилось. Напишите нам в WhatsApp — примем объект вручную.'; }
     }).catch(function(){
