@@ -11,6 +11,7 @@ const P = f => fs.readFileSync(path.join(ROOT, 'build/parts', f), 'utf8');
 const HEADER = P('header.html');
 const MNAV   = P('mnav.html');
 const FOOTER = P('footer.html');
+const HEADTH = P('head-theme.html');
 
 /* чем страницы отличаются: подсветка текущего места */
 const VARIANTS = {
@@ -30,6 +31,7 @@ const MARKS = [
   ['<!-- PLP:HEADER:START -->', '<!-- PLP:HEADER:END -->', HEADER],
   ['<!-- PLP:MNAV:START -->',   '<!-- PLP:MNAV:END -->',   MNAV],
   ['<!-- PLP:FOOTER:START -->', '<!-- PLP:FOOTER:END -->', FOOTER],
+  ['<!-- PLP:HEADTHEME:START -->', '<!-- PLP:HEADTHEME:END -->', HEADTH],
   /* общий блок стилей интерфейса — внутри <style>, поэтому маркеры без HTML-комментария */
   ['/* PLP:UI:START */', '/* PLP:UI:END */', UI],
 ];

@@ -13,15 +13,39 @@
 </script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- PLP:HEADTHEME:START -->
+<meta name="color-scheme" content="light dark">
+<!-- цвет системных полей браузера = фон страницы. Без этого при прокрутке и
+     оттягивании из-под страницы проглядывает чужой цвет — кажется, что фон мигает. -->
+<meta name="theme-color" content="#f7f6f1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0C0D09" media="(prefers-color-scheme: dark)">
+<script>
+(function(){
+  function paintChrome(){
+    try{
+      var bg=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+      if(!bg && document.body) bg=getComputedStyle(document.body).backgroundColor;
+      if(!bg || bg==='rgba(0, 0, 0, 0)') return;
+      var list=document.querySelectorAll('meta[name="theme-color"]');
+      for(var i=0;i<list.length;i++) list[i].parentNode.removeChild(list[i]);
+      var m=document.createElement('meta'); m.setAttribute('name','theme-color');
+      m.setAttribute('content',bg); document.head.appendChild(m);
+    }catch(e){}
+  }
+  window.paintChrome=paintChrome;
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',paintChrome);
+  else paintChrome();
+  try{ matchMedia('(prefers-color-scheme: dark)').addEventListener('change',paintChrome); }catch(e){}
+})();
+</script>
+<!-- PLP:HEADTHEME:END -->
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Property Library Phuket. Агентство недвижимости на Пхукете</title>
 <meta name="description" content="Подберем недвижимость для покупки или аренды на Пхукете, оформим сделку, поможем с визой и обустройством. Все под ключ — от первого звонка до заезда.">
 
 <!-- ===== SEO / SOCIAL ===== -->
 <link rel="canonical" href="https://property-library.com/">
-<meta name="theme-color" content="#0A0A0A">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Property Library Phuket">
 <meta name="robots" content="index,follow">
 
@@ -162,6 +186,7 @@
 }
 </script>
 <style>
+html{background:var(--bg);overscroll-behavior-y:none}
 :root{
   --green:#D2D5B3;
   --green-soft:#E9EBD9;
@@ -1383,8 +1408,9 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
 /* Панель фильтров аренды уезжала вбок: кнопки и «Сбросить» оказывались за краем
    экрана — Эльнур 05.09 «фильтры не видно, они плавают». Ведём себя как в
    продаже: переносим по строкам, ничего не прячем. */
-#rentFilters,#saleFilters,.filterbar,.fbar-menus{
-  flex-wrap:wrap!important;overflow:visible!important;row-gap:8px}
+#rentFilters:not(.compact),#saleFilters:not(.compact),.filterbar:not(.compact),.fbar-menus:not(.compact){
+  flex-wrap:wrap!important;row-gap:8px}
+#rentFilters,#saleFilters,.filterbar,.fbar-menus{overflow:visible!important}
 #rentFilters .fbtn-reset,#saleFilters .fbtn-reset{margin-left:0}
 
 /* Панель поиска и сортировки на телефоне уезжала за край — переносим и её. */
@@ -1457,6 +1483,12 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
   .filterbar{gap:8px}
   .filterbar .fmenu>.fbtn{padding:8px 12px;font-size:.82rem}
   .filterbar.compact .fmenu.hide-sm{display:none}
+  /* свёрнутый вид — строго одна строка, ничего не переносится */
+  .filterbar.compact,#rentFilters.compact,#saleFilters.compact{flex-wrap:nowrap;align-items:center}
+  .filterbar.compact>*{flex:0 0 auto}
+  .filterbar.compact .fmenu>.fbtn{padding:8px 10px;max-width:44vw}
+  .filterbar.compact .fb-v{max-width:14ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .filterbar.compact .fbtn-more{margin-left:auto}
   .fbtn-more{display:none}
   /* «Сбросить» появляется, только когда есть что сбрасывать — строка короче */
   .filterbar.compact .fbtn-reset{display:none}
@@ -1502,13 +1534,7 @@ html{-webkit-tap-highlight-color:transparent}
   .filterbar .fpan{max-width:calc(100vw - 28px)}
 }
 
-@media(max-width:600px){
-  /* у панели тот же класс reveal, а он ставит свой transform и ломает
-     фиксированное положение — на аренде шторка уезжала за край экрана */
-  .filterbar.reveal{opacity:1;transform:translateY(110%)}
-  .filterbar{left:0!important;right:0!important;margin:0!important}
-  .filterbar.sheet-open,.filterbar.reveal.sheet-open{transform:translateY(0)}
-}
+/* остатки отменённой шторки убраны: transform уводил строку фильтров за экран */
 
 /* Бургер сливался с тёмным фоном — делаем его различимым в обеих темах */
 .burger{background:var(--warm);border-color:rgba(var(--ink-rgb),.22)}
@@ -1551,7 +1577,6 @@ html{-webkit-tap-highlight-color:transparent}
    сборщиком в конец стилей обеих страниц: правится только этот файл. */
 
 /* фон под страницей — чтобы при оттягивании вниз не проглядывал системный белый */
-html{background:var(--bg);overscroll-behavior-y:none}
 body{background:var(--bg)}
 
 /* логотип: заметный, «Library» фирменным оливковым */
@@ -4307,6 +4332,7 @@ function buildRentChips(){
   function group(labelKey,parent){
     var host=parent||bar;
     var g=document.createElement('div');g.className='rf-group';
+    g.dataset.gkey=labelKey;   /* по ключу узнаём фильтр, когда группа уезжает в меню */
     var l=document.createElement('div');l.className='rf-label';l.textContent=t(labelKey);
     var row=document.createElement('div');row.className='rf-chips';
     g.appendChild(l);g.appendChild(row);host.appendChild(g);return row;
@@ -4551,7 +4577,8 @@ function compactFilters(barId){
   }
   var menus=Array.prototype.slice.call(bar.querySelectorAll('.fmenu'));
   if(menus.length<4) return;
-  var keep=['budget','loc','beds','rentbudget'];
+  /* Эльнур 06.09: в строке ровно «Бюджет · Район · Ещё фильтры» — три кнопки в один ряд */
+  var keep=['budget','loc','rentbudget'];
   menus.forEach(function(m){
     var f=m.dataset.facet||'';
     if(keep.indexOf(f)<0) m.classList.add('hide-sm');
@@ -4579,6 +4606,8 @@ function groupRentMenus(){
     var label=(g.querySelector('.rf-label')||{}).textContent||'Фильтр';
     var chips=g.querySelector('.rf-chips');
     var wrap=document.createElement('div'); wrap.className='fmenu';
+    var gk=(g.dataset.gkey||'').split('.').pop();
+    wrap.dataset.facet = (gk==='district') ? 'loc' : gk;
     var btn=document.createElement('button'); btn.type='button'; btn.className='fbtn';
     btn.innerHTML='<span class="fb-t">'+label+'</span><span class="fb-v"></span><i>▾</i>';
     var pan=document.createElement('div'); pan.className='fpan';
@@ -5084,6 +5113,7 @@ function setTheme(v){
   }catch(e){}
   if(v==='system') document.documentElement.removeAttribute('data-theme');
   else document.documentElement.setAttribute('data-theme',v);
+  if(window.paintChrome) window.paintChrome();
   paintThemeBtn();
 }
 function cycleTheme(){
