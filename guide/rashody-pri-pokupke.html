@@ -732,6 +732,10 @@ input.bad{border-color:#d98a84!important;background:var(--paper)6f5}
 .st-soon{background:#eceadf;color:#807c74}.st-soon::before{background:#a8a39a}
 .prop .fav,.prop .cmpb{position:absolute;z-index:3;cursor:pointer;transition:transform .2s,background .2s;backdrop-filter:blur(8px)}
 .prop .fav{bottom:10px;left:10px;width:34px;height:34px;border-radius:50%;background:rgba(var(--glass-rgb),.86);font-size:1rem;line-height:1;display:flex;align-items:center;justify-content:center}
+/* сердечко лежит на фотографии: в светлой теме оно получало тёмный цвет на
+   тёмной подложке и пропадало. Цвет задаём явно под саму подложку. */
+.prop .fav{color:#F4F6EA}
+.prop .fav.on{color:#e0736a}
 .prop .fav:hover{transform:scale(1.1)}
 .prop .fav.on{background:var(--ink-block);color:var(--on-ink)}
 .prop .cmpb{bottom:10px;right:10px;border-radius:999px;padding:7px 12px;font-size:.76rem;font-weight:700;background:rgba(var(--glass-rgb),.86)}
@@ -1202,6 +1206,9 @@ input.bad{border-color:#d98a84!important;background:var(--paper)6f5}
 .calc-out .row{display:flex;justify-content:space-between;font-size:.84rem;color:var(--muted)}
 .calc-out .row b{color:var(--ink);font-weight:600}
 .calc-out .big{display:flex;justify-content:space-between;align-items:baseline;background:var(--green);border-radius:12px;padding:12px 14px;margin-top:4px}
+/* на зелёной плашке текст всегда чернильный: в тёмной теме он наследовал
+   светлый цвет и итоговая сумма читалась «светлым по светлому» */
+.calc-out .big,.calc-out .big .k,.calc-out .big .v{color:var(--on-green)}
 .calc-out .big .k{font-weight:700;font-size:.85rem}
 .calc-out .big .v{font-weight:800;font-size:1.4rem}
 .tnote{font-size:.7rem;color:var(--muted);line-height:1.45;margin-top:10px}
@@ -1334,7 +1341,8 @@ select option{background:var(--paper);color:var(--ink)}
 
 /* Кнопки поверх фото лежат на светло-зелёной подложке карточки и наследовали
    её тёмный текст — в тёмной теме надпись сливалась с плашкой. Задаём явно. */
-.prop .fav,.prop .cmpb,.pm-nav,.pm-count,.mini .mdot{color:var(--ink)}
+.pm-nav,.pm-count,.mini .mdot{color:var(--ink)}
+/* цвет кнопок поверх фото задаётся ниже отдельно — он не зависит от темы */
 .prop .cmpb.on,.prop .fav.on{color:var(--on-green)}
 .prop .fav.on{background:var(--green)}
 
@@ -1674,8 +1682,12 @@ body{background:var(--bg)}
   .car .tag,.pm-tag,.prop .fav,.prop .cmpb,.hero-float,.btn-glass,
   .mnav,.modal-overlay,.modal-back,.chatwin,.fab{
     backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
-  .car .tag,.pm-tag{background:var(--paper);border-color:rgba(var(--ink-rgb),.12)}
-  .prop .fav,.prop .cmpb{background:var(--paper)}
+  .car .tag,.pm-tag{background:var(--paper);color:var(--ink);border-color:rgba(var(--ink-rgb),.12)}
+  /* Сердечко и «сравнить» лежат прямо на фотографии, поэтому цвета им нужны
+     свои, а не темы страницы: в светлой теме выходило тёмное на тёмном. */
+  .prop .fav,.prop .cmpb{background:rgba(20,21,15,.55);color:#F4F6EA}
+  .prop .fav.on{background:#F4F6EA;color:#c9564b}
+  .prop .cmpb.on{background:var(--green);color:var(--on-green)}
   .prop,.zone,.mobj,.zprop{transition:none}
 }
 
@@ -1732,6 +1744,32 @@ body{background:var(--bg)}
   .header .lang,.header .themebtn{display:none!important}
 }
 
+/* Кнопки поверх фотографии — где бы карточка ни рендерилась (каталог продажи,
+   аренда, страницы районов): своя пара цветов, не зависящая от темы. */
+.fav,.cmpb{color:#F4F6EA}
+.fav{background:rgba(20,21,15,.55)}
+.fav.on{background:#F4F6EA;color:#c9564b}
+.cmpb.on{background:var(--green);color:var(--on-green)}
+/* шторка меню всегда тёмная (--ink-block), поэтому и текст в ней светлый:
+   раньше контейнер наследовал цвет темы и на тёмном фоне пропадал */
+.mnav .sheet,.mnav .mtools{color:var(--on-ink)}
+.mnav .mlang,.mnav .mtheme{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.22)}
+.mnav .mlang button,.mnav .mtheme{color:var(--on-ink)}
+.mnav .mlang button.on{background:var(--green);color:var(--on-green)}
+
+/* Чипы выбора в анкете: в тёмной теме текст сливался с подложкой */
+.chipf{color:var(--ink)}
+.chipf.on{background:var(--green);color:var(--on-green);border-color:transparent}
+
+/* Сообщение об ошибке в анкете должно читаться в обеих темах */
+.err,.df-status.err{color:#c0392b;font-weight:600}
+:root[data-theme="dark"] .err,:root[data-theme="dark"] .df-status.err,
+:root:not([data-theme="light"]) .err,:root:not([data-theme="light"]) .df-status.err{color:#ff9d8b}
+:root[data-theme="light"] .err,:root[data-theme="light"] .df-status.err{color:#c0392b}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]) .err,:root:not([data-theme="dark"]) .df-status.err{color:#c0392b}
+}
+
 /* PLP:UI:END */
 
 </style>
@@ -1758,7 +1796,7 @@ body{background:var(--bg)}
       <a href="/buy" data-i18n="nav.sale">Продажа</a>
       <a href="/rent" data-i18n="nav.rent">Аренда</a>
       <a href="/#map" data-i18n="nav.map">Районы</a>
-      <a href="/management">Управление</a>
+      <a href="/guide/management">Управление</a>
       <a href="/#about" data-i18n="nav.about">О нас</a>
     </nav>
     <div class="htools">
@@ -1786,8 +1824,8 @@ body{background:var(--bg)}
     <a href="/buy" data-i18n="nav.sale">Продажа</a>
     <a href="/rent" data-i18n="nav.rent">Аренда</a>
     <a href="/#map" onclick="toggleNav(false)" data-i18n="nav.map">Районы</a>
-    <a href="/management">Управление</a>
-    <a href="/add-property">Разместить объект</a>
+    <a href="/guide/management">Управление</a>
+    <a href="/guide/add-property">Разместить объект</a>
     <a href="/#about" onclick="toggleNav(false)" data-i18n="nav.about">О нас</a>
     <!-- Эльнур 06.09: язык и оформление на телефоне живут здесь, одинаково
          на сайте и в кабинете. В шапке их на узком экране нет. -->
