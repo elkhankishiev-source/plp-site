@@ -298,7 +298,10 @@ section[id],div[id^="q"],[id="about"],[id="steps"],[id="faq"]{scroll-margin-top:
 .logo{font-weight:800;font-size:1.05rem;letter-spacing:-.01em;display:flex;align-items:center;gap:10px;white-space:nowrap}
 .logo .chip{width:38px;height:38px;border-radius:11px;background:var(--green);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1rem;flex:none}
 .chip img{width:24px;height:auto;display:block}
-.logo span{color:var(--green-text,#6E7247)}
+/* Эльнур 06.09: лого должно быть заметным — оба слова полным цветом темы,
+   фирменный акцент остаётся на значке. */
+.logo span{color:inherit}
+.logo{color:var(--ink)}
 .nav{display:none;gap:4px;font-weight:600;font-size:.9rem}
 .nav a{opacity:.85;transition:opacity .2s,background .2s;padding:8px 10px;border-radius:9px}
 .nav a:hover{opacity:1;background:rgba(var(--glass-rgb),.7)}
@@ -1419,6 +1422,14 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
 /* Атрибут hidden проигрывал правилам с display: пустой красный кружок
    уведомлений висел на колокольчике всегда (Эльнур 06.09). */
 [hidden]{display:none!important}
+
+/* Переключатель «Сайт / Кабинет»: одинаковый на сайте и в кабинете */
+.swch{display:inline-flex;align-items:center;background:var(--warm);border:1px solid rgba(var(--ink-rgb),.12);
+  border-radius:999px;padding:3px;font-size:.8rem;font-weight:700;white-space:nowrap}
+.swch a,.swch b{display:block;padding:6px 12px;border-radius:999px;text-decoration:none;color:var(--muted)}
+.swch b{background:var(--ink-block);color:var(--on-ink)}
+.swch a:hover{color:var(--ink)}
+@media(max-width:900px){ .swch{display:none} }
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.6.0/maplibre-gl.min.css">
@@ -1451,7 +1462,9 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
       </div>
       <button type="button" class="themebtn" id="themeBtn" onclick="cycleTheme()"
               aria-label="Оформление: системное, светлое, тёмное"><span id="themeIco">◐</span></button>
-      <a class="btn btn-ghost btn-cab" href="owner.html" data-i18n="nav.cabinet">Кабинет</a>
+      <span class="swch" role="group" aria-label="Сайт или кабинет">
+        <b>Сайт</b><a href="owner.html" data-i18n="nav.cabinet">Кабинет</a>
+      </span>
       <button type="button" class="btn btn-green" onclick="openChat('hi')" data-i18n="nav.chat">Чат с консультантом</button>
       <button type="button" class="burger" aria-label="Меню" onclick="toggleNav(true)"><i></i><i></i><i></i></button>
     </div>
@@ -1920,7 +1933,7 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
   <div class="container">
     <div class="footer-grid">
       <div>
-        <a class="logo" href="#top"><span class="chip"><img src="img/brand/plp-mark-ink.png" alt="Property Library Phuket" width="24"></span><span>Property <span style="color:var(--green-text,#6E7247)">Library</span></span></a>
+        <a class="logo" href="#top"><span class="chip"><img src="img/brand/plp-mark-ink.png" alt="Property Library Phuket" width="24"></span><span>Property <span>Library</span></span></a>
         <p class="sub" style="font-size:.92rem;margin-top:12px" data-i18n="ft.tag">Мы уже выбрали Пхукет, поможем и вам. Все под ключ — от первого звонка до заезда.</p>
       </div>
       <div>
