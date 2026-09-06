@@ -944,9 +944,9 @@ input.bad{border-color:#d98a84!important;background:var(--paper)6f5}
 .footer{padding:22px 0 16px;border-top:1px solid rgba(var(--ink-rgb),.07);margin-top:40px;background:var(--paper);color:var(--muted)}
 /* На телефоне подвал был простынёй в один столбец: четыре блока подряд.
    Ставим их в две колонки — высота падает вдвое, читаемость не страдает. */
-.footer-grid{display:grid;gap:20px 22px;grid-template-columns:repeat(2,1fr)}
+.footer-grid{display:grid;gap:14px 18px;grid-template-columns:repeat(2,1fr)}
 .footer-grid>:first-child{grid-column:1/-1}
-@media(min-width:800px){.footer-grid{grid-template-columns:1.4fr 1fr 1fr 1fr;gap:28px}
+@media(min-width:800px){.footer-grid{grid-template-columns:1.4fr 1fr 1fr 1fr;gap:22px}
   .footer-grid>:first-child{grid-column:auto}}
 /* Эльнур 06.09: подвал должен быть мелким и еле заметным — это служебная зона,
    а не витрина: там документы и реквизиты, которые не надо подсвечивать. */
@@ -954,7 +954,9 @@ input.bad{border-color:#d98a84!important;background:var(--paper)6f5}
 .footer li{margin-bottom:5px;font-size:.76rem;line-height:1.35}
 .footer a{color:var(--muted)}
 .footer a:hover{color:var(--ink);text-decoration:underline}
-.footer .lname,.footer .logo{font-size:.85rem}
+.footer .lname,.footer .logo{font-size:.85rem;color:var(--ink)}
+.footer .logo .chip{width:26px;height:26px;border-radius:8px}
+.footer .logo img{width:16px}
 .footer-bottom{margin-top:14px;padding-top:10px;border-top:1px solid rgba(var(--ink-rgb),.07);display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;font-size:.7rem;color:var(--muted);opacity:.8}
 
 /* ===== chat widget ===== */
@@ -1049,7 +1051,10 @@ input.bad{border-color:#d98a84!important;background:var(--paper)6f5}
 .cw{background:var(--paper);border-radius:22px;max-width:920px;width:100%;max-height:88vh;overflow:auto;box-shadow:var(--shadow-lg)}
 .chd{position:sticky;top:0;background:var(--paper);display:flex;justify-content:space-between;align-items:center;gap:14px;padding:20px 24px;border-bottom:1px solid rgba(var(--ink-rgb),.08);z-index:2}
 .chd h3{font-size:1.2rem;font-weight:800}
-.cx{background:#eceadf;width:34px;height:34px;border-radius:50%;font-size:1.1rem;line-height:1;flex:none}
+/* крестик закрытия: свой фон и свой цвет, иначе на светлой плашке белел */
+.cx{background:var(--warm);color:var(--ink);width:34px;height:34px;border-radius:50%;
+  font-size:1.1rem;line-height:1;flex:none;border:1px solid rgba(var(--ink-rgb),.12)}
+.cx:hover{background:var(--green-soft)}
 .cmp-body{padding:20px 24px 24px}
 .cmp-foot{padding:0 24px 24px}
 .cmp-grid{display:grid;gap:1px;background:rgba(var(--ink-rgb),.1);border:1px solid rgba(var(--ink-rgb),.1);border-radius:14px;overflow:hidden}
@@ -1196,7 +1201,7 @@ input.bad{border-color:#d98a84!important;background:var(--paper)6f5}
   .curswitch button.on{background:var(--green);color:var(--on-green)}
 /* Список всех объектов ссылками — блок статический, скрипты его не трогают.
    Нужен и людям (быстро увидеть весь каталог), и поиску (внутренние ссылки). */
-.obj-index{padding:56px 0;background:#fafaf7;border-top:1px solid #ececE4}
+.obj-index{padding:34px 0;background:var(--warm);border-top:1px solid rgba(var(--ink-rgb),.08)}
 .obj-index h2{margin:0 0 6px;font-size:26px}
 .obj-index .sub{margin:0 0 26px;color:var(--muted);max-width:640px}
 .oi-box{max-width:760px;border:1px solid #e6e6de;border-radius:14px;background:var(--paper)}

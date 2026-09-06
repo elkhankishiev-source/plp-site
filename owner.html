@@ -2302,6 +2302,8 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
           '<option value="срочно">срочно</option></select></label>'+
         '<label class="wide">Что важно знать<textarea id="f-note" rows="3" '+
           'placeholder="торг, мебель в цене, кто платит за перевод, особые условия"></textarea></label>'+
+        '<p class="sub" style="grid-column:1/-1;margin:2px 0 0">Если не уверены, какие данные и файлы нужны — '+
+        'приложите всё, что есть, и напишите пару слов здесь. Наш специалист разберёт заявку и свяжется с вами в течение дня.</p>'+
       '</div>'+
       '<div class="fbtns"><button type="button" class="btn" id="f-save">Отправить</button>'+
       '<button type="button" class="btn ghost" id="f-cancel">Отмена</button></div>',
@@ -3032,12 +3034,19 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     var m=p.media||{}, ml='';
     var photo='img/'+p.id+'.jpg';
     var mediaInner='<img class="photo" src="'+photo+'" alt="" onerror="this.style.display=\'none\'">';
-    if(has(m.brochure_url))  ml+='<a href="'+esc(m.brochure_url)+'" target="_blank" rel="noopener">Фото и документы на Диске</a>';
+    /* Эльнур 06.09: ссылки на наш Диск — внутрянка, клиенту их не показываем.
+       Владелец видит только то, что относится к его объекту: планировку, видео,
+       карту. Всё остальное — через нас. */
+    var isStaffView = !!(DATA.owner && DATA.owner.is_staff===true);
     if(has(m.video_url))     ml+='<a href="'+esc(m.video_url)+'" target="_blank" rel="noopener">Видео объекта</a>';
     if(has(m.floorplan_url)) ml+='<a href="'+esc(m.floorplan_url)+'" target="_blank" rel="noopener">Планировка</a>';
     if(has(m.map_url))       ml+='<a href="'+esc(m.map_url)+'" target="_blank" rel="noopener">На карте</a>';
+    if(isStaffView && has(m.brochure_url))
+      ml+='<a href="'+esc(m.brochure_url)+'" target="_blank" rel="noopener">Папка объекта (для сотрудников)</a>';
     mediaInner += ml ? '<div class="links">'+ml+'</div>'
-                     : '<div class="empty">Материалы по объекту пока не загружены.</div>';
+                     : '<div class="empty">Фото и материалы по объекту мы готовим. '+
+                       'Если у вас есть свои снимки или документы — пришлите их в разделе «Документы», '+
+                       'мы разберём и добавим в карточку.</div>';
     H+=card('Фото и материалы', mediaInner);
 
     // об объекте
