@@ -1786,6 +1786,31 @@ body{background:var(--bg)}
   border-radius:0;flex:1 1 0;min-width:0}
 .mnav .mtheme{margin:0}
 
+/* Залипание кнопок на телефоне: на тач-экране состояние :hover остаётся
+   после нажатия, и кнопка выглядит выбранной, хотя выбор другой
+   (Эльнур про анкету 06.09). Наведение оставляем только там, где есть мышь. */
+@media (hover:none){
+  .chipf:hover,.chips button:hover,.btn:hover,.fbtn:hover,.opt:hover,
+  .cab-nav a:hover,.swch a:hover{background:inherit;border-color:inherit;
+    color:inherit;transform:none}
+  .chipf.on:hover{background:var(--green);color:var(--on-green)}
+}
+
+/* Быстрые подсказки в чате: фон свой, а цвет текста наследовался от пузыря
+   бота — в светлой теме выходило светлое по светлому. */
+.chips button{color:var(--ink)}
+.chips button:hover{background:var(--green);color:var(--on-green)}
+
+/* «Чат с консультантом» в меню: на зелёном фоне текст должен быть чернильным.
+   В кабинете он брал var(--ink), который в тёмной теме светлый. */
+.mnav .mwa{background:var(--green);color:var(--on-green)}
+
+/* «Разместить объект»: на телефоне две колонки сжимались в две узкие полосы
+   и текст рвался по словам (Эльнур 06.09) — ниже 860 px ставим в один столбец. */
+.lp-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);
+  gap:clamp(18px,3vw,34px);align-items:center}
+@media(max-width:860px){ .lp-grid{grid-template-columns:1fr;gap:16px} }
+
 /* PLP:UI:END */
 
 </style>
@@ -1922,7 +1947,7 @@ body{background:var(--bg)}
 
 <section id="list-property" style="padding-top:22px"><div class="container">
   <div style="background:var(--green-soft);border:1px solid var(--line,rgba(var(--ink-rgb),.12));border-radius:24px;padding:clamp(20px,3vw,30px)">
-    <div style="display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:clamp(18px,3vw,34px);align-items:center">
+    <div class="lp-grid">
       <div>
         <span class="kicker">Свой объект</span>
         <h2 style="font-size:clamp(24px,3.4vw,34px);margin:6px 0 10px">Разместить объект</h2>
@@ -1954,72 +1979,6 @@ body{background:var(--bg)}
     </div>
   </div>
 </div></section>
-<section id="rent" aria-labelledby="rent-title" style="padding-top:0">
-  <div class="container">
-    <div class="head-row reveal">
-      <div>
-        <span class="kicker" data-i18n="rent.lab">Аренда · 24/7</span>
-        <h2 id="rent-title" data-i18n="rent.h2">Объекты, где хочется жить</h2>
-        <p class="sub" data-i18n="rent.sub">Виллы и апартаменты на Пхукете для жизни и комфортного отдыха. Цены и условия — по запросу: оставьте заявку, подберём вариант и ответим лично. От первого касания до заселения — отдыхайте с самого начала.</p>
-      </div>
-    </div>
-    <div class="datefilter reveal" id="rentDateFilter">
-      <div class="df-fields">
-        <label class="df-fld"><span data-i18n="rent.dates.in">Заезд</span><input type="date" id="rentIn" autocomplete="off"></label>
-        <label class="df-fld"><span data-i18n="rent.dates.out">Выезд</span><input type="date" id="rentOut" autocomplete="off"></label>
-        <button type="button" class="btn btn-green" id="rentCheck" onclick="checkAvailability()" disabled data-i18n="rent.dates.btn">Показать свободные</button>
-        <button type="button" class="btn btn-glass df-reset" id="rentReset" onclick="resetAvailability()" style="display:none" data-i18n="rent.dates.reset">Сбросить</button>
-      </div>
-      <div class="df-status" id="rentDateStatus" data-i18n="rent.dates.hint">Выберите даты заезда и выезда — покажем только свободные варианты. Без дат показаны все объекты.</div>
-    </div>
-    <div class="filterbar reveal" id="rentFilters"></div>
-    <div class="toolbar reveal">
-      <label class="search"><input type="search" id="rentSearch" data-i18n-ph="rent.search" placeholder="Поиск: район, название, ID…" oninput="onRentSearch(this.value)"></label>
-      <select id="rentSort" onchange="setRentSort(this.value)" aria-label="Сортировка">
-        <option value="" data-i18n="sort.default">По порядку</option>
-        <option value="beds" data-i18n="sort.beds">Сначала больше спален</option>
-        <option value="area" data-i18n="sort.area">Сначала больше площадь</option>
-      </select>
-      <span class="chipf" id="rentFavChip" style="display:none" onclick="toggleFavOnly()" data-i18n="f.favs">♥ Избранное</span>
-    </div>
-    <p class="found" id="rentFound"></p>
-    <div class="carwrap reveal">
-      <div class="arrows carnav"><button type="button" onclick="scrollCar('rentCar',-1)" aria-label="Назад">‹</button><button type="button" onclick="scrollCar('rentCar',1)" aria-label="Вперёд">›</button></div>
-      <div class="car" id="rentCar"></div>
-      <div class="noresult" id="rentNoResult" data-i18n="rent.noresult">По выбранным фильтрам ничего не нашлось — измените условия или сбросьте фильтры.</div>
-    </div>
-    
-    
-    
-  </div>
-</section>
-
-<!-- ===== MAP / DISTRICTS ===== -->
-
-<section style="padding-top:26px"><div class="container">
-    <div class="rentband reveal">
-      <div>
-        <h3 data-i18n="rent.b1t">Запрос на аренду — 24/7</h3>
-        <p data-i18n="rent.b1p">Заполните заявку — подберём жильё под ваши даты и бюджет и ответим по условиям.</p>
-      </div>
-      <div class="cta">
-        <button type="button" class="btn btn-green" onclick="openRentRequest()" data-i18n="rent.b1cta">Оставить запрос</button>
-        <a class="btn btn-glass" href="https://t.me/elnurphuket_bot" target="_blank" rel="noopener" data-i18n="rent.b1tg">Консьерж в Telegram</a>
-      </div>
-    </div>
-    </div></section>
-<section style="padding-top:26px"><div class="container">
-    <div class="rentband reveal on-green">
-      <div>
-        <h3 data-i18n="rent.upt">Понравился остров?</h3>
-        <p style="color:#4E3A35" data-i18n="rent.upp">Многие наши гости после аренды решают стать владельцами — подберём объект для покупки под вашу задачу и бюджет.</p>
-      </div>
-      <div class="cta">
-        <a class="btn btn-primary" href="/#sale" data-i18n="rent.upcta">Смотреть объекты в продаже</a>
-        <button type="button" class="btn btn-light btn-2l" onclick="openQuiz()"><b data-i18n="rent.upquiz">Подобрать за 10 минут</b><small data-i18n="cta.free">бесплатная консультация</small></button>
-      </div>
-    </div>
-    </div></section>
 </main>
 </div><!-- /stage -->
 
