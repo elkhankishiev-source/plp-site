@@ -381,7 +381,9 @@ function buildCatalog(objects, benchmarks, preserve) {
       // Снимки из хранилища: первый идёт обложкой, остальные — лентой в карточке.
       // Локальные img/<ID>.jpg остаются запасным вариантом для старых объектов.
       photo: thumbUrl(o.main_image_url, 760, 72),
-      photoFull: o.main_image_url || null,
+      /* «полный» снимок для окна — тоже превью, просто крупнее: оригинал
+         на 19 МБ никому на экране не нужен */
+      photoFull: thumbUrl(o.main_image_url, 1600, 80),
       photos: Array.isArray(o.gallery_urls)
         ? o.gallery_urls.slice(0, 8).map(u => thumbUrl(u, 1280, 78)) : null,
       // Планировки: человек выбирает тип и сразу видит его площадь и спальни.
@@ -614,7 +616,9 @@ function buildRentals(objects, preserve, ratesBy) {
       // доезжали из базы. Теперь галерея, разделы и планировки тянутся так же,
       // как у продажи.
       photo: thumbUrl(o.main_image_url, 760, 72),
-      photoFull: o.main_image_url || null,
+      /* «полный» снимок для окна — тоже превью, просто крупнее: оригинал
+         на 19 МБ никому на экране не нужен */
+      photoFull: thumbUrl(o.main_image_url, 1600, 80),
       photos: Array.isArray(o.gallery_urls)
         ? o.gallery_urls.slice(0, 8).map(u => thumbUrl(u, 1280, 78)) : null,
       groups: Array.isArray(o.photo_groups)
@@ -854,8 +858,12 @@ function objectPage(o, benchmarks, ratesBy) {
     : '';
 
   // Галерея, планировки и ход стройки — те же данные, что и в карточке на сайте.
-  const gallery = Array.isArray(o.gallery_urls) ? o.gallery_urls.filter(u => /^https?:/.test(u)).slice(0, 8) : [];
-  const heroSrc = o.main_image_url || (gallery[0] || ('../img/' + pid + '.jpg'));
+  /* 07.09: страницы объектов тянули ОРИГИНАЛЫ по 2–19 МБ — за месяц это
+     съело 24 ГБ трафика Supabase при лимите 5,5 ГБ. Отдаём превью того же
+     хранилища: вес падает в десятки раз, качество для экрана то же. */
+  const galleryRaw = Array.isArray(o.gallery_urls) ? o.gallery_urls.filter(u => /^https?:/.test(u)).slice(0, 8) : [];
+  const gallery = galleryRaw.map(u => thumbUrl(u, 1280, 78));
+  const heroSrc = thumbUrl(o.main_image_url, 1600, 80) || (gallery[0] || ('../img/' + pid + '.jpg'));
   const shots = gallery.length > 1
     ? '<div class="shots">' + gallery.map((u, i) =>
         '<button type="button" class="' + (i ? '' : 'on') + '" data-src="' + htmlEsc(u) + '" aria-label="Фото ' + (i + 1) + '">' +
@@ -872,7 +880,7 @@ function objectPage(o, benchmarks, ratesBy) {
   const bp = o.build_progress && Array.isArray(o.build_progress.photos) ? o.build_progress : null;
   const progressBlock = bp && bp.photos.length
     ? '<section class="desc"><h2>Ход строительства' + (bp.as_of ? ' <small style="font-weight:400;color:var(--muted)">' + htmlEsc(bp.as_of) + '</small>' : '') + '</h2>' +
-      '<div class="prgs">' + bp.photos.slice(0, 6).map(u => '<img src="' + htmlEsc(u) + '" alt="" loading="lazy" decoding="async">').join('') + '</div>' +
+      '<div class="prgs">' + bp.photos.slice(0, 6).map(u => '<img src="' + htmlEsc(thumbUrl(u, 760, 74)) + '" alt="" loading="lazy" decoding="async">').join('') + '</div>' +
       '</section>'
     : '';
 
