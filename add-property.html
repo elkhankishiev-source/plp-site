@@ -1398,6 +1398,25 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
 .filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 
 html,*{-webkit-tap-highlight-color:transparent}
+
+/* ===== ПРИЧИНА МЕРЦАНИЯ (Эльнур 06.09: «мигания есть») =====
+   Размытие фона у липкой шапки и полупрозрачных плашек заставляет мобильный
+   браузер перерисовывать всё под ними при каждом кадре прокрутки — экран
+   «мигает». На узких экранах отключаем размытие и даём сплошной фон. */
+@media(max-width:900px){
+  .header{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+    background:var(--bg)!important}
+  .car .tag,.pm-tag,.prop .fav,.prop .cmpb,.hero-float,.btn-glass,
+  .mnav,.modal-overlay,.modal-back{
+    backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+  .car .tag,.pm-tag{background:var(--paper);border-color:rgba(var(--ink-rgb),.12)}
+  .prop .fav,.prop .cmpb{background:var(--paper)}
+  .mnav{background:rgba(10,10,10,.72)}
+  .modal-overlay{background:rgba(20,18,14,.68)}
+  .modal-back{background:rgba(20,18,14,.6)}
+  /* и никаких плавных переходов фона на прокрутке */
+  .prop,.zone,.mobj,.zprop{transition:none}
+}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.6.0/maplibre-gl.min.css">
