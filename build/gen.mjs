@@ -503,6 +503,10 @@ function buildRentals(objects, preserve, ratesBy) {
       lat: (o.lat === 0 || o.lat) ? Number(o.lat) : null,
       lng: (o.lng === 0 || o.lng) ? Number(o.lng) : null,
       coordOk: o.coord_source === 'exact' || o.coord_source === 'verified',
+      // стадия проекта: пока дом не сдан, снять нельзя — так и пишем
+      stage: o.stage || null,
+      handover: o.handover_date || null,
+      notReady: !!(o.stage && /construct|стро/i.test(String(o.stage))),
       min_stay: (o.min_stay === 0 || o.min_stay) ? o.min_stay : null,
       deposit: (o.deposit === 0 || o.deposit) ? o.deposit : null,
       // фильтр удобств: источники — amenities (если есть) + rent_included; distance_beach_m для «у моря»
@@ -989,7 +993,8 @@ async function main() {
     'objects?select=plp_property_id,name,district,beach,purpose,type,bedrooms,bedrooms_min,' +
     'bedrooms_max,area_sqm,area_min,area_max,min_stay,deposit,rent_included,rent_excluded,' +
     'rent_rules,amenities,usp,usp_en,distance_beach_m,on_site,lat,lng,coord_source,last_synced_at,' +
-    'main_image_url,gallery_urls,photo_groups,unit_types,price_tiers,season_rates,rent_price_month_thb' +
+    'main_image_url,gallery_urls,photo_groups,unit_types,price_tiers,season_rates,rent_price_month_thb,' +
+    'stage,handover_date,parent_object_id' +
     '&and=(or(purpose.eq.' + encodeURIComponent('аренда') + ',purpose.eq.rent),' +
     'on_site.eq.true)&order=plp_property_id');
 
@@ -1013,6 +1018,16 @@ async function main() {
   const catalog = buildCatalog(objects, benchmarks, preserve);
   html = writeIndex(html, catalog);
   const rentPreserve = parseExistingRentals(html);
+  /* Юнит в аренде наследует стадию своего проекта: Modeva сдаётся в 2027,
+     и показывать её как «цена по запросу» — обман. Эльнур 06.09. */
+  const byId = {};
+  for (const o of objects) byId[o.plp_property_id] = o;
+  for (const r of rentals) {
+    const parent = r.parent_object_id ? byId[r.parent_object_id] : null;
+    if (!parent) continue;
+    if (!r.stage) r.stage = parent.stage;
+    if (!r.handover_date) r.handover_date = parent.handover_date;
+  }
   const rentList = buildRentals(rentals, rentPreserve, ratesBy);
   // 30.08: пока в аренде нет объектов с on_site=true — показываем штатную карточку
   // «Скоро в каталоге» (ветка p.soon в renderRent), а не пустую полосу.
