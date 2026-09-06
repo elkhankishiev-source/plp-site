@@ -460,7 +460,12 @@ function rentRates(o, ratesBy) {
   const monthMax = monthTops.length ? Math.max(...monthTops) : null;
   if (month && !src) src = 'owner';
 
-  return { night, nightMax, month, monthMax, rateSrc: (night || month) ? src : null, minNights };
+  /* уровень источника виден наружу: факт из договоров, ставка собственника
+     или ориентир по рыночным объявлениям — чтобы витрина не выдавала одно за другое */
+  const level = (src === 'uk') ? 'uk' : (sr.level === 'market' ? 'market' : (src ? 'owner' : null));
+  return { night, nightMax, month, monthMax, rateSrc: (night || month) ? src : null,
+           rateLevel: (night || month) ? level : null,
+           rateAsOf: (night || month) ? (sr.as_of || null) : null, minNights };
 }
 
 function buildRentals(objects, preserve, ratesBy) {
@@ -683,7 +688,11 @@ function objectPage(o, benchmarks, ratesBy) {
       ((hi && hi > lo) ? money(lo) + ' — ' + money(hi) : 'от ' + money(lo)) + ' ' + unit;
     const main = part(rr.night, rr.nightMax, 'за ночь') || part(rr.month, rr.monthMax, 'в месяц');
     const second = (rr.night && rr.month) ? part(rr.month, rr.monthMax, 'в месяц') : '';
-    const note = [second, rr.minNights ? ('от ' + rr.minNights + ' ночей') : ''].filter(Boolean).join(' · ');
+    /* откуда цена: факт по нашим договорам подписи не требует, ориентир по чужим
+       объявлениям и ставка проекта — обязаны её иметь */
+    const lvl = rr.rateLevel === 'market' ? ('ориентир по объявлениям' + (rr.rateAsOf ? ' · ' + rr.rateAsOf.slice(0, 7).split('-').reverse().join('.') : ''))
+              : rr.rateLevel === 'owner' ? 'ставка по проекту' : '';
+    const note = [second, rr.minNights ? ('от ' + rr.minNights + ' ночей') : '', lvl].filter(Boolean).join(' · ');
     rentLine = '<div class="price">' + htmlEsc(main) +
       (note ? '<small>' + htmlEsc(note) + '</small>' : '') + '</div>';
   }
