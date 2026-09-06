@@ -90,6 +90,10 @@ p.text{margin:0;font-size:.94rem;line-height:1.6}
   -webkit-tap-highlight-color:transparent}
 .prop,.zone,.zprop,.mobj{user-select:none}
 .prop *,.zone *,.zprop *{-webkit-user-select:none;user-select:none}
+
+/* Атрибут hidden проигрывал правилам с display: пустой красный кружок
+   уведомлений висел на колокольчике всегда (Эльнур 06.09). */
+[hidden]{display:none!important}
 </style>
 </head>
 <body>
