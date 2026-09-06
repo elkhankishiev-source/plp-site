@@ -1614,7 +1614,9 @@ body{background:var(--bg)}
 .mnav .mlang button.on{background:var(--green);color:var(--on-green)}
 
 /* Чипы выбора в анкете: в тёмной теме текст сливался с подложкой */
-.chipf{color:var(--ink)}
+/* Чипы выбора: фон и текст из токенов, а не из полупрозрачного «стекла» —
+   на светлой теме в анкете выходил тёмный фон с тёмным текстом (Эльнур 07.09). */
+.chipf{background:var(--paper);color:var(--ink);border:1px solid rgba(var(--ink-rgb),.14)}
 .chipf.on{background:var(--green);color:var(--on-green);border-color:transparent}
 
 /* Сообщение об ошибке в анкете должно читаться в обеих темах */
