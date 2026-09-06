@@ -1248,7 +1248,7 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
   box-shadow:0 12px 34px rgba(0,0,0,.35);opacity:0;transition:opacity .18s}
 .saybox.on{opacity:1}
 </style>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<!-- Leaflet подгружается только при открытии раздела с картой: см. ensureLeaflet() -->
 </head>
 <body>
 <header class="header">
@@ -4543,7 +4543,6 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       if(!d||!d.ok) return;
       COITEMS=d.items||[];
       drawCoList();
-      initCoMap();
     });
   }
   function drawCoList(){
@@ -4561,9 +4560,27 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       box.appendChild(b);
     });
   }
+  /* Карта нужна одному разделу из тринадцати — грузим её при первом заходе туда,
+     а не на каждом открытии кабинета (Эльнур 06.09: «грузится долго»). */
+  var LEAFLET=null;
+  function ensureLeaflet(cb){
+    if(window.L) return cb();
+    if(LEAFLET){ LEAFLET.push(cb); return; }
+    LEAFLET=[cb];
+    var css=document.createElement('link');
+    css.rel='stylesheet'; css.href='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css';
+    document.head.appendChild(css);
+    var js=document.createElement('script');
+    js.src='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';
+    js.onload=function(){ var q=LEAFLET; LEAFLET=[]; q.forEach(function(f){ try{ f(); }catch(e){} }); };
+    js.onerror=function(){ var e=document.getElementById('co-err');
+      if(e) e.textContent='Карта не загрузилась — проверьте связь и обновите страницу.'; };
+    document.head.appendChild(js);
+  }
   function initCoMap(){
     var box=document.getElementById('co-map');
-    if(!box || COMAP || !window.L) return;
+    if(!box || COMAP) return;
+    if(!window.L){ ensureLeaflet(initCoMap); return; }
     COMAP=L.map(box,{scrollWheelZoom:true}).setView([7.95,98.33],11);
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{
       maxZoom:19, attribution:'Esri'}).addTo(COMAP);
@@ -4583,6 +4600,8 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     $('co-hint').textContent='Выбран: '+(it.name||it.plp_property_id)+
       (it.lat ? ' · нажмите на карте, чтобы поправить точку' : ' · нажмите на карте, где он стоит');
     $('co-save').disabled = true;
+    if(!COMAP){ initCoMap(); }
+    if(!COMAP) return;                       /* карта ещё грузится — точку поставим после */
     if(COMARK){ COMAP.removeLayer(COMARK); COMARK=null; }
     if(it.lat && it.lng){ setPin(Number(it.lat), Number(it.lng), true); COMAP.setView([it.lat,it.lng], 16); }
     else { COMAP.setView([7.95,98.33], 11); }
@@ -4890,7 +4909,9 @@ window.openChat=openChat;window.closeChat=closeChat;window.clearChat=clearChat;w
       a.classList.toggle('on', a.getAttribute('data-tab')===name);
     });
     try{ if(PLPMAP_OWNER) setTimeout(function(){ COMAP && COMAP.invalidateSize(); },80); }catch(e){}
-    if(name==='staff' && COMAP) setTimeout(function(){ try{COMAP.invalidateSize();}catch(e){} },120);
+    if(name==='staff') setTimeout(function(){
+      try{ COMAP ? COMAP.invalidateSize() : initCoMap(); }catch(e){}
+    },120);
     /* Эльнур 05.09: «нажимаю на любую кнопку — всё идёт вверх, а должно
        спускаться вниз». Ведём взгляд к раскрытому разделу, а не в начало
        страницы: на телефоне — к самому пункту, на большом экране — к телу. */
@@ -5358,6 +5379,6 @@ window.openChat=openChat;window.closeChat=closeChat;window.clearChat=clearChat;w
   if(TOKEN) loadData(); else gateStep('phone');
 })();
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" defer></script>
+
 </body>
 </html>
