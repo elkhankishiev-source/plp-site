@@ -867,7 +867,12 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
   .tdate{color:var(--muted);font-variant-numeric:tabular-nums;margin-right:6px}
   .clnote{display:flex;gap:8px}
   .clnote input{flex:1;min-width:0;padding:9px 12px;border:1px solid var(--line);border-radius:9px;font:inherit;background:var(--paper)}
-  @media(max-width:640px){.ctable th:nth-child(3),.ctable td:nth-child(3){display:none}}
+  /* Эльнур 06.09: «в разделе Люди на телефоне данные режутся». Прятать колонку —
+     значит терять данные; лучше дать таблице прокрутку вбок. */
+  @media(max-width:640px){
+    #cl-list,#cl-card,.tblwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+    #cl-list .ctable,#cl-card .ctable{min-width:520px}
+  }
   .clbar{display:flex;gap:8px;margin:10px 0 0;flex-wrap:wrap}
   .ctable.inner{font-size:13px;margin-top:6px}
   .ctable.inner th{font-size:11px}
@@ -1293,7 +1298,7 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
     <a href="add-property.html">Разместить объект</a>
     <a href="index.html#about" onclick="toggleNav(false)" data-i18n="nav.about">О нас</a>
     <a href="owner.html" onclick="toggleNav(false)" data-i18n="nav.cabinet">Кабинет</a>
-    <button type="button" class="mwa" onclick="toggleNav(false);openChat('hi')">Дарья · на связи</button>
+
   </div>
 </div>
 <div class="wrap">
@@ -1724,7 +1729,6 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
       <div>
         <h3 data-i18n="ft.connect">Мы на связи</h3>
         <ul>
-          <li><a href="https://wa.me/66955492587" target="_blank" rel="noopener">WhatsApp</a></li>
           <li><a href="https://t.me/elnurphuket_bot" target="_blank" rel="noopener" data-i18n="ft.bot">Консьерж в Telegram 24/7</a></li>
           <li><a href="https://t.me/property_library_phuket" target="_blank" rel="noopener" data-i18n="ft.tg">Telegram-канал</a></li>
           <li><a href="https://www.instagram.com/property.library.phuket/" target="_blank" rel="noopener">Instagram</a></li>
@@ -4129,21 +4133,33 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       /* Каждый показатель — кнопка: ведёт туда, где с ним можно работать.
          Раньше обработчик искал класс bgo, которого разметка не ставила,
          и «Система» не нажималась (Эльнур 05.09). */
-      var GO={'просят_кабинет':['clients','hot'],'клиентов':['clients',''],'горячих':['clients','hot'],
+      var GO={'просят_кабинет':['clients','hot'],'клиентов':['clients','client'],'горячих':['clients','hot'],
+              'всего':['clients',''],'клиенты':['clients','client'],'тёплые':['clients','warm'],
+              'холодные':['clients','cold'],'новых_за_неделю':['clients',''],'с_историей':['clients',''],
+              'с_кабинетом':['clients',''],
               'без_кода_страны':['phones',''],'короткие':['phones',''],'длинные':['phones',''],
-              'тестовые':['phones',''],'дубли':['phones',''],
+              'тестовые':['phones',''],'дубли':['phones',''],'рабочих':['phones',''],'отложены':['phones',''],
               'заявок_на_модерации':['moderation',''],'без_точки':['coords',''],'точка_неточная':['coords',''],
+              'объектов_опубликовано':['site','buy.html'],'продажа':['site','buy.html'],'аренда':['site','rent.html'],
               'просрочено':['tasks',''],'задач':['tasks',''],'сотрудников':['staff',''],
               'задач_открыто':['tasks',''],'на_неделе':['tasks',''],
               'выполнено_всего':['tasks',''],'выполнено_за_неделю':['tasks',''],
-              'работ_по_объектам_открыто':['service',''],'работ_по_объектам_выполнено':['service','']};
+              'работ_по_объектам_открыто':['service',''],'работ_по_объектам_выполнено':['service',''],
+              'сделок_в_работе':['clients',''],'выиграно':['clients','client'],
+              'записей_в_историях':['clients',''],'реальных_собеседников':['clients',''],
+              'диалогов_за_неделю':['clients','']};
+      /* Показатели без своего раздела всё равно должны отвечать на нажатие —
+         объясняем, что за цифра и откуда она (Эльнур 06.09: «кнопки не функционируют»). */
+      var EXPLAIN={'исходящие_включены':'Общий рубильник исходящих сообщений. Включается вручную, когда решаем начать писать первыми.',
+                   'обновлено':'Время последнего снятия показаний.'};
       function group(title, obj, marks){
         var h='<div class="bgroup"><h4>'+title+'</h4><div class="bgrid">';
         Object.keys(obj||{}).forEach(function(k){
           var v=obj[k], warn=(marks||[]).indexOf(k)>=0 && Number(v)>0;
           var go=GO[k];
-          h+='<div class="bcell'+(warn?' bwarn':'')+(go?' bgo':'')+'"'+
-             (go?(' data-go="'+go[0]+'" data-arg="'+go[1]+'" title="открыть"'):'')+'>'+
+          h+='<div class="bcell'+(warn?' bwarn':'')+' bgo"'+
+             ' data-key="'+k+'"'+
+             (go?(' data-go="'+go[0]+'" data-arg="'+go[1]+'" title="открыть"'):' title="что это за цифра"')+'>'+
              '<span class="bnum">'+(v===null||v===undefined?'—':v)+'</span><span class="blbl">'+
              k.replace(/_/g,' ')+'</span></div>';
         });
@@ -4164,6 +4180,12 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       Array.prototype.forEach.call(box.querySelectorAll('.bgo'),function(el){
         el.onclick=function(){
           var go=el.getAttribute('data-go'), arg=el.getAttribute('data-arg');
+          if(!go){
+            var k=el.getAttribute('data-key')||'';
+            say(EXPLAIN[k] || ('«'+k.replace(/_/g,' ')+'» — сводный показатель, отдельного раздела у него нет.'));
+            return;
+          }
+          if(go==='site'){ window.open(arg,'_blank','noopener'); return; }
           if(go==='clients'){
             cabPage('clients'); CL_TEMP=arg||''; CL_Q='';
             var fb=document.getElementById('cl-filter');
@@ -4789,19 +4811,24 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         if(b.status==='hold')
           out.push({tab:'calendar',t:'Бронь ждёт подтверждения',s:obj+' · '+dmy(b.check_in)+
                     (b.check_out?(' — '+dmy(b.check_out)):'')+(b.guest_name?(' · '+b.guest_name):'')});
-        else if(b.status==='upcoming')
-          out.push({tab:'calendar',t:'Скоро заезд',s:obj+' · '+dmy(b.check_in)+(b.guest_name?(' · '+b.guest_name):'')});
+        /* Эльнур 06.09: «если ничего нового, всё разобрано — зачем колокольчик горит».
+           Будущий заезд не требует действия: это расписание, а не уведомление. */
       });
       (p.requests||[]).forEach(function(r){
         if(!r.done_at) out.push({tab:'actions',t:'Заявка без ответа',s:obj+' · '+(r.kind||r.title||'запрос')});
       });
       (p.services||p.works||[]).forEach(function(w){
-        if(w.status && w.status!=='done')
-          out.push({tab:'service',t:'Работа не закрыта',s:obj+' · '+(w.kind||'работа')+
+        /* только просроченные работы: открытая работа со сроком в будущем — план, а не тревога */
+        var over = w.due_date && String(w.due_date).slice(0,10) < new Date().toISOString().slice(0,10);
+        if(w.status && w.status!=='done' && over)
+          out.push({tab:'service',t:'Работа просрочена',s:obj+' · '+(w.kind||'работа')+
                     (w.due_date?(' до '+dmy(w.due_date)):'')});
       });
     });
     (DATA.moderation||[]).forEach(function(m){
+      /* уже опубликованные и отклонённые внимания не ждут */
+      var st=String(m.status||'new');
+      if(st==='published'||st==='rejected') return;
       out.push({tab:'staff',t:'Заявка с сайта на модерации',s:(m.address||m.name||'новый объект')});
     });
     return out;

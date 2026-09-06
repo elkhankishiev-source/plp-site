@@ -92,7 +92,7 @@ const mgmt=`<section style="padding-bottom:0"><div class="container">
   </div>
   <div class="hero-cta" style="margin-top:22px">
     <a class="btn btn-primary" href="owner.html">Войти в кабинет</a>
-    <a class="btn btn-ghost" href="https://wa.me/66955492587" target="_blank" rel="noopener">Обсудить объект в WhatsApp</a>
+    <a class="btn btn-ghost" href="https://t.me/elnurphuket_bot?start=uk" target="_blank" rel="noopener">Обсудить объект в Telegram</a>
   </div>
 </div></section>
 
@@ -140,7 +140,7 @@ for(const f of faq){
     <div style="background:var(--green-soft);border-radius:18px;padding:18px 20px;margin:24px 0">
       <p style="margin:0 0 12px;font-size:15px">Разберём вашу ситуацию бесплатно — ответим за пять минут в рабочее время.</p>
       <div class="hero-cta" style="margin:0">
-        <a class="btn btn-primary" href="https://wa.me/66955492587" target="_blank" rel="noopener">Спросить в WhatsApp</a>
+        <a class="btn btn-primary" href="https://t.me/elnurphuket_bot?start=faq" target="_blank" rel="noopener">Спросить в Telegram</a>
         <a class="btn btn-ghost" href="../buy.html">Смотреть объекты</a>
       </div>
     </div>
