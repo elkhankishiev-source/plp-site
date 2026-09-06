@@ -20,6 +20,27 @@ function grabSection(id){
 }
 const SALE=grabSection('sale'), RENT=grabSection('rent');
 
+/* Куски блока аренды помечены в index.html маркерами PLP:PART:<имя>, чтобы
+   страница управления могла расставить их в нужном порядке, а не копировать
+   всё скопом. Порядок задал Эльнур 06.09. */
+function grabPart(name){
+  const a=idx.indexOf(`<!-- PLP:PART:${name}:START -->`);
+  const b=idx.indexOf(`<!-- PLP:PART:${name}:END -->`);
+  if(a===-1||b===-1||b<a) return '';
+  return idx.slice(a, b).replace(`<!-- PLP:PART:${name}:START -->`, '');
+}
+/* каталог аренды = секция целиком минус три куска, которые расставим отдельно */
+function rentCatalogOnly(){
+  let x=RENT;
+  for(const n of ['rent-band','rent-care','rent-island']){
+    const a=x.indexOf(`<!-- PLP:PART:${n}:START -->`);
+    const b=x.indexOf(`<!-- PLP:PART:${n}:END -->`);
+    if(a!==-1&&b!==-1&&b>a) x=x.slice(0,a)+x.slice(b+`<!-- PLP:PART:${n}:END -->`.length);
+  }
+  return x;
+}
+const wrapSection = inner => inner ? `<section style="padding-top:26px"><div class="container">${inner}</div></section>` : '';
+
 function page({file,depth,title,desc,body,jsonld}){
   let html=head+'\n'+body+'\n'+tail;
   const url=SITE+'/'+file;
@@ -49,14 +70,17 @@ const services=[
  ['Держим документы','Договор, акты, счета — в кабинете, а не в переписке.'],
  ['Отвечаем гостям вместо вас','Круглосуточно, на русском и английском. Вас не беспокоим по мелочам.'],
 ];
-const mgmt=`<section style="padding-bottom:0"><div class="container">
+/* Порядок разделов задал Эльнур 06.09:
+   управление → аренда с заботой → сколько стоит → свой объект →
+   каталог аренды → запрос 24/7 → понравился остров.
+   Плитки услуг и «что видно в кабинете» стоят рядом со своими разделами. */
+const M_HERO = `<section style="padding-bottom:0"><div class="container">
   <p class="kicker">Property Library · управление</p>
   <h1 style="font-size:clamp(28px,4.4vw,44px);margin:0 0 12px">Управление недвижимостью на Пхукете</h1>
   <p class="sub" style="max-width:64ch;margin:0 0 8px">Вы отдаёте ключи — мы берём на себя гостей, уборку, ремонт и отчётность.
   Каждый месяц вы видите доход, расходы и сумму к выплате в личном кабинете, а не в переписке с менеджером.</p>
-</div></section>
-
-<section id="list-property" style="padding-top:22px"><div class="container">
+</div></section>`;
+const M_LIST = `<section id="list-property" style="padding-top:22px"><div class="container">
   <div style="background:var(--green-soft);border:1px solid var(--line,rgba(var(--ink-rgb),.12));border-radius:24px;padding:clamp(20px,3vw,30px)">
     <div style="display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:clamp(18px,3vw,34px);align-items:center">
       <div>
@@ -89,19 +113,16 @@ const mgmt=`<section style="padding-bottom:0"><div class="container">
       </div>
     </div>
   </div>
-</div></section>
-
-<section style="padding-top:26px"><div class="container">
+</div></section>`;
+const M_SERV = `<section style="padding-top:26px"><div class="container">
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px">
     ${services.map(s=>`<div style="background:var(--paper);border:1px solid var(--line,rgba(var(--ink-rgb),.1));border-radius:18px;padding:18px 20px">
       <h3 style="margin:0 0 6px;font-size:17px">${esc(s[0])}</h3>
       <p class="sub" style="margin:0;font-size:15px">${esc(s[1])}</p></div>`).join('')}
   </div>
 </div></section>
-
-<!--OBJECTS-->
-
-<section style="padding-top:26px"><div class="container">
+`;
+const M_PRICE = `<section style="padding-top:26px"><div class="container">
   <h2 style="font-size:clamp(22px,3vw,28px);margin:0 0 14px">Сколько это стоит</h2>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px">
     <div style="background:var(--paper);border:1px solid var(--line,rgba(var(--ink-rgb),.1));border-radius:18px;padding:18px 20px">
@@ -117,8 +138,8 @@ const mgmt=`<section style="padding-bottom:0"><div class="container">
   <p class="sub" style="font-size:14px;margin-top:12px">Комиссия удерживается из дохода — платить отдельно ничего не нужно.
   Расходы на уборку и ремонт показываем отдельной строкой с чеком.</p>
 </div></section>
-
-<section style="padding-top:26px"><div class="container">
+`;
+const M_CABIN = `<section style="padding-top:26px"><div class="container">
   <h2 style="font-size:clamp(22px,3vw,28px);margin:0 0 10px">Что видно в кабинете</h2>
   <p class="sub" style="max-width:62ch;margin:0 0 16px">Доступ по коду из WhatsApp — без паролей и приложений.</p>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px">
@@ -129,9 +150,11 @@ const mgmt=`<section style="padding-bottom:0"><div class="container">
     <a class="btn btn-primary" href="owner.html">Войти в кабинет</a>
     <a class="btn btn-ghost" href="https://t.me/elnurphuket_bot?start=uk" target="_blank" rel="noopener">Обсудить объект в Telegram</a>
   </div>
-</div></section>
+</div></section>`;
+const mgmt = [M_HERO, M_SERV, wrapSection(grabPart('rent-care')), M_PRICE, M_CABIN,
+              M_LIST, rentCatalogOnly(), wrapSection(grabPart('rent-band')),
+              wrapSection(grabPart('rent-island'))].join('\n');
 
-`;
 
 const made=[];
 made.push(page({file:'management.html',depth:0,
@@ -139,7 +162,7 @@ made.push(page({file:'management.html',depth:0,
   desc:'Возьмём на себя гостей, уборку, ремонт и отчётность. Комиссия от 15% дохода, подключение бесплатно. Отчёты и выплаты — в личном кабинете.',
   /* Эльнур 06.09: «в блоке управление зачем аренда размещена?» — страница про
      услугу управления, каталог аренды живёт на rent.html. */
-  body:mgmt.replace('<!--OBJECTS-->', '')}));
+  body:mgmt}));
 
 /* ── ГАЙДЫ ──────────────────────────────────────────────── */
 const faq=JSON.parse(fs.readFileSync('/Users/elnurkhankishiev/plp-site/build/faq.json','utf8'));
