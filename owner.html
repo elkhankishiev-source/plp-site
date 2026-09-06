@@ -1349,6 +1349,11 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
 .swch b{background:var(--ink-block);color:var(--on-ink)}
 .swch a:hover{color:var(--ink)}
 @media(max-width:900px){ .swch{display:none} }
+
+/* Поиск объекта в списке точек: набрал название — список сузился */
+.co-find{display:block;margin-bottom:8px}
+.co-find input{width:100%;box-sizing:border-box;padding:9px 12px;border:1px solid var(--line);
+  border-radius:12px;background:var(--paper);color:var(--ink);font:inherit;font-size:.86rem}
 </style>
 <!-- Leaflet подгружается только при открытии раздела с картой: см. ensureLeaflet() -->
 </head>
@@ -1823,7 +1828,10 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
       <p class="sub" style="margin:0 0 12px">Выберите объект слева и нажмите на карте там, где он стоит.
       Точка сохранится, и объект встанет на своё место на сайте. Приблизительные помечены жёлтым.</p>
       <div class="coordwrap">
-        <div class="coordlist" id="co-list"></div>
+        <div>
+          <label class="co-find"><input type="search" id="co-q" placeholder="найти объект по названию или ID"></label>
+          <div class="coordlist" id="co-list"></div>
+        </div>
         <div>
           <div id="co-map" class="coordmap"></div>
           <div class="coordbar">
@@ -4862,8 +4870,17 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   }
   function drawCoList(){
     var box=document.getElementById('co-list'); if(!box) return;
+    var q=(document.getElementById('co-q')||{}).value||'';
+    q=q.trim().toLowerCase();
     box.innerHTML='';
+    var shown=0;
     COITEMS.forEach(function(it){
+      /* сузили список по названию, району или ID */
+      if(q){
+        var hay=((it.name||'')+' '+(it.district||'')+' '+(it.plp_property_id||'')).toLowerCase();
+        if(hay.indexOf(q)<0) return;
+      }
+      shown++;
       var st = !it.lat ? 'none' : (it.coord_source==='exact' ? 'exact' : 'approx');
       var lab = st==='none' ? 'нет точки' : (st==='exact' ? 'точная' : 'приблизительная');
       var b=document.createElement('button');
@@ -4874,6 +4891,13 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       b.onclick=function(){ pickObject(it); };
       box.appendChild(b);
     });
+    if(!shown) box.innerHTML='<p class="sub" style="padding:10px 2px">Ничего не нашлось — попробуйте другое слово.</p>';
+    var qi=document.getElementById('co-q');
+    if(qi && !qi.__wired){
+      qi.__wired=1;
+      var t=null;
+      qi.oninput=function(){ clearTimeout(t); t=setTimeout(drawCoList, 200); };
+    }
   }
   /* Карта нужна одному разделу из тринадцати — грузим её при первом заходе туда,
      а не на каждом открытии кабинета (Эльнур 06.09: «грузится долго»). */
