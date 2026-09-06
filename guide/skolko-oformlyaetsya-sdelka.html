@@ -1398,8 +1398,17 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
 /* наведение только там, где есть мышь: на телефоне hover залипал после нажатия
    и кнопка оставалась светлой плашкой со светлым текстом */
 @media (hover:none){
-  .chipf:hover,.fbtn:hover,.btn:hover,.zone:hover,.mobj:hover,.prop:hover{
-    background:inherit;color:inherit;transform:none}
+  /* Эльнур 06.09: «листаю карточки — они светятся светлым». Виноват был
+     background:inherit — карточка забирала фон родителя. Гасим только эффект. */
+  .prop:hover,.car .prop:hover{transform:none;box-shadow:var(--shadow-sm)}
+  .zone:hover,.mobj:hover,.zprop:hover{transform:none;box-shadow:none;border-color:inherit}
+  .chipf:hover{background:rgba(var(--glass-rgb),.85)}
+  .chipf.on:hover{background:var(--green);color:var(--on-green)}
+  .fbtn:hover{background:var(--paper)}
+  .btn:hover{transform:none}
+  .btn-primary:hover{background:var(--ink-block);color:var(--on-ink)}
+  .btn-green:hover{background:var(--green);color:var(--on-green)}
+  .btn-ghost:hover{background:transparent}
 }
 
 /* «мало осталось» кирпичным цветом тонуло в тёмной теме */
@@ -1430,6 +1439,14 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
 .swch b{background:var(--ink-block);color:var(--on-ink)}
 .swch a:hover{color:var(--ink)}
 @media(max-width:900px){ .swch{display:none} }
+
+/* На телефоне лого занимало слишком много света вверху — уменьшаем значок и текст */
+@media(max-width:600px){
+  .header-inner{height:58px}
+  .logo .chip{width:30px;height:30px;border-radius:9px}
+  .logo .chip img{width:18px}
+  .lname{font-size:.92rem}
+}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.6.0/maplibre-gl.min.css">
@@ -1468,7 +1485,6 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
       <span class="swch" role="group" aria-label="Сайт или кабинет">
         <b>Сайт</b><a href="../owner.html" data-i18n="nav.cabinet">Кабинет</a>
       </span>
-      <button type="button" class="btn btn-green" onclick="openChat('hi')" data-i18n="nav.chat">Чат с консультантом</button>
       <button type="button" class="burger" aria-label="Меню" onclick="toggleNav(true)"><i></i><i></i><i></i></button>
     </div>
   </div>

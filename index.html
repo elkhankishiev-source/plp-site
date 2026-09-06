@@ -1398,8 +1398,17 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
 /* наведение только там, где есть мышь: на телефоне hover залипал после нажатия
    и кнопка оставалась светлой плашкой со светлым текстом */
 @media (hover:none){
-  .chipf:hover,.fbtn:hover,.btn:hover,.zone:hover,.mobj:hover,.prop:hover{
-    background:inherit;color:inherit;transform:none}
+  /* Эльнур 06.09: «листаю карточки — они светятся светлым». Виноват был
+     background:inherit — карточка забирала фон родителя. Гасим только эффект. */
+  .prop:hover,.car .prop:hover{transform:none;box-shadow:var(--shadow-sm)}
+  .zone:hover,.mobj:hover,.zprop:hover{transform:none;box-shadow:none;border-color:inherit}
+  .chipf:hover{background:rgba(var(--glass-rgb),.85)}
+  .chipf.on:hover{background:var(--green);color:var(--on-green)}
+  .fbtn:hover{background:var(--paper)}
+  .btn:hover{transform:none}
+  .btn-primary:hover{background:var(--ink-block);color:var(--on-ink)}
+  .btn-green:hover{background:var(--green);color:var(--on-green)}
+  .btn-ghost:hover{background:transparent}
 }
 
 /* «мало осталось» кирпичным цветом тонуло в тёмной теме */
@@ -1430,6 +1439,30 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
 .swch b{background:var(--ink-block);color:var(--on-ink)}
 .swch a:hover{color:var(--ink)}
 @media(max-width:900px){ .swch{display:none} }
+
+/* На телефоне лого занимало слишком много света вверху — уменьшаем значок и текст */
+@media(max-width:600px){
+  .header-inner{height:58px}
+  .logo .chip{width:30px;height:30px;border-radius:9px}
+  .logo .chip img{width:18px}
+  .lname{font-size:.92rem}
+}
+
+/* Эльнур 06.09: «фильтр упорядочить, иначе плохо вмещается, хочется чтобы
+   основной посыл был заметнее». На телефоне в строке остаются главные фильтры,
+   остальные прячутся под «Ещё» — экран отдаём объектам. */
+@media(max-width:600px){
+  .filterbar{gap:8px}
+  .filterbar .fmenu>.fbtn{padding:8px 12px;font-size:.82rem}
+  .filterbar.compact .fmenu.hide-sm{display:none}
+  .fbtn-more{display:none}
+  /* «Сбросить» появляется, только когда есть что сбрасывать — строка короче */
+  .filterbar.compact .fbtn-reset{display:none}
+  .filterbar.compact.has-active .fbtn-reset{display:inline-flex}
+  .filterbar.compact .fbtn-more{display:inline-flex;align-items:center;gap:6px;
+    background:var(--paper);border:1px solid rgba(var(--ink-rgb),.12);border-radius:999px;
+    padding:8px 12px;font-size:.82rem;font-weight:600;color:var(--ink)}
+}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.6.0/maplibre-gl.min.css">
@@ -1467,7 +1500,6 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
       <span class="swch" role="group" aria-label="Сайт или кабинет">
         <b>Сайт</b><a href="owner.html" data-i18n="nav.cabinet">Кабинет</a>
       </span>
-      <button type="button" class="btn btn-green" onclick="openChat('hi')" data-i18n="nav.chat">Чат с консультантом</button>
       <button type="button" class="burger" aria-label="Меню" onclick="toggleNav(true)"><i></i><i></i><i></i></button>
     </div>
   </div>
@@ -4325,6 +4357,31 @@ var FILTER_MENUS=[
 ];
 /* Аренда рисует фильтры своими группами «подпись + чипы» — сворачиваем их
    в такие же кнопки с выпадающим списком, чтобы поведение было одинаковым. */
+/* Компактная строка фильтров на телефоне: главные видны, прочие — под «Ещё». */
+function compactFilters(barId){
+  var bar=document.getElementById(barId); if(!bar) return;
+  if(!window.matchMedia || !window.matchMedia('(max-width:600px)').matches){
+    bar.classList.remove('compact'); return;
+  }
+  var menus=Array.prototype.slice.call(bar.querySelectorAll('.fmenu'));
+  if(menus.length<4) return;
+  var keep=['budget','loc','beds','rentbudget'];
+  menus.forEach(function(m){
+    var f=m.dataset.facet||'';
+    if(keep.indexOf(f)<0) m.classList.add('hide-sm');
+  });
+  if(!bar.querySelector('.fbtn-more')){
+    var more=document.createElement('button');
+    more.type='button'; more.className='fbtn-more'; more.textContent='Ещё фильтры';
+    more.onclick=function(){
+      var on=bar.classList.toggle('compact');
+      more.textContent = on ? 'Ещё фильтры' : 'Свернуть фильтры';
+    };
+    var reset=bar.querySelector('.fbtn-reset');
+    bar.insertBefore(more, reset||null);
+  }
+  bar.classList.add('compact');
+}
 function groupRentMenus(){
   var bar=document.getElementById('rentFilters');
   if(!bar || bar.dataset.grouped) return;
@@ -4351,6 +4408,7 @@ function groupRentMenus(){
     bar.appendChild(e);
   });
   try{ buildRentPriceMenu(bar); }catch(e){}
+  try{ compactFilters('rentFilters'); }catch(e){}
   wireCloseOnOutside();
   syncMenuLabels();
 }
@@ -4502,6 +4560,7 @@ function buildFilterMenus(barId){
     btn.onclick=function(e){ e.stopPropagation(); wrap.classList.toggle('open'); closeOthers(wrap); };
   });
   try{ buildPriceSlider(bar); }catch(e){}
+  try{ compactFilters(barId); }catch(e){}
   try{ syncBudgetLabels(); }catch(e){}
   var reset=document.createElement('button');
   reset.type='button'; reset.className='fbtn fbtn-reset'; reset.textContent='Сбросить';
@@ -4655,6 +4714,12 @@ function closeOthers(keep){
 }
 /* на кнопке показываем, что выбрано — иначе выбор не виден, когда список закрыт */
 function syncMenuLabels(){
+  /* активные фильтры подсвечивают кнопку сброса на телефоне */
+  ['saleFilters','rentFilters'].forEach(function(id){
+    var b=document.getElementById(id); if(!b) return;
+    var active = b.querySelectorAll('.fmenu.has').length>0;
+    b.classList.toggle('has-active', active);
+  });
   document.querySelectorAll('.fmenu').forEach(function(w){
     var f=w.dataset.facet, out=[];
     /* бюджет аренды: на кнопке показываем сам диапазон, а не выбранный срок */
