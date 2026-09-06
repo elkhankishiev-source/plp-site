@@ -3901,10 +3901,15 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     /* Эльнур 07.09: «приём любого файла с авторазбором». Кладём сюда же, где
        человек ищет документы: договор, счёт, акт, фото бумаги — что угодно.
        Система прочитает и покажет, что поняла; в объект попадёт после проверки. */
+    /* сотрудник, выбравший человека в шапке, грузит документ сразу в его карточку */
+    var forWhom = (DATA.owner&&DATA.owner.is_staff===true&&CTX.lead)
+      ? ('<b>'+esc(CTX.leadName||CTX.lead)+'</b>') : '';
     dch+='<div class="upzone" id="doc-drop">'+
       '<input id="doc-file" type="file" hidden accept=".pdf,.jpg,.jpeg,.png,.heic,.doc,.docx">'+
       '<button type="button" class="btn ghost" id="doc-pick">Загрузить документ</button>'+
-      '<span class="sub" id="doc-state">Договор, счёт, акт или фото бумаги — прочитаем сами. '+
+      '<span class="sub" id="doc-state">'+
+      (forWhom ? ('Документ уйдёт в карточку: '+forWhom+'. ') : '')+
+      'Договор, счёт, акт или фото бумаги — прочитаем сами. '+
       'Из договора соберём график платежей и подставим в объект после вашей проверки.</span></div>'+
       '<div id="doc-parsed"></div>';
     H+=card('Документы объекта', dch, 'sec-docs');
@@ -4622,8 +4627,12 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       var rd=new FileReader();
       rd.onload=function(){
         var b64=String(rd.result).split(',')[1]||'';
-        post({action:'my_doc',token:TOKEN,file_name:f.name,mime:f.type,
-              kind:docKindByName(f.name),property_id:pid||'',data:b64})
+        var staffFor=(DATA.owner&&DATA.owner.is_staff===true&&CTX.lead)?CTX.lead:'';
+        post(staffFor
+          ? {action:'staff_doc',token:TOKEN,code:staffFor,file_name:f.name,mime:f.type,
+             kind:docKindByName(f.name),property_id:pid||'',data:b64}
+          : {action:'my_doc',token:TOKEN,file_name:f.name,mime:f.type,
+             kind:docKindByName(f.name),property_id:pid||'',data:b64})
           .then(function(r){
             pick.disabled=false; fi.value='';
             if(r&&r.ok){
