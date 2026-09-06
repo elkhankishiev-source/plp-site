@@ -313,8 +313,10 @@ function buildCatalog(objects, benchmarks, preserve) {
       beachM: (o.distance_beach_m === 0 || o.distance_beach_m) ? o.distance_beach_m : null,
       // Снимки из хранилища: первый идёт обложкой, остальные — лентой в карточке.
       // Локальные img/<ID>.jpg остаются запасным вариантом для старых объектов.
-      photo: o.main_image_url || null,
-      photos: Array.isArray(o.gallery_urls) ? o.gallery_urls.slice(0, 8) : null,
+      photo: thumbUrl(o.main_image_url, 760, 72),
+      photoFull: o.main_image_url || null,
+      photos: Array.isArray(o.gallery_urls)
+        ? o.gallery_urls.slice(0, 8).map(u => thumbUrl(u, 1280, 78)) : null,
       // Планировки: человек выбирает тип и сразу видит его площадь и спальни.
       // Где застройщик не давал названий планировок, берём тиры из прайса
       // (минимальная цена на каждый тип спальни) — Эльнур 05.09: «продаётся
@@ -325,7 +327,10 @@ function buildCatalog(objects, benchmarks, preserve) {
       hot: (o.hot_rank === 0 || o.hot_rank) ? Number(o.hot_rank) : null,
       // Ход стройки и разделы снимков — показываем, если застройщик их дал.
       progress: o.build_progress || null,
-      groups: Array.isArray(o.photo_groups) ? o.photo_groups : null,
+      groups: Array.isArray(o.photo_groups)
+        ? o.photo_groups.map(g => Object.assign({}, g, {
+            urls: Array.isArray(g.urls) ? g.urls.map(u => thumbUrl(u, 1280, 78)) : g.urls }))
+        : null,
       developer: shortDev(o.developer) || null,
       developerFull: o.developer || null,
       calc: withFacts(keep.calc || fallbackCalc(o), o),
@@ -335,6 +340,15 @@ function buildCatalog(objects, benchmarks, preserve) {
 
 /* Что можно купить в проекте: сначала именованные планировки застройщика,
    иначе — тиры прайса (по одной строке на тип спальни, цена «от»). */
+/* Обложки в каталоге весили до 19 МБ каждая — 112 МБ на страницу. Хранилище
+   умеет отдавать уменьшённые копии, поэтому на витрину идут превью, а полный
+   снимок открывается только в просмотрщике. Эльнур 06.09. */
+function thumbUrl(u, w, q) {
+  const s = String(u || '');
+  if (!s || s.indexOf('/storage/v1/object/public/') < 0) return s || null;
+  return s.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/')
+        + (s.indexOf('?') < 0 ? '?' : '&') + 'width=' + w + '&quality=' + q;
+}
 function unitsOf(o) {
   /* Типы приходят из разных источников и называют поля по-разному
      (area/area_sqm, beds/bedrooms). Приводим к одному виду, а ставки аренды
@@ -518,9 +532,14 @@ function buildRentals(objects, preserve, ratesBy) {
       // 05.09: у аренды на витрине не было ни одного снимка — поля просто не
       // доезжали из базы. Теперь галерея, разделы и планировки тянутся так же,
       // как у продажи.
-      photo: o.main_image_url || null,
-      photos: Array.isArray(o.gallery_urls) ? o.gallery_urls.slice(0, 8) : null,
-      groups: Array.isArray(o.photo_groups) ? o.photo_groups : null,
+      photo: thumbUrl(o.main_image_url, 760, 72),
+      photoFull: o.main_image_url || null,
+      photos: Array.isArray(o.gallery_urls)
+        ? o.gallery_urls.slice(0, 8).map(u => thumbUrl(u, 1280, 78)) : null,
+      groups: Array.isArray(o.photo_groups)
+        ? o.photo_groups.map(g => Object.assign({}, g, {
+            urls: Array.isArray(g.urls) ? g.urls.map(u => thumbUrl(u, 1280, 78)) : g.urls }))
+        : null,
       units: unitsOf(o),
       // ставки: что реально известно; чего нет — остаётся null, не выдумываем
       ...rentRates(o, ratesBy),
