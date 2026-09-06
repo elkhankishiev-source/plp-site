@@ -73,3 +73,56 @@ body{background:var(--bg)}
   .prop .fav,.prop .cmpb{background:var(--paper)}
   .prop,.zone,.mobj,.zprop{transition:none}
 }
+
+
+/* Язык и оформление: на телефоне живут в бургере, в шапке остаются только на
+   широком экране. Иначе шапка сайта и шапка кабинета расходятся, а тумблер
+   языка в кабинете «плывёт» (Эльнур 06.09). */
+.mnav .mtools{display:flex;align-items:center;gap:10px;margin:14px 0 4px;flex-wrap:wrap}
+.mnav .mlang{display:inline-flex;flex-wrap:nowrap;border:1px solid rgba(var(--ink-rgb),.16);
+  border-radius:999px;overflow:hidden;height:34px;background:var(--paper)}
+.mnav .mlang button{border:0;background:transparent;color:var(--ink);font:inherit;font-size:.78rem;
+  font-weight:700;letter-spacing:.02em;padding:0 12px;height:100%;cursor:pointer}
+.mnav .mlang button.on{background:var(--green);color:var(--on-green)}
+.mnav .mtheme{display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 14px;
+  border:1px solid rgba(var(--ink-rgb),.16);border-radius:999px;background:var(--paper);
+  color:var(--ink);font:inherit;font-size:.78rem;font-weight:700;cursor:pointer}
+.mnav .mtheme span:first-child{font-size:.95rem;line-height:1}
+
+
+
+/* Шапка обязана выглядеть одинаково на сайте и в кабинете. Здесь заданы все
+   размеры и цвета явно — локальные правила страниц наследовали случайные
+   значения (padding от чипа-метки, цвет от кнопки), и шапки расходились. */
+.header .logo{color:var(--ink);line-height:1.2}
+.header .logo .chip{padding:0;margin:0;display:flex;align-items:center;justify-content:center;
+  background:var(--green);flex:none}
+.header .logo .chip img{width:24px;height:auto;display:block}
+.header .lname{line-height:1.5;font-size:.98rem;font-weight:800;letter-spacing:-.01em}
+.header .themebtn{padding:0;width:34px;height:34px;display:inline-flex;align-items:center;
+  justify-content:center;font-size:.95rem;border-radius:11px}
+.header .burger{font-size:16px;color:var(--ink);padding:0}
+:root[data-theme="dark"] .header .logo,:root[data-theme="dark"] .header .lname,
+:root:not([data-theme="light"]) .header .logo,:root:not([data-theme="light"]) .header .lname{color:#F4F6EA}
+:root[data-theme="light"] .header .logo,:root[data-theme="light"] .header .lname{color:var(--ink)}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]) .header .logo,:root:not([data-theme="dark"]) .header .lname{color:var(--ink)}
+}
+.header .logo .lname>span{color:var(--olive)}
+
+/* внутри значка только картинка — цвет текста делаем нейтральным,
+   иначе он наследуется по-разному и шапки формально расходятся */
+.header .logo .chip{color:transparent!important}
+/* половинки тумблера одинаковой ширины: иначе жирная подсветка текущего места
+   двигает всю шапку на пару пикселей и сайт с кабинетом «не совпадают» */
+.header .swch{width:164px;box-sizing:border-box}
+.header .swch>a,.header .swch>b{flex:1 1 0;min-width:0;text-align:center}
+
+/* мобильное меню: язык и оформление стоят рядом, кнопка не растягивается
+   на всю ширину, как остальные пункты меню */
+.mnav .mtools .mtheme,.mnav .mtools .mlang{width:auto;flex:0 0 auto}
+/* На телефоне язык и оформление живут только в бургере — правило идёт
+   последним, иначе размеры шапки его перебивают. */
+@media(max-width:600px){
+  .header .lang,.header .themebtn{display:none!important}
+}

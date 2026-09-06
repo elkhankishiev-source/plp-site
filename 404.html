@@ -36,6 +36,21 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <style>
 html{background:var(--bg);overscroll-behavior-y:none}
+/* PLP:ANTIFLICKER */
+/* Мигание фона на телефоне — сводная защита. Эльнур 06.09: «фон в мобильной
+   версии везде мигает, ищи по всем страницам». Три источника:
+   1) размытие фона (backdrop-filter) под липкими элементами — браузер
+      перерисовывает весь экран на каждом кадре прокрутки;
+   2) долгое проявление блоков при прокрутке;
+   3) отложенные картинки без фона — на их месте на миг светится подложка. */
+@media(max-width:900px){
+  .header,#toTop,.badge,.pm-tag,.car .tag,.btn-glass,.hero-float,.fbtn,.chipf,
+  .modal-overlay,.mnav,.sheet,.pm-card,.toolbox{
+    backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+  .reveal{transition-duration:.35s!important}
+}
+.pic-photo,.thumb-photo,.prgs img,.simi-c i,.pm-img img{background-color:var(--warm,#EFEEE7)}
+/* PLP:ANTIFLICKER */
 :root{--ink:#2b2b26;--muted:#6b6b63;--bg:#faf9f5;--line:#e7e5dc;--accent:#D2D5B3}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);
@@ -57,6 +72,7 @@ h2{font-size:13px;letter-spacing:.05em;text-transform:uppercase;color:var(--mute
 .links a{color:var(--ink);text-decoration:none;border-bottom:1px solid rgba(0,0,0,.16);font-size:15px}
 footer{border-top:1px solid var(--line);padding:20px 0;color:var(--muted);font-size:14px}
 footer a{color:var(--ink)}
+
 </style>
 </head>
 <body>
@@ -69,21 +85,21 @@ footer a{color:var(--ink)}
   <p class="sub">Ссылка устарела или в адресе опечатка. Ничего страшного — вот куда стоит заглянуть.</p>
 
   <div class="btns">
-    <a class="btn main" href="/buy.html">Каталог на продажу</a>
-    <a class="btn" href="/rent.html">Аренда</a>
+    <a class="btn main" href="/buy">Каталог на продажу</a>
+    <a class="btn" href="/rent">Аренда</a>
     <a class="btn" href="https://wa.me/66955492587" rel="noopener" target="_blank">Спросить в WhatsApp</a>
   </div>
 
   <h2>Районы Пхукета</h2>
   <ul class="links">
-    <li><a href="/districts/bang-tao.html">Банг Тао</a></li>
-    <li><a href="/districts/layan.html">Лаян</a></li>
-    <li><a href="/districts/surin.html">Сурин</a></li>
-    <li><a href="/districts/kamala.html">Камала</a></li>
-    <li><a href="/districts/rawai.html">Равай</a></li>
-    <li><a href="/districts/kata.html">Ката</a></li>
-    <li><a href="/districts/nai-yang.html">Най Янг</a></li>
-    <li><a href="/districts/koh-kaew.html">Ко Кео</a></li>
+    <li><a href="/districts/bang-tao">Банг Тао</a></li>
+    <li><a href="/districts/layan">Лаян</a></li>
+    <li><a href="/districts/surin">Сурин</a></li>
+    <li><a href="/districts/kamala">Камала</a></li>
+    <li><a href="/districts/rawai">Равай</a></li>
+    <li><a href="/districts/kata">Ката</a></li>
+    <li><a href="/districts/nai-yang">Най Янг</a></li>
+    <li><a href="/districts/koh-kaew">Ко Кео</a></li>
   </ul>
 </div></main>
 

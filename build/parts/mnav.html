@@ -7,9 +7,16 @@
     <a href="management.html">Управление</a>
     <a href="add-property.html">Разместить объект</a>
     <a href="#about" onclick="toggleNav(false)" data-i18n="nav.about">О нас</a>
-    <div class="mlang">
-      <button type="button" data-l="ru" class="on" onclick="setLang('ru')">RU</button>
-      <button type="button" data-l="en" onclick="setLang('en')">EN</button>
+    <!-- Эльнур 06.09: язык и оформление на телефоне живут здесь, одинаково
+         на сайте и в кабинете. В шапке их на узком экране нет. -->
+    <div class="mtools">
+      <div class="mlang" role="group" aria-label="Язык">
+        <button type="button" data-l="ru" class="on" onclick="setLang('ru')">RU</button>
+        <button type="button" data-l="en" onclick="setLang('en')">EN</button>
+      </div>
+      <button type="button" class="mtheme" onclick="cycleTheme()" aria-label="Оформление">
+        <span id="mThemeIco">◐</span><span data-i18n="nav.theme">Оформление</span>
+      </button>
     </div>
     <!--MNAV-LINK-->
     <button type="button" class="mwa" onclick="toggleNav(false);openChat('hi')" data-i18n="nav.chat">Чат с консультантом</button>
