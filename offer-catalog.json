@@ -341,6 +341,14 @@
    ]
   },
   {
+   "id": "PLP-MANOR",
+   "name": "Manor",
+   "district": "Банг Тао",
+   "type": "Вилла",
+   "price_from": 26900000,
+   "units": []
+  },
+  {
    "id": "PLP-MODEVA",
    "name": "The Modeva Bang-Tao",
    "district": "Банг Тао",
