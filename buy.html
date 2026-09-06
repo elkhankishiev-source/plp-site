@@ -1857,7 +1857,7 @@ ru: {
   "u.wa":"Написать в WhatsApp","wa.hi":"Здравствуйте! Интересует объект:","wa.hi2":"Здравствуйте! Хочу подобрать объект на Пхукете.","wa.price":"Цена на сайте:","wa.dates":"Даты:","wa.link":"Ссылка:","wa.seen":"Смотрел на сайте:",
   "nav.pick":"Подобрать объект","f.any":"Любая цена","f.reset":"сбросить","u.upto":"до","map.list":"Объекты на карте","zone.budget":"Ваш бюджет","zone.all":"все районы","u.units":"Что можно купить","u.similar":"Похожие объекты","u.allphotos":"Все","u.progress":"Ход строительства","u.progressAll":"общая готовность по данным застройщика","stay.wait":"Считаем…","stay.nights":"ночей","stay.pernight":" за ночь","stay.off":"скидка за срок","stay.none":"Цена на эти даты — по запросу. Оставьте заявку, ответим точной суммой в течение дня.",
   "assist.lab":"Консультант","assist.h2":"Не уверены, что подходит именно вам?","assist.p":"Спросите Дарью прямо здесь, в чате на сайте. Она знает базу, считает доходность и сравнивает районы — отвечает сразу, в любое время. Что-то сложное передаст менеджеру.","assist.cta":"Задать вопрос в чате","assist.wa":"Подобрать за 10 минут","assist.q1s":"Что купить на 5 млн ฿?","assist.q1":"Что можно купить на 5 млн ฿?","assist.q2s":"Где выше доходность?","assist.q2":"В каком районе выше доходность аренды?","assist.q3s":"Чем Банг Тао лучше Раваи?","assist.q3":"Чем Банг Тао лучше Раваи для инвестиций?","assist.q4s":"Сколько выйдет с налогами?","assist.q4":"Какие расходы при покупке кроме цены объекта?",
-  "u.from":"от","u.onreq":"цена по запросу","u.calc":"Рассчитать доходность","u.cmp":"Сравнить","u.cmpOn":"В сравнении",
+  "u.from":"от","u.onreq":"цена по запросу","u.night":"за ночь","u.month":"в месяц","rent.f.budget":"Бюджет","rent.minnights":"от {n} ночей","rent.noprice":"цена по запросу","u.calc":"Рассчитать доходность","u.cmp":"Сравнить","u.cmpOn":"В сравнении",
   "u.roinote":"Ориентировочно; потенциал зависит от объекта, стратегии и управления — рассчитаем индивидуально",
   "u.view":"Записаться на показ","u.podborka":"Получить подборку","u.kp":"Получить КП",
   "u.share":"Поделиться","u.copied":"Ссылка скопирована","u.copyfail":"Не удалось скопировать — ссылка в адресной строке",
@@ -2042,7 +2042,7 @@ en: {
   "u.wa":"Message on WhatsApp","wa.hi":"Hello! I am interested in:","wa.hi2":"Hello! I would like help choosing a property in Phuket.","wa.price":"Price on the site:","wa.dates":"Dates:","wa.link":"Link:","wa.seen":"Viewed on the site:",
   "nav.pick":"Find me a property","f.any":"Any price","f.reset":"reset","u.upto":"up to","map.list":"Properties on the map","zone.budget":"Your budget","zone.all":"all areas","u.units":"What you can buy","u.similar":"Similar properties","u.allphotos":"All","u.progress":"Construction progress","u.progressAll":"overall readiness per the developer","stay.wait":"Calculating…","stay.nights":"nights","stay.pernight":" per night","stay.off":"length-of-stay discount","stay.none":"Price for these dates is on request. Leave a request and we will come back with the exact figure the same day.",
   "assist.lab":"Assistant","assist.h2":"Not sure what suits you?","assist.p":"Ask Daria right here, in the chat on this page. She knows the catalogue, works out the yield and compares districts — answers straight away, any time. Anything complex goes to a manager.","assist.cta":"Ask in the chat","assist.wa":"Find me a match in 10 minutes","assist.q1s":"What can I get for ฿5M?","assist.q1":"What can I buy for ฿5 million?","assist.q2s":"Where is the yield higher?","assist.q2":"Which district has the higher rental yield?","assist.q3s":"Bang Tao or Rawai?","assist.q3":"Why is Bang Tao better than Rawai for investment?","assist.q4s":"What about taxes?","assist.q4":"What costs come on top of the price?",
-  "u.from":"from","u.onreq":"price on request","u.calc":"Calculate the yield","u.cmp":"Compare","u.cmpOn":"Comparing",
+  "u.from":"from","u.onreq":"price on request","u.night":"per night","u.month":"per month","rent.f.budget":"Budget","rent.minnights":"from {n} nights","rent.noprice":"price on request","u.calc":"Calculate the yield","u.cmp":"Compare","u.cmpOn":"Comparing",
   "u.roinote":"Indicative; potential depends on the unit, strategy and management — we calculate it individually",
   "u.view":"Book a viewing","u.podborka":"Get a shortlist","u.kp":"Get the offer",
   "u.share":"Share","u.copied":"Link copied","u.copyfail":"Couldn't copy — link is in the address bar",
@@ -2167,11 +2167,11 @@ PL.PROPERTIES=[
 /* ===== RENT CATALOG (реальные объекты; цены не публикуем) ===== */
 /* PLP:AUTO-RENTALS:START — сгенерировано build/gen.mjs из Supabase (объекты аренды); вручную не править (grad сохраняется между прогонами) */
 PL.RENTALS=[
-  {"property_id":"PLP-ESTELLA-A24","title":"Villa Estella","funnel":"rent","grad":"g1","loc":{"ru":"Най Янг","en":"Nai Yang"},"type":{"ru":"Вилла","en":"Villa"},"beds":"3","bmin":3,"bmax":3,"area":"265 м²","tag":{"ru":"","en":""},"desc":{"ru":"Вилла в Най Янге — тихий север острова рядом с нацпарком. Условия и стоимость по запросу.","en":"Villa at Villa Estella, Nai Yang — the quiet north of the island by the national park. Terms and price on request."},"lat":8.08336,"lng":98.2998,"coordOk":true,"min_stay":null,"deposit":null,"amenities":"","beach_m":null,"included":"Обслуживание объекта управляющей компанией: уборка, инженерные системы, порядок на территории. Бассейн и территория комплекса, парковка. Подача уведомления TM30 в иммиграционное бюро за арендатора.","excluded":"Электричество, вода и интернет — при длительной аренде оплачиваются арендатором напрямую поставщикам по счётчикам. Уборка сверх графика, трансфер, страхование личного имущества.","rules":"Длительная аренда: депозит — три месяца аренды, вносится до заселения; аренда — ежемесячно не позднее пятого числа. Показания счётчиков и отчёт управляющая компания передаёт раз в месяц. Режим тишины 22:00–08:00, правила комплекса имеют приоритет. Курение в помещениях запрещено, животные и субаренда — только по письменному согласованию. Ремонт для поддержания объекта — за счёт собственника; о поломке сообщите менеджеру, аварии вне очереди. Депозит возвращается после осмотра за вычетом подтверждённых удержаний, каждое подтверждаем фото или актом. Время заезда и выезда и точные условия закрепляет договор аренды — он имеет приоритет. Полные правила: property-library.com/rules.html","photo":"https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-ESTELLA/01.jpg","photos":["https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-ESTELLA/01.jpg","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-ESTELLA/02.jpg","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-ESTELLA/03.jpg","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-ESTELLA/04.jpg"],"groups":[{"key":"exterior","name":"Виллы комплекса","urls":["https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-ESTELLA/01.jpg","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-ESTELLA/02.jpg","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-ESTELLA/03.jpg","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-ESTELLA/04.jpg"]}],"units":null},
-  {"property_id":"PLP-LEGENDARY-RENT","title":"The Title Legendary","funnel":"rent","grad":"g2","loc":{"ru":"Банг Тао","en":"Bang Tao"},"type":{"ru":"Кондо","en":"Condo"},"beds":"Studio–2","bmin":0,"bmax":2,"area":"31–94 м²","tag":{"ru":"","en":""},"desc":{"ru":"Аренда в комплексе «The Title Legendary Bang-Tao», Bang Tao. Условия и точная стоимость — по запросу.","en":"Rental at \"The Title Legendary Bang-Tao\", Bang Tao. Terms and exact price on request."},"lat":7.99155,"lng":98.29787,"coordOk":true,"min_stay":null,"deposit":null,"amenities":"","beach_m":null,"included":"Обслуживание объекта управляющей компанией: уборка, инженерные системы, порядок на территории. Бассейн и территория комплекса, парковка. Подача уведомления TM30 в иммиграционное бюро за арендатора.","excluded":"Электричество, вода и интернет — при длительной аренде оплачиваются арендатором напрямую поставщикам по счётчикам. Уборка сверх графика, трансфер, страхование личного имущества.","rules":"Длительная аренда: депозит — три месяца аренды, вносится до заселения; аренда — ежемесячно не позднее пятого числа. Показания счётчиков и отчёт управляющая компания передаёт раз в месяц. Режим тишины 22:00–08:00, правила комплекса имеют приоритет. Курение в помещениях запрещено, животные и субаренда — только по письменному согласованию. Ремонт для поддержания объекта — за счёт собственника; о поломке сообщите менеджеру, аварии вне очереди. Депозит возвращается после осмотра за вычетом подтверждённых удержаний, каждое подтверждаем фото или актом. Время заезда и выезда и точные условия закрепляет договор аренды — он имеет приоритет. Полные правила: property-library.com/rules.html","photo":"https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-LEGENDARY/01.jpg","photos":["https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-LEGENDARY/01.jpg","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-LEGENDARY/02.jpg","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-LEGENDARY/03.jpg","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-LEGENDARY/04.jpg"],"groups":[{"key":"exterior","name":"Территория комплекса","urls":["https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-LEGENDARY/01.jpg","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-LEGENDARY/02.jpg"]},{"key":"facilities","name":"Инфраструктура комплекса","urls":["https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-LEGENDARY/03.jpg","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-LEGENDARY/04.jpg"]}],"units":null},
-  {"property_id":"PLP-MANOR-S14","title":"Manor","funnel":"rent","grad":"g3","loc":{"ru":"Таланг","en":"Thalang"},"type":{"ru":"Вилла","en":"Villa"},"beds":"1–3","bmin":1,"bmax":3,"area":"","tag":{"ru":"","en":""},"desc":{"ru":"Вилла Manor S14 в Таланге — под управлением Property Library: заселение гостей, обслуживание, отчёт собственнику. Условия и стоимость по запросу.","en":"Apartment at Manor residence, Thalang — managed by Property Library. Terms and price on request."},"lat":null,"lng":null,"coordOk":false,"min_stay":null,"deposit":null,"amenities":"","beach_m":null,"included":"Обслуживание объекта управляющей компанией: уборка, инженерные системы, порядок на территории. Бассейн и территория комплекса, парковка. Подача уведомления TM30 в иммиграционное бюро за арендатора.","excluded":"Электричество, вода и интернет — при длительной аренде оплачиваются арендатором напрямую поставщикам по счётчикам. Уборка сверх графика, трансфер, страхование личного имущества.","rules":"Длительная аренда: депозит — три месяца аренды, вносится до заселения; аренда — ежемесячно не позднее пятого числа. Показания счётчиков и отчёт управляющая компания передаёт раз в месяц. Режим тишины 22:00–08:00, правила комплекса имеют приоритет. Курение в помещениях запрещено, животные и субаренда — только по письменному согласованию. Ремонт для поддержания объекта — за счёт собственника; о поломке сообщите менеджеру, аварии вне очереди. Депозит возвращается после осмотра за вычетом подтверждённых удержаний, каждое подтверждаем фото или актом. Время заезда и выезда и точные условия закрепляет договор аренды — он имеет приоритет. Полные правила: property-library.com/rules.html","photo":null,"photos":null,"groups":null,"units":null},
-  {"property_id":"PLP-MODEVA-RENT","title":"The Modeva","funnel":"rent","grad":"g1","loc":{"ru":"Банг Тао","en":"Bang Tao"},"type":{"ru":"Кондо","en":"Condo"},"beds":"1–3","bmin":1,"bmax":3,"area":"29–148 м²","tag":{"ru":"","en":""},"desc":{"ru":"Аренда в комплексе «The Modeva Bang-Tao», Bang Tao. Условия и точная стоимость — по запросу.","en":"Rental at \"The Modeva Bang-Tao\", Bang Tao. Terms and exact price on request."},"lat":7.99113,"lng":98.29633,"coordOk":true,"min_stay":null,"deposit":null,"amenities":"","beach_m":null,"included":"Обслуживание объекта управляющей компанией: уборка, инженерные системы, порядок на территории. Бассейн и территория комплекса, парковка. Подача уведомления TM30 в иммиграционное бюро за арендатора.","excluded":"Электричество, вода и интернет — при длительной аренде оплачиваются арендатором напрямую поставщикам по счётчикам. Уборка сверх графика, трансфер, страхование личного имущества.","rules":"Длительная аренда: депозит — три месяца аренды, вносится до заселения; аренда — ежемесячно не позднее пятого числа. Показания счётчиков и отчёт управляющая компания передаёт раз в месяц. Режим тишины 22:00–08:00, правила комплекса имеют приоритет. Курение в помещениях запрещено, животные и субаренда — только по письменному согласованию. Ремонт для поддержания объекта — за счёт собственника; о поломке сообщите менеджеру, аварии вне очереди. Депозит возвращается после осмотра за вычетом подтверждённых удержаний, каждое подтверждаем фото или актом. Время заезда и выезда и точные условия закрепляет договор аренды — он имеет приоритет. Полные правила: property-library.com/rules.html","photo":"https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-MODEVA/01.jpg","photos":["https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-MODEVA/01.jpg","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-MODEVA/02.jpg","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-MODEVA/03.jpg","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-MODEVA/04.jpg"],"groups":[{"key":"showroom","name":"Шоу-юниты комплекса","urls":["https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-MODEVA/01.jpg","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-MODEVA/02.jpg","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-MODEVA/03.jpg"]}],"units":null},
-  {"property_id":"PLP-QABALAH","title":"Villa Qabalah","funnel":"rent","grad":"g2","loc":{"ru":"Банг Тао","en":"Bang Tao"},"type":{"ru":"Вилла","en":"Villa"},"beds":"1–3","bmin":1,"bmax":3,"area":"","tag":{"ru":"","en":""},"desc":{"ru":"Вилла Qabalah в Банг Тао — главный арендный район острова. Условия и стоимость по запросу.","en":"Villa Qabalah in Bang Tao — the island's main rental district. Terms and price on request."},"lat":7.99761,"lng":98.32731,"coordOk":true,"min_stay":null,"deposit":null,"amenities":"Приватный бассейн, rooftop garden, устойчивый дизайн (3 типа: Moss 2BR, Fern 3BR, Pine 4BR)","beach_m":null,"included":"Обслуживание объекта управляющей компанией: уборка, инженерные системы, порядок на территории. Бассейн и территория комплекса, парковка. Подача уведомления TM30 в иммиграционное бюро за арендатора.","excluded":"Электричество, вода и интернет — при длительной аренде оплачиваются арендатором напрямую поставщикам по счётчикам. Уборка сверх графика, трансфер, страхование личного имущества.","rules":"Длительная аренда: депозит — три месяца аренды, вносится до заселения; аренда — ежемесячно не позднее пятого числа. Показания счётчиков и отчёт управляющая компания передаёт раз в месяц. Режим тишины 22:00–08:00, правила комплекса имеют приоритет. Курение в помещениях запрещено, животные и субаренда — только по письменному согласованию. Ремонт для поддержания объекта — за счёт собственника; о поломке сообщите менеджеру, аварии вне очереди. Депозит возвращается после осмотра за вычетом подтверждённых удержаний, каждое подтверждаем фото или актом. Время заезда и выезда и точные условия закрепляет договор аренды — он имеет приоритет. Полные правила: property-library.com/rules.html","photo":null,"photos":null,"groups":null,"units":null}
+  {"property_id":"PLP-ESTELLA-A24","title":"Villa Estella","funnel":"rent","grad":"g1","loc":{"ru":"Най Янг","en":"Nai Yang"},"type":{"ru":"Вилла","en":"Villa"},"beds":"3","bmin":3,"bmax":3,"area":"265 м²","tag":{"ru":"","en":""},"desc":{"ru":"Вилла в Най Янге — тихий север острова рядом с нацпарком. Условия и стоимость по запросу.","en":"Villa at Villa Estella, Nai Yang — the quiet north of the island by the national park. Terms and price on request."},"lat":8.08336,"lng":98.2998,"coordOk":true,"min_stay":null,"deposit":null,"amenities":"","beach_m":null,"included":"Обслуживание объекта управляющей компанией: уборка, инженерные системы, порядок на территории. Бассейн и территория комплекса, парковка. Подача уведомления TM30 в иммиграционное бюро за арендатора.","excluded":"Электричество, вода и интернет — при длительной аренде оплачиваются арендатором напрямую поставщикам по счётчикам. Уборка сверх графика, трансфер, страхование личного имущества.","rules":"Длительная аренда: депозит — три месяца аренды, вносится до заселения; аренда — ежемесячно не позднее пятого числа. Показания счётчиков и отчёт управляющая компания передаёт раз в месяц. Режим тишины 22:00–08:00, правила комплекса имеют приоритет. Курение в помещениях запрещено, животные и субаренда — только по письменному согласованию. Ремонт для поддержания объекта — за счёт собственника; о поломке сообщите менеджеру, аварии вне очереди. Депозит возвращается после осмотра за вычетом подтверждённых удержаний, каждое подтверждаем фото или актом. Время заезда и выезда и точные условия закрепляет договор аренды — он имеет приоритет. Полные правила: property-library.com/rules.html","photo":"https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-ESTELLA/01.jpg","photos":["https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-ESTELLA/01.jpg","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-ESTELLA/02.jpg","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-ESTELLA/03.jpg","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-ESTELLA/04.jpg"],"groups":[{"key":"exterior","name":"Виллы комплекса","urls":["https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-ESTELLA/01.jpg","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-ESTELLA/02.jpg","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-ESTELLA/03.jpg","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-ESTELLA/04.jpg"]}],"units":null,"night":null,"nightMax":null,"month":100000,"monthMax":180000,"rateSrc":"owner","minNights":null},
+  {"property_id":"PLP-LEGENDARY-RENT","title":"The Title Legendary","funnel":"rent","grad":"g2","loc":{"ru":"Банг Тао","en":"Bang Tao"},"type":{"ru":"Кондо","en":"Condo"},"beds":"Studio–2","bmin":0,"bmax":2,"area":"31–94 м²","tag":{"ru":"","en":""},"desc":{"ru":"Аренда в комплексе «The Title Legendary Bang-Tao», Bang Tao. Условия и точная стоимость — по запросу.","en":"Rental at \"The Title Legendary Bang-Tao\", Bang Tao. Terms and exact price on request."},"lat":7.99155,"lng":98.29787,"coordOk":true,"min_stay":null,"deposit":null,"amenities":"","beach_m":null,"included":"Обслуживание объекта управляющей компанией: уборка, инженерные системы, порядок на территории. Бассейн и территория комплекса, парковка. Подача уведомления TM30 в иммиграционное бюро за арендатора.","excluded":"Электричество, вода и интернет — при длительной аренде оплачиваются арендатором напрямую поставщикам по счётчикам. Уборка сверх графика, трансфер, страхование личного имущества.","rules":"Длительная аренда: депозит — три месяца аренды, вносится до заселения; аренда — ежемесячно не позднее пятого числа. Показания счётчиков и отчёт управляющая компания передаёт раз в месяц. Режим тишины 22:00–08:00, правила комплекса имеют приоритет. Курение в помещениях запрещено, животные и субаренда — только по письменному согласованию. Ремонт для поддержания объекта — за счёт собственника; о поломке сообщите менеджеру, аварии вне очереди. Депозит возвращается после осмотра за вычетом подтверждённых удержаний, каждое подтверждаем фото или актом. Время заезда и выезда и точные условия закрепляет договор аренды — он имеет приоритет. Полные правила: property-library.com/rules.html","photo":"https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-LEGENDARY/01.jpg","photos":["https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-LEGENDARY/01.jpg","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-LEGENDARY/02.jpg","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-LEGENDARY/03.jpg","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-LEGENDARY/04.jpg"],"groups":[{"key":"exterior","name":"Территория комплекса","urls":["https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-LEGENDARY/01.jpg","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-LEGENDARY/02.jpg"]},{"key":"facilities","name":"Инфраструктура комплекса","urls":["https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-LEGENDARY/03.jpg","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-LEGENDARY/04.jpg"]}],"units":null,"night":null,"nightMax":null,"month":null,"monthMax":null,"rateSrc":null,"minNights":null},
+  {"property_id":"PLP-MANOR-S14","title":"Manor","funnel":"rent","grad":"g3","loc":{"ru":"Таланг","en":"Thalang"},"type":{"ru":"Вилла","en":"Villa"},"beds":"1–3","bmin":1,"bmax":3,"area":"","tag":{"ru":"","en":""},"desc":{"ru":"Вилла Manor S14 в Таланге — под управлением Property Library: заселение гостей, обслуживание, отчёт собственнику. Условия и стоимость по запросу.","en":"Apartment at Manor residence, Thalang — managed by Property Library. Terms and price on request."},"lat":null,"lng":null,"coordOk":false,"min_stay":null,"deposit":null,"amenities":"","beach_m":null,"included":"Обслуживание объекта управляющей компанией: уборка, инженерные системы, порядок на территории. Бассейн и территория комплекса, парковка. Подача уведомления TM30 в иммиграционное бюро за арендатора.","excluded":"Электричество, вода и интернет — при длительной аренде оплачиваются арендатором напрямую поставщикам по счётчикам. Уборка сверх графика, трансфер, страхование личного имущества.","rules":"Длительная аренда: депозит — три месяца аренды, вносится до заселения; аренда — ежемесячно не позднее пятого числа. Показания счётчиков и отчёт управляющая компания передаёт раз в месяц. Режим тишины 22:00–08:00, правила комплекса имеют приоритет. Курение в помещениях запрещено, животные и субаренда — только по письменному согласованию. Ремонт для поддержания объекта — за счёт собственника; о поломке сообщите менеджеру, аварии вне очереди. Депозит возвращается после осмотра за вычетом подтверждённых удержаний, каждое подтверждаем фото или актом. Время заезда и выезда и точные условия закрепляет договор аренды — он имеет приоритет. Полные правила: property-library.com/rules.html","photo":null,"photos":null,"groups":null,"units":null,"night":12000,"nightMax":28000,"month":null,"monthMax":null,"rateSrc":"uk","minNights":3},
+  {"property_id":"PLP-MODEVA-RENT","title":"The Modeva","funnel":"rent","grad":"g1","loc":{"ru":"Банг Тао","en":"Bang Tao"},"type":{"ru":"Кондо","en":"Condo"},"beds":"1–3","bmin":1,"bmax":3,"area":"29–148 м²","tag":{"ru":"","en":""},"desc":{"ru":"Аренда в комплексе «The Modeva Bang-Tao», Bang Tao. Условия и точная стоимость — по запросу.","en":"Rental at \"The Modeva Bang-Tao\", Bang Tao. Terms and exact price on request."},"lat":7.99113,"lng":98.29633,"coordOk":true,"min_stay":null,"deposit":null,"amenities":"","beach_m":null,"included":"Обслуживание объекта управляющей компанией: уборка, инженерные системы, порядок на территории. Бассейн и территория комплекса, парковка. Подача уведомления TM30 в иммиграционное бюро за арендатора.","excluded":"Электричество, вода и интернет — при длительной аренде оплачиваются арендатором напрямую поставщикам по счётчикам. Уборка сверх графика, трансфер, страхование личного имущества.","rules":"Длительная аренда: депозит — три месяца аренды, вносится до заселения; аренда — ежемесячно не позднее пятого числа. Показания счётчиков и отчёт управляющая компания передаёт раз в месяц. Режим тишины 22:00–08:00, правила комплекса имеют приоритет. Курение в помещениях запрещено, животные и субаренда — только по письменному согласованию. Ремонт для поддержания объекта — за счёт собственника; о поломке сообщите менеджеру, аварии вне очереди. Депозит возвращается после осмотра за вычетом подтверждённых удержаний, каждое подтверждаем фото или актом. Время заезда и выезда и точные условия закрепляет договор аренды — он имеет приоритет. Полные правила: property-library.com/rules.html","photo":"https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-MODEVA/01.jpg","photos":["https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-MODEVA/01.jpg","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-MODEVA/02.jpg","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-MODEVA/03.jpg","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-MODEVA/04.jpg"],"groups":[{"key":"showroom","name":"Шоу-юниты комплекса","urls":["https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-MODEVA/01.jpg","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-MODEVA/02.jpg","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-MODEVA/03.jpg"]}],"units":null,"night":null,"nightMax":null,"month":null,"monthMax":null,"rateSrc":null,"minNights":null},
+  {"property_id":"PLP-QABALAH","title":"Villa Qabalah","funnel":"rent","grad":"g2","loc":{"ru":"Банг Тао","en":"Bang Tao"},"type":{"ru":"Вилла","en":"Villa"},"beds":"1–3","bmin":1,"bmax":3,"area":"","tag":{"ru":"","en":""},"desc":{"ru":"Вилла Qabalah в Банг Тао — главный арендный район острова. Условия и стоимость по запросу.","en":"Villa Qabalah in Bang Tao — the island's main rental district. Terms and price on request."},"lat":7.99761,"lng":98.32731,"coordOk":true,"min_stay":null,"deposit":null,"amenities":"Приватный бассейн, rooftop garden, устойчивый дизайн (3 типа: Moss 2BR, Fern 3BR, Pine 4BR)","beach_m":null,"included":"Обслуживание объекта управляющей компанией: уборка, инженерные системы, порядок на территории. Бассейн и территория комплекса, парковка. Подача уведомления TM30 в иммиграционное бюро за арендатора.","excluded":"Электричество, вода и интернет — при длительной аренде оплачиваются арендатором напрямую поставщикам по счётчикам. Уборка сверх графика, трансфер, страхование личного имущества.","rules":"Длительная аренда: депозит — три месяца аренды, вносится до заселения; аренда — ежемесячно не позднее пятого числа. Показания счётчиков и отчёт управляющая компания передаёт раз в месяц. Режим тишины 22:00–08:00, правила комплекса имеют приоритет. Курение в помещениях запрещено, животные и субаренда — только по письменному согласованию. Ремонт для поддержания объекта — за счёт собственника; о поломке сообщите менеджеру, аварии вне очереди. Депозит возвращается после осмотра за вычетом подтверждённых удержаний, каждое подтверждаем фото или актом. Время заезда и выезда и точные условия закрепляет договор аренды — он имеет приоритет. Полные правила: property-library.com/rules.html","photo":null,"photos":null,"groups":null,"units":null,"night":null,"nightMax":null,"month":null,"monthMax":null,"rateSrc":null,"minNights":null}
 ];
 /* PLP:AUTO-RENTALS:END */
 
@@ -2726,6 +2726,43 @@ function renderSale(){
 }
 
 /* ===== RENT RENDER ===== */
+/* Ставки аренды: ночная и помесячная — разные рынки, друг из друга не считаются.
+   Показываем то, что есть в базе; чего нет — «цена по запросу» (не выдумываем). */
+var rentPriceRange=null, rentUnit='night';
+function rentRate(p,u){ var v=(u==='month')?p.month:p.night; return (typeof v==='number'&&v>0)?v:null; }
+function rentRateTop(p,u){
+  var v=(u==='month')?p.monthMax:p.nightMax, lo=rentRate(p,u);
+  return (typeof v==='number'&&v>0)?v:lo;      /* нет верхней — берём нижнюю */
+}
+function rentHasRate(p){ return !!(rentRate(p,'night')||rentRate(p,'month')); }
+function rentPriceHTML(p){
+  var n=rentRate(p,'night'), m=rentRate(p,'month');
+  if(!n && !m) return '<span>'+t('u.onreq')+'</span>';
+  var nTop=rentRateTop(p,'night'), mTop=rentRateTop(p,'month');
+  var main = n
+    ? ((nTop && nTop>n ? fmtBaht(n)+' — '+fmtBaht(nTop) : t('u.from')+' '+fmtBaht(n))+
+       ' <small>'+t('u.night')+'</small>')
+    : ((mTop && mTop>m ? fmtBaht(m)+' — '+fmtBaht(mTop) : t('u.from')+' '+fmtBaht(m))+
+       ' <small>'+t('u.month')+'</small>');
+  var extra = (n && m)
+    ? ('<span class="pdate">'+(mTop && mTop>m ? fmtBaht(m)+' — '+fmtBaht(mTop) : t('u.from')+' '+fmtBaht(m))+
+       ' '+t('u.month')+'</span>')
+    : '';
+  if(!extra && p.minNights) extra='<span class="pdate">'+t('rent.minnights').replace('{n}',p.minNights)+'</span>';
+  return main+extra;
+}
+/* та же цена одной строкой — для окна объекта, чата, сравнения и списков карты:
+   единая система, цену показываем везде одинаково */
+function rentPriceShort(p){
+  var n=rentRate(p,'night'), m=rentRate(p,'month');
+  if(!n && !m) return t('u.onreq');
+  var nT=rentRateTop(p,'night'), mT=rentRateTop(p,'month');
+  if(n) return (nT&&nT>n ? fmtBaht(n)+'—'+fmtBaht(nT) : t('u.from')+' '+fmtBaht(n))+' '+t('u.night');
+  return (mT&&mT>m ? fmtBaht(m)+'—'+fmtBaht(mT) : t('u.from')+' '+fmtBaht(m))+' '+t('u.month');
+}
+function rentUnitAvailable(u){
+  return (PL.RENTALS||[]).filter(function(p){ return rentRate(p,u); }).length;
+}
 function renderRent(){
   var car=document.getElementById('rentCar');if(!car)return;
   car.innerHTML=PL.RENTALS.map(function(p){
@@ -2745,9 +2782,9 @@ function renderRent(){
       '<button type="button" class="cmpb" onclick="event.stopPropagation();toggleCmp(\''+p.property_id+'\')">'+t('u.cmp')+'</button></div>'+
       '<div class="body"><div class="trow"><h3>'+p.title+'</h3></div>'+
       '<p class="desc">'+loc(p.desc)+'</p>'+
-      '<div class="price"><span>'+t('u.onreq')+'</span></div>'+
+      '<div class="price">'+rentPriceHTML(p)+'</div>'+
       '<div class="meta"><span>🛏 '+p.beds+'</span><span>◫ '+areaOf(p)+'</span><span>'+loc(p.type)+'</span></div>'+
-      '<span class="amwarn">'+t('rent.am.soft')+'</span>'+
+      '<span class="amwarn"></span>'+
       '</div></div>';
   }).join('');
   buildRentChips();applyRentFilters();finishRentFilters();
@@ -3162,7 +3199,7 @@ function aiCards(ids){
   if(!items.length)return;
   var w=document.createElement('div');w.className='msg bot chat-cards';
   w.innerHTML=items.map(function(p){
-    var price=p.funnel==='sale'?(fmtBaht(thbOf(p))+(p.roi?(' · ROI '+roiRange(p)):'')):t('u.onreq');
+    var price=p.funnel==='sale'?(fmtBaht(thbOf(p))+(p.roi?(' · ROI '+roiRange(p)):'')):rentPriceShort(p);
     return '<button type="button" class="cc" onclick="closeChatToProp(\''+p.property_id+'\')">'+thumbDiv(p)+'<span class="ccb"><b>'+p.title+'</b><i>'+loc(p.loc)+' · '+loc(p.type)+'</i><u>'+price+'</u></span></button>';
   }).join('');
   cb.appendChild(w);cb.scrollTop=cb.scrollHeight;
@@ -3219,7 +3256,7 @@ function openProp(pid){
       similarHTML(p);
   }else{
     stEl.style.display='none';
-    document.getElementById('pmPrice').innerHTML='<span>'+t('u.onreq')+'</span>';
+    document.getElementById('pmPrice').innerHTML='<span>'+rentPriceShort(p)+'</span>';
     document.getElementById('pmSpecs').innerHTML=
       '<div class="sp"><b>'+p.beds+'</b><span>'+t('u.beds')+'</span></div>'+
       '<div class="sp"><b>'+areaOf(p)+'</b><span>'+t('u.area')+'</span></div>'+
@@ -3749,7 +3786,7 @@ function buildRentChips(){
 }
 function resetRentFilters(){
   activeRent.loc.clear();activeRent.type.clear();activeRent.beds.clear();activeRent.amen.clear();
-  rentQuery='';
+  rentQuery=''; rentPriceRange=null;
   var q=document.getElementById('rentSearch'); if(q) q.value='';
   var so=document.getElementById('rentSort'); if(so){ so.value=''; try{ setRentSort(''); }catch(e){} }
   buildRentChips();applyRentFilters();finishRentFilters();
@@ -3758,7 +3795,7 @@ function resetRentFilters(){
 function finishRentFilters(){ try{ groupRentMenus(); }catch(e){} }
 
 function applyRentFilters(){
-  var visible=0,freeVisible=0;
+  var visible=0,freeVisible=0,noPriceCount=0;
   document.querySelectorAll('#rentCar .prop').forEach(function(el){
     var pid=el.dataset.pid;var p=pid?PL.byId[pid]:null;
     var okL=activeRent.loc.size===0||activeRent.loc.has(el.dataset.loc);
@@ -3780,9 +3817,26 @@ function applyRentFilters(){
           String(pid||'').toLowerCase().indexOf(q)>=0;
     }
     var okF=!favOnly || (pid && FAVS.has(pid));
-    var vis=okL&&okT&&okB&&okA&&okQ&&okF;
+    /* Бюджет: сравниваем в выбранной единице (ночь или месяц). Объект без ставки
+       не выбрасываем — показываем с пометкой «цена по запросу», иначе человек
+       решит, что предложений нет. */
+    var okP=true, noPrice=false;
+    if(rentPriceRange && p){
+      var rate=rentRate(p,rentUnit), top=rentRateTop(p,rentUnit);
+      if(rate===null){ soft=true; noPrice=true; }
+      /* ставка меняется по сезонам: объект подходит, если его вилка
+         пересекается с бюджетом, а не только нижняя цена */
+      else okP = rate<=rentPriceRange.to && top>=rentPriceRange.from;
+    }
+    var vis=okL&&okT&&okB&&okA&&okQ&&okF&&okP;
     el.style.display=vis?'':'none';
     el.classList.toggle('softmatch',vis&&soft);
+    el.classList.toggle('noprice',vis&&noPrice);
+    if(vis&&soft){
+      var wn=el.querySelector('.amwarn');
+      if(wn) wn.textContent = noPrice ? t('rent.noprice') : t('rent.am.soft');
+    }
+    if(vis&&noPrice) noPriceCount++;
     var pic=el.querySelector('.pic');
     if(vis){
       visible++;
@@ -3802,7 +3856,20 @@ function applyRentFilters(){
   });
   var nr=document.getElementById('rentNoResult');if(nr)nr.style.display=visible?'none':'block';
   var rf=document.getElementById('rentFound');
-  if(rf) rf.textContent = visible + ' ' + plural(visible,'объект','объекта','объектов') + ' ' + t('f.found');
+  if(rf){
+    var txt = visible + ' ' + plural(visible,'объект','объекта','объектов') + ' ' + t('f.found');
+    /* при заданном бюджете честно говорим, сколько из них — «цена по запросу»:
+       выбрасывать их нельзя (цена может подойти), но и молчать нечестно */
+    if(rentPriceRange && noPriceCount) txt += ' · ' + noPriceCount + ' — ' + t('rent.noprice');
+    rf.textContent = txt;
+  }
+  /* подходящие по цене — вперёд, «по запросу» — в конец ленты */
+  if(rentPriceRange){
+    var carEl=document.getElementById('rentCar');
+    if(carEl) Array.prototype.slice.call(carEl.querySelectorAll('.prop.noprice')).forEach(function(el){
+      carEl.appendChild(el);
+    });
+  }
   if(rentAvailable&&visible){
     var st=document.getElementById('rentDateStatus');
     if(st){
@@ -3893,8 +3960,126 @@ function groupRentMenus(){
     if(e.classList.contains('rf-more') && !e.querySelector('.chipf')) return;
     bar.appendChild(e);
   });
+  try{ buildRentPriceMenu(bar); }catch(e){}
   wireCloseOnOutside();
   syncMenuLabels();
+}
+
+/* Бюджет аренды: та же кнопка-меню и тот же бегунок, что в продаже, плюс выбор
+   срока — за ночь или в месяц. Единицы не смешиваем: ночную ставку нельзя
+   умножить на 30 и выдать за месячную. */
+function buildRentPriceMenu(bar){
+  if(!bar || bar.querySelector('.fmenu[data-facet="rentbudget"]')) return;
+  var haveNight=rentUnitAvailable('night'), haveMonth=rentUnitAvailable('month');
+  if(!haveNight && !haveMonth) return;              /* ставок нет вообще — меню не рисуем */
+  if(!haveNight) rentUnit='month'; else if(!haveMonth) rentUnit='night';
+
+  var wrap=document.createElement('div'); wrap.className='fmenu'; wrap.dataset.facet='rentbudget';
+  var btn=document.createElement('button'); btn.type='button'; btn.className='fbtn';
+  btn.innerHTML='<span class="fb-t">'+t('rent.f.budget')+'</span><span class="fb-v"></span><i>▾</i>';
+  var pan=document.createElement('div'); pan.className='fpan';
+  wrap.appendChild(btn); wrap.appendChild(pan);
+  bar.insertBefore(wrap, bar.firstChild);           /* бюджет первым, как в продаже */
+  btn.onclick=function(e){ e.stopPropagation(); wrap.classList.toggle('open'); closeOthers(wrap); };
+
+  var units=document.createElement('div'); units.className='rf-chips runits';
+  [['night',t('u.night'),haveNight],['month',t('u.month'),haveMonth]].forEach(function(u){
+    if(!u[2]) return;
+    var c=document.createElement('span');
+    c.className='chipf'+(rentUnit===u[0]?' on':''); c.textContent=u[1];
+    c.onclick=function(){
+      rentUnit=u[0]; rentPriceRange=null;
+      Array.prototype.forEach.call(units.children,function(x){ x.classList.toggle('on', x===c); });
+      drawSlider(); applyRentFilters(); syncMenuLabels();
+    };
+    units.appendChild(c);
+  });
+  if(units.children.length>1) pan.appendChild(units);
+
+  var host=document.createElement('div'); pan.appendChild(host);
+  drawSlider();
+
+  function drawSlider(){
+    host.innerHTML='';
+    var vals=[];
+    (PL.RENTALS||[]).forEach(function(p){
+      var a=rentRate(p,rentUnit), b=rentRateTop(p,rentUnit);
+      if(a) vals.push(a);
+      if(b) vals.push(b);
+    });
+    if(!vals.length){ host.innerHTML='<p class="sub" style="margin:6px 2px">'+t('u.onreq')+'</p>'; return; }
+    var step=(rentUnit==='month')?10000:1000;
+    var lo=Math.floor(Math.min.apply(null,vals)/step)*step;
+    var hi=Math.ceil(Math.max.apply(null,vals)/step)*step;
+    if(hi<=lo) hi=lo+step*5;
+    var box=document.createElement('div'); box.className='prng';
+    box.innerHTML=
+      '<div class="prng-val"><span class="rp-out">'+t('f.any')+'</span>'+
+        '<button type="button" class="prng-clr rp-clr">'+t('f.reset')+'</button></div>'+
+      '<div class="prng-track rp-track">'+
+        '<div class="prng-fill rp-fill"></div>'+
+        '<button type="button" class="prng-h rp-a" aria-label="'+t('u.from')+'"></button>'+
+        '<button type="button" class="prng-h rp-b" aria-label="'+t('u.from')+'"></button>'+
+      '</div>'+
+      '<div class="prng-ends"><span>'+fmtBaht(lo)+'</span><span>'+fmtBaht(hi)+'</span></div>';
+    host.appendChild(box);
+
+    var track=box.querySelector('.rp-track'), fill=box.querySelector('.rp-fill'),
+        hA=box.querySelector('.rp-a'), hB=box.querySelector('.rp-b'), out=box.querySelector('.rp-out');
+    var A=lo, B=hi;
+    function pct(v){ return (v-lo)/(hi-lo)*100; }
+    function draw(){
+      var x=Math.min(A,B), y=Math.max(A,B);
+      fill.style.left=pct(x)+'%'; fill.style.right=(100-pct(y))+'%';
+      hA.style.left=pct(A)+'%'; hB.style.left=pct(B)+'%';
+      var full=(x===lo && y===hi);
+      out.textContent = full ? t('f.any')
+        : (fmtBaht(x)+' — '+(y>=hi ? fmtBaht(hi)+'+' : fmtBaht(y)));
+      return full;
+    }
+    function paint(){
+      var full=draw(), x=Math.min(A,B), y=Math.max(A,B);
+      rentPriceRange = full ? null : {from:x, to:(y>=hi ? Infinity : y)};
+      applyRentFilters(); syncMenuLabels();
+    }
+    var drag=null;
+    function valueAt(clientX){
+      var r=track.getBoundingClientRect(); if(!r.width) return A;
+      var k=(clientX-r.left)/r.width;
+      return Math.round((lo + Math.max(0,Math.min(1,k))*(hi-lo))/step)*step;
+    }
+    function grab(e){
+      var v=valueAt(e.clientX);
+      drag=(Math.abs(v-A)===Math.abs(v-B)) ? (v<A?'a':'b') : (Math.abs(v-A)<Math.abs(v-B)?'a':'b');
+      move(e);
+      try{ track.setPointerCapture(e.pointerId); }catch(err){}
+      wrap.classList.add('hold','open');
+      e.preventDefault();
+    }
+    function move(e){ if(!drag) return; var v=valueAt(e.clientX); if(drag==='a') A=v; else B=v; paint(); }
+    function drop(e){
+      if(!drag) return; drag=null;
+      try{ track.releasePointerCapture(e.pointerId); }catch(err){}
+      setTimeout(function(){ wrap.classList.remove('hold'); },60);
+    }
+    track.addEventListener('pointerdown',grab);
+    track.addEventListener('pointermove',move);
+    track.addEventListener('pointerup',drop);
+    track.addEventListener('pointercancel',drop);
+    track.addEventListener('click',function(e){ e.stopPropagation(); });
+    [hA,hB].forEach(function(h,i){
+      h.addEventListener('keydown',function(e){
+        var d=(e.key==='ArrowLeft')?-step:(e.key==='ArrowRight')?step:0;
+        if(!d) return;
+        if(i===0) A=Math.max(lo,Math.min(hi,A+d)); else B=Math.max(lo,Math.min(hi,B+d));
+        paint(); e.preventDefault();
+      });
+    });
+    box.querySelector('.rp-clr').onclick=function(e){
+      e.stopPropagation(); A=lo; B=hi; paint();
+    };
+    draw();
+  }
 }
 
 function buildFilterMenus(barId){
@@ -4082,6 +4267,15 @@ function closeOthers(keep){
 function syncMenuLabels(){
   document.querySelectorAll('.fmenu').forEach(function(w){
     var f=w.dataset.facet, out=[];
+    /* бюджет аренды: на кнопке показываем сам диапазон, а не выбранный срок */
+    if(f==='rentbudget'){
+      var v0=w.querySelector('.fb-v');
+      var o=w.querySelector('.rp-out');
+      var txt=(rentPriceRange && o) ? (o.textContent+' '+t(rentUnit==='month'?'u.month':'u.night')) : '';
+      if(v0) v0.textContent=txt;
+      w.classList.toggle('has', !!txt);
+      return;
+    }
     w.querySelectorAll('.chipf.on').forEach(function(c){
       if(f==='budget' && c.dataset.val==='') return;
       out.push(c.textContent.trim());
@@ -4310,7 +4504,7 @@ function openCompare(){
     [t('cmp.r.type'),function(p){return loc(p.type);}],
     /* в сравнение попадает и аренда: там нет цены, доходности и срока сдачи —
        пишем «по запросу» и прочерки вместо ฿0 и пустых клеток */
-    [t('cmp.r.price'),function(p){return p.funnel==='rent'?t('u.onreq'):fmtBaht(thbOf(p));}],
+    [t('cmp.r.price'),function(p){return p.funnel==='rent'?rentPriceShort(p):fmtBaht(thbOf(p));}],
     ['ROI',function(p){return p.roi!=null?roiRange(p):'—';}],
     [t('cmp.r.area'),function(p){return areaOf(p)||'—';}],
     [t('cmp.r.beds'),function(p){return p.beds||'—';}],
@@ -4910,7 +5104,7 @@ function zoneBodyHTML(nameRu){
         '<i style="'+(pic?('background-image:url('+pic+')'):'')+'"></i>'+
         '<b>'+escHTML(p.title)+'</b>'+
         '<u>'+escHTML(loc(p.type))+(p.beds?(' · '+escHTML(p.beds)+' сп.'):'')+'</u>'+
-        '<em>'+(p.funnel==='sale'?(t('u.from')+' '+fmtBaht(thbOf(p))):t('u.onreq'))+'</em>'+
+        '<em>'+(p.funnel==='sale'?(t('u.from')+' '+fmtBaht(thbOf(p))):rentPriceShort(p))+'</em>'+
         (out?'<s>вне бюджета</s>':'')+'</button>';
     }).join('')+'</div>';
 }
@@ -4952,7 +5146,7 @@ function renderMapObjs(filter){
       (pic?('<i style="background-image:url('+pic+')"></i>'):'<i class="nopic"></i>')+
       '<span><b>'+escHTML(p.title)+'</b>'+
       '<u>'+escHTML(loc(p.loc))+' · '+escHTML(loc(p.type))+(p.beds?(' · '+escHTML(p.beds)+' сп.'):'')+'</u>'+
-      '<em>'+(p.funnel==='sale'?(t('u.from')+' '+fmtBaht(thbOf(p))):t('u.onreq'))+'</em>'+
+      '<em>'+(p.funnel==='sale'?(t('u.from')+' '+fmtBaht(thbOf(p))):rentPriceShort(p))+'</em>'+
       '</span></button>';
   }).join('');
   Array.prototype.forEach.call(host.querySelectorAll('.mobj'),function(el){
@@ -5025,7 +5219,7 @@ function openDistrict(nameRu){
     '<div><b>'+items.length+'</b><span>'+t('d.count')+'</span></div></div>'+
     '<p style="font-size:.9rem;line-height:1.6;color:var(--muted);margin:0">'+loc(d.vibe)+'. '+t('d.who')+loc(d.who).toLowerCase()+'.</p>'+
     (items.length?('<div class="dprops">'+items.map(function(p){
-      return '<button type="button" data-pid="'+p.property_id+'">'+thumbDiv(p)+'<b>'+p.title+'</b><span>'+(p.funnel==='sale'?fmtBaht(thbOf(p)):t('u.onreq'))+'</span></button>';
+      return '<button type="button" data-pid="'+p.property_id+'">'+thumbDiv(p)+'<b>'+p.title+'</b><span>'+(p.funnel==='sale'?fmtBaht(thbOf(p)):rentPriceShort(p))+'</span></button>';
     }).join('')+'</div>'):('<p style="font-size:.84rem;color:var(--muted);margin:14px 0 0">'+t('d.none')+'</p>'));
   document.getElementById('dBody').querySelectorAll('.dprops button').forEach(function(b){
     b.addEventListener('click',function(){closeDistrict();openProp(b.dataset.pid);});
