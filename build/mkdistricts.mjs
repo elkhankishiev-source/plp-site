@@ -118,7 +118,10 @@ window.addEventListener('load',function(){
   saleHtml = saleHtml.replace(
     /<div class="head-row reveal">\s*<div>\s*<span class="kicker"[^>]*>[\s\S]*?<\/p>\s*<\/div>\s*<div class="arrows">[\s\S]*?<\/div>\s*<\/div>/, '');
   saleHtml = saleHtml.replace(
-    /<div class="head-row reveal">\s*<div>\s*<span class="kicker"[^>]*>[\s\S]*?<\/p>\s*<\/div>/, '<div class="head-row reveal"><div>');
+    /<div class="head-row reveal">\s*<div>\s*<span class="kicker"[^>]*>[\s\S]*?<\/p>\s*<\/div>/,
+    /* див заголовка обязан закрыться: без этого head-row (flex) поглощал ленту
+       объектов, и она растягивалась на 10 000 px за край экрана. Эльнур 06.09 */
+    '<div class="head-row reveal"><div></div>');
   let html=head+'\n'+intro+'\n'+saleHtml+'\n'+mine+'\n'+others+'\n'+tail;
   html=html.replace(/<title>[\s\S]*?<\/title>/,'<title>'+esc(title)+'</title>');
   html=html.replace(/(<meta name="description" content=")[^"]*(")/,'$1'+esc(desc)+'$2');

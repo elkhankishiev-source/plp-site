@@ -442,7 +442,7 @@ section[id],div[id^="q"],[id="about"],[id="steps"],[id="faq"]{scroll-margin-top:
 .rd-row b{font-size:.74rem;text-transform:uppercase;letter-spacing:.03em;color:var(--muted,#8a8f7a);font-weight:700}
 .prop.booked{opacity:.5;filter:grayscale(.5);pointer-events:none;position:relative}
 .prop.booked .pic::after{content:attr(data-busy);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(var(--ink-rgb),.55);color:#fff;font-weight:700;font-size:.9rem;text-align:center;padding:12px;border-radius:inherit}
-.chipf{white-space:nowrap;background:rgba(var(--glass-rgb),.85);border:1px solid rgba(var(--ink-rgb),.07);border-radius:999px;padding:9px 15px;font-size:.84rem;font-weight:600;cursor:pointer;transition:border-color .2s,background .2s,transform .15s;user-select:none}
+.chipf{white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;background:rgba(var(--glass-rgb),.85);border:1px solid rgba(var(--ink-rgb),.07);border-radius:999px;padding:9px 15px;font-size:.84rem;font-weight:600;cursor:pointer;transition:border-color .2s,background .2s,transform .15s;user-select:none}
 /* Бегунок цены: две ручки на одной дорожке, между ними закрашенный отрезок. */
 .stay{margin-top:12px;padding:12px;background:var(--paper);border:1px solid rgba(var(--ink-rgb),.08);border-radius:13px}
 .stay-f{display:flex;gap:10px;flex-wrap:wrap}
@@ -1481,7 +1481,7 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
   </div></section>
 <section id="sale" aria-labelledby="sale-title">
   <div class="container">
-    <div class="head-row reveal"><div>
+    <div class="head-row reveal"><div></div>
     </div>
     <div class="filterbar reveal" id="saleFilters">
       <span class="chipf on" data-facet="budget" data-val="" onclick="toggleFilter(this)" data-i18n="f.budget.all">Все бюджеты</span><span class="chipf" data-facet="budget" data-val="b1" onclick="toggleFilter(this)" data-i18n="f.b1">฿3–5 млн</span><span class="chipf" data-facet="budget" data-val="b2" onclick="toggleFilter(this)" data-i18n="f.b2">฿5–10 млн</span><span class="chipf" data-facet="budget" data-val="b3" onclick="toggleFilter(this)" data-i18n="f.b3">฿10–15 млн</span><span class="chipf" data-facet="budget" data-val="b4" onclick="toggleFilter(this)" data-i18n="f.b4">฿15–20 млн</span><span class="chipf" data-facet="budget" data-val="b5" onclick="toggleFilter(this)" data-i18n="f.b5">฿20–25 млн</span><span class="chipf" data-facet="budget" data-val="b6" onclick="toggleFilter(this)" data-i18n="f.b6">฿25–30 млн</span><span class="chipf" data-facet="budget" data-val="b7" onclick="toggleFilter(this)" data-i18n="f.b7">฿30 млн+</span><span class="chipf" data-facet="type" data-val="Вилла" onclick="toggleFilter(this)" data-i18n="f.type.villa">Вилла</span><span class="chipf" data-facet="type" data-val="Кондо" onclick="toggleFilter(this)" data-i18n="f.type.condo">Кондо</span><span class="chipf" data-facet="stage" data-val="ready" onclick="toggleFilter(this)">Готовые</span><span class="chipf" data-facet="stage" data-val="construction" onclick="toggleFilter(this)">Строятся</span><span class="chipf" data-facet="stage" data-val="presale" onclick="toggleFilter(this)">Старт продаж</span>
