@@ -1523,8 +1523,12 @@ body{background:var(--bg)}
   .car .tag,.pm-tag,.prop .fav,.prop .cmpb,.hero-float,.btn-glass,
   .mnav,.modal-overlay,.modal-back,.chatwin,.fab{
     backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
-  .car .tag,.pm-tag{background:var(--paper);border-color:rgba(var(--ink-rgb),.12)}
-  .prop .fav,.prop .cmpb{background:var(--paper)}
+  .car .tag,.pm-tag{background:var(--paper);color:var(--ink);border-color:rgba(var(--ink-rgb),.12)}
+  /* Сердечко и «сравнить» лежат прямо на фотографии, поэтому цвета им нужны
+     свои, а не темы страницы: в светлой теме выходило тёмное на тёмном. */
+  .prop .fav,.prop .cmpb{background:rgba(20,21,15,.55);color:#F4F6EA}
+  .prop .fav.on{background:#F4F6EA;color:#c9564b}
+  .prop .cmpb.on{background:var(--green);color:var(--on-green)}
   .prop,.zone,.mobj,.zprop{transition:none}
 }
 
@@ -1579,6 +1583,32 @@ body{background:var(--bg)}
    последним, иначе размеры шапки его перебивают. */
 @media(max-width:600px){
   .header .lang,.header .themebtn{display:none!important}
+}
+
+/* Кнопки поверх фотографии — где бы карточка ни рендерилась (каталог продажи,
+   аренда, страницы районов): своя пара цветов, не зависящая от темы. */
+.fav,.cmpb{color:#F4F6EA}
+.fav{background:rgba(20,21,15,.55)}
+.fav.on{background:#F4F6EA;color:#c9564b}
+.cmpb.on{background:var(--green);color:var(--on-green)}
+/* шторка меню всегда тёмная (--ink-block), поэтому и текст в ней светлый:
+   раньше контейнер наследовал цвет темы и на тёмном фоне пропадал */
+.mnav .sheet,.mnav .mtools{color:var(--on-ink)}
+.mnav .mlang,.mnav .mtheme{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.22)}
+.mnav .mlang button,.mnav .mtheme{color:var(--on-ink)}
+.mnav .mlang button.on{background:var(--green);color:var(--on-green)}
+
+/* Чипы выбора в анкете: в тёмной теме текст сливался с подложкой */
+.chipf{color:var(--ink)}
+.chipf.on{background:var(--green);color:var(--on-green);border-color:transparent}
+
+/* Сообщение об ошибке в анкете должно читаться в обеих темах */
+.err,.df-status.err{color:#c0392b;font-weight:600}
+:root[data-theme="dark"] .err,:root[data-theme="dark"] .df-status.err,
+:root:not([data-theme="light"]) .err,:root:not([data-theme="light"]) .df-status.err{color:#ff9d8b}
+:root[data-theme="light"] .err,:root[data-theme="light"] .df-status.err{color:#c0392b}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]) .err,:root:not([data-theme="dark"]) .df-status.err{color:#c0392b}
 }
 
 /* PLP:UI:END */
