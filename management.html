@@ -298,7 +298,10 @@ section[id],div[id^="q"],[id="about"],[id="steps"],[id="faq"]{scroll-margin-top:
 .logo{font-weight:800;font-size:1.05rem;letter-spacing:-.01em;display:flex;align-items:center;gap:10px;white-space:nowrap}
 .logo .chip{width:38px;height:38px;border-radius:11px;background:var(--green);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1rem;flex:none}
 .chip img{width:24px;height:auto;display:block}
-.logo span{color:var(--green-text,#6E7247)}
+/* Эльнур 06.09: лого должно быть заметным — оба слова полным цветом темы,
+   фирменный акцент остаётся на значке. */
+.logo span{color:inherit}
+.logo{color:var(--ink)}
 .nav{display:none;gap:4px;font-weight:600;font-size:.9rem}
 .nav a{opacity:.85;transition:opacity .2s,background .2s;padding:8px 10px;border-radius:9px}
 .nav a:hover{opacity:1;background:rgba(var(--glass-rgb),.7)}
@@ -1419,6 +1422,14 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
 /* Атрибут hidden проигрывал правилам с display: пустой красный кружок
    уведомлений висел на колокольчике всегда (Эльнур 06.09). */
 [hidden]{display:none!important}
+
+/* Переключатель «Сайт / Кабинет»: одинаковый на сайте и в кабинете */
+.swch{display:inline-flex;align-items:center;background:var(--warm);border:1px solid rgba(var(--ink-rgb),.12);
+  border-radius:999px;padding:3px;font-size:.8rem;font-weight:700;white-space:nowrap}
+.swch a,.swch b{display:block;padding:6px 12px;border-radius:999px;text-decoration:none;color:var(--muted)}
+.swch b{background:var(--ink-block);color:var(--on-ink)}
+.swch a:hover{color:var(--ink)}
+@media(max-width:900px){ .swch{display:none} }
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.6.0/maplibre-gl.min.css">
@@ -1451,7 +1462,9 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
       </div>
       <button type="button" class="themebtn" id="themeBtn" onclick="cycleTheme()"
               aria-label="Оформление: системное, светлое, тёмное"><span id="themeIco">◐</span></button>
-      <a class="btn btn-ghost btn-cab" href="owner.html" data-i18n="nav.cabinet">Кабинет</a>
+      <span class="swch" role="group" aria-label="Сайт или кабинет">
+        <b>Сайт</b><a href="owner.html" data-i18n="nav.cabinet">Кабинет</a>
+      </span>
       <button type="button" class="btn btn-green" onclick="openChat('hi')" data-i18n="nav.chat">Чат с консультантом</button>
       <button type="button" class="burger" aria-label="Меню" onclick="toggleNav(true)"><i></i><i></i><i></i></button>
     </div>
@@ -1895,7 +1908,7 @@ ru: {
   "chat.av":"Д","chat.fab":"Дарья · на связи","chat.name":"Дарья","chat.sub":"персональный менеджер · отвечает сразу","chat.placeholder":"Напишите сообщение…",
   "chat.botline":"Личный диалог. Отвечаем в течение 5 минут в рабочее время",
   "chat.hello":"Здравствуйте! Я Дарья, менеджер Property Library из команды Эльнура. Помогу с покупкой, арендой и любым вопросом по Пхукету. Что вам интересно?",
-  "chat.menu1":"Купить / инвестировать","chat.menu2":"Аренда от месяца","chat.menu3":"Услуги и сопровождение","chat.menu4":"Оставить контакт",
+  "chat.menu1":"Купить / инвестировать","chat.menu2":"Аренда от месяца","chat.menu3":"Услуги и сопровождение","chat.menu4":"Оставить контакт — соберём подборку",
   "chat.r.sale":"Хороший запрос. Вход в рынок — от ฿3.9 млн, доходность 6–12% годовых в зависимости от района и проекта. Покажу пару вариантов из нашей базы — а под вашу задачу соберу подборку лично.",
   "chat.r.rent":"Мы сдаём в долгосрочную аренду — от месяца и дольше. Цены и условия по каждому объекту называем по запросу: напишите район, даты и бюджет — подберу вариант. Оставьте WhatsApp или Telegram — отвечу лично.",
   "chat.r.service":"Мы закрываем всё под ключ: юристы по тайскому праву, визы, дизайн, строительство и управление арендой после покупки. Для клиентов услуги бесплатны. Расскажите вашу ситуацию — подскажу, с чего начать.",
@@ -2080,7 +2093,7 @@ en: {
   "chat.av":"D","chat.fab":"Daria · online","chat.name":"Daria","chat.sub":"personal manager · replies right away","chat.placeholder":"Type a message…",
   "chat.botline":"Personal dialogue. We reply within 5 minutes during working hours",
   "chat.hello":"Hello! I am Daria, a Property Library manager from Elnur's team. I will help with buying, renting and any question about Phuket. What are you interested in?",
-  "chat.menu1":"Buy / invest","chat.menu2":"Rent from a month","chat.menu3":"Services and support","chat.menu4":"Leave my contact",
+  "chat.menu1":"Buy / invest","chat.menu2":"Rent from a month","chat.menu3":"Services and support","chat.menu4":"Leave contact — we will prepare a shortlist",
   "chat.r.sale":"Good request. Market entry starts from ฿3.9M, with 6–12% annual yield depending on the area and project. I will show a couple of options from our base — and put together a personal shortlist for your goal.",
   "chat.r.rent":"We do long-term rentals — from one month and longer. Prices and terms for each home are given on request: tell me the area, dates and budget and I will find a match. Leave your WhatsApp or Telegram — I will reply personally.",
   "chat.r.service":"We cover everything end-to-end: Thai law attorneys, visas, design, construction and rental management after purchase. Our services are free for clients. Tell me your situation — I will suggest where to start.",
