@@ -1276,6 +1276,10 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
 /* Подпись о кабинете: мелко и спокойно, не витрина */
 .cab-note{font-size:.72rem;line-height:1.5;color:var(--muted);opacity:.85;
   margin:0 0 14px;padding-bottom:12px;border-bottom:1px solid rgba(var(--ink-rgb),.07);max-width:680px}
+
+/* Атрибут hidden проигрывал правилам с display: пустой красный кружок
+   уведомлений висел на колокольчике всегда (Эльнур 06.09). */
+[hidden]{display:none!important}
 </style>
 <!-- Leaflet подгружается только при открытии раздела с картой: см. ensureLeaflet() -->
 </head>

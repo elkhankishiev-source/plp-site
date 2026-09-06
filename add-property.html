@@ -1389,6 +1389,10 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
   -webkit-tap-highlight-color:transparent}
 .prop,.zone,.zprop,.mobj{user-select:none}
 .prop *,.zone *,.zprop *{-webkit-user-select:none;user-select:none}
+
+/* Атрибут hidden проигрывал правилам с display: пустой красный кружок
+   уведомлений висел на колокольчике всегда (Эльнур 06.09). */
+[hidden]{display:none!important}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.6.0/maplibre-gl.min.css">
