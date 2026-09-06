@@ -1635,6 +1635,31 @@ body{background:var(--bg)}
   border-radius:0;flex:1 1 0;min-width:0}
 .mnav .mtheme{margin:0}
 
+/* Залипание кнопок на телефоне: на тач-экране состояние :hover остаётся
+   после нажатия, и кнопка выглядит выбранной, хотя выбор другой
+   (Эльнур про анкету 06.09). Наведение оставляем только там, где есть мышь. */
+@media (hover:none){
+  .chipf:hover,.chips button:hover,.btn:hover,.fbtn:hover,.opt:hover,
+  .cab-nav a:hover,.swch a:hover{background:inherit;border-color:inherit;
+    color:inherit;transform:none}
+  .chipf.on:hover{background:var(--green);color:var(--on-green)}
+}
+
+/* Быстрые подсказки в чате: фон свой, а цвет текста наследовался от пузыря
+   бота — в светлой теме выходило светлое по светлому. */
+.chips button{color:var(--ink)}
+.chips button:hover{background:var(--green);color:var(--on-green)}
+
+/* «Чат с консультантом» в меню: на зелёном фоне текст должен быть чернильным.
+   В кабинете он брал var(--ink), который в тёмной теме светлый. */
+.mnav .mwa{background:var(--green);color:var(--on-green)}
+
+/* «Разместить объект»: на телефоне две колонки сжимались в две узкие полосы
+   и текст рвался по словам (Эльнур 06.09) — ниже 860 px ставим в один столбец. */
+.lp-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);
+  gap:clamp(18px,3vw,34px);align-items:center}
+@media(max-width:860px){ .lp-grid{grid-template-columns:1fr;gap:16px} }
+
 /* PLP:UI:END */
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
@@ -1937,10 +1962,21 @@ body{background:var(--bg)}
     var name=g('ap-name').value.trim(), phone=g('ap-phone').value.trim();
     if(!name){ g('ap-err').textContent='Как к вам обращаться?'; return; }
     if(!phone){ g('ap-err').textContent='Оставьте телефон — иначе не сможем ответить.'; return; }
+    /* Эльнур 06.09: анкета принимала обрывок номера. Проверяем по-человечески:
+       только цифры и «+», длина как у настоящего номера с кодом страны. */
+    var digits=phone.replace(/[^0-9]/g,'');
+    if(digits.length<9 || digits.length>15){
+      g('ap-err').textContent='Проверьте номер: нужен полный, с кодом страны — например 66 812 345 678.';
+      g('ap-phone').focus(); return;
+    }
     if(files.some(function(f){return !f.done && !f.error;})){ g('ap-err').textContent='Дождитесь загрузки файлов.'; return; }
 
     var btn=g('ap-next'); btn.disabled=true; btn.textContent='Отправляем…';
-    fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+    /* без ограничения по времени кнопка «Отправляем…» висела бесконечно,
+       если связь пропала посреди запроса */
+    var ac=(window.AbortController? new AbortController() : null);
+    var killer=setTimeout(function(){ try{ ac&&ac.abort(); }catch(e){} }, 20000);
+    fetch(API,{method:'POST',signal:(ac?ac.signal:undefined),headers:{'Content-Type':'application/json'},body:JSON.stringify({
       action:'submit_object', ref:ref, name:name, phone:phone, contact_via:pick('ap-via'),
       kind:pick('ap-kind'), beds:pick('ap-beds'), district:pick('ap-area'),
       area_sqm:g('ap-area-sqm').value.trim(), stage:pick('ap-stage'), goal:pick('ap-goal'),
@@ -1954,19 +1990,24 @@ body{background:var(--bg)}
       min_stay:num('ap-min'),
       media:files.filter(function(f){return f.done;}).map(function(f){return {url:f.url,type:f.type,name:f.name};})
     })}).then(function(r){return r.json();}).then(function(d){
+      clearTimeout(killer);
       btn.disabled=false; btn.textContent='Отправить объект';
       if(d&&d.ok){
         document.querySelector('.ap-card').innerHTML=
           '<h2 style="font-size:22px;margin:0 0 8px">Спасибо, объект принят</h2>'+
           '<p class="sub" style="margin:0 0 14px">Менеджер посмотрит материалы, оформит карточку и свяжется с вами. '+
           'Обычно это занимает один рабочий день.</p>'+
-          '<div class="hero-cta" style="margin:0"><a class="btn btn-primary" href="/">На главную</a>'+
+          '<div class="hero-cta" style="margin:0"><a class="btn btn-primary" href="/owner">В личный кабинет</a>'+
+          '<a class="btn btn-ghost" href="/">На главную</a>'+
           '<a class="btn btn-ghost" href="'+BOT_LINK+'?start=object" target="_blank" rel="noopener">Написать в Telegram</a></div>';
         window.scrollTo({top:0,behavior:'smooth'});
       } else { g('ap-err').textContent='Не отправилось. Напишите нам в WhatsApp — примем объект вручную.'; }
-    }).catch(function(){
+    }).catch(function(err){
+      clearTimeout(killer);
       btn.disabled=false; btn.textContent='Отправить объект';
-      g('ap-err').textContent='Нет связи с сервером.';
+      g('ap-err').textContent=(err&&err.name==='AbortError')
+        ? 'Ответ не пришёл за 20 секунд. Проверьте связь и нажмите ещё раз — или напишите нам в Telegram, примем объект вручную.'
+        : 'Не удалось отправить. Проверьте связь и попробуйте ещё раз.';
     });
   };
 
