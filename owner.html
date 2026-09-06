@@ -786,6 +786,14 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
 .mb-col.neg{background:#c98b7a}
 .mb-val{position:absolute;top:-4px;left:0;right:0;text-align:center;font-size:10.5px;color:var(--muted);
   opacity:.85;transition:opacity .2s;white-space:nowrap}
+/* Эльнур 06.09: «цифры можно написать вертикально в самом столбике, иначе
+   не вмещается». Пишем вдоль столбика — помещается любая сумма. */
+@media(max-width:900px){
+  .mb-val{position:absolute;top:auto;bottom:34px;left:50%;right:auto;transform:translateX(-50%);
+    writing-mode:vertical-rl;text-orientation:mixed;letter-spacing:.02em;
+    max-height:120px;overflow:hidden;opacity:1;font-size:10px}
+  .mbar.empty .mb-val{display:none}
+}
 .mbar:hover .mb-val,.mbar.on .mb-val{opacity:1}
 .mb-lab{font-size:11px;color:var(--dim);margin-top:7px;white-space:nowrap}
 .stay{display:flex;align-items:center;gap:14px;padding:12px 0;border-top:1px solid var(--line)}
@@ -1290,6 +1298,7 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
 .picktitle{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pickitem{max-width:100%}
 
+.chart-note{margin-top:10px;font-size:.78rem;opacity:.9}
 /* Каркас загрузки: серые плашки в форме кабинета — видно, что идёт работа */
 #loading{padding:6px 0 20px}
 .sk{display:block;background:linear-gradient(90deg,var(--warm) 25%,rgba(var(--ink-rgb),.06) 37%,var(--warm) 63%);
@@ -1306,6 +1315,10 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
 .sk-chart{height:200px}
 #load-note{margin-top:16px;text-align:center}
 @media (prefers-reduced-motion:reduce){ .sk{animation:none} }
+
+/* Режим просмотра чужого кабинета виден всегда, чтобы не перепутать, чьи данные */
+.as-banner{margin-top:10px;padding:9px 12px;border-radius:12px;font-size:.8rem;
+  background:var(--green-soft);color:var(--ink);border:1px solid var(--green)}
 </style>
 <!-- Leaflet подгружается только при открытии раздела с картой: см. ensureLeaflet() -->
 </head>
@@ -1579,6 +1592,7 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
         <label class="ctx-f"><span>Объект</span><div id="ctx-obj"></div></label>
       </div>
       <p class="ctx-note" id="ctx-note"></p>
+      <div id="as-banner" class="as-banner" hidden></div>
     </div>
     <div id="cab-nav" class="cab-nav" aria-label="Разделы кабинета">
       <a data-tab="overview" class="on">Обзор</a>
@@ -2521,6 +2535,8 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       ((want>real)?(' <span class="dim">данные есть за '+real+' из '+want+' — остальные месяцы пока пустые</span>'):'')+
       '</p>'+
       '<div class="mchart" id="ch-bars">'+bars+'</div>'+
+      ((want>real)?('<p class="sub chart-note">Бледные столбики — месяцы, по которым данных ещё нет: '+
+        'объект тогда не был у нас в работе или операции не заведены.</p>'):'')+
       '<div id="ch-detail"></div></div>';
   }
   /* Обработчики вешаем на документ, а не на элементы: кабинет перерисовывает
@@ -4810,7 +4826,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   /* ===== КОНТЕКСТ РАБОТЫ: человек → его объект =====
      Эльнур 05.09: «сотрудник заходит, выбирает лида, выбирает его объект — и мы
      работаем с конкретной информацией». Выбор живёт наверху и виден всегда. */
-  var CTX={lead:null, leadName:'', obj:null};
+  var CTX={lead:null, leadName:'', obj:null, asOwner:null, asName:''};
   function ctxIsStaff(){ return !!(DATA && DATA.owner && DATA.owner.is_staff===true); }
   /* Список людей нужен и контекст-бару, и форме заявки — тянем его один раз.
      Раньше уходило два одинаковых запроса по 300 человек на каждом входе. */
@@ -4899,6 +4915,22 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       }
     }).catch(function(){});
   }
+  /* Кабинет получает полными только первые объекты — остальные приходят
+     заголовком. Выбрали такой объект — подтягиваем его карточку. Эльнур 06.09. */
+  function ensureCard(idx, done){
+    var p=(DATA.properties||[])[idx];
+    if(!p || !p.brief){ if(done) done(); return; }
+    var pid=p.plp_property_id||p.id;
+    post({action:'card',token:TOKEN,property_id:pid,as_owner:(CTX.asOwner||undefined)})
+      .then(function(d){
+        if(d&&d.ok&&d.property){
+          d.property.relation=p.relation;
+          DATA.properties[idx]=d.property;
+        }
+        if(done) done();
+      })
+      .catch(function(){ if(done) done(); });
+  }
   function buildCtxObj(items, placeholder){
     var host=document.getElementById('ctx-obj'); if(!host) return;
     host.__built=1;
@@ -4908,7 +4940,9 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         if(v==null){ CTX.obj=null; ctxNote(); return; }
         if(/^\d+$/.test(String(v))){ CTX.obj=Number(v); CUR=CTX.obj; }
         ctxNote();
-        try{ renderProp(); renderPortfolio(); }catch(e){}
+        ensureCard(CUR, function(){
+          try{ renderProp(); renderPortfolio(); paintCounts(); }catch(e){}
+        });
       }});
   }
   function ctxNote(){
@@ -4974,8 +5008,9 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   }
   function bellOpen(){
     var items=bellItems();
-    /* одно событие — сразу ведём туда, без лишнего окна */
-    if(items.length===1){ cabPage(items[0].tab); return; }
+    /* Эльнур 06.09: «колокольчик горит, уведомления не показаны». Раньше при
+       одном событии кабинет молча прыгал в раздел — человек не понимал, что это
+       было. Теперь список показываем всегда, даже если событие одно. */
     if(!items.length){
       clForm('<h3>Уведомления</h3><p class="sub">Ничего нового — всё разобрано.</p>'+
              '<div class="fbtns"><button type="button" class="btn ghost" id="f-cancel">Закрыть</button></div>');
@@ -5191,7 +5226,7 @@ window.openChat=openChat;window.closeChat=closeChat;window.clearChat=clearChat;w
         cabPage(t);
       };
     });
-    try{ renderCtx(); paintCounts(); }catch(e){}
+    try{ renderCtx(); ctxCabinets(); paintCounts(); }catch(e){}
     try{ initFab(); }catch(e){}
     var bell=document.getElementById('bellBtn');
     if(bell && !bell.__wired){ bell.__wired=1; bell.onclick=function(){ bellOpen(); }; }
