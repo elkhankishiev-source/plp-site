@@ -1096,6 +1096,11 @@ button#send-code,button#send-code-2,button#do-login,button#do-reg{
     background:var(--paper);border:1px solid rgba(var(--ink-rgb),.08);border-radius:13px;
     padding:13px 14px;font-weight:600}
   .cab-nav a.on{border-color:var(--ink);background:var(--warm)}
+  /* Раскрытый раздел: его заголовок прилипает под шапкой и держится, пока
+     идёт содержимое; дошли до следующего пункта — отпускает (Эльнур 06.09). */
+  .cab-open{display:flex;flex-direction:column;gap:6px}
+  .cab-nav .cab-open>a.on{position:sticky;top:58px;z-index:14;
+    box-shadow:0 8px 20px rgba(0,0,0,.22);background:var(--warm)}
   .cab-nav a.on::after{content:'▴';color:var(--muted);margin-left:8px}
   .cab-nav a:not(.on)::after{content:'▾';color:var(--muted);margin-left:8px}
   #cab-body{margin:8px 0 10px}
@@ -5740,7 +5745,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   function paintCounts(){
     var c=cabCounts(), total=0;
     var nav=document.getElementById('cab-nav'); if(!nav) return;
-    Array.prototype.forEach.call(nav.querySelectorAll(':scope > a[data-tab]'),function(a){
+    Array.prototype.forEach.call(nav.querySelectorAll('a[data-tab]'),function(a){
       var t=a.getAttribute('data-tab'), n=c[t]||0;
       var b=a.querySelector('.nav-n');
       if(!b){ b=document.createElement('span'); b.className='nav-n'; a.appendChild(b); }
@@ -5869,17 +5874,39 @@ window.openChat=openChat;window.closeChat=closeChat;window.clearChat=clearChat;w
     if(body2) body2.hidden=false;
     var nav=document.getElementById('cab-nav');
     if(nav && body2 && window.matchMedia && window.matchMedia('(max-width:900px)').matches){
-      /* на телефоне содержимое раздела встаёт сразу под его пунктом */
+      /* На телефоне содержимое раздела встаёт сразу под своим пунктом, а пункт
+         с содержимым лежат в общей обёртке. Благодаря ей заголовок раздела
+         прилипает под шапкой и держится ровно до следующего пункта
+         (Эльнур 06.09: «чтобы он клеился к шапке и тянулся до следующего»). */
       var act=nav.querySelector('a[data-tab="'+name+'"]');
-      if(act && act.nextSibling!==body2 && act.parentElement===nav){
-        nav.parentElement.insertBefore(body2, act.nextSibling ? null : null);
-        act.insertAdjacentElement('afterend', body2);
+      if(act){
+        var wrap=document.getElementById('cab-open');
+        if(!wrap){ wrap=document.createElement('div'); wrap.id='cab-open'; wrap.className='cab-open'; }
+        /* прежний раскрытый пункт возвращаем на его место в списке */
+        var prev=wrap.firstElementChild;
+        if(prev && prev!==act && prev.hasAttribute && prev.hasAttribute('data-tab') && wrap.parentElement){
+          wrap.parentElement.insertBefore(prev, wrap);
+        }
+        if(act.parentElement!==wrap){
+          act.parentElement.insertBefore(wrap, act);   /* обёртка встаёт на место пункта */
+        }
+        /* порядок внутри обёртки строгий: сначала сам пункт, под ним содержимое */
+        wrap.appendChild(act);
+        wrap.appendChild(body2);
       }
-    } else if(body2 && body2.parentElement && body2.parentElement.id==='cab-nav'){
-      /* на большом экране возвращаем тело под список */
-      nav.parentElement.insertBefore(body2, nav.nextSibling);
+    } else if(body2 && nav){
+      /* на большом экране список и тело снова раздельные */
+      var w2=document.getElementById('cab-open');
+      if(w2 && w2.parentElement){
+        var a2=w2.firstElementChild;
+        if(a2 && a2.hasAttribute && a2.hasAttribute('data-tab')) w2.parentElement.insertBefore(a2, w2);
+        w2.parentElement.removeChild(w2);
+      }
+      if(body2.parentElement && body2.parentElement.id!=='app'){
+        nav.parentElement.insertBefore(body2, nav.nextSibling);
+      }
     }
-    if(nav) Array.prototype.forEach.call(nav.querySelectorAll(':scope > a[data-tab]'), function(a){
+    if(nav) Array.prototype.forEach.call(nav.querySelectorAll('a[data-tab]'), function(a){
       a.classList.toggle('on', a.getAttribute('data-tab')===name);
     });
     try{ if(PLPMAP_OWNER) setTimeout(function(){ COMAP && COMAP.invalidateSize(); },80); }catch(e){}
@@ -5925,7 +5952,7 @@ window.openChat=openChat;window.closeChat=closeChat;window.clearChat=clearChat;w
     var nav=document.getElementById('cab-nav'); if(!nav) return;
     /* Эльнур 05.09: вертикальный список — нажал, детали выехали под пунктом;
        нажал ещё раз — свернулись. Та же механика, что у районов на сайте. */
-    Array.prototype.forEach.call(nav.querySelectorAll(':scope > a[data-tab]'), function(a){
+    Array.prototype.forEach.call(nav.querySelectorAll('a[data-tab]'), function(a){
       a.onclick=function(e){
         e.preventDefault();
         var t=a.getAttribute('data-tab');
