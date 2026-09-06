@@ -1151,10 +1151,9 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
 .fabmin{position:absolute;top:-7px;right:-7px;width:21px;height:21px;border-radius:50%;
   border:1px solid rgba(var(--glass-rgb),.22);background:var(--ink-block);color:var(--on-ink);font-size:14px;line-height:1;
   cursor:pointer;padding:0;opacity:0;transition:opacity .18s;display:flex;align-items:center;justify-content:center}
-.fabmin{opacity:1}
-.chatwin{position:fixed;right:20px;bottom:20px;z-index:71;width:372px;max-width:calc(100vw - 32px);background:var(--paper);border-radius:22px;box-shadow:0 30px 70px rgba(20,18,14,.3);overflow:hidden;display:none;flex-direction:column}
+.fabwrap:hover .fabmin{opacity:1}
+@media(hover:none){.fabmin{opacity:1}}
 .chatwin.open{display:flex;animation:rise .3s cubic-bezier(.16,1,.3,1)}
-.chatwin{right:10px;bottom:10px;width:calc(100vw - 20px)}
 .chathead .av img{width:20px;height:20px;object-fit:contain;display:block}
 .chathead{background:var(--ink-block);color:var(--on-ink);padding:15px;display:flex;align-items:center;gap:12px}
 .chathead .av{width:40px;height:40px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;color:var(--on-green);font-weight:800;flex:none}
@@ -1165,8 +1164,6 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
 .chathead .x{margin-left:auto;width:30px;height:30px;font-size:1rem}
 .chathead .clr{width:30px;height:30px;font-size:.85rem;margin-left:auto}
 .chathead .x{margin-left:8px}
-.chatbody{padding:16px;display:flex;flex-direction:column;gap:10px;height:340px;overflow-y:auto;background:var(--warm)}
-.chatbody{height:50vh}
 .chatinput{display:flex;gap:8px;padding:12px;border-top:1px solid rgba(var(--ink-rgb),.08);background:var(--paper)}
 .chatinput input{flex:1;height:44px;border:1.5px solid rgba(var(--ink-rgb),.12);border-radius:999px;padding:0 16px;font-size:.88rem;outline:none}
 .chatinput input:focus{border-color:var(--ink)}
@@ -4865,10 +4862,23 @@ function cabChatContext(){
 }
 function chatMsg(kind, text){
   var cb=document.getElementById('chatbody'); if(!cb) return null;
+  /* разметка ровно как на сайте: сам пузырь и есть сообщение */
   var row=document.createElement('div'); row.className='msg '+kind;
-  var b=document.createElement('div'); b.className='bub'; b.textContent=text;
-  row.appendChild(b); cb.appendChild(row); cb.scrollTop=cb.scrollHeight;
+  row.textContent=text;
+  cb.appendChild(row); cb.scrollTop=cb.scrollHeight;
   return row;
+}
+/* кнопки-подсказки — те же четыре, что на сайте */
+function chatChips(items){
+  var cb=document.getElementById('chatbody'); if(!cb) return;
+  var w=document.createElement('div'); w.className='msg bot';
+  var c=document.createElement('div'); c.className='chips';
+  items.forEach(function(txt){
+    var b=document.createElement('button'); b.type='button'; b.textContent=txt;
+    b.onclick=function(){ w.remove(); askDaria(txt); };
+    c.appendChild(b);
+  });
+  w.appendChild(c); cb.appendChild(w); cb.scrollTop=cb.scrollHeight;
 }
 function openChat(){
   var w=document.getElementById('chatwin'); if(!w) return;
@@ -4879,6 +4889,7 @@ function openChat(){
     /* то же приветствие, что на сайте — без привязки к случайному объекту */
     chatMsg('bot','Здравствуйте! Я Дарья, менеджер Property Library из команды Эльнура. '+
                   'Помогу с покупкой, арендой и любым вопросом по Пхукету. Что вам интересно?');
+    chatChips(['Вопрос по моему объекту','Аренда и заезды','Отчёты и выплаты','Позвать менеджера']);
   }
   var f=document.getElementById('chatField'); if(f && innerWidth>760) f.focus();
 }
@@ -4902,7 +4913,10 @@ function initFab(){
 function sendFree(){
   var f=document.getElementById('chatField'); if(!f) return;
   var txt=(f.value||'').trim(); if(!txt) return;
-  f.value=''; chatMsg('me',txt); chatHist.push({role:'user',content:txt});
+  f.value=''; askDaria(txt);
+}
+function askDaria(txt){
+  chatMsg('me',txt); chatHist.push({role:'user',content:txt});
   var wait=chatMsg('bot','…'); if(wait) wait.classList.add('typing');
   fetch(CHAT_ENDPOINT,{method:'POST',headers:{'Content-Type':'text/plain'},
     body:JSON.stringify({message:txt,history:chatHist.slice(-8),lang:'ru',context:cabChatContext()})})
