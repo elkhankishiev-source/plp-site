@@ -925,12 +925,15 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
   .ccard .crow{gap:8px 14px}
   .ccard .tline li{padding:5px 0;font-size:13px}
   .cmfind{flex:1;min-width:0;padding:8px 12px;border:1px solid var(--line);border-radius:9px;font:inherit;background:var(--paper)}
-  .picker{position:relative}
-  .pickbtn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;
+  /* Длинное название объекта распирало колонку, и поля уезжали за экран
+     (Эльнур 06.09). Во flex-раскладке обрезка работает только с min-width:0. */
+  .picker{position:relative;min-width:0;max-width:100%}
+  .picker *{min-width:0}
+  .pickbtn{width:100%;max-width:100%;min-width:0;display:flex;align-items:center;justify-content:space-between;gap:8px;
            padding:9px 12px;border:1px solid var(--line);border-radius:9px;background:var(--paper);
            font:inherit;cursor:pointer;text-align:left;color:inherit}
   .pickbtn.on{border-color:var(--green-deep)}
-  .pickval{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pickval{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}
   .pickval.dim{color:var(--muted)}
   .pickarr{color:var(--muted);font-size:11px;flex:none}
   .pickdrop{position:absolute;z-index:40;left:0;right:0;top:calc(100% + 4px);background:var(--paper);
@@ -1280,6 +1283,29 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
 /* Атрибут hidden проигрывал правилам с display: пустой красный кружок
    уведомлений висел на колокольчике всегда (Эльнур 06.09). */
 [hidden]{display:none!important}
+
+/* Ни одно длинное значение не должно распирать колонку */
+.fgrid,.fgrid label,.ctxgrid,#cab-ctx,#cab-ctx>*{min-width:0}
+.fgrid label{overflow-wrap:anywhere}
+.picktitle{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pickitem{max-width:100%}
+
+/* Каркас загрузки: серые плашки в форме кабинета — видно, что идёт работа */
+#loading{padding:6px 0 20px}
+.sk{display:block;background:linear-gradient(90deg,var(--warm) 25%,rgba(var(--ink-rgb),.06) 37%,var(--warm) 63%);
+  background-size:400% 100%;animation:skwave 1.4s ease-in-out infinite;border-radius:12px}
+@keyframes skwave{0%{background-position:100% 0}100%{background-position:0 0}}
+.sk-row{display:flex;gap:12px;margin-bottom:18px}
+.sk-t{height:38px;flex:1;max-width:220px}
+.sk-b{height:38px;width:120px}
+.sk-h1{height:34px;max-width:340px;margin-bottom:10px}
+.sk-h2{height:18px;max-width:200px;margin-bottom:20px}
+.sk-kpi{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:18px}
+@media(min-width:800px){.sk-kpi{grid-template-columns:repeat(4,1fr)}}
+.sk-kpi .sk{height:96px}
+.sk-chart{height:200px}
+#load-note{margin-top:16px;text-align:center}
+@media (prefers-reduced-motion:reduce){ .sk{animation:none} }
 </style>
 <!-- Leaflet подгружается только при открытии раздела с картой: см. ensureLeaflet() -->
 </head>
@@ -1535,7 +1561,16 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
     <div class="err" id="pwd-err"></div>
   </div>
 
-  <div id="loading" class="card"><p class="sub">Загружаем данные…</p></div>
+  <!-- Пока сценарий собирает данные (обычно 3 секунды, после простоя дольше),
+       показываем каркас кабинета, а не пустую надпись. Эльнур 06.09. -->
+  <div id="loading">
+    <div class="sk-row"><span class="sk sk-t"></span><span class="sk sk-b"></span></div>
+    <div class="sk sk-h1"></div>
+    <div class="sk sk-h2"></div>
+    <div class="sk-kpi"><span class="sk"></span><span class="sk"></span><span class="sk"></span><span class="sk"></span></div>
+    <div class="sk sk-chart"></div>
+    <p class="sub" id="load-note">Собираем ваши данные…</p>
+  </div>
 
   <div id="app" style="display:none">
     <div id="cab-ctx" class="cab-ctx" hidden data-build="05.09-4">
@@ -5232,7 +5267,15 @@ window.openChat=openChat;window.closeChat=closeChat;window.clearChat=clearChat;w
         }
       }
     }catch(e){}
-    if(!shown) show('loading');
+    if(!shown){
+      show('loading');
+      /* сценарий после простоя просыпается дольше — предупреждаем, а не молчим */
+      setTimeout(function(){
+        var n=document.getElementById('load-note');
+        if(n && document.getElementById('loading').style.display!=='none')
+          n.textContent='Сервер просыпается после простоя — это занимает несколько секунд.';
+      },4000);
+    }
 
     post({action:'data',token:TOKEN}).then(function(d){
       if(!d||!d.ok){
