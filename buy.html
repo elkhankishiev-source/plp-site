@@ -1472,6 +1472,49 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
 .faq-fold>summary .chev{color:var(--muted);transition:transform .2s;font-weight:400}
 .faq-fold[open]>summary .chev{transform:rotate(45deg)}
 .faq-fold[open]>summary{border-bottom:1px solid rgba(var(--ink-rgb),.08);margin-bottom:6px}
+
+/* Подсветку касания браузер рисует на любом элементе, а не только на карточке —
+   гасим её на всей странице (Эльнур 06.09: «карточки светятся, когда касаюсь»). */
+html{-webkit-tap-highlight-color:transparent}
+*{-webkit-tap-highlight-color:transparent}
+.prop:active,.prop:focus,.prop:focus-within{background:var(--paper)}
+.car .prop:active{transform:none;box-shadow:var(--shadow-sm)}
+
+/* Эльнур 06.09: «на мобильном фильтры съедают много места, карточки не видно».
+   Делаем как в тревел-сервисах: одна кнопка «Фильтры», панель выезжает снизу. */
+.fbar-open{display:none}
+@media(max-width:600px){
+  .fbar-open{display:inline-flex;align-items:center;gap:8px;background:var(--paper);
+    border:1px solid rgba(var(--ink-rgb),.14);border-radius:999px;padding:9px 14px;
+    font-size:.84rem;font-weight:700;color:var(--ink);margin-top:12px}
+  .fbar-open .n{background:var(--green);color:var(--on-green);border-radius:999px;
+    min-width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:.72rem}
+  .filterbar{position:fixed;left:0;right:0;bottom:0;z-index:75;background:var(--paper);
+    border-radius:20px 20px 0 0;box-shadow:0 -18px 50px rgba(0,0,0,.35);
+    padding:14px 14px calc(14px + env(safe-area-inset-bottom,0px));
+    transform:translateY(110%);transition:transform .28s cubic-bezier(.16,1,.3,1);
+    max-height:76vh;overflow:auto;display:flex;flex-wrap:wrap;gap:8px}
+  .filterbar.sheet-open{transform:translateY(0)}
+  .filterbar .fbar-head{display:flex;width:100%;align-items:center;justify-content:space-between;
+    margin-bottom:6px;font-weight:800}
+  .filterbar .fbar-head .x{background:var(--warm);border:0;border-radius:50%;width:32px;height:32px;
+    font-size:1.1rem;color:var(--ink)}
+  .fbar-backdrop{position:fixed;inset:0;background:rgba(20,18,14,.5);z-index:74;display:none}
+  .fbar-backdrop.on{display:block}
+  /* внутри шторки показываем всё, «Ещё фильтры» не нужен */
+  .filterbar.sheet-open .fmenu.hide-sm{display:block}
+  .filterbar .fbtn-more{display:none}
+}
+
+@media(max-width:600px){
+  /* объекты должны быть видны сразу: служебные строки уезжают в шторку фильтров */
+  #sale .toolbar,#rent .toolbar{display:none}
+  .filterbar.sheet-open .sheet-tools{display:flex;width:100%;gap:8px;flex-wrap:wrap;margin-top:4px}
+  .sheet-tools{display:none}
+  #sale .head-row h2,#rent .head-row h2{font-size:1.25rem}
+  #sale .head-row p,#rent .head-row p{display:none}
+  .found{font-size:.8rem;margin:8px 0 0}
+}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.6.0/maplibre-gl.min.css">
@@ -4072,6 +4115,67 @@ var FILTER_MENUS=[
 /* Аренда рисует фильтры своими группами «подпись + чипы» — сворачиваем их
    в такие же кнопки с выпадающим списком, чтобы поведение было одинаковым. */
 /* Компактная строка фильтров на телефоне: главные видны, прочие — под «Ещё». */
+/* Кнопка «Фильтры» и выезжающая панель на телефоне */
+function filterSheet(barId){
+  var bar=document.getElementById(barId); if(!bar) return;
+  if(!window.matchMedia || !window.matchMedia('(max-width:600px)').matches){
+    bar.classList.remove('sheet-open'); return;
+  }
+  /* панель пересобирается при каждой отрисовке каталога, поэтому шапку, кнопку
+     и подложку восстанавливаем каждый раз, если их нет */
+  if(!bar.querySelector('.fbar-head')){
+    var head=document.createElement('div');
+    head.className='fbar-head';
+    head.innerHTML='<span>Фильтры</span><button type="button" class="x" aria-label="Закрыть">×</button>';
+    bar.insertBefore(head, bar.firstChild);
+  }
+  var back=document.querySelector('.fbar-backdrop');
+  if(!back){ back=document.createElement('div'); back.className='fbar-backdrop'; document.body.appendChild(back); }
+
+  var open=bar.parentNode.querySelector('.fbar-open');
+  if(!open){
+    open=document.createElement('button');
+    open.type='button'; open.className='fbar-open';
+    open.innerHTML='<span>Фильтры</span><span class="n" hidden>0</span>';
+    bar.parentNode.insertBefore(open, bar);
+  }
+
+  function show(v){
+    bar.classList.toggle('sheet-open', v);
+    back.classList.toggle('on', v);
+    document.body.style.overflow = v ? 'hidden' : '';
+  }
+  open.onclick=function(){ show(true); };
+  back.onclick=function(){ show(false); };
+  /* панель пересобирается при каждой отрисовке фильтров — ловим нажатие делегированно */
+  /* панель пересобирается при каждой отрисовке — слушаем на документе */
+  if(!window.__fbarWired){
+    window.__fbarWired=1;
+    document.addEventListener('click', function(e){
+      var x=e.target.closest && e.target.closest('.fbar-head .x');
+      if(!x) return;
+      var b=x.closest('.filterbar');
+      if(b && b.__showSheet) b.__showSheet(false);
+    });
+  }
+  bar.__showSheet=show;
+  /* поиск и сортировка переезжают в шторку — на экране остаются объекты */
+  var sec=bar.closest('section') || bar.parentNode;
+  var toolbar=sec.querySelector('.toolbar');
+  if(toolbar && !bar.querySelector('.sheet-tools')){
+    var box=document.createElement('div'); box.className='sheet-tools';
+    while(toolbar.firstChild) box.appendChild(toolbar.firstChild);
+    bar.appendChild(box);
+  }
+  updateFilterCount(barId);
+}
+function updateFilterCount(barId){
+  var bar=document.getElementById(barId); if(!bar) return;
+  var btn=bar.parentNode.querySelector('.fbar-open'); if(!btn) return;
+  var n=bar.querySelectorAll('.fmenu.has').length;
+  var b=btn.querySelector('.n');
+  b.textContent=n; b.hidden=!n;
+}
 function compactFilters(barId){
   var bar=document.getElementById(barId); if(!bar) return;
   if(!window.matchMedia || !window.matchMedia('(max-width:600px)').matches){
@@ -4122,7 +4226,7 @@ function groupRentMenus(){
     bar.appendChild(e);
   });
   try{ buildRentPriceMenu(bar); }catch(e){}
-  try{ compactFilters('rentFilters'); }catch(e){}
+  try{ compactFilters('rentFilters'); filterSheet('rentFilters'); }catch(e){}
   wireCloseOnOutside();
   syncMenuLabels();
 }
@@ -4274,7 +4378,7 @@ function buildFilterMenus(barId){
     btn.onclick=function(e){ e.stopPropagation(); wrap.classList.toggle('open'); closeOthers(wrap); };
   });
   try{ buildPriceSlider(bar); }catch(e){}
-  try{ compactFilters(barId); }catch(e){}
+  try{ compactFilters(barId); filterSheet(barId); }catch(e){}
   try{ syncBudgetLabels(); }catch(e){}
   var reset=document.createElement('button');
   reset.type='button'; reset.className='fbtn fbtn-reset'; reset.textContent='Сбросить';
@@ -4433,6 +4537,7 @@ function syncMenuLabels(){
     var b=document.getElementById(id); if(!b) return;
     var active = b.querySelectorAll('.fmenu.has').length>0;
     b.classList.toggle('has-active', active);
+    try{ updateFilterCount(id); }catch(e){}
   });
   document.querySelectorAll('.fmenu').forEach(function(w){
     var f=w.dataset.facet, out=[];
