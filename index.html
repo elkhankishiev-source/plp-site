@@ -657,7 +657,7 @@ input.bad{border-color:#d98a84!important;background:var(--paper)6f5}
 .car{display:flex;gap:20px;padding:6px 4px 12px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;cursor:grab}
 .car::-webkit-scrollbar{display:none}
 .car.drag{cursor:grabbing;scroll-snap-type:none}
-.car .prop{flex:0 0 clamp(340px,30%,380px);scroll-snap-align:start;background:var(--paper);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow-sm);transition:transform .25s,box-shadow .25s;cursor:pointer;display:flex;flex-direction:column}
+.car .prop{flex:0 0 clamp(380px,32%,440px);scroll-snap-align:start;background:var(--paper);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow-sm);transition:transform .25s,box-shadow .25s;cursor:pointer;display:flex;flex-direction:column}
 @media(max-width:640px){.car .prop{flex:0 0 85vw}}
 .car .prop:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
 .car .pic{aspect-ratio:4/3;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:600;color:rgba(var(--ink-rgb),.45)}
@@ -1463,6 +1463,15 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
     background:var(--paper);border:1px solid rgba(var(--ink-rgb),.12);border-radius:999px;
     padding:8px 12px;font-size:.82rem;font-weight:600;color:var(--ink)}
 }
+
+/* FAQ: свёрнут по умолчанию — экономит экран, разворачивается по нажатию */
+/* Эльнур 06.09: FAQ целиком сворачивается — экономит экран на телефоне */
+.faq-fold>summary{list-style:none;cursor:pointer;display:flex;align-items:center;
+  justify-content:space-between;gap:12px;padding:14px 0;font-weight:800;font-size:1.05rem}
+.faq-fold>summary::-webkit-details-marker{display:none}
+.faq-fold>summary .chev{color:var(--muted);transition:transform .2s;font-weight:400}
+.faq-fold[open]>summary .chev{transform:rotate(45deg)}
+.faq-fold[open]>summary{border-bottom:1px solid rgba(var(--ink-rgb),.08);margin-bottom:6px}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.6.0/maplibre-gl.min.css">
@@ -1915,11 +1924,9 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
 <!-- ===== FAQ ===== -->
 <section id="faq" aria-labelledby="faq-title" style="padding-top:0">
   <div class="container">
-    <div class="reveal">
-      <span class="kicker">FAQ</span>
-      <h2 id="faq-title" data-i18n="faq.h2">Нас часто спрашивают</h2>
-    </div>
-    <div class="faq-list reveal">
+    <details class="faq-fold reveal">
+      <summary><span><span class="kicker">FAQ</span><br><span id="faq-title" data-i18n="faq.h2">Нас часто спрашивают</span></span><span class="chev" aria-hidden="true">+</span></summary>
+    <div class="faq-list">
       <div class="faq-item">
         <button type="button" class="faq-q" aria-expanded="false"><span data-i18n="faq.1q">Может ли иностранец купить недвижимость в Таиланде?</span><span class="chev" aria-hidden="true">+</span></button>
         <div class="faq-a"><div class="faq-a-inner"><p data-i18n="faq.1a">Да, полностью легально. Квартиру в кондоминиуме можно оформить сразу в собственность (freehold) — на иностранцев выделено до 49% площади здания. Виллы и землю оформляют через долгосрочный зарегистрированный leasehold или тайскую компанию. Каждую сделку сопровождают юристы по тайскому праву.</p></div></div>
@@ -1946,6 +1953,8 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
       </div>
     </div>
   </div>
+    </details>
+
 </section>
 
 <!-- ===== FINAL CTA ===== -->
