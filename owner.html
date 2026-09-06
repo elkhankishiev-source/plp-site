@@ -4868,6 +4868,35 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
           })[0];
           if(hit){ pickWho.add([hit.code]); found++; } else miss.push(v);
         });
+        /* Эльнур 06.09: «свой номер не вводится». Список для выбора — только
+           клиенты с проверенным номером, поэтому свои и новые контакты в нём
+           не появлялись. Не нашли в списке — ищем по всей базе. */
+        if(miss.length){
+          var pending=miss.slice(), stillMiss=[];
+          var done=0;
+          pending.forEach(function(v){
+            post({action:'clients',token:TOKEN,q:v,limit:5}).then(function(d){
+              var rows=(d&&d.data&&d.data.rows)||[];
+              var dg=v.replace(/[^0-9]/g,'');
+              var hit2=rows.filter(function(c){
+                var cp=String(c.phone||'').replace(/[^0-9]/g,'');
+                return (dg.length>=8 && cp && cp.slice(-9)===dg.slice(-9)) ||
+                       String(c.code||'').toUpperCase()===v.toUpperCase();
+              })[0]||rows[0];
+              if(hit2 && hit2.code){ pickWho.add([hit2.code]); found++; }
+              else stillMiss.push(v);
+            }).catch(function(){ stillMiss.push(v); }).then(function(){
+              if(++done===pending.length){
+                say(stillMiss.length
+                  ? ('Добавил: '+found+'. Не нашёл в базе: '+stillMiss.join(', ')+
+                     ' — заведите человека в разделе «Люди», потом добавьте в рассылку.')
+                  : ('Добавил: '+found+'.'));
+              }
+            });
+          });
+          document.getElementById('cm-paste').value='';
+          return;
+        }
         document.getElementById('cm-paste').value='';
         var msg='Добавил: '+found+'.';
         if(miss.length) msg+='\n\nНе нашёл в базе: '+miss.join(', ')+
