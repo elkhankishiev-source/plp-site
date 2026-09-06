@@ -2169,7 +2169,7 @@ ru: {
   "calc.furn":"Мебельный пакет, ฿","calc.reg":"Регистрация/сбор, ฿","calc.sink":"Фонд капремонта, ฿",
   "calc.horizon":"Горизонт, лет","calc.exit":"Комиссия при перепродаже, %",
   "calc.down":"Первый взнос, %","calc.st1":"Этап стройки 1, %","calc.st2":"Этап стройки 2, %","calc.st3":"Этап стройки 3, %","calc.rate":"Курс, ฿/$",
-  "calc.checkv":"считаем точно","calc.checkl":"ставки по этому объекту сверяем с рынком — доходность и срок окупаемости пришлём расчётом",
+  "calc.net5":"Аренда за 5 лет","calc.checkv":"считаем точно","calc.checkl":"ставки по этому объекту сверяем с рынком — доходность и срок окупаемости пришлём расчётом",
   "calc.fullinc":"Полный доход за {n} лет","calc.capgain":"Прирост стоимости за {n} лет","calc.disc":"Скидка, %","calc.discp":"Со скидкой: {b} (≈ ${u})","calc.norates":"впишите ставку аренды в «Ещё параметры» — посчитаем доходность","calc.schedttl":"График платежей","pay.title":"Условия оплаты","pay.first":"первый взнос","pay.note":"График подтверждаем у застройщика на дату брони — он может сдвигаться вслед за стройкой.",
   "calc.sc.pay":"Платёж","calc.sc.date":"Дата","calc.sc.pct":"%","calc.sc.amt":"Сумма","calc.sc.down":"Первый взнос","calc.sc.stage":"Этап","calc.sc.keys":"Ключи","calc.sc.total":"Итого",
   "calc.schednote":"Прикидка по срокам стройки. Точные даты — в договоре застройщика.","calc.schedwarn":"Сумма этапов больше цены — уменьшите проценты.","calc.schedplan":"График застройщика","calc.schedready":"Объект сдан — рассрочки на стройку нет, расчёт при передаче.","calc.schednodate":"Срок сдачи уточняется у застройщика — сроки взносов даём по договору.",
@@ -2355,7 +2355,7 @@ en: {
   "calc.furn":"Furniture package, ฿","calc.reg":"Registration/fees, ฿","calc.sink":"Sinking fund, ฿",
   "calc.horizon":"Horizon, yrs","calc.exit":"Resale commission, %",
   "calc.down":"Down payment, %","calc.st1":"Construction stage 1, %","calc.st2":"Construction stage 2, %","calc.st3":"Construction stage 3, %","calc.rate":"Rate, ฿/$",
-  "calc.checkv":"we verify","calc.checkl":"we are cross-checking the rates for this property — we will send the yield and payback as a calculation",
+  "calc.net5":"Rental income, 5 yrs","calc.checkv":"we verify","calc.checkl":"we are cross-checking the rates for this property — we will send the yield and payback as a calculation",
   "calc.fullinc":"Total return over {n} yrs","calc.capgain":"Capital growth over {n} yrs","calc.disc":"Discount, %","calc.discp":"Discounted: {b} (≈ ${u})","calc.norates":"enter a rental rate under More settings and we will compute the yield","calc.schedttl":"Payment schedule","pay.title":"Payment terms","pay.first":"first payment","pay.note":"We confirm the schedule with the developer on the booking date — it can shift with construction.",
   "calc.sc.pay":"Payment","calc.sc.date":"Date","calc.sc.pct":"%","calc.sc.amt":"Amount","calc.sc.down":"Down payment","calc.sc.stage":"Stage","calc.sc.keys":"Keys","calc.sc.total":"Total",
   "calc.schednote":"An estimate based on construction timing. Exact dates are in the developer contract.","calc.schedwarn":"Stages exceed the price — reduce the percentages.","calc.schedplan":"Developer schedule","calc.schedready":"The property is finished — no construction installments, payment at transfer.","calc.schednodate":"The handover date is being confirmed with the developer — instalment dates come from the contract.",
@@ -3488,7 +3488,7 @@ function chatCalcReply(low){
   if(!p)p=PL.PROPERTIES.slice().sort(function(a,b){return (b.roi||0)-(a.roi||0);})[0];
   var r=calcFromData(p.calc);
   /* тот же гейт, что и в карточке: непроверенный срок окупаемости не называем */
-  var cOk=!((p.calc||{}).estimated) && r.netY>=2 && r.netY<=15 && r.payback>0 && r.payback<=25;
+  var cOk=!((p.calc||{}).estimated) && r.netY>=4 && r.netY<=15 && r.payback>0 && r.payback<=12;
   botT(tpl('chat.r.calc',{o:p.title,d:loc(p.loc),n:fmtBt(r.net),y:(netYieldByLoc(p.loc)||r.netY.toFixed(1)),p:cOk?r.payback.toFixed(1):'—'}),700);
   setTimeout(function(){aiCards([p.property_id]);},2400);
   if(!leadShown)setTimeout(function(){offerLead(false);},3400);
@@ -3938,15 +3938,24 @@ function wireCalc(p){
        вообще не пиши и не пугай». Окупаемость под 50 лет означает одно: ставки
        аренды по объекту ещё не выверены с рынком. Такие цифры на витрину не
        выпускаем — вместо них честное «считаем точно». */
+    /* Пороги задал Эльнур 06.09: доходность 4–15% годовых, окупаемость не
+       больше 12 лет. Цифры вне этих рамок значат, что ставки по объекту ещё не
+       выверены, — клиент не должен видеть «49 лет» и уходить.
+       Арифметика: 12 лет окупаемости — это 8,3% годовых, поэтому плитку срока
+       показываем только у самых доходных, а доходность 4–15% сама по себе
+       честная и остаётся на месте. */
     var cc=(p&&p.calc)||{};
-    var trusted = !cc.estimated && netY>=2 && netY<=15 && payback>0 && payback<=25;
-    window.__calcTrusted = trusted;
+    var yieldOk = !cc.estimated && netY>=4 && netY<=15;
+    var backOk  = yieldOk && payback>0 && payback<=12;
+    window.__calcTrusted = yieldOk;
     document.getElementById('calcKpi').innerHTML= noRates
       ? '<div class="kpi wide"><div class="kv">—</div><div class="kl">'+t('calc.norates')+'</div></div>'
-      : (trusted
+      : (yieldOk
          ? ('<div class="kpi"><div class="kv">'+fmtTHB(net)+'</div><div class="kl">'+t('calc.netyr')+'</div></div>'+
             '<div class="kpi"><div class="kv">'+netY.toFixed(1)+'%</div><div class="kl">'+t('calc.netyield')+'</div></div>'+
-            '<div class="kpi"><div class="kv">'+payback.toFixed(1)+' '+t('calc.years')+'</div><div class="kl">'+t('calc.payback')+'</div></div>')
+            (backOk
+              ? '<div class="kpi"><div class="kv">'+payback.toFixed(1)+' '+t('calc.years')+'</div><div class="kl">'+t('calc.payback')+'</div></div>'
+              : '<div class="kpi"><div class="kv">'+fmtTHB(net*5)+'</div><div class="kl">'+t('calc.net5')+'</div></div>'))
          : ('<div class="kpi"><div class="kv">'+fmtTHB(net)+'</div><div class="kl">'+t('calc.netyr')+'</div></div>'+
             '<div class="kpi wide"><div class="kv">'+t('calc.checkv')+'</div><div class="kl">'+t('calc.checkl')+'</div></div>'));
     document.getElementById('calcOut').innerHTML=

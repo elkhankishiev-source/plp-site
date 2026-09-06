@@ -151,7 +151,10 @@ const M_CABIN = `<section style="padding-top:26px"><div class="container">
     <a class="btn btn-ghost" href="https://t.me/elnurphuket_bot?start=uk" target="_blank" rel="noopener">Обсудить объект в Telegram</a>
   </div>
 </div></section>`;
-const mgmt = [M_HERO, M_SERV, wrapSection(grabPart('rent-care')), M_PRICE, M_CABIN,
+/* «Что видно в кабинете» на публичной странице не нужно: Эльнур 06.09 —
+   «в кабинете уже и так видно». Блок M_CABIN оставлен в файле на случай
+   возврата, но в страницу не собирается. */
+const mgmt = [M_HERO, M_SERV, wrapSection(grabPart('rent-care')), M_PRICE,
               M_LIST, rentCatalogOnly(), wrapSection(grabPart('rent-band')),
               wrapSection(grabPart('rent-island'))].join('\n');
 
