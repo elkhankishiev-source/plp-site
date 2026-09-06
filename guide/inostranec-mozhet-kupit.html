@@ -1401,6 +1401,15 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
 /* подпись карты всегда на своей светлой подложке */
 .leaflet-control-attribution{background:rgba(255,255,255,.86)!important;color:#333!important}
 .leaflet-control-attribution a{color:#0b6bcb!important}
+
+/* Нажатие по карточке не должно белить текст: на телефоне срабатывало системное
+   выделение и подсветка тапа (Эльнур 06.09). Свой цвет выделения — в нашей палитре. */
+::selection{background:var(--green);color:var(--on-green)}
+::-moz-selection{background:var(--green);color:var(--on-green)}
+.prop,.zone,.zprop,.mobj,.msub-h,.openrow,.bcell,.cab-nav a,.fbtn,.chipf,.opt,.mdot,.unit{
+  -webkit-tap-highlight-color:transparent}
+.prop,.zone,.zprop,.mobj{user-select:none}
+.prop *,.zone *,.zprop *{-webkit-user-select:none;user-select:none}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.6.0/maplibre-gl.min.css">

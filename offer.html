@@ -81,6 +81,15 @@ p.text{margin:0;font-size:.94rem;line-height:1.6}
 .msg p{color:var(--muted);font-size:.94rem}
 .skel{color:var(--muted);font-size:.9rem;padding:40px 26px;text-align:center}
 @media print{body{background:#fff}.card{box-shadow:none}.cta{display:none}}
+
+/* Нажатие по карточке не должно белить текст: на телефоне срабатывало системное
+   выделение и подсветка тапа (Эльнур 06.09). Свой цвет выделения — в нашей палитре. */
+::selection{background:var(--green);color:var(--on-green)}
+::-moz-selection{background:var(--green);color:var(--on-green)}
+.prop,.zone,.zprop,.mobj,.msub-h,.openrow,.bcell,.cab-nav a,.fbtn,.chipf,.opt,.mdot,.unit{
+  -webkit-tap-highlight-color:transparent}
+.prop,.zone,.zprop,.mobj{user-select:none}
+.prop *,.zone *,.zprop *{-webkit-user-select:none;user-select:none}
 </style>
 </head>
 <body>
