@@ -2244,6 +2244,40 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
           });
       });
   }
+  /* Заявка на перепродажу: цена, срочность и комментарий уходят нам обычной
+     заявкой; дальше сотрудник оформляет карточку и возвращает владельцу ссылку. */
+  function resaleForm(pid){
+    var p=(DATA.properties||[]).filter(function(x){ return String(x.id)===String(pid); })[0]
+        || (DATA.properties||[])[CUR] || {};
+    clForm('<h3>Выставить на перепродажу</h3>'+
+      '<p class="sub">Объект: <b>'+clEsc(p.name||pid)+'</b>. Проверим цену и условия, '+
+      'оформим карточку на сайте и пришлём ссылку — её можно отправлять покупателям. '+
+      'Публикуем только после вашего подтверждения.</p>'+
+      '<div class="fgrid">'+
+        '<label>Ваша цена, ฿<input id="f-price" type="number" inputmode="numeric" placeholder="например, 9500000"></label>'+
+        '<label>Насколько срочно<select id="f-urg">'+
+          '<option value="без спешки">без спешки</option>'+
+          '<option value="в течение пары месяцев">в течение пары месяцев</option>'+
+          '<option value="срочно">срочно</option></select></label>'+
+        '<label class="wide">Что важно знать<textarea id="f-note" rows="3" '+
+          'placeholder="торг, мебель в цене, кто платит за перевод, особые условия"></textarea></label>'+
+      '</div>'+
+      '<div class="fbtns"><button type="button" class="btn" id="f-save">Отправить</button>'+
+      '<button type="button" class="btn ghost" id="f-cancel">Отмена</button></div>',
+      function(){
+        var b=document.getElementById('f-save'); if(b){ b.disabled=true; b.textContent='…'; }
+        var urg=document.getElementById('f-urg');
+        post({action:'request',token:TOKEN,property_id:pid,kind:'resale',
+              details:'Цена: '+(fv('f-price')||'по договорённости')+' ฿ · срочность: '+
+                      (urg?urg.value:'—')+(fv('f-note')?(' · '+fv('f-note')):'')})
+          .then(function(r){
+            var f=document.getElementById('cl-form');
+            if(f){ f.innerHTML=''; document.body.style.overflow=''; }
+            if(r&&r.ok){ say('Заявка принята. Подготовим карточку и пришлём ссылку.'); loadData(); }
+            else say('Не отправилось: '+((r&&r.error)||'ошибка'));
+          });
+      });
+  }
   function bindUkForms(){
     /* Действия по объекту (операция, работа, документ) вешаем на документ:
        разделы перерисовываются, и привязка к узлам терялась — ссылки выглядели
@@ -2276,6 +2310,8 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
             });
           return;
         }
+        var rsl=t.closest && t.closest('[data-resale]');
+        if(rsl){ e.preventDefault(); resaleForm(rsl.getAttribute('data-resale')); return; }
         var uk=t.closest && t.closest('[data-uk]');
         if(uk){
           e.preventDefault();
@@ -3035,6 +3071,16 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       bh+='<p class="sub"><a href="#" class="lnk" data-uk="book" data-pid="'+(p.id||'')+
           '">Поставить бронь</a> — даты, гость, сумма и канал. Пересечение дат система не пропустит.</p>';
     H+=card('Календарь заездов', bh, 'sec-calendar');
+
+    /* Эльнур 06.09: пока дом строится, сдавать нечего — зато объект можно
+       выставить на перепродажу через нас, и владелец получит ссылку. */
+    var underBuild = /construct|стро/i.test(String(p.stage||''));
+    var rs='<p class="sub">'+
+      (underBuild
+        ? 'Объект ещё строится, поэтому аренда пока недоступна. Зато его можно выставить на перепродажу: проверим цену, оформим карточку на сайте и пришлём ссылку — её можно отправлять покупателям.'
+        : 'Хотите продать объект? Оформим карточку на сайте и пришлём ссылку — её можно отправлять покупателям.')+
+      '</p><div class="fbtns"><button type="button" class="btn" data-resale="'+(p.id||'')+'">Выставить на перепродажу</button></div>';
+    H+=card('Перепродажа', rs, 'sec-resale');
 
     // ставки
     var rt=p.rates||[], rh='';
@@ -4818,7 +4864,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     'portfolio':'overview', 'prop-tabs':'object', 'prop':'object',
     'sec-money':'money', 'sec-calendar':'calendar', 'sec-reports':'docs',
     'sec-docs':'docs',
-    'sec-service':'service', 'sec-costs':'costs',
+    'sec-service':'service', 'sec-costs':'costs', 'sec-resale':'object',
     'sec-edit':'object', 'sec-objedit':'object', 'sec-addobj':'actions', 'sec-request':'actions',
     'sec-myreq':'actions', 'sec-moder':'staff', 'sec-coords':'staff',
     'sec-clients':'clients', 'sec-mine':'mine', 'sec-board':'board', 'sec-camp':'camp'
@@ -5551,6 +5597,7 @@ window.openChat=openChat;window.closeChat=closeChat;window.clearChat=clearChat;w
     {id:'price',    title:'Изменить цену или условия'},
     {id:'docs',     title:'Документы'},
     {id:'payout',   title:'Вопрос по выплате'},
+    {id:'resale',   title:'Выставить на перепродажу'},
     {id:'other',    title:'Другое'}
   ];
   var REQ_CLIENT=null, REQ_ALLOBJ=[];
