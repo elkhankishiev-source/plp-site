@@ -39,6 +39,14 @@
    ]
   },
   {
+   "id": "PLP-AYANA",
+   "name": "AYANA Heights Seaview Residences",
+   "district": "Phuket",
+   "type": "Кондо",
+   "price_from": null,
+   "units": []
+  },
+  {
    "id": "PLP-BALCONY",
    "name": "The BALCONY Nai Yang",
    "district": "Най Янг",
@@ -130,6 +138,14 @@
    ]
   },
   {
+   "id": "PLP-CLOVER",
+   "name": "Clover Residence",
+   "district": "Банг Тао",
+   "type": "Вилла",
+   "price_from": 66288000,
+   "units": []
+  },
+  {
    "id": "PLP-CORALINA",
    "name": "The Title Coralina Kamala",
    "district": "Камала",
@@ -165,6 +181,30 @@
    "units": []
   },
   {
+   "id": "PLP-EDEN-ETRO",
+   "name": "ETRO Residences Phuket",
+   "district": "Банг Тао",
+   "type": "Кондо",
+   "price_from": null,
+   "units": []
+  },
+  {
+   "id": "PLP-EDEN-PARK",
+   "name": "Eden · Park Residences",
+   "district": "Банг Тао",
+   "type": "Кондо",
+   "price_from": null,
+   "units": []
+  },
+  {
+   "id": "PLP-EDEN-RES",
+   "name": "Eden Residences",
+   "district": "Банг Тао",
+   "type": "Кондо",
+   "price_from": null,
+   "units": []
+  },
+  {
    "id": "PLP-ESTELLA",
    "name": "The Title Villa Estella Naiyang",
    "district": "Най Янг",
@@ -178,6 +218,22 @@
      "from": 18600000
     }
    ]
+  },
+  {
+   "id": "PLP-EVERPRIME",
+   "name": "Ever Prime",
+   "district": "Phuket",
+   "type": "Кондо",
+   "price_from": null,
+   "units": []
+  },
+  {
+   "id": "PLP-FANTASY-RAWAI",
+   "name": "Fantasy Plus Rawai",
+   "district": "Равай",
+   "type": "Кондо",
+   "price_from": 5700000,
+   "units": []
   },
   {
    "id": "PLP-HALO1",
@@ -226,6 +282,14 @@
      "from": 20887146
     }
    ]
+  },
+  {
+   "id": "PLP-HYTHE",
+   "name": "HYTHE by Botanica",
+   "district": "Phuket",
+   "type": "Кондо",
+   "price_from": null,
+   "units": []
   },
   {
    "id": "PLP-KATABELLO",
@@ -398,6 +462,22 @@
    ]
   },
   {
+   "id": "PLP-MORI-VALLEY",
+   "name": "MORI The Valley",
+   "district": "Банг Тао",
+   "type": "Вилла",
+   "price_from": 16670000,
+   "units": []
+  },
+  {
+   "id": "PLP-MORI1",
+   "name": "MORI 1",
+   "district": "Банг Тао",
+   "type": "Вилла",
+   "price_from": 16510000,
+   "units": []
+  },
+  {
    "id": "PLP-PEYLAA",
    "name": "PEYLAA Phuket, Autograph Collection Residences",
    "district": "Банг Тао",
@@ -467,6 +547,22 @@
    ]
   },
   {
+   "id": "PLP-STANDARD",
+   "name": "The Standard Residences Phuket Bang Tao",
+   "district": "Банг Тао",
+   "type": "Кондо",
+   "price_from": null,
+   "units": []
+  },
+  {
+   "id": "PLP-SUDARA",
+   "name": "Sudara Phuket",
+   "district": "Phuket",
+   "type": "Вилла",
+   "price_from": null,
+   "units": []
+  },
+  {
    "id": "PLP-SUNHILLS-LAYAN",
    "name": "SUN HILLS Layan",
    "district": "Лаян",
@@ -492,6 +588,14 @@
      "from": 6750000
     }
    ]
+  },
+  {
+   "id": "PLP-VIBE-KARON",
+   "name": "Vibe Residence Karon",
+   "district": "Карон",
+   "type": "Кондо",
+   "price_from": null,
+   "units": []
   },
   {
    "id": "PLP-VIVANA",
@@ -528,6 +632,72 @@
      "from": 3500000
     }
    ]
+  },
+  {
+   "id": "PLP-ZENITHY",
+   "name": "Zenithy La Ville · Oasis Collection",
+   "district": "Ко Кео",
+   "type": "Вилла",
+   "price_from": 20940000,
+   "units": []
+  },
+  {
+   "id": "PLP-ZERO-BANGTAO",
+   "name": "The ZERO Bang Tao",
+   "district": "Банг Тао",
+   "type": "Кондо",
+   "price_from": null,
+   "units": []
+  },
+  {
+   "id": "PLP-ZERO-NAIYANG",
+   "name": "The ZERO Nai Yang",
+   "district": "Най Янг",
+   "type": "Кондо",
+   "price_from": 4446514,
+   "units": [
+    {
+     "тип": "Студия",
+     "цена_฿": "4 203 750 – 5 613 964",
+     "площадь_м2": "29,5–36,3"
+    },
+    {
+     "тип": "1 спальня",
+     "цена_฿": "5 263 393 – 6 755 143",
+     "площадь_м2": "37,5–44,4"
+    },
+    {
+     "тип": "1 спальня+",
+     "цена_฿": "6 231 857 – 7 236 000",
+     "площадь_м2": "44,4–46,9"
+    },
+    {
+     "тип": "2 спальни",
+     "цена_฿": "7 680 750 – 10 147 929",
+     "площадь_м2": "53,9–66,7"
+    },
+    {
+     "тип": "Сьют",
+     "цена_฿": "14 040 000 – 16 324 179",
+     "площадь_м2": "91,0–100,9"
+    }
+   ]
+  },
+  {
+   "id": "RESALE-PANORA",
+   "name": "Panora Villas, Сурин — перепродажа",
+   "district": "Сурин",
+   "type": "Вилла",
+   "price_from": 19850000,
+   "units": []
+  },
+  {
+   "id": "RESALE-RAWAI-POOLVILLA",
+   "name": "Пул-вилла Раваи, 5 спален — перепродажа",
+   "district": "Равай",
+   "type": "Вилла",
+   "price_from": 39750000,
+   "units": []
   }
  ]
 }
