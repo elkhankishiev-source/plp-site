@@ -44,7 +44,7 @@
 <meta name="description" content="Расскажите об объекте и приложите фото — проверим, оформим карточку и опубликуем. Управление арендой, отчёты и выплаты в личном кабинете.">
 
 <!-- ===== SEO / SOCIAL ===== -->
-<link rel="canonical" href="https://property-library.com/add-property.html">
+<link rel="canonical" href="https://property-library.com/add-property">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Property Library Phuket">
 <meta name="robots" content="index,follow">
@@ -59,7 +59,7 @@
 <meta property="og:site_name" content="Property Library Phuket">
 <meta property="og:title" content="Разместить объект на Пхукете — сдать или продать через Property Library">
 <meta property="og:description" content="Расскажите об объекте и приложите фото — проверим, оформим карточку и опубликуем. Управление арендой, отчёты и выплаты в личном кабинете.">
-<meta property="og:url" content="https://property-library.com/add-property.html">
+<meta property="og:url" content="https://property-library.com/add-property">
 <meta property="og:image" content="https://property-library.com/img/PLP-HERITAGE.jpg">
 <meta property="og:image:secure_url" content="https://property-library.com/img/PLP-HERITAGE.jpg">
 <meta property="og:image:type" content="image/jpeg">
@@ -72,7 +72,7 @@
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Property Library Phuket. Агентство недвижимости на Пхукете">
-<meta name="twitter:description" content="Подберем недвижимость для покупки или аренды на Пхукете. Все под ключ — от первого звонка до заезда.">
+<meta name="twitter:description" content="Подберем недвижимость для покупки или аренды на Пхукете. Все под ключ — от первого звонка до заезда и получения дохода.">
 <meta name="twitter:image" content="https://property-library.com/img/PLP-HERITAGE.jpg">
 <meta name="twitter:image:alt" content="Property Library Phuket — недвижимость на Пхукете">
 
@@ -187,6 +187,21 @@
 </script>
 <style>
 html{background:var(--bg);overscroll-behavior-y:none}
+/* PLP:ANTIFLICKER */
+/* Мигание фона на телефоне — сводная защита. Эльнур 06.09: «фон в мобильной
+   версии везде мигает, ищи по всем страницам». Три источника:
+   1) размытие фона (backdrop-filter) под липкими элементами — браузер
+      перерисовывает весь экран на каждом кадре прокрутки;
+   2) долгое проявление блоков при прокрутке;
+   3) отложенные картинки без фона — на их месте на миг светится подложка. */
+@media(max-width:900px){
+  .header,#toTop,.badge,.pm-tag,.car .tag,.btn-glass,.hero-float,.fbtn,.chipf,
+  .modal-overlay,.mnav,.sheet,.pm-card,.toolbox{
+    backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+  .reveal{transition-duration:.35s!important}
+}
+.pic-photo,.thumb-photo,.prgs img,.simi-c i,.pm-img img{background-color:var(--warm,#EFEEE7)}
+/* PLP:ANTIFLICKER */
 :root{
   --green:#D2D5B3;
   --green-soft:#E9EBD9;
@@ -1460,13 +1475,13 @@ html,*{-webkit-tap-highlight-color:transparent}
 <!-- PLP:HEADER:START -->
 <header class="header">
   <div class="container header-inner">
-    <a class="logo" href="index.html" aria-label="Property Library — на главную"><span class="chip"><img src="img/brand/plp-mark-ink.png" alt="Property Library Phuket" width="24"></span><span class="lname">Property <span>Library</span></span></a>
+    <a class="logo" href="/" aria-label="Property Library — на главную"><span class="chip"><img src="img/brand/plp-mark-ink.png" alt="Property Library Phuket" width="24"></span><span class="lname">Property <span>Library</span></span></a>
     <nav class="nav" aria-label="Основное меню">
-      <a href="buy.html" data-i18n="nav.sale">Продажа</a>
-      <a href="rent.html" data-i18n="nav.rent">Аренда</a>
-      <a href="index.html#map" data-i18n="nav.map">Районы</a>
-      <a href="management.html">Управление</a>
-      <a href="index.html#about" data-i18n="nav.about">О нас</a>
+      <a href="/buy" data-i18n="nav.sale">Продажа</a>
+      <a href="/rent" data-i18n="nav.rent">Аренда</a>
+      <a href="/#map" data-i18n="nav.map">Районы</a>
+      <a href="/management">Управление</a>
+      <a href="/#about" data-i18n="nav.about">О нас</a>
     </nav>
     <div class="htools">
       <div class="lang" role="group" aria-label="Язык">
@@ -1477,7 +1492,7 @@ html,*{-webkit-tap-highlight-color:transparent}
       <button type="button" class="themebtn" id="themeBtn" onclick="cycleTheme()"
               aria-label="Оформление: системное, светлое, тёмное"><span id="themeIco">◐</span></button>
       <span class="swch" role="group" aria-label="Сайт или кабинет">
-        <b>Сайт</b><a href="owner.html" data-i18n="nav.cabinet">Кабинет</a>
+        <b>Сайт</b><a href="/owner" data-i18n="nav.cabinet">Кабинет</a>
       </span>
       <button type="button" class="burger" aria-label="Меню" onclick="toggleNav(true)"><i></i><i></i><i></i></button>
     </div>
@@ -1490,17 +1505,24 @@ html,*{-webkit-tap-highlight-color:transparent}
 <div class="mnav" id="mnav" onclick="if(event.target===this)toggleNav(false)">
   <div class="sheet">
     <div class="top"><b data-i18n="nav.menu">Меню</b><button type="button" class="xx" onclick="toggleNav(false)" aria-label="Закрыть">×</button></div>
-    <a href="buy.html" data-i18n="nav.sale">Продажа</a>
-    <a href="rent.html" data-i18n="nav.rent">Аренда</a>
+    <a href="/buy" data-i18n="nav.sale">Продажа</a>
+    <a href="/rent" data-i18n="nav.rent">Аренда</a>
     <a href="#map" onclick="toggleNav(false)" data-i18n="nav.map">Районы</a>
-    <a href="management.html">Управление</a>
-    <a href="add-property.html">Разместить объект</a>
+    <a href="/management">Управление</a>
+    <a href="/add-property">Разместить объект</a>
     <a href="#about" onclick="toggleNav(false)" data-i18n="nav.about">О нас</a>
-    <div class="mlang">
-      <button type="button" data-l="ru" class="on" onclick="setLang('ru')">RU</button>
-      <button type="button" data-l="en" onclick="setLang('en')">EN</button>
+    <!-- Эльнур 06.09: язык и оформление на телефоне живут здесь, одинаково
+         на сайте и в кабинете. В шапке их на узком экране нет. -->
+    <div class="mtools">
+      <div class="mlang" role="group" aria-label="Язык">
+        <button type="button" data-l="ru" class="on" onclick="setLang('ru')">RU</button>
+        <button type="button" data-l="en" onclick="setLang('en')">EN</button>
+      </div>
+      <button type="button" class="mtheme" onclick="cycleTheme()" aria-label="Оформление">
+        <span id="mThemeIco">◐</span><span data-i18n="nav.theme">Оформление</span>
+      </button>
     </div>
-    <a href="owner.html" onclick="toggleNav(false)" data-i18n="nav.cabinet">Кабинет</a>
+    <a href="/owner" onclick="toggleNav(false)" data-i18n="nav.cabinet">Кабинет</a>
     <button type="button" class="mwa" onclick="toggleNav(false);openChat('hi')" data-i18n="nav.chat">Чат с консультантом</button>
   </div>
 </div>
@@ -1617,6 +1639,7 @@ html,*{-webkit-tap-highlight-color:transparent}
 .ap-thumb .bar{position:absolute;left:0;bottom:0;height:3px;background:var(--green-deep);width:0}
 .ap-sum{background:#f7f6f1;border-radius:16px;padding:16px 18px;margin-top:18px;font-size:14.5px;line-height:1.7}
 .ap-sum b{color:var(--ink)}
+
 </style>
 
 <script>
@@ -1758,7 +1781,7 @@ html,*{-webkit-tap-highlight-color:transparent}
           '<h2 style="font-size:22px;margin:0 0 8px">Спасибо, объект принят</h2>'+
           '<p class="sub" style="margin:0 0 14px">Менеджер посмотрит материалы, оформит карточку и свяжется с вами. '+
           'Обычно это занимает один рабочий день.</p>'+
-          '<div class="hero-cta" style="margin:0"><a class="btn btn-primary" href="index.html">На главную</a>'+
+          '<div class="hero-cta" style="margin:0"><a class="btn btn-primary" href="/">На главную</a>'+
           '<a class="btn btn-ghost" href="'+BOT_LINK+'?start=object" target="_blank" rel="noopener">Написать в Telegram</a></div>';
         window.scrollTo({top:0,behavior:'smooth'});
       } else { g('ap-err').textContent='Не отправилось. Напишите нам в WhatsApp — примем объект вручную.'; }
@@ -1876,10 +1899,10 @@ window.PL = {};
 PL.I18N = {
 ru: {
   "meta.title":"Property Library Phuket. Агентство недвижимости на Пхукете",
-  "meta.desc":"Подберем недвижимость для покупки или аренды на Пхукете, оформим сделку, поможем с визой и обустройством. Все под ключ — от первого звонка до заезда.",
+  "meta.desc":"Подберем недвижимость для покупки или аренды на Пхукете, оформим сделку, поможем с визой и обустройством. Все под ключ — от первого звонка до заезда и получения дохода.",
   "nav.why":"Пхукет","nav.sale":"Продажа","nav.rent":"Аренда","nav.map":"Районы","nav.quiz":"Подбор","nav.about":"О нас","nav.faq":"FAQ","nav.menu":"Меню",
   "hero.h1":"Мы уже выбрали Пхукет — поможем и&nbsp;вам",
-  "hero.lead":"Подберем недвижимость для покупки или аренды, оформим сделку, поможем с визой и обустройством. Все под ключ — от первого звонка до заезда.",
+  "hero.lead":"Подберем недвижимость для покупки или аренды, оформим сделку, поможем с визой и обустройством. Все под ключ — от первого звонка до заезда и получения дохода.",
   "cta.free":"бесплатная консультация","hero.cta1":"Подобрать за 10 минут","hero.cta2":"Смотреть объекты",
   "hero.note":"Бесплатная консультация","hero.float":"Ответим в течение 5 минут",
   "ph.elnur":"фото Эльнура","ph.object":"фото скоро",
@@ -1978,7 +2001,7 @@ ru: {
   "cta.h2":"Поможем выбрать, купить и переехать",
   "cta.p":"Оставьте заявку — ответим в течение 5 минут в рабочее время и бесплатно проконсультируем, чтобы подобрать лучший вариант для покупки или аренды.",
   "cta.b1":"Оставить заявку","cta.b2":"Подобрать за 10 минут","cta.b3":"Перейти в Telegram-бот",
-  "ft.tag":"Мы уже выбрали Пхукет, поможем и вам. Все под ключ — от первого звонка до заезда.",
+  "ft.tag":"Мы уже выбрали Пхукет, поможем и вам. Все под ключ — от первого звонка до заезда и получения дохода.",
   "ft.menu":"Меню","ft.buy":"Покупка","ft.contacts":"Контакты","ft.connect":"Мы на связи","ft.bot":"Консьерж в Telegram 24/7","ft.tg":"Telegram-канал","ft.terms":"Условия использования","ft.rules":"Правила бронирования и проживания","ft.policy":"Политика конфиденциальности",
   "rs.9t":"Консьерж 24/7","rs.9p":"Бот в Telegram отвечает в любое время суток, сложное сразу берёт на себя менеджер","rs.10t":"Управление жильём","rs.10p":"Если сдаёте своё: заселяем гостей, ведём календарь и показываем доход в личном кабинете","val.7":"Заботимся, а не продаём","val.8":"Эксклюзивные условия","val.9":"Консьерж на связи 24/7",
   "lf.err.empty":"Оставьте номер телефона или ник в Telegram — иначе мы не сможем ответить.","lf.err.short":"Похоже, в номере не хватает цифр. Проверьте, пожалуйста.","lf.err.bad":"Не похоже на номер, @ник или почту. Напишите так, как вам удобно ответить.",
@@ -2061,10 +2084,10 @@ ru: {
 },
 en: {
   "meta.title":"Property Library Phuket. Real estate agency in Phuket",
-  "meta.desc":"We help you buy or rent property in Phuket, handle the deal, visas and relocation. Full service — from the first call to move-in.",
+  "meta.desc":"We help you buy or rent property in Phuket, handle the deal, visas and relocation. Full service — from the first call to move-in and first income.",
   "nav.why":"Phuket","nav.sale":"Buy","nav.rent":"Rent","nav.map":"Areas","nav.quiz":"Matchmaker","nav.about":"About","nav.faq":"FAQ","nav.menu":"Menu",
   "hero.h1":"We already chose Phuket — let us help&nbsp;you",
-  "hero.lead":"We find property to buy or rent, handle the deal, help with visas and settling in. Full service — from the first call to move-in.",
+  "hero.lead":"We find property to buy or rent, handle the deal, help with visas and settling in. Full service — from the first call to move-in and first income.",
   "cta.free":"free consultation","hero.cta1":"Get matched in 10 minutes","hero.cta2":"Browse properties",
   "hero.note":"Free consultation","hero.float":"We reply within 5 minutes",
   "ph.elnur":"photo of Elnur","ph.object":"photo soon",
@@ -2163,7 +2186,7 @@ en: {
   "cta.h2":"We will help you choose, buy and move",
   "cta.p":"Leave a request — we will reply within 5 minutes during working hours and consult you for free to find the best option to buy or rent.",
   "cta.b1":"Leave a request","cta.b2":"Find me a match in 10 minutes","cta.b3":"Open the Telegram bot",
-  "ft.tag":"We already chose Phuket — let us help you. Full service, from the first call to move-in.",
+  "ft.tag":"We already chose Phuket — let us help you. Full service, from the first call to move-in and first income.",
   "ft.menu":"Menu","ft.buy":"Buy","ft.contacts":"Contacts","ft.connect":"Stay in touch","ft.bot":"Telegram concierge 24/7","ft.tg":"Telegram channel","ft.terms":"Terms of use","ft.rules":"Booking and stay rules","ft.policy":"Privacy policy",
   "rs.9t":"Concierge 24/7","rs.9p":"The Telegram bot answers any time of day; anything complex goes straight to a manager","rs.10t":"Property management","rs.10p":"If you rent yours out: we check guests in, keep the calendar and show the income in your account","val.7":"We care, we do not sell","val.8":"Exclusive terms","val.9":"Concierge on call 24/7",
   "lf.err.empty":"Leave a phone number or a Telegram handle — otherwise we cannot reply.","lf.err.short":"That number looks too short. Please check it.","lf.err.bad":"That is not a phone number, an @handle or an email. Write the way you would like us to reply.",
@@ -5163,7 +5186,7 @@ function openDistrict(nameRu){
   var slug=DPAGE[nameRu], extra=document.getElementById('dExtra');
   if(extra){
     extra.innerHTML='<button type="button" class="btn btn-ghost" id="dMap">Показать на карте</button>'+
-      (slug?'<a class="btn btn-ghost" href="districts/'+slug+'.html">Подробно о районе</a>':'');
+      (slug?'<a class="btn btn-ghost" href="/districts/'+slug+'">Подробно о районе</a>':'');
     var bm=document.getElementById('dMap');
     if(bm) bm.onclick=function(){
       closeDistrict(); focusDistrict(nameRu);

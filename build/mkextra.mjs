@@ -56,6 +56,41 @@ const mgmt=`<section style="padding-bottom:0"><div class="container">
   Каждый месяц вы видите доход, расходы и сумму к выплате в личном кабинете, а не в переписке с менеджером.</p>
 </div></section>
 
+<section id="list-property" style="padding-top:22px"><div class="container">
+  <div style="background:var(--green-soft);border:1px solid var(--line,rgba(var(--ink-rgb),.12));border-radius:24px;padding:clamp(20px,3vw,30px)">
+    <div style="display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:clamp(18px,3vw,34px);align-items:center">
+      <div>
+        <span class="kicker">Свой объект</span>
+        <h2 style="font-size:clamp(24px,3.4vw,34px);margin:6px 0 10px">Разместить объект</h2>
+        <p class="sub" style="margin:0 0 14px;max-width:52ch">Зачем это вам: объект попадает к тем, кто уже ищет
+        жильё на Пхукете — на сайт, в каталог консьерж-бота и в подборки, которые мы отправляем клиентам.
+        Переписку, показы и договор берём на себя.</p>
+        <ul class="sub" style="margin:0 0 18px;padding-left:20px;line-height:1.9;font-size:15px">
+          <li>Сдать в аренду или продать — решаете вы, карточку готовим под цель</li>
+          <li>Оценим ставку и цену по свежим сделкам района, а не «на глаз»</li>
+          <li>Пока объект стоит пустым, он приносит только расходы</li>
+        </ul>
+        <div class="hero-cta" style="margin:0">
+          <a class="btn btn-primary" href="add-property.html">Разместить объект</a>
+          <a class="btn btn-ghost" href="owner.html">Личный кабинет</a>
+        </div>
+      </div>
+      <div style="background:var(--paper);border-radius:18px;padding:18px 20px">
+        <p style="margin:0 0 10px;font-weight:700;font-size:15px">Пять коротких шагов</p>
+        <ol style="margin:0;padding-left:20px;color:var(--muted);font-size:15px;line-height:1.9">
+          <li>Тип, район, спальни</li>
+          <li>Готовность и на что рассчитываете</li>
+          <li>Фото и видео — можно пачкой</li>
+          <li>Описание и адрес</li>
+          <li>Контакты — и всё</li>
+        </ol>
+        <p class="sub" style="margin:12px 0 0;font-size:14px">Регистрация не нужна. Проверим материалы,
+        оформим карточку и пришлём ссылку.</p>
+      </div>
+    </div>
+  </div>
+</div></section>
+
 <section style="padding-top:26px"><div class="container">
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px">
     ${services.map(s=>`<div style="background:var(--paper);border:1px solid var(--line,rgba(var(--ink-rgb),.1));border-radius:18px;padding:18px 20px">
@@ -96,31 +131,15 @@ const mgmt=`<section style="padding-bottom:0"><div class="container">
   </div>
 </div></section>
 
-<section id="list-property" style="padding-top:26px"><div class="container">
-  <div style="background:var(--paper);border:1px solid var(--line,rgba(var(--ink-rgb),.1));border-radius:24px;padding:clamp(20px,3vw,32px);max-width:760px">
-    <span class="kicker">Свой объект</span>
-    <h2 style="font-size:clamp(22px,3vw,30px);margin:6px 0 8px">Разместить свой объект</h2>
-    <p class="sub" style="margin:0 0 18px">Пять коротких шагов: расскажите об объекте и приложите фото.
-    Мы проверим материалы, оформим карточку и опубликуем. Регистрация не нужна.</p>
-    <ol style="margin:0 0 22px;padding-left:20px;color:var(--muted);font-size:15px;line-height:1.9">
-      <li>Тип, район, спальни</li>
-      <li>Готовность и на что рассчитываете</li>
-      <li>Фото и видео — можно перетащить сразу пачкой</li>
-      <li>Описание и адрес</li>
-      <li>Контакты — и всё</li>
-    </ol>
-    <div class="hero-cta" style="margin:0">
-      <a class="btn btn-primary" href="add-property.html">Разместить объект</a>
-      <a class="btn btn-ghost" href="owner.html">Личный кабинет</a>
-    </div>
-  </div>
-</div></section>`;
+`;
 
 const made=[];
 made.push(page({file:'management.html',depth:0,
   title:'Управление недвижимостью на Пхукете — сдача, отчёты, выплаты | Property Library',
   desc:'Возьмём на себя гостей, уборку, ремонт и отчётность. Комиссия от 15% дохода, подключение бесплатно. Отчёты и выплаты — в личном кабинете.',
-  body:mgmt.replace('<!--OBJECTS-->', RENT)}));
+  /* Эльнур 06.09: «в блоке управление зачем аренда размещена?» — страница про
+     услугу управления, каталог аренды живёт на rent.html. */
+  body:mgmt.replace('<!--OBJECTS-->', '')}));
 
 /* ── ГАЙДЫ ──────────────────────────────────────────────── */
 const faq=JSON.parse(fs.readFileSync('/Users/elnurkhankishiev/plp-site/build/faq.json','utf8'));

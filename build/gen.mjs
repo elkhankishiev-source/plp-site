@@ -201,6 +201,58 @@ function fallbackCalc(o) {
 // Короткое имя застройщика для карточки. В базе поле развёрнутое, с юридическим
 // названием и регистрационным номером — в карточке это нечитаемая простыня.
 // Ничего не выдумываем: только отрезаем служебные хвосты от того, что уже есть.
+/* Контакты застройщика — наш хлеб, на витрину не идут (Эльнур 06.09:
+   «никаких номеров, сайтов, почт, каналов»). Чистим ВСЁ, что уходит на сайт:
+   описания, заметки по типам, подписи к ходу стройки. Свои каналы не трогаем —
+   их на витрине печатает шаблон, а не данные объекта. */
+const OUR = /(elnurphuket_bot|property_library_phuket|property-library\.com)/i;
+function noContacts(text) {
+  if (!text) return text;
+  let s = String(text);
+  s = s.replace(/(?:https?:\/\/)?(?:www\.)?t\.me\/[A-Za-z0-9_]+/gi, m => OUR.test(m) ? m : '');
+  s = s.replace(/@[A-Za-z][A-Za-z0-9_]{3,}/g, m => OUR.test(m) ? m : '');
+  s = s.replace(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g, m => OUR.test(m) ? m : '');
+  s = s.replace(/https?:\/\/[^\s<>"']+/gi, m => OUR.test(m) ? m : '');
+  s = s.replace(/(?:^|[\s(])(?:www\.)[^\s<>"')]+/gi, m => OUR.test(m) ? m : ' ');
+  s = s.replace(/\+?\d[\d\s()-]{8,}\d/g, '');
+  s = s.replace(/\b(?:канал|телеграм|telegram|instagram|инстаграм|whatsapp|ватсап)\s+(?:застройщика|проекта|отдела продаж)\b[:\s-]*/gi, '');
+  return s.replace(/[ \t]{2,}/g, ' ').replace(/\s+([,.;])/g, '$1').trim();
+}
+
+/* Площадь участка у вилл живёт в заметке типа («участок 270–352 м²») или
+   в описании («на участке 187-331 м²»). Эльнур 06.09: «есть площадь дома,
+   и есть еще участка, что не мало важно». Достаём и показываем отдельно. */
+function isVilla(o) { return /villa|вилл/i.test(String(o.type || '')); }
+function plotNums(txt) {
+  const nums = [];
+  const re = /участ(?:ок|ки|ке|ка|кам)?\s*(?:площадью\s*)?([\d\s.,]+)(?:\s*[–—-]\s*([\d\s.,]+))?\s*(?:м²|м2|кв\.?\s*м)/gi;
+  let m;
+  while ((m = re.exec(txt))) {
+    [m[1], m[2]].forEach(v => {
+      if (!v) return;
+      const x = parseFloat(String(v).replace(/\s/g, '').replace(',', '.'));
+      /* участок виллы: меньше сотки — опечатка, больше 3000 м² — это площадь
+         всего проекта, а не покупателя. Такое на витрину не пускаем. */
+      if (x >= 80 && x <= 3000) nums.push(Math.round(x));
+    });
+  }
+  return nums;
+}
+function fmtPlot(nums) {
+  if (!nums.length) return null;
+  const lo = Math.min(...nums), hi = Math.max(...nums);
+  return lo === hi ? (lo + ' м²') : (lo + '–' + hi + ' м²');
+}
+/* Участок показываем ТОЛЬКО у вилл: у кондо «участок» в описании — это земля
+   всего проекта, покупателю она не принадлежит и вводит в заблуждение. */
+function plotOf(o) {
+  if (!isVilla(o)) return null;
+  const nums = [];
+  if (Array.isArray(o.unit_types)) o.unit_types.forEach(u => { if (u && u.note) nums.push(...plotNums(String(u.note))); });
+  if (!nums.length && o.usp) nums.push(...plotNums(String(o.usp)));
+  return fmtPlot(nums);
+}
+
 function shortDev(dev) {
   if (!dev) return '';
   let d = String(dev).split(' — ')[0].split(' – ')[0].trim();
@@ -294,9 +346,19 @@ function buildCatalog(objects, benchmarks, preserve) {
         if (st === 'construction') return 'construction';
         if (st === 'pre-sale' || st === 'presale') return 'presale';
         if (st === 'resale' || String(o.purpose||'').toLowerCase() === 'resale') return 'resale';
+        /* часть объектов описывает стадию словами («Строится, сдача 08.2028»).
+           Раньше такие оставались вообще без плашки — читаем смысл. */
+        if (/распродан|sold\s*out/.test(st) || String(o.status||'') === 'sold') return 'resale';
+        if (/стро|constru|off-?plan/.test(st)) return 'construction';
+        if (/готов|ready|заселени/.test(st)) return 'ready';
+        if (/старт|pre-?sale|презентац/.test(st)) return 'presale';
+        if (o.handover_date) {
+          var hd = new Date(o.handover_date);
+          if (!isNaN(hd)) return hd > new Date() ? 'construction' : 'ready';
+        }
         return '';
       })(),
-      desc: { ru: usp, en: uspEn },
+      desc: { ru: noContacts(usp), en: noContacts(uspEn) },
       // 02.09: то, что человек ищет глазами в первую очередь — море и застройщик.
       // Пишем только если данные есть, пустое поле карточка не рисует.
       // координаты нужны карте объектов — без них метку не поставить
@@ -326,7 +388,15 @@ function buildCatalog(objects, benchmarks, preserve) {
       // Витрина «горячие предложения»: порядок задаём вручную в базе (hot_rank).
       hot: (o.hot_rank === 0 || o.hot_rank) ? Number(o.hot_rank) : null,
       // Ход стройки и разделы снимков — показываем, если застройщик их дал.
-      progress: o.build_progress || null,
+      // Подпись к снимкам стройки — это имя канала застройщика. На витрину не идёт.
+      progress: (function(){
+        const g = o.build_progress; if (!g) return null;
+        const c = Object.assign({}, g); delete c.source; delete c.channel; delete c.link;
+        if (Array.isArray(c.stages)) c.stages = c.stages.map(x => Object.assign({}, x, { name: noContacts(x.name) }));
+        return c;
+      })(),
+      // Площадь участка — отдельная метрика, для вилл важнее площади дома
+      plot: plotOf(o),
       groups: Array.isArray(o.photo_groups)
         ? o.photo_groups.map(g => Object.assign({}, g, {
             urls: Array.isArray(g.urls) ? g.urls.map(u => thumbUrl(u, 1280, 78)) : g.urls }))
@@ -361,6 +431,10 @@ function unitsOf(o) {
     if (n.beds == null && n.bedrooms != null) n.beds = n.bedrooms;
     if (n.rentLow == null && n.rent_low_thb_month != null) n.rentLow = n.rent_low_thb_month;
     if (n.rentHigh == null && n.rent_high_thb_month != null) n.rentHigh = n.rent_high_thb_month;
+    /* участок по типу виллы: в заметке «участок 270–352 м²» — покупателю это
+       такая же важная цифра, как площадь дома */
+    if (isVilla(o) && n.note) { const pl = fmtPlot(plotNums(String(n.note))); if (pl) n.plot = pl; }
+    n.note = noContacts(n.note);
     return n;
   });
   // Тиры приходят от разных застройщиков в двух видах: с числом спален или с
@@ -514,7 +588,7 @@ function buildRentals(objects, preserve, ratesBy) {
       bmax: (o.bedrooms_max === 0 || o.bedrooms_max) ? o.bedrooms_max : null,
       area: areaLabel(o),
       tag: rentTag(o),
-      desc: { ru: usp, en: uspEn },
+      desc: { ru: noContacts(usp), en: noContacts(uspEn) },
       // 02.09: аренда тоже встаёт на карту — координаты из той же таблицы
       lat: (o.lat === 0 || o.lat) ? Number(o.lat) : null,
       lng: (o.lng === 0 || o.lng) ? Number(o.lng) : null,
@@ -732,7 +806,7 @@ function objectPage(o, benchmarks, ratesBy) {
       (note ? '<small>' + htmlEsc(note) + '</small>' : '') + '</div>';
   }
   const title = o.name + ' — ' + ru + ', Пхукет | Property Library';
-  const metaDesc = truncate(usp || (o.name + ' — ' + t.ru + ' в районе ' + ru + ', Пхукет.'), 200);
+  const metaDesc = truncate(noContacts(usp) || (o.name + ' — ' + t.ru + ' в районе ' + ru + ', Пхукет.'), 200);
   const distBeach = o.distance_beach_m ? o.distance_beach_m + ' м до пляжа' : '';
 
   const waText = encodeURIComponent(o.name + ' — интересует этот объект. ' + url);
@@ -743,7 +817,7 @@ function objectPage(o, benchmarks, ratesBy) {
     '@context': 'https://schema.org',
     '@type': ['Residence', 'Product'],
     name: o.name,
-    description: truncate(usp, 500),
+    description: truncate(noContacts(usp), 500),
     url,
     image: img,
     address: { '@type': 'PostalAddress', addressRegion: 'Phuket', addressLocality: ru, addressCountry: 'TH' },
@@ -794,7 +868,6 @@ function objectPage(o, benchmarks, ratesBy) {
   const progressBlock = bp && bp.photos.length
     ? '<section class="desc"><h2>Ход строительства' + (bp.as_of ? ' <small style="font-weight:400;color:var(--muted)">' + htmlEsc(bp.as_of) + '</small>' : '') + '</h2>' +
       '<div class="prgs">' + bp.photos.slice(0, 6).map(u => '<img src="' + htmlEsc(u) + '" alt="" loading="lazy" decoding="async">').join('') + '</div>' +
-      (bp.source ? '<p style="font-size:13px;color:var(--muted);margin-top:8px">' + htmlEsc(bp.source) + '</p>' : '') +
       '</section>'
     : '';
 
@@ -921,7 +994,7 @@ if(dark) i.src='../img/brand/plp-mark-white.png';})();</script>
   </div>
   ${unitsBlock}
   ${progressBlock}
-  ${usp ? '<section class="desc"><h2>Об объекте</h2><p>' + htmlEsc(usp) + '</p></section>' : ''}
+  ${usp ? '<section class="desc"><h2>Об объекте</h2><p>' + htmlEsc(noContacts(usp)) + '</p></section>' : ''}
   ${uspEn ? '<section class="desc" lang="en"><h2>About</h2><p>' + htmlEsc(uspEn) + '</p></section>' : ''}
   ${materials}
   <div class="cta">

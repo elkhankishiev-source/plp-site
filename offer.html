@@ -35,6 +35,21 @@
 <link rel="icon" href="img/brand/plp-mark-ink.png">
 <style>
 html{background:#F4F4EE;overscroll-behavior-y:none}
+/* PLP:ANTIFLICKER */
+/* Мигание фона на телефоне — сводная защита. Эльнур 06.09: «фон в мобильной
+   версии везде мигает, ищи по всем страницам». Три источника:
+   1) размытие фона (backdrop-filter) под липкими элементами — браузер
+      перерисовывает весь экран на каждом кадре прокрутки;
+   2) долгое проявление блоков при прокрутке;
+   3) отложенные картинки без фона — на их месте на миг светится подложка. */
+@media(max-width:900px){
+  .header,#toTop,.badge,.pm-tag,.car .tag,.btn-glass,.hero-float,.fbtn,.chipf,
+  .modal-overlay,.mnav,.sheet,.pm-card,.toolbox{
+    backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+  .reveal{transition-duration:.35s!important}
+}
+.pic-photo,.thumb-photo,.prgs img,.simi-c i,.pm-img img{background-color:var(--warm,#EFEEE7)}
+/* PLP:ANTIFLICKER */
 :root{
   --ink:#22251C; --paper:#FBFBF7; --muted:#6B6B63; --line:#E6E6DE;
   --green:#D2D5B3; --green-deep:#5F6242; --shadow:0 18px 44px rgba(20,18,14,.10);
@@ -121,6 +136,7 @@ p.text{margin:0;font-size:.94rem;line-height:1.6}
 /* Атрибут hidden проигрывал правилам с display: пустой красный кружок
    уведомлений висел на колокольчике всегда (Эльнур 06.09). */
 [hidden]{display:none!important}
+
 </style>
 </head>
 <body>
@@ -147,7 +163,7 @@ p.text{margin:0;font-size:.94rem;line-height:1.6}
 
   function fail(title, text){
     root.innerHTML='<div class="msg"><h1>'+esc(title)+'</h1><p>'+esc(text)+'</p>'+
-      '<p style="margin-top:18px"><a class="btn ghost" href="index.html">На главную</a></p></div>';
+      '<p style="margin-top:18px"><a class="btn ghost" href="/">На главную</a></p></div>';
   }
 
   if(!token){ fail('Ссылка неполная','Откройте предложение по ссылке, которую прислал менеджер.'); return; }
@@ -267,7 +283,7 @@ p.text{margin:0;font-size:.94rem;line-height:1.6}
             '<a class="btn ghost" href="tel:+66955492587">+66 95-549-2587</a>'+
           '</div>'+
           '<div class="foot"><span>Property Library Phuket</span>'+
-            '<a href="index.html">property-library.com</a>'+
+            '<a href="/">property-library.com</a>'+
             '<span>Ссылка личная — не пересылайте её третьим лицам.</span></div>'+
         '</div>'+
       '</div>';

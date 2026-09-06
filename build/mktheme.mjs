@@ -11,6 +11,8 @@ const ROOT = '/Users/elnurkhankishiev/plp-site';
 const PART = fs.readFileSync(path.join(ROOT, 'build/parts/head-theme.html'), 'utf8').trim();
 const OPEN = '<!-- PLP:HEADTHEME:START -->', CLOSE = '<!-- PLP:HEADTHEME:END -->';
 const HTMLBG = 'html{background:var(--bg);overscroll-behavior-y:none}';
+const ANTIFLICK = fs.readFileSync(path.join(ROOT, 'build/parts/anti-flicker.css'), 'utf8').trim();
+const AF_MARK = '/* PLP:ANTIFLICKER */';
 /* у печатных страниц своих токенов нет — берём фон прямо из body */
 const plainBg = html => {
   const m = html.match(/body\s*\{[^}]*?background:\s*([^;}]+)/s);
@@ -58,6 +60,23 @@ for (const file of walk(ROOT)) {
       const at = html.indexOf('>', s) + 1;
       html = html.slice(0, at) + '\n' + rule + html.slice(at);
       bg++;
+    }
+  }
+
+  /* Защита от мигания — тем же одним источником на все страницы.
+     Кладём в НАЧАЛО первого <style>: закрывающий тег искать нельзя, он
+     встречается внутри JS-строк (печатная форма отчёта в кабинете) — вставка
+     туда ломала скрипт целиком. Правила внутри помечены !important, поэтому
+     от места в файле не зависят. */
+  const afStart = html.indexOf(AF_MARK);
+  if (afStart !== -1) {
+    const afEnd = html.indexOf(AF_MARK, afStart + AF_MARK.length);
+    if (afEnd !== -1) html = html.slice(0, afStart) + AF_MARK + '\n' + ANTIFLICK + '\n' + html.slice(afEnd);
+  } else {
+    const s0 = html.indexOf('<style');
+    if (s0 !== -1) {
+      const at = html.indexOf('>', s0) + 1;
+      html = html.slice(0, at) + '\n' + AF_MARK + '\n' + ANTIFLICK + '\n' + AF_MARK + html.slice(at);
     }
   }
   if (html !== before) { fs.writeFileSync(file, html); fixed++; }
