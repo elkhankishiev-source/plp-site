@@ -1107,6 +1107,12 @@ button#send-code,button#send-code-2,button#do-login,button#do-reg{
 }
 
 /* Хвосты системы: короткий список того, что ждёт решения */
+/* Модерация: фильтр и счётчик держатся наверху, пока листаешь длинный список
+   (Эльнур: «навигация в длинном списке»). */
+.mod-head{background:var(--paper);padding:6px 0 8px}
+.mod-head.mod-sticky{position:sticky;top:58px;z-index:8;
+  box-shadow:0 8px 16px -12px rgba(0,0,0,.5)}
+@media(min-width:1000px){ .mod-head.mod-sticky{top:8px} }
 .openbox{margin:12px 0 4px}
 .openbox h4{margin:0 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
 .openlist{display:grid;gap:6px}
@@ -2134,13 +2140,15 @@ body{background:var(--bg)}
       <h2>Заявки с сайта</h2>
       <p class="sub" style="margin:0 0 12px">Собственники присылают объект с фотографиями.
       Проверьте, поправьте текст и опубликуйте — карточка встанет в каталог.</p>
-      <div class="opts" id="m-filter">
-        <button type="button" class="opt on" data-v="">Новые</button>
-        <button type="button" class="opt" data-v="published">Опубликованные</button>
-        <button type="button" class="opt" data-v="rejected">Отклонённые</button>
+      <div class="mod-head">
+        <div class="opts" id="m-filter">
+          <button type="button" class="opt on" data-v="">Новые</button>
+          <button type="button" class="opt" data-v="published">Опубликованные</button>
+          <button type="button" class="opt" data-v="rejected">Отклонённые</button>
+        </div>
+        <div id="m-count" class="sub" style="margin:8px 0 0"></div>
       </div>
       <div id="m-open" class="openbox"></div>
-      <div id="m-count" class="sub" style="margin:8px 0 0"></div>
       <div id="m-list"></div>
       <div class="ok" id="m-ok"></div>
       <div class="err" id="m-err"></div>
@@ -3886,6 +3894,10 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     post({action:'mod_list',token:TOKEN,status:MOD_STATUS}).then(function(d){
       if(!d||!d.ok){ box.innerHTML='<p class="sub">Не удалось загрузить заявки.</p>'; return; }
       var items=d.items||[];
+      /* длинный список: строка со счётчиком и фильтром держится наверху,
+         чтобы не терять место (Эльнур 05.09) */
+      var mh=document.querySelector('#sec-moder .mod-head');
+      if(mh) mh.classList.add('mod-sticky');
       var sm=document.getElementById('m-count');
       if(sm) sm.textContent = items.length
         ? ('Заявок в этом списке: '+items.length)
@@ -4007,7 +4019,22 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     if(db) db.onclick=function(){ dupesBoard(); };
     var go=document.getElementById('cl-go'), qi=document.getElementById('cl-q');
     if(go) go.onclick=function(){ CL_Q=qi.value.trim(); loadClients(); };
-    if(qi) qi.onkeydown=function(e){ if(e.key==='Enter'){ CL_Q=qi.value.trim(); loadClients(); } };
+    if(qi){
+      qi.onkeydown=function(e){ if(e.key==='Enter'){ CL_Q=qi.value.trim(); loadClients(); } };
+      /* Эльнур 06.09: «поле поиска в Людях — аккуратнее». Ищем по мере набора,
+         с паузой, чтобы не дёргать сервер на каждую букву. */
+      var tmr=null;
+      qi.oninput=function(){
+        clearTimeout(tmr);
+        var v=qi.value.trim();
+        tmr=setTimeout(function(){
+          if(v===CL_Q) return;
+          if(v.length && v.length<2) return;       /* одна буква — не ищем */
+          CL_Q=v; loadClients();
+        }, 350);
+      };
+      qi.setAttribute('type','search');            /* у поля появляется крестик очистки */
+    }
   }
   var TEMP_RU={cold:'без номера',warm:'в работе',hot:'горячий',client:'купил',lost:'отложен'};
   var SRC_RU={wa:'WhatsApp',tg:'Telegram',tg_bot:'бот в Telegram',tg_dm:'Telegram',
