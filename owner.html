@@ -2360,10 +2360,14 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   }
 
   var KINDS={cleaning:'Уборка',repair:'Ремонт',maintenance:'Обслуживание',inspection:'Осмотр',
-             checkin:'Заезд',checkout:'Выезд',block_dates:'Блокировка дат',payout:'Выплата',other:'Другое'};
+             checkin:'Заезд',checkout:'Выезд',block_dates:'Блокировка дат',payout:'Выплата',
+             /* заявка на выгрузку объекта приходила как «resale» — по-английски
+                и непонятно (Эльнур 06.09) */
+             resale:'Выгрузить объект', own:'Свободная заявка', other:'Другое'};
   var CATS={booking:'Бронирование',cleaning:'Уборка',repair:'Ремонт',utilities:'Коммунальные',
             management:'Управление',supplies:'Расходники',other:'Прочее'};
-  var RSTAT={'new':'принята','in_progress':'в работе','done':'выполнена','rejected':'отклонена'};
+  var RSTAT={'new':'принята · ждёт менеджера','in_progress':'в работе','done':'выполнена',
+             'rejected':'отклонена','cancelled':'отменена'};
   var RT={mixed:'короткие и длинные сроки',short:'короткие сроки',long:'договор на год'};
   var ST={active:'действует',paused:'приостановлен',ended:'завершён'};
 
@@ -3290,7 +3294,8 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       '<div><span class="eyebrow">Кабинет владельца</span>'+
         '<h1>'+esc(greet+(first?', '+first:''))+'</h1></div>'+
       '<div class="ov-act">'+
-        '<button type="button" class="btn-mini" data-resale="'+esc(p.id||'')+'">Выгрузить объект</button>'+
+        /* Эльнур 06.09: «не надо туда добавлять выгрузить объект, эта функция
+         спрятана в соответствующем блоке» — в шапке остаётся только отчёт. */
         '<button type="button" class="btn-mini" id="ov-report">Скачать отчёт</button>'+
         '<span class="ava">'+esc(ini)+'</span></div></div>';
 
