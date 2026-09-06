@@ -1786,6 +1786,31 @@ body{background:var(--bg)}
   border-radius:0;flex:1 1 0;min-width:0}
 .mnav .mtheme{margin:0}
 
+/* Залипание кнопок на телефоне: на тач-экране состояние :hover остаётся
+   после нажатия, и кнопка выглядит выбранной, хотя выбор другой
+   (Эльнур про анкету 06.09). Наведение оставляем только там, где есть мышь. */
+@media (hover:none){
+  .chipf:hover,.chips button:hover,.btn:hover,.fbtn:hover,.opt:hover,
+  .cab-nav a:hover,.swch a:hover{background:inherit;border-color:inherit;
+    color:inherit;transform:none}
+  .chipf.on:hover{background:var(--green);color:var(--on-green)}
+}
+
+/* Быстрые подсказки в чате: фон свой, а цвет текста наследовался от пузыря
+   бота — в светлой теме выходило светлое по светлому. */
+.chips button{color:var(--ink)}
+.chips button:hover{background:var(--green);color:var(--on-green)}
+
+/* «Чат с консультантом» в меню: на зелёном фоне текст должен быть чернильным.
+   В кабинете он брал var(--ink), который в тёмной теме светлый. */
+.mnav .mwa{background:var(--green);color:var(--on-green)}
+
+/* «Разместить объект»: на телефоне две колонки сжимались в две узкие полосы
+   и текст рвался по словам (Эльнур 06.09) — ниже 860 px ставим в один столбец. */
+.lp-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);
+  gap:clamp(18px,3vw,34px);align-items:center}
+@media(max-width:860px){ .lp-grid{grid-template-columns:1fr;gap:16px} }
+
 /* PLP:UI:END */
 
 </style>

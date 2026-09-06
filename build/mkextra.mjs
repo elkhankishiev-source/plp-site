@@ -82,7 +82,7 @@ const M_HERO = `<section style="padding-bottom:0"><div class="container">
 </div></section>`;
 const M_LIST = `<section id="list-property" style="padding-top:22px"><div class="container">
   <div style="background:var(--green-soft);border:1px solid var(--line,rgba(var(--ink-rgb),.12));border-radius:24px;padding:clamp(20px,3vw,30px)">
-    <div style="display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:clamp(18px,3vw,34px);align-items:center">
+    <div class="lp-grid">
       <div>
         <span class="kicker">Свой объект</span>
         <h2 style="font-size:clamp(24px,3.4vw,34px);margin:6px 0 10px">Разместить объект</h2>
@@ -154,9 +154,12 @@ const M_CABIN = `<section style="padding-top:26px"><div class="container">
 /* «Что видно в кабинете» на публичной странице не нужно: Эльнур 06.09 —
    «в кабинете уже и так видно». Блок M_CABIN оставлен в файле на случай
    возврата, но в страницу не собирается. */
+/* Эльнур 06.09 (уточнение): со страницы управления убираем каталог аренды,
+   «Запрос на аренду 24/7» и «Понравился остров?» — их место в блоке аренды.
+   Остаётся услуга управления: как мы работаем, аренда с заботой, сколько
+   стоит и как разместить свой объект. */
 const mgmt = [M_HERO, M_SERV, wrapSection(grabPart('rent-care')), M_PRICE,
-              M_LIST, rentCatalogOnly(), wrapSection(grabPart('rent-band')),
-              wrapSection(grabPart('rent-island'))].join('\n');
+              M_LIST].join('\n');
 
 
 const made=[];
