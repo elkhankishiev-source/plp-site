@@ -156,10 +156,9 @@ h3{font-size:1.12rem;font-weight:700}
 .logo{font-weight:800;font-size:1.05rem;letter-spacing:-.01em;display:flex;align-items:center;gap:10px;white-space:nowrap}
 .logo .chip{width:38px;height:38px;border-radius:11px;background:var(--green);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1rem;flex:none}
 .chip img{width:24px;height:auto;display:block}
-/* Эльнур 06.09: лого должно быть заметным — оба слова полным цветом темы,
-   фирменный акцент остаётся на значке. */
-.logo span{color:inherit}
+/* Лого: «Library» фирменным оливковым, который адаптируется по теме */
 .logo{color:var(--ink)}
+.logo .lname>span{color:var(--olive)}
 .nav{display:none;gap:4px;font-weight:600;font-size:.9rem}
 .nav a{opacity:.85;transition:opacity .2s,background .2s;padding:8px 10px;border-radius:9px}
 .nav a:hover{opacity:1;background:rgba(var(--glass-rgb),.7)}
@@ -1003,7 +1002,7 @@ input::placeholder,textarea::placeholder{color:var(--muted)}
 .btn-ghost{border-color:rgba(var(--ink-rgb),.3);color:var(--ink);background:transparent}
 /* полоски бургера */
 .burger i{background:var(--ink)}
-.burger{background:rgba(var(--glass-rgb),.8);border-color:rgba(var(--ink-rgb),.14)}
+.burger{background:var(--warm);border-color:rgba(var(--ink-rgb),.22)}
 
 /* Кнопки формы входа красились фоном var(--txt) — в тёмной теме он светлеет
    и надпись пропадала. Плашка тёмная в обеих темах. */
@@ -1356,6 +1355,12 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
   border-radius:12px;background:var(--paper);color:var(--ink);font:inherit;font-size:.86rem}
 
 html,*{-webkit-tap-highlight-color:transparent}
+
+/* Лого: фирменный оливковый на слове Library — правило идёт последним,
+   иначе его перебивает общий цвет шапки. Бургер получает заметную рамку. */
+.header .logo .lname>span{color:var(--olive)!important}
+.header .burger{background:var(--green-soft);border:1px solid rgba(var(--ink-rgb),.28)}
+.header .burger i{background:var(--ink)}
 </style>
 <!-- Leaflet подгружается только при открытии раздела с картой: см. ensureLeaflet() -->
 </head>
