@@ -400,6 +400,8 @@ function buildCatalog(objects, benchmarks, preserve) {
         const g = o.build_progress; if (!g) return null;
         const c = Object.assign({}, g); delete c.source; delete c.channel; delete c.link;
         if (Array.isArray(c.stages)) c.stages = c.stages.map(x => Object.assign({}, x, { name: noContacts(x.name) }));
+        /* снимки стройки тоже отдаём превью, а не оригиналами */
+        if (Array.isArray(c.photos)) c.photos = c.photos.map(u => thumbUrl(u, 1000, 76));
         return c;
       })(),
       // Площадь участка — отдельная метрика, для вилл важнее площади дома
