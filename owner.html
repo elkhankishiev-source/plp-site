@@ -1361,6 +1361,32 @@ html,*{-webkit-tap-highlight-color:transparent}
 .header .logo .lname>span{color:var(--olive)!important}
 .header .burger{background:var(--green-soft);border:1px solid rgba(var(--ink-rgb),.28)}
 .header .burger i{background:var(--ink)}
+
+/* Переключатель языка на телефоне занимал много места — делаем компактным */
+@media(max-width:600px){
+  .lang{font-size:.66rem;padding:2px;border-radius:999px}
+  .lang button{padding:4px 7px;letter-spacing:.02em}
+  .themebtn{width:30px;height:30px;font-size:13px}
+  .bellbtn{width:30px;height:30px;font-size:13px}
+  .htools{gap:6px}
+  .burger{width:36px;height:36px;border-radius:10px}
+  .burger i{width:16px}
+}
+
+@media(max-width:600px){
+  .header .header-inner{height:58px}
+  .header .lang{font-size:.66rem;padding:2px}
+  .header .lang button{padding:4px 7px}
+  .header .themebtn,.header .bellbtn{width:30px;height:30px;font-size:13px}
+  .header .htools{gap:6px}
+  .header .burger{width:36px;height:36px}
+}
+
+/* Даты брони рядом одной строкой: заезд → выезд */
+.dates2{display:flex;align-items:center;gap:8px;margin-top:4px}
+.dates2 input{flex:1;min-width:0}
+.dates2 i{font-style:normal;color:var(--muted);flex:none}
+.hintline{display:block;font-size:.72rem;color:var(--muted);margin-top:4px}
 </style>
 <!-- Leaflet подгружается только при открытии раздела с картой: см. ensureLeaflet() -->
 </head>
@@ -2275,17 +2301,40 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
      Открываются окном, после сохранения кабинет обновляется. */
   /* Своя бронь: календарь занятости у нас собственный, данные лежат в нашей
      базе (rental_guests). Пересечение дат отсекает сама база. */
+  /* Подсказка под датами: сколько ночей и сколько выходит за ночь.
+     Эльнур 06.09: «заезд-выезд в одном поле удобнее», «сумма за день или всего?» */
+  function bookHints(){
+    var a=document.getElementById('b-in'), b=document.getElementById('b-out');
+    var sum=document.getElementById('b-sum');
+    var n1=document.getElementById('b-nights'), n2=document.getElementById('b-pernight');
+    if(!a||!b||!n1) return;
+    var d1=a.value, d2=b.value, nights=0;
+    if(d1&&d2){
+      nights=Math.round((new Date(d2+'T00:00:00')-new Date(d1+'T00:00:00'))/86400000);
+    }
+    n1.textContent = nights>0
+      ? ('Ночей: '+nights+' · заезд '+clDate(d1)+', выезд '+clDate(d2))
+      : (d1||d2 ? 'Выезд должен быть позже заезда.' : 'Выберите заезд и выезд — посчитаем ночи.');
+    if(n2){
+      var v=Number(sum&&sum.value)||0;
+      n2.textContent = (nights>0 && v>0) ? ('Это '+money(Math.round(v/nights),'THB')+' за ночь') : '';
+    }
+  }
   function ukBookForm(pid, pre){
     pre=pre||{};
     var objs=(DATA.properties||[]).map(function(x){ return {id:x.id, name:(x.name||x.id)}; });
     clForm('<h3>'+(pre.booking_id?'Правка брони':'Новая бронь')+'</h3><div class="fgrid">'+
       '<label class="wide">Объект<select id="b-obj">'+objs.map(function(o){
          return '<option value="'+clEsc(o.id)+'"'+((o.id===pid)?' selected':'')+'>'+clEsc(o.name)+'</option>';}).join('')+'</select></label>'+
-      '<label>Заезд<input id="b-in" type="date" value="'+(pre.check_in||'')+'"></label>'+
-      '<label>Выезд<input id="b-out" type="date" value="'+(pre.check_out||'')+'"></label>'+
+      '<label class="wide">Даты проживания'+
+        '<span class="dates2"><input id="b-in" type="date" aria-label="Заезд" value="'+(pre.check_in||'')+'">'+
+        '<i>→</i><input id="b-out" type="date" aria-label="Выезд" value="'+(pre.check_out||'')+'"></span>'+
+        '<span class="hintline" id="b-nights">Выберите заезд и выезд — посчитаем ночи.</span></label>'+
       '<label class="wide">Гость<input id="b-guest" type="text" value="'+clEsc(pre.guest_name||'')+'" placeholder="Имя"></label>'+
       '<label>Телефон<input id="b-phone" type="text" value="'+clEsc(pre.guest_phone||'')+'" placeholder="66..."></label>'+
-      '<label>Сумма, ฿<input id="b-sum" type="number" value="'+(pre.amount_thb||'')+'"></label>'+
+      '<label>Сумма за всё проживание, ฿<input id="b-sum" type="number" '+
+        'value="'+(pre.amount_thb||'')+'" placeholder="например, 64000">'+
+        '<span class="hintline" id="b-pernight"></span></label>'+
       '<label>Канал<select id="b-ch">'+
         ['direct:напрямую','airbnb:Airbnb','booking:Booking','agent:агент','owner:собственник']
         .map(function(x){var v=x.split(':');
@@ -2296,7 +2345,8 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         .map(function(x){var v=x.split(':');
           return '<option value="'+v[0]+'"'+((pre.status===v[0])?' selected':'')+'>'+v[1]+'</option>';}).join('')+
       '</select></label>'+
-      '<label class="wide">Заметка<input id="b-note" type="text" value="'+clEsc(pre.notes||'')+'"></label>'+
+      '<label class="wide">Заметка для нас<input id="b-note" type="text" value="'+clEsc(pre.notes||'')+'" '+
+        'placeholder="поздний заезд, трансфер, детская кроватка, кто передаёт ключи"></label>'+
       '</div><div class="fbtns"><button type="button" class="btn" id="f-save">Сохранить</button>'+
       '<button type="button" class="btn ghost" id="f-cancel">Отмена</button></div>',
       function(){
@@ -2312,6 +2362,11 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
             } else say((r&&r.error)||'Не получилось сохранить бронь');
           });
       });
+    ['b-in','b-out','b-sum'].forEach(function(id){
+      var el=document.getElementById(id);
+      if(el){ el.addEventListener('change', bookHints); el.addEventListener('input', bookHints); }
+    });
+    bookHints();
   }
   /* Заявка на перепродажу: цена, срочность и комментарий уходят нам обычной
      заявкой; дальше сотрудник оформляет карточку и возвращает владельцу ссылку. */
