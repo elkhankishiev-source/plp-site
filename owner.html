@@ -1675,6 +1675,11 @@ body{background:var(--bg)}
   gap:clamp(18px,3vw,34px);align-items:center}
 @media(max-width:860px){ .lp-grid{grid-template-columns:1fr;gap:16px} }
 
+/* Приём документа в кабинете: заметная зона под таблицей документов */
+.upzone{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:12px;
+  padding:14px;border:1.5px dashed rgba(var(--ink-rgb),.22);border-radius:14px;background:var(--warm)}
+.upzone .sub{flex:1 1 240px;margin:0;font-size:.82rem}
+
 /* PLP:UI:END */
 </style>
 <!-- Leaflet подгружается только при открытии раздела с картой: см. ensureLeaflet() -->
@@ -3810,8 +3815,18 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     if(DATA.owner&&DATA.owner.is_staff===true)
       dch+='<p class="sub"><a href="#" class="lnk" data-uk="doc" data-pid="'+(p.id||'')+
            '">Добавить документ</a> — ссылка на Google Диск или файл.</p>';
+    /* Эльнур 07.09: «приём любого файла с авторазбором». Кладём сюда же, где
+       человек ищет документы: договор, счёт, акт, фото бумаги — что угодно.
+       Система прочитает и покажет, что поняла; в объект попадёт после проверки. */
+    dch+='<div class="upzone" id="doc-drop">'+
+      '<input id="doc-file" type="file" hidden accept=".pdf,.jpg,.jpeg,.png,.heic,.doc,.docx">'+
+      '<button type="button" class="btn ghost" id="doc-pick">Загрузить документ</button>'+
+      '<span class="sub" id="doc-state">Договор, счёт, акт или фото бумаги — прочитаем сами. '+
+      'Из договора соберём график платежей и подставим в объект после вашей проверки.</span></div>'+
+      '<div id="doc-parsed"></div>';
     H+=card('Документы объекта', dch, 'sec-docs');
 
+    setTimeout(function(){ try{ bindDocUpload(p.id||''); }catch(e){} }, 0);
     CARD_N=0;
     $('prop').innerHTML=H;
     bindFolds();
@@ -4498,6 +4513,69 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     });
   }
 
+  /* Приём документа в разделе «Документы объекта»: тот же путь, что и в личном
+     кабинете клиента — файл уходит в приватное хранилище, система читает его и
+     возвращает разбор. Вид документа определяем по имени файла, чтобы человек
+     ничего не выбирал руками. */
+  function docKindByName(n){
+    var s=String(n||'').toLowerCase();
+    if(/договор|contract|spa|agreement/.test(s)) return 'contract';
+    if(/акт|act|hand.?over|приём|priem/.test(s)) return 'act';
+    if(/счёт|счет|invoice|bill|receipt|квитан/.test(s)) return 'invoice';
+    if(/план|plan|floor/.test(s)) return 'plan';
+    if(/паспорт|passport|id/.test(s)) return 'passport';
+    return 'other';
+  }
+  function bindDocUpload(pid){
+    var pick=document.getElementById('doc-pick'), fi=document.getElementById('doc-file'),
+        st=document.getElementById('doc-state');
+    if(!pick||!fi) return;
+    pick.onclick=function(){ fi.click(); };
+    fi.onchange=function(){
+      var f=fi.files&&fi.files[0]; if(!f) return;
+      if(f.size>20*1024*1024){ say('Файл больше 20 МБ — пришлите поменьше или ссылкой'); return; }
+      st.textContent='Отправляем «'+f.name+'»…';
+      pick.disabled=true;
+      var rd=new FileReader();
+      rd.onload=function(){
+        var b64=String(rd.result).split(',')[1]||'';
+        post({action:'my_doc',token:TOKEN,file_name:f.name,mime:f.type,
+              kind:docKindByName(f.name),property_id:pid||'',data:b64})
+          .then(function(r){
+            pick.disabled=false; fi.value='';
+            if(r&&r.ok){
+              st.textContent='Приняли. Читаем документ — обычно до минуты.';
+              docPoll(r.doc_id, 0);
+            } else st.textContent=(r&&r.error)||'Не загрузилось';
+          });
+      };
+      rd.readAsDataURL(f);
+    };
+  }
+  /* ждём разбор и показываем результат прямо под кнопкой */
+  function docPoll(docId, n){
+    if(n>12) return;
+    setTimeout(function(){
+      post({action:'me',token:TOKEN}).then(function(r){
+        var list=(r&&r.docs)||(r&&r.data&&r.data.docs)||[];
+        var mine=list.filter(function(x){ return String(x.id)===String(docId); })[0];
+        var st=document.getElementById('doc-state');
+        if(!mine){ docPoll(docId, n+1); return; }
+        if(mine.status==='parsed'||mine.status==='confirmed'){
+          if(st) st.textContent='Прочитали. Проверьте, что мы поняли:';
+          var host=document.getElementById('doc-parsed');
+          if(host){ host.innerHTML='<div id="my-docs"></div>'; drawDocs([mine]); }
+          return;
+        }
+        if(mine.status==='failed'){
+          if(st) st.textContent='Не смогли прочитать: '+(mine.parse_error||'файл нечитаемый')+
+                 '. Пришлите менеджеру — разберём руками.';
+          return;
+        }
+        docPoll(docId, n+1);
+      }).catch(function(){ docPoll(docId, n+1); });
+    }, 5000);
+  }
   function drawDocs(docs){
     var box=document.getElementById('my-docs'); if(!box) return;
     if(!docs.length){ box.innerHTML=''; return; }
