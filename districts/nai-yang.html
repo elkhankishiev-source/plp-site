@@ -1086,6 +1086,12 @@ input.bad{border-color:#d98a84!important;background:var(--paper)6f5}
 .chatinput input{flex:1;height:44px;border:1.5px solid rgba(var(--ink-rgb),.12);border-radius:999px;padding:0 16px;font-size:.88rem;outline:none}
 .chatinput input:focus{border-color:var(--ink)}
 .chatinput .s{width:44px;height:44px;border-radius:50%;background:var(--ink-block);color:var(--on-ink);font-size:1rem;flex:none}
+/* Голосовой ввод: браузер сам распознаёт речь, ничего наружу не уходит.
+   Кнопка появляется только там, где это поддерживается. */
+.chatinput .mic{width:44px;height:44px;border-radius:50%;flex:none;font-size:1.05rem;
+  background:var(--warm);border:1px solid rgba(var(--ink-rgb),.14);color:var(--ink);cursor:pointer}
+.chatinput .mic.rec{background:#c0392b;color:#fff;border-color:transparent;animation:micpulse 1.1s infinite}
+@keyframes micpulse{0%,100%{box-shadow:0 0 0 0 rgba(192,57,43,.5)}50%{box-shadow:0 0 0 8px rgba(192,57,43,0)}}
 @media(max-width:760px){
   .chatwin{right:10px;bottom:10px;width:calc(100vw - 20px)}
   .chatbody{height:50vh}
@@ -1944,6 +1950,7 @@ body{background:var(--bg)}
   <div class="chatbody" id="chatbody"></div>
   <div class="chatinput">
     <input id="chatField" data-i18n-ph="chat.placeholder" placeholder="Напишите сообщение…" onkeydown="if(event.key==='Enter')sendFree()">
+    <button type="button" class="mic" id="chatMic" onclick="chatVoice()" aria-label="Сказать голосом" hidden>🎤</button>
     <button type="button" class="s" onclick="sendFree()" aria-label="Отправить">↑</button>
   </div>
 </div>
@@ -3582,6 +3589,36 @@ function aiCards(ids){
 }
 function closeChatToProp(pid){closeChat();openProp(pid);}
 function clearChat(){chatHist=[];leadShown=false;chatStarted=false;userMsgs=0;lastTopic=null;lastLeadSummary=null;saveHist();cb.innerHTML='';openChat('reset');}
+/* Голосовой ввод в чате (Эльнур 06.09). Распознаёт сам браузер — запись
+   никуда не отправляется. Где не поддерживается (Firefox) — кнопки просто нет. */
+var CHAT_REC=null;
+function chatVoice(){
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  var btn=document.getElementById('chatMic'), fld=document.getElementById('chatField');
+  if(!SR||!btn||!fld) return;
+  if(CHAT_REC){ try{ CHAT_REC.stop(); }catch(e){} return; }
+  var r=new SR();
+  r.lang=(PL.lang==='en')?'en-US':'ru-RU';
+  r.interimResults=true; r.continuous=false;
+  var base=fld.value ? (fld.value.replace(/\s+$/,'')+' ') : '';
+  r.onstart=function(){ CHAT_REC=r; btn.classList.add('rec'); btn.setAttribute('aria-label','Остановить запись'); };
+  r.onresult=function(e){
+    var txt='';
+    for(var i=e.resultIndex;i<e.results.length;i++) txt+=e.results[i][0].transcript;
+    fld.value=base+txt;
+  };
+  r.onerror=function(){ /* отказ в доступе к микрофону — молча возвращаем ввод текстом */ };
+  r.onend=function(){ CHAT_REC=null; btn.classList.remove('rec'); btn.setAttribute('aria-label','Сказать голосом'); fld.focus(); };
+  try{ r.start(); }catch(e){ CHAT_REC=null; btn.classList.remove('rec'); }
+}
+/* показываем кнопку только если браузер умеет распознавать речь */
+(function(){
+  try{
+    if(window.SpeechRecognition||window.webkitSpeechRecognition){
+      var b=document.getElementById('chatMic'); if(b) b.hidden=false;
+    }
+  }catch(e){}
+})();
 function closeChat(){document.getElementById('chatwin').classList.remove('open');var w=document.getElementById('fabWrap');if(w)w.style.display='block';else document.getElementById('fab').style.display='flex';}
 
 /* ===== MOBILE NAV ===== */
