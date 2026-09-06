@@ -26,16 +26,13 @@ publish () {
   git add img/elnur-hero.jpg img/elnur-founder.jpg 2>/dev/null || true
   git -c user.name="Elnur" -c user.email="el.khankishiev@gmail.com" \
       commit -q -m "Фото Эльнура и семьи на сайт" || { echo "Нечего коммитить"; exit 0; }
-  PAT=$(python3 -c "
-import json,urllib.request,re,pathlib
-key=re.search(r'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9[A-Za-z0-9._-]+',pathlib.Path.home().joinpath('plp_diag.py').read_text()).group(0)
-r=urllib.request.Request('https://proplib.app.n8n.cloud/api/v1/variables?limit=200',headers={'X-N8N-API-KEY':key})
-print({v['key']:v['value'] for v in json.load(urllib.request.urlopen(r,timeout=20))['data']}.get('GITHUB_PAT',''))" 2>/dev/null)
-  if [ -n "$PAT" ]; then
-    git push "https://x-access-token:$PAT@github.com/elkhankishiev-source/plp-site.git" HEAD:main 2>&1 | sed "s/$PAT/***/g" | tail -1
+  # Публикуем обычным git push: доступ к GitHub уже настроен на этом маке.
+  # Раньше скрипт доставал ключ n8n из ~/plp_diag.py и выменивал на него токен
+  # GitHub — лишний путь для секрета там, где он не нужен.
+  if git push origin HEAD:main >/dev/null 2>&1; then
     echo "Опубликовано. Сайт обновится за минуту."
   else
-    echo "Токен не нашёлся — выполни: git push"
+    echo "Не удалось запушить. Проверь доступ: git push origin main"
   fi
 }
 

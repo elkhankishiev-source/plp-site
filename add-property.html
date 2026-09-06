@@ -1578,6 +1578,16 @@ body{background:var(--bg)}
 .header .logo .chip{color:transparent!important}
 /* половинки тумблера одинаковой ширины: иначе жирная подсветка текущего места
    двигает всю шапку на пару пикселей и сайт с кабинетом «не совпадают» */
+/* Тумблер «Сайт / Кабинет» — один на все страницы. В анкете он раньше
+   оставался без оформления и читался как «СайтКабинет» (Эльнур 06.09). */
+.swch{display:inline-flex;align-items:center;background:var(--warm);
+  border:1px solid rgba(var(--ink-rgb),.12);border-radius:999px;padding:3px;
+  font-size:.8rem;font-weight:700;white-space:nowrap}
+.swch a,.swch b{display:block;padding:6px 12px;border-radius:999px;text-decoration:none;color:var(--muted)}
+.swch b{background:var(--ink-block);color:var(--on-ink)}
+.swch a:hover{color:var(--ink)}
+/* на телефоне переход между сайтом и кабинетом живёт пунктом в бургере */
+@media(max-width:900px){ .header .swch,.swch{display:none} }
 .header .swch{width:164px;box-sizing:border-box}
 .header .swch>a,.header .swch>b{flex:1 1 0;min-width:0;text-align:center}
 
@@ -1615,6 +1625,15 @@ body{background:var(--bg)}
 @media (prefers-color-scheme: light){
   :root:not([data-theme="dark"]) .err,:root:not([data-theme="dark"]) .df-status.err{color:#c0392b}
 }
+
+/* В кабинете общее правило button{margin-top:14px;width:100%} сдвигало кнопки
+   языка вниз, и тумблер «уплывал» из своего овала. Кнопкам в шапке и в меню
+   отступы и ширину задаём сами. */
+.mnav .mlang button,.mnav .mtheme,.header .lang button,.header .themebtn,.header .burger{
+  margin:0;width:auto}
+.mnav .mlang button{height:100%;display:inline-flex;align-items:center;justify-content:center;
+  border-radius:0;flex:1 1 0;min-width:0}
+.mnav .mtheme{margin:0}
 
 /* PLP:UI:END */
 </style>

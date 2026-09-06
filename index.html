@@ -697,7 +697,8 @@ input.bad{border-color:#d98a84!important;background:var(--paper)6f5}
 .car{display:flex;gap:20px;padding:6px 4px 12px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;cursor:grab}
 .car::-webkit-scrollbar{display:none}
 .car.drag{cursor:grabbing;scroll-snap-type:none}
-.car .prop{flex:0 0 clamp(380px,32%,440px);scroll-snap-align:start;background:var(--paper);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow-sm);transition:transform .25s,box-shadow .25s;cursor:pointer;display:flex;flex-direction:column}
+/* Эльнур просил карточки в ленте чуть крупнее — на маке это 420–500 px */
+.car .prop{flex:0 0 clamp(420px,35%,500px);scroll-snap-align:start;background:var(--paper);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow-sm);transition:transform .25s,box-shadow .25s;cursor:pointer;display:flex;flex-direction:column}
 @media(max-width:640px){.car .prop{flex:0 0 85vw}}
 .car .prop:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
 .car .pic{aspect-ratio:4/3;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:600;color:rgba(var(--ink-rgb),.45)}
@@ -1501,12 +1502,8 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
 [hidden]{display:none!important}
 
 /* Переключатель «Сайт / Кабинет»: одинаковый на сайте и в кабинете */
-.swch{display:inline-flex;align-items:center;background:var(--warm);border:1px solid rgba(var(--ink-rgb),.12);
-  border-radius:999px;padding:3px;font-size:.8rem;font-weight:700;white-space:nowrap}
-.swch a,.swch b{display:block;padding:6px 12px;border-radius:999px;text-decoration:none;color:var(--muted)}
-.swch b{background:var(--ink-block);color:var(--on-ink)}
-.swch a:hover{color:var(--ink)}
-@media(max-width:900px){ .swch{display:none} }
+/* тумблер «Сайт / Кабинет» живёт в build/parts/ui-common.css — он нужен
+   одинаковым на сайте, в кабинете и в анкете */
 
 /* На телефоне лого занимало слишком много света вверху — уменьшаем значок и текст */
 @media(max-width:600px){
@@ -1732,6 +1729,16 @@ body{background:var(--bg)}
 .header .logo .chip{color:transparent!important}
 /* половинки тумблера одинаковой ширины: иначе жирная подсветка текущего места
    двигает всю шапку на пару пикселей и сайт с кабинетом «не совпадают» */
+/* Тумблер «Сайт / Кабинет» — один на все страницы. В анкете он раньше
+   оставался без оформления и читался как «СайтКабинет» (Эльнур 06.09). */
+.swch{display:inline-flex;align-items:center;background:var(--warm);
+  border:1px solid rgba(var(--ink-rgb),.12);border-radius:999px;padding:3px;
+  font-size:.8rem;font-weight:700;white-space:nowrap}
+.swch a,.swch b{display:block;padding:6px 12px;border-radius:999px;text-decoration:none;color:var(--muted)}
+.swch b{background:var(--ink-block);color:var(--on-ink)}
+.swch a:hover{color:var(--ink)}
+/* на телефоне переход между сайтом и кабинетом живёт пунктом в бургере */
+@media(max-width:900px){ .header .swch,.swch{display:none} }
 .header .swch{width:164px;box-sizing:border-box}
 .header .swch>a,.header .swch>b{flex:1 1 0;min-width:0;text-align:center}
 
@@ -1769,6 +1776,15 @@ body{background:var(--bg)}
 @media (prefers-color-scheme: light){
   :root:not([data-theme="dark"]) .err,:root:not([data-theme="dark"]) .df-status.err{color:#c0392b}
 }
+
+/* В кабинете общее правило button{margin-top:14px;width:100%} сдвигало кнопки
+   языка вниз, и тумблер «уплывал» из своего овала. Кнопкам в шапке и в меню
+   отступы и ширину задаём сами. */
+.mnav .mlang button,.mnav .mtheme,.header .lang button,.header .themebtn,.header .burger{
+  margin:0;width:auto}
+.mnav .mlang button{height:100%;display:inline-flex;align-items:center;justify-content:center;
+  border-radius:0;flex:1 1 0;min-width:0}
+.mnav .mtheme{margin:0}
 
 /* PLP:UI:END */
 
@@ -1947,7 +1963,7 @@ body{background:var(--bg)}
       <div>
         <span class="kicker" data-i18n="rent.lab">Аренда · 24/7</span>
         <h2 id="rent-title" data-i18n="rent.h2">Объекты, где хочется жить</h2>
-        <p class="sub" data-i18n="rent.sub">Виллы и апартаменты на Пхукете для жизни и комфортного отдыха — аренда от месяца. Цены и условия — по запросу: оставьте заявку, подберём вариант и ответим лично. От первого касания до заселения — отдыхайте с самого начала.</p>
+        <p class="sub" data-i18n="rent.sub">Виллы и апартаменты на Пхукете для жизни и комфортного отдыха. Цены и условия — по запросу: оставьте заявку, подберём вариант и ответим лично. От первого касания до заселения — отдыхайте с самого начала.</p>
       </div>
     </div>
     <div class="datefilter reveal" id="rentDateFilter">
@@ -1975,6 +1991,7 @@ body{background:var(--bg)}
       <div class="car" id="rentCar"></div>
       <div class="noresult" id="rentNoResult" data-i18n="rent.noresult">По выбранным фильтрам ничего не нашлось — измените условия или сбросьте фильтры.</div>
     </div>
+    <!-- PLP:PART:rent-band:START -->
     <div class="rentband reveal">
       <div>
         <h3 data-i18n="rent.b1t">Запрос на аренду — 24/7</h3>
@@ -1985,6 +2002,8 @@ body{background:var(--bg)}
         <a class="btn btn-glass" href="https://t.me/elnurphuket_bot" target="_blank" rel="noopener" data-i18n="rent.b1tg">Консьерж в Telegram</a>
       </div>
     </div>
+    <!-- PLP:PART:rent-band:END -->
+    <!-- PLP:PART:rent-care:START -->
     <div class="reveal" style="margin-top:28px">
       <span class="kicker" data-i18n="rent.servlab">Аренда с заботой</span>
       <h2 data-i18n="rent.servh2">Организуем всё и даже больше</h2>
@@ -2002,6 +2021,8 @@ body{background:var(--bg)}
       <div class="serv-card"><h4 data-i18n="rs.9t">Консьерж 24/7</h4><p data-i18n="rs.9p">Бот в Telegram отвечает в любое время суток, сложное сразу берёт на себя менеджер</p></div>
       <div class="serv-card"><h4 data-i18n="rs.10t">Управление жильём</h4><p data-i18n="rs.10p">Если сдаёте своё: заселяем гостей, ведём календарь и показываем доход в личном кабинете</p></div>
     </div>
+    <!-- PLP:PART:rent-care:END -->
+    <!-- PLP:PART:rent-island:START -->
     <div class="rentband reveal on-green">
       <div>
         <h3 data-i18n="rent.upt">Понравился остров?</h3>
@@ -2012,6 +2033,7 @@ body{background:var(--bg)}
         <button type="button" class="btn btn-light btn-2l" onclick="openQuiz()"><b data-i18n="rent.upquiz">Подобрать за 10 минут</b><small data-i18n="cta.free">бесплатная консультация</small></button>
       </div>
     </div>
+    <!-- PLP:PART:rent-island:END -->
   </div>
 </section>
 
@@ -2458,7 +2480,7 @@ ru: {
   "pdf.lab":"PDF · 23 страницы","pdf.h2":"Скачать полный каталог эксклюзивных предложений",
   "pdf.p":"Все лучшие предложения в одном PDF: цены, метражи, фото, планировки и бонусы.","pdf.cta":"Получить каталог","pdf.cover":"Каталог объектов","pdf.cover2":"Пхукет · 2026","pdf.cover3":"Property Library Phuket","pdf.cover4":"цены · планировки · рассрочка","pdf.pg2":"23 страницы",
   "rent.lab":"Аренда · 24/7","rent.h2":"Объекты, где хочется жить",
-  "rent.sub":"Виллы и апартаменты на Пхукете для жизни и комфортного отдыха — аренда от месяца. Цены и условия — по запросу: оставьте заявку, подберём вариант и ответим лично. От первого касания до заселения — отдыхайте с самого начала.",
+  "rent.sub":"Виллы и апартаменты на Пхукете для жизни и комфортного отдыха. Цены и условия — по запросу: оставьте заявку, подберём вариант и ответим лично. От первого касания до заселения — отдыхайте с самого начала.",
   "rent.b1t":"Запрос на аренду — 24/7","rent.b1p":"Заполните заявку — подберём жильё под ваши даты и бюджет и ответим по условиям.",
   "rent.b1cta":"Оставить запрос","rent.b1tg":"Консьерж в Telegram",
   "rent.servlab":"Аренда с заботой","rent.servh2":"Организуем всё и даже больше","rent.servsub":"Мы не сдаём ключи и не исчезаем. Остаёмся рядом: организуем, подскажем, решим — от встречи в аэропорту до продления визы.",
@@ -2482,7 +2504,7 @@ ru: {
   "quiz.cta":"Начать подбор","quiz.step":"Шаг","quiz.of":"из","quiz.back":"Назад","quiz.next":"Далее","quiz.match":"Похоже, вам подойдёт","quiz.view":"Открыть объект",
   "quiz.done.t":"Спасибо! Заявка принята","quiz.done.p":"Специалист свяжется с вами в течение 5 минут в рабочее время и пришлёт персональную подборку. Продолжить можно в чате с Дарьей или в Telegram.","quiz.done.close":"Закрыть",
   "quiz.err.t":"Не удалось отправить","quiz.err.p":"Похоже, пропала связь. Напишите нам напрямую в WhatsApp — ответим лично и подберём вариант.",
-  "q.1":"Какая у вас цель?","q.1a":"Инвестиции и доходность","q.1b":"Для жизни и переезда","q.1c":"Аренда от месяца","q.1d":"Пока изучаю рынок",
+  "q.1":"Какая у вас цель?","q.1a":"Инвестиции и доходность","q.1b":"Для жизни и переезда","q.1c":"Аренда","q.1d":"Пока изучаю рынок",
   "q.2":"На какой бюджет ориентируетесь?","q.2a":"฿3–5 млн","q.2b":"฿5–10 млн","q.2c":"฿10–15 млн","q.2e":"฿15–25 млн","q.2f":"฿25 млн и выше","q.2d":"Интересует аренда",
   "q.3":"Какой район интересен?","q.3a":"Банг Тао / Лагуна","q.3b":"Лаян / Сурин","q.3c":"Ката / Карон","q.3d":"Равай / Найхарн","q.3e":"Патонг","q.3f":"Север: Най Янг / Май Кхао","q.3g":"Пхукет-таун","q.3h":"Доверюсь вашему совету",
   "q.4":"Какой тип объекта?","q.4a":"Кондо / апартаменты","q.4b":"Вилла","q.4c":"Таунхаус","q.4d":"Пока не определился",
@@ -2542,7 +2564,7 @@ ru: {
   "u.wa":"Написать в WhatsApp","wa.hi":"Здравствуйте! Интересует объект:","wa.hi2":"Здравствуйте! Хочу подобрать объект на Пхукете.","wa.price":"Цена на сайте:","wa.dates":"Даты:","wa.link":"Ссылка:","wa.seen":"Смотрел на сайте:",
   "nav.pick":"Подобрать объект","nav.chat":"Чат с консультантом","f.any":"Любая цена","f.reset":"сбросить","u.upto":"до","map.list":"Объекты на карте","zone.budget":"Ваш бюджет","zone.all":"все районы","u.units":"Что можно купить","u.unitsRent":"Что можно снять","u.plot":"Участок","u.areaHouse":"Площадь дома","u.similar":"Похожие объекты","u.allphotos":"Все","u.progress":"Ход строительства","u.progressAll":"общая готовность по данным застройщика","stay.wait":"Считаем…","stay.nights":"ночей","stay.pernight":" за ночь","stay.off":"скидка за срок","stay.none":"Цена на эти даты — по запросу. Оставьте заявку, ответим точной суммой в течение дня.",
   "assist.lab":"Консультант","assist.h2":"Не уверены, что подходит именно вам?","assist.p":"Спросите Дарью прямо здесь, в чате на сайте. Она знает базу, считает доходность и сравнивает районы — отвечает сразу, в любое время. Что-то сложное передаст менеджеру.","assist.cta":"Задать вопрос в чате","assist.wa":"Подобрать за 10 минут","assist.q1s":"Что купить на 5 млн ฿?","assist.q1":"Что можно купить на 5 млн ฿?","assist.q2s":"Где выше доходность?","assist.q2":"В каком районе выше доходность аренды?","assist.q3s":"Чем Банг Тао лучше Раваи?","assist.q3":"Чем Банг Тао лучше Раваи для инвестиций?","assist.q4s":"Сколько выйдет с налогами?","assist.q4":"Какие расходы при покупке кроме цены объекта?",
-  "u.from":"от","u.onreq":"цена по запросу","u.night":"за ночь","u.month":"в месяц","rent.f.budget":"Бюджет","rent.minnights":"от {n} ночей","rent.noprice":"цена по запросу","rent.soon":"сдача {d} · аренда откроется после сдачи","rent.lvl.market":"ориентир по объявлениям","rent.lvl.owner":"ставка по проекту","u.calc":"Рассчитать доходность","u.cmp":"Сравнить","u.cmpOn":"В сравнении",
+  "u.from":"от","u.onreq":"цена по запросу","u.night":"за ночь","u.month":"в месяц","rent.f.nolimit":"без ограничения","rent.f.budget":"Бюджет","rent.minnights":"от {n} ночей","rent.noprice":"цена по запросу","rent.soon":"сдача {d} · аренда откроется после сдачи","rent.lvl.market":"ориентир по объявлениям","rent.lvl.owner":"ставка по проекту","u.calc":"Рассчитать доходность","u.cmp":"Сравнить","u.cmpOn":"В сравнении",
   "u.roinote":"Ориентировочно; потенциал зависит от объекта, стратегии и управления — рассчитаем индивидуально",
   "u.view":"Записаться на показ","u.podborka":"Получить подборку","u.kp":"Получить КП",
   "u.share":"Поделиться","u.copied":"Ссылка скопирована","u.copyfail":"Не удалось скопировать — ссылка в адресной строке",
@@ -2595,9 +2617,9 @@ ru: {
   "chat.av":"Д","chat.fab":"Дарья · на связи","chat.name":"Дарья","chat.sub":"персональный менеджер · отвечает сразу","chat.placeholder":"Напишите сообщение…",
   "chat.botline":"Личный диалог. Отвечаем в течение 5 минут в рабочее время",
   "chat.hello":"Здравствуйте! Я Дарья, менеджер Property Library из команды Эльнура. Помогу с покупкой, арендой и любым вопросом по Пхукету. Что вам интересно?",
-  "chat.menu1":"Купить / инвестировать","chat.menu2":"Аренда от месяца","chat.menu3":"Услуги и сопровождение","chat.menu4":"Оставить контакт — соберём подборку",
+  "chat.menu1":"Купить / инвестировать","chat.menu2":"Аренда","chat.menu3":"Услуги и сопровождение","chat.menu4":"Оставить контакт — соберём подборку",
   "chat.r.sale":"Хороший запрос. Вход в рынок — от ฿3.9 млн, доходность 6–12% годовых в зависимости от района и проекта. Покажу пару вариантов из нашей базы — а под вашу задачу соберу подборку лично.",
-  "chat.r.rent":"Мы сдаём в долгосрочную аренду — от месяца и дольше. Цены и условия по каждому объекту называем по запросу: напишите район, даты и бюджет — подберу вариант. Оставьте WhatsApp или Telegram — отвечу лично.",
+  "chat.r.rent":"Сдаём и посуточно, и на длительный срок. Цены и условия по каждому объекту называем по запросу: напишите район, даты и бюджет — подберу вариант. Оставьте WhatsApp или Telegram — отвечу лично.",
   "chat.r.service":"Мы закрываем всё под ключ: юристы по тайскому праву, визы, дизайн, строительство и управление арендой после покупки. Для клиентов услуги бесплатны. Расскажите вашу ситуацию — подскажу, с чего начать.",
   "chat.r.calc":"Смотрю по нашей посезонной модели. {o} ({d}): чистыми ~{n} в год, ориентир доходности по району ~{y}% годовых, окупаемость ~{p} лет. Это ориентир — точную доходность по юниту рассчитаем индивидуально: она зависит от объекта, стратегии и управления. В карточке объекта можно подправить любое допущение — загрузку, ставки, расходы. Оставьте контакт — соберу точный расчёт лично.",
   "chat.r.support":"Понимаю. Чтобы не ввести вас в заблуждение, уточню детали у Эльнура и вернусь с точным ответом. Оставьте WhatsApp или Telegram — отвечу лично в течение 5 минут в рабочее время.",
@@ -2610,7 +2632,7 @@ ru: {
   "chat.aifail":"Кажется, у меня пропала связь и я не расслышала. Напишите мне в <a href=\"https://t.me/elnurphuket_bot\" target=\"_blank\" rel=\"noopener\" style=\"color:#1a7f4b;font-weight:600\">консьерж-бот в Telegram</a> — отвечу там же, по делу.",
   "chat.rentreq":"Запрос на аренду принят. Подберу вариант под ваши даты и отвечу по условиям — оставьте контакт, чтобы я могла написать лично.",
   "lead.sent":"Заявка отправлена",
-  "lf.goal":"Ваша цель…","lf.goal1":"Инвестиции","lf.goal2":"Для жизни","lf.goal3":"Аренда от месяца","lf.goal4":"Пока изучаю",
+  "lf.goal":"Ваша цель…","lf.goal1":"Инвестиции","lf.goal2":"Для жизни","lf.goal3":"Аренда","lf.goal4":"Пока изучаю",
   "lf.budget":"Бюджет…","lf.br":"Интересует аренда",
   "lf.name":"Имя","lf.contact":"Телефон или @ник в мессенджере","lf.hp":"Не заполняйте это поле",
   "lf.consent":"Согласен на обработку персональных данных — <a href='privacy.html' target='_blank' rel='noopener' onclick='event.stopPropagation()'>политика</a>","lf.send":"Отправить","lf.wait":"Секунду — проверьте, что данные введены верно.",
@@ -2728,7 +2750,7 @@ en: {
   "u.wa":"Message on WhatsApp","wa.hi":"Hello! I am interested in:","wa.hi2":"Hello! I would like help choosing a property in Phuket.","wa.price":"Price on the site:","wa.dates":"Dates:","wa.link":"Link:","wa.seen":"Viewed on the site:",
   "nav.pick":"Find me a property","nav.chat":"Chat with a consultant","f.any":"Any price","f.reset":"reset","u.upto":"up to","map.list":"Properties on the map","zone.budget":"Your budget","zone.all":"all areas","u.units":"What you can buy","u.unitsRent":"What you can rent","u.plot":"Plot","u.areaHouse":"House area","u.similar":"Similar properties","u.allphotos":"All","u.progress":"Construction progress","u.progressAll":"overall readiness per the developer","stay.wait":"Calculating…","stay.nights":"nights","stay.pernight":" per night","stay.off":"length-of-stay discount","stay.none":"Price for these dates is on request. Leave a request and we will come back with the exact figure the same day.",
   "assist.lab":"Assistant","assist.h2":"Not sure what suits you?","assist.p":"Ask Daria right here, in the chat on this page. She knows the catalogue, works out the yield and compares districts — answers straight away, any time. Anything complex goes to a manager.","assist.cta":"Ask in the chat","assist.wa":"Find me a match in 10 minutes","assist.q1s":"What can I get for ฿5M?","assist.q1":"What can I buy for ฿5 million?","assist.q2s":"Where is the yield higher?","assist.q2":"Which district has the higher rental yield?","assist.q3s":"Bang Tao or Rawai?","assist.q3":"Why is Bang Tao better than Rawai for investment?","assist.q4s":"What about taxes?","assist.q4":"What costs come on top of the price?",
-  "u.from":"from","u.onreq":"price on request","u.night":"per night","u.month":"per month","rent.f.budget":"Budget","rent.minnights":"from {n} nights","rent.noprice":"price on request","rent.soon":"handover {d} · rentals open after handover","rent.lvl.market":"market benchmark","rent.lvl.owner":"project rate","u.calc":"Calculate the yield","u.cmp":"Compare","u.cmpOn":"Comparing",
+  "u.from":"from","u.onreq":"price on request","u.night":"per night","u.month":"per month","rent.f.nolimit":"no upper limit","rent.f.budget":"Budget","rent.minnights":"from {n} nights","rent.noprice":"price on request","rent.soon":"handover {d} · rentals open after handover","rent.lvl.market":"market benchmark","rent.lvl.owner":"project rate","u.calc":"Calculate the yield","u.cmp":"Compare","u.cmpOn":"Comparing",
   "u.roinote":"Indicative; potential depends on the unit, strategy and management — we calculate it individually",
   "u.view":"Book a viewing","u.podborka":"Get a shortlist","u.kp":"Get the offer",
   "u.share":"Share","u.copied":"Link copied","u.copyfail":"Couldn't copy — link is in the address bar",
@@ -4857,7 +4879,12 @@ function buildRentPriceMenu(bar){
     if(!vals.length){ host.innerHTML='<p class="sub" style="margin:6px 2px">'+t('u.onreq')+'</p>'; return; }
     var step=(rentUnit==='month')?10000:1000;
     var lo=Math.floor(Math.min.apply(null,vals)/step)*step;
-    var hi=Math.ceil(Math.max.apply(null,vals)/step)*step;
+    /* Эльнур 06.09: «за сутки только до 28к — а если 50к?». Верхняя граница
+       шла ровно по нашим четырём объектам, и шкала выглядела как весь рынок.
+       Держим потолок по рынку Пхукета, а крайнее правое положение ручки
+       означает «без верхней границы» — новые дорогие объекты не отсекаются. */
+    var floorHi=(rentUnit==='month')?400000:80000;
+    var hi=Math.ceil(Math.max(Math.max.apply(null,vals), floorHi)/step)*step;
     if(hi<=lo) hi=lo+step*5;
     var box=document.createElement('div'); box.className='prng';
     box.innerHTML=
@@ -4868,7 +4895,7 @@ function buildRentPriceMenu(bar){
         '<button type="button" class="prng-h rp-a" aria-label="'+t('u.from')+'"></button>'+
         '<button type="button" class="prng-h rp-b" aria-label="'+t('u.from')+'"></button>'+
       '</div>'+
-      '<div class="prng-ends"><span>'+fmtBaht(lo)+'</span><span>'+fmtBaht(hi)+'</span></div>';
+      '<div class="prng-ends"><span>'+fmtBaht(lo)+'</span><span>'+t('rent.f.nolimit')+'</span></div>';
     host.appendChild(box);
 
     var track=box.querySelector('.rp-track'), fill=box.querySelector('.rp-fill'),
