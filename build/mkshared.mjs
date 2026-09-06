@@ -24,10 +24,14 @@ const VARIANTS = {
   },
 };
 
+const UI = fs.readFileSync(path.join(ROOT, 'build/parts/ui-common.css'), 'utf8');
+
 const MARKS = [
   ['<!-- PLP:HEADER:START -->', '<!-- PLP:HEADER:END -->', HEADER],
   ['<!-- PLP:MNAV:START -->',   '<!-- PLP:MNAV:END -->',   MNAV],
   ['<!-- PLP:FOOTER:START -->', '<!-- PLP:FOOTER:END -->', FOOTER],
+  /* общий блок стилей интерфейса — внутри <style>, поэтому маркеры без HTML-комментария */
+  ['/* PLP:UI:START */', '/* PLP:UI:END */', UI],
 ];
 
 function apply(file, variant) {
