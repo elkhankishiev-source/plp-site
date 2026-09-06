@@ -3,6 +3,32 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- PLP:HEADTHEME:START -->
+<meta name="color-scheme" content="light dark">
+<!-- цвет системных полей браузера = фон страницы. Без этого при прокрутке и
+     оттягивании из-под страницы проглядывает чужой цвет — кажется, что фон мигает. -->
+<meta name="theme-color" content="#f7f6f1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0C0D09" media="(prefers-color-scheme: dark)">
+<script>
+(function(){
+  function paintChrome(){
+    try{
+      var bg=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+      if(!bg && document.body) bg=getComputedStyle(document.body).backgroundColor;
+      if(!bg || bg==='rgba(0, 0, 0, 0)') return;
+      var list=document.querySelectorAll('meta[name="theme-color"]');
+      for(var i=0;i<list.length;i++) list[i].parentNode.removeChild(list[i]);
+      var m=document.createElement('meta'); m.setAttribute('name','theme-color');
+      m.setAttribute('content',bg); document.head.appendChild(m);
+    }catch(e){}
+  }
+  window.paintChrome=paintChrome;
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',paintChrome);
+  else paintChrome();
+  try{ matchMedia('(prefers-color-scheme: dark)').addEventListener('change',paintChrome); }catch(e){}
+})();
+</script>
+<!-- PLP:HEADTHEME:END -->
 <script>(function(){try{var v=localStorage.getItem('pl_theme');
 if(v==='dark'||v==='light')document.documentElement.setAttribute('data-theme',v);}catch(e){}})();</script>
 <title>The Title Heritage Bang-Tao — Банг Тао, Пхукет | Property Library</title>
@@ -27,6 +53,7 @@ if(v==='dark'||v==='light')document.documentElement.setAttribute('data-theme',v)
 <meta name="twitter:image" content="https://property-library.com/img/PLP-HERITAGE.jpg">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":["Residence","Product"],"name":"The Title Heritage Bang-Tao","description":"The Title Heritage Bang Tao — премиум-резиденция в престижном районе Bang Tao с сдачей Q1 2026. 7 корпусов по 7 этажей, 789 юнитов от 1BR до 3BR (32-174 м²). Premium facilities: 8+ бассейнов (включая rooftop и hydrotherapy), sky bar, onsen, home cinema, music zone, gaming, gym, yoga. Награда: Best Luxury Condo Interior Design Phuket 2024. От 5.05M THB. По данным застройщика: 7 корпусов по 7 этажей, 789 квартир, участок 15-3-37,6 рай (25 350 м²).","url":"https://property-library.com/object/heritage.html","image":"https://property-library.com/img/PLP-HERITAGE.jpg","address":{"@type":"PostalAddress","addressRegion":"Phuket","addressLocality":"Банг Тао","addressCountry":"TH"},"brand":{"@type":"Organization","name":"Rhom Bho Property (AssetWise)"},"numberOfRooms":3,"floorSize":{"@type":"QuantitativeValue","value":174,"unitCode":"MTK"},"offers":{"@type":"Offer","priceCurrency":"THB","price":5525730,"availability":"https://schema.org/InStock","url":"https://property-library.com/object/heritage.html"}}</script>
 <style>
+html{background:var(--bg);overscroll-behavior-y:none}
 /* Эльнур 05.09: сайт — единая система. Страница объекта живёт в тех же
    цветах и с тем же набором блоков, что и карточка на сайте. */
 :root{--green:#D2D5B3;--green-deep:#5F6242;--olive:#5F6242;--ink:#22251C;--paper:#FBFBF7;
