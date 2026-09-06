@@ -346,8 +346,10 @@ function buildCatalog(objects, benchmarks, preserve) {
 function thumbUrl(u, w, q) {
   const s = String(u || '');
   if (!s || s.indexOf('/storage/v1/object/public/') < 0) return s || null;
+  /* без resize=contain хранилище режет кадр по ширине, а высоту оставляет
+     исходной — обложка Balcony приходила 760×3300 «кустами». Эльнур 06.09. */
   return s.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/')
-        + (s.indexOf('?') < 0 ? '?' : '&') + 'width=' + w + '&quality=' + q;
+        + (s.indexOf('?') < 0 ? '?' : '&') + 'width=' + w + '&resize=contain&quality=' + q;
 }
 function unitsOf(o) {
   /* Типы приходят из разных источников и называют поля по-разному
