@@ -1393,6 +1393,66 @@ html,*{-webkit-tap-highlight-color:transparent}
 .header .burger{display:flex;flex-direction:column;justify-content:center;gap:4px;padding:0}
 .header .burger i{display:block;flex:none;width:18px;height:2px;min-height:2px;
   background:var(--ink);border-radius:2px}
+
+/* ===== ЕДИНЫЙ ВИД ШАПКИ И ПОДВАЛА (Эльнур 06.09) =====
+   Раньше правила лежали в разных местах двух файлов и спорили друг с другом:
+   лого то бледнело, то мельчало, язык раздувался, подвал в кабинете оставался
+   огромным. Собрано в один блок в конце — он и решает. */
+
+/* логотип: заметный на всех экранах, «Library» фирменным оливковым */
+.header .logo{font-size:1.12rem;font-weight:800;color:var(--ink);gap:10px}
+.header .logo .chip{width:40px;height:40px;border-radius:12px}
+.header .logo .chip img{width:26px}
+.header .logo .lname{font-size:1.06rem;letter-spacing:-.01em}
+.header .logo .lname>span{color:var(--olive)}
+@media(max-width:600px){
+  .header .logo{font-size:1.02rem;gap:8px}
+  .header .logo .chip{width:34px;height:34px;border-radius:10px}
+  .header .logo .chip img{width:22px}
+  .header .logo .lname{font-size:.98rem}
+}
+
+/* переключатель языка: компактный на всех ширинах */
+.header .lang{font-size:.7rem;padding:2px;border-radius:999px}
+.header .lang button{padding:4px 8px;font-weight:700}
+@media(max-width:600px){
+  .header .lang{font-size:.62rem;padding:2px}
+  .header .lang button{padding:3px 6px}
+}
+
+/* подвал: мелкий и спокойный и на телефоне, и на компьютере */
+.footer{padding:20px 0 14px!important;color:var(--muted)}
+.footer h3{font-size:.68rem!important;opacity:.75;margin-bottom:6px}
+.footer li{margin-bottom:4px!important;font-size:.74rem!important;line-height:1.35}
+.footer a{color:var(--muted)}
+.footer a:hover{color:var(--ink)}
+.footer .logo,.footer .lname{font-size:.82rem}
+.footer .logo .chip{width:24px;height:24px;border-radius:7px}
+.footer .logo .chip img{width:15px}
+.footer-grid{gap:10px 16px!important;grid-template-columns:repeat(2,1fr)!important}
+@media(min-width:800px){.footer-grid{grid-template-columns:1.4fr 1fr 1fr 1fr!important}}
+.footer-grid>:first-child{grid-column:1/-1}
+@media(min-width:800px){.footer-grid>:first-child{grid-column:auto}}
+.footer-bottom{margin-top:12px!important;padding-top:9px!important;font-size:.68rem!important;opacity:.8}
+
+/* ===== ПРИЧИНА МЕРЦАНИЯ (Эльнур 06.09: «мигания есть») =====
+   Размытие фона у липкой шапки и полупрозрачных плашек заставляет мобильный
+   браузер перерисовывать всё под ними при каждом кадре прокрутки — экран
+   «мигает». На узких экранах отключаем размытие и даём сплошной фон. */
+@media(max-width:900px){
+  .header{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+    background:var(--bg)!important}
+  .car .tag,.pm-tag,.prop .fav,.prop .cmpb,.hero-float,.btn-glass,
+  .mnav,.modal-overlay,.modal-back{
+    backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+  .car .tag,.pm-tag{background:var(--paper);border-color:rgba(var(--ink-rgb),.12)}
+  .prop .fav,.prop .cmpb{background:var(--paper)}
+  .mnav{background:rgba(10,10,10,.72)}
+  .modal-overlay{background:rgba(20,18,14,.68)}
+  .modal-back{background:rgba(20,18,14,.6)}
+  /* и никаких плавных переходов фона на прокрутке */
+  .prop,.zone,.mobj,.zprop{transition:none}
+}
 </style>
 <!-- Leaflet подгружается только при открытии раздела с картой: см. ensureLeaflet() -->
 </head>
