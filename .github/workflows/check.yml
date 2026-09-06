@@ -51,7 +51,7 @@ jobs:
         run: |
           set -e
           fail=0
-          grep -q 'href="object/' index.html || { echo "❌ на главной нет ссылок на объекты"; fail=1; }
+          grep -Eq 'href="/?object/' index.html || { echo "❌ на главной нет ссылок на объекты"; fail=1; }
           grep -q 'og:image:width' index.html || { echo "❌ нет размеров og:image — мессенджеры не покажут превью"; fail=1; }
           grep -q 'property-library.com/sitemap.xml' robots.txt || { echo "❌ в robots.txt чужая карта сайта"; fail=1; }
           grep -q '<loc>' sitemap.xml || { echo "❌ карта сайта пуста"; fail=1; }
