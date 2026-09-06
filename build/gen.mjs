@@ -147,7 +147,10 @@ function typeLabel(t) {
 }
 function typeRu(t) { return typeLabel(t).ru; }
 
-function slugOf(pid) { return pid.replace(/^PLP-/, '').toLowerCase(); }
+/* Адрес страницы объекта строим из публичного кода: номер юнита в URL —
+   это та же внутренняя информация, что и на карточке (Эльнур 07.09). */
+function slugOf(pid) { return String(pid).replace(/^PLP-/, '').toLowerCase(); }
+function pubOf(o) { return (o && o.public_code) || (o && o.plp_property_id) || ''; }
 
 // диапазон доходности из rental_benchmarks: (district,type) → (district,Кондо) → 6–12
 function yieldRange(benchmarks, district, type) {
@@ -586,7 +589,11 @@ function buildRentals(objects, preserve, ratesBy) {
     const uspEn = (o.usp_en || '').trim() || usp;
     const S = (v) => (v === undefined || v === null) ? '' : String(v).trim();
     return {
-      property_id: pid,
+      /* На витрине аренды показываем публичный код проекта, а не номер юнита:
+         «S14», «F302» — внутренняя информация (Эльнур 07.09). Внутренний PLP-ID
+         остаётся в системе, заявка приходит с публичным кодом и разворачивается
+         обратно на сервере. */
+      property_id: o.public_code || pid,
       title: o.name,
       funnel: 'rent',
       grad: keep.grad || ('g' + ((i % 4) + 1)),
@@ -708,7 +715,7 @@ function writeObjectIndex(html, objects) {
   all.sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''), 'ru'));
   const total = all.length;
   const rows = all.map((o) => {
-    const href = 'object/' + slugOf(o.plp_property_id) + '.html';
+    const href = 'object/' + slugOf(pubOf(o)) + '.html';
     const price = o.price_from_thb ? fmtBahtShort(Number(o.price_from_thb)) : '';
     const d = DISTRICT_RU[(o.district || '').trim()] || o.district || '';
     return '<li><a href="' + href + '">' + htmlEsc(o.name || o.plp_property_id) + '</a>' +
@@ -780,12 +787,15 @@ function chipRow(items) {
 
 function objectPage(o, benchmarks, ratesBy) {
   const pid = o.plp_property_id;
-  const slug = slugOf(pid);
+  const pub = pubOf(o);            /* публичный код: он же в адресе и на странице */
+  const slug = slugOf(pub);
   const url = SITE_BASE + '/object/' + slug + '.html';
-  const img = SITE_BASE + '/img/' + pid + '.jpg';
+  /* og-картинка тоже по публичному коду: адрес файла попадает в мессенджеры */
+  const img = SITE_BASE + '/img/' + pub + '.jpg';
   // Реальные размеры картинки: WhatsApp без og:image:width/height часто вообще
   // не рисует превью, а соврать нельзя — высота у карточек разная (674…1167).
-  const imgDim = jpegSize(path.join(ROOT, 'img', pid + '.jpg'));
+  const imgDim = jpegSize(path.join(ROOT, 'img', pub + '.jpg'))
+              || jpegSize(path.join(ROOT, 'img', pid + '.jpg'));
   const en = o.district || o.beach || '';
   const ru = DISTRICT_RU[en] || en;
   const t = typeLabel(o.type);
@@ -822,7 +832,7 @@ function objectPage(o, benchmarks, ratesBy) {
 
   const waText = encodeURIComponent(o.name + ' — интересует этот объект. ' + url);
   const waLink = 'https://wa.me/' + WA + '?text=' + waText;
-  const backLink = '../#object=' + encodeURIComponent(pid);
+  const backLink = '../#object=' + encodeURIComponent(pub);   /* в каталоге объект живёт под публичным кодом */
 
   const ld = {
     '@context': 'https://schema.org',
@@ -865,7 +875,7 @@ function objectPage(o, benchmarks, ratesBy) {
      хранилища: вес падает в десятки раз, качество для экрана то же. */
   const galleryRaw = Array.isArray(o.gallery_urls) ? o.gallery_urls.filter(u => /^https?:/.test(u)).slice(0, 8) : [];
   const gallery = galleryRaw.map(u => thumbUrl(u, 1280, 78));
-  const heroSrc = thumbUrl(o.main_image_url, 1600, 80) || (gallery[0] || ('../img/' + pid + '.jpg'));
+  const heroSrc = thumbUrl(o.main_image_url, 1600, 80) || (gallery[0] || ('../img/' + pub + '.jpg'));
   const shots = gallery.length > 1
     ? '<div class="shots">' + gallery.map((u, i) =>
         '<button type="button" class="' + (i ? '' : 'on') + '" data-src="' + htmlEsc(u) + '" aria-label="Фото ' + (i + 1) + '">' +
@@ -1068,7 +1078,7 @@ function sitemap(objects) {
     parts.push(`  <url><loc>${SITE_BASE}/${doc}</loc><lastmod>${today}</lastmod><changefreq>yearly</changefreq><priority>0.3</priority></url>`);
   }
   for (const o of objects) {
-    const loc = SITE_BASE + '/object/' + slugOf(o.plp_property_id) + '.html';
+    const loc = SITE_BASE + '/object/' + slugOf(pubOf(o)) + '.html';
     parts.push(`  <url><loc>${loc}</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>`);
   }
   parts.push('</urlset>');
@@ -1101,7 +1111,7 @@ async function main() {
   const rentals = await sbGet(env,
     'objects?select=plp_property_id,name,district,beach,purpose,type,bedrooms,bedrooms_min,' +
     'bedrooms_max,area_sqm,area_min,area_max,min_stay,deposit,rent_included,rent_excluded,' +
-    'rent_rules,amenities,usp,usp_en,distance_beach_m,on_site,lat,lng,coord_source,last_synced_at,' +
+    'rent_rules,amenities,usp,usp_en,distance_beach_m,on_site,lat,lng,coord_source,last_synced_at,public_code,' +
     'main_image_url,gallery_urls,photo_groups,unit_types,price_tiers,season_rates,rent_price_month_thb,' +
     'stage,handover_date,parent_object_id' +
     '&and=(or(purpose.eq.' + encodeURIComponent('аренда') + ',purpose.eq.rent),' +
@@ -1183,7 +1193,7 @@ async function main() {
   if (!fs.existsSync(OBJDIR)) fs.mkdirSync(OBJDIR, { recursive: true });
   let pages = 0;
   for (const o of pageList) {
-    const slug = slugOf(o.plp_property_id);
+    const slug = slugOf(pubOf(o));
     fs.writeFileSync(path.join(OBJDIR, slug + '.html'), objectPage(o, benchmarks, ratesBy));
     pages++;
   }
@@ -1191,7 +1201,9 @@ async function main() {
   // Раньше генератор только дописывал — из-за бага с протечкой аренды в продажу
   // на прод уехали страницы арендных юнитов с ИМЕНЕМ СОБСТВЕННИКА и номером
   // квартиры, и после исправления каталога они там так и остались.
-  const keep = new Set(pageList.map(o => slugOf(o.plp_property_id) + '.html'));
+  /* адрес страницы строится из публичного кода — по нему же решаем,
+     какие файлы оставить, иначе свежие страницы удалялись как «лишние» */
+  const keep = new Set(pageList.map(o => slugOf(pubOf(o)) + '.html'));
   let removed = 0;
   for (const f of fs.readdirSync(OBJDIR)) {
     if (f.endsWith('.html') && !keep.has(f)) { fs.unlinkSync(path.join(OBJDIR, f)); removed++; }
