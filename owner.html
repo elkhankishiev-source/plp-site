@@ -1387,6 +1387,12 @@ html,*{-webkit-tap-highlight-color:transparent}
 .dates2 input{flex:1;min-width:0}
 .dates2 i{font-style:normal;color:var(--muted);flex:none}
 .hintline{display:block;font-size:.72rem;color:var(--muted);margin-top:4px}
+
+/* Эльнур 06.09: «бургер снова исчез». Полоски съезжали до 0,7 px —
+   их высоту сжимал flex-контейнер. Фиксируем размер и цвет явно. */
+.header .burger{display:flex;flex-direction:column;justify-content:center;gap:4px;padding:0}
+.header .burger i{display:block;flex:none;width:18px;height:2px;min-height:2px;
+  background:var(--ink);border-radius:2px}
 </style>
 <!-- Leaflet подгружается только при открытии раздела с картой: см. ensureLeaflet() -->
 </head>

@@ -1530,6 +1530,19 @@ html{-webkit-tap-highlight-color:transparent}
   .burger{width:36px;height:36px;border-radius:10px}
   .burger i{width:16px}
 }
+
+.header .burger{display:flex;flex-direction:column;justify-content:center;gap:4px;padding:0}
+.header .burger i{display:block;flex:none;width:18px;height:2px;min-height:2px;
+  background:var(--ink);border-radius:2px}
+
+/* Эльнур 06.09: блок фактов занимал полэкрана — ужимаем вдвое, чтобы карточки
+   объектов попадали на первый экран вместе с ним. */
+@media(max-width:700px){
+  .trust{padding:14px 14px;border-radius:18px}
+  .trust-grid{gap:10px 10px}
+  .trust-num{font-size:1.25rem}
+  .trust-label{font-size:.7rem;margin-top:2px;line-height:1.25}
+}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.6.0/maplibre-gl.min.css">
