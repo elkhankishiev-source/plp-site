@@ -1336,6 +1336,14 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
   .modal-win{width:100%;max-width:100%;border-radius:18px 18px 0 0}
   .modal-win .ccard{padding:14px}
 }
+
+/* Переключатель «Сайт / Кабинет»: видно, где находишься, и одним нажатием туда-обратно */
+.swch{display:inline-flex;align-items:center;background:var(--warm);border:1px solid rgba(var(--ink-rgb),.12);
+  border-radius:999px;padding:3px;font-size:.8rem;font-weight:700;white-space:nowrap}
+.swch a,.swch b{display:block;padding:6px 12px;border-radius:999px;text-decoration:none;color:var(--muted)}
+.swch b{background:var(--ink-block);color:var(--on-ink)}
+.swch a:hover{color:var(--ink)}
+@media(max-width:900px){ .swch{display:none} }
 </style>
 <!-- Leaflet подгружается только при открытии раздела с картой: см. ensureLeaflet() -->
 </head>
@@ -1354,7 +1362,9 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
       <button type="button" class="bellbtn" id="bellBtn" aria-label="Уведомления">🔔<span class="bell-n" id="bellN" hidden>0</span></button>
       <button type="button" class="themebtn" id="themeBtn" onclick="cycleTheme()"
               aria-label="Оформление: системное, светлое, тёмное"><span id="themeIco">◐</span></button>
-      <a class="btn btn-ghost btn-cab on" href="owner.html" data-i18n="nav.cabinet">Кабинет</a>
+      <span class="swch" role="group" aria-label="Сайт или кабинет">
+        <a href="index.html">Сайт</a><b>Кабинет</b>
+      </span>
       <button type="button" class="burger" aria-label="Меню" onclick="toggleNav(true)"><i></i><i></i><i></i></button>
     </div>
   </div>
@@ -1384,8 +1394,8 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
     <a href="management.html">Управление</a>
     <a href="add-property.html">Разместить объект</a>
     <a href="index.html#about" onclick="toggleNav(false)" data-i18n="nav.about">О нас</a>
-    <a href="owner.html" onclick="toggleNav(false)" data-i18n="nav.cabinet">Кабинет</a>
-
+    <a href="index.html" onclick="toggleNav(false)">На сайт</a>
+    <button type="button" class="mwa" onclick="toggleNav(false);openChat('hi')">Чат с консультантом</button>
   </div>
 </div>
 <div class="wrap">
@@ -2816,10 +2826,14 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     var per=DATA.period||{}, from=per.start, to=per.end;
     var d0=from?new Date(from+'T00:00:00'):null, d1=to?new Date(to+'T00:00:00'):null;
     var periodNights=(d0&&d1)?Math.max(1,Math.round((d1-d0)/86400000)):30;
-    var props=Math.max(1,(DATA.properties||[]).length);
+    /* Эльнур 06.09: «меняю объект, а цифры те же». Показатели считались всегда
+       по всему портфелю. Выбран конкретный объект — считаем по нему. */
+    var one = (typeof CTX!=='undefined' && CTX.obj!=null) ? (DATA.properties||[])[CTX.obj] : null;
+    var scope = one ? [one] : (DATA.properties||[]);
+    var props=Math.max(1, scope.length);
 
     var busy=0, revenue=0;
-    (DATA.properties||[]).forEach(function(x){
+    scope.forEach(function(x){
       (x.bookings||[]).forEach(function(b){
         if(!b.check_in||!b.check_out) return;
         if(String(b.status||'').toLowerCase()==='cancelled') return;
@@ -2834,7 +2848,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
 
     /* доход за текущий год и сравнение с прошлым */
     var yr=new Date().getFullYear(), curY=0, prevY=0;
-    (DATA.properties||[]).forEach(function(x){
+    scope.forEach(function(x){
       (x.statements||[]).forEach(function(st){
         var y=parseInt(String(st.period||'').slice(0,4),10);
         if(y===yr) curY+=Number(st.net)||0;
@@ -2847,11 +2861,17 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     })() : '<span class="sm">за '+yr+' год</span>';
 
     function card(k,v,note){ return '<div class="kpi"><div class="k">'+k+'</div><div class="v">'+v+'</div><div class="n">'+note+'</div></div>'; }
-    return card('Доход в '+yr, curY?money(curY,'THB'):money(t.income,'THB'), dyn)+
+    /* при выбранном объекте показываем его деньги, а не сводку по портфелю */
+    var inc = one ? ((one.current&&one.current.income)||0) : t.income;
+    var pay = one ? (function(){
+        var st=(one.statements||[])[0];
+        return st ? (Number(st.net)||0) : null;
+      })() : t.payout;
+    return card('Доход в '+yr, curY?money(curY,'THB'):money(inc,'THB'), dyn)+
       card('Загрузка', load+'%', '<span class="sm">'+busy+' ноч. забронировано</span>')+
       card('Средняя ставка', adr?money(adr,'THB'):'—', '<span class="sm">за занятую ночь</span>')+
-      card('Ближайшая выплата', t.payout===null?'—':money(t.payout,'THB'),
-           '<span class="sm">'+(t.payout===null?'первый отчёт '+dmy(per.end):dmy(per.end))+'</span>');
+      card('Ближайшая выплата', pay===null||pay===undefined?'—':money(pay,'THB'),
+           '<span class="sm">'+(pay===null||pay===undefined?'первый отчёт '+dmy(per.end):dmy(per.end))+'</span>');
   }
 
   /* «Объект сейчас»: кто живёт, что ждёт решения, что готово */
