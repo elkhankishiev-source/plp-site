@@ -3,14 +3,38 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- PLP:HEADTHEME:START -->
+<meta name="color-scheme" content="light dark">
+<!-- цвет системных полей браузера = фон страницы. Без этого при прокрутке и
+     оттягивании из-под страницы проглядывает чужой цвет — кажется, что фон мигает. -->
+<meta name="theme-color" content="#f7f6f1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0C0D09" media="(prefers-color-scheme: dark)">
+<script>
+(function(){
+  function paintChrome(){
+    try{
+      var bg=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+      if(!bg && document.body) bg=getComputedStyle(document.body).backgroundColor;
+      if(!bg || bg==='rgba(0, 0, 0, 0)') return;
+      var list=document.querySelectorAll('meta[name="theme-color"]');
+      for(var i=0;i<list.length;i++) list[i].parentNode.removeChild(list[i]);
+      var m=document.createElement('meta'); m.setAttribute('name','theme-color');
+      m.setAttribute('content',bg); document.head.appendChild(m);
+    }catch(e){}
+  }
+  window.paintChrome=paintChrome;
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',paintChrome);
+  else paintChrome();
+  try{ matchMedia('(prefers-color-scheme: dark)').addEventListener('change',paintChrome); }catch(e){}
+})();
+</script>
+<!-- PLP:HEADTHEME:END -->
 <title>Property Library Phuket. Агентство недвижимости на Пхукете</title>
 <meta name="description" content="Подберем недвижимость для покупки или аренды на Пхукете, оформим сделку, поможем с визой и обустройством. Все под ключ — от первого звонка до заезда.">
 
 <!-- ===== SEO / SOCIAL ===== -->
 <link rel="canonical" href="https://property-library.com/">
-<meta name="theme-color" content="#0A0A0A">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Property Library Phuket">
 <meta name="robots" content="index,follow">
 
@@ -146,6 +170,7 @@
 }
 </script>
 <style>
+html{background:var(--bg);overscroll-behavior-y:none}
 :root{
   --green:#D2D5B3;
   --green-soft:#E9EBD9;

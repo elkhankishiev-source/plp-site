@@ -12,6 +12,32 @@
 </script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- PLP:HEADTHEME:START -->
+<meta name="color-scheme" content="light dark">
+<!-- цвет системных полей браузера = фон страницы. Без этого при прокрутке и
+     оттягивании из-под страницы проглядывает чужой цвет — кажется, что фон мигает. -->
+<meta name="theme-color" content="#f7f6f1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0C0D09" media="(prefers-color-scheme: dark)">
+<script>
+(function(){
+  function paintChrome(){
+    try{
+      var bg=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+      if(!bg && document.body) bg=getComputedStyle(document.body).backgroundColor;
+      if(!bg || bg==='rgba(0, 0, 0, 0)') return;
+      var list=document.querySelectorAll('meta[name="theme-color"]');
+      for(var i=0;i<list.length;i++) list[i].parentNode.removeChild(list[i]);
+      var m=document.createElement('meta'); m.setAttribute('name','theme-color');
+      m.setAttribute('content',bg); document.head.appendChild(m);
+    }catch(e){}
+  }
+  window.paintChrome=paintChrome;
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',paintChrome);
+  else paintChrome();
+  try{ matchMedia('(prefers-color-scheme: dark)').addEventListener('change',paintChrome); }catch(e){}
+})();
+</script>
+<!-- PLP:HEADTHEME:END -->
 <meta name="robots" content="noindex,nofollow">
 <title>Личный кабинет — Property Library Phuket</title>
 <meta name="description" content="Личный кабинет Property Library Phuket: ваши объекты, отчёты, документы и заявки. Вход по номеру телефона.">
@@ -33,6 +59,7 @@
 <meta name="twitter:image" content="https://property-library.com/img/og-cabinet.jpg">
 <link rel="icon" href="/img/brand/plp-mark.png">
 <style>
+html{background:var(--bg);overscroll-behavior-y:none}
 /* ── стили сайта: кабинет — его продолжение, а не отдельная страница ── */
 
 :root{
@@ -1384,6 +1411,21 @@ html,*{-webkit-tap-highlight-color:transparent}
 
 /* Даты брони рядом одной строкой: заезд → выезд */
 .dates2{display:flex;align-items:center;gap:8px;margin-top:4px}
+/* Заезд и выезд — одна графа: кнопка с диапазоном и календарь тут же,
+   обе даты отмечаются в нём двумя нажатиями. */
+.dateline{width:100%;margin-top:4px;display:flex;align-items:center;justify-content:space-between;
+  gap:10px;padding:11px 13px;border:1.5px solid rgba(var(--ink-rgb),.14);border-radius:12px;
+  background:var(--paper);color:var(--ink);font:inherit;font-weight:600;text-align:left;cursor:pointer}
+.dateline i{font-style:normal;color:var(--muted);transition:transform .15s}
+.dateline.open i{transform:rotate(180deg)}
+.rangecal{margin-top:8px;padding:12px;border:1.5px solid rgba(var(--ink-rgb),.12);
+  border-radius:14px;background:var(--warm)}
+.rangecal .cal-d{cursor:pointer;user-select:none}
+.rangecal .cal-d.off{opacity:.35;cursor:not-allowed}
+.rangecal .cal-d.in{background:var(--green-soft);color:var(--green-text);border-color:transparent}
+.rangecal .cal-d.edge{background:var(--green);color:var(--on-green);font-weight:800;border-color:transparent}
+.rangecal .cal-legend{display:flex;gap:14px;flex-wrap:wrap;margin:10px 0 0;font-size:.72rem;color:var(--muted)}
+.rangecal .cal-legend b{display:inline-block;width:10px;height:10px;border-radius:3px;vertical-align:-1px;margin-right:5px}
 .dates2 input{flex:1;min-width:0}
 .dates2 i{font-style:normal;color:var(--muted);flex:none}
 .hintline{display:block;font-size:.72rem;color:var(--muted);margin-top:4px}
@@ -1401,7 +1443,6 @@ html,*{-webkit-tap-highlight-color:transparent}
    сборщиком в конец стилей обеих страниц: правится только этот файл. */
 
 /* фон под страницей — чтобы при оттягивании вниз не проглядывал системный белый */
-html{background:var(--bg);overscroll-behavior-y:none}
 body{background:var(--bg)}
 
 /* логотип: заметный, «Library» фирменным оливковым */
@@ -2063,6 +2104,7 @@ function setTheme(v){
   try{ if(v==='system') localStorage.removeItem('pl_theme'); else localStorage.setItem('pl_theme',v); }catch(e){}
   if(v==='system') document.documentElement.removeAttribute('data-theme');
   else document.documentElement.setAttribute('data-theme',v);
+  if(window.paintChrome) window.paintChrome();
   paintThemeBtn();
 }
 function cycleTheme(){ var i=THEMES.indexOf(themeNow()); setTheme(THEMES[(i+1)%THEMES.length]); }
@@ -2406,15 +2448,110 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       n2.textContent = (nights>0 && v>0) ? ('Это '+money(Math.round(v/nights),'THB')+' за ночь') : '';
     }
   }
+  /* Календарь диапазона прямо в форме: первое нажатие — заезд, второе — выезд.
+     Занятые дни берём из броней объекта и не даём их перекрыть. Эльнур 06.09:
+     «заезд выезд в одной графе и календарь сразу прям там же». */
+  var RC={m:null, skip:''};
+  function rcISO(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+  function rcBusy(){
+    var pid=fv('b-obj');
+    var p=(DATA.properties||[]).filter(function(x){ return String(x.id)===String(pid); })[0]||{};
+    var out={};
+    (p.bookings||[]).forEach(function(b){
+      if(!b.check_in) return;
+      if(RC.skip && String(b.id)===String(RC.skip)) return;      /* свою же бронь не считаем занятой */
+      if(b.status==='cancelled') return;
+      var a=new Date(b.check_in+'T00:00:00');
+      var z=b.check_out?new Date(b.check_out+'T00:00:00'):new Date(a);
+      for(var d=new Date(a); d<z; d.setDate(d.getDate()+1)) out[rcISO(d)]=(b.guest_name||'занято');
+    });
+    return out;
+  }
+  function rcDraw(){
+    var host=document.getElementById('b-cal'); if(!host) return;
+    var inV=fv('b-in'), outV=fv('b-out');
+    var base = RC.m || (inV ? new Date(inV+'T00:00:00') : new Date());
+    RC.m = new Date(base.getFullYear(), base.getMonth(), 1);
+    var y=RC.m.getFullYear(), m=RC.m.getMonth();
+    var start=(new Date(y,m,1).getDay()+6)%7, days=new Date(y,m+1,0).getDate();
+    var busy=rcBusy();
+    var MN=['январь','февраль','март','апрель','май','июнь','июль','август','сентябрь','октябрь','ноябрь','декабрь'];
+    var cells='';
+    for(var i=0;i<start;i++) cells+='<span class="cal-e"></span>';
+    for(var d=1; d<=days; d++){
+      var iso=y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+      var cls='cal-d', ttl='';
+      if(busy[iso]){ cls+=' busy'; ttl=' title="'+esc(busy[iso])+'"'; }
+      if(inV && outV && iso>inV && iso<outV) cls+=' in';
+      if(iso===inV || iso===outV) cls+=' edge';
+      cells+='<span class="'+cls+'" data-d="'+iso+'"'+ttl+'>'+d+'</span>';
+    }
+    host.innerHTML='<div class="cal-h">'+
+      '<button type="button" class="cal-nav" data-rc="-1">‹</button>'+
+      '<b>'+MN[m]+' '+y+'</b>'+
+      '<button type="button" class="cal-nav" data-rc="1">›</button></div>'+
+      '<div class="cal-w"><span>пн</span><span>вт</span><span>ср</span><span>чт</span><span>пт</span><span>сб</span><span>вс</span></div>'+
+      '<div class="cal-g">'+cells+'</div>'+
+      '<div class="cal-legend"><span><b style="background:var(--green)"></b>выбрано или занято</span>'+
+      '<span><b style="background:var(--green-soft)"></b>ночи проживания</span></div>';
+  }
+  function rcLabel(){
+    var a=fv('b-in'), b=fv('b-out'), t=document.getElementById('b-range-t');
+    if(!t) return;
+    if(a&&b){
+      var n=Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/86400000);
+      t.textContent=clDate(a)+' — '+clDate(b)+(n>0?(' · '+n+' '+plural(n,'ночь','ночи','ночей')):'');
+    } else if(a){ t.textContent='Заезд '+clDate(a)+' — выберите выезд'; }
+    else { t.textContent='Выберите даты'; }
+  }
+  function plural(n,a,b,c){
+    var n10=n%10, n100=n%100;
+    if(n10===1 && n100!==11) return a;
+    if(n10>=2 && n10<=4 && (n100<10 || n100>=20)) return b;
+    return c;
+  }
+  function rcPick(iso){
+    var a=fv('b-in'), b=fv('b-out');
+    var A=document.getElementById('b-in'), B=document.getElementById('b-out');
+    if(!a || (a&&b) || iso<=a){ A.value=iso; B.value=''; }
+    else {
+      var busy=rcBusy(), d=new Date(a+'T00:00:00'), end=new Date(iso+'T00:00:00');
+      for(var x=new Date(d); x<end; x.setDate(x.getDate()+1)){
+        if(busy[rcISO(x)]){ say('В эти даты уже есть бронь — выберите другой промежуток.'); return; }
+      }
+      B.value=iso;
+    }
+    rcDraw(); rcLabel(); bookHints();
+  }
+  function bindRangeCal(skipId){
+    RC.m=null; RC.skip=skipId||'';
+    var btn=document.getElementById('b-range'), host=document.getElementById('b-cal');
+    if(!btn||!host) return;
+    var open = !fv('b-in') || !fv('b-out');
+    host.hidden=!open; btn.classList.toggle('open', open);
+    btn.onclick=function(){ host.hidden=!host.hidden; btn.classList.toggle('open',!host.hidden); if(!host.hidden) rcDraw(); };
+    host.onclick=function(e){
+      var nav=e.target.closest && e.target.closest('[data-rc]');
+      if(nav){ RC.m=new Date(RC.m.getFullYear(), RC.m.getMonth()+Number(nav.getAttribute('data-rc')), 1); rcDraw(); return; }
+      var day=e.target.closest && e.target.closest('[data-d]');
+      if(day) rcPick(day.getAttribute('data-d'));
+    };
+    var obj=document.getElementById('b-obj');
+    if(obj) obj.addEventListener('change', function(){ rcDraw(); });
+    rcDraw(); rcLabel();
+  }
   function ukBookForm(pid, pre){
     pre=pre||{};
     var objs=(DATA.properties||[]).map(function(x){ return {id:x.id, name:(x.name||x.id)}; });
     clForm('<h3>'+(pre.booking_id?'Правка брони':'Новая бронь')+'</h3><div class="fgrid">'+
       '<label class="wide">Объект<select id="b-obj">'+objs.map(function(o){
          return '<option value="'+clEsc(o.id)+'"'+((o.id===pid)?' selected':'')+'>'+clEsc(o.name)+'</option>';}).join('')+'</select></label>'+
-      '<label class="wide">Даты проживания'+
-        '<span class="dates2"><input id="b-in" type="date" aria-label="Заезд" value="'+(pre.check_in||'')+'">'+
-        '<i>→</i><input id="b-out" type="date" aria-label="Выезд" value="'+(pre.check_out||'')+'"></span>'+
+      '<label class="wide">Заезд и выезд'+
+        '<button type="button" class="dateline" id="b-range">'+
+          '<span id="b-range-t">Выберите даты</span><i>▾</i></button>'+
+        '<input type="hidden" id="b-in" value="'+clEsc(pre.check_in||'')+'">'+
+        '<input type="hidden" id="b-out" value="'+clEsc(pre.check_out||'')+'">'+
+        '<div class="rangecal" id="b-cal" hidden></div>'+
         '<span class="hintline" id="b-nights">Выберите заезд и выезд — посчитаем ночи.</span></label>'+
       '<label class="wide">Гость<input id="b-guest" type="text" value="'+clEsc(pre.guest_name||'')+'" placeholder="Имя"></label>'+
       '<label>Телефон<input id="b-phone" type="text" value="'+clEsc(pre.guest_phone||'')+'" placeholder="66..."></label>'+
@@ -2448,29 +2585,50 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
             } else say((r&&r.error)||'Не получилось сохранить бронь');
           });
       });
-    ['b-in','b-out','b-sum'].forEach(function(id){
-      var el=document.getElementById(id);
-      if(el){ el.addEventListener('change', bookHints); el.addEventListener('input', bookHints); }
-    });
+    var sm=document.getElementById('b-sum');
+    if(sm){ sm.addEventListener('input', bookHints); }
+    bindRangeCal(pre.booking_id||'');
     bookHints();
   }
   /* Заявка на перепродажу: цена, срочность и комментарий уходят нам обычной
      заявкой; дальше сотрудник оформляет карточку и возвращает владельцу ссылку. */
-  function resaleForm(pid){
+  function bindGoal(){
+    var g=document.getElementById('f-goal'); if(!g) return;
+    Array.prototype.forEach.call(g.querySelectorAll('.opt'),function(o){
+      o.onclick=function(){
+        Array.prototype.forEach.call(g.querySelectorAll('.opt'),function(x){x.classList.remove('on');});
+        o.classList.add('on');
+        var pr=document.getElementById('f-price');
+        if(pr) pr.placeholder = (o.getAttribute('data-v')==='rent')
+          ? 'например, 65000 в месяц' : 'например, 9500000';
+      };
+    });
+  }
+  function resaleForm(pid, goal){
     var p=(DATA.properties||[]).filter(function(x){ return String(x.id)===String(pid); })[0]
         || (DATA.properties||[])[CUR] || {};
-    clForm('<h3>Выставить на перепродажу</h3>'+
-      '<p class="sub">Объект: <b>'+clEsc(p.name||pid)+'</b>. Проверим цену и условия, '+
-      'оформим карточку на сайте и пришлём ссылку — её можно отправлять покупателям. '+
+    goal = goal || 'sale';
+    var isRent = goal==='rent';
+    clForm('<h3>Выгрузить объект</h3>'+
+      '<p class="sub">Объект: <b>'+clEsc(p.name||pid)+'</b>. Проверим данные, оформим карточку '+
+      'на сайте и пришлём ссылку — её можно отправлять клиентам. '+
       'Публикуем только после вашего подтверждения.</p>'+
+      '<div class="opts" id="f-goal">'+
+        '<button type="button" class="opt'+(isRent?' on':'')+'" data-v="rent">Сдать в аренду</button>'+
+        '<button type="button" class="opt'+(isRent?'':' on')+'" data-v="sale">Продать</button>'+
+      '</div>'+
       '<div class="fgrid">'+
-        '<label>Ваша цена, ฿<input id="f-price" type="number" inputmode="numeric" placeholder="например, 9500000"></label>'+
+        '<label>Ваша цена, ฿<input id="f-price" type="number" inputmode="numeric" '+
+          'placeholder="'+(isRent?'например, 65000 в месяц':'например, 9500000')+'"></label>'+
         '<label>Насколько срочно<select id="f-urg">'+
           '<option value="без спешки">без спешки</option>'+
           '<option value="в течение пары месяцев">в течение пары месяцев</option>'+
           '<option value="срочно">срочно</option></select></label>'+
         '<label class="wide">Что важно знать<textarea id="f-note" rows="3" '+
           'placeholder="торг, мебель в цене, кто платит за перевод, особые условия"></textarea></label>'+
+        '<label class="wide">Файлы по объекту'+
+          '<input id="f-files" type="file" multiple accept=".pdf,.doc,.docx,image/*">'+
+          '<span class="hintline" id="f-files-note">Договор, планировка, фотографии — что есть.</span></label>'+
         '<p class="sub" style="grid-column:1/-1;margin:2px 0 0">Если не уверены, какие данные и файлы нужны — '+
         'приложите всё, что есть, и напишите пару слов здесь. Наш специалист разберёт заявку и свяжется с вами в течение дня.</p>'+
       '</div>'+
@@ -2479,16 +2637,28 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       function(){
         var b=document.getElementById('f-save'); if(b){ b.disabled=true; b.textContent='…'; }
         var urg=document.getElementById('f-urg');
+        var g=document.querySelector('#f-goal .opt.on');
+        var goalV=g?g.getAttribute('data-v'):'sale';
+        var files=document.getElementById('f-files');
+        var fnames=files&&files.files ? Array.prototype.map.call(files.files,function(f){return f.name;}) : [];
         post({action:'request',token:TOKEN,property_id:pid,kind:'resale',
-              details:'Цена: '+(fv('f-price')||'по договорённости')+' ฿ · срочность: '+
-                      (urg?urg.value:'—')+(fv('f-note')?(' · '+fv('f-note')):'')})
+              details:(goalV==='rent'?'СДАТЬ В АРЕНДУ':'ПРОДАТЬ')+
+                      ' · цена: '+(fv('f-price')||'по договорённости')+' ฿ · срочность: '+
+                      (urg?urg.value:'—')+(fv('f-note')?(' · '+fv('f-note')):'')+
+                      (fnames.length?(' · файлы: '+fnames.join(', ')):'')})
           .then(function(r){
             var f=document.getElementById('cl-form');
             if(f){ f.innerHTML=''; document.body.style.overflow=''; }
-            if(r&&r.ok){ say('Заявка принята. Подготовим карточку и пришлём ссылку.'); loadData(); }
+            if(r&&r.ok){
+              say(fnames.length
+                ? 'Заявка принята. Файлы пришлите менеджеру в ответ на его сообщение — приложим к карточке.'
+                : 'Заявка принята. Подготовим карточку и пришлём ссылку.');
+              loadData();
+            }
             else say('Не отправилось: '+((r&&r.error)||'ошибка'));
           });
       });
+    bindGoal();
   }
   function bindUkForms(){
     /* Действия по объекту (операция, работа, документ) вешаем на документ:
@@ -2523,7 +2693,8 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
           return;
         }
         var rsl=t.closest && t.closest('[data-resale]');
-        if(rsl){ e.preventDefault(); resaleForm(rsl.getAttribute('data-resale')); return; }
+        if(rsl){ e.preventDefault();
+          resaleForm(rsl.getAttribute('data-resale'), rsl.getAttribute('data-goal')||''); return; }
         var uk=t.closest && t.closest('[data-uk]');
         if(uk){
           e.preventDefault();
@@ -2940,6 +3111,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       '<div><span class="eyebrow">Кабинет владельца</span>'+
         '<h1>'+esc(greet+(first?', '+first:''))+'</h1></div>'+
       '<div class="ov-act">'+
+        '<button type="button" class="btn-mini" data-resale="'+esc(p.id||'')+'">Выгрузить объект</button>'+
         '<button type="button" class="btn-mini" id="ov-report">Скачать отчёт</button>'+
         '<span class="ava">'+esc(ini)+'</span></div></div>';
 
@@ -3301,15 +3473,18 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
           '">Поставить бронь</a> — даты, гость, сумма и канал. Пересечение дат система не пропустит.</p>';
     H+=card('Календарь заездов', bh, 'sec-calendar');
 
-    /* Эльнур 06.09: пока дом строится, сдавать нечего — зато объект можно
-       выставить на перепродажу через нас, и владелец получит ссылку. */
+    /* Эльнур 06.09: «перепродажа отдельным пунктом — странно, это то же самое,
+       что выгрузить объект». Один раздел: сдать или продать, дальше мы сами. */
     var underBuild = /construct|стро/i.test(String(p.stage||''));
     var rs='<p class="sub">'+
       (underBuild
-        ? 'Объект ещё строится, поэтому аренда пока недоступна. Зато его можно выставить на перепродажу: проверим цену, оформим карточку на сайте и пришлём ссылку — её можно отправлять покупателям.'
-        : 'Хотите продать объект? Оформим карточку на сайте и пришлём ссылку — её можно отправлять покупателям.')+
-      '</p><div class="fbtns"><button type="button" class="btn" data-resale="'+(p.id||'')+'">Выставить на перепродажу</button></div>';
-    H+=card('Перепродажа', rs, 'sec-resale');
+        ? 'Объект ещё строится, поэтому сдавать пока нечего — зато его можно выставить на продажу. Проверим цену, оформим карточку на сайте и пришлём ссылку: её можно отправлять покупателям.'
+        : 'Сдать в аренду или продать — оформим карточку на сайте и пришлём ссылку, её можно отправлять клиентам.')+
+      '</p><div class="fbtns">'+
+        (underBuild?'':'<button type="button" class="btn" data-resale="'+(p.id||'')+'" data-goal="rent">Сдать в аренду</button>')+
+        '<button type="button" class="btn'+(underBuild?'':' ghost')+'" data-resale="'+(p.id||'')+'" data-goal="sale">Продать</button>'+
+      '</div>';
+    H+=card('Выгрузить объект', rs, 'sec-resale');
 
     // ставки
     var rt=p.rates||[], rh='';
