@@ -456,7 +456,12 @@ h3{font-size:1.12rem;font-weight:700}
 .footer-grid{display:grid;gap:28px}
 @media(min-width:800px){.footer-grid{grid-template-columns:1.4fr 1fr 1fr 1fr}}
 .footer h3{font-size:.8rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:14px}
-.footer li{margin-bottom:10px;font-size:.92rem}
+.footer li{margin-bottom:5px;font-size:.76rem;line-height:1.35}
+.footer h3{font-size:.68rem;opacity:.75;margin-bottom:7px}
+.footer a{color:var(--muted)}
+.footer a:hover{color:var(--ink)}
+.footer{padding:22px 0 16px;color:var(--muted)}
+.footer-bottom{font-size:.7rem;opacity:.8;margin-top:14px;padding-top:10px}
 .footer a:hover{text-decoration:underline}
 .footer-bottom{margin-top:28px;padding-top:18px;border-top:1px solid rgba(var(--ink-rgb),.07);display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;font-size:.82rem;color:var(--muted)}
 .fab .av{width:34px;height:34px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;color:var(--ink);font-weight:800}
@@ -1319,6 +1324,18 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
 /* Режим просмотра чужого кабинета виден всегда, чтобы не перепутать, чьи данные */
 .as-banner{margin-top:10px;padding:9px 12px;border-radius:12px;font-size:.8rem;
   background:var(--green-soft);color:var(--ink);border:1px solid var(--green)}
+
+/* Окно разбора: шапка на месте, длинный список крутится внутри, таблица
+   листается вбок — на телефоне «битые номера» больше не обрезаются. */
+.modal-win{max-height:88vh;display:flex;flex-direction:column}
+.modal-win .ccard{overflow:auto;-webkit-overflow-scrolling:touch}
+.modal-win .chead{position:sticky;top:0;background:var(--paper);z-index:3;padding-bottom:10px}
+.modal-win .ctable{min-width:520px}
+.modal-win .ccard>table,.modal-win .ccard>div>table{display:block;overflow-x:auto}
+@media(max-width:640px){
+  .modal-win{width:100%;max-width:100%;border-radius:18px 18px 0 0}
+  .modal-win .ccard{padding:14px}
+}
 </style>
 <!-- Leaflet подгружается только при открытии раздела с картой: см. ensureLeaflet() -->
 </head>
@@ -1939,6 +1956,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     if(!inner) return '';
     CARD_N++;
     var key=id||('c'+CARD_N);
+    /* по умолчанию раскрыт только первый блок раздела */
     var open = (CARD_OPEN[key]!==undefined) ? CARD_OPEN[key] : (CARD_N===1);
     return '<div class="card fold'+(open?' open':'')+'"'+(id?' id="'+id+'"':'')+' data-fold="'+key+'">'+
            '<h2 class="foldh"><span>'+esc(title)+'</span><span class="foldi">'+(open?'−':'+')+'</span></h2>'+
@@ -1949,10 +1967,23 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       h.onclick=function(){
         var c=h.parentElement, b=c.querySelector('.foldb'),
             key=c.getAttribute('data-fold'), open=!c.classList.contains('open');
+        /* Эльнур 06.09: «открываю плюсики по очереди — старые должны сворачиваться,
+           а не висеть». Раскрыт всегда один блок: экран не превращается в простыню. */
+        if(open){
+          var host=c.parentElement;
+          Array.prototype.forEach.call(host.querySelectorAll(':scope > .card.fold.open'), function(o){
+            if(o===c) return;
+            o.classList.remove('open');
+            var ob=o.querySelector('.foldb'); if(ob) ob.hidden=true;
+            var oi=o.querySelector('.foldi'); if(oi) oi.textContent='+';
+            var ok=o.getAttribute('data-fold'); if(ok) CARD_OPEN[ok]=false;
+          });
+        }
         c.classList.toggle('open', open);
         b.hidden=!open;
         c.querySelector('.foldi').textContent = open?'−':'+';
         CARD_OPEN[key]=open;
+        if(open) setTimeout(function(){ cabScrollTo(c); }, 40);
       };
     });
   }
@@ -3253,8 +3284,10 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
           var go=b.getAttribute('data-go');
           if(go==='moderation'){ var f=document.getElementById('m-list'); if(f) f.scrollIntoView({behavior:'smooth'}); return; }
           if(go==='coords'){ var sc=document.getElementById('sec-coords'); if(sc) sc.scrollIntoView({behavior:'smooth'}); return; }
-          if(go==='phones'){ cabPage('clients'); dupesBoard(); return; }
-          if(go==='tasks'){ cabPage('clients'); tasksBoard(); return; }
+          /* Эльнур 06.09: «нажал квадратик — кинуло в Люди, назад не вернуться».
+             Разбор открываем окном поверх текущего раздела: закрыл — остался здесь. */
+          if(go==='phones'){ dupesBoard(); return; }
+          if(go==='tasks'){ tasksBoard(); return; }
           if(go==='clients'||go==='calendar'||go==='service'||go==='object') cabPage(go==='clients'?'clients':go);
         };
       });
@@ -3934,12 +3967,30 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       val.textContent = label();
       val.classList.toggle('dim', !Object.keys(chosen).length);
     }
+    var remoteT=null;
     function draw(){
       var q=(search.value||'').trim().toLowerCase();
-      /* пустая строка — показываем весь список, ввод сужает его */
+      /* Эльнур 06.09: «ввёл номер клиента — пусто». В список грузились только
+         первые 300 человек, а в базе их тысячи. Ищем на сервере. */
+      if(opts.remote && q.length>=2){
+        clearTimeout(remoteT);
+        remoteT=setTimeout(function(){
+          opts.remote(q, function(items){
+            if((search.value||'').trim().toLowerCase()!==q) return;
+            opts.items=items; drawRows(items, q);
+          });
+        }, 300);
+      }
       var rows=(opts.items||[]).filter(function(it){
         return !q || (it.title+' '+(it.sub||'')).toLowerCase().indexOf(q)>=0; });
-      if(!rows.length){ list.innerHTML='<div class="pickempty">ничего не нашлось</div>'; return; }
+      drawRows(rows, q);
+    }
+    function drawRows(rows, q){
+      if(!rows.length){
+        list.innerHTML='<div class="pickempty">'+
+          (opts.remote && (q||'').length>=2 ? 'ищем в базе…' : 'ничего не нашлось')+'</div>';
+        return;
+      }
       list.innerHTML = rows.slice(0,300).map(function(it){
         var on = !!chosen[it.id];
         return '<button type="button" class="pickitem'+(on?' on':'')+'" data-id="'+
@@ -4393,8 +4444,8 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
             if(fb) Array.prototype.forEach.call(fb.querySelectorAll('.opt'),function(o){
               o.classList.toggle('on', o.getAttribute('data-v')===(arg||'')); });
             loadClients();
-          } else if(go==='phones'){ cabPage('clients'); dupesBoard(); }
-          else if(go==='tasks'){ cabPage('clients'); tasksBoard(); }
+          } else if(go==='phones'){ dupesBoard(); }
+          else if(go==='tasks'){ tasksBoard(); }
           else if(go==='staff'){ cabPage('staff'); }
           else if(go==='service'){ cabPage('service'); }
           else if(go==='coords'){ cabPage('staff');
@@ -4917,6 +4968,15 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         lh.__built=1;
         peopleList().then(function(rows){
           pickList(lh,{ multi:false, placeholder:'выбрать: имя или номер',
+            remote:function(q, cb){
+              post({action:'clients',token:TOKEN,q:q,limit:40}).then(function(d){
+                var list=((d&&d.data&&d.data.rows)||[]).map(function(c){
+                  return { id:String(c.code||''), title:(c.name||'Без имени'),
+                           sub:[c.phone,(TEMP_RU[c.temp]||c.temp)].filter(Boolean).join(' · ') };
+                });
+                rows=list; cb(list);
+              }).catch(function(){ cb([]); });
+            },
             items:rows.map(function(c){
               return { id:String(c.code||c.client_code||c.id||''),
                        title:(c.name||'Без имени'),
