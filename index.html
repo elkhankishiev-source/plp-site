@@ -1479,38 +1479,16 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
    гасим её на всей странице (Эльнур 06.09: «карточки светятся, когда касаюсь»). */
 html{-webkit-tap-highlight-color:transparent}
 *{-webkit-tap-highlight-color:transparent}
-.prop:active,.prop:focus,.prop:focus-within{background:var(--paper)}
-.car .prop:active{transform:none;box-shadow:var(--shadow-sm)}
+/* Эльнур 06.09: «весь сайт мигает фоном». Виновато было правило, менявшее фон
+   при фокусе — на прокрутке фокус перескакивает и карточка мигала. Оставляем
+   только снятие системной подсветки. */
+.car .prop:active{transform:none}
 
-/* Эльнур 06.09: «на мобильном фильтры съедают много места, карточки не видно».
-   Делаем как в тревел-сервисах: одна кнопка «Фильтры», панель выезжает снизу. */
-.fbar-open{display:none}
-@media(max-width:600px){
-  .fbar-open{display:inline-flex;align-items:center;gap:8px;background:var(--paper);
-    border:1px solid rgba(var(--ink-rgb),.14);border-radius:999px;padding:9px 14px;
-    font-size:.84rem;font-weight:700;color:var(--ink);margin-top:12px}
-  .fbar-open .n{background:var(--green);color:var(--on-green);border-radius:999px;
-    min-width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:.72rem}
-  .filterbar{position:fixed;left:0;right:0;bottom:0;z-index:75;background:var(--paper);box-sizing:border-box;width:100%;
-    border-radius:20px 20px 0 0;box-shadow:0 -18px 50px rgba(0,0,0,.35);
-    padding:14px 14px calc(14px + env(safe-area-inset-bottom,0px));
-    transform:translateY(110%);transition:transform .28s cubic-bezier(.16,1,.3,1);
-    max-height:76vh;overflow:auto;display:flex;flex-wrap:wrap;gap:8px}
-  .filterbar.sheet-open{transform:translateY(0)}
-  .filterbar .fbar-head{display:flex;width:100%;align-items:center;justify-content:space-between;
-    margin-bottom:6px;font-weight:800}
-  .filterbar .fbar-head .x{background:var(--warm);border:0;border-radius:50%;width:32px;height:32px;
-    font-size:1.1rem;color:var(--ink)}
-  .fbar-backdrop{position:fixed;inset:0;background:rgba(20,18,14,.5);z-index:74;display:none}
-  .fbar-backdrop.on{display:block}
-  /* внутри шторки показываем всё, «Ещё фильтры» не нужен */
-  .filterbar.sheet-open .fmenu.hide-sm{display:block}
-  .filterbar .fbtn-more{display:none}
-}
+/* Фильтры остаются строкой: главные видны, остальные выезжают по «Ещё». */
 
 @media(max-width:600px){
-  /* объекты должны быть видны сразу: служебные строки уезжают в шторку фильтров */
-  #sale .toolbar,#rent .toolbar{display:none}
+  /* поиск и сортировка снова на месте, просто компактнее */
+  #sale .toolbar,#rent .toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
   .filterbar.sheet-open .sheet-tools{display:flex;width:100%;gap:8px;flex-wrap:wrap;margin-top:4px}
   .sheet-tools{display:none}
   #sale .head-row h2,#rent .head-row h2{font-size:1.25rem}
@@ -2616,7 +2594,7 @@ PL.PROPERTIES=[
 PL.RENTALS=[
   {"property_id":"PLP-ESTELLA-A24","title":"Villa Estella","funnel":"rent","grad":"g1","loc":{"ru":"Най Янг","en":"Nai Yang"},"type":{"ru":"Вилла","en":"Villa"},"beds":"3","bmin":3,"bmax":3,"area":"265 м²","tag":{"ru":"","en":""},"desc":{"ru":"Вилла в Най Янге — тихий север острова рядом с нацпарком. Условия и стоимость по запросу.","en":"Villa at Villa Estella, Nai Yang — the quiet north of the island by the national park. Terms and price on request."},"lat":8.08336,"lng":98.2998,"coordOk":true,"stage":"Pre-sale","handover":"2026-12-01","notReady":false,"min_stay":null,"deposit":null,"amenities":"","beach_m":null,"included":"Обслуживание объекта управляющей компанией: уборка, инженерные системы, порядок на территории. Бассейн и территория комплекса, парковка. Подача уведомления TM30 в иммиграционное бюро за арендатора.","excluded":"Электричество, вода и интернет — при длительной аренде оплачиваются арендатором напрямую поставщикам по счётчикам. Уборка сверх графика, трансфер, страхование личного имущества.","rules":"Длительная аренда: депозит — три месяца аренды, вносится до заселения; аренда — ежемесячно не позднее пятого числа. Показания счётчиков и отчёт управляющая компания передаёт раз в месяц. Режим тишины 22:00–08:00, правила комплекса имеют приоритет. Курение в помещениях запрещено, животные и субаренда — только по письменному согласованию. Ремонт для поддержания объекта — за счёт собственника; о поломке сообщите менеджеру, аварии вне очереди. Депозит возвращается после осмотра за вычетом подтверждённых удержаний, каждое подтверждаем фото или актом. Время заезда и выезда и точные условия закрепляет договор аренды — он имеет приоритет. Полные правила: property-library.com/rules.html","photo":"https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-ESTELLA/01.jpg?width=760&resize=contain&quality=72","photoFull":"https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-ESTELLA/01.jpg","photos":["https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-ESTELLA/01.jpg?width=1280&resize=contain&quality=78","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-ESTELLA/02.jpg?width=1280&resize=contain&quality=78","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-ESTELLA/03.jpg?width=1280&resize=contain&quality=78","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-ESTELLA/04.jpg?width=1280&resize=contain&quality=78"],"groups":[{"key":"exterior","name":"Виллы комплекса","urls":["https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-ESTELLA/01.jpg?width=1280&resize=contain&quality=78","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-ESTELLA/02.jpg?width=1280&resize=contain&quality=78","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-ESTELLA/03.jpg?width=1280&resize=contain&quality=78","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-ESTELLA/04.jpg?width=1280&resize=contain&quality=78"]}],"units":null,"night":null,"nightMax":null,"month":100000,"monthMax":180000,"rateSrc":"owner","rateLevel":"owner","rateAsOf":null,"minNights":null},
   {"property_id":"PLP-LEGENDARY-RENT","title":"The Title Legendary","funnel":"rent","grad":"g2","loc":{"ru":"Банг Тао","en":"Bang Tao"},"type":{"ru":"Кондо","en":"Condo"},"beds":"Studio–2","bmin":0,"bmax":2,"area":"31–94 м²","tag":{"ru":"","en":""},"desc":{"ru":"Аренда в комплексе «The Title Legendary Bang-Tao», Bang Tao. Условия и точная стоимость — по запросу.","en":"Rental at \"The Title Legendary Bang-Tao\", Bang Tao. Terms and exact price on request."},"lat":7.99155,"lng":98.29787,"coordOk":true,"stage":"Ready","handover":"2025-08-01","notReady":false,"min_stay":null,"deposit":null,"amenities":"","beach_m":null,"included":"Обслуживание объекта управляющей компанией: уборка, инженерные системы, порядок на территории. Бассейн и территория комплекса, парковка. Подача уведомления TM30 в иммиграционное бюро за арендатора.","excluded":"Электричество, вода и интернет — при длительной аренде оплачиваются арендатором напрямую поставщикам по счётчикам. Уборка сверх графика, трансфер, страхование личного имущества.","rules":"Длительная аренда: депозит — три месяца аренды, вносится до заселения; аренда — ежемесячно не позднее пятого числа. Показания счётчиков и отчёт управляющая компания передаёт раз в месяц. Режим тишины 22:00–08:00, правила комплекса имеют приоритет. Курение в помещениях запрещено, животные и субаренда — только по письменному согласованию. Ремонт для поддержания объекта — за счёт собственника; о поломке сообщите менеджеру, аварии вне очереди. Депозит возвращается после осмотра за вычетом подтверждённых удержаний, каждое подтверждаем фото или актом. Время заезда и выезда и точные условия закрепляет договор аренды — он имеет приоритет. Полные правила: property-library.com/rules.html","photo":"https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-LEGENDARY/01.jpg?width=760&resize=contain&quality=72","photoFull":"https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-LEGENDARY/01.jpg","photos":["https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-LEGENDARY/01.jpg?width=1280&resize=contain&quality=78","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-LEGENDARY/02.jpg?width=1280&resize=contain&quality=78","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-LEGENDARY/03.jpg?width=1280&resize=contain&quality=78","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-LEGENDARY/04.jpg?width=1280&resize=contain&quality=78"],"groups":[{"key":"exterior","name":"Территория комплекса","urls":["https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-LEGENDARY/01.jpg?width=1280&resize=contain&quality=78","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-LEGENDARY/02.jpg?width=1280&resize=contain&quality=78"]},{"key":"facilities","name":"Инфраструктура комплекса","urls":["https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-LEGENDARY/03.jpg?width=1280&resize=contain&quality=78","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-LEGENDARY/04.jpg?width=1280&resize=contain&quality=78"]}],"units":[{"name":"Студия","area_sqm":31,"bedrooms":0,"rent_low_thb_month":30000,"rent_high_thb_month":60000,"area":31,"beds":0,"rentLow":30000,"rentHigh":60000},{"name":"1 спальня","area_sqm":44,"bedrooms":1,"rent_low_thb_month":40000,"rent_high_thb_month":90000,"area":44,"beds":1,"rentLow":40000,"rentHigh":90000},{"name":"2 спальни","area_sqm":60,"bedrooms":2,"rent_low_thb_month":70000,"rent_high_thb_month":175000,"area":60,"beds":2,"rentLow":70000,"rentHigh":175000}],"night":null,"nightMax":null,"month":30000,"monthMax":110000,"rateSrc":"owner","rateLevel":"market","rateAsOf":"2026-09-06","minNights":null},
-  {"property_id":"PLP-MANOR-S14","title":"Manor","funnel":"rent","grad":"g3","loc":{"ru":"Таланг","en":"Thalang"},"type":{"ru":"Вилла","en":"Villa"},"beds":"3","bmin":3,"bmax":3,"area":"","tag":{"ru":"","en":""},"desc":{"ru":"Вилла Manor S14 в Таланге — под управлением Property Library: заселение гостей, обслуживание, отчёт собственнику. Условия и стоимость по запросу.","en":"Apartment at Manor residence, Thalang — managed by Property Library. Terms and price on request."},"lat":null,"lng":null,"coordOk":false,"stage":null,"handover":null,"notReady":false,"min_stay":null,"deposit":null,"amenities":"","beach_m":null,"included":"Обслуживание объекта управляющей компанией: уборка, инженерные системы, порядок на территории. Бассейн и территория комплекса, парковка. Подача уведомления TM30 в иммиграционное бюро за арендатора.","excluded":"Электричество, вода и интернет — при длительной аренде оплачиваются арендатором напрямую поставщикам по счётчикам. Уборка сверх графика, трансфер, страхование личного имущества.","rules":"Длительная аренда: депозит — три месяца аренды, вносится до заселения; аренда — ежемесячно не позднее пятого числа. Показания счётчиков и отчёт управляющая компания передаёт раз в месяц. Режим тишины 22:00–08:00, правила комплекса имеют приоритет. Курение в помещениях запрещено, животные и субаренда — только по письменному согласованию. Ремонт для поддержания объекта — за счёт собственника; о поломке сообщите менеджеру, аварии вне очереди. Депозит возвращается после осмотра за вычетом подтверждённых удержаний, каждое подтверждаем фото или актом. Время заезда и выезда и точные условия закрепляет договор аренды — он имеет приоритет. Полные правила: property-library.com/rules.html","photo":null,"photoFull":null,"photos":null,"groups":null,"units":null,"night":12000,"nightMax":28000,"month":null,"monthMax":null,"rateSrc":"uk","rateLevel":"uk","rateAsOf":null,"minNights":3},
+  {"property_id":"PLP-MANOR-S14","title":"Manor","funnel":"rent","grad":"g3","loc":{"ru":"Таланг","en":"Thalang"},"type":{"ru":"Вилла","en":"Villa"},"beds":"3","bmin":3,"bmax":3,"area":"","tag":{"ru":"","en":""},"desc":{"ru":"Вилла в резиденции Manor, Таланг — под управлением Property Library: заселение гостей, обслуживание, отчёт собственнику. Условия и стоимость по запросу.","en":"Villa at Manor residence, Thalang — managed by Property Library: guest check-in, maintenance, owner reporting. Terms and price on request."},"lat":null,"lng":null,"coordOk":false,"stage":null,"handover":null,"notReady":false,"min_stay":null,"deposit":null,"amenities":"","beach_m":null,"included":"Обслуживание объекта управляющей компанией: уборка, инженерные системы, порядок на территории. Бассейн и территория комплекса, парковка. Подача уведомления TM30 в иммиграционное бюро за арендатора.","excluded":"Электричество, вода и интернет — при длительной аренде оплачиваются арендатором напрямую поставщикам по счётчикам. Уборка сверх графика, трансфер, страхование личного имущества.","rules":"Длительная аренда: депозит — три месяца аренды, вносится до заселения; аренда — ежемесячно не позднее пятого числа. Показания счётчиков и отчёт управляющая компания передаёт раз в месяц. Режим тишины 22:00–08:00, правила комплекса имеют приоритет. Курение в помещениях запрещено, животные и субаренда — только по письменному согласованию. Ремонт для поддержания объекта — за счёт собственника; о поломке сообщите менеджеру, аварии вне очереди. Депозит возвращается после осмотра за вычетом подтверждённых удержаний, каждое подтверждаем фото или актом. Время заезда и выезда и точные условия закрепляет договор аренды — он имеет приоритет. Полные правила: property-library.com/rules.html","photo":null,"photoFull":null,"photos":null,"groups":null,"units":null,"night":12000,"nightMax":28000,"month":null,"monthMax":null,"rateSrc":"uk","rateLevel":"uk","rateAsOf":null,"minNights":3},
   {"property_id":"PLP-MODEVA-RENT","title":"The Modeva","funnel":"rent","grad":"g1","loc":{"ru":"Банг Тао","en":"Bang Tao"},"type":{"ru":"Кондо","en":"Condo"},"beds":"1–3","bmin":1,"bmax":3,"area":"29–148 м²","tag":{"ru":"","en":""},"desc":{"ru":"Аренда в комплексе «The Modeva Bang-Tao», Bang Tao. Условия и точная стоимость — по запросу.","en":"Rental at \"The Modeva Bang-Tao\", Bang Tao. Terms and exact price on request."},"lat":7.99113,"lng":98.29633,"coordOk":true,"stage":"Construction","handover":"2027-03-01","notReady":true,"min_stay":null,"deposit":null,"amenities":"","beach_m":null,"included":"Обслуживание объекта управляющей компанией: уборка, инженерные системы, порядок на территории. Бассейн и территория комплекса, парковка. Подача уведомления TM30 в иммиграционное бюро за арендатора.","excluded":"Электричество, вода и интернет — при длительной аренде оплачиваются арендатором напрямую поставщикам по счётчикам. Уборка сверх графика, трансфер, страхование личного имущества.","rules":"Длительная аренда: депозит — три месяца аренды, вносится до заселения; аренда — ежемесячно не позднее пятого числа. Показания счётчиков и отчёт управляющая компания передаёт раз в месяц. Режим тишины 22:00–08:00, правила комплекса имеют приоритет. Курение в помещениях запрещено, животные и субаренда — только по письменному согласованию. Ремонт для поддержания объекта — за счёт собственника; о поломке сообщите менеджеру, аварии вне очереди. Депозит возвращается после осмотра за вычетом подтверждённых удержаний, каждое подтверждаем фото или актом. Время заезда и выезда и точные условия закрепляет договор аренды — он имеет приоритет. Полные правила: property-library.com/rules.html","photo":"https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/01.jpg?width=760&resize=contain&quality=72","photoFull":"https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/object/public/object-media/objects/PLP-MODEVA/01.jpg","photos":["https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/01.jpg?width=1280&resize=contain&quality=78","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/02.jpg?width=1280&resize=contain&quality=78","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/03.jpg?width=1280&resize=contain&quality=78","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/04.jpg?width=1280&resize=contain&quality=78"],"groups":[{"key":"showroom","name":"Шоу-юниты комплекса","urls":["https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/01.jpg?width=1280&resize=contain&quality=78","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/02.jpg?width=1280&resize=contain&quality=78","https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/03.jpg?width=1280&resize=contain&quality=78"]}],"units":null,"night":null,"nightMax":null,"month":null,"monthMax":null,"rateSrc":null,"rateLevel":null,"rateAsOf":null,"minNights":null},
   {"property_id":"PLP-QABALAH","title":"Villa Qabalah","funnel":"rent","grad":"g2","loc":{"ru":"Банг Тао","en":"Bang Tao"},"type":{"ru":"Вилла","en":"Villa"},"beds":"1–3","bmin":1,"bmax":3,"area":"","tag":{"ru":"","en":""},"desc":{"ru":"Вилла Qabalah в Банг Тао — главный арендный район острова. Условия и стоимость по запросу.","en":"Villa Qabalah in Bang Tao — the island's main rental district. Terms and price on request."},"lat":7.99761,"lng":98.32731,"coordOk":true,"stage":null,"handover":null,"notReady":false,"min_stay":null,"deposit":null,"amenities":"Приватный бассейн, rooftop garden, устойчивый дизайн (3 типа: Moss 2BR, Fern 3BR, Pine 4BR)","beach_m":null,"included":"Обслуживание объекта управляющей компанией: уборка, инженерные системы, порядок на территории. Бассейн и территория комплекса, парковка. Подача уведомления TM30 в иммиграционное бюро за арендатора.","excluded":"Электричество, вода и интернет — при длительной аренде оплачиваются арендатором напрямую поставщикам по счётчикам. Уборка сверх графика, трансфер, страхование личного имущества.","rules":"Длительная аренда: депозит — три месяца аренды, вносится до заселения; аренда — ежемесячно не позднее пятого числа. Показания счётчиков и отчёт управляющая компания передаёт раз в месяц. Режим тишины 22:00–08:00, правила комплекса имеют приоритет. Курение в помещениях запрещено, животные и субаренда — только по письменному согласованию. Ремонт для поддержания объекта — за счёт собственника; о поломке сообщите менеджеру, аварии вне очереди. Депозит возвращается после осмотра за вычетом подтверждённых удержаний, каждое подтверждаем фото или актом. Время заезда и выезда и точные условия закрепляет договор аренды — он имеет приоритет. Полные правила: property-library.com/rules.html","photo":null,"photoFull":null,"photos":null,"groups":null,"units":null,"night":5000,"nightMax":null,"month":120000,"monthMax":220000,"rateSrc":"owner","rateLevel":"market","rateAsOf":"2026-03-26","minNights":null}
 ];
@@ -4438,57 +4416,22 @@ var FILTER_MENUS=[
 /* Компактная строка фильтров на телефоне: главные видны, прочие — под «Ещё». */
 /* Кнопка «Фильтры» и выезжающая панель на телефоне */
 function filterSheet(barId){
+  /* Эльнур 06.09: «липучка выглядит ужасно, верни как было». Фильтры остаются
+     строкой; что не влезло — раскрывается кнопкой «Ещё фильтры». */
   var bar=document.getElementById(barId); if(!bar) return;
-  if(!window.matchMedia || !window.matchMedia('(max-width:600px)').matches){
-    bar.classList.remove('sheet-open'); return;
+  bar.classList.remove('sheet-open');
+  var old=bar.parentNode.querySelector('.fbar-open'); if(old) old.remove();
+  var head=bar.querySelector('.fbar-head'); if(head) head.remove();
+  var back=document.querySelector('.fbar-backdrop'); if(back) back.remove();
+  /* поиск и сортировка возвращаются на своё место */
+  var tools=bar.querySelector('.sheet-tools');
+  if(tools){
+    var sec=bar.closest('section')||bar.parentNode;
+    var toolbar=sec.querySelector('.toolbar');
+    if(toolbar){ while(tools.firstChild) toolbar.appendChild(tools.firstChild); }
+    tools.remove();
   }
-  /* панель пересобирается при каждой отрисовке каталога, поэтому шапку, кнопку
-     и подложку восстанавливаем каждый раз, если их нет */
-  if(!bar.querySelector('.fbar-head')){
-    var head=document.createElement('div');
-    head.className='fbar-head';
-    head.innerHTML='<span>Фильтры</span><button type="button" class="x" aria-label="Закрыть">×</button>';
-    bar.insertBefore(head, bar.firstChild);
-  }
-  var back=document.querySelector('.fbar-backdrop');
-  if(!back){ back=document.createElement('div'); back.className='fbar-backdrop'; document.body.appendChild(back); }
-
-  var open=bar.parentNode.querySelector('.fbar-open');
-  if(!open){
-    open=document.createElement('button');
-    open.type='button'; open.className='fbar-open';
-    open.innerHTML='<span>Фильтры</span><span class="n" hidden>0</span>';
-    bar.parentNode.insertBefore(open, bar);
-  }
-
-  function show(v){
-    bar.classList.toggle('sheet-open', v);
-    back.classList.toggle('on', v);
-    document.body.style.overflow = v ? 'hidden' : '';
-  }
-  open.onclick=function(){ show(true); };
-  back.onclick=function(){ show(false); };
-  /* панель пересобирается при каждой отрисовке фильтров — ловим нажатие делегированно */
-  /* панель пересобирается при каждой отрисовке — слушаем на документе */
-  if(!window.__fbarWired){
-    window.__fbarWired=1;
-    document.addEventListener('click', function(e){
-      var x=e.target.closest && e.target.closest('.fbar-head .x');
-      if(!x) return;
-      var b=x.closest('.filterbar');
-      if(b && b.__showSheet) b.__showSheet(false);
-    });
-  }
-  bar.__showSheet=show;
-  /* поиск и сортировка переезжают в шторку — на экране остаются объекты */
-  var sec=bar.closest('section') || bar.parentNode;
-  var toolbar=sec.querySelector('.toolbar');
-  if(toolbar && !bar.querySelector('.sheet-tools')){
-    var box=document.createElement('div'); box.className='sheet-tools';
-    while(toolbar.firstChild) box.appendChild(toolbar.firstChild);
-    bar.appendChild(box);
-  }
-  updateFilterCount(barId);
+  document.body.style.overflow='';
 }
 function updateFilterCount(barId){
   var bar=document.getElementById(barId); if(!bar) return;
