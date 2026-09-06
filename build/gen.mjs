@@ -432,7 +432,38 @@ function rentTag(o) {
   return { ru: '', en: '' };
 }
 
-function buildRentals(objects, preserve) {
+/* Цена аренды для витрины. Ночная ставка — из uk_rates (факт), затем из
+   season_rates собственника; помесячная — из season_rates или rent_price_month_thb.
+   Ничего не пересчитываем из ночной в месячную и обратно: это разные рынки,
+   умножение на 30 давало бы цену втрое выше настоящей. */
+function rentRates(o, ratesBy) {
+  const pid = o.plp_property_id;
+  const sr = (o.season_rates && typeof o.season_rates === 'object') ? o.season_rates : {};
+  const num = v => { const n = Number(v); return Number.isFinite(n) && n > 0 ? n : null; };
+
+  let night = null, nightMax = null, src = null, minNights = null;
+  const own = (ratesBy && ratesBy[pid]) || [];
+  if (own.length) {
+    night = Math.min(...own.map(r => r.v));
+    nightMax = Math.max(...own.map(r => r.v));
+    minNights = own.map(r => r.min).filter(Boolean).sort((a, b) => a - b)[0] || null;
+    src = 'uk';
+  } else {
+    const cands = [sr.low_thb_night, sr.night_low_thb, sr.low_night_thb, sr.nightly_low_thb].map(num).filter(Boolean);
+    const tops = [sr.high_thb_night, sr.night_high_thb, sr.high_night_thb, sr.nightly_high_thb].map(num).filter(Boolean);
+    if (cands.length) { night = Math.min(...cands); nightMax = tops.length ? Math.max(...tops) : null; src = 'owner'; }
+  }
+
+  const monthCands = [sr.low_thb_month, sr.month_low_thb, o.rent_price_month_thb].map(num).filter(Boolean);
+  const monthTops = [sr.high_thb_month, sr.month_high_thb].map(num).filter(Boolean);
+  const month = monthCands.length ? Math.min(...monthCands) : null;
+  const monthMax = monthTops.length ? Math.max(...monthTops) : null;
+  if (month && !src) src = 'owner';
+
+  return { night, nightMax, month, monthMax, rateSrc: (night || month) ? src : null, minNights };
+}
+
+function buildRentals(objects, preserve, ratesBy) {
   return objects.map((o, i) => {
     const pid = o.plp_property_id;
     const keep = preserve[pid] || {};
@@ -472,6 +503,8 @@ function buildRentals(objects, preserve) {
       photos: Array.isArray(o.gallery_urls) ? o.gallery_urls.slice(0, 8) : null,
       groups: Array.isArray(o.photo_groups) ? o.photo_groups : null,
       units: unitsOf(o),
+      // ставки: что реально известно; чего нет — остаётся null, не выдумываем
+      ...rentRates(o, ratesBy),
     };
   });
 }
@@ -620,7 +653,7 @@ function chipRow(items) {
   ).join('');
 }
 
-function objectPage(o, benchmarks) {
+function objectPage(o, benchmarks, ratesBy) {
   const pid = o.plp_property_id;
   const slug = slugOf(pid);
   const url = SITE_BASE + '/object/' + slug + '.html';
@@ -638,7 +671,22 @@ function objectPage(o, benchmarks) {
   const usp = (o.usp || '').trim();
   const uspEn = (o.usp_en || '').trim(); // EN-описание; секция рендерится только если непусто
   const priceTHB = o.price_from_thb;
-  const priceFmt = priceTHB ? new Intl.NumberFormat('ru-RU').format(priceTHB) + ' ฿' : '';
+  const money = v => new Intl.NumberFormat('ru-RU').format(Math.round(v)) + ' ฿';
+  const priceFmt = priceTHB ? money(priceTHB) : '';
+  /* Аренда: вместо стартовой цены застройщика — ставка (ночь или месяц),
+     источник тот же, что на витрине: uk_rates → season_rates. */
+  const isRent = /аренда|rent/i.test(String(o.purpose || ''));
+  const rr = isRent ? rentRates(o, ratesBy) : null;
+  let rentLine = '';
+  if (rr && (rr.night || rr.month)) {
+    const part = (lo, hi, unit) => !lo ? '' :
+      ((hi && hi > lo) ? money(lo) + ' — ' + money(hi) : 'от ' + money(lo)) + ' ' + unit;
+    const main = part(rr.night, rr.nightMax, 'за ночь') || part(rr.month, rr.monthMax, 'в месяц');
+    const second = (rr.night && rr.month) ? part(rr.month, rr.monthMax, 'в месяц') : '';
+    const note = [second, rr.minNights ? ('от ' + rr.minNights + ' ночей') : ''].filter(Boolean).join(' · ');
+    rentLine = '<div class="price">' + htmlEsc(main) +
+      (note ? '<small>' + htmlEsc(note) + '</small>' : '') + '</div>';
+  }
   const title = o.name + ' — ' + ru + ', Пхукет | Property Library';
   const metaDesc = truncate(usp || (o.name + ' — ' + t.ru + ' в районе ' + ru + ', Пхукет.'), 200);
   const distBeach = o.distance_beach_m ? o.distance_beach_m + ' м до пляжа' : '';
@@ -821,7 +869,7 @@ if(dark) i.src='../img/brand/plp-mark-white.png';})();</script>
   ${shots}
   <h1>${htmlEsc(o.name)}</h1>
   <p class="loc">${htmlEsc(ru)}, Пхукет${distBeach ? ' · ' + htmlEsc(distBeach) : ''}</p>
-  ${priceFmt ? '<div class="price">от ' + htmlEsc(priceFmt) + '<small>стартовая цена застройщика</small></div>' : ''}
+  ${rentLine || (priceFmt ? '<div class="price">от ' + htmlEsc(priceFmt) + '<small>стартовая цена застройщика</small></div>' : '')}
   <div class="chips">${chips}</div>
   <div class="yield">
     <div class="num">${yr.low}${DASH}${yr.high}%</div>
@@ -922,11 +970,22 @@ async function main() {
     'objects?select=plp_property_id,name,district,beach,purpose,type,bedrooms,bedrooms_min,' +
     'bedrooms_max,area_sqm,area_min,area_max,min_stay,deposit,rent_included,rent_excluded,' +
     'rent_rules,amenities,usp,usp_en,distance_beach_m,on_site,lat,lng,coord_source,last_synced_at,' +
-    'main_image_url,gallery_urls,photo_groups,unit_types,price_tiers' +
+    'main_image_url,gallery_urls,photo_groups,unit_types,price_tiers,season_rates,rent_price_month_thb' +
     '&and=(or(purpose.eq.' + encodeURIComponent('аренда') + ',purpose.eq.rent),' +
     'on_site.eq.true)&order=plp_property_id');
 
-  console.log('[gen] Объектов on_site=true:', objects.length, '| benchmarks:', benchmarks.length, '| аренда:', rentals.length);
+  // Ставки посуточной аренды: истина — uk_rates (договор/реальные брони),
+  // ниже по иерархии — objects.season_rates собственника. Ниже не переписываем.
+  const ukRates = await sbGet(env, 'uk_rates?select=property_id,season,nightly_thb,min_nights');
+  const ratesBy = {};
+  for (const r of ukRates || []) {
+    const v = Number(r.nightly_thb);
+    if (!Number.isFinite(v) || v <= 0) continue;
+    (ratesBy[r.property_id] = ratesBy[r.property_id] || []).push({ v, min: r.min_nights || null });
+  }
+
+  console.log('[gen] Объектов on_site=true:', objects.length, '| benchmarks:', benchmarks.length,
+              '| аренда:', rentals.length, '| со ставками:', Object.keys(ratesBy).length);
   if (!objects.length) { console.error('[gen] Пусто — прерываю, index.html не трогаю.'); process.exit(1); }
 
   // 1) каталог продажи + аренда в index.html (с сохранением calc/grad/budget)
@@ -935,7 +994,7 @@ async function main() {
   const catalog = buildCatalog(objects, benchmarks, preserve);
   html = writeIndex(html, catalog);
   const rentPreserve = parseExistingRentals(html);
-  const rentList = buildRentals(rentals, rentPreserve);
+  const rentList = buildRentals(rentals, rentPreserve, ratesBy);
   // 30.08: пока в аренде нет объектов с on_site=true — показываем штатную карточку
   // «Скоро в каталоге» (ветка p.soon в renderRent), а не пустую полосу.
   if (!rentList.length) {
@@ -982,7 +1041,7 @@ async function main() {
   let pages = 0;
   for (const o of pageList) {
     const slug = slugOf(o.plp_property_id);
-    fs.writeFileSync(path.join(OBJDIR, slug + '.html'), objectPage(o, benchmarks));
+    fs.writeFileSync(path.join(OBJDIR, slug + '.html'), objectPage(o, benchmarks, ratesBy));
     pages++;
   }
   // 30.08: удаляем страницы объектов, которых больше нет в каталоге.
