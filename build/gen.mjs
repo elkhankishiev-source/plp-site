@@ -336,7 +336,17 @@ function buildCatalog(objects, benchmarks, preserve) {
 /* Что можно купить в проекте: сначала именованные планировки застройщика,
    иначе — тиры прайса (по одной строке на тип спальни, цена «от»). */
 function unitsOf(o) {
-  const named = Array.isArray(o.unit_types) ? o.unit_types.slice(0, 12) : [];
+  /* Типы приходят из разных источников и называют поля по-разному
+     (area/area_sqm, beds/bedrooms). Приводим к одному виду, а ставки аренды
+     по типу переносим отдельными полями — у аренды цена не «от застройщика». */
+  const named = (Array.isArray(o.unit_types) ? o.unit_types.slice(0, 12) : []).map(u => {
+    const n = Object.assign({}, u);
+    if (n.area == null && n.area_sqm != null) n.area = n.area_sqm;
+    if (n.beds == null && n.bedrooms != null) n.beds = n.bedrooms;
+    if (n.rentLow == null && n.rent_low_thb_month != null) n.rentLow = n.rent_low_thb_month;
+    if (n.rentHigh == null && n.rent_high_thb_month != null) n.rentHigh = n.rent_high_thb_month;
+    return n;
+  });
   // Тиры приходят от разных застройщиков в двух видах: с числом спален или с
   // подписью типа «Studio / 1BR / 2BR», цена — price_from_thb либо price_thb.
   // Приводим к одному виду, иначе половина проектов остаётся без планировок.
