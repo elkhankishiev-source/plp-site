@@ -1036,6 +1036,16 @@ button#send-code,button#send-code-2,button#do-login,button#do-reg{
   #cab-body{margin:8px 0 10px}
 }
 
+/* Хвосты системы: короткий список того, что ждёт решения */
+.openbox{margin:12px 0 4px}
+.openbox h4{margin:0 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.openlist{display:grid;gap:6px}
+.openrow{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;
+  text-align:left;background:var(--warm);border:1px solid rgba(var(--ink-rgb),.1);
+  border-radius:12px;padding:10px 14px;font:inherit;font-size:.86rem;color:var(--ink);cursor:pointer;margin:0}
+.openrow b{font-variant-numeric:tabular-nums;color:var(--ink)}
+@media (hover:hover) and (pointer:fine){ .openrow:hover{border-color:var(--olive)} }
+
 /* Модерация: список свёрнутых карточек, детали — по нажатию */
 .msub.fold{padding:0;overflow:hidden}
 .msub-h{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;
@@ -1647,6 +1657,7 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
         <button type="button" class="opt" data-v="published">Опубликованные</button>
         <button type="button" class="opt" data-v="rejected">Отклонённые</button>
       </div>
+      <div id="m-open" class="openbox"></div>
       <div id="m-count" class="sub" style="margin:8px 0 0"></div>
       <div id="m-list"></div>
       <div class="ok" id="m-ok"></div>
@@ -3057,6 +3068,32 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         Array.prototype.forEach.call(fb.querySelectorAll('.opt'),function(x){x.classList.remove('on');});
         o.classList.add('on'); MOD_STATUS=o.getAttribute('data-v'); loadModeration();
       };
+    });
+  }
+  /* Эльнур 06.09: «в модерацию можно писать текущие нерешённые вопросы,
+     чтобы мы видели важное и со временем закрывали». Список приходит из базы
+     тем же запросом, что и сводка, и каждая строка ведёт туда, где закрывают. */
+  function loadOpenIssues(){
+    var box=document.getElementById('m-open'); if(!box) return;
+    post({action:'board',token:TOKEN}).then(function(d){
+      var list=(d&&d.board&&d.board['не_закрыто'])||[];
+      if(!list.length){ box.innerHTML='<p class="sub">Хвостов нет — всё разобрано.</p>'; return; }
+      var h='<h4>Что не закрыто</h4><div class="openlist">';
+      list.forEach(function(x){
+        h+='<button type="button" class="openrow" data-go="'+(x['куда']||'')+'">'+
+           '<span>'+clEsc(x['что']||'')+'</span><b>'+(x['сколько']||0)+'</b></button>';
+      });
+      box.innerHTML=h+'</div>';
+      Array.prototype.forEach.call(box.querySelectorAll('.openrow'),function(b){
+        b.onclick=function(){
+          var go=b.getAttribute('data-go');
+          if(go==='moderation'){ var f=document.getElementById('m-list'); if(f) f.scrollIntoView({behavior:'smooth'}); return; }
+          if(go==='coords'){ var sc=document.getElementById('sec-coords'); if(sc) sc.scrollIntoView({behavior:'smooth'}); return; }
+          if(go==='phones'){ cabPage('clients'); dupesBoard(); return; }
+          if(go==='tasks'){ cabPage('clients'); tasksBoard(); return; }
+          if(go==='clients'||go==='calendar'||go==='service'||go==='object') cabPage(go==='clients'?'clients':go);
+        };
+      });
     });
   }
   function loadModeration(){
@@ -5009,7 +5046,7 @@ window.openChat=openChat;window.closeChat=closeChat;window.clearChat=clearChat;w
     if(!CAB_LOADED[name]){
       CAB_LOADED[name]=1;
       try{
-        if(name==='staff'){ loadModeration(); loadCoords(); }
+        if(name==='staff'){ loadModeration(); loadCoords(); loadOpenIssues(); }
         else if(name==='clients') loadClients();
         else if(name==='board') loadBoard();
         else if(name==='camp') loadCamps();
