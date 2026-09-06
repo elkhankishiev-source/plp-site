@@ -657,7 +657,7 @@ input.bad{border-color:#d98a84!important;background:var(--paper)6f5}
 .car{display:flex;gap:20px;padding:6px 4px 12px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;cursor:grab}
 .car::-webkit-scrollbar{display:none}
 .car.drag{cursor:grabbing;scroll-snap-type:none}
-.car .prop{flex:0 0 clamp(340px,30%,380px);scroll-snap-align:start;background:var(--paper);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow-sm);transition:transform .25s,box-shadow .25s;cursor:pointer;display:flex;flex-direction:column}
+.car .prop{flex:0 0 clamp(380px,32%,440px);scroll-snap-align:start;background:var(--paper);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow-sm);transition:transform .25s,box-shadow .25s;cursor:pointer;display:flex;flex-direction:column}
 @media(max-width:640px){.car .prop{flex:0 0 85vw}}
 .car .prop:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
 .car .pic{aspect-ratio:4/3;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:600;color:rgba(var(--ink-rgb),.45)}
@@ -1447,6 +1447,31 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
   .logo .chip img{width:18px}
   .lname{font-size:.92rem}
 }
+
+/* Эльнур 06.09: «фильтр упорядочить, иначе плохо вмещается, хочется чтобы
+   основной посыл был заметнее». На телефоне в строке остаются главные фильтры,
+   остальные прячутся под «Ещё» — экран отдаём объектам. */
+@media(max-width:600px){
+  .filterbar{gap:8px}
+  .filterbar .fmenu>.fbtn{padding:8px 12px;font-size:.82rem}
+  .filterbar.compact .fmenu.hide-sm{display:none}
+  .fbtn-more{display:none}
+  /* «Сбросить» появляется, только когда есть что сбрасывать — строка короче */
+  .filterbar.compact .fbtn-reset{display:none}
+  .filterbar.compact.has-active .fbtn-reset{display:inline-flex}
+  .filterbar.compact .fbtn-more{display:inline-flex;align-items:center;gap:6px;
+    background:var(--paper);border:1px solid rgba(var(--ink-rgb),.12);border-radius:999px;
+    padding:8px 12px;font-size:.82rem;font-weight:600;color:var(--ink)}
+}
+
+/* FAQ: свёрнут по умолчанию — экономит экран, разворачивается по нажатию */
+/* Эльнур 06.09: FAQ целиком сворачивается — экономит экран на телефоне */
+.faq-fold>summary{list-style:none;cursor:pointer;display:flex;align-items:center;
+  justify-content:space-between;gap:12px;padding:14px 0;font-weight:800;font-size:1.05rem}
+.faq-fold>summary::-webkit-details-marker{display:none}
+.faq-fold>summary .chev{color:var(--muted);transition:transform .2s;font-weight:400}
+.faq-fold[open]>summary .chev{transform:rotate(45deg)}
+.faq-fold[open]>summary{border-bottom:1px solid rgba(var(--ink-rgb),.08);margin-bottom:6px}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.6.0/maplibre-gl.min.css">
@@ -3911,6 +3936,31 @@ var FILTER_MENUS=[
 ];
 /* Аренда рисует фильтры своими группами «подпись + чипы» — сворачиваем их
    в такие же кнопки с выпадающим списком, чтобы поведение было одинаковым. */
+/* Компактная строка фильтров на телефоне: главные видны, прочие — под «Ещё». */
+function compactFilters(barId){
+  var bar=document.getElementById(barId); if(!bar) return;
+  if(!window.matchMedia || !window.matchMedia('(max-width:600px)').matches){
+    bar.classList.remove('compact'); return;
+  }
+  var menus=Array.prototype.slice.call(bar.querySelectorAll('.fmenu'));
+  if(menus.length<4) return;
+  var keep=['budget','loc','beds','rentbudget'];
+  menus.forEach(function(m){
+    var f=m.dataset.facet||'';
+    if(keep.indexOf(f)<0) m.classList.add('hide-sm');
+  });
+  if(!bar.querySelector('.fbtn-more')){
+    var more=document.createElement('button');
+    more.type='button'; more.className='fbtn-more'; more.textContent='Ещё фильтры';
+    more.onclick=function(){
+      var on=bar.classList.toggle('compact');
+      more.textContent = on ? 'Ещё фильтры' : 'Свернуть фильтры';
+    };
+    var reset=bar.querySelector('.fbtn-reset');
+    bar.insertBefore(more, reset||null);
+  }
+  bar.classList.add('compact');
+}
 function groupRentMenus(){
   var bar=document.getElementById('rentFilters');
   if(!bar || bar.dataset.grouped) return;
@@ -3937,6 +3987,7 @@ function groupRentMenus(){
     bar.appendChild(e);
   });
   try{ buildRentPriceMenu(bar); }catch(e){}
+  try{ compactFilters('rentFilters'); }catch(e){}
   wireCloseOnOutside();
   syncMenuLabels();
 }
@@ -4088,6 +4139,7 @@ function buildFilterMenus(barId){
     btn.onclick=function(e){ e.stopPropagation(); wrap.classList.toggle('open'); closeOthers(wrap); };
   });
   try{ buildPriceSlider(bar); }catch(e){}
+  try{ compactFilters(barId); }catch(e){}
   try{ syncBudgetLabels(); }catch(e){}
   var reset=document.createElement('button');
   reset.type='button'; reset.className='fbtn fbtn-reset'; reset.textContent='Сбросить';
@@ -4241,6 +4293,12 @@ function closeOthers(keep){
 }
 /* на кнопке показываем, что выбрано — иначе выбор не виден, когда список закрыт */
 function syncMenuLabels(){
+  /* активные фильтры подсвечивают кнопку сброса на телефоне */
+  ['saleFilters','rentFilters'].forEach(function(id){
+    var b=document.getElementById(id); if(!b) return;
+    var active = b.querySelectorAll('.fmenu.has').length>0;
+    b.classList.toggle('has-active', active);
+  });
   document.querySelectorAll('.fmenu').forEach(function(w){
     var f=w.dataset.facet, out=[];
     /* бюджет аренды: на кнопке показываем сам диапазон, а не выбранный срок */
