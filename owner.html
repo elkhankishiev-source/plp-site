@@ -3057,7 +3057,6 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         o.classList.add('on'); MOD_STATUS=o.getAttribute('data-v'); loadModeration();
       };
     });
-    loadModeration();
   }
   function loadModeration(){
     var box=document.getElementById('m-list'); if(!box) return;
@@ -3187,7 +3186,6 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     var go=document.getElementById('cl-go'), qi=document.getElementById('cl-q');
     if(go) go.onclick=function(){ CL_Q=qi.value.trim(); loadClients(); };
     if(qi) qi.onkeydown=function(e){ if(e.key==='Enter'){ CL_Q=qi.value.trim(); loadClients(); } };
-    loadClients();
   }
   var TEMP_RU={cold:'без номера',warm:'в работе',hot:'горячий',client:'купил',lost:'отложен'};
   var SRC_RU={wa:'WhatsApp',tg:'Telegram',tg_bot:'бот в Telegram',tg_dm:'Telegram',
@@ -3885,7 +3883,6 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     if(!(DATA && DATA.owner && DATA.owner.is_staff===true)){ sec.remove(); return; }
     document.getElementById('cmp-new').onclick=function(){ campForm(); };
     document.getElementById('cmp-refresh').onclick=function(){ loadCamps(); };
-    loadCamps();
   }
   function loadCamps(){
     var box=document.getElementById('cmp-list'); if(!box) return;
@@ -4124,6 +4121,9 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   function renderBoard(){
     var sec=document.getElementById('sec-board'); if(!sec) return;
     if(!(DATA && DATA.owner && DATA.owner.is_staff===true)){ sec.remove(); return; }
+  }
+  function loadBoard(){
+    var sec=document.getElementById('sec-board'); if(!sec) return;
     var box=document.getElementById('board-body');
     box.innerHTML='<p class="sub">Снимаем показания…</p>';
     post({action:'board',token:TOKEN}).then(function(d){
@@ -4538,6 +4538,9 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       return;
     }
     sec.style.display='';
+  }
+  function loadCoords(){
+    if(!document.getElementById('sec-coords')) return;
     post({action:'mod_coords',token:TOKEN}).then(function(d){
       if(!d||!d.ok) return;
       COITEMS=d.items||[];
@@ -4636,6 +4639,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
      своя страница, как в концепте. Блоки уже отрисованы, мы их только
      раскладываем по вкладкам и показываем одну за раз. */
   var CAB_TAB='overview';
+  var CAB_LOADED={};
   var TAB_OF={
     'portfolio':'overview', 'prop-tabs':'object', 'prop':'object',
     'sec-money':'money', 'sec-calendar':'calendar', 'sec-reports':'docs',
@@ -4650,10 +4654,24 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
      работаем с конкретной информацией». Выбор живёт наверху и виден всегда. */
   var CTX={lead:null, leadName:'', obj:null};
   function ctxIsStaff(){ return !!(DATA && DATA.owner && DATA.owner.is_staff===true); }
+  /* Список людей нужен и контекст-бару, и форме заявки — тянем его один раз.
+     Раньше уходило два одинаковых запроса по 300 человек на каждом входе. */
+  var PEOPLE=null;
+  function peopleList(){
+    if(PEOPLE) return PEOPLE;
+    PEOPLE=post({action:'clients',token:TOKEN,limit:300}).then(function(d){
+      var rows=(d&&(d.data||d.rows||d.clients))||[];
+      if(rows && rows.rows) rows=rows.rows;
+      return Array.isArray(rows)?rows:[];
+    }).catch(function(){ return []; });
+    return PEOPLE;
+  }
+  /* Объект в списке — конкретный юнит: имя, номер квартиры и его ID. */
   function ctxObjects(){
     return (DATA && DATA.properties || []).map(function(p,i){
-      return { id:String(i), title:(p.name||p.id||'Объект'),
-               sub:[p.district,p.unit].filter(Boolean).join(' · ') };
+      return { id:String(i),
+               title:(p.name||p.id||'Объект')+(p.unit?(' · '+p.unit):''),
+               sub:[p.district,p.id].filter(Boolean).join(' · ') };
     });
   }
   function renderCtx(){
@@ -4677,12 +4695,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       var lh=document.getElementById('ctx-lead');
       if(lh && !lh.__built){
         lh.__built=1;
-        /* список людей подтягиваем тем же запросом, что и раздел «Люди» */
-        post({action:'clients',token:TOKEN,limit:300}).then(function(d){
-          /* сценарий отдаёт список в поле data */
-          var rows=(d&&(d.data||d.rows||d.clients))||[];
-          if(rows && rows.rows) rows=rows.rows;
-          if(!Array.isArray(rows)) rows=[];
+        peopleList().then(function(rows){
           pickList(lh,{ multi:false, placeholder:'выбрать: имя или номер',
             items:rows.map(function(c){
               return { id:String(c.code||c.client_code||c.id||''),
@@ -4694,11 +4707,51 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
               var it=rows.filter(function(c){return String(c.code||c.client_code||c.id)===CTX.lead;})[0];
               CTX.leadName=it?(it.name||''):'';
               ctxNote();
+              ctxNarrow(CTX.lead);
             }});
         }).catch(function(){});
       }
     }
     ctxNote();
+  }
+  /* Выбрали человека — список объектов сужается до его объектов.
+     Эльнур 06.09: «когда мы тут выбираем лида и его объект, я уже не Manor S14».
+     Сотрудник при этом не теряет остальные: они остаются ниже, с пометкой. */
+  function ctxNarrow(code){
+    var host=document.getElementById('ctx-obj'); if(!host) return;
+    var all=ctxObjects();
+    if(!code){ CTX.objItems=all; buildCtxObj(all, 'все объекты'); return; }
+    post({action:'client_objects',token:TOKEN,code:code}).then(function(d){
+      var his=(d&&d.rows)||[];
+      if(!his.length){ buildCtxObj(all, 'у человека объектов нет — все объекты'); return; }
+      var byName={};
+      all.forEach(function(x){ byName[String(x.sub).split(' · ').pop()]=x; });
+      var mine=his.map(function(x){
+        var known=byName[x.id];
+        return { id: known?known.id:('pid:'+x.id), title:x.title||x.id,
+                 sub:[x.sub,x.id].filter(Boolean).join(' · ') };
+      });
+      var mineIds={}; mine.forEach(function(m){ mineIds[m.id]=1; });
+      var rest=all.filter(function(x){ return !mineIds[x.id]; })
+                  .map(function(x){ return {id:x.id,title:x.title,sub:x.sub+' · не его'}; });
+      buildCtxObj(mine.concat(rest), 'объекты этого человека');
+      if(mine.length===1 && /^\d+$/.test(mine[0].id)){
+        CTX.obj=Number(mine[0].id); CUR=CTX.obj; ctxNote();
+        try{ renderProp(); renderPortfolio(); }catch(e){}
+      }
+    }).catch(function(){});
+  }
+  function buildCtxObj(items, placeholder){
+    var host=document.getElementById('ctx-obj'); if(!host) return;
+    host.__built=1;
+    pickList(host,{ multi:false, placeholder:placeholder, items:items,
+      onChange:function(ids){
+        var v=ids[0];
+        if(v==null){ CTX.obj=null; ctxNote(); return; }
+        if(/^\d+$/.test(String(v))){ CTX.obj=Number(v); CUR=CTX.obj; }
+        ctxNote();
+        try{ renderProp(); renderPortfolio(); }catch(e){}
+      }});
   }
   function ctxNote(){
     var n=document.getElementById('ctx-note'); if(!n) return;
@@ -4908,6 +4961,20 @@ window.openChat=openChat;window.closeChat=closeChat;window.clearChat=clearChat;w
       a.classList.toggle('on', a.getAttribute('data-tab')===name);
     });
     try{ if(PLPMAP_OWNER) setTimeout(function(){ COMAP && COMAP.invalidateSize(); },80); }catch(e){}
+    /* Эльнур 06.09: «кабинет долго грузится». Раньше при входе улетало
+       одиннадцать запросов разом — по одному от каждого раздела, и первый
+       из них шёл двенадцать секунд. Теперь раздел просит данные, когда его
+       открыли, а не когда открыли кабинет. */
+    if(!CAB_LOADED[name]){
+      CAB_LOADED[name]=1;
+      try{
+        if(name==='staff'){ loadModeration(); loadCoords(); }
+        else if(name==='clients') loadClients();
+        else if(name==='board') loadBoard();
+        else if(name==='camp') loadCamps();
+        else if(name==='mine') loadMine();
+      }catch(e){ if(window.console) console.warn('раздел '+name+':', e); }
+    }
     if(name==='staff') setTimeout(function(){
       try{ COMAP ? COMAP.invalidateSize() : initCoMap(); }catch(e){}
     },120);
@@ -5030,7 +5097,7 @@ window.openChat=openChat;window.closeChat=closeChat;window.clearChat=clearChat;w
       DATA=d; CUR=0;
       try{ localStorage.setItem(CACHE, JSON.stringify({token:TOKEN,at:Date.now(),data:d})); }catch(e){}
       if(d.owner&&d.owner.must_change_password){ show('pwd'); return; }
-      draw(); markStale(false); loadMine();
+      draw(); markStale(false);
     }).catch(function(){
       if(shown){ markStale(false, 'нет связи — показаны последние данные'); return; }
       gateStep('phone'); $('gate-err').textContent='Нет связи с сервером. Попробуйте позже.';
@@ -5269,8 +5336,7 @@ window.openChat=openChat;window.closeChat=closeChat;window.clearChat=clearChat;w
     // сотрудник оформляет заявку за клиента: сначала человек, потом его объект
     if(DATA.owner && DATA.owner.is_staff===true){
       document.getElementById('r-cl-wrap').style.display='';
-      post({action:'clients',token:TOKEN,limit:300}).then(function(d){
-        var rows=(d&&d.data&&d.data.rows)||[];
+      peopleList().then(function(rows){
         REQ_CLIENT=pickList('r-client',{
           multi:false, placeholder:'без клиента — просто по объекту',
           items: rows.map(function(r){
