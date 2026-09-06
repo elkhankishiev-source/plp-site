@@ -692,6 +692,14 @@
    "units": []
   },
   {
+   "id": "RESALE-PANORA-CONDO",
+   "name": "The Panora Phuket, корпус D — перепродажа",
+   "district": "Сурин",
+   "type": "Кондо",
+   "price_from": 4425400,
+   "units": []
+  },
+  {
    "id": "RESALE-RAWAI-POOLVILLA",
    "name": "Пул-вилла Раваи, 5 спален — перепродажа",
    "district": "Равай",
