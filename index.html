@@ -1445,21 +1445,23 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
 <div class="stage">
 
 <!-- ===== HEADER ===== -->
+<!-- PLP:HEADER:START -->
 <header class="header">
   <div class="container header-inner">
     <a class="logo" href="index.html" aria-label="Property Library — на главную"><span class="chip"><img src="img/brand/plp-mark-ink.png" alt="Property Library Phuket" width="24"></span><span class="lname">Property <span>Library</span></span></a>
     <nav class="nav" aria-label="Основное меню">
       <a href="buy.html" data-i18n="nav.sale">Продажа</a>
       <a href="rent.html" data-i18n="nav.rent">Аренда</a>
-      <a href="#map" data-i18n="nav.map">Районы</a>
+      <a href="index.html#map" data-i18n="nav.map">Районы</a>
       <a href="management.html">Управление</a>
-      <a href="#about" data-i18n="nav.about">О нас</a>
+      <a href="index.html#about" data-i18n="nav.about">О нас</a>
     </nav>
     <div class="htools">
       <div class="lang" role="group" aria-label="Язык">
         <button type="button" data-l="ru" class="on" onclick="setLang('ru')">RU</button>
         <button type="button" data-l="en" onclick="setLang('en')">EN</button>
       </div>
+      <button type="button" class="bellbtn" id="bellBtn" aria-label="Уведомления" hidden>🔔<span class="bell-n" id="bellN" hidden>0</span></button>
       <button type="button" class="themebtn" id="themeBtn" onclick="cycleTheme()"
               aria-label="Оформление: системное, светлое, тёмное"><span id="themeIco">◐</span></button>
       <span class="swch" role="group" aria-label="Сайт или кабинет">
@@ -1470,8 +1472,10 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
     </div>
   </div>
 </header>
+<!-- PLP:HEADER:END -->
 
 <!-- ===== MOBILE NAV ===== -->
+<!-- PLP:MNAV:START -->
 <div class="mnav" id="mnav" onclick="if(event.target===this)toggleNav(false)">
   <div class="sheet">
     <div class="top"><b data-i18n="nav.menu">Меню</b><button type="button" class="xx" onclick="toggleNav(false)" aria-label="Закрыть">×</button></div>
@@ -1489,6 +1493,7 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
     <button type="button" class="mwa" onclick="toggleNav(false);openChat('hi')" data-i18n="nav.chat">Чат с консультантом</button>
   </div>
 </div>
+<!-- PLP:MNAV:END -->
 
 <main id="top">
 
@@ -1929,6 +1934,7 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
 <!-- PLP:OBJECT-INDEX:END -->
 
 <!-- ===== FOOTER ===== -->
+<!-- PLP:FOOTER:START -->
 <footer class="footer" id="contacts">
   <div class="container">
     <div class="footer-grid">
@@ -1971,6 +1977,7 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
     </div>
   </div>
 </footer>
+<!-- PLP:FOOTER:END -->
 
 </main>
 </div><!-- /stage -->
