@@ -3,6 +3,8 @@
  "items": [
   {
    "id": "INTAKE-BOTANICA",
+   "pub": "INTAKE-BOTANICA",
+   "url": "https://property-library.com/object/intake-botanica",
    "name": "The GENS by Botanica, у Blue Tree",
    "district": "Банг Тао",
    "type": "Кондо",
@@ -11,6 +13,8 @@
   },
   {
    "id": "INTAKE-CHAMPACA",
+   "pub": "INTAKE-CHAMPACA",
+   "url": "https://property-library.com/object/intake-champaca",
    "name": "Mono Champaca, Таланг",
    "district": "Таланг",
    "type": "Вилла",
@@ -19,6 +23,8 @@
   },
   {
    "id": "PLP-ADORA",
+   "pub": "PLP-ADORA",
+   "url": "https://property-library.com/object/adora",
    "name": "The Title Adora Rawai",
    "district": "Равай",
    "type": "Кондо",
@@ -40,6 +46,8 @@
   },
   {
    "id": "PLP-AYANA",
+   "pub": "PLP-AYANA",
+   "url": "https://property-library.com/object/ayana",
    "name": "AYANA Heights Seaview Residences",
    "district": "Phuket",
    "type": "Кондо",
@@ -48,6 +56,8 @@
   },
   {
    "id": "PLP-BALCONY",
+   "pub": "PLP-BALCONY",
+   "url": "https://property-library.com/object/balcony",
    "name": "The BALCONY Nai Yang",
    "district": "Най Янг",
    "type": "Кондо",
@@ -69,6 +79,8 @@
   },
   {
    "id": "PLP-BIANCANA",
+   "pub": "PLP-BIANCANA",
+   "url": "https://property-library.com/object/biancana",
    "name": "The Title Biancana Surin",
    "district": "Сурин",
    "type": "Кондо",
@@ -90,6 +102,8 @@
   },
   {
    "id": "PLP-CASADEMONTE",
+   "pub": "PLP-CASADEMONTE",
+   "url": "https://property-library.com/object/casademonte",
    "name": "The Title Casa De Monte",
    "district": "Ко Кео",
    "type": "Вилла",
@@ -111,6 +125,8 @@
   },
   {
    "id": "PLP-CIELO",
+   "pub": "PLP-CIELO",
+   "url": "https://property-library.com/object/cielo",
    "name": "The Title Cielo Rawai",
    "district": "Равай",
    "type": "Кондо",
@@ -139,6 +155,8 @@
   },
   {
    "id": "PLP-CLOVER",
+   "pub": "PLP-CLOVER",
+   "url": "https://property-library.com/object/clover",
    "name": "Clover Residence",
    "district": "Банг Тао",
    "type": "Вилла",
@@ -147,6 +165,8 @@
   },
   {
    "id": "PLP-CORALINA",
+   "pub": "PLP-CORALINA",
+   "url": "https://property-library.com/object/coralina",
    "name": "The Title Coralina Kamala",
    "district": "Камала",
    "type": "Кондо",
@@ -174,6 +194,8 @@
   },
   {
    "id": "PLP-EDEN",
+   "pub": "PLP-EDEN",
+   "url": "https://property-library.com/object/eden",
    "name": "Gardens of Eden",
    "district": "Банг Тао",
    "type": "Кондо",
@@ -182,6 +204,8 @@
   },
   {
    "id": "PLP-EDEN-ETRO",
+   "pub": "PLP-EDEN-ETRO",
+   "url": "https://property-library.com/object/eden-etro",
    "name": "ETRO Residences Phuket",
    "district": "Банг Тао",
    "type": "Кондо",
@@ -190,6 +214,8 @@
   },
   {
    "id": "PLP-EDEN-PARK",
+   "pub": "PLP-EDEN-PARK",
+   "url": "https://property-library.com/object/eden-park",
    "name": "Eden · Park Residences",
    "district": "Банг Тао",
    "type": "Кондо",
@@ -198,6 +224,8 @@
   },
   {
    "id": "PLP-EDEN-RES",
+   "pub": "PLP-EDEN-RES",
+   "url": "https://property-library.com/object/eden-res",
    "name": "Eden Residences",
    "district": "Банг Тао",
    "type": "Кондо",
@@ -206,6 +234,8 @@
   },
   {
    "id": "PLP-ESTELLA",
+   "pub": "PLP-ESTELLA",
+   "url": "https://property-library.com/object/estella",
    "name": "The Title Villa Estella Naiyang",
    "district": "Най Янг",
    "type": "Вилла",
@@ -221,6 +251,8 @@
   },
   {
    "id": "PLP-EVERPRIME",
+   "pub": "PLP-EVERPRIME",
+   "url": "https://property-library.com/object/everprime",
    "name": "Ever Prime",
    "district": "Phuket",
    "type": "Кондо",
@@ -229,6 +261,8 @@
   },
   {
    "id": "PLP-FANTASY-RAWAI",
+   "pub": "PLP-FANTASY-RAWAI",
+   "url": "https://property-library.com/object/fantasy-rawai",
    "name": "Fantasy Plus Rawai",
    "district": "Равай",
    "type": "Кондо",
@@ -237,6 +271,8 @@
   },
   {
    "id": "PLP-HALO1",
+   "pub": "PLP-HALO1",
+   "url": "https://property-library.com/object/halo1",
    "name": "The Title Halo 1 Naiyang",
    "district": "Най Янг",
    "type": "Кондо",
@@ -258,6 +294,8 @@
   },
   {
    "id": "PLP-HERITAGE",
+   "pub": "PLP-HERITAGE",
+   "url": "https://property-library.com/object/heritage",
    "name": "The Title Heritage Bang-Tao",
    "district": "Банг Тао",
    "type": "Кондо",
@@ -285,6 +323,8 @@
   },
   {
    "id": "PLP-HYTHE",
+   "pub": "PLP-HYTHE",
+   "url": "https://property-library.com/object/hythe",
    "name": "HYTHE by Botanica",
    "district": "Phuket",
    "type": "Кондо",
@@ -293,6 +333,8 @@
   },
   {
    "id": "PLP-KATABELLO",
+   "pub": "PLP-KATABELLO",
+   "url": "https://property-library.com/object/katabello",
    "name": "The Title Katabello",
    "district": "Ката",
    "type": "Кондо",
@@ -320,6 +362,8 @@
   },
   {
    "id": "PLP-KIRARA",
+   "pub": "PLP-KIRARA",
+   "url": "https://property-library.com/object/kirara",
    "name": "The Title Villa Kirara Bang-Tao",
    "district": "Банг Тао",
    "type": "Вилла",
@@ -364,6 +408,8 @@
   },
   {
    "id": "PLP-LEGENDARY",
+   "pub": "PLP-LEGENDARY",
+   "url": "https://property-library.com/object/legendary",
    "name": "The Title Legendary Bang-Tao",
    "district": "Банг Тао",
    "type": "Кондо",
@@ -385,6 +431,8 @@
   },
   {
    "id": "PLP-LIBERTY",
+   "pub": "PLP-LIBERTY",
+   "url": "https://property-library.com/object/liberty",
    "name": "The Liberty by Wallaya Villas",
    "district": "Банг Тао",
    "type": "Кондо",
@@ -406,6 +454,8 @@
   },
   {
    "id": "PLP-MANOR",
+   "pub": "PLP-MANOR",
+   "url": "https://property-library.com/object/manor",
    "name": "Manor",
    "district": "Банг Тао",
    "type": "Вилла",
@@ -414,6 +464,8 @@
   },
   {
    "id": "PLP-MODEVA",
+   "pub": "PLP-MODEVA",
+   "url": "https://property-library.com/object/modeva",
    "name": "The Modeva Bang-Tao",
    "district": "Банг Тао",
    "type": "Кондо",
@@ -463,6 +515,8 @@
   },
   {
    "id": "PLP-MORI-VALLEY",
+   "pub": "PLP-MORI-VALLEY",
+   "url": "https://property-library.com/object/mori-valley",
    "name": "MORI The Valley",
    "district": "Банг Тао",
    "type": "Вилла",
@@ -471,6 +525,8 @@
   },
   {
    "id": "PLP-MORI1",
+   "pub": "PLP-MORI1",
+   "url": "https://property-library.com/object/mori1",
    "name": "MORI 1",
    "district": "Банг Тао",
    "type": "Вилла",
@@ -479,6 +535,8 @@
   },
   {
    "id": "PLP-PEYLAA",
+   "pub": "PLP-PEYLAA",
+   "url": "https://property-library.com/object/peylaa",
    "name": "PEYLAA Phuket, Autograph Collection Residences",
    "district": "Банг Тао",
    "type": "Кондо",
@@ -500,6 +558,8 @@
   },
   {
    "id": "PLP-SERENITY",
+   "pub": "PLP-SERENITY",
+   "url": "https://property-library.com/object/serenity",
    "name": "The Title Serenity Naiyang",
    "district": "Най Янг",
    "type": "Кондо",
@@ -527,6 +587,8 @@
   },
   {
    "id": "PLP-SIERRA",
+   "pub": "PLP-SIERRA",
+   "url": "https://property-library.com/object/sierra",
    "name": "The Title Sierra",
    "district": "Банг Тао",
    "type": "Кондо",
@@ -548,6 +610,8 @@
   },
   {
    "id": "PLP-STANDARD",
+   "pub": "PLP-STANDARD",
+   "url": "https://property-library.com/object/standard",
    "name": "The Standard Residences Phuket Bang Tao",
    "district": "Банг Тао",
    "type": "Кондо",
@@ -556,6 +620,8 @@
   },
   {
    "id": "PLP-SUDARA",
+   "pub": "PLP-SUDARA",
+   "url": "https://property-library.com/object/sudara",
    "name": "Sudara Phuket",
    "district": "Phuket",
    "type": "Вилла",
@@ -564,6 +630,8 @@
   },
   {
    "id": "PLP-SUNHILLS-LAYAN",
+   "pub": "PLP-SUNHILLS-LAYAN",
+   "url": "https://property-library.com/object/sunhills-layan",
    "name": "SUN HILLS Layan",
    "district": "Лаян",
    "type": "Кондо",
@@ -591,6 +659,8 @@
   },
   {
    "id": "PLP-VIBE-KARON",
+   "pub": "PLP-VIBE-KARON",
+   "url": "https://property-library.com/object/vibe-karon",
    "name": "Vibe Residence Karon",
    "district": "Карон",
    "type": "Кондо",
@@ -599,6 +669,8 @@
   },
   {
    "id": "PLP-VIVANA",
+   "pub": "PLP-VIVANA",
+   "url": "https://property-library.com/object/vivana",
    "name": "The Title Vivana Kamala",
    "district": "Камала",
    "type": "Кондо",
@@ -620,6 +692,8 @@
   },
   {
    "id": "PLP-VIVI",
+   "pub": "PLP-VIVI",
+   "url": "https://property-library.com/object/vivi",
    "name": "The Title VIVI",
    "district": "Банг Тао",
    "type": "Кондо",
@@ -635,6 +709,8 @@
   },
   {
    "id": "PLP-ZENITHY",
+   "pub": "PLP-ZENITHY",
+   "url": "https://property-library.com/object/zenithy",
    "name": "Zenithy La Ville · Oasis Collection",
    "district": "Ко Кео",
    "type": "Вилла",
@@ -643,6 +719,8 @@
   },
   {
    "id": "PLP-ZERO-BANGTAO",
+   "pub": "PLP-ZERO-BANGTAO",
+   "url": "https://property-library.com/object/zero-bangtao",
    "name": "The ZERO Bang Tao",
    "district": "Банг Тао",
    "type": "Кондо",
@@ -651,6 +729,8 @@
   },
   {
    "id": "PLP-ZERO-NAIYANG",
+   "pub": "PLP-ZERO-NAIYANG",
+   "url": "https://property-library.com/object/zero-naiyang",
    "name": "The ZERO Nai Yang",
    "district": "Най Янг",
    "type": "Кондо",
@@ -685,6 +765,8 @@
   },
   {
    "id": "RESALE-PANORA",
+   "pub": "RESALE-PANORA",
+   "url": "https://property-library.com/object/resale-panora",
    "name": "Panora Villas, Сурин — перепродажа",
    "district": "Сурин",
    "type": "Вилла",
@@ -693,6 +775,8 @@
   },
   {
    "id": "RESALE-PANORA-CONDO",
+   "pub": "RESALE-PANORA-CONDO",
+   "url": "https://property-library.com/object/resale-panora-condo",
    "name": "The Panora Phuket, корпус D — перепродажа",
    "district": "Сурин",
    "type": "Кондо",
@@ -701,6 +785,8 @@
   },
   {
    "id": "RESALE-RAWAI-POOLVILLA",
+   "pub": "RESALE-RAWAI-POOLVILLA",
+   "url": "https://property-library.com/object/resale-rawai-poolvilla",
    "name": "Пул-вилла Раваи, 5 спален — перепродажа",
    "district": "Равай",
    "type": "Вилла",
