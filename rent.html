@@ -2111,7 +2111,6 @@ section#rent,section#sale{padding-top:10px}
 </div><!-- /stage -->
 
 <!-- ===== CHAT WIDGET ===== -->
-<div class="fabwrap" id="fabWrap"><button type="button" class="fab" id="fab" onclick="openChat('hi')"><span class="av"><img src="img/brand/plp-mark-ink.png" alt="" width="20" height="20"></span><span class="fabtxt" data-i18n="chat.fab">Дарья · на связи</span><span class="dot"></span></button><button type="button" class="fabmin" id="fabMin" onclick="event.stopPropagation();toggleFab()" aria-label="Свернуть" title="Свернуть">×</button></div>
 <div class="chatwin" id="chatwin" role="dialog" aria-label="Чат с менеджером">
   <div class="chathead">
     <span class="av"><img src="img/brand/plp-mark-ink.png" alt="" width="20" height="20"></span>
@@ -3605,7 +3604,8 @@ function askAssistant(q){
 }
 function openChat(ctx){
   document.getElementById('chatwin').classList.add('open');
-  (document.getElementById('fabWrap')||document.getElementById('fab')).style.display='none';
+  var _fw=document.getElementById('fabWrap')||document.getElementById('fab');
+  if(_fw) _fw.style.display='none';
   var fld=document.getElementById('chatField');if(fld&&innerWidth>760)fld.focus();
   if(ctx==='rentreq'&&chatStarted){lastTopic='rent';botT(t('chat.rentreq'),500);setTimeout(function(){offerLead(true);},2200);return;}
   if(chatStarted)return;
@@ -3800,7 +3800,9 @@ function chatVoice(){
     }
   }catch(e){}
 })();
-function closeChat(){document.getElementById('chatwin').classList.remove('open');var w=document.getElementById('fabWrap');if(w)w.style.display='block';else document.getElementById('fab').style.display='flex';}
+function closeChat(){var c=document.getElementById('chatwin'); if(c) c.classList.remove('open');
+  var w=document.getElementById('fabWrap'); if(w) w.style.display='block';
+  var b=document.getElementById('fab'); if(!w && b) b.style.display='flex';}
 
 /* ===== MOBILE NAV ===== */
 function toggleNav(open){document.getElementById('mnav').classList.toggle('open',open);document.body.style.overflow=open?'hidden':'';}
