@@ -1241,8 +1241,13 @@ async function main() {
 
   // 4) короткий список для конструктора оффера в кабинете: чтобы сотрудник
   //    выбирал объект и тип юнита из списка, а не вбивал ID руками.
+  /* 07.09: тем же файлом пользуются наши боты и ИИ-агенты — иначе им
+     приходится тянуть всю главную (684 КБ) ради названия и цены.
+     Поэтому добавлены публичный код и адрес страницы объекта. */
   const offerCat = objects.map(o => ({
     id: o.plp_property_id,
+    pub: pubOf(o),
+    url: 'https://property-library.com/object/' + slugOf(pubOf(o)),
     name: o.name,
     district: DISTRICT_RU[o.district || ''] || o.district || '',
     type: typeLabel(o.type).ru,
@@ -1252,6 +1257,40 @@ async function main() {
   fs.writeFileSync(path.join(ROOT, 'offer-catalog.json'),
     JSON.stringify({ updated: new Date().toISOString().slice(0, 10), items: offerCat }, null, 1));
   console.log('[gen] offer-catalog.json:', offerCat.length, 'объектов для конструктора оффера');
+
+  /* 5) указатель для машин: наши боты, ИИ-агенты и поисковики читают его
+        первым и сразу знают, где данные, а не разбирают вёрстку. */
+  const llms = [
+    '# Property Library Phuket',
+    '',
+    '> Агентство недвижимости на Пхукете: продажа, аренда, управление объектами.',
+    '> Сайт открыт для чтения целиком, вход и ключи не нужны.',
+    '',
+    '## Данные',
+    '',
+    '- [Каталог объектов](https://property-library.com/offer-catalog.json): название, район, тип,',
+    '  цена от, типы юнитов, адрес страницы. Поле updated — дата сборки.',
+    '- [Карта сайта](https://property-library.com/sitemap.xml): все страницы.',
+    '',
+    '## Разделы',
+    '',
+    '- [Продажа](https://property-library.com/buy)',
+    '- [Аренда](https://property-library.com/rent)',
+    '- [Управление](https://property-library.com/management)',
+    '- [Разместить объект](https://property-library.com/add-property)',
+    '- [Страница объекта](https://property-library.com/object/): адрес берётся из поля url каталога.',
+    '',
+    '## Как читать цифры',
+    '',
+    '- Цены в тайских батах, «от» — минимальный доступный юнит на дату сборки.',
+    '- Доходность на страницах — ориентир по району, а не обещание. Точный расчёт делает специалист.',
+    '- Наличие и цены меняются: перед разговором с клиентом сверяйтесь с датой updated.',
+    '',
+    'Обновлено: ' + new Date().toISOString().slice(0, 10),
+    '',
+  ].join('\n');
+  fs.writeFileSync(path.join(ROOT, 'llms.txt'), llms);
+  console.log('[gen] llms.txt: указатель для ботов и ИИ-агентов');
 
   console.log('[gen] Готово.');
 }
