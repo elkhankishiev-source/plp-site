@@ -269,3 +269,6 @@ body{background:var(--bg)}
   color:var(--on-green);display:inline-flex;align-items:center;justify-content:center;
   font-size:1.15rem;font-weight:700}
 .faq-fold[open]>summary .chev{transform:rotate(45deg)}
+
+/* цена, которую давно не сверяли, — честная пометка вместо молчания */
+.pdate.stale{display:block;color:var(--warn-ink,#b8863b);font-weight:600}

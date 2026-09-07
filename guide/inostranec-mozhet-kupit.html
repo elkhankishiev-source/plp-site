@@ -1918,6 +1918,9 @@ body{background:var(--bg)}
   font-size:1.15rem;font-weight:700}
 .faq-fold[open]>summary .chev{transform:rotate(45deg)}
 
+/* цена, которую давно не сверяли, — честная пометка вместо молчания */
+.pdate.stale{display:block;color:var(--warn-ink,#b8863b);font-weight:600}
+
 /* PLP:UI:END */
 
 </style>
@@ -3171,9 +3174,18 @@ function dealBadge(p){
 function stageBadge(p){ return dealBadge(p); }
 
 function priceAge(p){
-  if(p.avail==null) return '';
-  var n=p.avail, w=(n%10===1&&n%100!==11)?'вариант':((n%10>=2&&n%10<=4&&(n%100<10||n%100>20))?'варианта':'вариантов');
-  return '<span class="pdate av'+(n<=5?' few':'')+'">свободно '+n+' '+w+'</span>';
+  var out='';
+  if(p.avail!=null){
+    var n=p.avail, w=(n%10===1&&n%100!==11)?'вариант':((n%10>=2&&n%10<=4&&(n%100<10||n%100>20))?'варианта':'вариантов');
+    out+='<span class="pdate av'+(n<=5?' few':'')+'">свободно '+n+' '+w+'</span>';
+  }
+  /* Цена, которую давно не сверяли, вводит в заблуждение: честно помечаем.
+     Эльнур 07.09 — учёт актуального наличия и цен. */
+  if(p.priceDate){
+    var days=Math.round((Date.now()-new Date(p.priceDate+'T00:00:00'))/86400000);
+    if(days>=45) out+='<span class="pdate stale">цену уточняем — сверяем с застройщиком</span>';
+  }
+  return out;
 }
 
 function renderSale(){
