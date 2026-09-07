@@ -3095,6 +3095,11 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         var rsl=t.closest && t.closest('[data-resale]');
         if(rsl){ e.preventDefault();
           resaleForm(rsl.getAttribute('data-resale'), rsl.getAttribute('data-goal')||''); return; }
+        /* правка и удаление операции: строку можно поправить прямо в таблице */
+        var ed=t.closest && t.closest('[data-txedit]');
+        if(ed){ e.preventDefault(); ukTxEdit(ed.getAttribute('data-txedit')); return; }
+        var dl=t.closest && t.closest('[data-txdel]');
+        if(dl){ e.preventDefault(); ukTxDelete(dl.getAttribute('data-txdel')); return; }
         var uk=t.closest && t.closest('[data-uk]');
         if(uk){
           e.preventDefault();
@@ -3125,12 +3130,64 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       '<button type="button" class="btn ghost" id="f-cancel">Отмена</button></div>',
       function(){
         if(!fv('u-amount')){ say('Укажите сумму'); return; }
+        /* 07.09: одна и та же уборка записалась трижды — кнопку нажали несколько
+           раз подряд. Блокируем её на время отправки. */
+        var _b=document.getElementById('f-save');
+        if(_b){ if(_b.disabled) return; _b.disabled=true; _b.textContent='Вносим…'; }
         post({action:'uk_tx',token:TOKEN,property_id:pid,kind:fv('u-kind'),
               amount:fv('u-amount'),category:fv('u-cat'),date:fv('u-date'),
               note:fv('u-note'),receipt:fv('u-rec')}).then(function(r){
           if(r&&r.ok){ document.getElementById('cl-form').innerHTML='';
             document.body.style.overflow=''; loadData(); }
           else say((r&&r.error)||'Не сохранилось');
+        });
+      });
+  }
+  /* Эльнур 07.09: «не могу изменить, удалить». Операция правится и удаляется
+     здесь же, без захода в базу. Удаление мягкое — запись остаётся в истории. */
+  function txById(id){
+    var all=(DATA.properties||[]);
+    for(var i=0;i<all.length;i++){
+      var list=all[i].transactions||[];
+      for(var j=0;j<list.length;j++) if(String(list[j].id)===String(id)) return list[j];
+    }
+    return null;
+  }
+  function ukTxEdit(id){
+    var t=txById(id); if(!t){ say('Операция не найдена'); return; }
+    clForm('<h3>Изменить операцию</h3>'+
+      '<div class="fgrid">'+
+      '<label>Что это<select id="e-kind">'+
+        '<option value="expense"'+(t.kind!=='income'?' selected':'')+'>Расход</option>'+
+        '<option value="income"'+(t.kind==='income'?' selected':'')+'>Доход</option></select></label>'+
+      '<label>Сумма, ฿<input id="e-amount" type="number" min="1" step="100" value="'+(Number(t.amount_thb)||'')+'"></label>'+
+      '<label>Дата<input id="e-date" type="date" value="'+(t.tx_date||'')+'"></label>'+
+      '<label>Статья<input id="e-cat" type="text" value="'+clEsc(t.category||'')+'"></label>'+
+      '<label class="wide">Комментарий<input id="e-note" type="text" value="'+clEsc(t.note||'')+'"></label>'+
+      '</div><div class="fbtns"><button type="button" class="btn" id="f-save">Сохранить</button>'+
+      '<button type="button" class="btn ghost" id="f-cancel">Отмена</button></div>',
+      function(){
+        var b=document.getElementById('f-save'); if(b){ b.disabled=true; b.textContent='Сохраняем…'; }
+        post({action:'uk_tx_update',token:TOKEN,id:id,kind:fv('e-kind'),amount:fv('e-amount'),
+              category:fv('e-cat'),date:fv('e-date'),note:fv('e-note')}).then(function(r){
+          var f=document.getElementById('cl-form');
+          if(r&&r.ok){ if(f){ f.innerHTML=''; document.body.style.overflow=''; } loadData(); }
+          else { if(b){ b.disabled=false; b.textContent='Сохранить'; } say((r&&r.error)||'Не сохранилось'); }
+        });
+      });
+  }
+  function ukTxDelete(id){
+    var t=txById(id);
+    clForm('<h3>Удалить операцию?</h3>'+
+      '<p class="sub">'+(t?(clEsc(t.category||'')+' · '+(Number(t.amount_thb)||0)+' ฿ · '+(t.tx_date||'')):'')+'</p>'+
+      '<div class="fbtns"><button type="button" class="btn" id="f-save">Удалить</button>'+
+      '<button type="button" class="btn ghost" id="f-cancel">Отмена</button></div>',
+      function(){
+        var b=document.getElementById('f-save'); if(b){ b.disabled=true; b.textContent='Удаляем…'; }
+        post({action:'uk_tx_delete',token:TOKEN,id:id}).then(function(r){
+          var f=document.getElementById('cl-form');
+          if(r&&r.ok){ if(f){ f.innerHTML=''; document.body.style.overflow=''; } loadData(); }
+          else { if(b){ b.disabled=false; b.textContent='Удалить'; } say((r&&r.error)||'Не удалилось'); }
         });
       });
   }
@@ -3847,12 +3904,17 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
          'Здесь можно вести карточку, документы и заявки.</p>'+th;
     if(!tx.length){ th+='<div class="empty">Операций за этот период пока нет.</div>'; }
     else{
-      th+='<table><tr><th>Дата</th><th>Операция</th><th class="r">Сумма</th></tr>';
+      var canEdit=(DATA.owner&&DATA.owner.is_staff===true);
+      th+='<table><tr><th>Дата</th><th>Операция</th><th class="r">Сумма</th>'+(canEdit?'<th></th>':'')+'</tr>';
       tx.forEach(function(t){
         var isInc=String(t.kind)==='income';
         th+='<tr><td>'+dmy(t.tx_date)+'</td><td>'+esc(CATS[t.category]||t.category||(isInc?'Доход':'Расход'))+
             (t.note?'<br><span style="color:var(--dim);font-size:12px">'+esc(t.note)+'</span>':'')+'</td>'+
-            '<td class="r '+(isInc?'pos':'neg')+'">'+(isInc?'+':'−')+money(t.amount_thb,cur)+'</td></tr>';
+            '<td class="r '+(isInc?'pos':'neg')+'">'+(isInc?'+':'−')+money(t.amount_thb,cur)+'</td>'+
+            (canEdit?('<td class="r" style="white-space:nowrap">'+
+              '<a href="#" class="lnk" data-txedit="'+t.id+'" title="Изменить">✎</a> '+
+              '<a href="#" class="lnk" data-txdel="'+t.id+'" title="Удалить">🗑</a></td>'):'')+
+            '</tr>';
       });
       th+='</table>';
     }
