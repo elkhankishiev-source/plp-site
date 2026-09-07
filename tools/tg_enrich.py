@@ -94,14 +94,9 @@ async def run(people, want_facts, dry):
         # 2) телефон — единственное надёжное совпадение
         if not hit and phone:
             hit = next((d for d in dialogs if d['phone'] and d['phone'][-9:] == phone[-9:]), None)
-        # 3) по имени — только если совпало И имя, И фамилия: одного «Виктора»
-        #    мало, иначе к Виктору Путило прилетает Виктория
-        if not hit:
-            words = [w.lower() for w in re.split(r'[\s(),]+', p.get('name') or '')
-                     if len(w) > 3 and w.isalpha()]
-            if len(words) >= 2:
-                hit = next((d for d in dialogs
-                            if all(w in d['name'].lower() for w in words[:2])), None)
+        # 3) по имени НЕ ищем вовсе. Эльнур 07.09: «у тебя есть номер телефона,
+        #    ты ищешь по имени такое же и ошибаешься». Тёзки ловились постоянно:
+        #    Виктору Путило доставалась Виктория, Дарье — однофамилица.
         if not hit:
             print('%-14s %-26s — в Telegram не нашёл' % (p['code'], (p.get('name') or '')[:26]))
             continue
