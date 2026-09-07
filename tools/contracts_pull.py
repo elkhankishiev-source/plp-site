@@ -20,7 +20,8 @@ BUCKET = 'client-docs'
 # Ищем во всех рабочих папках, а не только во «Входящих»: договоры Эльнур
 # часто отправлял сам, и часть переписки лежит в архиве и в папке личной почты.
 FOLDERS = ['INBOX', 'Sent', '&BBAEQARFBDgEMgQ4BEAEPgQyBDAEQgRM-',
-           'el.khankishiev@gmail.com', 'Archive', 'Sent Messages', 'Drafts']
+           'el.khankishiev@gmail.com', 'Archive', 'Sent Messages', 'Drafts',
+           'Spam', 'Junk']
 CONTRACT = re.compile(r'contract|agreement|договор|lease|purchase|reservation|schedule|график', re.I)
 
 
