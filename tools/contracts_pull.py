@@ -22,7 +22,14 @@ BUCKET = 'client-docs'
 FOLDERS = ['INBOX', 'Sent', '&BBAEQARFBDgEMgQ4BEAEPgQyBDAEQgRM-',
            'el.khankishiev@gmail.com', 'Archive', 'Sent Messages', 'Drafts',
            'Spam', 'Junk']
-CONTRACT = re.compile(r'contract|agreement|договор|lease|purchase|reservation|schedule|график', re.I)
+# «Agency Agreement» — это НАШ договор с застройщиком, в карточку клиента не кладём
+CONTRACT = re.compile(r'contract|agreement|договор|lease|purchase|reservation|schedule|график|'
+                      r'addendum|дополнительн|booking|s&p|sale', re.I)
+AGENCY = re.compile(r'agency\s*agreement|агентск', re.I)
+# как застройщик сокращает наши проекты в именах файлов
+PROJ_CODE = {'LEGENDARY': 'LEB', 'KATABELLO': 'KAT', 'ESTELLA': 'EST',
+             'HERITAGE': 'HEB', 'SERENITY': 'SEN', 'CIELO': 'CIR',
+             'MODEVA': 'MOB', 'ADORA': 'ADR'}
 
 
 def req(method, path, body=None):
@@ -107,16 +114,41 @@ def handle(M, code, ak, apply):
         print('%-22s не понял проект/юнит' % code)
         return
     proj, unit = parts[1], parts[2]
-    # обходим все рабочие папки: договоры бывают и в отправленных, и в архиве
+    flat = unit.replace('-', '')
+    # Кто владелец — по нему и ищем: в письмах застройщика проект называется
+    # своим кодом («PARK 2_NP»), а вот фамилия клиента и номер юнита есть всегда.
+    owners = []
+    try:
+        rows = req('GET', 'client_objects?select=client_id&object_id=eq.' + code) or []
+        for r in rows[:3]:
+            c = req('GET', 'clients?select=name&client_id=eq.%s&limit=1' % r['client_id'])
+            if c and c[0].get('name'):
+                for w in re.split(r'[\s(),]+', c[0]['name']):
+                    if len(w) > 4 and w.isalpha():
+                        owners.append(w)
+    except Exception:
+        pass
+
+    queries = ['(TEXT "%s" TEXT "%s")' % (proj, unit),
+               '(TEXT "%s" TEXT "%s")' % (proj, flat)]
+    for w in owners[:3]:
+        queries.append('(TEXT "%s" TEXT "%s")' % (w, flat))
+    if len(flat) >= 4:
+        queries.append('TEXT "%s"' % flat)          # номер юнита сам по себе достаточно редкий
+
     found = []
     for box in FOLDERS:
         try:
             typ, _ = M.select('"%s"' % box, readonly=True)
             if typ != 'OK':
                 continue
-            typ, data = M.search(None, '(TEXT "%s" TEXT "%s")' % (proj, unit))
-            for i in (data[0] or b'').split():
-                found.append((box, i))
+            for q in queries:
+                try:
+                    typ, data = M.search(None, q)
+                    for i in (data[0] or b'').split():
+                        found.append((box, i))
+                except Exception:
+                    continue
         except Exception:
             continue
     best = None
@@ -129,23 +161,38 @@ def handle(M, code, ak, apply):
             continue
         for part in m.walk():
             fn = dec(part.get_filename() or '')
-            if not fn.lower().endswith('.pdf') or not CONTRACT.search(fn):
+            if not CONTRACT.search(fn) or AGENCY.search(fn):
+                continue
+            # У застройщика в имени файла стоит код ЕГО проекта: PH-LEB (Legendary),
+            # PH-KAT (Katabello), PH-EST (Estella). Номер юнита сам по себе врёт:
+            # A-606 есть и в Legendary, и в Katabello. Чужой код — файл не наш.
+            other = re.search(r'PH-([A-Z]{3})', fn, re.I)
+            if other and PROJ_CODE.get(proj.upper()) and other.group(1).upper() != PROJ_CODE[proj.upper()]:
+                continue
+            if not re.search(r'\.(pdf|docx?)$', fn, re.I):
                 continue
             payload = part.get_payload(decode=True)
-            if not payload or payload[:4] != b'%PDF':
+            if not payload:
                 continue
-            if best is None or len(payload) > len(best[1]):
-                best = (fn, payload, dec(m.get('Subject')))
+            is_pdf = payload[:4] == b'%PDF'
+            # предпочитаем PDF: его модель прочитает; docx просто сохраним в карточку
+            score = (1 if is_pdf else 0, len(payload))
+            if best is None or score > best[3]:
+                best = (fn, payload, dec(m.get('Subject')), score)
     if not best:
         print('%-22s договоров в письмах нет' % code)
         return
-    fn, payload, subj = best
+    fn, payload, subj, _score = best
     print('%-22s %s (%.1f МБ)' % (code, fn[:52], len(payload) / 1048576))
-    try:
-        f = ask_pdf(payload, ak, unit)
-    except Exception as e:
-        print('      прочитать не вышло:', str(e)[:80])
-        return
+    if payload[:4] != b'%PDF':
+        print('      это не PDF — сохраню в карточку, но читать не буду')
+        f = {}
+    else:
+        try:
+            f = ask_pdf(payload, ak, unit)
+        except Exception as e:
+            print('      прочитать не вышло:', str(e)[:80])
+            f = {}
     plan = f.get('payment_plan') or []
     print('      цена %s · сдача %s · этапов графика %d · подписан %s'
           % (f.get('purchase_price') or '—', f.get('handover_on') or '—', len(plan), f.get('signed_on') or '—'))
