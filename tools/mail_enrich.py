@@ -28,6 +28,14 @@ UNITS = {
     'MBA-509': 'PLP-MODEVA-A509', 'MBD-103': 'PLP-MODEVA-D103',
     'F-105': 'PLP-EDEN-F105', 'K-504': 'PLP-EDEN-K504',
     'BSC-413': 'PLP-BIANCANA-C413',
+    'F-404': 'PLP-EDEN-F404', 'F-412': 'PLP-AYANA-F412', 'A-701': 'PLP-CAPRI-A701',
+    'A-12': 'PLP-ESTELLA-A12', 'M-30': 'PLP-MORI-M30', 'D-301': 'PLP-LEGENDARY-D301',
+    'G-402': 'PLP-BALCONY-G402', 'M-14': 'PLP-QABALAH-M14', '2417': 'PLP-BAYSIDE-2417',
+    'C-202': 'PLP-AYANA-C202', 'F-4': 'PLP-QABALAH-F4', 'A-35': 'PLP-AYANA-A35',
+    'F-3': 'PLP-QABALAH-F3', 'A-36': 'PLP-AYANA-A36', 'M-1': 'PLP-QABALAH-M1',
+    'M-2': 'PLP-QABALAH-M2', 'M-4': 'PLP-QABALAH-M4', 'A-515': 'PLP-SERENITY-A515',
+    'M-3': 'PLP-QABALAH-M3', 'D-306': 'PLP-BALCONY-D306', 'A-507': 'PLP-VIVI-A507',
+    'A-304': 'PLP-VIVI-A304', 'F-2': 'PLP-QABALAH-F2',
 }
 
 SYSTEM = (
@@ -44,6 +52,8 @@ SYSTEM = (
     'ЗАПРЕЩЕНО переносить наши комиссии, агентские бонусы, чеки агентству и '
     'упоминания PPA / Property Library как получателя денег — это внутренняя кухня, '
     'её видит клиент в кабинете.\n'
+    'Если письма явно про ДРУГОЙ проект или другой юнит — верни пустой JSON '
+    '{"facts":[]} и ничего не выдумывай.\n'
     'НЕ утверждать, что клиент недоплатил или что есть долг: в письмах суммы бывают '
     'частичными и без последних поступлений. Такие места писать как '
     '«по письму от <дата> — сверить с графиком».'
@@ -131,13 +141,23 @@ def main():
 
     todo = {a.unit: UNITS[a.unit]} if a.unit else UNITS
     for unit, code in todo.items():
+        # «M-1» или «F-2» встречаются в чужих письмах сотнями. Такой маркер
+        # ищем только вместе с названием проекта, иначе в карточку попадает чужое.
+        project = code.split('-')[1].title() if code.count('-') >= 2 else ''
+        short = len(unit.replace('-', '')) <= 3
         ids = set()
         for v in {unit, unit.replace('-', ' '), unit.replace('-', '')}:
             try:
-                typ, data = M.search(None, 'TEXT', '"%s"' % v)
+                if short and project:
+                    typ, data = M.search(None, '(TEXT "%s" TEXT "%s")' % (project, v))
+                else:
+                    typ, data = M.search(None, 'TEXT', '"%s"' % v)
                 ids |= set((data[0] or b'').split())
             except Exception:
                 pass
+        if short and not project:
+            print('%-22s пропущен: слишком короткий номер юнита' % code)
+            continue
         chunks = []
         for i in list(ids)[-12:]:
             try:
