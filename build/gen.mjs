@@ -854,7 +854,13 @@ function objectPage(o, benchmarks, ratesBy) {
 
   // Материалы застройщика: показываем только то, что реально заполнено в базе,
   // и только http(s) — чтобы мусорное поле не уехало в разметку.
-  const linkOk = (u) => typeof u === 'string' && /^https?:\/\//i.test(u.trim());
+  /* 07.09, канон showcase_privacy: внутренние рабочие ссылки на витрину не выносим.
+     Диск, Dropbox, SharePoint и наше хранилище — это кухня агентства: там лежат
+     прайсы с наличием, комиссии и переписка с застройщиком. Клиенту показываем
+     только публичное: сайт проекта, карту, тур. Раньше 39 страниц объектов
+     публиковали прямую ссылку на папку застройщика. */
+  const PRIVATE_HOST = /(drive\.google|docs\.google|dropbox|sharepoint|onedrive|supabase\.co\/storage)/i;
+  const linkOk = (u) => typeof u === 'string' && /^https?:\/\//i.test(u.trim()) && !PRIVATE_HOST.test(u);
   const matLinks = [
     { u: o.brochure_url, t: 'Сейл-кит и презентация' },
     { u: o.floorplan_url, t: 'Планировки' },

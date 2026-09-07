@@ -22,7 +22,39 @@
       m.setAttribute('content',bg); document.head.appendChild(m);
     }catch(e){}
   }
+  /* Кнопка «поделиться»: на телефоне открывает системное меню, на компьютере
+     кладёт ссылку в буфер и говорит об этом. Эльнур 07.09: «сайтом надо
+     пользоваться, он не просто для красоты». */
+  document.addEventListener('click', function(e){
+    var b = e.target && e.target.closest && e.target.closest('[data-share]');
+    if(!b) return;
+    e.preventDefault();
+    var path = b.getAttribute('data-share') || location.pathname;
+    var url = location.origin + path;
+    var title = b.getAttribute('data-share-title') || document.title;
+    var done = function(){
+      var was = b.textContent;
+      b.textContent = '✓ Ссылка скопирована';
+      b.classList.add('ok');
+      setTimeout(function(){ b.textContent = was; b.classList.remove('ok'); }, 2200);
+    };
+    if(navigator.share){ navigator.share({title:title, url:url}).catch(function(){}); return; }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(url).then(done).catch(function(){ prompt('Скопируйте ссылку:', url); });
+    } else prompt('Скопируйте ссылку:', url);
+  });
   window.paintChrome=paintChrome;
+  /* Адрес без .html: страницы и так открываются коротким адресом, но если
+     человек пришёл по старой ссылке, приводим строку браузера к чистому виду.
+     Эльнур 07.09: «мне не нравится html в адресе, я ни у кого её не видел». */
+  try{
+    var pth=location.pathname;
+    if(/\.html$/.test(pth)){
+      var clean=pth.replace(/index\.html$/,'').replace(/\.html$/,'');
+      if(clean==='') clean='/';
+      history.replaceState(null,'',clean+location.search+location.hash);
+    }
+  }catch(e){}
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',paintChrome);
   else paintChrome();
   try{ matchMedia('(prefers-color-scheme: dark)').addEventListener('change',paintChrome); }catch(e){}
@@ -150,7 +182,7 @@ if(dark) i.src='../img/brand/plp-mark-white.png';})();</script>
   
   <section class="desc"><h2>Об объекте</h2><p>Пул-вилла между Чалонгом и Раваи. 5 спален, 4 санузла, две европейские кухни, домашний офис, большой сад. Дом 400 м², участок 1 864 м². Thai Freehold.</p></section>
   <section class="desc" lang="en"><h2>About</h2><p>Pool villa between Chalong and Rawai. 5 bedrooms, 4 bathrooms, double European kitchen, home office, large garden. Building 400 sq.m, land 1,864 sq.m. Thai Freehold. 39,750,000 THB. Resale.</p></section>
-  <section class="desc"><h2>Материалы застройщика</h2><div class="cta"><a class="btn ghost" href="https://drive.google.com/drive/folders/1vQ5PO7_G--BM4nYvbKd6ietC7T3K1MIH" rel="noopener nofollow" target="_blank">Сейл-кит и презентация</a><a class="btn ghost" href="https://www.phuket.net/property/profile/4366-en/" rel="noopener nofollow" target="_blank">Сайт проекта</a></div></section>
+  <section class="desc"><h2>Материалы застройщика</h2><div class="cta"><a class="btn ghost" href="https://www.phuket.net/property/profile/4366-en/" rel="noopener nofollow" target="_blank">Сайт проекта</a></div></section>
   <div class="cta">
     <a class="btn wa" href="https://wa.me/66955492587?text=%D0%9F%D1%83%D0%BB-%D0%B2%D0%B8%D0%BB%D0%BB%D0%B0%20%D0%A0%D0%B0%D0%B2%D0%B0%D0%B8%2C%205%20%D1%81%D0%BF%D0%B0%D0%BB%D0%B5%D0%BD%20%E2%80%94%20%D0%BF%D0%B5%D1%80%D0%B5%D0%BF%D1%80%D0%BE%D0%B4%D0%B0%D0%B6%D0%B0%20%E2%80%94%20%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D0%B5%D1%81%D1%83%D0%B5%D1%82%20%D1%8D%D1%82%D0%BE%D1%82%20%D0%BE%D0%B1%D1%8A%D0%B5%D0%BA%D1%82.%20https%3A%2F%2Fproperty-library.com%2Fobject%2Fresale-rawai-poolvilla.html" rel="noopener" target="_blank">WhatsApp — узнать детали</a>
     <a class="btn primary" href="../#object=RESALE-RAWAI-POOLVILLA">Открыть карточку на сайте</a>
