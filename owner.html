@@ -6000,12 +6000,17 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
             }),
             onChange:function(ids){
               CTX.lead=ids[0]||null;
-              /* меняем человека — кабинет должен показать его объекты */
-              setTimeout(function(){ try{ loadData(); }catch(e){} }, 0);
+              CTX.obj=null; CTX.objs=[];
               var it=rows.filter(function(c){return String(c.code||c.client_code||c.id)===CTX.lead;})[0];
               CTX.leadName=it?(it.name||''):'';
               ctxNote();
-              ctxNarrow(CTX.lead);
+              /* Сначала дожидаемся данных этого человека, и только потом строим
+                 список объектов — иначе в списке остаются объекты предыдущего. */
+              try{
+                var pr=loadData();
+                if(pr&&pr.then) pr.then(function(){ ctxNarrow(CTX.lead); });
+                else setTimeout(function(){ ctxNarrow(CTX.lead); },400);
+              }catch(e){ ctxNarrow(CTX.lead); }
             }});
         }).catch(function(){});
       }
@@ -6017,28 +6022,18 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
      Сотрудник при этом не теряет остальные: они остаются ниже, с пометкой. */
   function ctxNarrow(code){
     var host=document.getElementById('ctx-obj'); if(!host) return;
-    var all=ctxObjects();
-    if(!code){ CTX.objItems=all; buildCtxObj(all, 'все объекты'); return; }
-    post({action:'client_objects',token:TOKEN,code:code}).then(function(d){
-      var his=(d&&d.rows)||[];
-      if(!his.length){ buildCtxObj(all, 'у человека объектов нет — все объекты'); return; }
-      var byName={};
-      all.forEach(function(x){ byName[String(x.sub).split(' · ').pop()]=x; });
-      var mine=his.map(function(x){
-        var known=byName[x.id];
-        return { id: known?known.id:('pid:'+x.id), title:x.title||x.id,
-                 sub:[x.sub,x.id].filter(Boolean).join(' · ') };
-      });
-      var mineIds={}; mine.forEach(function(m){ mineIds[m.id]=1; });
-      var rest=all.filter(function(x){ return !mineIds[x.id]; })
-                  .map(function(x){ return {id:x.id,title:x.title,sub:x.sub+' · не его'}; });
-      buildCtxObj(mine.concat(rest), 'объекты этого человека');
-      if(mine.length===1 && /^\d+$/.test(mine[0].id)){
-        CTX.obj=Number(mine[0].id); CUR=CTX.obj; ctxNote();
-        try{ renderProp(); renderPortfolio(); }catch(e){}
-      }
-    }).catch(function(){});
+    /* Одна истина: сервер уже вернул объекты выбранного человека,
+       список выбора строим из них же. Эльнур 07.09: «выбрал имя клиента,
+       а в объектах всё равно видны все». Чужих в списке быть не должно. */
+    var mine=ctxObjects();
+    buildCtxObj(mine, code ? (mine.length?'объекты этого человека':'у человека объектов нет')
+                           : 'все объекты');
+    if(code && mine.length===1){
+      CTX.obj=Number(mine[0].id); CUR=CTX.obj; ctxNote();
+      try{ renderProp(); renderPortfolio(); }catch(e){}
+    }
   }
+
   /* Кабинет получает полными только первые объекты — остальные приходят
      заголовком. Выбрали такой объект — подтягиваем его карточку. Эльнур 06.09. */
   function ensureCard(idx, done){
@@ -6473,7 +6468,7 @@ window.openChat=openChat;window.closeChat=closeChat;window.clearChat=clearChat;w
 
     /* Сотрудник выбрал человека в шапке — грузим ЕГО кабинет. Эльнур 07.09:
        «я выбрал клиента, а вижу свои объекты — странно и нелогично». */
-    post({action:'data',token:TOKEN,as_client:(CTX.lead||undefined)}).then(function(d){
+    return post({action:'data',token:TOKEN,as_client:(CTX.lead||undefined)}).then(function(d){
       if(!d||!d.ok){
         try{localStorage.removeItem(LS);localStorage.removeItem(CACHE);}catch(e){}
         TOKEN=null; gateStep('phone');
