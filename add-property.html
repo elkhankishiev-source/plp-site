@@ -1764,6 +1764,24 @@ body{background:var(--bg)}
 /* цена, которую давно не сверяли, — честная пометка вместо молчания */
 .pdate.stale{display:block;color:var(--warn-ink,#b8863b);font-weight:600}
 
+/* Состояние объекта: свёрнутый блок в календаре заездов. Снимки грузятся только
+   при раскрытии и приходят уменьшенными — трафик и хранилище бережём. */
+.statebox{margin-top:12px;border:1px solid rgba(var(--ink-rgb),.12);border-radius:14px;
+  background:var(--warm);padding:0 14px}
+.statebox>summary{list-style:none;cursor:pointer;display:flex;align-items:center;
+  justify-content:space-between;gap:12px;padding:12px 0;font-size:.92rem}
+.statebox>summary::-webkit-details-marker{display:none}
+.statebox>summary::after{content:'▾';color:var(--muted);font-size:.9rem}
+.statebox[open]>summary::after{content:'▴'}
+.statebox>summary .sub{margin:0;font-size:.78rem}
+.statebox>div{padding:0 0 14px}
+.statelist{display:grid;gap:14px}
+.staterow{border-top:1px dashed rgba(var(--ink-rgb),.14);padding-top:10px}
+.statehead{font-size:.86rem;margin-bottom:6px}
+.stateshots{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.stateshots img{flex:0 0 116px;height:86px;object-fit:cover;border-radius:10px;display:block;
+  background:var(--paper)}
+
 /* PLP:UI:END */
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
