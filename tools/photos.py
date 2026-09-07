@@ -139,6 +139,7 @@ def main():
     ap.add_argument('--id', help='PLP-код объекта (иначе берётся из имени папки)')
     ap.add_argument('--kind', choices=list(KINDS), help='считать все файлы одним видом')
     ap.add_argument('--list', action='store_true', help='показать, что уже есть у объектов')
+    ap.add_argument('--report', action='store_true', help='чего не хватает: по объектам на сайте')
     ap.add_argument('--dry', action='store_true', help='только показать план, ничего не менять')
     ap.add_argument('--pdf', help='взять кадры из PDF застройщика (презентация, буклет)')
     a = ap.parse_args()
@@ -156,6 +157,38 @@ def main():
                 'да' if o.get('on_site') else '—',
                 'есть' if o.get('main_image_url') else 'НЕТ',
                 len(g) if isinstance(g, list) else 0, len(gr) if isinstance(gr, list) else 0))
+        return
+
+    # Отчёт по нехватке: что просить у застройщика в первую очередь.
+    # Разделы важны по-разному, поэтому и спрос с них разный.
+    if a.report:
+        rows = st.rest('objects?select=plp_property_id,name,on_site,main_image_url,gallery_urls,photo_groups'
+                       '&on_site=is.true&order=plp_property_id')
+        # обложка засчитывается по main_image_url: у старых карточек её ставили
+        # до того, как появились разделы, и группы cover у них просто нет
+        NEED = [('exterior', 'территория'), ('interior', 'интерьеры'),
+                ('master', 'мастер-план'), ('plans', 'планировки')]
+        holes = []
+        for o in rows:
+            have = {}
+            for grp in (o.get('photo_groups') or []):
+                if isinstance(grp, dict):
+                    have[grp.get('key')] = len(grp.get('urls') or [])
+            if not have and (o.get('gallery_urls') or []):
+                have['exterior'] = len(o['gallery_urls'])   # старые карточки без разделов
+            miss = [ru for k, ru in NEED if not have.get(k)]
+            if not o.get('main_image_url'):
+                miss.insert(0, 'обложка')
+            total = sum(have.values()) + (1 if o.get('main_image_url') and not have.get('cover') else 0)
+            holes.append((total, o['plp_property_id'], (o.get('name') or '')[:30], miss))
+        holes.sort()
+        print('Объекты на сайте: %d. Сначала те, где снимков меньше всего.\n' % len(rows))
+        print('%-22s %-32s %-6s %s' % ('ID', 'название', 'фото', 'чего нет'))
+        for total, pid, name, miss in holes:
+            print('%-22s %-32s %-6d %s' % (pid, name, total, ', '.join(miss) if miss else '— всё есть'))
+        pust = [h for h in holes if h[0] == 0]
+        if pust:
+            print('\nБез единого снимка: %d — с них и начинать.' % len(pust))
         return
 
     # Материалы застройщика часто приходят одним PDF. Достаём встроенные кадры:
