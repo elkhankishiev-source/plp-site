@@ -31,7 +31,39 @@
       m.setAttribute('content',bg); document.head.appendChild(m);
     }catch(e){}
   }
+  /* Кнопка «поделиться»: на телефоне открывает системное меню, на компьютере
+     кладёт ссылку в буфер и говорит об этом. Эльнур 07.09: «сайтом надо
+     пользоваться, он не просто для красоты». */
+  document.addEventListener('click', function(e){
+    var b = e.target && e.target.closest && e.target.closest('[data-share]');
+    if(!b) return;
+    e.preventDefault();
+    var path = b.getAttribute('data-share') || location.pathname;
+    var url = location.origin + path;
+    var title = b.getAttribute('data-share-title') || document.title;
+    var done = function(){
+      var was = b.textContent;
+      b.textContent = '✓ Ссылка скопирована';
+      b.classList.add('ok');
+      setTimeout(function(){ b.textContent = was; b.classList.remove('ok'); }, 2200);
+    };
+    if(navigator.share){ navigator.share({title:title, url:url}).catch(function(){}); return; }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(url).then(done).catch(function(){ prompt('Скопируйте ссылку:', url); });
+    } else prompt('Скопируйте ссылку:', url);
+  });
   window.paintChrome=paintChrome;
+  /* Адрес без .html: страницы и так открываются коротким адресом, но если
+     человек пришёл по старой ссылке, приводим строку браузера к чистому виду.
+     Эльнур 07.09: «мне не нравится html в адресе, я ни у кого её не видел». */
+  try{
+    var pth=location.pathname;
+    if(/\.html$/.test(pth)){
+      var clean=pth.replace(/index\.html$/,'').replace(/\.html$/,'');
+      if(clean==='') clean='/';
+      history.replaceState(null,'',clean+location.search+location.hash);
+    }
+  }catch(e){}
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',paintChrome);
   else paintChrome();
   try{ matchMedia('(prefers-color-scheme: dark)').addEventListener('change',paintChrome); }catch(e){}
@@ -1711,6 +1743,38 @@ body{background:var(--bg)}
   color:rgba(255,255,255,.85);font:inherit;font-size:.95rem;font-weight:600;
   padding:10px 12px;border-radius:11px;cursor:pointer}
 .mnav .msec button.on{background:rgba(255,255,255,.12);color:#fff}
+
+/* Значок оформления и колокольчик — ровные круги, флекс их не сплющивает
+   (Эльнур 07.09: «значок какой-то приплюснутый»). */
+.header .themebtn,.header .bellbtn{flex:0 0 34px;width:34px;height:34px;aspect-ratio:1;
+  border-radius:50%;padding:0;display:inline-flex;align-items:center;justify-content:center;
+  line-height:1}
+@media(max-width:1059px){
+  .header .themebtn,.header .bellbtn{flex:0 0 32px;width:32px;height:32px}
+}
+/* Кнопка «поделиться» рядом с заголовком раздела */
+.share-btn{display:inline-flex;align-items:center;gap:7px;border:1px solid rgba(var(--ink-rgb),.16);
+  background:var(--paper);color:var(--ink);border-radius:999px;padding:7px 13px;font:inherit;
+  font-size:.8rem;font-weight:600;cursor:pointer;margin:0}
+.share-btn:active{transform:scale(.98)}
+.share-btn.ok{background:var(--green);color:var(--on-green);border-color:transparent}
+
+/* поделиться: на телефоне системное меню, на компьютере — копия в буфер */
+
+/* подпись под кнопкой перехода в бот: коротко объясняет, что там будет */
+.tg-hint{max-width:64ch;margin:14px auto 0;font-size:.86rem;line-height:1.55;opacity:.85}
+
+/* FAQ: видно, что раздел раскрывается — подпись и кнопка-плюс, а не голый текст
+   (Эльнур 07.09: «не понятно, что нажать, чтобы оттуда что-то выехало»). */
+.faq-fold>summary{border:1px solid rgba(var(--ink-rgb),.12);border-radius:16px;
+  padding:14px 18px;background:var(--paper)}
+.faq-fold[open]>summary{border-radius:16px 16px 0 0;margin-bottom:0}
+.faq-fold>summary .faq-hint{display:block;margin-top:4px;font-size:.8rem;font-weight:500;
+  color:var(--muted)}
+.faq-fold>summary .chev{width:32px;height:32px;border-radius:50%;background:var(--green);
+  color:var(--on-green);display:inline-flex;align-items:center;justify-content:center;
+  font-size:1.15rem;font-weight:700}
+.faq-fold[open]>summary .chev{transform:rotate(45deg)}
 
 /* PLP:UI:END */
 </style>
