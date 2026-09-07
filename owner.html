@@ -4602,6 +4602,15 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
            (c.portal_status==='requested'?' · <a href="#" class="lnk" id="cl-deny">Отказать</a>':'')+
            '</p>';
       }
+      /* Эльнур 07.09: «а если надо отредактировать, то как?» — правим прямо здесь */
+      if(DATA.owner&&DATA.owner.is_staff===true)
+        h+='<h4>Данные человека</h4>'+
+           '<div class="fgrid">'+
+           '<label>Имя<input id="cp-name" type="text" value="'+clEsc(c.name||'')+'"></label>'+
+           '<label>Телефон<input id="cp-phone" type="text" value="'+clEsc(c.phone||'')+'" placeholder="+66..."></label>'+
+           '<label>Почта<input id="cp-mail" type="text" value="'+clEsc(c.email||'')+'"></label>'+
+           '<label>Telegram id<input id="cp-tg" type="text" value="'+clEsc(c.tg_id||'')+'"></label>'+
+           '</div><p class="sub"><button type="button" class="btn ghost" id="cp-save">Сохранить данные</button></p>';
       h+='<h4>Стадия и пометка</h4>'+
          '<div class="opts tight" id="cl-temp">'+['cold','warm','hot','client','lost'].map(function(t){
            return '<button type="button" class="opt'+(t===c.temp?' on':'')+'" data-v="'+t+'">'+TEMP_RU[t]+'</button>';
@@ -4611,6 +4620,18 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       box.innerHTML=h;
       var win=box.closest('.modal-win'); if(win) win.scrollTop=0;
       document.getElementById('cl-close').onclick=closeClient;
+      var cps=document.getElementById('cp-save');
+      if(cps) cps.onclick=function(){
+        cps.disabled=true; cps.textContent='Сохраняем…';
+        post({action:'client_profile',token:TOKEN,code:code,
+              name:fv('cp-name'),phone:fv('cp-phone'),email:fv('cp-mail'),tg:fv('cp-tg')})
+          .then(function(r){
+            cps.disabled=false; cps.textContent='Сохранить данные';
+            if(r&&r.ok){ openClient(code); loadClients(); }
+            else if(r&&r.error==='phone_taken') say('Этот номер уже стоит у другого человека: '+(r.code||''));
+            else say((r&&r.error)||'Не сохранилось');
+          });
+      };
       document.getElementById('cl-save').onclick=function(){
         var v=document.getElementById('cl-note').value.trim(); if(!v) return;
         post({action:'client_update',token:TOKEN,code:code,note:v}).then(function(){ openClient(code); });
