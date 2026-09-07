@@ -3096,6 +3096,12 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         if(rsl){ e.preventDefault();
           resaleForm(rsl.getAttribute('data-resale'), rsl.getAttribute('data-goal')||''); return; }
         /* правка и удаление операции: строку можно поправить прямо в таблице */
+        var tke=t.closest && t.closest('[data-tkedit]');
+        if(tke){ e.preventDefault(); ukTaskEdit(tke.getAttribute('data-tkedit')); return; }
+        var tkd=t.closest && t.closest('[data-tkdel]');
+        if(tkd){ e.preventDefault(); ukTaskDelete(tkd.getAttribute('data-tkdel')); return; }
+        var dcd=t.closest && t.closest('[data-docdel]');
+        if(dcd){ e.preventDefault(); ukDocDelete(dcd.getAttribute('data-docdel')); return; }
         var ed=t.closest && t.closest('[data-txedit]');
         if(ed){ e.preventDefault(); ukTxEdit(ed.getAttribute('data-txedit')); return; }
         var dl=t.closest && t.closest('[data-txdel]');
@@ -3108,6 +3114,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
           else if(what==='tx') ukTxForm(pid);
           else if(what==='task') ukTaskForm(pid);
           else if(what==='doc') ukDocForm(pid);
+          else if(what==='costs') ukCostsForm(pid);
         }
       });
     }
@@ -3188,6 +3195,94 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
           var f=document.getElementById('cl-form');
           if(r&&r.ok){ if(f){ f.innerHTML=''; document.body.style.overflow=''; } loadData(); }
           else { if(b){ b.disabled=false; b.textContent='Удалить'; } say((r&&r.error)||'Не удалилось'); }
+        });
+      });
+  }
+  /* Эльнур 07.09: «расходы на содержание — по нулям и не написать»,
+     «работы по объекту — не сделано». Здесь всё это заполняется и правится. */
+  function propById(pid){
+    var all=(DATA.properties||[]);
+    for(var i=0;i<all.length;i++) if(String(all[i].id)===String(pid)) return all[i];
+    return all[CUR]||null;
+  }
+  function taskById(id){
+    var all=(DATA.properties||[]);
+    for(var i=0;i<all.length;i++){
+      var l=(all[i].tasks||[]).concat(all[i].tasks_all||[]);
+      for(var j=0;j<l.length;j++) if(String(l[j].id)===String(id)) return l[j];
+    }
+    return null;
+  }
+  function ukCostsForm(pid){
+    var p=propById(pid), co=(p&&p.costs)||{};
+    clForm('<h3>Расходы на содержание</h3>'+
+      '<p class="sub">Ставки владения по объекту. Пустые поля не трогаем.</p>'+
+      '<div class="fgrid">'+
+      '<label>Фонд капремонта, ฿<input id="c-sink" type="number" step="100" value="'+(co.sinking_fund_thb||'')+'"></label>'+
+      '<label>Обслуживание, ฿/м²<input id="c-maint" type="number" step="1" value="'+(co.maintenance_fee_thb_sqm||'')+'"></label>'+
+      '<label>Депозит брони, ฿<input id="c-dep" type="number" step="100" value="'+(co.booking_deposit_thb||'')+'"></label>'+
+      '<label>Сбор за перевод права<input id="c-tr" type="text" value="'+clEsc(co.transfer_fee||'')+'"></label>'+
+      '<label class="wide">Налоги<input id="c-tax" type="text" value="'+clEsc(co.taxes_note||'')+'"></label>'+
+      '<label class="wide">Общая территория<input id="c-com" type="text" value="'+clEsc(co.common_area_fee_note||'')+'"></label>'+
+      '</div><div class="fbtns"><button type="button" class="btn" id="f-save">Сохранить</button>'+
+      '<button type="button" class="btn ghost" id="f-cancel">Отмена</button></div>',
+      function(){
+        var b=document.getElementById('f-save'); if(b){ if(b.disabled) return; b.disabled=true; b.textContent='Сохраняем…'; }
+        post({action:'uk_costs_update',token:TOKEN,property_id:pid,
+              sinking:fv('c-sink'),maintenance:fv('c-maint'),deposit:fv('c-dep'),
+              transfer:fv('c-tr'),taxes:fv('c-tax'),common:fv('c-com')}).then(function(r){
+          var f=document.getElementById('cl-form');
+          if(r&&r.ok){ if(f){ f.innerHTML=''; document.body.style.overflow=''; } loadData(); }
+          else { if(b){ b.disabled=false; b.textContent='Сохранить'; } say((r&&r.error)||'Не сохранилось'); }
+        });
+      });
+  }
+  function ukTaskEdit(id){
+    var t=taskById(id); if(!t){ say('Работа не найдена'); return; }
+    clForm('<h3>Изменить работу</h3>'+
+      '<div class="fgrid">'+
+      '<label>Что<input id="k-kind" type="text" value="'+clEsc(t.kind||'')+'"></label>'+
+      '<label>Когда<input id="k-due" type="date" value="'+(t.due_date||'')+'"></label>'+
+      '<label>Стоимость, ฿<input id="k-cost" type="number" step="100" value="'+(t.cost_thb||'')+'"></label>'+
+      '<label>Исполнитель<input id="k-who" type="text" value="'+clEsc(t.assignee||'')+'"></label>'+
+      '<label class="wide">Комментарий<input id="k-note" type="text" value="'+clEsc(t.note||'')+'"></label>'+
+      '</div><div class="fbtns"><button type="button" class="btn" id="f-save">Сохранить</button>'+
+      '<button type="button" class="btn ghost" id="f-cancel">Отмена</button></div>',
+      function(){
+        var b=document.getElementById('f-save'); if(b){ if(b.disabled) return; b.disabled=true; b.textContent='Сохраняем…'; }
+        post({action:'uk_task_update',token:TOKEN,id:id,kind:fv('k-kind'),due:fv('k-due'),
+              cost:fv('k-cost'),note:fv('k-note'),assignee:fv('k-who')}).then(function(r){
+          var f=document.getElementById('cl-form');
+          if(r&&r.ok){ if(f){ f.innerHTML=''; document.body.style.overflow=''; } loadData(); }
+          else { if(b){ b.disabled=false; b.textContent='Сохранить'; } say((r&&r.error)||'Не сохранилось'); }
+        });
+      });
+  }
+  function ukTaskDelete(id){
+    var t=taskById(id);
+    clForm('<h3>Снять работу?</h3><p class="sub">'+(t?clEsc(t.kind||''):'')+'</p>'+
+      '<div class="fbtns"><button type="button" class="btn" id="f-save">Снять</button>'+
+      '<button type="button" class="btn ghost" id="f-cancel">Отмена</button></div>',
+      function(){
+        var b=document.getElementById('f-save'); if(b){ b.disabled=true; b.textContent='Снимаем…'; }
+        post({action:'uk_task_delete',token:TOKEN,id:id}).then(function(r){
+          var f=document.getElementById('cl-form');
+          if(r&&r.ok){ if(f){ f.innerHTML=''; document.body.style.overflow=''; } loadData(); }
+          else { if(b){ b.disabled=false; b.textContent='Снять'; } say((r&&r.error)||'Не вышло'); }
+        });
+      });
+  }
+  function ukDocDelete(id){
+    clForm('<h3>Убрать документ из карточки?</h3>'+
+      '<p class="sub">Файл останется в хранилище, из списка пропадёт.</p>'+
+      '<div class="fbtns"><button type="button" class="btn" id="f-save">Убрать</button>'+
+      '<button type="button" class="btn ghost" id="f-cancel">Отмена</button></div>',
+      function(){
+        var b=document.getElementById('f-save'); if(b){ b.disabled=true; b.textContent='Убираем…'; }
+        post({action:'uk_doc_delete',token:TOKEN,id:id}).then(function(r){
+          var f=document.getElementById('cl-form');
+          if(r&&r.ok){ if(f){ f.innerHTML=''; document.body.style.overflow=''; } loadData(); }
+          else { if(b){ b.disabled=false; b.textContent='Убрать'; } say((r&&r.error)||'Не вышло'); }
         });
       });
   }
@@ -3992,8 +4087,10 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         kh+='<tr><td>'+dmy(t.due_date)+'</td><td>'+esc(KINDS[t.kind]||t.kind||'—')+
             (t.note?'<br><span style="color:var(--dim);font-size:12px">'+esc(t.note)+'</span>':'')+
             '</td><td class="r">'+(t.cost_thb?money(t.cost_thb,cur):'—')+'</td>'+
-            (isStaff?('<td class="r"><a href="#" class="lnk tk-done" data-id="'+(t.id||'')+
-              '" data-cost="'+(t.cost_thb||'')+'">выполнено</a></td>'):'')+'</tr>';
+            (isStaff?('<td class="r" style="white-space:nowrap">'+
+              '<a href="#" class="lnk tk-done" data-id="'+(t.id||'')+'" data-cost="'+(t.cost_thb||'')+'">✔</a> '+
+              '<a href="#" class="lnk" data-tkedit="'+(t.id||'')+'" title="Изменить">✎</a> '+
+              '<a href="#" class="lnk" data-tkdel="'+(t.id||'')+'" title="Снять">🗑</a></td>'):'')+'</tr>';
       });
       kh+='</table>';
     }
@@ -4025,6 +4122,10 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     ch+=line('Депозит брони',has(co.booking_deposit_thb)?money(co.booking_deposit_thb,'THB'):null);
     ch+=line('Налоги',co.taxes_note);
     ch+=line('Общая территория',co.common_area_fee_note);
+    if(!ch) ch='<div class="empty">Ставки владения пока не заполнены.</div>';
+    if(DATA.owner&&DATA.owner.is_staff===true)
+      ch+='<p class="sub"><a href="#" class="lnk" data-uk="costs" data-pid="'+(p.id||'')+
+          '">Заполнить или изменить</a> — фонд капремонта, обслуживание, сборы, налоги.</p>';
     H+=card('Расходы на содержание', '<p class="hintline">Это не операции, а ставки владения: фонд капремонта, обслуживание за м², сборы и налоги. Фактические траты за период — в разделе «Финансы».</p>'+ch, 'sec-costs');
 
     // договор
@@ -4060,10 +4161,12 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
                invoice:'счёт',photo:'фото',other:'документ'};
     if(!dcs.length){ dch='<div class="empty">Документов пока нет.</div>'; }
     else{
-      dch='<table><tr><th>Что</th><th>Вид</th><th>Когда</th></tr>';
+      var canDoc=(DATA.owner&&DATA.owner.is_staff===true);
+      dch='<table><tr><th>Что</th><th>Вид</th><th>Когда</th>'+(canDoc?'<th></th>':'')+'</tr>';
       dcs.forEach(function(d){
         dch+='<tr><td><a href="'+d.url+'" target="_blank" rel="noopener">'+esc(d.title||'документ')+
-             '</a></td><td>'+(DKIND[d.kind]||d.kind||'—')+'</td><td>'+dmy(d.created_at)+'</td></tr>';
+             '</a></td><td>'+(DKIND[d.kind]||d.kind||'—')+'</td><td>'+dmy(d.created_at)+'</td>'+
+             (canDoc?('<td class="r"><a href="#" class="lnk" data-docdel="'+(d.id||'')+'" title="Убрать">🗑</a></td>'):'')+'</tr>';
       });
       dch+='</table>';
     }
