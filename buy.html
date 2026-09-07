@@ -5252,7 +5252,10 @@ function toggleCmp(pid){
   syncCardStates();updateTray();
 }
 function syncCardStates(){
-  document.querySelectorAll('#saleCar .prop, #rentCar .prop').forEach(function(el){
+  /* 07.09: обновлялись только карточки в двух каруселях главной, поэтому
+     в каталоге и на страницах разделов кнопки «в избранное» и «сравнить»
+     нажимались, но вид не менялся — выглядело как мёртвая кнопка. */
+  document.querySelectorAll('.prop').forEach(function(el){
     var pid=el.dataset.pid;
     var f=el.querySelector('.fav'),c=el.querySelector('.cmpb');
     if(f){var on=FAVS.has(pid);f.classList.toggle('on',on);f.textContent=on?'♥':'♡';}
