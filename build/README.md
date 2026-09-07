@@ -105,3 +105,25 @@ Supabase, править руками бессмысленно (перезатр
 - колокольчик лежит в общей шапке скрытым, кабинет показывает его сам.
 
 Порядок полной пересборки: `mkshared` → `gen` → `mkpages` → `mkdistricts` → `mkextra`.
+
+## Фотографии объектов — `tools/photos.py`
+
+```bash
+python3 tools/photos.py ~/Downloads/PLP-HERITAGE      # имя папки = код объекта
+python3 tools/photos.py ~/Downloads/фото --id PLP-AYANA
+python3 tools/photos.py ~/Downloads/планировки --id PLP-AYANA --kind plans
+python3 tools/photos.py --list                        # у кого что уже есть
+python3 tools/photos.py <папка> --id <код> --dry      # только показать план
+```
+
+Вид снимка определяется сам — по подпапке или имени файла: обложка, территория,
+интерьеры, инфраструктура, мастер-план, планировки, ход стройки. В хранилище
+файлы ложатся по адресу `objects/<PLP-ID>/<вид>/<хеш>.jpg`, одинаковые не
+заливаются дважды. Карточка объекта дополняется, а не переписывается: обложка
+ставится только если её нет, галерея и группы снимков пополняются без дублей,
+ход стройки уходит в `build_progress`.
+
+После заливки — `node build/all.mjs`, и фото появляются на сайте.
+
+Канон целиком: `canon_rules` → `catalog/media_upload_standard` и
+`catalog/object_fill_priority`.
