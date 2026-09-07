@@ -3611,12 +3611,20 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     })() : '<span class="sm">за '+yr+' год</span>';
 
     function card(k,v,note){ return '<div class="kpi"><div class="k">'+k+'</div><div class="v">'+v+'</div><div class="n">'+note+'</div></div>'; }
-    /* при выбранном объекте показываем его деньги, а не сводку по портфелю */
-    var inc = one ? ((one.current&&one.current.income)||0) : t.income;
-    var pay = one ? (function(){
-        var st=(one.statements||[])[0];
-        return st ? (Number(st.net)||0) : null;
-      })() : t.payout;
+    /* при выбранном объекте показываем его деньги, а не сводку по портфелю;
+       отмечено несколько — складываем. 07.09: здесь оставалась переменная от
+       старой версии, из-за неё вся сводка падала и показатели не рисовались. */
+    var inc, pay;
+    if (picked.length) {
+      inc = 0; pay = null;
+      picked.forEach(function(x){
+        inc += (x.current && x.current.income) || 0;
+        var st = (x.statements || [])[0];
+        if (st) pay = (pay || 0) + (Number(st.net) || 0);
+      });
+    } else {
+      inc = t.income; pay = t.payout;
+    }
     return card('Доход в '+yr, curY?money(curY,'THB'):money(inc,'THB'), dyn)+
       card('Загрузка', load+'%', '<span class="sm">'+busy+' ноч. забронировано</span>')+
       card('Средняя ставка', adr?money(adr,'THB'):'—', '<span class="sm">за занятую ночь</span>')+
@@ -4786,6 +4794,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         if(!rows.length){
           host.innerHTML='<p class="sub">Снимков пока нет. Мы фотографируем объект перед заездом '+
             'и после выезда — так видно, что он в порядке.</p>'+staffAddBtn(pid);
+          bindStateAdd(pid);   /* кнопка нужна и когда снимков ещё нет — иначе она мёртвая */
           return;
         }
         var KIND={checkin:'перед заездом',checkout:'после выезда',routine:'плановый осмотр'};
