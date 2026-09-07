@@ -92,12 +92,23 @@ def ensure_object(code, name, district):
     return True
 
 
+def from_file(path):
+    """Второй и последующие списки Эльнура живут в tools/units_owners.json."""
+    d = json.load(open(path, encoding='utf-8'))
+    rows = [(o['code'], o['name'], o['district'], o['who'], o['phone'], o.get('rel', 'owns'), o.get('note', ''))
+            for o in d.get('owners', [])]
+    extra = d.get('people', [])
+    return rows, extra
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--dry', action='store_true')
+    ap.add_argument('--file', help='список из json (tools/units_owners.json)')
     a = ap.parse_args()
 
-    for code, name, district, who, phone, rel, note in ROWS:
+    rows, extra_people = (from_file(a.file) if a.file else (ROWS, []))
+    for code, name, district, who, phone, rel, note in rows:
         if a.dry:
             print('%-22s → %-16s %-16s %s' % (code, who, phone, rel))
             continue
@@ -123,6 +134,27 @@ def main():
             act = 'связь создана'
         print('%-22s %-14s %s · %s%s' % (code, cl['code'], who, act, ' + карточка' if made else ''))
 
+    # вторые люди в тех же сделках: супруги, партнёры
+    for p in extra_people:
+        if a.dry:
+            print('%-22s → %s' % (', '.join(p['objects']), p['who']))
+            continue
+        r = rpc('client_resolve', {'p_channel': 'wa', 'p_handle': p['phone'], 'p_name': p['who'],
+                                   'p_source': 'личные сделки Эльнура'})
+        cl = r[0] if isinstance(r, list) else r
+        full = req('GET', 'clients?select=client_id,code&code=eq.' + cl['code'] + '&limit=1')[0]
+        for o in p['objects']:
+            if req('GET', 'client_objects?select=id&client_id=eq.%s&object_id=eq.%s&limit=1' % (full['client_id'], o)):
+                continue
+            obj = req('GET', 'objects?select=name&plp_property_id=eq.' + o + '&limit=1')
+            nm = obj[0]['name'] if obj else o
+            proj, unit = (nm.split(' · ') + [''])[:2]
+            req('POST', 'client_objects', {'client_id': full['client_id'], 'object_id': o, 'unit': unit,
+                                           'project_name': proj, 'rel': p.get('rel', 'owns'), 'note': p.get('note', '')})
+        print('%-22s %-14s %s · связан' % (', '.join(p['objects'])[:22], cl['code'], p['who']))
+
+    if a.file:
+        return
     for code, name, district, note in ORPHANS:
         if a.dry:
             print('%-22s → без владельца' % code)

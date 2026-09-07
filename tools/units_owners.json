@@ -1,0 +1,83 @@
+{
+  "_": "Кто чей юнит — со слов Эльнура. Файл читает tools/link_units.py. Телефон в формате +7...; 'email:адрес' — если телефона нет.",
+  "owners": [
+    {"code": "PLP-EDEN-F404", "name": "Gardens of Eden · F-404", "district": "Bang Tao",
+     "who": "Екатерина Черных", "phone": "+79661520001", "rel": "owns",
+     "note": "Eden Residence F-404, первая фаза. Переписка в личном WhatsApp Эльнура. Муж — Андрей Черных (+79660058080). Прилетали 24 октября 2024. Дети: Захар 15 лет (международная школа, английский разговорный, занимается с репетитором), Лиза 11 лет в декабре, 5 класс (английский слабее), Злата 7 лет, 1 класс (английский слабее)."},
+
+    {"code": "PLP-AYANA-F412", "name": "Ayana Heights · F-412", "district": "Phuket",
+     "who": "Виктор Кузьминков", "phone": "+79161016368", "rel": "owns",
+     "note": "Друг Евгения (+79265563838), который купил Capri A-701."},
+
+    {"code": "PLP-CAPRI-A701", "name": "Capri · A-701", "district": "Rawai",
+     "who": "Евгений", "phone": "+79265563838", "rel": "owns",
+     "note": "Застройщик Fantasy Plus. Друг Виктора Кузьминкова (+79161016368)."},
+
+    {"code": "PLP-ESTELLA-A12", "name": "The Title Villa Estella · A-12", "district": "Nai Yang",
+     "who": "Дарья", "phone": "+995595002662", "rel": "owns",
+     "note": "Второй объект — MORI M-30. Муж Артур (+995599153269)."},
+    {"code": "PLP-MORI-M30", "name": "MORI · M-30", "district": "Bang Tao",
+     "who": "Дарья", "phone": "+995595002662", "rel": "owns",
+     "note": "Второй объект Дарьи. Муж Артур (+995599153269)."},
+
+    {"code": "PLP-LEGENDARY-D301", "name": "Legendary · D-301", "district": "Bang Tao",
+     "who": "Александр (A2Fitness)", "phone": "+77075251180", "rel": "owns",
+     "note": "Куплен НЕ через нас — ведём для учёта. Второй объект — Balcony G-402. Старый номер +77074088887, похоже, не работает."},
+    {"code": "PLP-BALCONY-G402", "name": "The BALCONY · G-402", "district": "Nai Yang",
+     "who": "Александр (A2Fitness)", "phone": "+77075251180", "rel": "owns",
+     "note": "Второй объект. Старый номер +77074088887, похоже, не работает."},
+
+    {"code": "PLP-QABALAH-M14", "name": "Villa Qabalah · M-14", "district": "Bang Tao",
+     "who": "Владислав Коваленко", "phone": "+79219278292", "rel": "owns",
+     "note": "Две спальни. Посоветовал друга Владимира (+79145501668), который купил Bayside Laguna 2417."},
+
+    {"code": "PLP-BAYSIDE-2417", "name": "Bayside Laguna · 2417", "district": "Bang Tao",
+     "who": "Владимир", "phone": "+79145501668", "rel": "owns",
+     "note": "Пришёл по совету Владислава Коваленко. Предложить The Standard — анонс 2 октября."},
+
+    {"code": "PLP-AYANA-C202", "name": "Ayana Heights · C-202", "district": "Phuket",
+     "who": "Гульнара", "phone": "+77015441915", "rel": "owns",
+     "note": "Муж Бек: +77000707079, второй номер +77019798079."},
+
+    {"code": "PLP-QABALAH-F4", "name": "Villa Qabalah · F-4", "district": "Bang Tao",
+     "who": "Егор Голубенко", "phone": "+79137476758", "rel": "owns",
+     "note": "Второй объект — Ayana A-35. На связь не выходит: попробовать Telegram. Почта iegor.error@gmail.com."},
+    {"code": "PLP-AYANA-A35", "name": "Ayana Heights · A-35", "district": "Phuket",
+     "who": "Егор Голубенко", "phone": "+79137476758", "rel": "owns",
+     "note": "Второй объект Егора. На связь не выходит: попробовать Telegram."},
+
+    {"code": "PLP-QABALAH-F3", "name": "Villa Qabalah · F-3", "district": "Bang Tao",
+     "who": "Юлия Науменко", "phone": "+31615501509", "rel": "owns",
+     "note": "Второй объект — Ayana A-36 (вилла). Второй номер +393491585284 в блоке, но переписка там есть."},
+    {"code": "PLP-AYANA-A36", "name": "Ayana Heights · A-36", "district": "Phuket",
+     "who": "Юлия Науменко", "phone": "+31615501509", "rel": "owns",
+     "note": "Второй объект Юлии. Второй номер +393491585284 в блоке, но переписка там есть."},
+
+    {"code": "PLP-QABALAH-M1", "name": "Villa Qabalah · M-1", "district": "Bang Tao",
+     "who": "Виталий", "phone": "+79145582324", "rel": "owns",
+     "note": "Клиент Елены из Income Asia. Всего три виллы: M-1, M-2, M-4."},
+    {"code": "PLP-QABALAH-M2", "name": "Villa Qabalah · M-2", "district": "Bang Tao",
+     "who": "Виталий", "phone": "+79145582324", "rel": "owns",
+     "note": "Клиент Елены из Income Asia. Всего три виллы: M-1, M-2, M-4."},
+    {"code": "PLP-QABALAH-M4", "name": "Villa Qabalah · M-4", "district": "Bang Tao",
+     "who": "Виталий", "phone": "+79145582324", "rel": "owns",
+     "note": "Клиент Елены из Income Asia. Всего три виллы: M-1, M-2, M-4."},
+
+    {"code": "PLP-SERENITY-A515", "name": "The Title Serenity · A-515", "district": "Nai Yang",
+     "who": "Максим Музырин", "phone": "+79137486644", "rel": "owns", "note": ""},
+
+    {"code": "PLP-QABALAH-M3", "name": "Villa Qabalah · M-3", "district": "Bang Tao",
+     "who": "Айрат Ямаев", "phone": "+79139139887", "rel": "owns",
+     "note": "Клиент не наш — держим как владельца на будущее. Жена Анна Ямаева (+79612246008)."}
+  ],
+  "people": [
+    {"who": "Андрей Черных", "phone": "+79660058080", "objects": ["PLP-EDEN-F404"], "rel": "owns",
+     "note": "Муж Екатерины (+79661520001). Второй номер +447867961531. Хочет виллу примерно в 2027 — сейчас два года платит ипотеку в Москве. Вернуться к разговору ближе к сроку."},
+    {"who": "Бек", "phone": "+77000707079", "objects": ["PLP-AYANA-C202"], "rel": "owns",
+     "note": "Муж Гульнары (+77015441915). Второй номер +77019798079."},
+    {"who": "Артур", "phone": "+995599153269", "objects": ["PLP-ESTELLA-A12", "PLP-MORI-M30"], "rel": "owns",
+     "note": "Муж Дарьи (+995595002662)."},
+    {"who": "Анна Ямаева", "phone": "+79612246008", "objects": ["PLP-QABALAH-M3"], "rel": "owns",
+     "note": "Жена Айрата Ямаева (+79139139887). Клиент не наш, держим на будущее."}
+  ]
+}
