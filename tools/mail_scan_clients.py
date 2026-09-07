@@ -19,7 +19,8 @@ SKIP = {'PLP-001555', 'PLP-004198'}
 # Ищем во всех рабочих папках, а не только во «Входящих»: договоры Эльнур
 # часто отправлял сам, и часть переписки лежит в архиве и в папке личной почты.
 FOLDERS = ['INBOX', 'Sent', '&BBAEQARFBDgEMgQ4BEAEPgQyBDAEQgRM-',
-           'el.khankishiev@gmail.com', 'Archive', 'Sent Messages', 'Drafts']
+           'el.khankishiev@gmail.com', 'Archive', 'Sent Messages', 'Drafts',
+           'Spam', 'Junk']
 DOC = re.compile(r'\.(pdf|docx?|xlsx?|jpg|jpeg|png)$', re.I)
 CONTRACT = re.compile(r'contract|agreement|договор|lease|sale|purchase|reservation|бронир', re.I)
 MONEY = re.compile(r'invoice|payment|счёт|счет|платёж|платеж|schedule|график', re.I)
