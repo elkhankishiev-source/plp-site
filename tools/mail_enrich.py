@@ -185,11 +185,11 @@ def main():
             if not row.get('purchase_price') and f.get('purchase_price'):
                 patch['purchase_price'] = f['purchase_price']
                 patch['currency'] = f.get('currency') or 'THB'
-            for k in ('handover_on', 'next_payment_on', 'stage', 'payment_plan'):
+            # Стадию и платежи из переписки НЕ берём: там частичные суммы,
+            # старые инвойсы и уже закрытые ультиматумы. Только договор — источник.
+            for k in ('handover_on',):
                 if not row.get(k) and f.get(k):
                     patch[k] = f[k]
-            if not row.get('next_payment_amount') and f.get('next_payment_amount'):
-                patch['next_payment_amount'] = f['next_payment_amount']
             facts = ' · '.join(str(x) for x in (f.get('facts') or [])[:4])
             if facts:
                 patch['note'] = ((row.get('note') or '') + '\nИз переписки: ' + facts).strip()
