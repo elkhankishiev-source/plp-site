@@ -204,7 +204,11 @@ def main():
         except ImportError:
             sys.exit('нужен модуль PyMuPDF: pip3 install pymupdf')
         dst = pathlib.Path('/tmp/plp_pdf_shots'); dst.mkdir(exist_ok=True)
-        for old in dst.iterdir(): old.unlink()
+        # 07.09: падало с PermissionError, если внутри остались подпапки от
+        # прошлого отбора (exterior/facilities/plans). Чистим и файлы, и папки.
+        import shutil
+        for old in dst.iterdir():
+            shutil.rmtree(old) if old.is_dir() else old.unlink()
         doc = fitz.open(src)
         seen, got = set(), 0
         for i, page in enumerate(doc):
