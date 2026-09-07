@@ -3555,8 +3555,13 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     var periodNights=(d0&&d1)?Math.max(1,Math.round((d1-d0)/86400000)):30;
     /* Эльнур 06.09: «меняю объект, а цифры те же». Показатели считались всегда
        по всему портфелю. Выбран конкретный объект — считаем по нему. */
-    var one = (typeof CTX!=='undefined' && CTX.obj!=null) ? (DATA.properties||[])[CTX.obj] : null;
-    var scope = one ? [one] : (DATA.properties||[]);
+    /* Отмечено несколько объектов — считаем сумму по ним; один — по нему;
+       ничего не отмечено — по всему портфелю (Эльнур 07.09). */
+    var all=(DATA.properties||[]);
+    var picked=(typeof CTX!=='undefined' && CTX.objs && CTX.objs.length)
+      ? CTX.objs.map(function(i){ return all[i]; }).filter(Boolean)
+      : ((typeof CTX!=='undefined' && CTX.obj!=null && all[CTX.obj]) ? [all[CTX.obj]] : []);
+    var scope = picked.length ? picked : all;
     var props=Math.max(1, scope.length);
 
     var busy=0, revenue=0;
@@ -5829,7 +5834,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   /* ===== КОНТЕКСТ РАБОТЫ: человек → его объект =====
      Эльнур 05.09: «сотрудник заходит, выбирает лида, выбирает его объект — и мы
      работаем с конкретной информацией». Выбор живёт наверху и виден всегда. */
-  var CTX={lead:null, leadName:'', obj:null, asOwner:null, asName:''};
+  var CTX={lead:null, leadName:'', obj:null, objs:[], asOwner:null, asName:''};
   function ctxIsStaff(){ return !!(DATA && DATA.owner && DATA.owner.is_staff===true); }
   /* Список людей нужен и контекст-бару, и форме заявки — тянем его один раз.
      Раньше уходило два одинаковых запроса по 300 человек на каждом входе. */
@@ -5860,10 +5865,15 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     var host=document.getElementById('ctx-obj');
     if(host && !host.__built){
       host.__built=1;
-      pickList(host,{ multi:false, placeholder:'все объекты', items:ctxObjects(),
+      /* Эльнур 07.09: «если у него 10 объектов и надо посчитать общий доход —
+         не открывать же каждый и складывать самому». Отмечаем несколько —
+         показатели считаются по отмеченным. */
+      pickList(host,{ multi:true, placeholder:'все объекты', items:ctxObjects(),
         onChange:function(ids){
-          CTX.obj=ids.length?Number(ids[0]):null;
+          CTX.objs = ids.map(Number).filter(function(x){ return !isNaN(x); });
+          CTX.obj = CTX.objs.length===1 ? CTX.objs[0] : null;
           if(CTX.obj!=null){ CUR=CTX.obj; }
+          else if(CTX.objs.length) CUR=CTX.objs[0];
           ctxNote();
           try{ renderProp(); renderPortfolio(); }catch(e){}
         }});
@@ -5890,6 +5900,8 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
             }),
             onChange:function(ids){
               CTX.lead=ids[0]||null;
+              /* меняем человека — кабинет должен показать его объекты */
+              setTimeout(function(){ try{ loadData(); }catch(e){} }, 0);
               var it=rows.filter(function(c){return String(c.code||c.client_code||c.id)===CTX.lead;})[0];
               CTX.leadName=it?(it.name||''):'';
               ctxNote();
@@ -5959,10 +5971,18 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   }
   function ctxNote(){
     var n=document.getElementById('ctx-note'); if(!n) return;
-    var parts=[];
-    if(ctxIsStaff()) parts.push(CTX.lead?('человек: '+(CTX.leadName||CTX.lead)):'человек не выбран');
-    var p=(DATA.properties||[])[CTX.obj!=null?CTX.obj:CUR];
-    parts.push(p?('объект: '+(p.name||p.id)):'объект не выбран');
+    var parts=[], all=(DATA.properties||[]);
+    if(ctxIsStaff()){
+      var vw=(DATA.owner&&DATA.owner.viewing);
+      parts.push(vw ? ('смотрите кабинет: '+(vw.name||vw.code))
+                    : (CTX.lead?('человек: '+(CTX.leadName||CTX.lead)):'человек не выбран'));
+    }
+    if(CTX.objs && CTX.objs.length>1){
+      parts.push('объектов выбрано: '+CTX.objs.length+' — показатели суммируются');
+    } else {
+      var p=all[CTX.obj!=null?CTX.obj:CUR];
+      parts.push(p?('объект: '+(p.name||p.id)):'объект не выбран');
+    }
     n.textContent=parts.join(' · ');
   }
 
@@ -6351,7 +6371,9 @@ window.openChat=openChat;window.closeChat=closeChat;window.clearChat=clearChat;w
       },4000);
     }
 
-    post({action:'data',token:TOKEN}).then(function(d){
+    /* Сотрудник выбрал человека в шапке — грузим ЕГО кабинет. Эльнур 07.09:
+       «я выбрал клиента, а вижу свои объекты — странно и нелогично». */
+    post({action:'data',token:TOKEN,as_client:(CTX.lead||undefined)}).then(function(d){
       if(!d||!d.ok){
         try{localStorage.removeItem(LS);localStorage.removeItem(CACHE);}catch(e){}
         TOKEN=null; gateStep('phone');
