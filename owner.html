@@ -1779,6 +1779,24 @@ body{background:var(--bg)}
 /* цена, которую давно не сверяли, — честная пометка вместо молчания */
 .pdate.stale{display:block;color:var(--warn-ink,#b8863b);font-weight:600}
 
+/* Состояние объекта: свёрнутый блок в календаре заездов. Снимки грузятся только
+   при раскрытии и приходят уменьшенными — трафик и хранилище бережём. */
+.statebox{margin-top:12px;border:1px solid rgba(var(--ink-rgb),.12);border-radius:14px;
+  background:var(--warm);padding:0 14px}
+.statebox>summary{list-style:none;cursor:pointer;display:flex;align-items:center;
+  justify-content:space-between;gap:12px;padding:12px 0;font-size:.92rem}
+.statebox>summary::-webkit-details-marker{display:none}
+.statebox>summary::after{content:'▾';color:var(--muted);font-size:.9rem}
+.statebox[open]>summary::after{content:'▴'}
+.statebox>summary .sub{margin:0;font-size:.78rem}
+.statebox>div{padding:0 0 14px}
+.statelist{display:grid;gap:14px}
+.staterow{border-top:1px dashed rgba(var(--ink-rgb),.14);padding-top:10px}
+.statehead{font-size:.86rem;margin-bottom:6px}
+.stateshots{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.stateshots img{flex:0 0 116px;height:86px;object-fit:cover;border-radius:10px;display:block;
+  background:var(--paper)}
+
 /* PLP:UI:END */
 </style>
 <!-- Leaflet подгружается только при открытии раздела с картой: см. ensureLeaflet() -->
@@ -3860,6 +3878,12 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     if(DATA.owner&&DATA.owner.is_staff===true)
       bh+='<p class="sub"><a href="#" class="lnk" data-uk="book" data-pid="'+(p.id||'')+
           '">Поставить бронь</a> — даты, гость, сумма и канал. Пересечение дат система не пропустит.</p>';
+    /* Эльнур 07.09: собственник спрашивает «сдаётся ли объект и цел ли он».
+       Ответ живёт здесь же, рядом с заездами: снимки до заезда и после выезда
+       с датами. Показываем свёрнутой строкой — страницу не раздуваем. */
+    bh+='<details class="statebox" id="state-box"><summary>'+
+        '<b>Состояние объекта</b><span class="sub" id="state-sum">фото до заезда и после выезда</span>'+
+        '</summary><div id="state-body"><p class="sub">Загружаем…</p></div></details>';
     H+=card('Календарь заездов', bh, 'sec-calendar');
 
     /* Эльнур 06.09: «перепродажа отдельным пунктом — странно, это то же самое,
@@ -3993,7 +4017,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       '<div id="doc-parsed"></div>';
     H+=card('Документы объекта', dch, 'sec-docs');
 
-    setTimeout(function(){ try{ bindDocUpload(p.id||''); }catch(e){} }, 0);
+    setTimeout(function(){ try{ bindDocUpload(p.id||''); bindStateBox(p.id||''); }catch(e){} }, 0);
     CARD_N=0;
     $('prop').innerHTML=H;
     bindFolds();
@@ -4746,6 +4770,82 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         docPoll(docId, n+1);
       }).catch(function(){ docPoll(docId, n+1); });
     }, 5000);
+  }
+  /* Состояние объекта: список проверок с фото. Ссылки на снимки подписанные и
+     живут час — наружу не утекают. Грузим только когда человек раскрыл блок,
+     чтобы не жечь трафик зря. */
+  function bindStateBox(pid){
+    var box=document.getElementById('state-box'); if(!box || box.__wired) return;
+    box.__wired=1;
+    box.addEventListener('toggle', function(){
+      if(!box.open || box.__loaded) return;
+      box.__loaded=1;
+      post({action:'check_list',token:TOKEN,property_id:pid}).then(function(r){
+        var rows=(r&&r.rows)||[], host=document.getElementById('state-body');
+        if(!host) return;
+        if(!rows.length){
+          host.innerHTML='<p class="sub">Снимков пока нет. Мы фотографируем объект перед заездом '+
+            'и после выезда — так видно, что он в порядке.</p>'+staffAddBtn(pid);
+          return;
+        }
+        var KIND={checkin:'перед заездом',checkout:'после выезда',routine:'плановый осмотр'};
+        var h='<div class="statelist">';
+        rows.forEach(function(x){
+          h+='<div class="staterow"><div class="statehead">'+
+             '<b>'+clDate(x.checked_on)+'</b> · '+(KIND[x.kind]||x.kind)+
+             (x.damages?' · <span class="tmp t-lost">есть замечания</span>':'')+
+             '</div>'+
+             (x.note?('<p class="sub">'+clEsc(x.note)+'</p>'):'')+
+             '<div class="stateshots">'+
+             (x.urls||[]).map(function(u){
+               return '<a href="'+u+'" target="_blank" rel="noopener"><img src="'+u+'" alt="" loading="lazy" decoding="async"></a>';
+             }).join('')+'</div></div>';
+        });
+        host.innerHTML=h+'</div>'+staffAddBtn(pid);
+        var sum=document.getElementById('state-sum');
+        if(sum) sum.textContent='последняя проверка '+clDate(rows[0].checked_on);
+        bindStateAdd(pid);
+      });
+    });
+  }
+  function staffAddBtn(pid){
+    if(!(DATA.owner&&DATA.owner.is_staff===true)) return '';
+    return '<div class="fbtns" style="margin-top:10px">'+
+      '<input id="st-file" type="file" accept="image/*" multiple hidden>'+
+      '<button type="button" class="btn ghost" id="st-add">Добавить фото состояния</button>'+
+      '<span class="sub" id="st-note">до 8 кадров: перед заездом или после выезда</span></div>';
+  }
+  function bindStateAdd(pid){
+    var b=document.getElementById('st-add'), f=document.getElementById('st-file');
+    if(!b||!f) return;
+    b.onclick=function(){ f.click(); };
+    f.onchange=function(){
+      var list=Array.prototype.slice.call(f.files||[]).slice(0,8);
+      if(!list.length) return;
+      var kind = confirm('Это фото ПЕРЕД заездом? Нажмите «Отмена», если после выезда.') ? 'checkin' : 'checkout';
+      var note=document.getElementById('st-note');
+      note.textContent='Отправляем '+list.length+' фото…';
+      b.disabled=true;
+      var out=[], left=list.length;
+      list.forEach(function(file){
+        var rd=new FileReader();
+        rd.onload=function(){
+          out.push({ data:String(rd.result).split(',')[1]||'', mime:file.type||'image/jpeg' });
+          if(--left===0){
+            post({action:'check_add',token:TOKEN,property_id:pid,kind:kind,photos:out})
+              .then(function(r){
+                b.disabled=false; f.value='';
+                if(r&&r.ok){
+                  note.textContent='Готово: '+r.photos+' фото. Собственник увидит их в кабинете.';
+                  var box=document.getElementById('state-box');
+                  if(box){ box.__loaded=0; box.open=false; setTimeout(function(){ box.open=true; },50); }
+                } else note.textContent=(r&&r.error)||'Не загрузилось';
+              });
+          }
+        };
+        rd.readAsDataURL(file);
+      });
+    };
   }
   function drawDocs(docs){
     var box=document.getElementById('my-docs'); if(!box) return;
