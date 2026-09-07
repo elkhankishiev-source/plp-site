@@ -879,7 +879,26 @@ function objectPage(o, benchmarks, ratesBy) {
   /* 07.09: страницы объектов тянули ОРИГИНАЛЫ по 2–19 МБ — за месяц это
      съело 24 ГБ трафика Supabase при лимите 5,5 ГБ. Отдаём превью того же
      хранилища: вес падает в десятки раз, качество для экрана то же. */
-  const galleryRaw = Array.isArray(o.gallery_urls) ? o.gallery_urls.filter(u => /^https?:/.test(u)).slice(0, 8) : [];
+  /* 07.09: восемь кадров подряд — это восемь фасадов, а интерьеров клиент
+     не видит вовсе. Берём по кругу из каждого раздела: территория, интерьеры,
+     инфраструктура, мастер-план — тогда в ленте показан весь объект. */
+  const galleryAll = Array.isArray(o.gallery_urls) ? o.gallery_urls.filter(u => /^https?:/.test(u)) : [];
+  const galleryRaw = (function () {
+    const gs = Array.isArray(o.photo_groups) ? o.photo_groups
+      .map(g => (Array.isArray(g.urls) ? g.urls.filter(u => /^https?:/.test(u)) : []))
+      .filter(a => a.length) : [];
+    if (gs.length < 2) return galleryAll.slice(0, 8);
+    const out = [];
+    for (let round = 0; out.length < 8; round++) {
+      let added = false;
+      for (const arr of gs) {
+        if (arr[round] && !out.includes(arr[round])) { out.push(arr[round]); added = true; }
+        if (out.length >= 8) break;
+      }
+      if (!added) break;
+    }
+    return out;
+  })();
   const gallery = galleryRaw.map(u => thumbUrl(u, 1280, 78));
   const heroSrc = thumbUrl(o.main_image_url, 1600, 80) || (gallery[0] || ('../img/' + pub + '.jpg'));
   const shots = gallery.length > 1
