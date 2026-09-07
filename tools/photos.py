@@ -13,6 +13,9 @@
      ход стройки. Существующие данные не затираются — дополняются.
   5. Отмечаем дату сверки, чтобы было видно, насколько карточка свежая.
 
+Материалы застройщика часто приходят одним PDF — из него кадры достаются сами:
+    python3 tools/photos.py --pdf ~/Downloads/ayana.pdf --id PLP-AYANA
+
 Запуск:
     python3 tools/photos.py ~/Downloads/PLP-HERITAGE
     python3 tools/photos.py ~/Downloads/фото --id PLP-HERITAGE
@@ -36,6 +39,40 @@ KINDS = {
 }
 ORDER = ['cover', 'exterior', 'interior', 'facilities', 'master', 'plans', 'progress']
 IMG = re.compile(r'\.(jpe?g|png|webp|heic)$', re.I)
+MAX_W = 2000          # шире держать незачем: витрина отдаёт превью 760–1600
+MAX_BYTES = 900_000   # тяжелее — пережимаем, чтобы не жечь место и трафик
+
+
+def looks_like_image(data: bytes) -> bool:
+    """Файл действительно картинка, а не страница входа Google и не ошибка."""
+    if len(data) < 3000:
+        return False
+    head = data[:12]
+    if head[:3] == b'\xff\xd8\xff':                    return True      # jpeg
+    if head[:8] == b'\x89PNG\r\n\x1a\n':                return True      # png
+    if head[:4] == b'RIFF' and data[8:12] == b'WEBP':   return True
+    if head[4:12] in (b'ftypheic', b'ftypheix', b'ftypmif1'): return True
+    return False
+
+
+def shrink(data: bytes):
+    """Уменьшаем до разумного размера прямо перед заливкой: оригинал не храним."""
+    try:
+        from PIL import Image
+        import io
+        im = Image.open(io.BytesIO(data))
+        im = im.convert('RGB')
+        if im.width > MAX_W:
+            im = im.resize((MAX_W, round(im.height * MAX_W / im.width)), Image.LANCZOS)
+        for q in (86, 78, 70, 62):
+            buf = io.BytesIO()
+            im.save(buf, 'JPEG', quality=q, optimize=True, progressive=True)
+            out = buf.getvalue()
+            if len(out) <= MAX_BYTES or q == 62:
+                return out, 'image/jpeg'
+    except Exception:
+        pass
+    return data, None
 
 
 def creds():
@@ -103,6 +140,7 @@ def main():
     ap.add_argument('--kind', choices=list(KINDS), help='считать все файлы одним видом')
     ap.add_argument('--list', action='store_true', help='показать, что уже есть у объектов')
     ap.add_argument('--dry', action='store_true', help='только показать план, ничего не менять')
+    ap.add_argument('--pdf', help='взять кадры из PDF застройщика (презентация, буклет)')
     a = ap.parse_args()
     st = Store()
 
@@ -119,6 +157,39 @@ def main():
                 'есть' if o.get('main_image_url') else 'НЕТ',
                 len(g) if isinstance(g, list) else 0, len(gr) if isinstance(gr, list) else 0))
         return
+
+    # Материалы застройщика часто приходят одним PDF. Достаём встроенные кадры:
+    # это исходные рендеры без наложенного текста — ровно то, что нужно витрине.
+    if a.pdf:
+        src = pathlib.Path(a.pdf).expanduser()
+        if not src.is_file(): sys.exit('нет файла: ' + str(src))
+        head = src.open('rb').read(5)
+        if head[:4] != b'%PDF':
+            sys.exit('это не PDF, а похоже на страницу входа — откройте доступ к файлу и скачайте заново')
+        try:
+            import fitz
+        except ImportError:
+            sys.exit('нужен модуль PyMuPDF: pip3 install pymupdf')
+        dst = pathlib.Path('/tmp/plp_pdf_shots'); dst.mkdir(exist_ok=True)
+        for old in dst.iterdir(): old.unlink()
+        doc = fitz.open(src)
+        seen, got = set(), 0
+        for i, page in enumerate(doc):
+            for img in page.get_images(full=True):
+                xref = img[0]
+                if xref in seen: continue
+                seen.add(xref)
+                try: d = doc.extract_image(xref)
+                except Exception: continue
+                w, hgt = d.get('width', 0), d.get('height', 0)
+                if w < 1200 or hgt < 700: continue          # мелочь и иконки не берём
+                ratio = w / max(hgt, 1)
+                if ratio < 1.1 or ratio > 2.4: continue     # обрезки и полоски пропускаем
+                (dst / ('p%02d_%d.%s' % (i + 1, xref, d.get('ext', 'jpg')))).write_bytes(d['image'])
+                got += 1
+        print('из PDF отобрано кадров:', got, '→', dst)
+        if not got: sys.exit('в этом PDF нет крупных кадров — пришлите папку с фото')
+        a.folder = str(dst)
 
     if not a.folder: ap.error('нужна папка с файлами')
     folder = pathlib.Path(a.folder).expanduser()
@@ -152,13 +223,17 @@ def main():
     added = {k: [] for k in by_kind}
     for k, items in by_kind.items():
         for p, data, h in items:
-            ext = p.suffix.lower().replace('.jpeg', '.jpg')
+            if not looks_like_image(data):
+                print('   пропуск (это не изображение, похоже на страницу входа):', p.name)
+                continue
+            small, forced = shrink(data)
+            ext = '.jpg' if forced else p.suffix.lower().replace('.jpeg', '.jpg')
+            mime = forced or (mimetypes.guess_type(p.name)[0] or 'image/jpeg')
             key = 'objects/%s/%s/%s%s' % (pid, k, h, ext)
-            mime = mimetypes.guess_type(p.name)[0] or 'image/jpeg'
             if st.exists(key):
                 url = st.url + '/storage/v1/object/public/' + BUCKET + '/' + key
             else:
-                url = st.put(key, data, mime)
+                url = st.put(key, small, mime)
             added[k].append(url)
         print('  %-16s %d файлов' % (KINDS[k][0], len(added[k])))
 
