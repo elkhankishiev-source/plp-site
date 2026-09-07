@@ -803,16 +803,6 @@
    "type": "Кондо",
    "price_from": 4425400,
    "units": []
-  },
-  {
-   "id": "RESALE-RAWAI-POOLVILLA",
-   "pub": "RESALE-RAWAI-POOLVILLA",
-   "url": "https://property-library.com/object/resale-rawai-poolvilla",
-   "name": "Пул-вилла Раваи, 5 спален — перепродажа",
-   "district": "Равай",
-   "type": "Вилла",
-   "price_from": 39750000,
-   "units": []
   }
  ]
 }
