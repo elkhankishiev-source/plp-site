@@ -22,7 +22,39 @@
       m.setAttribute('content',bg); document.head.appendChild(m);
     }catch(e){}
   }
+  /* Кнопка «поделиться»: на телефоне открывает системное меню, на компьютере
+     кладёт ссылку в буфер и говорит об этом. Эльнур 07.09: «сайтом надо
+     пользоваться, он не просто для красоты». */
+  document.addEventListener('click', function(e){
+    var b = e.target && e.target.closest && e.target.closest('[data-share]');
+    if(!b) return;
+    e.preventDefault();
+    var path = b.getAttribute('data-share') || location.pathname;
+    var url = location.origin + path;
+    var title = b.getAttribute('data-share-title') || document.title;
+    var done = function(){
+      var was = b.textContent;
+      b.textContent = '✓ Ссылка скопирована';
+      b.classList.add('ok');
+      setTimeout(function(){ b.textContent = was; b.classList.remove('ok'); }, 2200);
+    };
+    if(navigator.share){ navigator.share({title:title, url:url}).catch(function(){}); return; }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(url).then(done).catch(function(){ prompt('Скопируйте ссылку:', url); });
+    } else prompt('Скопируйте ссылку:', url);
+  });
   window.paintChrome=paintChrome;
+  /* Адрес без .html: страницы и так открываются коротким адресом, но если
+     человек пришёл по старой ссылке, приводим строку браузера к чистому виду.
+     Эльнур 07.09: «мне не нравится html в адресе, я ни у кого её не видел». */
+  try{
+    var pth=location.pathname;
+    if(/\.html$/.test(pth)){
+      var clean=pth.replace(/index\.html$/,'').replace(/\.html$/,'');
+      if(clean==='') clean='/';
+      history.replaceState(null,'',clean+location.search+location.hash);
+    }
+  }catch(e){}
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',paintChrome);
   else paintChrome();
   try{ matchMedia('(prefers-color-scheme: dark)').addEventListener('change',paintChrome); }catch(e){}
@@ -151,7 +183,7 @@ if(dark) i.src='../img/brand/plp-mark-white.png';})();</script>
   <section class="desc"><h2>Об объекте</h2><p>Корпус D комплекса The Panora Phuket под управлением MIDA Grande Resort. В продаже шесть готовых юнитов: однокомнатная 38,7 м² с видом на бассейн, четыре однокомнатных по 92,89 м² с видом на море на пятом этаже и двухкомнатная 166,88 м².
 Цена за метр после снижения — от 114 351 до 132 997 ฿. Оплата быстрая: бронь 100 000 ฿ и полный расчёт с регистрацией в течение 21 дня.</p></section>
   <section class="desc" lang="en"><h2>About</h2><p>Building D of The Panora Phuket, managed by MIDA Grande Resort. Six ready units: a 38.7 sq.m 1-bed with pool view, four 92.89 sq.m sea-view 1-beds on the 5th floor, and a 166.88 sq.m 2-bed. Reduced price per sq.m: 114,351-132,997 THB. Reservation 100,000 THB, full payment and registration within 21 days.</p></section>
-  <section class="desc"><h2>Материалы застройщика</h2><div class="cta"><a class="btn ghost" href="https://drive.google.com/drive/folders/1wWsOKWxNU-Fftex8o8SLRxgdt85-F1qX" rel="noopener nofollow" target="_blank">Сейл-кит и презентация</a><a class="btn ghost" href="https://drive.google.com/file/d/1M6vseSVp5U9KPdVuc3OmKK1GiCDNKliG/view" rel="noopener nofollow" target="_blank">Планировки</a><a class="btn ghost" href="https://drive.google.com/file/d/1y9xaRkxVlaV1lycSUk-0fE-TaOwImpZd/view" rel="noopener nofollow" target="_blank">3D-тур и видео</a></div></section>
+  
   <div class="cta">
     <a class="btn wa" href="https://wa.me/66955492587?text=The%20Panora%20Phuket%2C%20%D0%BA%D0%BE%D1%80%D0%BF%D1%83%D1%81%20D%20%E2%80%94%20%D0%BF%D0%B5%D1%80%D0%B5%D0%BF%D1%80%D0%BE%D0%B4%D0%B0%D0%B6%D0%B0%20%E2%80%94%20%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D0%B5%D1%81%D1%83%D0%B5%D1%82%20%D1%8D%D1%82%D0%BE%D1%82%20%D0%BE%D0%B1%D1%8A%D0%B5%D0%BA%D1%82.%20https%3A%2F%2Fproperty-library.com%2Fobject%2Fresale-panora-condo.html" rel="noopener" target="_blank">WhatsApp — узнать детали</a>
     <a class="btn primary" href="../#object=RESALE-PANORA-CONDO">Открыть карточку на сайте</a>
