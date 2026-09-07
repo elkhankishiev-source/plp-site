@@ -178,7 +178,8 @@ made.push(page({file:'management.html',depth:0,
 /* ── ГАЙДЫ ──────────────────────────────────────────────── */
 const faq=JSON.parse(fs.readFileSync('/Users/elnurkhankishiev/plp-site/build/faq.json','utf8'));
 const slugs={'1':'inostranec-mozhet-kupit','2':'leasehold-ili-freehold','3':'skolko-oformlyaetsya-sdelka',
-             '4':'rashody-pri-pokupke','5':'kupit-udalenno','6':'stoimost-uslug'};
+             '4':'rashody-pri-pokupke','5':'kupit-udalenno','6':'stoimost-uslug',
+             '7':'kakaya-dohodnost','8':'kto-upravlyaet-obektom','9':'risk-nedostroya','10':'pereprodazha-do-sdachi'};
 const gdir=path.join(ROOT,'guide');
 if(!fs.existsSync(gdir)) fs.mkdirSync(gdir,{recursive:true});
 
