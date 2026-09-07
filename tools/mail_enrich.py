@@ -143,21 +143,19 @@ def main():
     for unit, code in todo.items():
         # «M-1» или «F-2» встречаются в чужих письмах сотнями. Такой маркер
         # ищем только вместе с названием проекта, иначе в карточку попадает чужое.
+        # Номер юнита сам по себе ничего не значит: A-606 есть и в Legendary,
+        # и в Katabello. Ищем ВСЕГДА вместе с названием проекта.
         project = code.split('-')[1].title() if code.count('-') >= 2 else ''
-        short = len(unit.replace('-', '')) <= 3
+        if not project:
+            print('%-22s пропущен: не понял проект по коду' % code)
+            continue
         ids = set()
         for v in {unit, unit.replace('-', ' '), unit.replace('-', '')}:
             try:
-                if short and project:
-                    typ, data = M.search(None, '(TEXT "%s" TEXT "%s")' % (project, v))
-                else:
-                    typ, data = M.search(None, 'TEXT', '"%s"' % v)
+                typ, data = M.search(None, '(TEXT "%s" TEXT "%s")' % (project, v))
                 ids |= set((data[0] or b'').split())
             except Exception:
                 pass
-        if short and not project:
-            print('%-22s пропущен: слишком короткий номер юнита' % code)
-            continue
         chunks = []
         for i in list(ids)[-12:]:
             try:
