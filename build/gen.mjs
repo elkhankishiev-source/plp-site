@@ -926,7 +926,7 @@ function objectPage(o, benchmarks, ratesBy) {
     { k: 'Спальни', v: beds },
     { k: 'Площадь', v: area },
     { k: 'Сдача', v: dl.ru },
-    { k: 'Доходность', v: o.roi ? '~' + o.roi + '%/год' : '' },
+    { k: 'Доходность', v: o.roi ? '~' + o.roi + '%/год до расходов' : '' },
     { k: 'До пляжа', v: distBeach },
     { k: 'Застройщик', v: shortDev(o.developer) },
     // Полное юридическое название — отдельной строкой и только если оно
@@ -1040,7 +1040,7 @@ if(dark) i.src='../img/brand/plp-mark-white.png';})();</script>
   <div class="chips">${chips}</div>
   <div class="yield">
     <div class="num">${yr.low}${DASH}${yr.high}%</div>
-    <div class="lbl">Ориентир доходности по району (${htmlEsc(ru)}, ${htmlEsc(t.ru.toLowerCase())}) — потенциал при активном управлении. Индивидуально, раскрывается со специалистом.</div>
+    <div class="lbl">Ориентир по району (${htmlEsc(ru)}, ${htmlEsc(t.ru.toLowerCase())}) — <b>до расходов</b>, при активном управлении. Чистыми обычно выходит 5–8%; точный расчёт по вашему объекту делает специалист.</div>
   </div>
   ${unitsBlock}
   ${progressBlock}
