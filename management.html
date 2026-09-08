@@ -3919,11 +3919,17 @@ function chatCalcReply(low){
   PL.PROPERTIES.forEach(function(x){if(!p&&low.indexOf(x.title.toLowerCase())>-1)p=x;});
   if(!p)p=PL.PROPERTIES.slice().sort(function(a,b){return (b.roi||0)-(a.roi||0);})[0];
   var r=calcFromData(p.calc);
+  /* 🔴 09.09: у объектов, где ставки аренды ещё не выверены (calc.estimated),
+     сезонная модель даёт отрицательный доход — клиент видел «−47 640 ฿ в год».
+     Считаем сами только когда цифра осмысленная; иначе отвечает Дарья, у неё
+     расчёт идёт от ориентира района. */
+  if((p.calc||{}).estimated || !(r.net>0)) return false;
   /* тот же гейт, что и в карточке: непроверенный срок окупаемости не называем */
   var cOk=!((p.calc||{}).estimated) && r.netY>=4 && r.netY<=15 && r.payback>0 && r.payback<=12;
   botT(tpl('chat.r.calc',{o:p.title,d:loc(p.loc),n:fmtBt(r.net),y:(netYieldByLoc(p.loc)||r.netY.toFixed(1)),p:cOk?r.payback.toFixed(1):'—'}),700);
   setTimeout(function(){aiCards([p.property_id]);},2400);
   if(!leadShown)setTimeout(function(){offerLead(false);},3400);
+  return true;
 }
 var chatBusy=false;
 function setChatBusy(on){
@@ -3990,7 +3996,7 @@ function sendFree(){
   var low=txt.toLowerCase();
   var topic=detectTopic(low);if(topic)lastTopic=topic;
   /* быстрый локальный расчёт доходности остаётся мгновенным; всё остальное — в ИИ */
-  if(topic==='calc'){chatCalcReply(low);return;}
+  if(topic==='calc'&&chatCalcReply(low))return;
   askAI(txt);
 }
 /* то, что Дарья сделала руками: страница-оффер, расчёт, свободные даты */
