@@ -377,6 +377,8 @@ function buildCatalog(objects, benchmarks, preserve) {
           }
         }
         if (st === 'ready') return 'ready';
+        if (st === 'announced') return 'announced';
+        if (st === 'sold out') return 'resale';
         if (st === 'construction') return 'construction';
         if (st === 'pre-sale' || st === 'presale') return 'presale';
         if (st === 'resale' || String(o.purpose||'').toLowerCase() === 'resale') return 'resale';
@@ -389,12 +391,18 @@ function buildCatalog(objects, benchmarks, preserve) {
         if (/стро|constru|off-?plan/.test(st)) return 'construction';
         if (/готов|ready|заселени/.test(st)) return 'ready';
         if (/старт|pre-?sale|презентац/.test(st)) return 'presale';
-        if (o.handover_date) {
-          var hd = new Date(o.handover_date);
-          if (!isNaN(hd)) return hd > new Date() ? 'construction' : 'ready';
-        }
+        /* 08.09: стадия не заполнена — «сдан» из одной даты больше не выводим.
+           Эльнур: Tonino стоял «сдан 2025», хотя это лишь заявленный срок.
+           Пустая стадия честнее догадки: витрина покажет «В продаже». */
         return '';
       })(),
+      /* Эльнур 08.09: «старт продаж писать на всех проектах это не верно».
+         Плашка «Старт продаж» живёт, только пока старт свежий — дальше объект
+         просто «в продаже». Дату старта храним в базе, а не гадаем. */
+      saleStart: o.sale_started_on || null,
+      /* короткая приписка к стадии: «сдан в декабре 2025», «2 октября —
+         презентация сдачи». Эльнур: «доп отметки это прикольно» */
+      stageNote: o.stage_note || null,
       desc: { ru: noContacts(usp), en: noContacts(uspEn) },
       // 02.09: то, что человек ищет глазами в первую очередь — море и застройщик.
       // Пишем только если данные есть, пустое поле карточка не рисует.
@@ -714,6 +722,13 @@ function buildRentals(objects, preserve, ratesBy) {
       bmax: (o.bedrooms_max === 0 || o.bedrooms_max) ? o.bedrooms_max : null,
       area: areaLabel(o),
       tag: rentTag(o),
+      /* Эльнур 08.09: «старт продаж писать на всех проектах это не верно».
+         Плашка «Старт продаж» живёт, только пока старт свежий — дальше объект
+         просто «в продаже». Дату старта храним в базе, а не гадаем. */
+      saleStart: o.sale_started_on || null,
+      /* короткая приписка к стадии: «сдан в декабре 2025», «2 октября —
+         презентация сдачи». Эльнур: «доп отметки это прикольно» */
+      stageNote: o.stage_note || null,
       desc: { ru: noContacts(usp), en: noContacts(uspEn) },
       // 02.09: аренда тоже встаёт на карту — координаты из той же таблицы
       lat: (o.lat === 0 || o.lat) ? Number(o.lat) : null,
@@ -1233,7 +1248,7 @@ async function main() {
     '&order=plp_property_id' +
     '&select=plp_property_id,name,district,beach,purpose,type,price_from_thb,price_to_thb,' +
     'bedrooms,bedrooms_min,bedrooms_max,area_sqm,area_min,area_max,roi,rental_yield_pct,' +
-    'capital_growth_pct,handover_date,status,stage,developer,distance_beach_m,usp,usp_en,'+
+    'capital_growth_pct,handover_date,status,stage,stage_note,sale_started_on,developer,distance_beach_m,usp,usp_en,'+
     'bedrooms_min,bedrooms_max,' +
     'brochure_url,floorplan_url,video_url,website_url,map_url,' +
     'season_rates,occupancy_est_pct,maintenance_fee_thb_sqm,lat,lng,coord_source,last_synced_at,availability,' +
@@ -1248,7 +1263,7 @@ async function main() {
     'bedrooms_max,area_sqm,area_min,area_max,min_stay,deposit,rent_included,rent_excluded,' +
     'rent_rules,amenities,usp,usp_en,distance_beach_m,on_site,lat,lng,coord_source,last_synced_at,public_code,' +
     'main_image_url,gallery_urls,photo_groups,unit_types,price_tiers,season_rates,rent_price_month_thb,' +
-    'stage,handover_date,parent_object_id' +
+    'stage,stage_note,sale_started_on,handover_date,parent_object_id' +
     '&and=(or(purpose.eq.' + encodeURIComponent('аренда') + ',purpose.eq.rent),' +
     'on_site.eq.true)&order=plp_property_id');
 
