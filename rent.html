@@ -3667,6 +3667,10 @@ function pushLead(p){
     property_id:p.property_id||null,
     source:'site',channel:p.channel||null,
     name:p.name||null,contact:p.contact||null,
+    /* 🔴 08.09: сайт слал только contact, а приёмник ждёт phone — клиент
+       заводился БЕЗ номера, даже когда человек его ввёл. Похоже на телефон —
+       кладём и в phone. */
+    phone:(function(){var v=String(p.contact||'');return /^[+\d][\d\s()\-]{7,}$/.test(v.trim())?v.replace(/[^\d+]/g,''):null;})(),
     consent:!!p.consent,
     qualified:!!(p.contact&&(p.goal||p.budget||p.property_id)),
     /* контекст: что человек смотрел, какие даты выбрал и по какой ссылке пришёл —
@@ -3962,6 +3966,10 @@ function aiTools(cards){
       h+='<div class="tool"><b>Ориентир доходности</b><span>'+escHtml(c.title||'')+'</span><dl>';
       c.rows.forEach(function(r){ h+='<dt>'+escHtml(r[0])+'</dt><dd>'+escHtml(r[1])+'</dd>'; });
       h+='</dl>'+(c.note?('<i>'+escHtml(c.note)+'</i>'):'')+'</div>';
+    }
+    /* объект без цены: оффера нет — говорим честно, а не даём мёртвую ссылку */
+    if(c.type==='note'&&c.text){
+      h+='<div class="tool"><b>'+escHtml(c.title||'')+'</b><i style="margin-top:4px">'+escHtml(c.text)+'</i></div>';
     }
     if(c.type==='dates'){
       var dd=function(x){ return String(x||'').split('-').reverse().join('.'); };
