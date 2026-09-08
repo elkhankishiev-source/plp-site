@@ -2699,7 +2699,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         document.getElementById('oe-msg').textContent =
           (r&&r.ok) ? ('Сохранено полей: '+r['полей']+'. На сайте обновится при следующей сборке.')
                     : ((r&&r.error)||'Не сохранилось');
-        if(r&&r.ok) loadData();
+        if(r&&r.ok) reload();
       });
     };
   }
@@ -2886,7 +2886,10 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     for(var d=1; d<=days; d++){
       var iso=y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
       var cls='cal-d', ttl='';
-      if(busy[iso]){ cls+=' busy'; ttl=' title="'+esc(busy[iso])+'"'; }
+      /* Эльнур 08.09: «как я могу выбрать 1 сентября, сейчас уже 8 так-то».
+         Прошедшие дни не выбираются — заселить назад нельзя. */
+      if(iso<rcISO(new Date())) cls+=' off';
+      else if(busy[iso]){ cls+=' busy'; ttl=' title="'+esc(busy[iso])+'"'; }
       if(inV && outV && iso>inV && iso<outV) cls+=' in';
       if(iso===inV || iso===outV) cls+=' edge';
       cells+='<span class="'+cls+'" data-d="'+iso+'"'+ttl+'>'+d+'</span>';
@@ -2916,6 +2919,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     return c;
   }
   function rcPick(iso){
+    if(iso<rcISO(new Date())){ say('Прошедшие дни выбрать нельзя.'); return; }
     var a=fv('b-in'), b=fv('b-out');
     var A=document.getElementById('b-in'), B=document.getElementById('b-out');
     if(!a || (a&&b) || iso<=a){ A.value=iso; B.value=''; }
@@ -3008,8 +3012,85 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   }
   var REQ_R={from:'r-from',to:'r-to',btn:'r-range',cal:'r-rcal',label:'r-range-t'};
   var REQ_Q={from:'q-from',to:'q-to',btn:'q-range',cal:'q-rcal',label:'q-range-t'};
+  /* Эльнур 08.09: «как я могу поставить его объект на бронь, если он строится,
+     не сдан и не подписал с нами УК договор??? нужны какие-то указатели,
+     нажал, прошёл, протестировал, а бронь не проходит — подпишите пожалуйста
+     контракт, и там же есть место, где он расположен, чтобы это проходило всё
+     в один раз». Показываем причину и путь: скачать шаблон → подписать →
+     загрузить подписанный прямо здесь. */
+  function bookBlocked(pid){
+    var p=propById(pid)||{};
+    var c=p.contract;
+    if(!c) return { why:'Объект не в управлении: договор с собственником не подписан.',
+                    fix:'Пока договора нет, бронь по нему не проходит.' };
+    if(c.status && c.status!=='active')
+      return { why:'Договор управления не действует (статус: '+c.status+').', fix:'' };
+    var today=rcISO(new Date());
+    if(c.start_date && c.start_date>today)
+      return { why:'Договор управления вступает в силу '+clDate(c.start_date)+'.', fix:'' };
+    if(c.end_date && c.end_date<today)
+      return { why:'Договор управления закончился '+clDate(c.end_date)+'.',
+               fix:'Нужно продление — загрузите подписанное дополнение.' };
+    var st=String(p.stage||'');
+    if(/стро|constru|pre-?sale|старт|анонс/i.test(st))
+      return { why:'Объект ещё строится — заселять некуда.',
+               fix:'Бронь откроется, когда объект сдадут.' };
+    return null;
+  }
+  function bookNeedContract(pid, blk){
+    var p=propById(pid)||{};
+    var staffFor=(DATA.owner&&DATA.owner.is_staff===true&&CTX.lead)?CTX.lead:'';
+    clForm('<h3>Сначала договор управления</h3>'+
+      '<p class="sub">'+clEsc(blk.why)+(blk.fix?(' '+clEsc(blk.fix)):'')+'</p>'+
+      '<div class="fgrid"><div class="wide">'+
+        '<p class="hintline" style="margin:0 0 8px">Порядок такой: скачали шаблон → '+
+        'собственник подписал → подписанный файл загружаете здесь. Он тут же ляжет '+
+        'в документы объекта и в кабинет собственника, а копия — в наш архив.</p>'+
+        '<div class="upzone">'+
+          '<a class="btn ghost" id="bk-tpl" href="#" target="_blank" rel="noopener">Шаблон договора</a> '+
+          '<input id="bk-file" type="file" hidden accept=".pdf,.jpg,.jpeg,.png,.heic,.doc,.docx">'+
+          '<button type="button" class="btn" id="bk-pick">Загрузить подписанный</button>'+
+          '<span class="sub" id="bk-state">Прочитаем сам файл: срок, комиссию и стороны '+
+          'подставим в карточку после вашей проверки.</span>'+
+        '</div></div></div>'+
+      '<div class="fbtns"><button type="button" class="btn ghost" id="f-cancel">Закрыть</button></div>', null);
+    var tpl=document.getElementById('bk-tpl');
+    if(tpl) tpl.onclick=function(e){
+      if(!UK_TEMPLATE){ e.preventDefault(); say('Шаблон ещё не заведён — попросите его в офисе.'); }
+      else tpl.href=UK_TEMPLATE;
+    };
+    var pick=document.getElementById('bk-pick'), fi=document.getElementById('bk-file'),
+        st=document.getElementById('bk-state');
+    if(!pick||!fi) return;
+    pick.onclick=function(){ fi.click(); };
+    fi.onchange=function(){
+      var f=fi.files&&fi.files[0]; if(!f) return;
+      if(f.size>20*1024*1024){ say('Файл больше 20 МБ — пришлите поменьше или ссылкой'); return; }
+      st.textContent='Отправляем «'+f.name+'»…'; pick.disabled=true;
+      var rd=new FileReader();
+      rd.onload=function(){
+        var b64=String(rd.result).split(',')[1]||'';
+        post(staffFor
+          ? {action:'staff_doc',token:TOKEN,code:staffFor,file_name:f.name,mime:f.type,
+             kind:'contract',property_id:pid,data:b64}
+          : {action:'my_doc',token:TOKEN,file_name:f.name,mime:f.type,
+             kind:'contract',property_id:pid,data:b64})
+          .then(function(r){
+            pick.disabled=false; fi.value='';
+            if(r&&r.ok){ st.textContent='Приняли. Читаем договор — обычно до минуты. '+
+                          'Как проверим, объект откроется для броней.';
+                         reload(); }
+            else st.textContent=(r&&r.error)||'Не загрузилось';
+          });
+      };
+      rd.readAsDataURL(f);
+    };
+  }
+  var UK_TEMPLATE='';   /* ссылка на шаблон договора — заводится в канонах */
   function ukBookForm(pid, pre){
     pre=pre||{};
+    var blk=bookBlocked(pid);
+    if(blk && !pre.booking_id){ bookNeedContract(pid, blk); return; }
     var objs=(DATA.properties||[]).map(function(x){ return {id:x.id, name:(x.name||x.id)}; });
     clForm('<h3>'+(pre.booking_id?'Правка брони':'Новая бронь')+'</h3><div class="fgrid">'+
       '<label class="wide">Объект<select id="b-obj">'+objs.map(function(o){
@@ -3049,7 +3130,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
           .then(function(r){
             if(r&&r.ok){ var f=document.getElementById('cl-form');
               if(f){ f.innerHTML=''; document.body.style.overflow=''; }
-              loadData();
+              reload();
             } else say((r&&r.error)||'Не получилось сохранить бронь');
           });
       });
@@ -3121,7 +3202,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
               say(fnames.length
                 ? 'Заявка принята. Файлы пришлите менеджеру в ответ на его сообщение — приложим к карточке.'
                 : 'Заявка принята. Подготовим карточку и пришлём ссылку.');
-              loadData();
+              reload();
             }
             else say('Не отправилось: '+((r&&r.error)||'ошибка'));
           });
@@ -3155,7 +3236,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
                 .then(function(r){
                   var f=document.getElementById('cl-form');
                   if(f){ f.innerHTML=''; document.body.style.overflow=''; }
-                  if(r&&r.ok) loadData(); else say('Не вышло: '+((r&&r.error)||'ошибка'));
+                  if(r&&r.ok) reload(); else say('Не вышло: '+((r&&r.error)||'ошибка'));
                 });
             });
           return;
@@ -3213,7 +3294,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
               amount:fv('u-amount'),category:fv('u-cat'),date:fv('u-date'),
               note:fv('u-note'),receipt:fv('u-rec')}).then(function(r){
           if(r&&r.ok){ document.getElementById('cl-form').innerHTML='';
-            document.body.style.overflow=''; loadData(); }
+            document.body.style.overflow=''; reload(); }
           else say((r&&r.error)||'Не сохранилось');
         });
       });
@@ -3246,7 +3327,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         post({action:'uk_tx_update',token:TOKEN,id:id,kind:fv('e-kind'),amount:fv('e-amount'),
               category:fv('e-cat'),date:fv('e-date'),note:fv('e-note')}).then(function(r){
           var f=document.getElementById('cl-form');
-          if(r&&r.ok){ if(f){ f.innerHTML=''; document.body.style.overflow=''; } loadData(); }
+          if(r&&r.ok){ if(f){ f.innerHTML=''; document.body.style.overflow=''; } reload(); }
           else { if(b){ b.disabled=false; b.textContent='Сохранить'; } say((r&&r.error)||'Не сохранилось'); }
         });
       });
@@ -3261,7 +3342,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         var b=document.getElementById('f-save'); if(b){ b.disabled=true; b.textContent='Удаляем…'; }
         post({action:'uk_tx_delete',token:TOKEN,id:id}).then(function(r){
           var f=document.getElementById('cl-form');
-          if(r&&r.ok){ if(f){ f.innerHTML=''; document.body.style.overflow=''; } loadData(); }
+          if(r&&r.ok){ if(f){ f.innerHTML=''; document.body.style.overflow=''; } reload(); }
           else { if(b){ b.disabled=false; b.textContent='Удалить'; } say((r&&r.error)||'Не удалилось'); }
         });
       });
@@ -3300,13 +3381,18 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
               sinking:fv('c-sink'),maintenance:fv('c-maint'),deposit:fv('c-dep'),
               transfer:fv('c-tr'),taxes:fv('c-tax'),common:fv('c-com')}).then(function(r){
           var f=document.getElementById('cl-form');
-          if(r&&r.ok){ if(f){ f.innerHTML=''; document.body.style.overflow=''; } loadData(); }
+          if(r&&r.ok){ if(f){ f.innerHTML=''; document.body.style.overflow=''; } reload(); }
           else { if(b){ b.disabled=false; b.textContent='Сохранить'; } say((r&&r.error)||'Не сохранилось'); }
         });
       });
   }
   function ukTaskEdit(id){
-    var t=taskById(id); if(!t){ say('Работа не найдена'); return; }
+    /* Эльнур 08.09: «нажал на карандаш отредактировать — она написала, что
+       работа не найдена». Список на экране мог устареть после обновления, но
+       сама работа на сервере жива — правим по её номеру, поля оставляем
+       пустыми: что не тронули, то и не меняем. */
+    var t=taskById(id) || {};
+    if(!id){ say('Не понял, какую работу править — обновите страницу.'); return; }
     clForm('<h3>Изменить работу</h3>'+
       '<div class="fgrid">'+
       '<label>Что<input id="k-kind" type="text" value="'+clEsc(t.kind||'')+'"></label>'+
@@ -3321,7 +3407,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         post({action:'uk_task_update',token:TOKEN,id:id,kind:fv('k-kind'),due:fv('k-due'),
               cost:fv('k-cost'),note:fv('k-note'),assignee:fv('k-who')}).then(function(r){
           var f=document.getElementById('cl-form');
-          if(r&&r.ok){ if(f){ f.innerHTML=''; document.body.style.overflow=''; } loadData(); }
+          if(r&&r.ok){ if(f){ f.innerHTML=''; document.body.style.overflow=''; } reload(); }
           else { if(b){ b.disabled=false; b.textContent='Сохранить'; } say((r&&r.error)||'Не сохранилось'); }
         });
       });
@@ -3335,7 +3421,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         var b=document.getElementById('f-save'); if(b){ b.disabled=true; b.textContent='Снимаем…'; }
         post({action:'uk_task_delete',token:TOKEN,id:id}).then(function(r){
           var f=document.getElementById('cl-form');
-          if(r&&r.ok){ if(f){ f.innerHTML=''; document.body.style.overflow=''; } loadData(); }
+          if(r&&r.ok){ if(f){ f.innerHTML=''; document.body.style.overflow=''; } reload(); }
           else { if(b){ b.disabled=false; b.textContent='Снять'; } say((r&&r.error)||'Не вышло'); }
         });
       });
@@ -3349,7 +3435,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         var b=document.getElementById('f-save'); if(b){ b.disabled=true; b.textContent='Убираем…'; }
         post({action:'uk_doc_delete',token:TOKEN,id:id}).then(function(r){
           var f=document.getElementById('cl-form');
-          if(r&&r.ok){ if(f){ f.innerHTML=''; document.body.style.overflow=''; } loadData(); }
+          if(r&&r.ok){ if(f){ f.innerHTML=''; document.body.style.overflow=''; } reload(); }
           else { if(b){ b.disabled=false; b.textContent='Убрать'; } say((r&&r.error)||'Не вышло'); }
         });
       });
@@ -3372,7 +3458,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         post({action:'uk_task',token:TOKEN,property_id:pid,kind:fv('u-tkind'),
               due:fv('u-due'),cost:fv('u-cost'),note:fv('u-tnote')}).then(function(r){
           if(r&&r.ok){ document.getElementById('cl-form').innerHTML='';
-            document.body.style.overflow=''; loadData(); }
+            document.body.style.overflow=''; reload(); }
           else say((r&&r.error)||'Не сохранилось');
         });
       });
@@ -3397,7 +3483,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         post({action:'uk_doc',token:TOKEN,property_id:pid,title:fv('u-dtitle'),
               url:fv('u-durl'),kind:fv('u-dkind'),note:fv('u-dnote')}).then(function(r){
           if(r&&r.ok){ document.getElementById('cl-form').innerHTML='';
-            document.body.style.overflow=''; loadData(); }
+            document.body.style.overflow=''; reload(); }
           else say((r&&r.error)||'Не сохранилось');
         });
       });
@@ -3484,7 +3570,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
               due:r.co||r.ci,note:note+' · '+r.who}).then(function(x){
           document.getElementById('cl-form').innerHTML='';
           document.body.style.overflow='';
-          if(x&&x.ok) loadData(); else say((x&&x.error)||'Не получилось');
+          if(x&&x.ok) reload(); else say((x&&x.error)||'Не получилось');
         });
       };
     };
@@ -3602,7 +3688,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
                 check_out:ok.getAttribute('data-out'),
                 status:'upcoming', booking_id:ok.getAttribute('data-ok')})
             .then(function(r){
-              if(r&&r.ok){ loadData(); }
+              if(r&&r.ok){ reload(); }
               else { ok.disabled=false; ok.textContent='Подтвердить';
                      say((r&&r.error)||'Не получилось подтвердить'); }
             });
@@ -4119,9 +4205,17 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       });
       bh+='</table>';
     }
-    if(DATA.owner&&DATA.owner.is_staff===true)
-      bh+='<p class="sub"><a href="#" class="lnk" data-uk="book" data-pid="'+(p.id||'')+
-          '">Поставить бронь</a> — даты, гость, сумма и канал. Пересечение дат система не пропустит.</p>';
+    if(DATA.owner&&DATA.owner.is_staff===true){
+      /* Видно ещё до нажатия, можно ли вообще бронировать этот объект. */
+      var _blk=(function(){ try{ return bookBlocked(p.id); }catch(e){ return null; } })();
+      if(_blk)
+        bh+='<p class="sub" style="color:var(--dim)"><b>Бронь пока закрыта.</b> '+esc(_blk.why)+
+            ' <a href="#" class="lnk" data-uk="book" data-pid="'+(p.id||'')+
+            '">Что нужно сделать</a></p>';
+      else
+        bh+='<p class="sub"><a href="#" class="lnk" data-uk="book" data-pid="'+(p.id||'')+
+            '">Поставить бронь</a> — даты, гость, сумма и канал. Пересечение дат система не пропустит.</p>';
+    }
     /* Эльнур 07.09: собственник спрашивает «сдаётся ли объект и цел ли он».
        Ответ живёт здесь же, рядом с заездами: снимки до заезда и после выезда
        с датами. Показываем свёрнутой строкой — страницу не раздуваем. */
@@ -6284,7 +6378,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
               /* Сначала дожидаемся данных этого человека, и только потом строим
                  список объектов — иначе в списке остаются объекты предыдущего. */
               try{
-                var pr=loadData();
+                var pr=loadData();   /* сменили человека — начинаем с обзора его кабинета */
                 if(pr&&pr.then) pr.then(function(){ ctxNarrow(CTX.lead); });
                 else setTimeout(function(){ ctxNarrow(CTX.lead); },400);
               }catch(e){ ctxNarrow(CTX.lead); }
@@ -6553,10 +6647,23 @@ window.openChat=openChat;window.closeChat=closeChat;window.clearChat=clearChat;w
     ['sec-money','sec-calendar','sec-reports','sec-docs','sec-service','sec-costs'].forEach(function(id){
       /* Карточка объекта рисуется заново при каждом обновлении, а её блоки
          переезжают в тело кабинета — старые копии оставались и раздел
-         показывался дважды (Эльнур 05.09). Держим ровно одну. */
+         показывался дважды (Эльнур 05.09). Держим ровно одну.
+
+         🔴 08.09: «ровно одна» оставалась НЕ ТА. Брали последнюю в документе,
+         а последняя — это старая копия, вынесенная в конец тела кабинета на
+         прошлой перерисовке; свежая рождается внутри #prop, то есть раньше по
+         документу, и её же и удаляли. Из-за этого разделы «Финансы», «Заезды»
+         и «Работы» показывали вчерашнее: внесённая операция «нигде не
+         зачлась», снятая работа оставалась в списке, а нажатие на карандаш у
+         неё давало «работа не найдена». Берём свежую — ту, что лежит в
+         карточке объекта; если её нет (карточку ещё не рисовали) — последнюю. */
       var all=document.querySelectorAll('[id="'+id+'"]');
-      var el=all[all.length-1]; if(!el) return;
-      for(var k=0;k<all.length-1;k++){ if(all[k]!==el) all[k].remove(); }
+      if(!all.length) return;
+      var host=document.getElementById('prop');
+      var el=null;
+      for(var q=0;q<all.length;q++){ if(host && host.contains(all[q])) { el=all[q]; break; } }
+      if(!el) el=all[all.length-1];
+      for(var k=0;k<all.length;k++){ if(all[k]!==el) all[k].remove(); }
       if(el.parentElement && el.parentElement.id!=='cab-body'){
         document.getElementById('cab-body').appendChild(el);
       }
@@ -6679,10 +6786,17 @@ window.openChat=openChat;window.closeChat=closeChat;window.clearChat=clearChat;w
         var a=nav.querySelector('a[data-tab="'+t+'"]'); if(a) a.remove();
       });
     }
-    /* всегда начинаем с обзора: запомненный раздел сбивал с толку —
-       человек заходил и видел, например, одни «Заявки» */
+    /* При входе всегда начинаем с обзора: запомненный раздел сбивал с толку.
+       А вот после сохранения возвращаем туда, где человек работал. */
+    var keep = window.__cabKeep; window.__cabKeep = null;
     var first = nav.querySelector('a[data-tab]');
-    cabPage(first ? first.getAttribute('data-tab') : 'overview');
+    var want = first ? first.getAttribute('data-tab') : 'overview';
+    if(keep && keep.tab && nav.querySelector('a[data-tab="'+keep.tab+'"]')) want = keep.tab;
+    cabPage(want);
+    if(keep){
+      if(keep.open===false){ var cb=document.getElementById('cab-body'); if(cb) cb.hidden=true; }
+      if(keep.y) setTimeout(function(){ window.scrollTo(0, keep.y); }, 0);
+    }
   }
 
   function draw(){
@@ -6721,6 +6835,15 @@ window.openChat=openChat;window.closeChat=closeChat;window.clearChat=clearChat;w
     try{ draw(); }catch(e){ if(window.console) console.warn('кабинет:', e); }
     return true;
   };
+  /* Эльнур 08.09: «внёс операцию и я выскочил в самое начало кабинета, блок
+     обзор, а хотелось бы продолжить с того же места, так логичнее».
+     Перед обновлением запоминаем раздел, объект и прокрутку — после
+     перерисовки возвращаем человека туда же. */
+  function reload(){
+    window.__cabKeep={ tab:CAB_TAB, cur:CUR, y:(window.scrollY||0),
+                       open:!(document.getElementById('cab-body')||{}).hidden };
+    return loadData();
+  }
   function loadData(){
     var shown=false;
     try{
@@ -6728,7 +6851,7 @@ window.openChat=openChat;window.closeChat=closeChat;window.clearChat=clearChat;w
       if(raw){
         var c=JSON.parse(raw);
         if(c && c.token===TOKEN && c.data && (Date.now()-c.at) < 7*24*3600e3){
-          DATA=c.data; CUR=0;
+          DATA=c.data; CUR=0;   /* из памяти браузера — всегда сначала */
           if(!(DATA.owner&&DATA.owner.must_change_password)){ draw(); shown=true; markStale(true); }
         }
       }
@@ -6750,7 +6873,8 @@ window.openChat=openChat;window.closeChat=closeChat;window.clearChat=clearChat;w
         try{localStorage.removeItem(LS);localStorage.removeItem(CACHE);}catch(e){}
         TOKEN=null; gateStep('phone');
         $('gate-err').textContent=(d&&d.error==='expired')?'Вход истёк — получите новый код.':''; return; }
-      DATA=d; CUR=0;
+      var keepCur = window.__cabKeep ? window.__cabKeep.cur : 0;
+      DATA=d; CUR=(keepCur < (d.properties||[]).length) ? keepCur : 0;
       try{ localStorage.setItem(CACHE, JSON.stringify({token:TOKEN,at:Date.now(),data:d})); }catch(e){}
       if(d.owner&&d.owner.must_change_password){ show('pwd'); return; }
       draw(); markStale(false);
@@ -6964,7 +7088,7 @@ window.openChat=openChat;window.closeChat=closeChat;window.clearChat=clearChat;w
     $('e-send').disabled=true; $('e-send').textContent='Отправляем…';
     post(body).then(function(d){
       $('e-send').disabled=false; $('e-send').textContent='Отправить на проверку';
-      if(d&&d.ok){ $('e-ok').textContent='Спасибо — отправили менеджеру. Проверим и добавим в карточку.'; loadData(); }
+      if(d&&d.ok){ $('e-ok').textContent='Спасибо — отправили менеджеру. Проверим и добавим в карточку.'; reload(); }
       else $('e-err').textContent = (d&&d.error==='not_your_property') ? 'Этот объект не привязан к вашему кабинету.' : 'Не удалось отправить.';
     }).catch(function(){
       $('e-send').disabled=false; $('e-send').textContent='Отправить на проверку';
@@ -7098,7 +7222,7 @@ window.openChat=openChat;window.closeChat=closeChat;window.clearChat=clearChat;w
         if($('r-from')) $('r-from').value='';
         if($('r-to')) $('r-to').value='';
         reqRangeLabel('r'); reqRangeDraw('r');
-        showCal(); loadData();
+        showCal(); reload();
       } else {
         err.textContent=(d&&d.error) ? d.error : 'Не удалось отправить заявку.';
       }

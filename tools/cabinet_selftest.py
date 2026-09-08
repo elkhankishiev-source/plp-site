@@ -77,6 +77,47 @@ else:
     fail_count += 1
     print('❌ работа не вернулась с id')
 
+print('\n— формы с незаполненными полями —')
+# Эльнур 08.09 «поставить в работу — всё заполнил и выдало rpc_failed»: проверка
+# была зелёной, потому что всегда заполняла КАЖДОЕ поле. Живой человек часть
+# полей не трогает — гоняем и такие случаи.
+check('работа без срока', {'action': 'uk_task', 'property_id': DEMO_OBJ, 'kind': 'repair',
+                           'due': '', 'cost': '', 'note': 'самопроверка пустые'})
+check('работа без всего кроме вида', {'action': 'uk_task', 'property_id': DEMO_OBJ,
+                                      'kind': 'check', 'note': 'самопроверка пустые'})
+check('операция без даты и заметки', {'action': 'uk_tx', 'property_id': DEMO_OBJ,
+                                      'kind': 'expense', 'amount': 1, 'category': 'прочее',
+                                      'date': '', 'note': 'самопроверка пустые'})
+# убираем за собой всё, что завела эта часть
+d = call({'action': 'data'})
+for p in (d.get('properties') or []):
+    if p.get('id') != DEMO_OBJ:
+        continue
+    for t in (p.get('tasks') or []):
+        if (t.get('note') or '') == 'самопроверка пустые':
+            call({'action': 'uk_task_delete', 'id': t['id']})
+    for t in (p.get('transactions') or []):
+        if (t.get('note') or '') == 'самопроверка пустые':
+            call({'action': 'uk_tx_delete', 'id': t['id']})
+
+print('\n— сторож брони —')
+# Эльнур 08.09: «как я могу поставить его объект на бронь, если он строится,
+# не сдан и не подписал с нами УК договор». Бронь без договора не должна проходить.
+r = call({'action': 'booking_check', 'property_id': 'PLP-HYTHE'})
+if r.get('ok') is False and r.get('error') == 'no_contract':
+    ok_count += 1
+    print('✅ %-34s %s' % ('бронь без договора отбита', (r.get('msg') or '')[:50]))
+else:
+    fail_count += 1
+    print('❌ %-34s %s' % ('бронь без договора ПРОШЛА', json.dumps(r, ensure_ascii=False)[:80]))
+r = call({'action': 'booking_check', 'property_id': DEMO_OBJ})
+if r.get('ok') is True:
+    ok_count += 1
+    print('✅ %-34s' % 'бронь по объекту с договором открыта')
+else:
+    fail_count += 1
+    print('❌ %-34s %s' % ('объект с договором закрыт', json.dumps(r, ensure_ascii=False)[:80]))
+
 print('\n— расходы владения —')
 check('заполнить ставки', {'action': 'uk_costs_update', 'property_id': DEMO_OBJ,
                            'taxes': 'проверка ' + str(id(object()))[-4:]})
@@ -99,9 +140,25 @@ else:
     print('❌ документ не вернулся с id')
 
 print('\n— бронь и состояние —')
-check('сохранить бронь', {'action': 'uk_booking_save', 'property_id': DEMO_OBJ,
-                          'guest': 'Самопроверка', 'check_in': '2026-11-01',
-                          'check_out': '2026-11-05', 'amount': 10000, 'channel': 'direct'})
+# бронь от прошлого прогона занимала даты и следующая проверка падала —
+# снимаем свои прежние брони, потом ставим новую и её тоже убираем
+_d = call({'action': 'data'})
+for _p in (_d.get('properties') or []):
+    if _p.get('id') != DEMO_OBJ:
+        continue
+    for _b in (_p.get('bookings') or []):
+        if (_b.get('guest_name') or '') == 'Самопроверка' and _b.get('status') != 'cancelled':
+            call({'action': 'uk_booking_save', 'property_id': DEMO_OBJ,
+                  'booking_id': _b.get('booking_id'), 'status': 'cancelled',
+                  'check_in': _b.get('check_in'), 'check_out': _b.get('check_out'),
+                  'guest': _b.get('guest_name')})
+_r = check('сохранить бронь', {'action': 'uk_booking_save', 'property_id': DEMO_OBJ,
+                               'guest': 'Самопроверка', 'check_in': '2026-11-01',
+                               'check_out': '2026-11-05', 'amount': 10000, 'channel': 'direct'})
+if _r and _r.get('booking_id'):
+    call({'action': 'uk_booking_save', 'property_id': DEMO_OBJ,
+          'booking_id': _r['booking_id'], 'status': 'cancelled',
+          'check_in': '2026-11-01', 'check_out': '2026-11-05', 'guest': 'Самопроверка'})
 check('состояние: список', {'action': 'check_list', 'property_id': DEMO_OBJ}, want_key='rows')
 
 print('\n— карточка человека —')
