@@ -8044,6 +8044,15 @@ window.chatVoice=chatVoice;window.listenBar=listenBar;window.paintVoiceMode=pain
   var CACHE='plp_owner_data';
   /* Точка входа для проверок вёрстки: подставляет готовые данные и рисует
      кабинет, не трогая вход. Без вызова снаружи ничего не делает. */
+  /* Та же точка входа для блока разбора папок: рисуем список из готовых
+     данных и смотрим, что видит сотрудник. */
+  window.__cabIntakeDemo=function(items){
+    var w=document.getElementById('in-wrap'), box=document.getElementById('in-list');
+    if(!w||!box) return false;
+    w.style.display=''; box.innerHTML='';
+    items.forEach(function(j){ box.appendChild(intakeCard(j)); });
+    return true;
+  };
   window.__cabDemo=function(data){
     DATA=data; CUR=0; TOKEN='demo';
     try{ show('app'); }catch(e){}
