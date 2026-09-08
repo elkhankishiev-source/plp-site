@@ -4063,7 +4063,7 @@ function aiTools(cards){
       if(c.items&&c.items.length){
         h+='<ul>'+c.items.map(function(x){
           return '<li><button type="button" onclick="closeChatToProp(\''+x.id+'\')">'+
-                 escHtml(x.title)+'</button>'+
+                 escHtml(x.title)+(x.price?(' · '+escHtml(x.price)):'')+'</button>'+
                  '<button type="button" class="book" onclick="askBooking(\''+x.id+'\',\''+
                  escHtml(String(x.title).replace(/'/g,'')) +'\',\''+escHtml(c.from)+'\',\''+
                  escHtml(c.to)+'\')">Запросить бронь</button></li>'; }).join('')+'</ul>';
