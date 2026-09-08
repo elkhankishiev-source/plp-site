@@ -1478,6 +1478,18 @@ html,*{-webkit-tap-highlight-color:transparent}
   .header .burger{width:36px;height:36px}
 }
 
+/* Полка документов собственника: что должно быть и чего не хватает */
+.shelf{border:1px solid rgba(var(--ink-rgb),.10);border-radius:14px;padding:12px 14px;margin:0 0 14px;background:var(--warm)}
+.shelf-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:8px}
+.shelf-l{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.shelf-l li{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(var(--ink-rgb),.05)}
+.shelf-l li:last-child{border-bottom:0}
+.shelf-i{flex:none;width:20px;text-align:center;font-weight:700;color:var(--green)}
+.shelf-l li.off .shelf-i{color:var(--dim);font-weight:400}
+.shelf-t{flex:1;min-width:0;display:flex;flex-direction:column}
+.shelf-t .sub{font-size:12px}
+.shelf-l li.off .shelf-t{color:var(--dim)}
+.shelf-add{flex:none}
 /* Даты брони рядом одной строкой: заезд → выезд */
 .dates2{display:flex;align-items:center;gap:8px;margin-top:4px}
 /* Заезд и выезд — одна графа: кнопка с диапазоном и календарь тут же,
@@ -2582,6 +2594,10 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   }
 
   var KINDS={cleaning:'Уборка',repair:'Ремонт',maintenance:'Обслуживание',inspection:'Осмотр',
+             /* Эльнур 08.09: «есть ведь функция осмотр объекта, обычно мы его не
+                пишем, но когда объект не сдаётся, туда всё равно надо идти
+                следить — это тоже наше время, в контракте эта инф есть». */
+             check:'Осмотр объекта', laundry:'Стирка и бельё', pool:'Бассейн', garden:'Сад',
              checkin:'Заезд',checkout:'Выезд',block_dates:'Блокировка дат',payout:'Выплата',
              /* заявка на выгрузку объекта приходила как «resale» — по-английски
                 и непонятно (Эльнур 06.09) */
@@ -2732,6 +2748,15 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       });
   }
   function fv2(id){ var e=document.getElementById(id); return e?e.value:''; }
+  /* Печатный бланк за один период — из строки «Истории отчётов». */
+  function reportForPeriod(period){
+    var key=String(period||'').slice(0,7);
+    var months=allMonths().filter(function(m){ return String(m.month).slice(0,7)===key; });
+    if(!months.length){
+      say('За '+period+' операций в кабинете нет — печатать нечего.'); return;
+    }
+    printReport(months);
+  }
   function printReport(rows){
     var props=DATA.properties||[];
     var inc=rows.reduce(function(a,m){return a+m.income;},0);
@@ -3245,6 +3270,13 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         if(rsl){ e.preventDefault();
           resaleForm(rsl.getAttribute('data-resale'), rsl.getAttribute('data-goal')||''); return; }
         /* правка и удаление операции: строку можно поправить прямо в таблице */
+        var need=t.closest && t.closest('[data-need]');
+        if(need){ e.preventDefault();
+          var fi=document.getElementById('doc-file');
+          if(fi) fi.click(); else say('Загрузка документов ниже на странице.');
+          return; }
+        var rep=t.closest && t.closest('[data-rep]');
+        if(rep){ e.preventDefault(); reportForPeriod(rep.getAttribute('data-rep')); return; }
         var tke=t.closest && t.closest('[data-tkedit]');
         if(tke){ e.preventDefault(); ukTaskEdit(tke.getAttribute('data-tkedit')); return; }
         var tkd=t.closest && t.closest('[data-tkdel]');
@@ -3275,14 +3307,26 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       '<option value="income">Доход</option></select></label>'+
       '<label>Сумма, ฿<input id="u-amount" type="number" min="1" step="100"></label>'+
       '<label>Дата<input id="u-date" type="date" value="'+new Date().toISOString().slice(0,10)+'"></label>'+
+      /* Статьи и тарифы — из общего справочника, а не из зашитого списка.
+         Эльнур 08.09: «перечисление не уборки, а уборка, комиссия, не комиссии,
+         уже шаблонно должен быть список вариантов с зафиксированными тарифами». */
       '<label>Статья<select id="u-cat">'+
-        ['аренда','уборка','ремонт','коммунальные','обслуживание','комиссия управления',
-         'налоги','мебель','страховка','прочее'].map(function(c){
-          return '<option value="'+c+'">'+c+'</option>'; }).join('')+
-      '</select></label>'+
+        (function(){
+          var tf=(DATA.tariffs||[]);
+          if(!tf.length) tf=[{category:'уборка'},{category:'ремонт'},{category:'коммунальные'},
+                             {category:'прочее'}];
+          return tf.map(function(c){
+            var lab=c.category+(has(c.amount_thb)?(' — '+money(c.amount_thb,'THB')+
+                    (c.unit&&c.unit!=='за раз'?(' '+c.unit):'')):'');
+            return '<option value="'+clEsc(c.category)+'" data-a="'+(c.amount_thb||'')+
+                   '" data-k="'+clEsc(c.kind||'expense')+'">'+clEsc(lab)+'</option>'; }).join('');
+        })()+
+      '</select><span class="hintline" id="u-tar"></span></label>'+
       '<label class="wide">Комментарий<input id="u-note" type="text" placeholder="за что именно"></label>'+
       '<label class="wide">Ссылка на чек<input id="u-rec" type="text" placeholder="необязательно"></label>'+
-      '</div><div class="fbtns"><button type="button" class="btn" id="f-save">Внести</button>'+
+      '</div><p class="sub"><a href="#" class="lnk" id="u-tarif">Изменить тарифы</a> — '+
+      'ставки по статьям, чтобы сумма подставлялась сама.</p>'+
+      '<div class="fbtns"><button type="button" class="btn" id="f-save">Внести</button>'+
       '<button type="button" class="btn ghost" id="f-cancel">Отмена</button></div>',
       function(){
         if(!fv('u-amount')){ say('Укажите сумму'); return; }
@@ -3296,6 +3340,65 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
           if(r&&r.ok){ document.getElementById('cl-form').innerHTML='';
             document.body.style.overflow=''; reload(); }
           else say((r&&r.error)||'Не сохранилось');
+        });
+      });
+    /* Выбрал статью — подставились тариф и вид операции. Ставку можно
+       поменять руками: тариф это подсказка, а не запрет. */
+    var cat=document.getElementById('u-cat'), amt=document.getElementById('u-amount'),
+        kind=document.getElementById('u-kind'), hint=document.getElementById('u-tar');
+    function fromTariff(){
+      var o=cat.options[cat.selectedIndex]; if(!o) return;
+      var a=o.getAttribute('data-a'), k=o.getAttribute('data-k')||'expense';
+      var t=(DATA.tariffs||[]).filter(function(x){return x.category===o.value;})[0]||{};
+      kind.value=k;
+      /* Ставку подставляем, пока человек не вписал свою: как только сумму
+         поправили руками, тариф её не перебивает. */
+      if(a && (!amt.value || amt.value===String(amt.dataset.fromTariff||''))){
+        amt.value=a; amt.dataset.fromTariff=a;
+      }
+      var ar=(propById(pid)||{}).areas||{};
+      var calc='';
+      if(a && t.unit==='за м² жилья' && has(ar.built)) calc=' → '+money(Math.round(a*ar.built),'THB')+' за '+ar.built+' м²';
+      if(a && t.unit==='за м² участка' && has(ar.plot)) calc=' → '+money(Math.round(a*ar.plot),'THB')+' за '+ar.plot+' м² участка';
+      hint.textContent = (t.period?('Обычно: '+t.period+'. '):'') + (t.note||'') + calc;
+    }
+    cat.onchange=fromTariff; fromTariff();
+    var tb=document.getElementById('u-tarif');
+    if(tb) tb.onclick=function(e){ e.preventDefault(); ukTariffForm(pid); };
+  }
+  /* Ставки по статьям: заполняются из договора и описания объекта, правятся руками. */
+  function ukTariffForm(pid){
+    var tf=(DATA.tariffs||[]);
+    clForm('<h3>Тарифы по статьям</h3>'+
+      '<p class="sub">Ставки подставляются в операции. Пусто — значит сумму вносим руками. '+
+      'Ставка «за м²» умножается на площадь: жильё — обслуживание и фонд, участок — сад и бассейн.</p>'+
+      '<table class="ctable inner"><tr><th>Статья</th><th>Ставка, ฿</th><th>Считается</th><th>Как часто</th></tr>'+
+      tf.map(function(t,i){
+        return '<tr><td>'+clEsc(t.category)+'</td>'+
+          '<td><input class="tarif-a" data-c="'+clEsc(t.category)+'" type="number" step="1" '+
+          'style="width:110px" value="'+(t.amount_thb||'')+'"></td>'+
+          '<td class="sub">'+clEsc(t.unit||'')+'</td>'+
+          '<td class="sub">'+clEsc(t.period||'')+'</td></tr>'; }).join('')+
+      '</table>'+
+      '<div class="fbtns"><button type="button" class="btn" id="f-save">Сохранить</button>'+
+      '<button type="button" class="btn ghost" id="f-cancel">Отмена</button></div>',
+      function(){
+        var b=document.getElementById('f-save'); if(b){ if(b.disabled) return; b.disabled=true; b.textContent='Сохраняем…'; }
+        var inputs=[].slice.call(document.querySelectorAll('.tarif-a'));
+        var jobs=inputs.filter(function(i){
+          var was=(tf.filter(function(x){return x.category===i.getAttribute('data-c');})[0]||{}).amount_thb;
+          return String(i.value||'')!==String(was==null?'':was);
+        }).map(function(i){
+          return post({action:'uk_tariff_set',token:TOKEN,category:i.getAttribute('data-c'),
+                       amount:i.value});
+        });
+        Promise.all(jobs).then(function(){
+          var f=document.getElementById('cl-form');
+          if(f){ f.innerHTML=''; document.body.style.overflow=''; }
+          post({action:'uk_tariffs',token:TOKEN,property_id:pid}).then(function(t){
+            if(t&&t.ok){ DATA.tariffs=t.rows||[]; try{ renderProp(); }catch(e){} }
+            say('Тарифы сохранены: '+jobs.length);
+          });
         });
       });
   }
@@ -3363,12 +3466,14 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     return null;
   }
   function ukCostsForm(pid){
-    var p=propById(pid), co=(p&&p.costs)||{};
+    var p=propById(pid), co=(p&&p.costs)||{}, ar=(p&&p.areas)||{};
     clForm('<h3>Расходы на содержание</h3>'+
       '<p class="sub">Ставки владения по объекту. Пустые поля не трогаем.</p>'+
       '<div class="fgrid">'+
       '<label>Фонд капремонта, ฿<input id="c-sink" type="number" step="100" value="'+(co.sinking_fund_thb||'')+'"></label>'+
-      '<label>Обслуживание, ฿/м²<input id="c-maint" type="number" step="1" value="'+(co.maintenance_fee_thb_sqm||'')+'"></label>'+
+      '<label>Обслуживание, ฿/м² в год<input id="c-maint" type="number" step="1" value="'+(co.maintenance_fee_thb_sqm||'')+'"></label>'+
+      '<label>Площадь дома или квартиры, м²<input id="c-built" type="number" step="0.1" value="'+(ar.built||'')+'"></label>'+
+      '<label>Площадь участка, м²<input id="c-plot" type="number" step="0.1" value="'+(ar.plot||'')+'"></label>'+
       '<label>Депозит брони, ฿<input id="c-dep" type="number" step="100" value="'+(co.booking_deposit_thb||'')+'"></label>'+
       '<label>Сбор за перевод права<input id="c-tr" type="text" value="'+clEsc(co.transfer_fee||'')+'"></label>'+
       '<label class="wide">Налоги<input id="c-tax" type="text" value="'+clEsc(co.taxes_note||'')+'"></label>'+
@@ -3379,7 +3484,8 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         var b=document.getElementById('f-save'); if(b){ if(b.disabled) return; b.disabled=true; b.textContent='Сохраняем…'; }
         post({action:'uk_costs_update',token:TOKEN,property_id:pid,
               sinking:fv('c-sink'),maintenance:fv('c-maint'),deposit:fv('c-dep'),
-              transfer:fv('c-tr'),taxes:fv('c-tax'),common:fv('c-com')}).then(function(r){
+              transfer:fv('c-tr'),taxes:fv('c-tax'),common:fv('c-com'),
+              plot:fv('c-plot'),built:fv('c-built')}).then(function(r){
           var f=document.getElementById('cl-form');
           if(r&&r.ok){ if(f){ f.innerHTML=''; document.body.style.overflow=''; } reload(); }
           else { if(b){ b.disabled=false; b.textContent='Сохранить'; } say((r&&r.error)||'Не сохранилось'); }
@@ -3444,7 +3550,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     clForm('<h3>Работа по объекту</h3>'+
       '<div class="fgrid">'+
       '<label>Что сделать<select id="u-tkind">'+
-        [['cleaning','Уборка'],['repair','Ремонт'],['check','Проверка'],
+        [['cleaning','Уборка'],['repair','Ремонт'],['check','Осмотр объекта'],
          ['laundry','Стирка и бельё'],['pool','Бассейн'],['garden','Сад'],
          ['other','Другое']].map(function(k){
           return '<option value="'+k[0]+'">'+k[1]+'</option>'; }).join('')+
@@ -4289,13 +4395,37 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     H+=card('Работы по объекту', kh, 'sec-service');
 
     // расходы владения
-    var co=p.costs||{}, ch='';
+    var co=p.costs||{}, ar=p.areas||{}, ch='';
+    /* Эльнур 08.09: «надо добавить пунктик площадь участка, площадь дома или
+       квартиры: обслуживание умножаем на площадь жилья, сад и бассейн — на
+       площадь участка. От того, какой площади земля под кондоминиумом, не
+       важно». Показываем и ставку, и что из неё выходит за год. */
+    ch+=line('Площадь дома или квартиры', has(ar.built)?(ar.built+' м²'):null);
+    ch+=line('Площадь участка', has(ar.plot)?(ar.plot+' м²'):null);
+    ch+=line('Обслуживание общих территорий, за м² в год',
+             has(co.maintenance_fee_thb_sqm)?money(co.maintenance_fee_thb_sqm,'THB'):null);
+    if(has(co.maintenance_fee_thb_sqm) && has(ar.built))
+      ch+=line('Выходит за год', money(Math.round(co.maintenance_fee_thb_sqm*ar.built),'THB')+
+               ' <span class="sub">= '+co.maintenance_fee_thb_sqm+' × '+ar.built+' м²</span>');
     ch+=line('Фонд капремонта',has(co.sinking_fund_thb)?money(co.sinking_fund_thb,'THB'):null);
-    ch+=line('Обслуживание за м²',has(co.maintenance_fee_thb_sqm)?money(co.maintenance_fee_thb_sqm,'THB'):null);
+    if(has(co.sinking_fund_thb) && has(ar.built))
+      ch+=line('Разово при передаче', money(Math.round(co.sinking_fund_thb*ar.built),'THB')+
+               ' <span class="sub">= '+co.sinking_fund_thb+' × '+ar.built+' м²</span>');
     ch+=line('Сбор за перевод права',co.transfer_fee);
     ch+=line('Депозит брони',has(co.booking_deposit_thb)?money(co.booking_deposit_thb,'THB'):null);
     ch+=line('Налоги',co.taxes_note);
     ch+=line('Общая территория',co.common_area_fee_note);
+    /* вилла: сад и бассейн считаются от участка */
+    var _tf=(DATA.tariffs||[]);
+    if(has(ar.plot)){
+      _tf.forEach(function(t){
+        if(t.unit!=='за м² участка' || !has(t.amount_thb)) return;
+        ch+=line(t.category+', в месяц', money(Math.round(t.amount_thb*ar.plot),'THB')+
+                 ' <span class="sub">= '+t.amount_thb+' × '+ar.plot+' м² участка</span>');
+      });
+    }
+    ch+='<p class="hintline">Коммунальные считаются по счётчику: платит собственник '+
+        'или тот, кто снял на долгий срок — как записано в договоре.</p>';
     if(!ch) ch='<div class="empty">Ставки владения пока не заполнены.</div>';
     if(DATA.owner&&DATA.owner.is_staff===true)
       ch+='<p class="sub"><a href="#" class="lnk" data-uk="costs" data-pid="'+(p.id||'')+
@@ -4319,24 +4449,39 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     var st=p.statements||[], sh='';
     if(!st.length){ sh='<div class="empty">Закрытых отчётов пока нет.</div>'; }
     else{
-      sh='<table><tr><th>Период</th><th class="r">Доход</th><th class="r">Расходы</th><th class="r">К выплате</th></tr>';
+      /* Эльнур 08.09: «история отчётов — только текст, не файлы, даже распечатать
+         не могу». Печатная версия в кабинете есть, но лежала только под кнопкой
+         в шапке. Даём её прямо из строки: открывается бланком на печать и в PDF
+         через «Сохранить как PDF» в окне печати. */
+      sh='<table><tr><th>Период</th><th class="r">Доход</th><th class="r">Расходы</th>'+
+         '<th class="r">К выплате</th><th></th></tr>';
       st.forEach(function(s){
         sh+='<tr><td>'+esc(s.period)+(s.status==='draft'?'<span class="chip grey">черновик</span>':'')+'</td>'+
             '<td class="r">'+money(s.income,s.currency||cur)+'</td>'+
             '<td class="r">'+money(s.expenses,s.currency||cur)+'</td>'+
-            '<td class="r"><b>'+money(s.net,s.currency||cur)+'</b></td></tr>';
+            '<td class="r"><b>'+money(s.net,s.currency||cur)+'</b></td>'+
+            '<td class="r" style="white-space:nowrap">'+
+            '<a href="#" class="lnk" data-rep="'+esc(s.period)+'">Открыть и распечатать</a></td></tr>';
       });
-      sh+='</table>';
+      sh+='</table><p class="hintline">Нажмите «Открыть и распечатать» — бланк откроется '+
+          'в новом окне. Там же «Сохранить как PDF», если нужен файл.</p>';
     }
     H+=card('История отчётов', sh, 'sec-reports');
 
     var dcs=p.docs||[], dch='';
     var DKIND={contract:'договор',act:'акт',report:'отчёт',plan:'планировка',
                invoice:'счёт',photo:'фото',other:'документ'};
-    if(!dcs.length){ dch='<div class="empty">Документов пока нет.</div>'; }
+    /* Эльнур 08.09: «наша витрина документов пуста, и более того, там надо
+       предложить какие документы там должны быть, и система должна их уметь
+       считывать, понимать и видеть как только они туда упали… ему надо
+       напоминать что у него есть, чего нет — это тоже своего рода прогрев
+       и сервис». Ниже — полка собственника: что должно лежать, что уже есть.
+       Узнаём по виду документа и по словам в названии, ничего не додумывая. */
+    dch+=docShelf(p, dcs);
+    if(!dcs.length){ dch+='<div class="empty">Файлов пока не загружено.</div>'; }
     else{
       var canDoc=(DATA.owner&&DATA.owner.is_staff===true);
-      dch='<table><tr><th>Что</th><th>Вид</th><th>Когда</th>'+(canDoc?'<th></th>':'')+'</tr>';
+      dch+='<table><tr><th>Что</th><th>Вид</th><th>Когда</th>'+(canDoc?'<th></th>':'')+'</tr>';
       dcs.forEach(function(d){
         dch+='<tr><td><a href="'+d.url+'" target="_blank" rel="noopener">'+esc(d.title||'документ')+
              '</a></td><td>'+(DKIND[d.kind]||d.kind||'—')+'</td><td>'+dmy(d.created_at)+'</td>'+
@@ -4359,7 +4504,17 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       '<span class="sub" id="doc-state">'+
       (forWhom ? ('Документ уйдёт в карточку: '+forWhom+'. ') : '')+
       'Договор, счёт, акт или фото бумаги — прочитаем сами. '+
-      'Из договора соберём график платежей и подставим в объект после вашей проверки.</span></div>'+
+      'Из договора соберём график платежей и подставим в объект после вашей проверки.</span>'+
+      /* Эльнур 08.09: «клиенту может быть лень всё это сортировать, надо ему
+         тоже дать возможность просто передать свою ссылку с файлами, а наша
+         умная система всё там рассортирует». */
+      '<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">'+
+        '<input id="doc-folder" type="url" placeholder="или ссылка на папку: Google Диск, Dropbox…" '+
+        'style="flex:1;min-width:220px">'+
+        '<button type="button" class="btn ghost" id="doc-folder-go">Передать папку</button>'+
+      '</div>'+
+      '<span class="sub" id="doc-folder-st">Разложим сами: договоры, планировки, снимки — '+
+      'каждое встанет на своё место, вам сортировать не нужно.</span></div>'+
       '<div id="doc-parsed"></div>';
     H+=card('Документы объекта', dch, 'sec-docs');
 
@@ -4369,6 +4524,80 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     bindFolds();
   }
 
+  /* Полка документов собственника: что положено иметь по объекту на Пхукете.
+     Порядок — как в жизни сделки: сначала купля-продажа, потом собственность,
+     потом управление и текущее. */
+  var DOC_SHELF=[
+    {id:'spa',      t:'Договор купли-продажи',      k:['contract'],
+     w:['sale','purchase','spa','s&p','договор куп','дкп','reservation','бронир'],
+     why:'основа сделки: кто, что и за сколько купил'},
+    {id:'schedule', t:'График платежей',            k:['contract','invoice'],
+     w:['schedule','график','payment plan','рассроч'],
+     why:'сколько и когда платить застройщику'},
+    {id:'title',    t:'Право собственности',        k:['contract','act'],
+     w:['chanote','title deed','ns3','нс3','чанот','свидетельств','lease','лизхолд','лиз'],
+     why:'чанот на фрихолд или зарегистрированный лизхолд'},
+    {id:'handover', t:'Акт приёма-передачи',        k:['act'],
+     w:['handover','акт при','приём','transfer act'],
+     why:'подтверждает, что объект принят'},
+    {id:'uk',       t:'Договор управления с нами',  k:['contract'],
+     w:['management','управлен','ук ','agency','агентск'],
+     why:'без него бронь по объекту не проходит'},
+    {id:'fet',      t:'Ввоз валюты (FET / Tor Tor 3)', k:['other','invoice'],
+     w:['fet','tor tor','tt3','foreign exchange','валют'],
+     why:'нужен фрихолду при перепродаже и выводе денег'},
+    {id:'passport', t:'Паспорт собственника',       k:['other','photo'],
+     w:['passport','паспорт'],
+     why:'страница с фото — для регистраций и договоров'},
+    {id:'rent',     t:'Договор аренды',             k:['contract'],
+     w:['lease agreement','tenancy','аренд','долгосроч'],
+     why:'если объект сдан на долгий срок'},
+    {id:'insurance',t:'Страховка',                  k:['other','invoice'],
+     w:['insurance','страхов','полис'],
+     why:'на дом и имущество'},
+    {id:'cam',      t:'Счета по общим сборам',      k:['invoice'],
+     w:['common area','cam','maintenance','sinking','обслужив','капремонт'],
+     why:'подтверждают оплату обслуживания и фонда'},
+    {id:'plan',     t:'Планировка и мебельный лист',k:['plan'],
+     w:['floor plan','планировк','layout','furniture','мебел'],
+     why:'нужны для аренды и перепродажи'}
+  ];
+  function docShelf(p, dcs){
+    var have={}, link={};
+    (dcs||[]).forEach(function(d){
+      var name=String(d.title||'').toLowerCase();
+      DOC_SHELF.forEach(function(x){
+        if(have[x.id]) return;
+        var byKind = x.k.indexOf(String(d.kind||''))>=0;
+        var byWord = x.w.some(function(w){ return name.indexOf(w)>=0; });
+        /* вид совпал и в названии есть слово — либо просто узнали по названию */
+        if(byWord || (byKind && x.id==='spa' && /контракт|contract/.test(name))){
+          have[x.id]=1; link[x.id]=d.url;
+        }
+      });
+    });
+    var got=DOC_SHELF.filter(function(x){ return have[x.id]; }).length;
+    var isStaff=(DATA.owner&&DATA.owner.is_staff===true);
+    var h='<div class="shelf"><div class="shelf-h"><b>Папка собственника</b>'+
+      '<span class="sub">' + got + ' из ' + DOC_SHELF.length + ' на месте</span></div><ul class="shelf-l">';
+    DOC_SHELF.forEach(function(x){
+      var ok=!!have[x.id];
+      h+='<li class="'+(ok?'on':'off')+'">'+
+         '<span class="shelf-i">'+(ok?'✓':'—')+'</span>'+
+         '<span class="shelf-t">'+(ok
+            ? ('<a href="'+link[x.id]+'" target="_blank" rel="noopener">'+esc(x.t)+'</a>')
+            : esc(x.t))+
+         '<span class="sub">'+esc(x.why)+'</span></span>'+
+         (ok?'':'<button type="button" class="btn-mini shelf-add" data-need="'+x.id+'">Загрузить</button>')+
+         '</li>';
+    });
+    h+='</ul>';
+    if(got<DOC_SHELF.length)
+      h+='<p class="hintline">Чего нет — можно донести позже: файлом здесь, ссылкой на папку '+
+         'или прямо в наш телеграм-бот. Как файл попадёт к нам, он сам встанет на своё место.</p>';
+    h+='</div>';
+    return h;
+  }
   function renderEditState(){
     var p=(DATA.properties||[])[CUR], box=$('edit-was');
     if(!box) return;
@@ -5087,6 +5316,21 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   function bindDocUpload(pid){
     var pick=document.getElementById('doc-pick'), fi=document.getElementById('doc-file'),
         st=document.getElementById('doc-state');
+    /* передать всю папку одной ссылкой */
+    var fg=document.getElementById('doc-folder'), fgo=document.getElementById('doc-folder-go'),
+        fst=document.getElementById('doc-folder-st');
+    if(fgo && fg) fgo.onclick=function(){
+      var u=(fg.value||'').trim();
+      if(!/^https?:\/\//i.test(u)){ fst.textContent='Нужна ссылка целиком, вместе с http.'; return; }
+      fgo.disabled=true; fst.textContent='Передаём…';
+      post({action:'source_add',token:TOKEN,property_id:pid||'',url:u}).then(function(r){
+        fgo.disabled=false;
+        if(r&&r.ok){ fg.value='';
+          fst.textContent='Приняли папку. Разберём и разложим — что попадёт в карточку, '+
+                          'увидите здесь же.'; }
+        else fst.textContent=(r&&r.error)||'Не передалось';
+      });
+    };
     if(!pick||!fi) return;
     pick.onclick=function(){ fi.click(); };
     fi.onchange=function(){
@@ -6878,6 +7122,13 @@ window.openChat=openChat;window.closeChat=closeChat;window.clearChat=clearChat;w
       try{ localStorage.setItem(CACHE, JSON.stringify({token:TOKEN,at:Date.now(),data:d})); }catch(e){}
       if(d.owner&&d.owner.must_change_password){ show('pwd'); return; }
       draw(); markStale(false);
+      /* Справочник статей с тарифами — один раз на загрузку кабинета.
+         Эльнур 08.09: «уже шаблонно должен быть список вариантов
+         с зафиксированными тарифами». */
+      post({action:'uk_tariffs',token:TOKEN,
+            property_id:((DATA.properties||[])[CUR]||{}).id||''}).then(function(t){
+        if(t&&t.ok){ DATA.tariffs=t.rows||[]; try{ renderProp(); }catch(e){} }
+      });
     }).catch(function(){
       if(shown){ markStale(false, 'нет связи — показаны последние данные'); return; }
       gateStep('phone'); $('gate-err').textContent='Нет связи с сервером. Попробуйте позже.';
