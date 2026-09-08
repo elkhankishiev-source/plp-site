@@ -219,7 +219,7 @@
    "name": "Eden · Park Residences",
    "district": "Банг Тао",
    "type": "Кондо",
-   "price_from": null,
+   "price_from": 11904800,
    "units": []
   },
   {
@@ -229,7 +229,7 @@
    "name": "Eden Residences",
    "district": "Банг Тао",
    "type": "Кондо",
-   "price_from": null,
+   "price_from": 13900000,
    "units": []
   },
   {
