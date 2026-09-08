@@ -679,6 +679,35 @@
    ]
   },
   {
+   "id": "PLP-TONINO-OV",
+   "pub": "PLP-TONINO-OV",
+   "url": "https://property-library.com/object/tonino-ov",
+   "name": "Tonino Lamborghini Ocean Valley Villas",
+   "district": "Ao Por",
+   "type": "Вилла",
+   "price_from": 70771000,
+   "units": [
+    {
+     "beds": 4,
+     "name": "Тип B — 4 спальни",
+     "note": "внутренняя площадь 295 м², терраса и двор 330 м², участок 1143–1539 м², бассейн 4,35 × 12,48 м",
+     "area_sqm": 625,
+     "price_from_thb": 70771000,
+     "area": 625,
+     "plot": "1143–1539 м²"
+    },
+    {
+     "beds": 5,
+     "name": "Тип C — 5 спален",
+     "note": "внутренняя площадь 662 м², терраса и двор 467–679 м², участок 1520–1818 м², бассейн 4,88 × 16,38 м",
+     "area_sqm": 1341,
+     "price_from_thb": 119635000,
+     "area": 1341,
+     "plot": "1520–1818 м²"
+    }
+   ]
+  },
+  {
    "id": "PLP-VIBE-KARON",
    "pub": "PLP-VIBE-KARON",
    "url": "https://property-library.com/object/vibe-karon",
@@ -727,6 +756,26 @@
      "from": 3500000
     }
    ]
+  },
+  {
+   "id": "PLP-VIVI-A304",
+   "pub": "PLP-VIVI-A304",
+   "url": "https://property-library.com/object/vivi-a304",
+   "name": "The Title VIVI, Банг Тао — перепродажа, 3 этаж",
+   "district": "Банг Тао",
+   "type": "Кондо",
+   "price_from": null,
+   "units": []
+  },
+  {
+   "id": "PLP-VIVI-A507",
+   "pub": "PLP-VIVI-A507",
+   "url": "https://property-library.com/object/vivi-a507",
+   "name": "The Title VIVI, Банг Тао — перепродажа, 5 этаж",
+   "district": "Банг Тао",
+   "type": "Кондо",
+   "price_from": null,
+   "units": []
   },
   {
    "id": "PLP-ZENITHY",
