@@ -1910,6 +1910,13 @@ body{background:var(--bg)}
   background:var(--paper)}
 
 /* PLP:UI:END */
+/* Разбор документа: то, что система прочитала, разложенное по пунктам */
+.docread{border:1px solid var(--line);border-radius:14px;margin:8px 0;background:var(--paper)}
+.docread>summary{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:12px 14px;cursor:pointer;list-style:none}
+.docread>summary::-webkit-details-marker{display:none}
+.docread>summary b{flex:1;min-width:140px;font-size:14.5px;word-break:break-word}
+.docread-b{padding:0 14px 14px}
+.docread-b h5{margin:12px 0 4px;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--dim)}
 </style>
 <!-- Leaflet подгружается только при открытии раздела с картой: см. ensureLeaflet() -->
 </head>
@@ -5117,6 +5124,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       '</div>'+
       '<span class="sub" id="doc-folder-st">Разложим сами: договоры, планировки, снимки — '+
       'каждое встанет на своё место, вам сортировать не нужно.</span></div>'+
+      docRead(p)+
       '<div id="doc-parsed"></div>';
     H+=card('Документы объекта', dch, 'sec-docs');
 
@@ -5166,6 +5174,66 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
      w:['floor plan','планировк','layout','furniture','мебел'],
      why:'нужны для аренды и перепродажи'}
   ];
+  /* Эльнур 08.09: «если я и владелец закинет контракт — система распознает всё
+     необходимое и рассортирует всё по пунктам, так надо! так с любым блоком».
+     Один разбор — одна раскладка: её же показываем в карточке клиента и в
+     финансах, чтобы не плодить три вида одного и того же. */
+  var DOC_ST={'new':'приняли','reading':'читаем…','parsed':'прочитали','confirmed':'учтено','failed':'не прочитали'};
+  function docFacts(f){
+    var d=f.parsed||{}, h='';
+    function row(k,v){ return v ? ('<div><span class="lbl">'+k+'</span>'+v+'</div>') : ''; }
+    var obj = row('Проект', d.project?esc(d.project):'')+
+              row('Юнит', d.unit?esc(d.unit):'')+
+              row('Площадь', d.area_sqm?(d.area_sqm+' м²'):'')+
+              row('Спальни', d.bedrooms?String(d.bedrooms):'');
+    var deal= row('Сумма', d.price?(Number(d.price).toLocaleString('ru-RU')+' '+(d.currency||'THB')):'')+
+              row('Договор', d.contract_date?dmy(d.contract_date):'')+
+              row('Сдача', d.handover_date?dmy(d.handover_date):'')+
+              row('Стадия', d.stage?esc(d.stage):'');
+    var who = row('Покупатель', d.buyer?esc(d.buyer):'')+
+              row('Застройщик', d.developer?esc(d.developer):'');
+    if(obj)  h+='<h5>Объект</h5><div class="crow">'+obj+'</div>';
+    if(deal) h+='<h5>Сделка</h5><div class="crow">'+deal+'</div>';
+    if(who)  h+='<h5>Стороны</h5><div class="crow">'+who+'</div>';
+    var pay=d.payments||[];
+    if(pay.length){
+      var paid=pay.filter(function(x){return x.paid;}).length;
+      h+='<h5>График платежей — '+pay.length+', оплачено '+paid+'</h5>'+
+         '<table><tr><th>Когда</th><th class="r">Сколько</th><th>За что</th><th></th></tr>';
+      pay.slice(0,14).forEach(function(x){
+        h+='<tr><td>'+(x.date?dmy(x.date):'—')+'</td><td class="r">'+
+           (x.amount?Number(x.amount).toLocaleString('ru-RU'):(x.percent?(x.percent+' %'):'—'))+
+           '</td><td>'+esc(x.note||'')+'</td><td>'+(x.paid?'<span class="chip">оплачен</span>':'')+'</td></tr>';
+      });
+      h+='</table>';
+    }
+    if(d.summary) h+='<p class="sub" style="margin:8px 0 0">'+esc(d.summary)+'</p>';
+    if(d.confidence==='low')
+      h+='<p class="sub" style="color:var(--dim)">Читалось плохо — проверьте цифры глазами.</p>';
+    return h;
+  }
+  function docRead(p){
+    var fs=(p.files||[]);
+    if(!fs.length) return '';
+    var h='<h4 style="margin:16px 0 6px">Что система прочитала</h4>'+
+          '<p class="sub" style="margin:0 0 8px">Загруженные файлы разбираются сами. '+
+          'В карточку объекта данные попадают только после вашей проверки.</p>';
+    fs.forEach(function(f){
+      var st=String(f.status||'new');
+      h+='<details class="docread"><summary><b>'+esc(f.name||'документ')+'</b>'+
+         '<span class="chip'+(st==='failed'?' grey':'')+'">'+(DOC_ST[st]||st)+'</span>'+
+         '<span class="sub">'+dmy(f.created_at)+(f.by?(' · '+esc(f.by)):'')+'</span></summary>'+
+         '<div class="docread-b">';
+      if(st==='parsed'||st==='confirmed') h+=docFacts(f);
+      else if(st==='failed') h+='<p class="sub">Не прочитали: '+esc(f.error||'файл нечитаемый')+'</p>';
+      else h+='<p class="sub">Читаем документ — обычно до минуты.</p>';
+      h+='<div class="clbar">'+
+         ((st==='parsed')?('<button type="button" class="btn" data-docapply="'+f.id+'">Перенести в карточку</button>'):'')+
+         '<button type="button" class="btn ghost" data-docre="'+f.id+'">Прочитать ещё раз</button>'+
+         '</div><span class="sub" data-docst="'+f.id+'"></span></div></details>';
+    });
+    return h;
+  }
   function docShelf(p, dcs){
     var have={}, link={};
     (dcs||[]).forEach(function(d){
@@ -6114,11 +6182,14 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       rd.onload=function(){
         var b64=String(rd.result).split(',')[1]||'';
         var staffFor=(DATA.owner&&DATA.owner.is_staff===true&&CTX.lead)?CTX.lead:'';
-        post(staffFor
-          ? {action:'staff_doc',token:TOKEN,code:staffFor,file_name:f.name,mime:f.type,
-             kind:docKindByName(f.name),property_id:pid||'',data:b64}
+        /* Документ всегда ложится к объекту: и когда грузит собственник, и когда
+           сотрудник. Раньше уходило в client-портал, а сотрудничье «staff_doc»
+           сервер вообще не знал — файл терялся. */
+        post(pid
+          ? {action:'uk_doc_file',token:TOKEN,property_id:pid,file_name:f.name,
+             mime:f.type,kind:docKindByName(f.name),data:b64}
           : {action:'my_doc',token:TOKEN,file_name:f.name,mime:f.type,
-             kind:docKindByName(f.name),property_id:pid||'',data:b64})
+             kind:docKindByName(f.name),data:b64})
           .then(function(r){
             pick.disabled=false; fi.value='';
             if(r&&r.ok){
@@ -8060,6 +8131,13 @@ window.chatVoice=chatVoice;window.listenBar=listenBar;window.paintVoiceMode=pain
      кабинет, не трогая вход. Без вызова снаружи ничего не делает. */
   /* Та же точка входа для блока разбора папок: рисуем список из готовых
      данных и смотрим, что видит сотрудник. */
+  /* Проверка вёрстки разбора документов: рисуем раскладку из готовых данных. */
+  window.__cabDocDemo=function(files){
+    var host=document.createElement('div'); host.id='doc-demo';
+    host.innerHTML=docRead({files:files});
+    document.body.appendChild(host);
+    return host.querySelectorAll('.docread').length;
+  };
   window.__cabIntakeDemo=function(items){
     var w=document.getElementById('in-wrap'), box=document.getElementById('in-list');
     if(!w||!box) return false;
