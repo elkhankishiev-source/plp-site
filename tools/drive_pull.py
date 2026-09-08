@@ -97,6 +97,35 @@ def download(fid, dst):
     return head[:3] == b'\xff\xd8\xff' or head[:8] == b'\x89PNG\r\n\x1a\n' or head[:4] == b'RIFF'
 
 
+SBFILE = '/tmp/.sb'
+
+
+def sb():
+    d = json.load(open(SBFILE))
+    return d['url'].rstrip('/') + '/rest/v1', {
+        'apikey': d['key'], 'Authorization': 'Bearer ' + d['key'],
+        'Content-Type': 'application/json'}
+
+
+def queue_take():
+    """Папки, которые человек уже принял в кабинете. Разбор сделала система,
+    решение принял человек — здесь остаётся только забрать снимки."""
+    base, h = sb()
+    req = urllib.request.Request(
+        base + '/intake_jobs?select=id,folder_id,property_id,project_name'
+             + '&status=eq.approved&property_id=not.is.null&order=id.asc&limit=20', headers=h)
+    return json.load(urllib.request.urlopen(req, timeout=60))
+
+
+def queue_done(job_id, note):
+    base, h = sb()
+    req = urllib.request.Request(
+        base + '/intake_jobs?id=eq.%d' % job_id,
+        data=json.dumps({'status': 'done', 'note': note[:400]}).encode(),
+        headers=h, method='PATCH')
+    urllib.request.urlopen(req, timeout=60).read()
+
+
 def main():
     ap = argparse.ArgumentParser(description='Материалы застройщика с Диска в карточку объекта')
     ap.add_argument('--folder', help='id папки проекта на Диске')
@@ -104,7 +133,21 @@ def main():
     ap.add_argument('--list', dest='listing', help='показать содержимое папки и выйти')
     ap.add_argument('--dry', action='store_true', help='показать план, ничего не качать')
     ap.add_argument('--max', type=int, default=MAX_PER_KIND, help='сколько снимков брать на вид')
+    ap.add_argument('--queue', action='store_true',
+                    help='забрать все папки, принятые в кабинете')
     a = ap.parse_args()
+
+    if a.queue:
+        jobs = queue_take()
+        if not jobs:
+            print('принятых папок нет — очередь пуста')
+            return
+        for j in jobs:
+            print('\n=== %s · %s' % (j.get('property_id'), j.get('project_name') or ''))
+            r = subprocess.run([sys.executable, __file__, '--folder', j['folder_id'],
+                                '--id', j['property_id'], '--max', str(a.max)])
+            queue_done(j['id'], 'снимки забраны' if r.returncode == 0 else 'снимки не забрались')
+        return
 
     if a.listing:
         for f in children(a.listing):

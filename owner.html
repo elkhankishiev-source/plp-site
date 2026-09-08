@@ -2394,6 +2394,12 @@ body{background:var(--bg)}
         </div>
         <div id="m-count" class="sub" style="margin:8px 0 0"></div>
       </div>
+      <div id="in-wrap" class="intake" style="display:none">
+        <h4 style="margin:0 0 6px">Разбор папок</h4>
+        <p class="sub" style="margin:0 0 10px">Собственник прислал одну ссылку — система сама раскрыла
+        папку, разложила файлы по видам и собрала черновик. Смотрите и решайте: принять или отклонить.</p>
+        <div id="in-list"></div>
+      </div>
       <div id="m-open" class="openbox"></div>
       <div id="m-list"></div>
       <div class="ok" id="m-ok"></div>
@@ -4599,7 +4605,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     /* Эльнур 08.09: «висит уборка и только согласовать, а закрыть или отменить
        нету снова». У сотрудника — сделано и снять; у собственника — согласовать. */
     var isStaff=!!(DATA.owner&&DATA.owner.is_staff===true);
-    (p.tasks||[]).slice(0,3).forEach(function(k){
+    (p.tasks||[]).filter(function(k){ return k.status!=='done'; }).slice(0,3).forEach(function(k){
       items.push({t:(KINDS[k.kind]||k.kind||'Работа'),
                   s:(k.due_date?dmy(k.due_date)+' · ':'')+(k.cost_thb?money(k.cost_thb,'THB'):'по факту'),
                   a:(isStaff?'':'Согласовать'), kind:k.kind, cost:k.cost_thb,
@@ -5351,9 +5357,80 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       });
     });
   }
+  /* Эльнур 08.09: «клиенту может быть лень всё это сортировать — пусть просто
+     передаст ссылку, а наша умная система там всё рассортирует». Раскладывает
+     система, решает человек: полный автомат нам уже трижды выходил боком. */
+  var IN_RU={exterior:'фасады и виды',interior:'интерьеры',plans:'планировки',
+             master:'генплан',facilities:'инфраструктура',other:'без разбора'};
+  function loadIntake(){
+    var w=document.getElementById('in-wrap'), box=document.getElementById('in-list');
+    if(!w||!box) return;
+    post({action:'intake_list',token:TOKEN}).then(function(d){
+      var items=(d&&d.ok&&d.items)||[];
+      if(!items.length){ w.style.display='none'; return; }
+      w.style.display=''; box.innerHTML='';
+      items.forEach(function(j){ box.appendChild(intakeCard(j)); });
+    })['catch'](function(){ w.style.display='none'; });
+  }
+  function intakeCard(j){
+    var d=document.createElement('div'); d.className='msub fold';
+    var sm=j.summary||{}, kinds=sm.kinds||{}, docs=sm.docs||[];
+    var st = j.status==='parsed' ? 'разобрано'
+           : j.status==='parsing' ? 'разбираем…'
+           : j.status==='approved' ? 'принято'
+           : j.status==='rejected' ? 'отклонено'
+           : j.status==='error' ? 'папка закрыта' : 'в очереди';
+    var ttl = j.project_name || j.property_id || 'папка с материалами';
+    var head=document.createElement('button'); head.type='button'; head.className='msub-h';
+    head.innerHTML='<span class="ms-t"><b>'+esc(ttl)+'</b><u>'+
+      (sm.files?('файлов '+sm.files+' · снимков '+(sm.images||0)+' · документов '+(sm.pdfs||0)):'ждёт разбора')+
+      (j.property_id?(' · '+esc(j.property_id)):'')+'</u></span>'+
+      '<span class="ms-s">'+st+'</span><span class="ms-c">▾</span>';
+    var wrap=d;
+    head.onclick=function(){ wrap.classList.toggle('open', !wrap.classList.contains('open')); };
+    d.appendChild(head);
+    var body=document.createElement('div'); body.className='msub-b'; d.appendChild(body);
+    var h='';
+    var ks=Object.keys(kinds);
+    if(ks.length){
+      h+='<p class="sub" style="margin:0 0 4px">Отобрано для витрины: '+(sm.picked||0)+'</p><ul class="inl">';
+      ks.sort(function(x,y){return kinds[y]-kinds[x];}).forEach(function(k){
+        h+='<li>'+esc(IN_RU[k]||k)+' — '+kinds[k]+'</li>'; });
+      h+='</ul>';
+    }
+    if(docs.length){
+      h+='<p class="sub" style="margin:8px 0 4px">Документы</p><ul class="inl">';
+      docs.slice(0,8).forEach(function(x){ h+='<li>'+esc(x.what||'документ')+': '+esc(x.name||'')+'</li>'; });
+      h+='</ul>';
+    }
+    if(j.findings) h+='<p class="sub" style="margin:8px 0 0">'+esc(j.findings)+'</p>';
+    h+='<p class="sub" style="margin:8px 0 0">Папка: <a href="'+esc(j.folder_url||'')+'" target="_blank" rel="noopener">открыть на Диске</a></p>';
+    body.innerHTML=h;
+    if(j.status==='parsed'){
+      var bar=document.createElement('div'); bar.className='clbar';
+      var ok=document.createElement('button'); ok.type='button'; ok.className='btn'; ok.textContent='Принять';
+      var no=document.createElement('button'); no.type='button'; no.className='btn ghost'; no.textContent='Отклонить';
+      var st2=document.createElement('span'); st2.className='sub';
+      function go(yes,btn){
+        btn.disabled=true; st2.textContent='Сохраняем…';
+        post({action:'intake_decide',token:TOKEN,id:j.id,ok:yes}).then(function(r){
+          if(r&&r.ok){ st2.textContent = yes
+            ? ('Принято. Папка закреплена за объектом'+(r.linked?'':' (ссылка уже была)')+
+               ', снимки заберём при ближайшей выгрузке.')
+            : 'Отклонено.';
+            setTimeout(loadIntake,900);
+          } else { st2.textContent=(r&&r.error)||'не сохранилось'; btn.disabled=false; }
+        })['catch'](function(){ st2.textContent='сеть не ответила'; btn.disabled=false; });
+      }
+      ok.onclick=function(){ go(true,ok); }; no.onclick=function(){ go(false,no); };
+      bar.appendChild(ok); bar.appendChild(no); body.appendChild(bar); body.appendChild(st2);
+    }
+    return d;
+  }
   function loadModeration(){
     var box=document.getElementById('m-list'); if(!box) return;
     box.innerHTML='<p class="sub">Загружаем…</p>';
+    loadIntake();
     post({action:'mod_list',token:TOKEN,status:MOD_STATUS}).then(function(d){
       if(!d||!d.ok){ box.innerHTML='<p class="sub">Не удалось загрузить заявки.</p>'; return; }
       var items=d.items||[];

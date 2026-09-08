@@ -172,6 +172,7 @@ print('\n— рассылка и служебное —')
 check('рассылка: список', {'action': 'camp_list'}, want_key='rows')
 check('рассылка: каналы', {'action': 'camp_channels'}, want_key='rows')
 check('модерация объектов', {'action': 'mod_list'}, want_key='rows')
+check('разбор папок', {'action': 'intake_list'}, want_key='rows')
 check('каноны', {'action': 'canon'}, want_key='rows')
 
 print('\nитог: работает %d, сломано %d' % (ok_count, fail_count))
