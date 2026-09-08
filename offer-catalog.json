@@ -264,7 +264,7 @@
    "pub": "PLP-EVERPRIME",
    "url": "https://property-library.com/object/everprime",
    "name": "Ever Prime",
-   "district": "Phuket",
+   "district": "Карон",
    "type": "Кондо",
    "price_from": null,
    "units": []
@@ -814,7 +814,7 @@
    "name": "The ZERO Bang Tao",
    "district": "Банг Тао",
    "type": "Кондо",
-   "price_from": null,
+   "price_from": 5147687,
    "units": []
   },
   {
