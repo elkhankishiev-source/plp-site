@@ -187,8 +187,11 @@ body{background:var(--bg)}
 /* В кабинете общее правило button{margin-top:14px;width:100%} сдвигало кнопки
    языка вниз, и тумблер «уплывал» из своего овала. Кнопкам в шапке и в меню
    отступы и ширину задаём сами. */
-.mnav .mlang button,.mnav .mtheme,.header .lang button,.header .themebtn,.header .burger{
+/* 🔴 08.09: сюда попал и бургер — width:auto перебивал его 36px, и на телефоне
+   он сжимался до ширины полосок: выглядел обрезанным. Бургеру ширину задаём отдельно. */
+.mnav .mlang button,.mnav .mtheme,.header .lang button,.header .themebtn{
   margin:0;width:auto}
+.header .burger{margin:0;width:36px;height:36px;flex:0 0 36px}
 .mnav .mlang button{height:100%;display:inline-flex;align-items:center;justify-content:center;
   border-radius:0;flex:1 1 0;min-width:0}
 .mnav .mtheme{margin:0}
