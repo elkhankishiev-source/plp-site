@@ -11,4 +11,10 @@ for (const s of steps) {
   process.stdout.write(`— ${s}\n`);
   execFileSync('node', [`build/${s}`], { cwd: '/Users/elnurkhankishiev/plp-site', stdio: 'inherit' });
 }
+/* Приёмка карточек идёт на каждой сборке — чтобы противоречия всплывали сами,
+   а не когда Эльнур их заметит. Сборку не валит: это отчёт, а не запрет. */
+try {
+  execFileSync('python3', ['tools/catalog_audit.py', '--short'],
+    { cwd: '/Users/elnurkhankishiev/plp-site', stdio: 'inherit' });
+} catch (e) { console.log('[приёмка] проверка не отработала'); }
 console.log('сборка завершена');
