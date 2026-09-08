@@ -520,6 +520,31 @@ section[id],div[id^="q"],[id="about"],[id="steps"],[id="faq"]{scroll-margin-top:
 .chipf{white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;background:rgba(var(--glass-rgb),.85);border:1px solid rgba(var(--ink-rgb),.07);border-radius:999px;padding:9px 15px;font-size:.84rem;font-weight:600;cursor:pointer;transition:border-color .2s,background .2s,transform .15s;user-select:none}
 /* Бегунок цены: две ручки на одной дорожке, между ними закрашенный отрезок. */
 .stay{margin-top:12px;padding:12px;background:var(--paper);border:1px solid rgba(var(--ink-rgb),.08);border-radius:13px}
+/* Заезд и выезд — одно поле. Эльнур 08.09: «заезд выезд везде должны
+   проставляться в одном поле». Кнопка с диапазоном и календарь тут же:
+   первое нажатие — заезд, второе — выезд. */
+.rf-btn{font:inherit;font-size:.9rem;font-weight:600;color:inherit;background:rgba(var(--glass-rgb),.9);
+  border:1px solid rgba(var(--ink-rgb),.12);border-radius:10px;padding:10px 12px;min-width:230px;
+  cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left}
+.rf-btn i{font-style:normal;opacity:.55;transition:transform .15s}
+.rf-btn.open i{transform:rotate(180deg)}
+.rf-cal{margin-top:8px;padding:12px;border:1px solid rgba(var(--ink-rgb),.12);border-radius:14px;
+  background:rgba(var(--glass-rgb),.9);max-width:330px}
+.rf-cal .rf-h{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;font-size:.86rem}
+.rf-cal .rf-h b{font-weight:700;text-transform:capitalize}
+.rf-nav{font:inherit;background:none;border:1px solid rgba(var(--ink-rgb),.12);border-radius:8px;
+  width:28px;height:28px;cursor:pointer;color:inherit;line-height:1}
+.rf-w,.rf-g{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.rf-w span{text-align:center;font-size:.66rem;color:var(--muted);padding:2px 0}
+.rf-g span{text-align:center;font-size:.82rem;padding:6px 0;border-radius:8px;
+  border:1px solid transparent;cursor:pointer;user-select:none}
+.rf-g span.rf-e{cursor:default}
+.rf-g span.rf-off{opacity:.3;cursor:not-allowed}
+.rf-g span.rf-in{background:var(--green-soft,rgba(210,213,179,.4));color:var(--green-text,inherit)}
+.rf-g span.rf-edge{background:var(--green,#5c6b3f);color:var(--on-green,#fff);font-weight:700}
+.rf-hint{display:block;font-size:.7rem;color:var(--muted);margin-top:8px}
+.df-fld .rf-cal{position:absolute;z-index:30}
+.df-range{position:relative}
 .stay-f{display:flex;gap:10px;flex-wrap:wrap}
 .stay-f label{flex:1 1 130px;display:flex;flex-direction:column;gap:4px;font-size:.72rem;font-weight:600;color:var(--muted)}
 .stay-f input{border:1px solid rgba(var(--ink-rgb),.12);border-radius:9px;padding:8px 10px;font:inherit;font-size:.86rem}
@@ -2288,6 +2313,7 @@ ru: {
   "book.title":"Запрос на аренду","book.req":"Оставить запрос на аренду",
   "u.req2":"Запросить (даты/цену)",
   "rent.dates.in":"Заезд","rent.dates.out":"Выезд","rent.dates.btn":"Показать свободные","rent.dates.reset":"Сбросить дату",
+  "rent.dates.stay":"Даты проживания","rent.dates.pick":"Выберите даты","rent.dates.pickout":"выберите выезд","rent.dates.n1":"ночь","rent.dates.n2":"ночи","rent.dates.n5":"ночей",
   "rent.dates.hint":"Выберите даты заезда и выезда — покажем только свободные варианты. Без дат показаны все объекты.",
   "rent.dates.loading":"Проверяем доступность","rent.dates.free":"Показаны варианты, свободные на выбранные даты.",
   "rent.dates.busy":"Занято на эти даты","rent.dates.none":"На выбранные даты свободных вариантов нет — оставьте запрос, подберём альтернативу.",
@@ -2462,6 +2488,7 @@ en: {
   "book.title":"Rental enquiry","book.req":"Leave a rental enquiry",
   "u.req2":"Request (dates/price)",
   "rent.dates.in":"Check-in","rent.dates.out":"Check-out","rent.dates.btn":"Show available","rent.dates.reset":"Reset dates",
+  "rent.dates.stay":"Stay dates","rent.dates.pick":"Select dates","rent.dates.pickout":"pick check-out","rent.dates.n1":"night","rent.dates.n2":"nights","rent.dates.n5":"nights",
   "rent.dates.hint":"Pick check-in and check-out dates — we will show only what is free. Without dates, all homes are shown.",
   "rent.dates.loading":"Checking availability","rent.dates.free":"Showing homes available for the selected dates.",
   "rent.dates.busy":"Booked for these dates","rent.dates.none":"No homes available for the selected dates — leave an enquiry and we will find an alternative.",
@@ -3908,8 +3935,10 @@ function openProp(pid){
       /* Считаем стоимость проживания прямо здесь: выбрал даты — увидел цену
          со скидкой за срок, как на нормальных сервисах бронирования. */
       '<div class="stay"><div class="stay-f">'+
-        '<label>'+t('rent.dates.in')+'<input type="date" id="stayIn"></label>'+
-        '<label>'+t('rent.dates.out')+'<input type="date" id="stayOut"></label></div>'+
+        '<label style="flex:1 1 100%">'+t('rent.dates.stay')+
+          '<button type="button" class="rf-btn" id="stayRangeBtn"><span id="stayRangeT">'+t('rent.dates.pick')+'</span><i>▾</i></button>'+
+          '<input type="hidden" id="stayIn"><input type="hidden" id="stayOut">'+
+          '<div class="rf-cal" id="stayRangeCal" hidden></div></label></div>'+
         '<div class="stay-out" id="stayOutBox"></div></div>'+
       '<div class="tnote">'+t('rent.b1p')+'</div>'+
       '<button type="button" class="btn btn-primary btn-block" id="bReq" style="margin-top:10px">'+t('u.req2')+'</button></div>'+
@@ -4010,9 +4039,9 @@ function wireStay(p){
   var a=document.getElementById('stayIn'), b=document.getElementById('stayOut'),
       box=document.getElementById('stayOutBox');
   if(!a||!b||!box) return;
-  var today=new Date().toISOString().slice(0,10);
-  a.min=today; b.min=today;
   if(rentSelDates&&rentSelDates.check_in){ a.value=rentSelDates.check_in; b.value=rentSelDates.check_out||''; }
+  mkRangeField({inId:'stayIn',outId:'stayOut',btnId:'stayRangeBtn',
+                calId:'stayRangeCal',labelId:'stayRangeT'});
   function ask(){
     if(!a.value||!b.value||b.value<=a.value){ box.innerHTML=''; return; }
     box.innerHTML='<span class="stay-wait">'+t('stay.wait')+'</span>';
@@ -4540,18 +4569,89 @@ function applyRentFilters(){
     }
   }
 }
+/* ===== ОДНО ПОЛЕ «ЗАЕЗД И ВЫЕЗД» =====
+   Эльнур 08.09: «заезд выезд везде должны проставляться в одном поле».
+   Один виджет на весь сайт: кнопка показывает выбранный промежуток, под ней
+   календарь — первое нажатие ставит заезд, второе выезд. Значения по-прежнему
+   лежат в полях с прежними именами, поэтому всё, что их читало, работает как
+   раньше: мы просто шлём им событие change. */
+function rfISO(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function rfLoc(){return PL.lang==='en'?'en-GB':'ru-RU';}
+function rfDay(iso){try{return new Date(iso+'T00:00:00').toLocaleDateString(rfLoc(),{day:'numeric',month:'short'});}catch(e){return iso;}}
+function rfNights(n){
+  if(PL.lang!=='ru') return n+' '+t(n===1?'rent.dates.n1':'rent.dates.n2');
+  var a=n%10,b=n%100;
+  var k = (a===1&&b!==11)?'rent.dates.n1':((a>=2&&a<=4&&(b<10||b>=20))?'rent.dates.n2':'rent.dates.n5');
+  return n+' '+t(k);
+}
+function mkRangeField(o){
+  var A=document.getElementById(o.inId), B=document.getElementById(o.outId),
+      btn=document.getElementById(o.btnId), cal=document.getElementById(o.calId),
+      lab=document.getElementById(o.labelId);
+  if(!A||!B||!btn||!cal||!lab) return null;
+  var today=rfISO(new Date()), month=null;
+  function label(){
+    if(A.value&&B.value){
+      var n=Math.round((new Date(B.value+'T00:00:00')-new Date(A.value+'T00:00:00'))/86400000);
+      lab.textContent=rfDay(A.value)+' — '+rfDay(B.value)+(n>0?(' · '+rfNights(n)):'');
+    } else if(A.value){ lab.textContent=rfDay(A.value)+' — '+t('rent.dates.pickout'); }
+    else { lab.textContent=t('rent.dates.pick'); }
+  }
+  function draw(){
+    var base = month || (A.value?new Date(A.value+'T00:00:00'):new Date());
+    month=new Date(base.getFullYear(), base.getMonth(), 1);
+    var y=month.getFullYear(), m=month.getMonth();
+    var start=(new Date(y,m,1).getDay()+6)%7, days=new Date(y,m+1,0).getDate();
+    var wd='';
+    for(var w=0;w<7;w++) wd+='<span>'+new Date(2024,0,1+w).toLocaleDateString(rfLoc(),{weekday:'short'})+'</span>';
+    var cells='';
+    for(var i=0;i<start;i++) cells+='<span class="rf-e"></span>';
+    for(var d=1;d<=days;d++){
+      var iso=y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+      var cls='';
+      if(iso<today) cls=' rf-off';
+      else if(iso===A.value||iso===B.value) cls=' rf-edge';
+      else if(A.value&&B.value&&iso>A.value&&iso<B.value) cls=' rf-in';
+      cells+='<span class="'+cls.trim()+'" data-d="'+iso+'">'+d+'</span>';
+    }
+    cal.innerHTML='<div class="rf-h"><button type="button" class="rf-nav" data-rf="-1">‹</button>'+
+      '<b>'+month.toLocaleDateString(rfLoc(),{month:'long',year:'numeric'})+'</b>'+
+      '<button type="button" class="rf-nav" data-rf="1">›</button></div>'+
+      '<div class="rf-w">'+wd+'</div><div class="rf-g">'+cells+'</div>';
+  }
+  function fire(el){
+    try{ el.dispatchEvent(new Event('input',{bubbles:true})); }catch(e){}
+    try{ el.dispatchEvent(new Event('change',{bubbles:true})); }catch(e){}
+  }
+  function pick(iso){
+    if(iso<today) return;
+    if(!A.value || (A.value&&B.value) || iso<=A.value){ A.value=iso; B.value=''; fire(A); fire(B); }
+    else { B.value=iso; fire(B); }
+    draw(); label();
+    if(A.value&&B.value){ cal.hidden=true; btn.classList.remove('open'); }
+  }
+  btn.onclick=function(){ cal.hidden=!cal.hidden; btn.classList.toggle('open',!cal.hidden); if(!cal.hidden) draw(); };
+  cal.onclick=function(e){
+    var nav=e.target.closest&&e.target.closest('[data-rf]');
+    if(nav){ month=new Date(month.getFullYear(), month.getMonth()+Number(nav.getAttribute('data-rf')),1); draw(); return; }
+    var day=e.target.closest&&e.target.closest('[data-d]');
+    if(day) pick(day.getAttribute('data-d'));
+  };
+  /* если даты сбросили снаружи (кнопка «Сбросить»), надпись обновится сама */
+  A.addEventListener('change', label); B.addEventListener('change', label);
+  label(); draw();
+  return {refresh:function(){ label(); draw(); }};
+}
 /* ===== КЛИЕНТСКИЙ ФИЛЬТР ДАТ АРЕНДЫ (сверка с бронями через WF_availability) ===== */
+var RENT_RF=null;
 function initRentDates(){
   var ci=document.getElementById('rentIn'),co=document.getElementById('rentOut'),btn=document.getElementById('rentCheck');
   if(!ci||!co||!btn)return;
-  var today=new Date().toISOString().slice(0,10);
-  ci.min=today;co.min=today;
-  function sync(){
-    if(ci.value){var nx=new Date(ci.value);nx.setDate(nx.getDate()+1);co.min=nx.toISOString().slice(0,10);if(co.value&&co.value<=ci.value)co.value='';}
-    var ok=ci.value&&co.value&&co.value>ci.value;
-    btn.disabled=!ok;
-  }
-  ci.onchange=sync;co.onchange=sync;sync();
+  function sync(){ btn.disabled=!(ci.value&&co.value&&co.value>ci.value); }
+  ci.addEventListener('change',sync); co.addEventListener('change',sync);
+  RENT_RF=mkRangeField({inId:'rentIn',outId:'rentOut',btnId:'rentRangeBtn',
+                        calId:'rentRangeCal',labelId:'rentRangeT'});
+  sync();
 }
 function rentDateStatus(cls,key){var st=document.getElementById('rentDateStatus');if(!st)return;st.className='df-status'+(cls?(' '+cls):'');st.textContent=t(key);}
 function checkAvailability(){
@@ -4579,7 +4679,7 @@ function resetAvailability(){
   rentAvailable=null;rentSelDates=null;
   var btn=document.getElementById('rentCheck');if(btn)btn.disabled=true;
   document.getElementById('rentReset').style.display='none';
-  var co2=document.getElementById('rentOut');if(co2)co2.min=new Date().toISOString().slice(0,10);
+  if(RENT_RF) RENT_RF.refresh();
   applyRentFilters();
   rentDateStatus('','rent.dates.hint');
 }
