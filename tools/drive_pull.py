@@ -25,7 +25,9 @@ MAX_PER_KIND = 10          # больше витрине не нужно, а м�
 # в эти папки не заходим: там не витрина, а служебное и чужое
 SKIP_FOLDER = re.compile(
     r'event|видео|video|logo|логотип|contact|payment|company\s*profile|'
-    r'furniture|living\s*serv|360|walkthrough|map|карта|price|прайс', re.I)
+    r'furniture|living\s*serv|360|walkthrough|map|карта|price|прайс|'
+    r'location|локац|site\s*visit|участок|land\s*photo|progress|прогресс|'
+    r'construction\s*photo|стройк|floor\s*view|view\s*from|вид\s*из', re.I)
 
 # по имени подпапки понимаем, что это за снимки
 KIND_BY_FOLDER = [
@@ -81,7 +83,8 @@ def walk(fid, kind=None, depth=0, seen=None):
                         k = name
                         break
             out.append({'id': f['id'], 'name': f['name'], 'kind': k or 'exterior',
-                        'size': int(f.get('size') or 0)})
+                        'size': int(f.get('size') or 0),
+                        'render': 1 if re.search(r'perspect|render|рендер|3d', f['name'], re.I) else 0})
     return out
 
 
@@ -122,7 +125,8 @@ def main():
 
     plan = {}
     for k, v in by.items():
-        v.sort(key=lambda x: -x['size'])          # крупные — обычно парадные рендеры
+        # сначала рендеры (их видно по имени), потом всё остальное по величине
+        v.sort(key=lambda x: (-x.get('render', 0), -x['size']))
         plan[k] = v[:a.max]
     print('возьму:', ', '.join('%s: %d' % (k, len(v)) for k, v in plan.items()))
     if a.dry:
