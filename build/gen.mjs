@@ -357,6 +357,9 @@ function buildCatalog(objects, benchmarks, preserve) {
         /* часть объектов описывает стадию словами («Строится, сдача 08.2028»).
            Раньше такие оставались вообще без плашки — читаем смысл. */
         if (/распродан|sold\s*out/.test(st) || String(o.status||'') === 'sold') return 'resale';
+        /* Эльнур 08.09: «раздел вторички я бы прям так и отметил в фильтре».
+           Часть карточек говорит об этом только названием. */
+        if (/перепродаж|вторичк|resale|переуступ/i.test(String(o.name || ''))) return 'resale';
         if (/стро|constru|off-?plan/.test(st)) return 'construction';
         if (/готов|ready|заселени/.test(st)) return 'ready';
         if (/старт|pre-?sale|презентац/.test(st)) return 'presale';
@@ -493,6 +496,87 @@ function unitsOf(o) {
     area: t.area_sqm || null,
     from: t.price_from_thb || null,
   }));
+}
+
+/* ===== ПОРЯДОК ВЫДАЧИ КАТАЛОГА =====
+   Эльнур 08.09: «первые несколько должно быть точно очень красивыми, топовыми
+   эффектными, и рядом с ними те, которые хорошо и быстро продаются, в конец
+   всё остальное», «есть правило продажи: три варианта — дорогой, хороший,
+   дешёвый, чтобы клиент мог сравнить», «вторичку держал бы где-то в конце»,
+   «3 фазы Eden не делал бы друг за другом».
+
+   Порядок никто не набивает руками: он выводится из того, насколько карточка
+   готова показывать себя (снимки, цена, описание, доходность) и продаётся ли
+   объект вообще. Считаем один раз при сборке — на сайте порядок уже готовый. */
+function shelfScore(p) {
+  var n = (p.photos && p.photos.length) || (p.photo ? 1 : 0);
+  var s = 0;
+  s += Math.min(n, 8) * 6;                       // снимки — главное, чем карточка берёт
+  if (p.priceUSD) s += 14;                       // без цены объект не сравнить
+  if (p.roi) s += Math.min(Number(p.roi), 9) * 2;
+  if (p.desc && p.desc.ru && p.desc.ru.length > 220) s += 8;
+  if (p.units && p.units.length) s += 6;         // видно, что именно можно купить
+  if (p.progress) s += 4;                        // ход стройки — доверие
+  if (p.beachM != null) s += 2;
+  return s;
+}
+function priceBand(p) {
+  var v = Number(p.priceUSD) || 0;               // цены в каталоге лежат в долларах
+  if (!v) return 'none';
+  if (v >= 400000) return 'high';                // дорогой
+  if (v >= 160000) return 'mid';                 // хороший
+  return 'low';                                  // доступный
+}
+function familyOf(p) {
+  /* «Gardens of Eden», «Eden Residences», «Eden · Park Residences» — одна семья.
+     Берём заметное слово названия, чтобы фазы одного проекта не шли подряд. */
+  var t = String(p.title || '').toLowerCase()
+    .replace(/^the\s+/, '').replace(/[·,].*$/, '').trim();
+  var w = t.split(/\s+/).filter(function (x) { return x.length > 2; });
+  if (/eden/.test(t)) return 'eden';
+  if (/title/.test(t)) return (w[1] || w[0] || t);   // The Title Adora → adora
+  return w[0] || t;
+}
+function spreadFamilies(list) {
+  var out = [], pool = list.slice();
+  while (pool.length) {
+    var idx = 0;
+    if (out.length) {
+      var prev = familyOf(out[out.length - 1]);
+      for (var j = 0; j < pool.length; j++) {
+        if (familyOf(pool[j]) !== prev) { idx = j; break; }
+      }
+    }
+    out.push(pool.splice(idx, 1)[0]);
+  }
+  return out;
+}
+function orderCatalog(list) {
+  var live = [], weak = [], resale = [];
+  list.forEach(function (p) {
+    if (p.stage_key === 'resale') resale.push(p);
+    else if (shelfScore(p) < 24) weak.push(p);     // пустая карточка вперёд не лезет
+    else live.push(p);
+  });
+  live.sort(function (a, b) { return shelfScore(b) - shelfScore(a); });
+
+  /* Правило трёх: рядом идут дорогой, хороший и доступный — так видна вилка
+     цен, а не десять похожих карточек подряд. Внутри каждой корзины уже
+     отсортировано по готовности карточки. */
+  var bins = { high: [], mid: [], low: [], none: [] };
+  live.forEach(function (p) { bins[priceBand(p)].push(p); });
+  var woven = [], turn = ['high', 'mid', 'low'], i = 0;
+  while (bins.high.length || bins.mid.length || bins.low.length) {
+    var k = turn[i % 3]; i++;
+    if (bins[k].length) woven.push(bins[k].shift());
+  }
+  woven = woven.concat(bins.none);
+
+  weak.sort(function (a, b) { return shelfScore(b) - shelfScore(a); });
+  resale.sort(function (a, b) { return shelfScore(b) - shelfScore(a); });
+  /* Фазы одного проекта разводим в каждой группе: подряд «Eden Residences» и
+     «Eden · Park Residences» читаются как повтор. */
+  return spreadFamilies(woven).concat(spreadFamilies(weak), spreadFamilies(resale));
 }
 
 function emitCatalogBlock(catalog) {
@@ -1159,7 +1243,7 @@ async function main() {
   // 1) каталог продажи + аренда в index.html (с сохранением calc/grad/budget)
   let html = fs.readFileSync(INDEX, 'utf8');
   const { preserve } = parseExisting(html);
-  const catalog = buildCatalog(objects, benchmarks, preserve);
+  const catalog = orderCatalog(buildCatalog(objects, benchmarks, preserve));
   html = writeIndex(html, catalog);
   const rentPreserve = parseExistingRentals(html);
   /* Юнит в аренде наследует стадию своего проекта: Modeva сдаётся в 2027,
