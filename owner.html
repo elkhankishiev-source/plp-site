@@ -872,12 +872,15 @@ button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt)
 .mchart{display:flex;align-items:flex-end;gap:6px;margin-top:18px;padding-top:22px;
   height:200px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
 .mbar{flex:1 0 auto;min-width:40px;display:flex;flex-direction:column;justify-content:flex-end;
-  align-items:center;position:relative;height:100%}
+  align-items:center;position:relative;height:100%;
+  /* Эльнур 08.09: «цифры над столбиками немного впритык и касаются столбика».
+     Отводим цифре свою полосу сверху — столбик выше неё не поднимается. */
+  padding-top:26px;box-sizing:border-box}
 .mb-col{width:100%;max-width:44px;background:var(--acc,#5F6242);border-radius:8px 8px 3px 3px;
   transition:opacity .2s;min-height:3px}
 .mbar:hover .mb-col{opacity:.75}
 .mb-col.neg{background:#c98b7a}
-.mb-val{position:absolute;top:-4px;left:0;right:0;text-align:center;font-size:10.5px;color:var(--muted);
+.mb-val{position:absolute;top:0;left:0;right:0;text-align:center;font-size:10.5px;line-height:1.4;color:var(--muted);
   opacity:.85;transition:opacity .2s;white-space:nowrap}
 /* Эльнур 06.09: «цифры можно написать вертикально в самом столбике, иначе
    не вмещается». Пишем вдоль столбика — помещается любая сумма. */
@@ -4440,10 +4443,6 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     var first = me.split(/\s+/)[0] || '';
     var ini = first ? first.slice(0,1).toUpperCase() : '·';
 
-    /* Путь владельца — сразу под приветствием: человек должен видеть,
-       что от него нужно, а не искать это по разделам. */
-    var pathHtml='';
-    try{ pathHtml=ownerPath((DATA.properties||[])[CUR]); }catch(e){}
     /* 1. Шапка: надзаголовок, приветствие, действие и аватар.
        Эльнур 08.09: «выбираю лида Константина — он мне пишет доброе утро,
        Константин, но я-то Эльнур». Сотрудник остаётся собой и видит, чей
@@ -4463,7 +4462,9 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         '<button type="button" class="btn-mini" id="ov-report">Скачать отчёт</button>'+
         '<span class="ava">'+esc(ini)+'</span></div></div>';
 
-    h+=pathHtml;
+    /* Эльнур 08.09: «"Как объект начнёт приносить доход, пройдено 1 из 6" —
+       эту функцию я бы лучше разместил в блоке бронирования». Переехала туда,
+       в обзоре её больше нет. */
 
     /* 2. Какой объект показываем */
     var addr=[p.district, p.bedrooms?('спален: '+p.bedrooms):'', p.stage].filter(Boolean).join(' · ');
@@ -4891,6 +4892,9 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     bh+='<details class="statebox" id="state-box"><summary>'+
         '<b>Состояние объекта</b><span class="sub" id="state-sum">фото до заезда и после выезда</span>'+
         '</summary><div id="state-body"><p class="sub">Загружаем…</p></div></details>';
+    /* Путь владельца живёт здесь: пока шаги не пройдены, бронировать нечего —
+       человек видит, что от него нужно, ровно там, где это мешает. */
+    try{ bh+=ownerPath(p); }catch(e){}
     H+=card('Календарь заездов', bh, 'sec-calendar');
 
     /* Эльнур 06.09: «перепродажа отдельным пунктом — странно, это то же самое,
