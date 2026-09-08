@@ -1654,7 +1654,19 @@ body{background:var(--bg)}
   :root:not([data-theme="light"]) .chipf{background:#191A12;color:#ECEFE0;border-color:rgba(236,239,224,.18)}
 }
 :root[data-theme="light"] .chipf{background:#ffffff;color:#0A0A0A;border-color:rgba(10,10,10,.14)}
+/* 🔴 08.09: выбранный ответ в анкете не закрашивался — Эльнур: «когда нажимаю
+   выбрать, ответы не фиксируются цветом». Правила темы задавались селектором
+   с большим весом (:root[data-theme] .chipf), чем .chipf.on, и перебивали
+   выбор. Повторяем выбранное состояние в каждой теме тем же весом. */
 .chipf.on{background:var(--green);color:var(--on-green);border-color:transparent}
+:root[data-theme="dark"] .chipf.on,
+:root[data-theme="light"] .chipf.on{background:var(--green);color:var(--on-green);border-color:transparent}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .chipf.on{background:var(--green);color:var(--on-green);border-color:transparent}
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]) .chipf.on{background:var(--green);color:var(--on-green);border-color:transparent}
+}
 
 /* Сообщение об ошибке в анкете должно читаться в обеих темах */
 .err,.df-status.err{color:#c0392b;font-weight:600}
@@ -1917,6 +1929,13 @@ body{background:var(--bg)}
       </div>
       <div class="ap-grid" id="ap-preview"></div>
       <div id="ap-upstat" class="sub" style="font-size:13px;margin-top:8px"></div>
+      <!-- Эльнур 08.09: «пункт там фото — залить фото или написать ссылку,
+           и наша система всё упакует, наведёт порядок сама» -->
+      <label style="display:block;color:var(--muted);font-size:13px;margin:16px 0 6px">Или ссылка на папку с файлами</label>
+      <input id="ap-folder" type="url" placeholder="Google Диск, Dropbox — ссылка целиком"
+        style="width:100%;border:1px solid var(--line,rgba(var(--ink-rgb),.12));border-radius:14px;padding:12px 14px;font-size:15px;font-family:inherit;background:var(--paper);color:var(--ink)">
+      <p class="sub" style="font-size:13px;margin-top:8px">Сортировать не нужно — разберём сами:
+      договоры, планировки и снимки встанут по местам.</p>
     </div>
 
     <div class="ap-step" data-step="4" hidden>
@@ -1972,6 +1991,10 @@ body{background:var(--bg)}
 (function(){
   var SB="https://dyxufgjrumebvrhadjun.supabase.co", ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR5eHVmZ2pydW1lYnZyaGFkanVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyMzcxOTYsImV4cCI6MjA5MzgxMzE5Nn0.VLIX0d-OGqZfDpS6WWaBaGkEsTxWa4iQhCozRqOcEAo";
   var API='https://proplib.app.n8n.cloud/webhook/uk-owner';
+  /* 🔴 08.09: BOT_LINK нигде не объявлялась. Заявка уходила и сохранялась, а на
+     экране успеха падал ReferenceError — его ловил общий catch и писал «Не
+     удалось отправить». Человек видел сбой там, где всё прошло. */
+  var BOT_LINK='https://t.me/elnurphuket_bot';
   var g=function(id){return document.getElementById(id);};
   var num=function(id){var e=g(id); return e?(parseInt(String(e.value).replace(/[^0-9]/g,''),10)||0):0;};
   var step=1, MAXSTEP=5, files=[], ref='obj-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7);
@@ -2014,7 +2037,8 @@ body{background:var(--bg)}
       ['Площадь',g('ap-area-sqm').value.trim()?g('ap-area-sqm').value.trim()+' м²':''],
       ['Готовность',pick('ap-stage')],['Цель',pick('ap-goal')],
       ['Ориентир по цене',g('ap-price').value.trim()],
-      ['Адрес',g('ap-address').value.trim()],['Файлов',files.length?String(files.length):'']];
+      ['Адрес',g('ap-address').value.trim()],['Файлов',files.length?String(files.length):''],
+      ['Папка со ссылкой',(g('ap-folder')&&g('ap-folder').value.trim())?'приложена':'']];
     g('ap-sum').innerHTML='<b>Проверьте, всё ли верно</b><br>'+
       rows.filter(function(r){return r[1];}).map(function(r){return r[0]+': '+r[1];}).join('<br>');
   }
@@ -2098,6 +2122,7 @@ body{background:var(--bg)}
        если связь пропала посреди запроса */
     var ac=(window.AbortController? new AbortController() : null);
     var killer=setTimeout(function(){ try{ ac&&ac.abort(); }catch(e){} }, 20000);
+    var sent=false;   /* приняли ли объект на сервере */
     fetch(API,{method:'POST',signal:(ac?ac.signal:undefined),headers:{'Content-Type':'application/json'},body:JSON.stringify({
       action:'submit_object', ref:ref, name:name, phone:phone, contact_via:pick('ap-via'),
       kind:pick('ap-kind'), beds:pick('ap-beds'), district:pick('ap-area'),
@@ -2110,11 +2135,13 @@ body{background:var(--bg)}
       discounts:[{nights:3,off:num('ap-d3')},{nights:7,off:num('ap-d7')},{nights:14,off:num('ap-d14')},
                  {nights:30,off:num('ap-d30')},{nights:90,off:num('ap-d90')}].filter(function(d){return d.off>0;}),
       min_stay:num('ap-min'),
-      media:files.filter(function(f){return f.done;}).map(function(f){return {url:f.url,type:f.type,name:f.name};})
+      media:files.filter(function(f){return f.done;}).map(function(f){return {url:f.url,type:f.type,name:f.name};}),
+      folder_url:(g('ap-folder')?g('ap-folder').value.trim():'')
     })}).then(function(r){return r.json();}).then(function(d){
       clearTimeout(killer);
       btn.disabled=false; btn.textContent='Отправить объект';
       if(d&&d.ok){
+        sent=true;
         document.querySelector('.ap-card').innerHTML=
           '<h2 style="font-size:22px;margin:0 0 8px">Спасибо, объект принят</h2>'+
           '<p class="sub" style="margin:0 0 14px">Менеджер посмотрит материалы, оформит карточку и свяжется с вами. '+
@@ -2127,6 +2154,13 @@ body{background:var(--bg)}
     }).catch(function(err){
       clearTimeout(killer);
       btn.disabled=false; btn.textContent='Отправить объект';
+      /* Сервер уже принял объект, споткнулась только отрисовка — так и говорим.
+         Пугать «не отправилось» там, где всё дошло, нельзя. */
+      if(sent){
+        g('ap-err').textContent='Объект мы приняли — страница просто не смогла это показать. '+
+          'Менеджер свяжется с вами, повторно отправлять не нужно.';
+        return;
+      }
       g('ap-err').textContent=(err&&err.name==='AbortError')
         ? 'Ответ не пришёл за 20 секунд. Проверьте связь и нажмите ещё раз — или напишите нам в Telegram, примем объект вручную.'
         : 'Не удалось отправить. Проверьте связь и попробуйте ещё раз.';
