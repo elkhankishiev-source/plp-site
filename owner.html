@@ -7635,7 +7635,8 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     });
     (DATA.requests||[]).forEach(function(r){
       if(r.status==='done'||r.status==='cancelled') return;
-      out.push({tab:'actions',t:'Заявка без ответа',
+      /* взятая в работу заявка всё ещё ждёт, но «без ответа» она уже не есть */
+      out.push({tab:'actions',t:(r.status==='in_progress'?'Заявка в работе':'Заявка без ответа'),
         s:(KINDS[r.kind]||r.kind||'запрос')+(r.plp_property_id?(' · '+r.plp_property_id):''),
         act:r.id?[{t:'Закрыть',a:'req_done',id:r.id},{t:'Отменить',a:'req_cancel',id:r.id}]:null});
     });
