@@ -78,6 +78,16 @@
    ]
   },
   {
+   "id": "PLP-BELLAGUNA",
+   "pub": "PLP-BELLAGUNA",
+   "url": "https://property-library.com/object/bellaguna",
+   "name": "Bellaguna Lake Residences",
+   "district": "Лагуна",
+   "type": "Кондо",
+   "price_from": 14120000,
+   "units": []
+  },
+  {
    "id": "PLP-BIANCANA",
    "pub": "PLP-BIANCANA",
    "url": "https://property-library.com/object/biancana",
@@ -351,6 +361,16 @@
      "площадь_м2": "683,78–702,00"
     }
    ]
+  },
+  {
+   "id": "PLP-INTERCONTINENTAL",
+   "pub": "PLP-INTERCONTINENTAL",
+   "url": "https://property-library.com/object/intercontinental",
+   "name": "The Residences at InterContinental Phuket Resort",
+   "district": "Камала",
+   "type": "Кондо",
+   "price_from": 13600000,
+   "units": []
   },
   {
    "id": "PLP-KATABELLO",
