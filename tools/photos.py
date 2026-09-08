@@ -232,7 +232,10 @@ def main():
     folder = pathlib.Path(a.folder).expanduser()
     if not folder.is_dir(): sys.exit('нет такой папки: ' + str(folder))
     pid = (a.id or folder.name).strip().upper()
-    if not pid.startswith('PLP-'): sys.exit('код объекта должен начинаться с PLP-, получено: ' + pid)
+    # Коды бывают не только PLP-: вторичка заводится как RESALE-…, приём с Диска
+    # как INTAKE-…. Проверяем не приставку, а что объект вообще есть в базе.
+    if not re.match(r'^[A-Z][A-Z0-9]*-[A-Z0-9-]+$', pid):
+        sys.exit('код объекта выглядит странно: ' + pid)
 
     obj = st.rest('objects?plp_property_id=eq.' + urllib.parse.quote(pid) +
                   '&select=plp_property_id,name,main_image_url,gallery_urls,photo_groups,build_progress')
