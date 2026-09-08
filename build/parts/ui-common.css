@@ -157,12 +157,10 @@ body{background:var(--bg)}
 /* Чипы выбора в анкете: в тёмной теме текст сливался с подложкой */
 /* Чипы выбора: фон и текст из токенов, а не из полупрозрачного «стекла» —
    на светлой теме в анкете выходил тёмный фон с тёмным текстом (Эльнур 07.09). */
-.chipf{background:#ffffff;color:#0A0A0A;border:1px solid rgba(10,10,10,.14)}
-:root[data-theme="dark"] .chipf{background:#191A12;color:#ECEFE0;border-color:rgba(236,239,224,.18)}
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]) .chipf{background:#191A12;color:#ECEFE0;border-color:rgba(236,239,224,.18)}
-}
-:root[data-theme="light"] .chipf{background:#ffffff;color:#0A0A0A;border-color:rgba(10,10,10,.14)}
+/* 🔴 08.09: фон и текст задавались отдельными правилами под каждую тему,
+   и при переключении они расходились — тёмная подложка с тёмным текстом.
+   Берём токены: они уже переключаются вместе, разойтись не могут. */
+.chipf{background:var(--paper);color:var(--ink);border:1px solid rgba(var(--ink-rgb),.14)}
 /* 🔴 08.09: выбранный ответ в анкете не закрашивался — Эльнур: «когда нажимаю
    выбрать, ответы не фиксируются цветом». Правила темы задавались селектором
    с большим весом (:root[data-theme] .chipf), чем .chipf.on, и перебивали
