@@ -142,22 +142,28 @@ else:
 print('\n— бронь и состояние —')
 # бронь от прошлого прогона занимала даты и следующая проверка падала —
 # снимаем свои прежние брони, потом ставим новую и её тоже убираем
+# 08.09: раньше каждый прогон создавал новую бронь и просто отменял её —
+# за пару недель в календаре демо-объекта накопилось полсотни «отменённых».
+# Теперь переиспользуем одну и ту же строку: есть — правим, нет — создаём.
 _d = call({'action': 'data'})
+_own = None
 for _p in (_d.get('properties') or []):
     if _p.get('id') != DEMO_OBJ:
         continue
     for _b in (_p.get('bookings') or []):
-        if (_b.get('guest_name') or '') == 'Самопроверка' and _b.get('status') != 'cancelled':
-            call({'action': 'uk_booking_save', 'property_id': DEMO_OBJ,
-                  'booking_id': _b.get('booking_id'), 'status': 'cancelled',
-                  'check_in': _b.get('check_in'), 'check_out': _b.get('check_out'),
-                  'guest': _b.get('guest_name')})
-_r = check('сохранить бронь', {'action': 'uk_booking_save', 'property_id': DEMO_OBJ,
-                               'guest': 'Самопроверка', 'check_in': '2026-11-01',
-                               'check_out': '2026-11-05', 'amount': 10000, 'channel': 'direct'})
-if _r and _r.get('booking_id'):
+        if (_b.get('guest_name') or '') == 'Самопроверка' and _b.get('booking_id'):
+            _own = _b.get('booking_id')
+            break
+_body = {'action': 'uk_booking_save', 'property_id': DEMO_OBJ,
+         'guest': 'Самопроверка', 'check_in': '2026-11-01',
+         'check_out': '2026-11-05', 'amount': 10000, 'channel': 'direct'}
+if _own:
+    _body['booking_id'] = _own
+_r = check('сохранить бронь', _body)
+_bid = (_r or {}).get('booking_id') or _own
+if _bid:
     call({'action': 'uk_booking_save', 'property_id': DEMO_OBJ,
-          'booking_id': _r['booking_id'], 'status': 'cancelled',
+          'booking_id': _bid, 'status': 'cancelled',
           'check_in': '2026-11-01', 'check_out': '2026-11-05', 'guest': 'Самопроверка'})
 check('состояние: список', {'action': 'check_list', 'property_id': DEMO_OBJ}, want_key='rows')
 
