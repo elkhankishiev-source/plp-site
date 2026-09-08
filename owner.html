@@ -236,7 +236,11 @@ h3{font-size:1.12rem;font-weight:700}
 .nav{display:none;gap:4px;font-weight:600;font-size:.9rem}
 .nav a{opacity:.85;transition:opacity .2s,background .2s;padding:8px 10px;border-radius:9px}
 .nav a:hover{opacity:1;background:rgba(var(--glass-rgb),.7)}
-.htools{display:flex;align-items:center;gap:8px}
+/* 🔴 08.09: на телефоне шапку съедало название — .htools ужимался до 20px,
+   и бургер выглядел обрезанным. Правая группа не сжимается, а длинное
+   название укорачивается. */
+.htools{display:flex;align-items:center;gap:8px;flex:0 0 auto;margin-left:auto}
+.header .brand,.brand{min-width:0}
 .lang{display:flex;background:rgba(var(--glass-rgb),.8);border-radius:999px;padding:3px;font-size:.75rem;font-weight:700}
 .lang button{padding:5px 10px;border-radius:999px;color:var(--muted);font-weight:700}
 .lang button.on{background:var(--ink-block);color:var(--on-ink)}
@@ -587,8 +591,9 @@ h3{font-size:1.12rem;font-weight:700}
 .consent input{width:18px;height:18px;flex:none;margin-top:1px;accent-color:var(--ink)}
 .hp{position:absolute !important;left:-9999px;width:1px;height:1px;opacity:0}
 .chatinput{display:flex;gap:8px;padding:12px;border-top:1px solid rgba(var(--ink-rgb),.08);background:var(--paper)}
-.chatinput input{flex:1;height:44px;border:1.5px solid rgba(var(--ink-rgb),.12);border-radius:999px;padding:0 16px;font-size:.88rem;outline:none}
-.chatinput input:focus{border-color:var(--ink)}
+.chatinput input,.chatinput textarea{flex:1;min-width:0;height:44px;max-height:44px;border:1.5px solid rgba(var(--ink-rgb),.12);border-radius:999px;padding:11px 16px;font:inherit;font-size:.88rem;line-height:20px;outline:none;resize:none;overflow:hidden;background:var(--paper);color:var(--ink);box-sizing:border-box}
+.chatinput input:focus,.chatinput textarea:focus{border-color:var(--ink)}
+
 .chatinput .s{width:44px;height:44px;border-radius:50%;background:var(--ink-block);color:var(--on-ink);font-size:1rem;flex:none}
 @media(max-width:760px){
   .chatwin{right:10px;bottom:10px;width:calc(100vw - 20px)}
@@ -1755,8 +1760,11 @@ body{background:var(--bg)}
 /* В кабинете общее правило button{margin-top:14px;width:100%} сдвигало кнопки
    языка вниз, и тумблер «уплывал» из своего овала. Кнопкам в шапке и в меню
    отступы и ширину задаём сами. */
-.mnav .mlang button,.mnav .mtheme,.header .lang button,.header .themebtn,.header .burger{
+/* 🔴 08.09: сюда попал и бургер — width:auto перебивал его 36px, и на телефоне
+   он сжимался до ширины полосок: выглядел обрезанным. Бургеру ширину задаём отдельно. */
+.mnav .mlang button,.mnav .mtheme,.header .lang button,.header .themebtn{
   margin:0;width:auto}
+.header .burger{margin:0;width:36px;height:36px;flex:0 0 36px}
 .mnav .mlang button{height:100%;display:inline-flex;align-items:center;justify-content:center;
   border-radius:0;flex:1 1 0;min-width:0}
 .mnav .mtheme{margin:0}
@@ -1907,24 +1915,20 @@ body{background:var(--bg)}
   <div class="chathead">
     <span class="av"><img src="img/brand/plp-mark-ink.png" alt="" width="20" height="20"></span>
     <div><b data-i18n="chat.name">Дарья</b><div class="st2"><span class="dot"></span> <span data-i18n="chat.sub">персональный менеджер · отвечает сразу</span></div></div>
-    <button type="button" class="vmode" id="chatVmode" onclick="toggleVoiceMode()"
-            title="Общаемся голосом: ответы приходят голосовыми">Голосом</button>
     <button type="button" class="clr" onclick="clearChat()" title="Очистить историю">⟲</button>
     <button type="button" class="x" onclick="closeChat()" aria-label="Закрыть">×</button>
   </div>
   <div class="chatbody" id="chatbody"></div>
   <div class="chatinput">
-    <input id="chatField" type="text" name="plp-message" enterkeyhint="send"
+    <!-- Эльнур 08.09: «на мобильном открыл чат и там, когда вводишь, снова
+     появляется ввести пароль, айфон предлагает». iOS предлагает пароли
+     для текстовых полей, которые не смог опознать, а для textarea — нет.
+     Поле осталось однострочным на вид; Enter отправляет, Shift+Enter — перенос. -->
+    <textarea id="chatField" rows="1" name="plp-chat-note" enterkeyhint="send"
            autocomplete="off" autocorrect="on" autocapitalize="sentences" spellcheck="true"
-           data-lpignore="true" data-form-type="other"
+           data-lpignore="true" data-1p-ignore data-form-type="other"
            data-i18n-ph="chat.placeholder" placeholder="Напишите сообщение…"
-           onkeydown="if(event.key==='Enter')sendFree()">
-    <button type="button" class="mic" id="chatMic" onclick="chatVoice()" aria-label="Сказать голосом" hidden>
-      <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7"
-           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <rect x="9" y="3" width="6" height="11" rx="3"></rect>
-        <path d="M5 11a7 7 0 0 0 14 0"></path><path d="M12 18v3"></path>
-      </svg></button>
+           onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendFree();}"></textarea>
     <button type="button" class="s" onclick="sendFree()" aria-label="Отправить">↑</button>
   </div>
 </div>
@@ -2597,8 +2601,11 @@ function playSpeech(text){
   };
 }
 /* Режим «Общаемся голосом»: ответы приходят голосовыми. Выбор помним. */
+/* Эльнур 08.09: «функция голосовые так себе, голос корявый, можно оставить
+   как и было — обычный ИИ-чат без голоса». Голос выключен: браузерный голос
+   звучит неживо, а серверный упирается в кредиты. Код оставлен на случай,
+   если решим вернуться, но в интерфейсе его нет. */
 var VOICE_MODE=false;
-try{ VOICE_MODE = localStorage.getItem('plp_voice_mode')==='1'; }catch(e){}
 function paintVoiceMode(){
   var b=document.getElementById('chatVmode'); if(!b) return;
   b.classList.toggle('on', VOICE_MODE);
@@ -4626,7 +4633,12 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     // календарь: сетка месяца + список заездов
     var bk=p.bookings||[], bh='';
     bh+=monthGrid(bk);
-    if(!bk.length){ bh+='<div class="empty">Заездов пока нет. Как появится бронь — она встанет в сетку.</div>'; }
+    if(!bk.length){
+      var els=staysElsewhere();
+      bh+='<div class="empty">По этому объекту заездов нет. Как появится бронь — встанет в сетку.'+
+          (els?(' Ещё '+els+' '+plural(els,'заезд','заезда','заездов')+
+                ' есть по другим вашим объектам — выберите объект в шапке.'):'')+'</div>';
+    }
     else{
       var BST={upcoming:'ожидается',checked_in:'проживает',checked_out:'выехал',
                cancelled:'отменена',hold:'бронь',pending:'ждёт оплаты',paid:'оплачена'};
@@ -4681,8 +4693,8 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       'фото или дать ссылку на папку. Мы проверим и оформим карточку.<br>'+
       /* Эльнур 08.09: «чтобы можно было кинуть эту форму лиду в переписке
          и он через сайт всё сделал». */
-      '<a href="#" class="lnk" id="ap-copy">Скопировать ссылку для клиента</a> — '+
-      'отправьте её в переписке, человек заполнит сам.</p>';
+      'Та же анкета открыта на сайте — в подвале «Сдать или продать свой объект». '+
+      'Ссылку оттуда можно отправить человеку в переписке.</p>';
     H+=card('Выгрузить объект', rs, 'sec-resale');
 
     // ставки
@@ -4888,16 +4900,6 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
 
     setTimeout(function(){
       try{ bindDocUpload(p.id||''); bindStateBox(p.id||''); }catch(e){}
-      var apc=document.getElementById('ap-copy');
-      if(apc) apc.onclick=function(e){
-        e.preventDefault();
-        var url='https://property-library.com/add-property';
-        var ok=function(){ apc.textContent='Ссылка скопирована'; setTimeout(function(){
-          apc.textContent='Скопировать ссылку для клиента'; },2500); };
-        if(navigator.clipboard && navigator.clipboard.writeText)
-          navigator.clipboard.writeText(url).then(ok, function(){ say(url); });
-        else say(url);
-      };
     }, 0);
     CARD_N=0;
     $('prop').innerHTML=H;
@@ -7140,7 +7142,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
           if(CTX.obj!=null){ CUR=CTX.obj; }
           else if(CTX.objs.length) CUR=CTX.objs[0];
           ctxNote();
-          try{ renderProp(); renderPortfolio(); }catch(e){}
+          try{ renderProp(); renderPortfolio(); cabPage(CAB_TAB); paintCounts(); }catch(e){}
         }});
     }
     if(ctxIsStaff()){
@@ -7251,20 +7253,35 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   function cabCounts(){
     var c={};
     var props=DATA.properties||[];
-    var reqs=0, works=0, docs=0, stays=0;
+    /* 🔴 08.09: значок «Заезды» считал брони по ВСЕМ объектам, а раздел
+       показывает только открытый. Эльнур: «вижу цифру 2, а там пусто».
+       Разделы, которые показывают один объект (заезды, работы), считаем
+       по этому же объекту; общие разделы — по всем. */
+    var cur=props[CUR]||{};
+    var stays=(cur.bookings||[]).filter(function(b){
+      return b.status==='upcoming'||b.status==='checked_in'; }).length;
+    var works=((cur.services||cur.works||cur.tasks||[]).filter(function(w){
+      return w.status && w.status!=='done'; })).length;
+    var reqs=(DATA.requests||[]).filter(function(r){
+      return r.status!=='done' && r.status!=='cancelled'; }).length;
     props.forEach(function(p){
       reqs+=((p.requests||[]).filter(function(r){return !r.done_at;})).length;
-      works+=((p.services||p.works||[]).filter(function(w){return w.status && w.status!=='done';})).length;
-      docs+=(p.documents||p.docs||[]).length ? 0 : 0;
-      /* 05.09: считали только 'upcoming' — гость, который живёт в доме прямо
-         сейчас, во вкладку не попадал: при трёх бронях значок показывал 1. */
-      (p.bookings||[]).forEach(function(b){ if(b.status==='upcoming'||b.status==='checked_in') stays++; });
     });
     if(reqs) c.actions=reqs;
     if(works) c.service=works;
     if(stays) c.calendar=stays;
     if(DATA.moderation && DATA.moderation.length) c.staff=DATA.moderation.length;
     return c;
+  }
+  /* Сколько заездов у остальных объектов — чтобы цифра не «терялась». */
+  function staysElsewhere(){
+    var props=DATA.properties||[], n=0, cur=props[CUR]||{};
+    props.forEach(function(p){
+      if(p===cur) return;
+      n+=(p.bookings||[]).filter(function(b){
+        return b.status==='upcoming'||b.status==='checked_in'; }).length;
+    });
+    return n;
   }
   /* Колокольчик показывает, что именно ждёт внимания, и ведёт в нужный раздел. */
   /* Что именно ждёт внимания — не просто цифра, а список событий. */
@@ -7419,10 +7436,7 @@ function askDaria(txt, byVoice){
       if(wait) wait.remove();
       var reply=(d&&d.reply)||'Записала. Передам менеджеру и вернусь с ответом.';
       /* спросили голосом — отвечаем голосовым, текст под ним читаемый */
-      if(byVoice || VOICE_MODE){
-        var v=voiceBubble('bot', playSpeech(reply), Math.max(2, reply.length/14), reply);
-        if(v) setTimeout(function(){ try{ v.start(); }catch(e){} },200);
-      } else chatMsg('bot',reply);
+      chatMsg('bot',reply);
       chatHist.push({role:'assistant',content:reply});
     })
     .catch(function(){ if(wait) wait.remove();

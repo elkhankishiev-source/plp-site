@@ -353,6 +353,29 @@ function buildCatalog(objects, benchmarks, preserve) {
       bmax: (o.bedrooms_max === 0 || o.bedrooms_max) ? o.bedrooms_max : null,
       stage_key: (function(){
         var st = String(o.stage || '').toLowerCase();
+        /* 🔴 08.09: Estella стояла как «старт продаж», а сдача у неё через 84 дня.
+           Эльнур: «ты как вообще придумал такое, такое сплошь и рядом, ну так
+           нельзя ведь». Дата сдачи — факт из договора, стадия — слово; когда они
+           спорят, верим дате. Расхождение печатаем при сборке, чтобы поправить
+           в базе, а не заклеивать здесь. */
+        if (o.handover_date) {
+          const hd = new Date(o.handover_date);
+          if (!isNaN(hd)) {
+            const days = Math.round((hd - new Date()) / 86400000);
+            const isPre = /pre-?sale|старт|анонс/.test(st);
+            const isBuild = /construction|строит/.test(st);
+            if (days < 0 && (isPre || isBuild)) {
+              console.error('[gen] ⚠ ' + o.plp_property_id + ': стадия «' + o.stage +
+                '», а сдача была ' + String(o.handover_date).slice(0, 10) + ' — показываю «готов»');
+              return 'ready';
+            }
+            if (days >= 0 && days <= 365 && isPre) {
+              console.error('[gen] ⚠ ' + o.plp_property_id + ': стадия «' + o.stage +
+                '», а до сдачи ' + days + ' дн. — показываю «строится»');
+              return 'construction';
+            }
+          }
+        }
         if (st === 'ready') return 'ready';
         if (st === 'construction') return 'construction';
         if (st === 'pre-sale' || st === 'presale') return 'presale';
