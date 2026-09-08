@@ -4108,7 +4108,8 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     var d=new Date(r.ci+'T00:00:00');
     var nights=r.co?Math.round((new Date(r.co)-d)/86400000):null;
     var BST={upcoming:'ожидается',checked_in:'проживает',checked_out:'выехал',
-             cancelled:'отменена',hold:'бронь',pending:'ждёт оплаты',paid:'оплачена'};
+             cancelled:'отменена',hold:'бронь',pending:'ждёт оплаты',paid:'оплачена',
+             request:'заявка с сайта'};
     var perNight=(r.sum&&nights)?Math.round(r.sum/nights):null;
     clForm('<h3>'+clEsc(r.who)+'</h3>'+
       '<div class="crow">'+
@@ -4867,11 +4868,14 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     }
     else{
       var BST={upcoming:'ожидается',checked_in:'проживает',checked_out:'выехал',
-               cancelled:'отменена',hold:'бронь',pending:'ждёт оплаты',paid:'оплачена'};
+               cancelled:'отменена',hold:'бронь',pending:'ждёт оплаты',paid:'оплачена',
+             request:'заявка с сайта'};
       bh+='<table><tr><th>Заезд</th><th>Выезд</th><th>Гость</th><th class="r">Сумма</th><th class="r">Статус</th></tr>';
       bk.forEach(function(g){
         /* удержание подтверждается одним нажатием — Эльнур 05.09 */
-        var act = (g.status==='hold' && DATA.owner && DATA.owner.is_staff===true && g.booking_id)
+        /* 08.09: заявка с сайта (request) календарь НЕ занимает — её тоже
+           подтверждает менеджер, и только тогда даты становятся занятыми. */
+        var act = ((g.status==='hold'||g.status==='request') && DATA.owner && DATA.owner.is_staff===true && g.booking_id)
           ? ('<button type="button" class="okbtn" data-ok="'+esc(g.booking_id)+'" '+
              'data-pid="'+esc(p.id||'')+'" data-in="'+esc(g.check_in||'')+'" data-out="'+esc(g.check_out||'')+'">Подтвердить</button>')
           : esc(BST[g.status]||g.status||'—');
@@ -7681,8 +7685,10 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     (DATA.properties||[]).forEach(function(p){
       var obj=p.name||p.id||'объект';
       (p.bookings||[]).forEach(function(b){
-        if(b.status==='hold')
-          out.push({tab:'calendar',t:'Бронь ждёт подтверждения',s:obj+' · '+dmy(b.check_in)+
+        if(b.status==='hold'||b.status==='request')
+          out.push({tab:'calendar',
+                    t:(b.status==='request'?'Заявка с сайта на эти даты':'Бронь ждёт подтверждения'),
+                    s:obj+' · '+dmy(b.check_in)+
                     (b.check_out?(' — '+dmy(b.check_out)):'')+(b.guest_name?(' · '+b.guest_name):''),
                     act:[{t:'Подтвердить',a:'book_ok',id:b.booking_id,pid:p.id,
                           ci:b.check_in,co:b.check_out,who:b.guest_name},

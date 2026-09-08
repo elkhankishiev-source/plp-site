@@ -64,7 +64,7 @@ const MARK_START = '/* PLP:AUTO-CATALOG:START — сгенерировано bui
 const MARK_END = '/* PLP:AUTO-CATALOG:END */';
 const MARK_RENT_START = '/* PLP:AUTO-RENTALS:START — сгенерировано build/gen.mjs из Supabase (объекты аренды); вручную не править (grad сохраняется между прогонами) */';
 const MARK_RENT_END = '/* PLP:AUTO-RENTALS:END */';
-const MARK_NY_START = '/* PLP:AUTO-NETYIELD:START — сгенерировано build/gen.mjs из Supabase rental_benchmarks (disp_yield_low/high_pct по району); вручную не править */';
+const MARK_NY_START = '/* PLP:AUTO-NETYIELD:START — сгенерировано build/gen.mjs из Supabase rental_benchmarks: GROSSYIELD из disp_yield_*, NETYIELD из net_yield_*; вручную не править */';
 const MARK_NY_END = '/* PLP:AUTO-NETYIELD:END */';
 
 // EN-район → RU-подпись (loc.ru). loc.en приходит из Supabase objects.district.
@@ -152,16 +152,25 @@ function typeRu(t) { return typeLabel(t).ru; }
 function slugOf(pid) { return String(pid).replace(/^PLP-/, '').toLowerCase(); }
 function pubOf(o) { return (o && o.public_code) || (o && o.plp_property_id) || ''; }
 
-// диапазон доходности из rental_benchmarks: (district,type) → (district,Кондо) → 6–12
+// диапазон доходности из rental_benchmarks: (district,type) → (district,Кондо) → медиана по Пхукету
 function yieldRange(benchmarks, district, type) {
   const tr = typeRu(type);
   const find = (d, u) => benchmarks.find(b => b.district === d && b.unit_type === u);
   let b = find(district, tr) || find(district, 'Кондо') ||
           benchmarks.find(x => x.district === district);
   if (b && b.disp_yield_low_pct != null && b.disp_yield_high_pct != null) {
-    return { low: b.disp_yield_low_pct, high: b.disp_yield_high_pct };
+    return { low: b.disp_yield_low_pct, high: b.disp_yield_high_pct,
+             netLow: b.net_yield_low_pct, netHigh: b.net_yield_high_pct, scope: 'district' };
   }
-  return { low: 6, high: 12 }; // клиентский ориентир по умолчанию
+  /* 08.09: раньше здесь стояло «6–12%» — придуманное число, которое вылезало
+     на карточках без района и без цены. Считаем ориентир по самой таблице
+     ориентиров: медиана по Пхукету, и честно называем его островным. */
+  const med = (key) => {
+    const v = benchmarks.map(x => x[key]).filter(x => x != null).sort((a, b2) => a - b2);
+    return v.length ? v[Math.floor(v.length / 2)] : null;
+  };
+  return { low: med('disp_yield_low_pct') || 6, high: med('disp_yield_high_pct') || 10,
+           netLow: med('net_yield_low_pct'), netHigh: med('net_yield_high_pct'), scope: 'island' };
 }
 
 // сохраняемый из index.html движок калькулятора (fallback для новых объектов)
@@ -789,16 +798,21 @@ function writeRentals(html, rentals) {
   return html.slice(0, ai) + block + html.slice(end);
 }
 
-// ------------------------------------------------- PL.NETYIELD (доходность района)
-// «Одна истина»: диапазон доходности района на карточках = disp_yield_low/high_pct
-// из rental_benchmarks. Если у района несколько unit_type — берём min(low)..max(high)
-// (самый широкий клиентский ориентир). Ключ = EN-название района (как в NETYIELD/DISTRICTKEY).
-function buildNetyield(benchmarks) {
+// ------------------------------------------------- доходность района: две величины
+// 🔴 08.09. Здесь была подмена, из которой росли все расхождения по доходности:
+// карта называлась PL.NETYIELD и комментарий обещал «честный net», а заполнялась
+// она из disp_yield_* — это ВАЛОВЫЕ цифры буклета (Банг Тао 7–11%). Сайт от этого
+// писал «чистыми обычно 5–8%» и считал нормой рынка 6–8%, тогда как исследование
+// 28.08 в той же таблице даёт честный net 4,5–6% («не 7-10% из буклетов»).
+// Теперь две отдельные карты: PL.GROSSYIELD — валовая (до расходов), PL.NETYIELD —
+// чистая (после УК, обслуживания и простоя). Ярлык у цифры обязателен.
+// Если у района несколько unit_type — берём min(low)..max(high), самый широкий ориентир.
+function buildYieldMap(benchmarks, loKey, hiKey) {
   const acc = {}; // district → { low, high }
   for (const b of benchmarks) {
     const d = b.district;
-    if (!d || b.disp_yield_low_pct == null || b.disp_yield_high_pct == null) continue;
-    const lo = Number(b.disp_yield_low_pct), hi = Number(b.disp_yield_high_pct);
+    if (!d || b[loKey] == null || b[hiKey] == null) continue;
+    const lo = Number(b[loKey]), hi = Number(b[hiKey]);
     if (!isFinite(lo) || !isFinite(hi)) continue;
     if (!acc[d]) acc[d] = { low: lo, high: hi };
     else { acc[d].low = Math.min(acc[d].low, lo); acc[d].high = Math.max(acc[d].high, hi); }
@@ -807,11 +821,16 @@ function buildNetyield(benchmarks) {
   for (const d of Object.keys(acc).sort()) out[d] = acc[d].low + DASH + acc[d].high; // «7–11» (en-dash)
   return out;
 }
+function buildNetyield(benchmarks) { return buildYieldMap(benchmarks, 'net_yield_low_pct', 'net_yield_high_pct'); }
+function buildGrossyield(benchmarks) { return buildYieldMap(benchmarks, 'disp_yield_low_pct', 'disp_yield_high_pct'); }
 
-function emitNetyieldBlock(netyield) {
-  const items = Object.keys(netyield).map(d => '  ' + JSON.stringify(d) + ':' + JSON.stringify(netyield[d])).join(',\n');
+function emitNetyieldBlock(netyield, grossyield) {
+  const line = (m) => Object.keys(m).map(d => '  ' + JSON.stringify(d) + ':' + JSON.stringify(m[d])).join(',\n');
   return MARK_NY_START + '\n' +
-    'PL.NETYIELD={\n' + items + '\n};\n' +
+    '/* валовая — до расходов; в текстах всегда с пометкой «до расходов» */\n' +
+    'PL.GROSSYIELD={\n' + line(grossyield) + '\n};\n' +
+    '/* чистая — после УК, обслуживания и простоя (исследование 28.08.2026) */\n' +
+    'PL.NETYIELD={\n' + line(netyield) + '\n};\n' +
     MARK_NY_END;
 }
 
@@ -840,7 +859,8 @@ function writeObjectIndex(html, objects) {
   all.sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''), 'ru'));
   const total = all.length;
   const rows = all.map((o) => {
-    const href = 'object/' + slugOf(pubOf(o)) + '.html';
+    /* 08.09: адреса без .html — правило Эльнура. Чистый путь на хостинге живой. */
+    const href = 'object/' + slugOf(pubOf(o));
     const price = o.price_from_thb ? fmtBahtShort(Number(o.price_from_thb)) : '';
     const d = DISTRICT_RU[(o.district || '').trim()] || o.district || '';
     return '<li><a href="' + href + '">' + htmlEsc(o.name || o.plp_property_id) + '</a>' +
@@ -874,8 +894,8 @@ function fmtBahtShort(n) {
                   : Math.round(n / 1000) + ' тыс. ฿';
 }
 
-function writeNetyield(html, netyield) {
-  const block = emitNetyieldBlock(netyield);
+function writeNetyield(html, netyield, grossyield) {
+  const block = emitNetyieldBlock(netyield, grossyield);
   const s = html.indexOf(MARK_NY_START);
   const e = html.indexOf(MARK_NY_END);
   if (s !== -1 && e !== -1 && e > s) {
@@ -914,7 +934,9 @@ function objectPage(o, benchmarks, ratesBy) {
   const pid = o.plp_property_id;
   const pub = pubOf(o);            /* публичный код: он же в адресе и на странице */
   const slug = slugOf(pub);
-  const url = SITE_BASE + '/object/' + slug + '.html';
+  /* 08.09: клиентам мы раздавали чистый адрес, а поисковикам каноническим
+     указывали .html — две версии одной страницы. Везде чистый. */
+  const url = SITE_BASE + '/object/' + slug;
   /* og-картинка тоже по публичному коду: адрес файла попадает в мессенджеры */
   const img = SITE_BASE + '/img/' + pub + '.jpg';
   // Реальные размеры картинки: WhatsApp без og:image:width/height часто вообще
@@ -1183,7 +1205,12 @@ if(dark) i.src='../img/brand/plp-mark-white.png';})();</script>
   ${o.current_promo ? '<section class="promo"><h2>Что рядом и что нового</h2><p>' + htmlEsc(noContacts(o.current_promo)) + '</p></section>' : ''}
   <div class="yield">
     <div class="num">${yr.low}${DASH}${yr.high}%</div>
-    <div class="lbl">Ориентир по району (${htmlEsc(ru)}, ${htmlEsc(t.ru.toLowerCase())}) — <b>до расходов</b>, при активном управлении. Чистыми обычно выходит 5–8%; точный расчёт по вашему объекту делает специалист.</div>
+    <div class="lbl">${yr.scope === 'district'
+      ? 'Ориентир по району (' + htmlEsc(ru) + ', ' + htmlEsc(t.ru.toLowerCase()) + ')'
+      : 'Ориентир по Пхукету в целом — по этому району отдельной статистики у нас пока нет'} — <b>до расходов</b>, при активном управлении.${
+      (yr.netLow != null && yr.netHigh != null)
+        ? ' Чистыми обычно выходит ' + yr.netLow + DASH + yr.netHigh + '%: минус управление, коммунальные и простои.'
+        : ''} Точный расчёт по вашему объекту делает специалист.</div>
   </div>
   ${unitsBlock}
   ${progressBlock}
@@ -1246,7 +1273,7 @@ function sitemap(objects) {
     parts.push(`  <url><loc>${SITE_BASE}/${doc}</loc><lastmod>${today}</lastmod><changefreq>yearly</changefreq><priority>0.3</priority></url>`);
   }
   for (const o of objects) {
-    const loc = SITE_BASE + '/object/' + slugOf(pubOf(o)) + '.html';
+    const loc = SITE_BASE + '/object/' + slugOf(pubOf(o));
     parts.push(`  <url><loc>${loc}</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>`);
   }
   parts.push('</urlset>');
@@ -1272,7 +1299,7 @@ async function main() {
     'season_rates,occupancy_est_pct,maintenance_fee_thb_sqm,lat,lng,coord_source,last_synced_at,availability,' +
     'first_payment,payment_plan,payment_schedule,main_image_url,gallery_urls,unit_types,price_tiers,build_progress,photo_groups,hot_rank,public_code');
   const benchmarks = await sbGet(env,
-    'rental_benchmarks?select=district,unit_type,disp_yield_low_pct,disp_yield_high_pct');
+    'rental_benchmarks?select=district,unit_type,disp_yield_low_pct,disp_yield_high_pct,net_yield_low_pct,net_yield_high_pct');
 
   // объекты аренды: purpose IN (аренда,rent) И on_site=true.
   // 30.08: убрано исключение для PLP-TEST-RENT — тестовый эталон утекал на публичный сайт.
@@ -1293,6 +1320,24 @@ async function main() {
     const v = Number(r.nightly_thb);
     if (!Number.isFinite(v) || v <= 0) continue;
     (ratesBy[r.property_id] = ratesBy[r.property_id] || []).push({ v, min: r.min_nights || null });
+  }
+
+  /* 08.09 сторож публичного кода. На витрину идёт только код вида PLP-…; если
+     кода нет — pubOf подставлял внутренний id, и на сайте всплывали INTAKE-…,
+     а у вторички всплыл бы номер юнита. Такую карточку не публикуем вовсе.
+     Аренда маскирует юнит кодом -R1/-R3 — это разрешённая форма. */
+  const badPub = o => {
+    const c = (o && o.public_code || '').trim();
+    if (!c) return 'нет публичного кода';
+    if (!/^PLP-/.test(c)) return 'публичный код не по канону: ' + c;
+    if (/-[A-Z]?\d{2,4}$/.test(c) && !/-R\d+$/.test(c)) return 'в публичном коде номер юнита: ' + c;
+    return '';
+  };
+  for (const arr of [objects, rentals]) {
+    for (let i = arr.length - 1; i >= 0; i--) {
+      const why = badPub(arr[i]);
+      if (why) { console.warn('[gen] ⚠ не публикую', arr[i].plp_property_id, '—', why); arr.splice(i, 1); }
+    }
   }
 
   console.log('[gen] Объектов on_site=true:', objects.length, '| benchmarks:', benchmarks.length,
@@ -1329,11 +1374,13 @@ async function main() {
   html = writeRentals(html, rentList);
   // доходность района (PL.NETYIELD) из rental_benchmarks — fail-closed: пустой ответ не трогаем
   const netyield = buildNetyield(benchmarks);
-  if (Object.keys(netyield).length) {
-    html = writeNetyield(html, netyield);
-    console.log('[gen] PL.NETYIELD обновлён из rental_benchmarks:', Object.keys(netyield).length, 'районов');
+  const grossyield = buildGrossyield(benchmarks);
+  if (Object.keys(netyield).length && Object.keys(grossyield).length) {
+    html = writeNetyield(html, netyield, grossyield);
+    console.log('[gen] доходность районов обновлена: чистая', Object.keys(netyield).length,
+                '· валовая', Object.keys(grossyield).length);
   } else {
-    console.error('[gen] rental_benchmarks пуст — PL.NETYIELD не тронут (fail-closed).');
+    console.error('[gen] rental_benchmarks пуст или без net-колонок — доходность не тронута (fail-closed).');
   }
   html = writeObjectIndex(html, objects);
   fs.writeFileSync(INDEX, html);
