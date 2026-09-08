@@ -1051,6 +1051,18 @@ function objectPage(o, benchmarks, ratesBy) {
     { k: 'Спальни', v: beds },
     { k: 'Площадь', v: area },
     { k: 'Сдача', v: dl.ru },
+    // 08.09: стадия — тем же правилом, что и плашка в каталоге, иначе страница
+    // объекта и карточка спорят между собой («старт продаж» против «в продаже»)
+    { k: 'Стадия', v: (function(){
+        const W = { Ready:'сдан', Construction:'строится', 'Pre-sale':'старт продаж',
+                    Resale:'вторичка', 'Sold out':'распродан', Announced:'анонсирован' };
+        if (o.stage === 'Pre-sale') {
+          const st = o.sale_started_on ? new Date(o.sale_started_on) : null;
+          const fresh = st && !isNaN(st) && (Date.now() - st) / 86400000 <= 120;
+          return fresh ? 'старт продаж' : 'в продаже';
+        }
+        return W[o.stage] || (o.stage ? '' : 'в продаже');
+      })() },
     { k: 'Доходность', v: o.roi ? '~' + o.roi + '%/год до расходов' : '' },
     { k: 'До пляжа', v: distBeach },
     { k: 'Застройщик', v: shortDev(o.developer) },
@@ -1129,6 +1141,10 @@ h1{font-size:clamp(24px,4vw,34px);line-height:1.2;margin:8px 0 4px}
 .price{font-size:clamp(22px,3.5vw,30px);font-weight:700;color:var(--ink)}
 .price small{display:block;font-size:13px;font-weight:400;color:var(--muted);margin-top:2px}
 .chips{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0}
+.stgnote{margin:-8px 0 18px;color:var(--muted);font-size:15px;line-height:1.5}
+.promo{margin:26px 0;padding:18px 20px;border:1px solid var(--line);border-radius:16px}
+.promo h2{font-size:17px;margin:0 0 8px;color:var(--ink)}
+.promo p{margin:0;color:var(--text);opacity:.94;line-height:1.6}
 .chip{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 14px;min-width:120px}
 .chip .k{display:block;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
 .chip .v{display:block;font-weight:600;margin-top:2px}
@@ -1163,6 +1179,8 @@ if(dark) i.src='../img/brand/plp-mark-white.png';})();</script>
   <p class="loc">${htmlEsc(ru)}, Пхукет${distBeach ? ' · ' + htmlEsc(distBeach) : ''}</p>
   ${rentLine || (priceFmt ? '<div class="price">от ' + htmlEsc(priceFmt) + '<small>стартовая цена застройщика</small></div>' : '')}
   <div class="chips">${chips}</div>
+  ${o.stage_note ? '<p class="stgnote">' + htmlEsc(o.stage_note) + '</p>' : ''}
+  ${o.current_promo ? '<section class="promo"><h2>Что рядом и что нового</h2><p>' + htmlEsc(noContacts(o.current_promo)) + '</p></section>' : ''}
   <div class="yield">
     <div class="num">${yr.low}${DASH}${yr.high}%</div>
     <div class="lbl">Ориентир по району (${htmlEsc(ru)}, ${htmlEsc(t.ru.toLowerCase())}) — <b>до расходов</b>, при активном управлении. Чистыми обычно выходит 5–8%; точный расчёт по вашему объекту делает специалист.</div>
@@ -1250,7 +1268,7 @@ async function main() {
     'bedrooms,bedrooms_min,bedrooms_max,area_sqm,area_min,area_max,roi,rental_yield_pct,' +
     'capital_growth_pct,handover_date,status,stage,stage_note,sale_started_on,developer,distance_beach_m,usp,usp_en,'+
     'bedrooms_min,bedrooms_max,' +
-    'brochure_url,floorplan_url,video_url,website_url,map_url,' +
+    'brochure_url,floorplan_url,video_url,website_url,map_url,current_promo,' +
     'season_rates,occupancy_est_pct,maintenance_fee_thb_sqm,lat,lng,coord_source,last_synced_at,availability,' +
     'first_payment,payment_plan,payment_schedule,main_image_url,gallery_urls,unit_types,price_tiers,build_progress,photo_groups,hot_rank,public_code');
   const benchmarks = await sbGet(env,
