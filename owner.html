@@ -1495,6 +1495,28 @@ details.fold[open]>summary::after{content:'–'}
 .vars button{margin:0;width:auto;padding:5px 11px;font-size:12px;font-weight:600;border-radius:999px;
   background:transparent;border:1px solid rgba(var(--ink-rgb),.16);color:var(--ink)}
 .vars button:hover{border-color:var(--green);color:var(--green-text,var(--ink))}
+/* Микрофон: спокойный значок, видимое состояние записи, строка «слушаю» */
+.chatinput .mic{width:44px;height:44px;border-radius:50%;flex:none;padding:0;margin:0;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--warm);border:1px solid rgba(var(--ink-rgb),.14);color:var(--ink);cursor:pointer;
+  transition:background .18s,color .18s,border-color .18s}
+.chatinput .mic:hover{border-color:var(--green)}
+.chatinput .mic.rec{background:var(--green);color:var(--on-green);border-color:transparent;
+  animation:micpulse 1.6s infinite}
+.chatinput .mic.rec svg{display:none}
+.chatinput .mic.rec::after{content:'';width:13px;height:13px;border-radius:3px;background:currentColor}
+@keyframes micpulse{0%,100%{box-shadow:0 0 0 0 rgba(var(--ink-rgb),.16)}50%{box-shadow:0 0 0 9px rgba(var(--ink-rgb),0)}}
+.vlisten{align-self:flex-start;max-width:88%;display:flex;align-items:center;gap:9px;
+  background:var(--warm);border:1px solid rgba(var(--ink-rgb),.10);border-radius:14px;
+  padding:9px 13px;font-size:.84rem;color:var(--ink)}
+.vlisten .vd{width:8px;height:8px;border-radius:50%;background:var(--green);flex:none;animation:vdot 1s infinite}
+@keyframes vdot{0%,100%{opacity:1}50%{opacity:.25}}
+.vlisten .vt{font-variant-numeric:tabular-nums;opacity:.65;flex:none}
+.vlisten .vx{flex:1;min-width:0;opacity:.85}
+.chathead .vmode{margin:0 0 0 auto;width:auto;padding:6px 12px;border-radius:999px;font-size:.72rem;
+  font-weight:700;background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.22);cursor:pointer}
+.chathead .vmode.on{background:var(--green);color:var(--on-green);border-color:transparent}
+.chathead .clr,.chathead .x{margin-left:8px}
 /* Голосовое сообщение в чате — кружок «играть», дорожка, длительность */
 .vm{display:flex;align-items:center;gap:10px;min-width:190px}
 .vm-play{flex:none;width:34px;height:34px;border-radius:50%;border:0;cursor:pointer;
@@ -1703,12 +1725,10 @@ body{background:var(--bg)}
 /* Чипы выбора в анкете: в тёмной теме текст сливался с подложкой */
 /* Чипы выбора: фон и текст из токенов, а не из полупрозрачного «стекла» —
    на светлой теме в анкете выходил тёмный фон с тёмным текстом (Эльнур 07.09). */
-.chipf{background:#ffffff;color:#0A0A0A;border:1px solid rgba(10,10,10,.14)}
-:root[data-theme="dark"] .chipf{background:#191A12;color:#ECEFE0;border-color:rgba(236,239,224,.18)}
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]) .chipf{background:#191A12;color:#ECEFE0;border-color:rgba(236,239,224,.18)}
-}
-:root[data-theme="light"] .chipf{background:#ffffff;color:#0A0A0A;border-color:rgba(10,10,10,.14)}
+/* 🔴 08.09: фон и текст задавались отдельными правилами под каждую тему,
+   и при переключении они расходились — тёмная подложка с тёмным текстом.
+   Берём токены: они уже переключаются вместе, разойтись не могут. */
+.chipf{background:var(--paper);color:var(--ink);border:1px solid rgba(var(--ink-rgb),.14)}
 /* 🔴 08.09: выбранный ответ в анкете не закрашивался — Эльнур: «когда нажимаю
    выбрать, ответы не фиксируются цветом». Правила темы задавались селектором
    с большим весом (:root[data-theme] .chipf), чем .chipf.on, и перебивали
@@ -1887,6 +1907,8 @@ body{background:var(--bg)}
   <div class="chathead">
     <span class="av"><img src="img/brand/plp-mark-ink.png" alt="" width="20" height="20"></span>
     <div><b data-i18n="chat.name">Дарья</b><div class="st2"><span class="dot"></span> <span data-i18n="chat.sub">персональный менеджер · отвечает сразу</span></div></div>
+    <button type="button" class="vmode" id="chatVmode" onclick="toggleVoiceMode()"
+            title="Общаемся голосом: ответы приходят голосовыми">Голосом</button>
     <button type="button" class="clr" onclick="clearChat()" title="Очистить историю">⟲</button>
     <button type="button" class="x" onclick="closeChat()" aria-label="Закрыть">×</button>
   </div>
@@ -1897,7 +1919,12 @@ body{background:var(--bg)}
            data-lpignore="true" data-form-type="other"
            data-i18n-ph="chat.placeholder" placeholder="Напишите сообщение…"
            onkeydown="if(event.key==='Enter')sendFree()">
-    <button type="button" class="mic" id="chatMic" onclick="chatVoice()" aria-label="Сказать голосом" hidden>🎤</button>
+    <button type="button" class="mic" id="chatMic" onclick="chatVoice()" aria-label="Сказать голосом" hidden>
+      <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="9" y="3" width="6" height="11" rx="3"></rect>
+        <path d="M5 11a7 7 0 0 0 14 0"></path><path d="M12 18v3"></path>
+      </svg></button>
     <button type="button" class="s" onclick="sendFree()" aria-label="Отправить">↑</button>
   </div>
 </div>
@@ -2414,6 +2441,9 @@ body{background:var(--bg)}
           <li><a href="#map" data-i18n="nav.map">Районы</a></li>
           <li><a href="#about" data-i18n="nav.about">О нас</a></li>
           <li><a href="#faq">FAQ</a></li>
+          <!-- Эльнур 08.09: «выгрузить объект должно быть на сайте, чтобы можно было
+               кинуть эту форму лиду в переписке и он через сайт всё сделал» -->
+          <li><a href="/add-property" data-i18n="ft.addobj">Сдать или продать свой объект</a></li>
         </ul>
       </div>
       <div>
@@ -2566,57 +2596,114 @@ function playSpeech(text){
     return { stop:function(){ clearInterval(tick); try{ speechSynthesis.cancel(); }catch(e){} } };
   };
 }
+/* Режим «Общаемся голосом»: ответы приходят голосовыми. Выбор помним. */
+var VOICE_MODE=false;
+try{ VOICE_MODE = localStorage.getItem('plp_voice_mode')==='1'; }catch(e){}
+function paintVoiceMode(){
+  var b=document.getElementById('chatVmode'); if(!b) return;
+  b.classList.toggle('on', VOICE_MODE);
+  b.textContent = VOICE_MODE ? 'Голосом ✓' : 'Голосом';
+}
+function toggleVoiceMode(){
+  VOICE_MODE=!VOICE_MODE;
+  try{ localStorage.setItem('plp_voice_mode', VOICE_MODE?'1':'0'); }catch(e){}
+  paintVoiceMode();
+  chatMsg('bot', VOICE_MODE
+    ? 'Хорошо, отвечаю голосом. Нажмите микрофон и говорите — расшифрую и отвечу голосовым.'
+    : 'Вернулась к тексту. Голосовое всё равно можно отправить — нажмите микрофон.');
+}
+/* Видно, что запись идёт: точка, таймер и то, что уже разобрали. */
+function listenBar(){
+  var cb=document.getElementById('chatbody'); if(!cb) return null;
+  var d=document.createElement('div'); d.className='vlisten';
+  var dot=document.createElement('span'); dot.className='vd';
+  var tm=document.createElement('span'); tm.className='vt'; tm.textContent='0:00';
+  var tx=document.createElement('span'); tx.className='vx';
+  tx.textContent='Слушаю — говорите, нажмите ещё раз, когда закончите';
+  d.appendChild(dot); d.appendChild(tm); d.appendChild(tx);
+  cb.appendChild(d); cb.scrollTop=cb.scrollHeight;
+  var t0=Date.now();
+  var iv=setInterval(function(){
+    var n=Math.round((Date.now()-t0)/1000);
+    tm.textContent=Math.floor(n/60)+':'+('0'+(n%60)).slice(-2);
+  },250);
+  return { el:d, secs:function(){ return (Date.now()-t0)/1000; },
+           heard:function(t){ tx.textContent=t||'Слушаю…'; cb.scrollTop=cb.scrollHeight; },
+           close:function(){ clearInterval(iv); d.remove(); } };
+}
 function chatVoice(){
   var btn=document.getElementById('chatMic');
-  if(window.__rec && window.__rec.state==='recording'){ window.__rec.stop(); return; }
-  if(!navigator.mediaDevices || !window.MediaRecorder){
-    chatMsg('bot','Этот браузер не умеет записывать голос — напишите текстом.'); return;
+  if(window.__sr){ try{ window.__sr.stop(); }catch(e){} return; }
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){
+    chatMsg('bot','Этот браузер не распознаёт речь. В Chrome на компьютере и Android голосовые '+
+                  'работают, а здесь — напишите текстом.');
+    return;
   }
-  navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
-    var rec=new MediaRecorder(stream), chunks=[], t0=Date.now();
-    window.__rec=rec;
-    if(btn) btn.classList.add('rec');
-    var SR=window.SpeechRecognition||window.webkitSpeechRecognition, heard='', sr=null;
-    if(SR){
-      try{
-        sr=new SR(); sr.lang=(typeof CAB_LANG!=='undefined' && CAB_LANG==='en')?'en-US':'ru-RU';
-        sr.interimResults=false; sr.continuous=true;
-        sr.onresult=function(e){ for(var i=e.resultIndex;i<e.results.length;i++) heard+=e.results[i][0].transcript; };
-        sr.onerror=function(){};
-        sr.start();
-      }catch(e){ sr=null; }
+  var r=new SR();
+  r.lang=(typeof CAB_LANG!=='undefined' && CAB_LANG==='en')?'en-US':'ru-RU';
+  r.interimResults=true; r.continuous=true;
+  var heard='', partial='', bar=null, stopped=false;
+  r.onstart=function(){
+    window.__sr=r;
+    if(btn){
+      btn.classList.add('rec'); btn.setAttribute('aria-label','Закончить запись');
+      /* Состояние записи задаём прямо на кнопке: так его не перебьёт ни одно
+         правило стилей. Эльнур 08.09: «не видно, что идёт запись». */
+      btn.style.setProperty('background','var(--green)','important');
+      btn.style.setProperty('color','var(--on-green,#14150F)','important');
+      btn.style.setProperty('border-color','transparent','important');
     }
-    rec.ondataavailable=function(e){ if(e.data && e.data.size) chunks.push(e.data); };
-    rec.onstop=function(){
-      stream.getTracks().forEach(function(t){ t.stop(); });
-      if(sr){ try{ sr.stop(); }catch(e){} }
-      if(btn) btn.classList.remove('rec');
-      var secs=(Date.now()-t0)/1000;
-      var blob=new Blob(chunks,{type:'audio/webm'});
-      if(blob.size<1500 || secs<0.6) return;
-      var mine=voiceBubble('me', playAudio(URL.createObjectURL(blob)), secs, '');
-      setTimeout(function(){
-        heard=heard.trim();
-        if(heard){
-          var tx=document.createElement('div'); tx.className='vm-text'; tx.textContent=heard;
-          if(mine) mine.el.appendChild(tx);
-          askDaria(heard, true);
-        } else {
-          chatMsg('bot','Не разобрала голос. Скажите ещё раз или напишите текстом.');
-        }
-      }, 400);
-    };
-    rec.start();
-    setTimeout(function(){ if(rec.state==='recording') rec.stop(); }, 60000);
-  }).catch(function(){ chatMsg('bot','Не дали доступ к микрофону — напишите текстом.'); });
+    bar=listenBar();
+  };
+  r.onresult=function(e){
+    partial='';
+    for(var i=e.resultIndex;i<e.results.length;i++){
+      var t=e.results[i][0].transcript;
+      if(e.results[i].isFinal) heard+=t; else partial+=t;
+    }
+    if(bar) bar.heard((heard+partial).trim());
+  };
+  r.onerror=function(ev){
+    stopped=true;
+    if(bar) bar.close();
+    if(btn){ btn.classList.remove('rec');
+      btn.style.removeProperty('background'); btn.style.removeProperty('color');
+      btn.style.removeProperty('border-color'); }
+    window.__sr=null;
+    var why=(ev&&ev.error)||'';
+    chatMsg('bot', why==='not-allowed'
+      ? 'Не дали доступ к микрофону. Разрешите его в браузере и нажмите ещё раз.'
+      : (why==='no-speech'
+         ? 'Ничего не услышала. Нажмите микрофон и говорите — или напишите текстом.'
+         : 'Не получилось записать голос. Напишите, пожалуйста, текстом.'));
+  };
+  r.onend=function(){
+    window.__sr=null;
+    if(btn){
+      btn.classList.remove('rec'); btn.setAttribute('aria-label','Сказать голосом');
+      btn.style.removeProperty('background'); btn.style.removeProperty('color');
+      btn.style.removeProperty('border-color');
+    }
+    if(stopped) return;
+    var secs=bar?bar.secs():0;
+    if(bar) bar.close();
+    var text=(heard+' '+partial).replace(/\s+/g,' ').trim();
+    if(!text){ chatMsg('bot','Не разобрала голос. Нажмите микрофон и скажите ещё раз — или напишите текстом.'); return; }
+    voiceBubble('me', playSpeech(text), Math.max(1, secs), text);
+    askDaria(text, true);
+  };
+  try{ r.start(); }
+  catch(e){ window.__sr=null; chatMsg('bot','Микрофон занят другой вкладкой. Закройте её и попробуйте снова.'); }
 }
 (function(){
-  /* мёртвой кнопки быть не должно: показываем только там, где запись работает */
+  /* мёртвой кнопки быть не должно: показываем там, где браузер распознаёт речь */
   try{
-    if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder){
+    if(window.SpeechRecognition||window.webkitSpeechRecognition){
       var b=document.getElementById('chatMic');
-      if(b){ b.hidden=false; b.title='Записать голосовое'; }
+      if(b){ b.hidden=false; b.title='Сказать голосом'; }
     }
+    paintVoiceMode();
   }catch(e){}
 })();
 function setTheme(v){
@@ -4591,7 +4678,11 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
          выгрузить объект». Третий путь: объект, которого у нас ещё нет. */
       '<p class="sub" style="margin-top:14px">Речь о другом объекте, которого у нас ещё нет? '+
       '<a href="/add-property" class="lnk">Заполните анкету</a> — пять шагов, можно приложить '+
-      'фото или дать ссылку на папку. Мы проверим и оформим карточку.</p>';
+      'фото или дать ссылку на папку. Мы проверим и оформим карточку.<br>'+
+      /* Эльнур 08.09: «чтобы можно было кинуть эту форму лиду в переписке
+         и он через сайт всё сделал». */
+      '<a href="#" class="lnk" id="ap-copy">Скопировать ссылку для клиента</a> — '+
+      'отправьте её в переписке, человек заполнит сам.</p>';
     H+=card('Выгрузить объект', rs, 'sec-resale');
 
     // ставки
@@ -4795,7 +4886,19 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       '<div id="doc-parsed"></div>';
     H+=card('Документы объекта', dch, 'sec-docs');
 
-    setTimeout(function(){ try{ bindDocUpload(p.id||''); bindStateBox(p.id||''); }catch(e){} }, 0);
+    setTimeout(function(){
+      try{ bindDocUpload(p.id||''); bindStateBox(p.id||''); }catch(e){}
+      var apc=document.getElementById('ap-copy');
+      if(apc) apc.onclick=function(e){
+        e.preventDefault();
+        var url='https://property-library.com/add-property';
+        var ok=function(){ apc.textContent='Ссылка скопирована'; setTimeout(function(){
+          apc.textContent='Скопировать ссылку для клиента'; },2500); };
+        if(navigator.clipboard && navigator.clipboard.writeText)
+          navigator.clipboard.writeText(url).then(ok, function(){ say(url); });
+        else say(url);
+      };
+    }, 0);
     CARD_N=0;
     $('prop').innerHTML=H;
     bindFolds();
@@ -7316,7 +7419,7 @@ function askDaria(txt, byVoice){
       if(wait) wait.remove();
       var reply=(d&&d.reply)||'Записала. Передам менеджеру и вернусь с ответом.';
       /* спросили голосом — отвечаем голосовым, текст под ним читаемый */
-      if(byVoice){
+      if(byVoice || VOICE_MODE){
         var v=voiceBubble('bot', playSpeech(reply), Math.max(2, reply.length/14), reply);
         if(v) setTimeout(function(){ try{ v.start(); }catch(e){} },200);
       } else chatMsg('bot',reply);
@@ -7326,7 +7429,7 @@ function askDaria(txt, byVoice){
       chatMsg('bot','Связь подвела. Напишите ещё раз или свяжитесь с менеджером.'); });
 }
 
-window.chatVoice=chatVoice;window.voiceBubble=voiceBubble;window.playAudio=playAudio;window.playSpeech=playSpeech;window.openChat=openChat;window.closeChat=closeChat;window.clearChat=clearChat;window.toggleFab=toggleFab;window.sendFree=sendFree;
+window.chatVoice=chatVoice;window.listenBar=listenBar;window.paintVoiceMode=paintVoiceMode;window.toggleVoiceMode=toggleVoiceMode;window.voiceBubble=voiceBubble;window.playAudio=playAudio;window.playSpeech=playSpeech;window.openChat=openChat;window.closeChat=closeChat;window.clearChat=clearChat;window.toggleFab=toggleFab;window.sendFree=sendFree;
 
   function cabPage(name){
     CAB_TAB=name;
