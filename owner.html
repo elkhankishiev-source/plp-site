@@ -2770,7 +2770,13 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   }
   function dmy(s){ if(!s) return '—'; var p=String(s).slice(0,10).split('-'); return p.length===3?p[2]+'.'+p[1]+'.'+p[0]:s; }
   function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-  function show(id){['gate','pwd','loading','app'].forEach(function(x){$(x).style.display=(x===id?'':'none');});}
+  function show(id){
+    ['gate','pwd','loading','app'].forEach(function(x){$(x).style.display=(x===id?'':'none');});
+    /* Эльнур 08.09: «мобильная версия немного страдает» — на телефоне пузырь чата
+       наезжал на кнопку «Войти». На экранах входа его не показываем. */
+    var fw=document.getElementById('fabWrap');
+    if(fw) fw.style.display=(id==='app')?'':'none';
+  }
   function post(body){
     return fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})
       .then(function(r){return r.json();});
