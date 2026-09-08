@@ -3,8 +3,8 @@
  "items": [
   {
    "id": "INTAKE-BOTANICA",
-   "pub": "INTAKE-BOTANICA",
-   "url": "https://property-library.com/object/intake-botanica",
+   "pub": "PLP-GENS-BOTANICA",
+   "url": "https://property-library.com/object/gens-botanica",
    "name": "The GENS by Botanica, у Blue Tree",
    "district": "Банг Тао",
    "type": "Кондо",
@@ -13,8 +13,8 @@
   },
   {
    "id": "INTAKE-CHAMPACA",
-   "pub": "INTAKE-CHAMPACA",
-   "url": "https://property-library.com/object/intake-champaca",
+   "pub": "PLP-MONO-CHAMPACA",
+   "url": "https://property-library.com/object/mono-champaca",
    "name": "Mono Champaca, Таланг",
    "district": "Таланг",
    "type": "Вилла",
@@ -855,8 +855,8 @@
   },
   {
    "id": "RESALE-PANORA",
-   "pub": "RESALE-PANORA",
-   "url": "https://property-library.com/object/resale-panora",
+   "pub": "PLP-PANORA-VILLA",
+   "url": "https://property-library.com/object/panora-villa",
    "name": "Panora Villas, Сурин — перепродажа",
    "district": "Сурин",
    "type": "Вилла",
@@ -865,8 +865,8 @@
   },
   {
    "id": "RESALE-PANORA-CONDO",
-   "pub": "RESALE-PANORA-CONDO",
-   "url": "https://property-library.com/object/resale-panora-condo",
+   "pub": "PLP-PANORA-CONDO",
+   "url": "https://property-library.com/object/panora-condo",
    "name": "The Panora Phuket, корпус D — перепродажа",
    "district": "Сурин",
    "type": "Кондо",
