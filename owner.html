@@ -1491,8 +1491,12 @@ html,*{-webkit-tap-highlight-color:transparent}
 }
 
 /* Путь владельца: пронумерованные этапы, пройденное отмечено */
-.path{border:1px solid rgba(var(--ink-rgb),.10);border-radius:16px;padding:16px 18px;
+.path{border:1px solid rgba(var(--ink-rgb),.10);border-radius:16px;padding:14px 18px;
   background:var(--warm);margin:14px 0 4px}
+.path>summary{cursor:pointer;list-style:none;display:flex;align-items:baseline;gap:8px}
+.path>summary::-webkit-details-marker{display:none}
+.path>summary::after{content:'+';margin-left:auto;font-size:20px;color:var(--dim);line-height:1}
+.path[open]>summary::after{content:'–'}
 .path-lead{margin:0 0 4px;font-weight:600}
 .path-l{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:2px;counter-reset:none}
 .path-l li{display:flex;gap:12px;align-items:flex-start;padding:10px 0;
@@ -2291,9 +2295,13 @@ body{background:var(--bg)}
       <p class="sub" style="margin:0 0 12px">Что происходит прямо сейчас: люди, сайт, работа, связь.
       Обновляется при каждом заходе.</p>
       <div id="board-body"></div>
-      <h4 style="margin:20px 0 8px">Истина системы</h4>
-      <p class="sub" style="margin:0 0 10px">Правила записаны в системе, и она сама проверяет,
-      что живёт по ним. Не «мы договорились», а «сверено с данными».</p>
+      <!-- Эльнур 08.09: «в самом низу самопроверка это что?» — объясняем прямо тут -->
+      <h4 style="margin:20px 0 8px">Сверка с правилами</h4>
+      <p class="sub" style="margin:0 0 10px">У нас записаны правила: как заводить объект,
+      что можно писать клиенту, откуда берётся цена. Нажмите «Сверить» — система пройдёт
+      по данным и покажет, где они разошлись с правилом: дубли номеров, объекты без цены,
+      стадия, которая спорит с датой сдачи. Ничего не меняется — это список того,
+      что стоит поправить руками.</p>
       <div id="canon-body"><button type="button" class="btn ghost" id="canon-go">Сверить</button></div>
     </div>
 
@@ -3026,24 +3034,53 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     var months=allMonths();
     if(!months.length){ say('Пока нет операций, из которых собрать отчёт.'); return; }
     // сначала спрашиваем период — отчёт всегда за то, что нужно сейчас
-    clForm('<h3>Отчёт за период</h3>'+
-      '<p class="sub">Есть данные с '+monthName(months[0].month)+' по '+
-      monthName(months[months.length-1].month)+'.</p>'+
+    /* Эльнур 08.09: «только 2 месяца на выбор, выглядит очень коряво, нажал
+       собрать — вышло 12 страниц». Месяцев в списке столько, сколько есть
+       операций, — так и пишем. И отчёт по умолчанию про ОДИН объект, а не про
+       все пятьдесят. */
+    var cur=(DATA.properties||[])[CUR]||{};
+    clForm('<h3>Отчёт</h3>'+
+      '<p class="sub">Операции есть за '+months.length+' '+plural(months.length,'месяц','месяца','месяцев')+
+      ': с '+monthName(months[0].month)+' по '+monthName(months[months.length-1].month)+'. '+
+      'Что было раньше — в отчёт не попадёт, потому что данных за те месяцы нет.</p>'+
+      '<div class="opts" id="rp-quick" style="margin:10px 0">'+
+        '<button type="button" class="opt on" data-q="all">Весь период</button>'+
+        '<button type="button" class="opt" data-q="last">Последний месяц</button>'+
+        '<button type="button" class="opt" data-q="3">Три месяца</button>'+
+      '</div>'+
       '<div class="fgrid">'+
       '<label>С месяца<select id="rp-from">'+months.map(function(m,i){
         return '<option value="'+i+'">'+monthName(m.month)+'</option>'; }).join('')+'</select></label>'+
       '<label>По месяц<select id="rp-to">'+months.map(function(m,i){
         return '<option value="'+i+'"'+(i===months.length-1?' selected':'')+'>'+
                monthName(m.month)+'</option>'; }).join('')+'</select></label>'+
+      '<label class="wide">По каким объектам<select id="rp-scope">'+
+        '<option value="cur">только '+clEsc(cur.name||cur.id||'текущий объект')+'</option>'+
+        '<option value="uk">по всем в управлении</option>'+
+        '<option value="all">по всем ('+((DATA.properties||[]).length)+')</option>'+
+      '</select></label>'+
       '</div><div class="fbtns"><button type="button" class="btn" id="f-save">Собрать отчёт</button>'+
       '<button type="button" class="btn ghost" id="f-cancel">Отмена</button></div>',
       function(){
         var a=Number(fv2('rp-from')), b=Number(fv2('rp-to'));
         if(b<a){ var t=a; a=b; b=t; }
+        var scope=fv2('rp-scope');
         document.getElementById('cl-form').innerHTML='';
         document.body.style.overflow='';
-        printReport(months.slice(a,b+1));
+        printReport(months.slice(a,b+1), scope);
       });
+    Array.prototype.forEach.call(document.querySelectorAll('#rp-quick .opt'),function(o){
+      o.onclick=function(){
+        Array.prototype.forEach.call(document.querySelectorAll('#rp-quick .opt'),function(x){x.classList.remove('on');});
+        o.classList.add('on');
+        var q=o.getAttribute('data-q'), n=months.length;
+        var from=0, to=n-1;
+        if(q==='last') from=n-1;
+        if(q==='3') from=Math.max(0,n-3);
+        document.getElementById('rp-from').value=String(from);
+        document.getElementById('rp-to').value=String(to);
+      };
+    });
   }
   function fv2(id){ var e=document.getElementById(id); return e?e.value:''; }
   /* Печатный бланк за один период — из строки «Истории отчётов». */
@@ -3055,8 +3092,12 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     }
     printReport(months);
   }
-  function printReport(rows){
-    var props=DATA.properties||[];
+  function printReport(rows, scope){
+    var all=DATA.properties||[];
+    var props = scope==='all' ? all
+      : (scope==='uk' ? all.filter(function(x){ return x.contract && x.contract.status==='active'; })
+                      : [ all[CUR] ].filter(Boolean));
+    if(!props.length) props=[all[CUR]].filter(Boolean);
     var inc=rows.reduce(function(a,m){return a+m.income;},0);
     var exp=rows.reduce(function(a,m){return a+m.expenses;},0);
     var net=rows.reduce(function(a,m){return a+m.net;},0);
@@ -3064,7 +3105,8 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     var period=rows.length?(monthName(rows[0].month)+' — '+monthName(rows[rows.length-1].month)):'';
 
     var h='<div class="rep">'+
-      '<div class="rep-head"><div><div class="rep-brand">Property Library Phuket</div>'+
+      '<div class="rep-head"><img class="rep-logo" src="'+location.origin+'/img/brand/plp-logo.png" alt="Property Library">'+
+      '<div><div class="rep-brand">Property Library Phuket</div>'+
       '<h1>Отчёт по управлению</h1>'+
       '<p>'+esc(who)+(period?(' · '+period):'')+' · подготовлен '+
       new Date().toLocaleDateString('ru-RU')+'</p></div></div>'+
@@ -3125,13 +3167,28 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     h+='<p class="rep-foot">Property Library Phuket · property-library.com · '+
        'Отчёт сформирован из данных кабинета. Вопросы — вашему менеджеру.</p></div>';
 
+    /* Эльнур 08.09: «а если я хочу поделиться или хочу проверить, верно ли там
+       всё наполнено». Сначала показываем бланк, а печать — по кнопке. Рядом —
+       «скопировать текстом», чтобы отправить в переписке. */
+    h='<div class="rep-bar">'+
+      '<button type="button" class="main" onclick="window.print()">Печать или PDF</button>'+
+      '<button type="button" id="rep-copy">Скопировать текстом</button>'+
+      '<button type="button" onclick="window.close()">Закрыть</button>'+
+      '</div>'+h;
     var w=window.open('','_blank');
     if(!w){ say('Браузер заблокировал окно отчёта — разрешите всплывающие окна.'); return; }
     w.document.write('<!doctype html><html lang="ru"><head><meta charset="utf-8">'+
       '<title>Отчёт — Property Library Phuket</title><style>'+
       'body{font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif;color:#14120e;margin:0;padding:32px;background:#fff}'+
       '.rep{max-width:820px;margin:0 auto}'+
+      '.rep-head{display:flex;align-items:flex-start;gap:16px}'+
+      '.rep-logo{height:40px;width:auto;display:block;flex:none}'+
       '.rep-brand{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#5F6242}'+
+      '.rep-bar{display:flex;gap:10px;margin:0 0 18px}'+
+      '.rep-bar button{font:inherit;font-size:13px;font-weight:700;padding:9px 16px;border-radius:999px;'+
+        'border:1px solid #d7d6cc;background:#fff;color:#14150F;cursor:pointer;margin:0;width:auto}'+
+      '.rep-bar button.main{background:#14150F;color:#fff;border-color:#14150F}'+
+      '@media print{.rep-bar{display:none}}'+
       'h1{font-size:26px;margin:6px 0 4px}h2{font-size:17px;margin:26px 0 8px}'+
       'h3{font-size:15px;margin:0 0 2px}'+
       '.rep-head p{color:#6b6b60;margin:0}'+
@@ -3150,7 +3207,21 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       '@media print{body{padding:0}.rep-obj{break-inside:avoid}}'+
       '</style></head><body>'+h+'</body></html>');
     w.document.close();
-    setTimeout(function(){ try{ w.focus(); w.print(); }catch(e){} }, 400);
+    /* печать не запускаем сами: человек сначала смотрит, всё ли верно */
+    setTimeout(function(){
+      try{
+        w.focus();
+        var cp=w.document.getElementById('rep-copy');
+        if(cp) cp.onclick=function(){
+          var txt=w.document.querySelector('.rep').innerText.replace(/\n{3,}/g,'\n\n');
+          if(w.navigator.clipboard && w.navigator.clipboard.writeText)
+            w.navigator.clipboard.writeText(txt).then(function(){
+              cp.textContent='Скопировано'; setTimeout(function(){ cp.textContent='Скопировать текстом'; },2000); },
+              function(){ cp.textContent='Не скопировалось'; });
+          else cp.textContent='Не скопировалось';
+        };
+      }catch(e){}
+    }, 400);
   }
 
   /* Формы внесения по объекту: операция, работа, документ.
@@ -4290,49 +4361,66 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   function ownerPath(p){
     p=p||{};
     var ct=p.contract||{}, docs=p.docs||[], rates=p.rates||[], bk=p.bookings||[], st=p.statements||[];
-    var hasPhoto=!!((p.media&&(p.media.gallery||[]).length)||p.photo);
+    /* Эльнур 08.09: «по чек-листу отмечено, что сделана часть, а по факту то нет,
+       почему так». Отмечаем только по настоящим следам, а не по косвенным.
+       Снимки из каталога — это не осмотр объекта: осмотр — это акт или снимки
+       состояния, которые мы сами сделали. */
+    var hasCheck=!!((p.checks&&p.checks.length) || docs.some(function(d){
+      return /осмотр|акт|состояни|check|inventory|опись/i.test(String(d.title||'')); }));
     var hasContract=!!(ct.status==='active');
-    var hasPack=!!(rates.length || docs.some(function(d){
-      return /опись|инструкц|правил|inventory|house\s*rules/i.test(String(d.title||'')); }));
-    var onSite=!!p.on_site;
+    var hasRates=rates.length>0;
+    var hasRules=docs.some(function(d){
+      return /инструкц|правил|house\s*rules|guest/i.test(String(d.title||'')); });
+    var hasPack=hasRates&&hasRules;
+    var onSite=p.on_site===true;
     var hasBooking=bk.some(function(b){ return b.status!=='cancelled'; });
-    var hasReport=st.length>0;
+    var hasReport=st.some(function(x){ return x.status && x.status!=='draft'; });
     var steps=[
-      {t:'Знакомство и осмотр',
-       d:'Смотрим объект: состояние, что уже есть из мебели и техники, какие снимки годятся для витрины.',
-       ok:hasPhoto, now:!hasPhoto},
+      {t:'Осмотр и опись',
+       d:'Приезжаем, смотрим состояние, снимаем что есть из мебели и техники. Так потом видно, в каком виде объект отдали и в каком вернули.',
+       ok:hasCheck, go:'docs'},
       {t:'Договор управления',
        d:'Берёте шаблон, подписываете, подписанный загружаете здесь же. Без него бронь по объекту не проходит.',
-       ok:hasContract, now:hasPhoto&&!hasContract, go:'contract'},
+       ok:hasContract, go:'contract'},
       {t:'Готовим объект к гостям',
-       d:'Опись имущества, комплект белья и посуды, инструкции для гостей, ключи и доступы, ставки за ночь.',
-       ok:hasPack, now:hasContract&&!hasPack, go:'docs'},
+       d:'Ставки за ночь, комплект белья и посуды, инструкции для гостей, ключи и доступы.'+
+         (hasRates&&!hasRules?' Ставки уже есть, осталась инструкция для гостей.':''),
+       ok:hasPack, go:'docs'},
       {t:'Объект на витрине',
        d:'Собираем карточку: снимки, описание, цены и календарь. Ссылку можно отправлять клиентам.',
-       ok:onSite, now:hasPack&&!onSite},
+       ok:onSite},
       {t:'Первые брони',
-       d:'Заезды приходят к нам, вы видите их в кабинете. Делать ничего не нужно — мы ведём гостя сами.',
-       ok:hasBooking, now:onSite&&!hasBooking, go:'calendar'},
+       d:'Заезды приходят к нам, вы видите их в кабинете. Гостя ведём мы.',
+       ok:hasBooking, go:'calendar'},
       {t:'Отчёт и выплата',
-       d:'Раз в месяц: что пришло, что потрачено, сколько к выплате. Отчёт можно распечатать или сохранить в PDF.',
-       ok:hasReport, now:hasBooking&&!hasReport, go:'docs'}
+       d:'Раз в месяц: что пришло, что потрачено, сколько к выплате.',
+       ok:hasReport, go:'docs'}
     ];
+    /* текущий — первый незакрытый */
+    var cur=-1;
+    steps.forEach(function(x,i){ if(cur<0 && !x.ok) cur=i; });
     var doneN=steps.filter(function(x){return x.ok;}).length;
     if(doneN===steps.length) return '';   /* всё пройдено — не мозолим глаза */
-    var h='<div class="path"><p class="path-lead">Чтобы объект приносил пассивный доход, '+
-      'нужно пройти несколько этапов. Мы ведём вас по ним — от вас только подпись и ключи.</p>'+
-      '<p class="sub">Пройдено '+doneN+' из '+steps.length+'.</p><ol class="path-l">';
+    var h='<details class="path fold"'+(doneN?'':' open')+'>'+
+      '<summary><b>Как объект начнёт приносить доход</b>'+
+      '<span class="sub" style="margin-left:8px">пройдено '+doneN+' из '+steps.length+'</span></summary>'+
+      '<p class="path-lead">Это путь для тех, кто хочет сдавать объект через нас. '+
+      'Если сдавать пока не планируете — просто закройте памятку, кабинет работает и так.</p>'+
+      '<p class="sub">Мы ведём по каждому шагу: договор, опись, фотосъёмка, цены, гости и отчёт — '+
+      'на нас. От вас — решение и доступ к объекту.</p><ol class="path-l">';
     steps.forEach(function(x,i){
-      h+='<li class="'+(x.ok?'ok':(x.now?'now':'wait'))+'">'+
+      var now=(i===cur);
+      h+='<li class="'+(x.ok?'ok':(now?'now':'wait'))+'">'+
          '<span class="path-n">'+(x.ok?'✓':(i+1))+'</span>'+
          '<span class="path-t"><b>'+esc(x.t)+'</b><span class="sub">'+esc(x.d)+'</span>'+
-         (x.now&&x.go==='contract'
+         (now&&x.go==='contract'
             ? ('<button type="button" class="btn-mini" data-uk="book" data-pid="'+(p.id||'')+
                '" style="margin-top:6px">Взять шаблон и подписать</button>')
-            : (x.now&&x.go ? ('<a href="#" class="lnk path-go" data-go="'+x.go+'">Перейти</a>') : ''))+
+            : (now&&x.go ? ('<button type="button" class="btn-mini path-go" data-go="'+x.go+
+                            '" style="margin-top:6px">Перейти</button>') : ''))+
          '</span></li>';
     });
-    return h+'</ol></div>';
+    return h+'</ol></details>';
   }
   function renderPortfolio(){
     var t=DATA.totals, o=DATA.owner||{};
@@ -4399,7 +4487,24 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
 
   /* Кнопки в блоке «Объект сейчас»: согласование работы уходит менеджеру
      как заявка, чтобы решение владельца не потерялось в переписке. */
+  var NOW_ACT={};
   function bindNowActions(p){
+    /* Сотрудник закрывает работу прямо отсюда — теми же действиями, что и в
+       колокольчике. Экран правим сразу, данные подтягиваем следом. */
+    document.querySelectorAll('#portfolio .now-do').forEach(function(b){
+      b.onclick=function(){
+        var a=NOW_ACT[b.getAttribute('data-k')]; if(!a) return;
+        b.disabled=true; b.textContent='…';
+        bellDo(a).then(function(r){
+          if(r&&r.ok){
+            bellForget(a);
+            var row=b.closest('.nowrow'); if(row) row.remove();
+            try{ paintCounts(); }catch(e){}
+            quietReload();
+          } else { b.disabled=false; b.textContent=a.t; say((r&&r.error)||'Не вышло'); }
+        });
+      };
+    });
     document.querySelectorAll('#portfolio .nowrow button[data-now]').forEach(function(b){
       b.onclick=function(){
         var go=b.getAttribute('data-go');
@@ -4491,19 +4596,33 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     var items=[], today=new Date().toISOString().slice(0,10);
     var live=(p.bookings||[]).find(function(b){ return b.check_in<=today && b.check_out>=today; });
     if(live) items.push({t:'Гость проживает', s:'Выезд '+dmy(live.check_out), a:''});
+    /* Эльнур 08.09: «висит уборка и только согласовать, а закрыть или отменить
+       нету снова». У сотрудника — сделано и снять; у собственника — согласовать. */
+    var isStaff=!!(DATA.owner&&DATA.owner.is_staff===true);
     (p.tasks||[]).slice(0,3).forEach(function(k){
       items.push({t:(KINDS[k.kind]||k.kind||'Работа'),
                   s:(k.due_date?dmy(k.due_date)+' · ':'')+(k.cost_thb?money(k.cost_thb,'THB'):'по факту'),
-                  a:'Согласовать', kind:k.kind, cost:k.cost_thb});
+                  a:(isStaff?'':'Согласовать'), kind:k.kind, cost:k.cost_thb,
+                  acts:(isStaff?[{t:'Сделано',a:'task_done',id:k.id,cost:k.cost_thb},
+                                 {t:'Снять',a:'task_del',id:k.id}]:null)});
     });
     var st=(p.statements||[])[0];
     if(st) items.push({t:'Отчёт за '+String(st.period||'').slice(0,7)+' готов', s:'Смотреть в разделе «Документы»', a:'Открыть', go:'docs'});
     if(!items.length) return '';
     return '<div class="card"><span class="eyebrow">Объект сейчас</span><h2>Статус и задачи</h2>'+
       items.map(function(i,n){
+        var btns='';
+        if(i.acts){
+          NOW_ACT=NOW_ACT||{};
+          i.acts.forEach(function(a,k){
+            var key='n'+n+'_'+k; NOW_ACT[key]=a;
+            btns+='<button type="button" class="btn-mini now-do" data-k="'+key+'">'+esc(a.t)+'</button> ';
+          });
+        } else if(i.a){
+          btns='<button type="button" class="btn-mini" data-now="'+n+'"'+(i.go?' data-go="'+i.go+'"':'')+'>'+i.a+'</button>';
+        }
         return '<div class="nowrow"><div><b>'+esc(i.t)+'</b><span>'+esc(i.s)+'</span></div>'+
-          (i.a?'<button type="button" class="btn-mini" data-now="'+n+'"'+(i.go?' data-go="'+i.go+'"':'')+'>'+i.a+'</button>':'')+
-          '</div>';
+          '<div style="display:flex;gap:6px;flex-wrap:wrap">'+btns+'</div></div>';
       }).join('')+'</div>';
   }
 
@@ -5121,24 +5240,33 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   }
 
   function renderRequests(){
-    var rq=DATA.requests||[];
+    /* Эльнур 08.09: «то, что отменил, так и висит в заявках в самом начале и
+       загораживает новые». Сверху то, с чем надо работать. */
+    var ORD={new:0, in_progress:1, done:2, cancelled:3};
+    var rq=(DATA.requests||[]).slice().sort(function(a,b){
+      var d=(ORD[a.status]==null?9:ORD[a.status])-(ORD[b.status]==null?9:ORD[b.status]);
+      if(d) return d;
+      return String(b.created_at||'').localeCompare(String(a.created_at||''));
+    });
     if(!rq.length){ $('req-wrap').innerHTML='<div class="empty">Заявок пока не было.</div>'; return; }
     /* Эльнур 08.09: «с ней я тоже ничего не могу сделать, только посмотреть,
        не открыть не узнать, не принять, не отменить». Действия — прямо в строке. */
     var isStaff=!!(DATA.owner&&DATA.owner.is_staff===true);
     var h='<table><tr><th>Дата</th><th>Заявка</th><th class="r">Статус</th><th></th></tr>';
     rq.forEach(function(r){
+      /* Эльнур 08.09: «заявка без ответа — принять / отменить, наверное так
+         логичнее». Принял — она в работе; сделал — закрыл. */
       var act='';
-      if(r.status!=='done' && r.status!=='cancelled'){
-        if(isStaff){
-          if(r.status!=='in_progress')
-            act+='<a href="#" class="lnk rq-set" data-id="'+r.id+'" data-st="in_progress">взять в работу</a> ';
-          act+='<a href="#" class="lnk rq-set" data-id="'+r.id+'" data-st="done">закрыть</a> ';
-        }
-        act+='<a href="#" class="lnk rq-set" data-id="'+r.id+'" data-st="cancelled">отменить</a>';
+      if(r.status==='new'){
+        act+='<a href="#" class="lnk rq-set" data-id="'+r.id+'" data-st="in_progress">Принять</a> ';
+        act+='<a href="#" class="lnk rq-set" data-id="'+r.id+'" data-st="cancelled">Отменить</a>';
+      } else if(r.status==='in_progress'){
+        act+='<a href="#" class="lnk rq-set" data-id="'+r.id+'" data-st="done">Сделано</a> ';
+        act+='<a href="#" class="lnk rq-set" data-id="'+r.id+'" data-st="cancelled">Отменить</a>';
       }
-      h+='<tr><td>'+dmy(r.created_at)+'</td><td>'+esc(KINDS[r.kind]||r.kind)+
-         (r.property_id?('<br><span class="sub">'+esc(r.property_id)+'</span>'):'')+
+      var dim=(r.status==='done'||r.status==='cancelled')?' style="opacity:.55"':'';
+      h+='<tr id="rq-'+r.id+'"'+dim+'><td>'+dmy(r.created_at)+'</td><td>'+esc(KINDS[r.kind]||r.kind)+
+         (r.plp_property_id?('<br><span class="sub">'+esc(r.plp_property_id)+'</span>'):'')+
          (r.details?'<br><span style="color:var(--dim);font-size:12px">'+esc(r.details)+'</span>':'')+
          '</td><td class="r">'+esc(RSTAT[r.status]||r.status)+'</td>'+
          '<td class="r" style="white-space:nowrap">'+act+'</td></tr>';
@@ -5159,7 +5287,16 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
             if(b){ if(b.disabled) return; b.disabled=true; b.textContent='Сохраняем…'; }
             post({action:'request_set',token:TOKEN,id:id,status:st,note:fv('rq-note')}).then(function(r){
               var f=document.getElementById('cl-form');
-              if(r&&r.ok){ if(f){ f.innerHTML=''; document.body.style.overflow=''; } reload(); }
+              if(r&&r.ok){
+                if(f){ f.innerHTML=''; document.body.style.overflow=''; }
+                /* правим на месте — человек остаётся в заявках, а не улетает в обзор */
+                (DATA.requests||[]).forEach(function(x){ if(String(x.id)===String(id)) x.status=st; });
+                try{ renderRequests(); paintCounts(); }catch(e){}
+                var row=document.getElementById('rq-'+id);
+                if(row){ row.style.transition='background .6s'; row.style.background='var(--green-soft)';
+                         setTimeout(function(){ row.style.background=''; },900); }
+                quietReload();
+              }
               else { if(b){ b.disabled=false; b.textContent='Да'; } say((r&&r.error)||'Не вышло'); }
             });
           });
@@ -7442,6 +7579,19 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
                    status:(a.a==='book_ok'?'upcoming':'cancelled')});
     return Promise.resolve({ok:false,error:'не понял действие'});
   }
+  /* Вычёркиваем событие из данных, чтобы значок погас сразу, а не через 4 секунды. */
+  function bellForget(a){
+    (DATA.properties||[]).forEach(function(p){
+      if(a.a==='task_done'||a.a==='task_del')
+        (p.tasks||[]).forEach(function(w){ if(String(w.id)===String(a.id)) w.status='done'; });
+      if(a.a==='book_ok'||a.a==='book_cancel')
+        (p.bookings||[]).forEach(function(x){
+          if(String(x.booking_id)===String(a.id)) x.status=(a.a==='book_ok')?'upcoming':'cancelled'; });
+    });
+    if(a.a==='req_done'||a.a==='req_cancel')
+      (DATA.requests||[]).forEach(function(r){
+        if(String(r.id)===String(a.id)) r.status=(a.a==='req_done')?'done':'cancelled'; });
+  }
   function bellOpen(){
     var items=bellItems();
     /* Эльнур 06.09: «колокольчик горит, уведомления не показаны». Раньше при
@@ -7459,10 +7609,11 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         var key='b'+n+'_'+k; BELL_ACT[key]=a;
         acts+='<button type="button" class="btn-mini bell-do" data-k="'+key+'">'+clEsc(a.t)+'</button>';
       });
+      var mark=(it.act&&it.act[0]&&it.act[0].a&&it.act[0].a.indexOf('req_')===0)?(' data-row="rq-'+it.act[0].id+'"'):'';
       return '<div class="bell-row" data-go="'+it.tab+'">'+
-             '<span class="bell-go" data-go="'+it.tab+'"><b>'+clEsc(it.t)+'</b><u>'+clEsc(it.s)+'</u></span>'+
+             '<span class="bell-go" data-go="'+it.tab+'"'+mark+'><b>'+clEsc(it.t)+'</b><u>'+clEsc(it.s)+'</u></span>'+
              '<span class="bell-acts">'+acts+'<button type="button" class="btn-mini ghost bell-open" '+
-             'data-go="'+it.tab+'">Открыть</button></span></div>';
+             'data-go="'+it.tab+'"'+mark+'>Открыть</button></span></div>';
     }).join('');
     clForm('<h3>Что ждёт внимания</h3>'+
       '<p class="sub">Каждое уведомление можно закрыть прямо здесь — тогда оно и погаснет.</p>'+
@@ -7473,6 +7624,16 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         var box=document.getElementById('cl-form');
         if(box){ box.innerHTML=''; document.body.style.overflow=''; }
         cabPage(b.getAttribute('data-go'));
+        /* Эльнур 08.09: «попал в общее меню и даже не знаю, на какую заявку я
+           ткнул, может бы она хотя бы была подсвечена». Подсвечиваем и подводим. */
+        var rid=b.getAttribute('data-row');
+        if(rid) setTimeout(function(){
+          var row=document.getElementById(rid);
+          if(!row) return;
+          row.scrollIntoView({behavior:'smooth',block:'center'});
+          row.style.transition='background .5s'; row.style.background='var(--green-soft)';
+          setTimeout(function(){ row.style.background=''; },2200);
+        },250);
       };
     });
     Array.prototype.forEach.call(document.querySelectorAll('.bell-do'),function(b){
@@ -7480,7 +7641,19 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         var a=BELL_ACT[b.getAttribute('data-k')]; if(!a) return;
         b.disabled=true; b.textContent='…';
         bellDo(a).then(function(r){
-          if(r&&r.ok){ reload(); setTimeout(function(){ try{ bellOpen(); }catch(e){} },900); }
+          if(r&&r.ok){
+            /* Эльнур 08.09: «то, что удалено или сделано, почему дальше висит».
+               Убираем строку сразу и правим данные на месте — не ждём 4 секунды. */
+            bellForget(a);
+            var row=b.closest('.bell-row'); if(row) row.remove();
+            try{ paintCounts(); }catch(e){}
+            var left=document.querySelectorAll('.bell-row').length;
+            if(!left){
+              var l=document.querySelector('.bell-list');
+              if(l) l.innerHTML='<p class="sub">Всё разобрано.</p>';
+            }
+            quietReload();
+          }
           else { b.disabled=false; b.textContent=a.t; say((r&&r.error)||'Не вышло'); }
         });
       };
@@ -7804,6 +7977,18 @@ window.chatVoice=chatVoice;window.listenBar=listenBar;window.paintVoiceMode=pain
      обзор, а хотелось бы продолжить с того же места, так логичнее».
      Перед обновлением запоминаем раздел, объект и прокрутку — после
      перерисовки возвращаем человека туда же. */
+  /* Эльнур 08.09: «когда нажимаю на какое-то действие, оно выполняется очень
+     долго, грузится». Полные данные идут 4 секунды, само действие — 0,7.
+     Поэтому: экран правим сразу, а данные подтягиваем следом, молча. */
+  function quietReload(){
+    return post({action:'data',token:TOKEN,as_client:(CTX.lead||undefined)}).then(function(d){
+      if(!d||!d.ok) return;
+      var keepCur=CUR;
+      DATA=d; CUR=(keepCur<(d.properties||[]).length)?keepCur:0;
+      try{ localStorage.setItem(CACHE, JSON.stringify({token:TOKEN,at:Date.now(),data:d})); }catch(e){}
+      try{ paintCounts(); }catch(e){}
+    }).catch(function(){});
+  }
   function reload(){
     window.__cabKeep={ tab:CAB_TAB, cur:CUR, y:(window.scrollY||0),
                        open:!(document.getElementById('cab-body')||{}).hidden };
