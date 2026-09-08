@@ -1485,6 +1485,25 @@ html,*{-webkit-tap-highlight-color:transparent}
   .header .burger{width:36px;height:36px}
 }
 
+/* Карточка на плюсик: заголовок виден всегда, содержимое раскрывается */
+details.fold>summary{cursor:pointer;list-style:none;display:flex;align-items:baseline;gap:8px}
+details.fold>summary::-webkit-details-marker{display:none}
+details.fold>summary::after{content:'+';margin-left:auto;font-size:20px;color:var(--dim);line-height:1}
+details.fold[open]>summary::after{content:'–'}
+/* Готовые варианты под полем: нажал — подставилось, писать не обязательно */
+.vars{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 2px}
+.vars button{margin:0;width:auto;padding:5px 11px;font-size:12px;font-weight:600;border-radius:999px;
+  background:transparent;border:1px solid rgba(var(--ink-rgb),.16);color:var(--ink)}
+.vars button:hover{border-color:var(--green);color:var(--green-text,var(--ink))}
+/* Голосовое сообщение в чате — кружок «играть», дорожка, длительность */
+.vm{display:flex;align-items:center;gap:10px;min-width:190px}
+.vm-play{flex:none;width:34px;height:34px;border-radius:50%;border:0;cursor:pointer;
+  background:var(--green);color:var(--on-green);font-size:.9rem;line-height:1;padding:0;margin:0}
+.msg.me .vm-play{background:rgba(255,255,255,.9);color:#14140f}
+.vm-wave{flex:1;height:3px;border-radius:2px;background:currentColor;opacity:.35;position:relative}
+.vm-wave i{position:absolute;left:0;top:0;bottom:0;width:0;background:currentColor;opacity:1;border-radius:2px;display:block}
+.vm-time{flex:none;font-size:.72rem;opacity:.75;font-variant-numeric:tabular-nums}
+.vm-text{margin-top:8px;font-size:.9rem;opacity:.9}
 /* Полка документов собственника: что должно быть и чего не хватает */
 .shelf{border:1px solid rgba(var(--ink-rgb),.10);border-radius:14px;padding:12px 14px;margin:0 0 14px;background:var(--warm)}
 .shelf-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:8px}
@@ -2158,16 +2177,25 @@ body{background:var(--bg)}
     <div id="prop"></div>
 
     <div class="card" id="sec-objedit" style="display:none">
-      <h2>Карточка объекта</h2>
-      <p class="sub" style="margin:0 0 10px">Правьте прямо здесь — что впишете, то и сохранится
-      в объекте и на сайте. Пустое поле оставит прежнее значение.</p>
-      <div id="oe-body"></div>
+      <!-- Эльнур 08.09: «лучше, чтобы она тоже открывалась на плюсик» -->
+      <details class="fold">
+        <summary><h2 style="display:inline-block;margin:0">Карточка объекта</h2>
+          <span class="sub" style="margin-left:10px">развернуть</span></summary>
+        <p class="sub" style="margin:10px 0">Уже заполнено тем, что мы собрали по объекту.
+        Правьте прямо здесь — что впишете, то и сохранится в объекте и на сайте.
+        Пустое поле оставит прежнее значение. Под полями — готовые варианты,
+        чтобы не набирать руками.</p>
+        <div id="oe-body"></div>
+      </details>
     </div>
 
     <div class="card" id="sec-edit">
-      <h2>Дополнить карточку объекта</h2>
-      <p class="sub" style="margin:0 0 4px">Вы знаете свой объект лучше всех. Напишите, что важно —
-      мы проверим и добавим в карточку.</p>
+      <details class="fold">
+        <summary><h2 style="display:inline-block;margin:0">Дополнить карточку объекта</h2>
+          <span class="sub" style="margin-left:10px">развернуть</span></summary>
+      <p class="sub" style="margin:10px 0 4px">Вы знаете свой объект лучше всех. Что уже есть в
+      карточке — подставлено, можно поправить. Под каждым полем готовые варианты:
+      нажали — добавилось.</p>
       <div id="edit-was" class="sub" style="margin:8px 0 0;display:none"></div>
 
       <label for="e-desc">Описание объекта</label>
@@ -2185,15 +2213,9 @@ body{background:var(--bg)}
       <button id="e-send">Отправить на проверку</button>
       <div class="ok" id="e-ok"></div>
       <div class="err" id="e-err"></div>
+      </details>
     </div>
 
-    <div class="card" id="sec-addobj">
-      <h2>Добавить ещё объект</h2>
-      <p class="sub" style="margin:0 0 14px">Есть другая недвижимость? Заполните короткую анкету
-      и приложите фото — за пять шагов. Мы проверим и оформим карточку.</p>
-      <a href="/add-property" style="display:inline-block;background:var(--ink-block);color:var(--on-ink);
-         border-radius:999px;padding:12px 20px;font-size:15px;font-weight:700;text-decoration:none">Разместить объект</a>
-    </div>
 
     <div class="card" id="sec-camp" style="display:none">
       <h2>Рассылка</h2>
@@ -2491,29 +2513,109 @@ try{ if(document.readyState==='loading') document.addEventListener('DOMContentLo
 /* Голосовой ввод в чате кабинета: распознаёт сам браузер, запись никуда не уходит.
    Кнопки нет там, где браузер этого не умеет (Эльнур 07.09). */
 var CHAT_REC=null;
-function chatVoice(){
-  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  var btn=document.getElementById('chatMic'), fld=document.getElementById('chatField');
-  if(!SR||!btn||!fld) return;
-  if(CHAT_REC){ try{ CHAT_REC.stop(); }catch(e){} return; }
-  var r=new SR();
-  r.lang=(typeof CAB_LANG!=='undefined' && CAB_LANG==='en')?'en-US':'ru-RU';
-  r.interimResults=true; r.continuous=false;
-  var base=fld.value ? (fld.value.replace(/\s+$/,'')+' ') : '';
-  r.onstart=function(){ CHAT_REC=r; btn.classList.add('rec'); };
-  r.onresult=function(e){
-    var txt='';
-    for(var i=e.resultIndex;i<e.results.length;i++) txt+=e.results[i][0].transcript;
-    fld.value=base+txt;
+/* ===== ГОЛОСОВЫЕ В КАБИНЕТЕ — как на сайте, одна система =====
+   Эльнур 08.09: «микрофон не выполнил то, что я хотел» — он писал текст под
+   диктовку в поле ввода. Нужен обмен голосовыми: нажал, записалось, в переписке
+   появилось ваше голосовое; ответ тоже голосовой, текст под ним для чтения. */
+function vmSecs(n){ n=Math.max(0,Math.round(n||0)); return Math.floor(n/60)+':'+('0'+(n%60)).slice(-2); }
+function voiceBubble(kind, play, dur, text){
+  var cb=document.getElementById('chatbody'); if(!cb) return null;
+  var d=document.createElement('div'); d.className='msg '+kind;
+  var w=document.createElement('div'); w.className='vm';
+  var b=document.createElement('button'); b.type='button'; b.className='vm-play'; b.textContent='▶';
+  var wave=document.createElement('span'); wave.className='vm-wave';
+  var fill=document.createElement('i'); wave.appendChild(fill);
+  var tm=document.createElement('span'); tm.className='vm-time'; tm.textContent=vmSecs(dur);
+  w.appendChild(b); w.appendChild(wave); w.appendChild(tm);
+  d.appendChild(w);
+  if(text){ var tx=document.createElement('div'); tx.className='vm-text'; tx.textContent=text; d.appendChild(tx); }
+  cb.appendChild(d); cb.scrollTop=cb.scrollHeight;
+  var ctl=null;
+  b.onclick=function(){
+    if(ctl && ctl.stop){ ctl.stop(); ctl=null; b.textContent='▶'; fill.style.width='0'; return; }
+    b.textContent='⏸';
+    ctl=play({ progress:function(p){ fill.style.width=Math.round(Math.min(1,p)*100)+'%'; },
+               time:function(sec){ tm.textContent=vmSecs(sec); },
+               done:function(){ b.textContent='▶'; fill.style.width='0'; ctl=null; } });
   };
-  r.onerror=function(){};
-  r.onend=function(){ CHAT_REC=null; btn.classList.remove('rec'); fld.focus(); };
-  try{ r.start(); }catch(e){ CHAT_REC=null; btn.classList.remove('rec'); }
+  return { el:d, start:function(){ b.onclick(); } };
+}
+function playAudio(url){
+  return function(cbs){
+    var a=new Audio(url);
+    a.ontimeupdate=function(){ if(a.duration) cbs.progress(a.currentTime/a.duration); cbs.time(a.currentTime); };
+    a.onended=function(){ cbs.done(); };
+    a.play();
+    return { stop:function(){ try{ a.pause(); }catch(e){} } };
+  };
+}
+function playSpeech(text){
+  return function(cbs){
+    if(!window.speechSynthesis){ cbs.done(); return null; }
+    try{ speechSynthesis.cancel(); }catch(e){}
+    var u=new SpeechSynthesisUtterance(text);
+    u.lang=(typeof CAB_LANG!=='undefined' && CAB_LANG==='en')?'en-US':'ru-RU'; u.rate=1.02;
+    var vs=speechSynthesis.getVoices()||[];
+    var v=vs.filter(function(x){ return x.lang && x.lang.indexOf(u.lang.slice(0,2))===0; })[0];
+    if(v) u.voice=v;
+    var t0=Date.now(), total=Math.max(2, text.length/14);
+    var tick=setInterval(function(){ var el=(Date.now()-t0)/1000; cbs.progress(el/total); cbs.time(el); },200);
+    u.onend=function(){ clearInterval(tick); cbs.done(); };
+    u.onerror=function(){ clearInterval(tick); cbs.done(); };
+    speechSynthesis.speak(u);
+    return { stop:function(){ clearInterval(tick); try{ speechSynthesis.cancel(); }catch(e){} } };
+  };
+}
+function chatVoice(){
+  var btn=document.getElementById('chatMic');
+  if(window.__rec && window.__rec.state==='recording'){ window.__rec.stop(); return; }
+  if(!navigator.mediaDevices || !window.MediaRecorder){
+    chatMsg('bot','Этот браузер не умеет записывать голос — напишите текстом.'); return;
+  }
+  navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
+    var rec=new MediaRecorder(stream), chunks=[], t0=Date.now();
+    window.__rec=rec;
+    if(btn) btn.classList.add('rec');
+    var SR=window.SpeechRecognition||window.webkitSpeechRecognition, heard='', sr=null;
+    if(SR){
+      try{
+        sr=new SR(); sr.lang=(typeof CAB_LANG!=='undefined' && CAB_LANG==='en')?'en-US':'ru-RU';
+        sr.interimResults=false; sr.continuous=true;
+        sr.onresult=function(e){ for(var i=e.resultIndex;i<e.results.length;i++) heard+=e.results[i][0].transcript; };
+        sr.onerror=function(){};
+        sr.start();
+      }catch(e){ sr=null; }
+    }
+    rec.ondataavailable=function(e){ if(e.data && e.data.size) chunks.push(e.data); };
+    rec.onstop=function(){
+      stream.getTracks().forEach(function(t){ t.stop(); });
+      if(sr){ try{ sr.stop(); }catch(e){} }
+      if(btn) btn.classList.remove('rec');
+      var secs=(Date.now()-t0)/1000;
+      var blob=new Blob(chunks,{type:'audio/webm'});
+      if(blob.size<1500 || secs<0.6) return;
+      var mine=voiceBubble('me', playAudio(URL.createObjectURL(blob)), secs, '');
+      setTimeout(function(){
+        heard=heard.trim();
+        if(heard){
+          var tx=document.createElement('div'); tx.className='vm-text'; tx.textContent=heard;
+          if(mine) mine.el.appendChild(tx);
+          askDaria(heard, true);
+        } else {
+          chatMsg('bot','Не разобрала голос. Скажите ещё раз или напишите текстом.');
+        }
+      }, 400);
+    };
+    rec.start();
+    setTimeout(function(){ if(rec.state==='recording') rec.stop(); }, 60000);
+  }).catch(function(){ chatMsg('bot','Не дали доступ к микрофону — напишите текстом.'); });
 }
 (function(){
+  /* мёртвой кнопки быть не должно: показываем только там, где запись работает */
   try{
-    if(window.SpeechRecognition||window.webkitSpeechRecognition){
-      var b=document.getElementById('chatMic'); if(b) b.hidden=false;
+    if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder){
+      var b=document.getElementById('chatMic');
+      if(b){ b.hidden=false; b.title='Записать голосовое'; }
     }
   }catch(e){}
 })();
@@ -2694,17 +2796,42 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
      Берём закрытые отчёты по всем объектам и складываем по месяцу. */
   /* Правка карточки объекта: каждое поле редактируется, сохранённое значение
      подставляется в следующий раз — вводить заново не нужно. */
+  /* Поле: ключ, подпись, вид, невидимая подсказка в поле, готовые варианты.
+     Эльнур 08.09: «надо добавить разные варианты на выбор, чтобы не мучать
+     клиента писаниной, и так же возможность написать. И невидимые подсказки
+     в самом поле мне очень нравится, используй это». */
   var OE_FIELDS=[
-    ['name','Название'], ['district','Район'], ['type','Тип'],
-    ['bedrooms','Спальни'], ['area_sqm','Площадь'], ['stage','Стадия'],
-    ['handover_date','Сдача','date'], ['price_from_thb','Цена от, ฿','number'],
-    ['price_to_thb','Цена до, ฿','number'], ['roi','Доходность, %','number'],
-    ['first_payment','Первый взнос, %','number'], ['payment_plan','Рассрочка'],
-    ['developer','Застройщик'], ['ownership','Форма владения'],
-    ['view_type','Вид из окон'], ['beach','Пляж'],
-    ['availability','Свободно'], ['brochure_url','Брошюра, ссылка'],
-    ['floorplan_url','Планировки, ссылка'], ['video_url','Видео, ссылка'],
-    ['amenities','Что есть','area'], ['nearby','Что рядом','area'], ['usp','Описание','area']
+    ['name','Название','text','The Title Serenity, корпус B'],
+    ['district','Район','text','Банг Тао',
+      ['Банг Тао','Лаян','Сурин','Камала','Най Янг','Равай','Ката','Карон','Най Тон','Ко Кео','Таланг']],
+    ['type','Тип','text','Кондо', ['Кондо','Вилла','Таунхаус','Апартамент']],
+    ['bedrooms','Спальни','text','2', ['Студия','1','2','3','4+']],
+    ['area_sqm','Площадь','text','от 34 до 78 м²'],
+    ['stage','Стадия','text','Строится',
+      ['Старт продаж','Строится','Готов','Распродан застройщиком']],
+    ['handover_date','Сдача','date',''],
+    ['price_from_thb','Цена от, ฿','number','5200000'],
+    ['price_to_thb','Цена до, ฿','number','12400000'],
+    ['roi','Доходность, %','number','7'],
+    ['first_payment','Первый взнос, %','number','30'],
+    ['payment_plan','Рассрочка','text','30% при договоре → 40% в стройку → 30% при передаче',
+      ['30/40/30','50/50 при передаче','рассрочка до сдачи','100% сразу']],
+    ['developer','Застройщик','text','Botanica Luxury Phuket'],
+    ['ownership','Форма владения','text','Лизхолд 30 лет, фрихолд по квоте',
+      ['Фрихолд по иностранной квоте','Лизхолд 30 лет','Участок в лизхолд, строение во фрихолд',
+       'Фрихолд только для граждан Таиланда']],
+    ['view_type','Вид из окон','text','На бассейн и сад',
+      ['На море','На бассейн','На горы','На сад','Во двор']],
+    ['beach','Пляж','text','Банг Тао', ['Банг Тао','Лаян','Сурин','Камала','Най Янг','Най Тон','Равай']],
+    ['availability','Свободно','text','12 юнитов из 84'],
+    ['brochure_url','Брошюра, ссылка','text','https://drive.google.com/...'],
+    ['floorplan_url','Планировки, ссылка','text','https://drive.google.com/...'],
+    ['video_url','Видео, ссылка','text','https://youtube.com/...'],
+    ['amenities','Что есть','area','Бассейн, спортзал, охрана 24/7, парковка, детская площадка',
+      ['бассейн','спортзал','охрана 24/7','парковка','детская площадка','коворкинг','сауна','ресторан','сервис уборки']],
+    ['nearby','Что рядом','area','Пляж 7 минут пешком, Villa Market 1,5 км, школа 10 минут',
+      ['пляж пешком','магазин рядом','международная школа','госпиталь','гольф-клуб','марина','торговый центр']],
+    ['usp','Описание','area','Чем этот объект отличается от соседних — своими словами']
   ];
   function renderObjEdit(){
     var sec=document.getElementById('sec-objedit'); if(!sec) return;
@@ -2718,17 +2845,35 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
               floorplan_url:md.floorplan_url, video_url:md.video_url };
     var h='<p class="sub">Объект: <b>'+clEsc(p.name||p.id||'—')+'</b></p><div class="fgrid">';
     OE_FIELDS.forEach(function(f){
-      var k=f[0], label=f[1], kind=f[2]||'text';
+      var k=f[0], label=f[1], kind=f[2]||'text', ph=f[3]||'', vars=f[4]||null;
       var v=(cur[k]===null||cur[k]===undefined)?'':String(cur[k]);
       if(kind==='date') v=v.slice(0,10);
+      var chips = vars ? ('<span class="vars">'+vars.map(function(x){
+          return '<button type="button" class="oe-var" data-f="'+k+'" data-v="'+clEsc(x)+'">'+clEsc(x)+'</button>';
+        }).join('')+'</span>') : '';
       h+= (kind==='area')
-        ? '<label class="wide">'+label+'<textarea id="oe-'+k+'" class="cmtext" rows="2">'+clEsc(v)+'</textarea></label>'
+        ? '<label class="wide">'+label+'<textarea id="oe-'+k+'" class="cmtext" rows="2" placeholder="'+
+          clEsc(ph).replace(/"/g,'&quot;')+'">'+clEsc(v)+'</textarea>'+chips+'</label>'
         : '<label>'+label+'<input id="oe-'+k+'" type="'+(kind==='number'?'number':kind)+'" value="'+
-          clEsc(v).replace(/"/g,'&quot;')+'"></label>';
+          clEsc(v).replace(/"/g,'&quot;')+'" placeholder="'+clEsc(ph).replace(/"/g,'&quot;')+'">'+chips+'</label>';
     });
     h+='</div><div class="fbtns"><button type="button" class="btn" id="oe-save">Сохранить</button>'+
        '<span class="sub" id="oe-msg"></span></div>';
     document.getElementById('oe-body').innerHTML=h;
+    /* нажал вариант — подставился; в текстовые поля добавляется через запятую */
+    Array.prototype.forEach.call(document.querySelectorAll('.oe-var'),function(b){
+      b.onclick=function(){
+        var el=document.getElementById('oe-'+b.getAttribute('data-f'));
+        if(!el) return;
+        var val=b.getAttribute('data-v');
+        if(el.tagName==='TEXTAREA'){
+          var cur=(el.value||'').trim();
+          if(cur.toLowerCase().indexOf(val.toLowerCase())<0)
+            el.value = cur ? (cur.replace(/[,;\s]+$/,'')+', '+val) : val;
+        } else el.value=val;
+        el.focus();
+      };
+    });
     document.getElementById('oe-save').onclick=function(){
       var patch={}, n=0;
       OE_FIELDS.forEach(function(f){
@@ -4441,7 +4586,12 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       '</p><div class="fbtns">'+
         (underBuild?'':'<button type="button" class="btn" data-resale="'+(p.id||'')+'" data-goal="rent">Сдать в аренду</button>')+
         '<button type="button" class="btn'+(underBuild?'':' ghost')+'" data-resale="'+(p.id||'')+'" data-goal="sale">Продать</button>'+
-      '</div>';
+      '</div>'+
+      /* Эльнур 08.09: «логичнее эту карточку поставить в блоке объекты — раздел
+         выгрузить объект». Третий путь: объект, которого у нас ещё нет. */
+      '<p class="sub" style="margin-top:14px">Речь о другом объекте, которого у нас ещё нет? '+
+      '<a href="/add-property" class="lnk">Заполните анкету</a> — пять шагов, можно приложить '+
+      'фото или дать ссылку на папку. Мы проверим и оформим карточку.</p>';
     H+=card('Выгрузить объект', rs, 'sec-resale');
 
     // ставки
@@ -4725,8 +4875,43 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     h+='</div>';
     return h;
   }
+  /* Готовые варианты под полями «Дополнить карточку»: нажал — добавилось. */
+  var ED_VARS={
+    'e-amen':['бассейн','спортзал','охрана 24/7','парковка','детская площадка','барбекю',
+              'стиральная машина','сушильная машина','генератор','сейф','кондиционеры во всех комнатах'],
+    'e-near':['пляж пешком','магазин рядом','международная школа','госпиталь','кафе и рестораны',
+              'гольф-клуб','марина','торговый центр','фитнес'],
+    'e-rules':['без вечеринок','без курения в доме','животные по согласованию','тихий час с 22:00',
+               'заезд после 14:00','выезд до 11:00','депозит возвращается при выезде']
+  };
   function renderEditState(){
     var p=(DATA.properties||[])[CUR], box=$('edit-was');
+    /* Эльнур 08.09: «если есть инф, которую мы получали ранее, пусть уже будет
+       наполнено, но так же с возможностью редактировать». Подставляем то, что
+       уже собрано по объекту, и рисуем варианты под каждым полем. */
+    (function(){
+      var ab=(p&&p.about)||{}, pre={'e-desc':ab.usp,'e-amen':ab.amenities,'e-near':ab.nearby,'e-rules':ab.rules};
+      Object.keys(pre).forEach(function(id){
+        var el=document.getElementById(id);
+        if(el && !el.value && pre[id]) el.value=String(pre[id]);
+      });
+      Object.keys(ED_VARS).forEach(function(id){
+        var el=document.getElementById(id); if(!el || el.__vars) return;
+        el.__vars=1;
+        var w=document.createElement('span'); w.className='vars';
+        ED_VARS[id].forEach(function(x){
+          var b=document.createElement('button'); b.type='button'; b.textContent=x;
+          b.onclick=function(){
+            var cur=(el.value||'').trim();
+            if(cur.toLowerCase().indexOf(x.toLowerCase())<0)
+              el.value = cur ? (cur.replace(/[,;\s]+$/,'')+', '+x) : x;
+            el.focus();
+          };
+          w.appendChild(b);
+        });
+        el.parentNode.insertBefore(w, el.nextSibling);
+      });
+    })();
     if(!box) return;
     var e = p && p.owner_edit;
     if(!e){ box.style.display='none'; return; }
@@ -6764,7 +6949,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     'sec-money':'money', 'sec-calendar':'calendar', 'sec-reports':'docs',
     'sec-docs':'docs',
     'sec-service':'service', 'sec-costs':'costs', 'sec-resale':'object',
-    'sec-edit':'object', 'sec-objedit':'object', 'sec-addobj':'actions', 'sec-request':'actions',
+    'sec-edit':'object', 'sec-objedit':'object', 'sec-request':'actions',
     'sec-myreq':'actions', 'sec-moder':'staff', 'sec-coords':'staff',
     'sec-clients':'clients', 'sec-mine':'mine', 'sec-board':'board', 'sec-camp':'camp'
   };
@@ -7120,8 +7305,9 @@ function sendFree(){
   var txt=(f.value||'').trim(); if(!txt) return;
   f.value=''; askDaria(txt);
 }
-function askDaria(txt){
-  chatMsg('me',txt); chatHist.push({role:'user',content:txt});
+function askDaria(txt, byVoice){
+  if(!byVoice) chatMsg('me',txt);
+  chatHist.push({role:'user',content:txt});
   var wait=chatMsg('bot','…'); if(wait) wait.classList.add('typing');
   fetch(CHAT_ENDPOINT,{method:'POST',headers:{'Content-Type':'text/plain'},
     body:JSON.stringify({message:txt,history:chatHist.slice(-8),lang:'ru',context:cabChatContext()})})
@@ -7129,13 +7315,18 @@ function askDaria(txt){
     .then(function(d){
       if(wait) wait.remove();
       var reply=(d&&d.reply)||'Записала. Передам менеджеру и вернусь с ответом.';
-      chatMsg('bot',reply); chatHist.push({role:'assistant',content:reply});
+      /* спросили голосом — отвечаем голосовым, текст под ним читаемый */
+      if(byVoice){
+        var v=voiceBubble('bot', playSpeech(reply), Math.max(2, reply.length/14), reply);
+        if(v) setTimeout(function(){ try{ v.start(); }catch(e){} },200);
+      } else chatMsg('bot',reply);
+      chatHist.push({role:'assistant',content:reply});
     })
     .catch(function(){ if(wait) wait.remove();
       chatMsg('bot','Связь подвела. Напишите ещё раз или свяжитесь с менеджером.'); });
 }
 
-window.openChat=openChat;window.closeChat=closeChat;window.clearChat=clearChat;window.toggleFab=toggleFab;window.sendFree=sendFree;
+window.chatVoice=chatVoice;window.voiceBubble=voiceBubble;window.playAudio=playAudio;window.playSpeech=playSpeech;window.openChat=openChat;window.closeChat=closeChat;window.clearChat=clearChat;window.toggleFab=toggleFab;window.sendFree=sendFree;
 
   function cabPage(name){
     CAB_TAB=name;
