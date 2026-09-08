@@ -329,7 +329,10 @@ function buildCatalog(objects, benchmarks, preserve) {
     const usp = (o.usp || '').trim();
     const uspEn = (o.usp_en || '').trim() || usp; // EN-описание из usp_en, фолбэк на usp
     return {
-      property_id: pid,
+      /* На витрину идёт публичный код, а не внутренний: у вторички внутренний
+         содержит номер юнита, а его на сайте писать нельзя. Аренда так делала
+         с самого начала — приводим продажу к тому же правилу. */
+      property_id: pubOf(o),
       title: o.name,
       funnel: 'sale',
       grad: keep.grad || ('g' + ((i % 4) + 1)),
@@ -1211,7 +1214,7 @@ async function main() {
     'bedrooms_min,bedrooms_max,' +
     'brochure_url,floorplan_url,video_url,website_url,map_url,' +
     'season_rates,occupancy_est_pct,maintenance_fee_thb_sqm,lat,lng,coord_source,last_synced_at,availability,' +
-    'first_payment,payment_plan,payment_schedule,main_image_url,gallery_urls,unit_types,price_tiers,build_progress,photo_groups,hot_rank');
+    'first_payment,payment_plan,payment_schedule,main_image_url,gallery_urls,unit_types,price_tiers,build_progress,photo_groups,hot_rank,public_code');
   const benchmarks = await sbGet(env,
     'rental_benchmarks?select=district,unit_type,disp_yield_low_pct,disp_yield_high_pct');
 
