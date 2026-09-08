@@ -802,7 +802,14 @@ input,select,textarea{width:100%;background:var(--paper);border:1px solid var(--
 textarea{min-height:76px;resize:vertical}
 /* Кнопки красились цветом текста (--txt): в тёмной теме он светлеет и надпись
    пропадала — это и есть «засвет» почти в каждом разделе (Эльнур 05.09). */
-button{background:var(--ink-block);color:var(--on-ink);border:0;border-radius:999px;padding:12px 18px;font-size:15px;font-weight:700;cursor:pointer;margin-top:14px;width:100%}
+/* 🔴 08.09: это правило било по КАЖДОЙ кнопке кабинета — растягивало во всю
+   ширину и добавляло отступ сверху. Отсюда «гигантские кнопки» в разделе
+   «Люди» и не только (Эльнур: «все кнопки очень странные и гигантские, не как
+   все остальные в нашем формате, такое ещё где-то встречалось»).
+   Во всю ширину кнопки нужны только на экране входа — там их и оставляем. */
+button{background:var(--ink-block);color:var(--on-ink);border:0;border-radius:999px;padding:12px 18px;font-size:15px;font-weight:700;cursor:pointer}
+#gate button,#pwd button{margin-top:14px;width:100%}
+#gate button.opt,#pwd button.opt{margin-top:0;width:auto}
 button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt);font-weight:700}
 .alt{display:block;text-align:center;color:var(--dim);font-size:14px;margin-top:14px;
      text-decoration:none;border-bottom:1px dotted var(--dim);width:fit-content;margin-left:auto;margin-right:auto;cursor:pointer}
@@ -1683,7 +1690,19 @@ body{background:var(--bg)}
   :root:not([data-theme="light"]) .chipf{background:#191A12;color:#ECEFE0;border-color:rgba(236,239,224,.18)}
 }
 :root[data-theme="light"] .chipf{background:#ffffff;color:#0A0A0A;border-color:rgba(10,10,10,.14)}
+/* 🔴 08.09: выбранный ответ в анкете не закрашивался — Эльнур: «когда нажимаю
+   выбрать, ответы не фиксируются цветом». Правила темы задавались селектором
+   с большим весом (:root[data-theme] .chipf), чем .chipf.on, и перебивали
+   выбор. Повторяем выбранное состояние в каждой теме тем же весом. */
 .chipf.on{background:var(--green);color:var(--on-green);border-color:transparent}
+:root[data-theme="dark"] .chipf.on,
+:root[data-theme="light"] .chipf.on{background:var(--green);color:var(--on-green);border-color:transparent}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .chipf.on{background:var(--green);color:var(--on-green);border-color:transparent}
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]) .chipf.on{background:var(--green);color:var(--on-green);border-color:transparent}
+}
 
 /* Сообщение об ошибке в анкете должно читаться в обеих темах */
 .err,.df-status.err{color:#c0392b;font-weight:600}
@@ -2317,9 +2336,17 @@ body{background:var(--bg)}
     </div>
 
     <div class="card" id="sec-request">
-      <h2>Оставить заявку</h2>
-      <p class="sub" style="margin:0 0 12px">Выберите объект и что нужно. Заявку увидим мы,
-      а по объектам под управлением — ещё и собственник.</p>
+      <!-- Эльнур 08.09: «надо её как-то сворачивать разворачивать, иначе карточка
+           мои заявки лежит внизу и могу вообще не дойти до неё» -->
+      <details id="req-fold">
+        <summary style="cursor:pointer;list-style:none">
+          <h2 style="display:inline-block;margin:0">Оставить заявку</h2>
+          <span class="sub" style="margin-left:10px">развернуть</span>
+        </summary>
+      <p class="sub" style="margin:10px 0 12px">Это внутренняя заявка по конкретному объекту:
+      бронь дат, уборка, ремонт, проверка. Она попадает к нам в работу, а по объектам
+      под управлением её видит ещё и собственник. Для нового объекта, которого у нас
+      ещё нет, — «Выгрузить объект» в разделе «Объект».</p>
       <div class="fgrid">
         <label class="wide" id="r-cl-wrap" style="display:none">Клиент<div id="r-client"></div></label>
         <label class="wide">Объект<div id="r-obj"></div></label>
@@ -2341,6 +2368,7 @@ body{background:var(--bg)}
       <div class="fbtns"><button type="button" class="btn" id="r-send">Отправить заявку</button></div>
       <div class="ok" id="r-ok"></div>
       <div class="err" id="r-err"></div>
+      </details>
     </div>
 
     <div class="card" id="sec-myreq"><h2>Мои заявки</h2><div id="req-wrap"></div></div>
@@ -3170,11 +3198,14 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     var g=document.getElementById('f-goal'); if(!g) return;
     Array.prototype.forEach.call(g.querySelectorAll('.opt'),function(o){
       o.onclick=function(){
-        Array.prototype.forEach.call(g.querySelectorAll('.opt'),function(x){x.classList.remove('on');});
-        o.classList.add('on');
+        /* можно отметить несколько: продать и пока сдавать — обычная история */
+        o.classList.toggle('on');
+        var on=g.querySelectorAll('.opt.on');
         var pr=document.getElementById('f-price');
-        if(pr) pr.placeholder = (o.getAttribute('data-v')==='rent')
-          ? 'например, 65000 в месяц' : 'например, 9500000';
+        if(pr){
+          var onlyRent = on.length===1 && on[0].getAttribute('data-v')==='rent';
+          pr.placeholder = onlyRent ? 'например, 65000 в месяц' : 'например, 9500000';
+        }
       };
     });
   }
@@ -3187,10 +3218,14 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       '<p class="sub">Объект: <b>'+clEsc(p.name||pid)+'</b>. Проверим данные, оформим карточку '+
       'на сайте и пришлём ссылку — её можно отправлять клиентам. '+
       'Публикуем только после вашего подтверждения.</p>'+
+      /* Эльнур 08.09: «там должно быть три пункта и можно выбрать несколько
+         сразу: продать, сдать в аренду и такой пункт add-property». */
       '<div class="opts" id="f-goal">'+
         '<button type="button" class="opt'+(isRent?' on':'')+'" data-v="rent">Сдать в аренду</button>'+
         '<button type="button" class="opt'+(isRent?'':' on')+'" data-v="sale">Продать</button>'+
+        '<button type="button" class="opt" data-v="uk">Взять в управление</button>'+
       '</div>'+
+      '<span class="hintline">Можно отметить несколько — например, продать и пока сдавать.</span>'+
       '<div class="fgrid">'+
         '<label>Ваша цена, ฿<input id="f-price" type="number" inputmode="numeric" '+
           'placeholder="'+(isRent?'например, 65000 в месяц':'например, 9500000')+'"></label>'+
@@ -3202,35 +3237,76 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
           'placeholder="торг, мебель в цене, кто платит за перевод, особые условия"></textarea></label>'+
         '<label class="wide">Файлы по объекту'+
           '<input id="f-files" type="file" multiple accept=".pdf,.doc,.docx,image/*">'+
-          '<span class="hintline" id="f-files-note">Договор, планировка, фотографии — что есть.</span></label>'+
+          '<span class="hintline" id="f-files-note">Договор, планировка, фотографии — что есть. '+
+          'Загрузим сразу, отдельно присылать не нужно.</span></label>'+
+        /* Эльнур 08.09: «можно дать возможность написать ссылку на файлы, это
+           удобно, чем грузить по одной фотке». */
+        '<label class="wide">Или ссылка на папку с файлами'+
+          '<input id="f-folder" type="url" placeholder="Google Диск, Dropbox — ссылка целиком">'+
+          '<span class="hintline">Разберём сами: договоры, планировки, снимки встанут по местам.</span></label>'+
         '<p class="sub" style="grid-column:1/-1;margin:2px 0 0">Если не уверены, какие данные и файлы нужны — '+
         'приложите всё, что есть, и напишите пару слов здесь. Наш специалист разберёт заявку и свяжется с вами в течение дня.</p>'+
       '</div>'+
       '<div class="fbtns"><button type="button" class="btn" id="f-save">Отправить</button>'+
       '<button type="button" class="btn ghost" id="f-cancel">Отмена</button></div>',
       function(){
-        var b=document.getElementById('f-save'); if(b){ b.disabled=true; b.textContent='…'; }
+        var b=document.getElementById('f-save'); if(b){ if(b.disabled) return; b.disabled=true; b.textContent='…'; }
         var urg=document.getElementById('f-urg');
-        var g=document.querySelector('#f-goal .opt.on');
-        var goalV=g?g.getAttribute('data-v'):'sale';
+        var WORD={rent:'СДАТЬ В АРЕНДУ',sale:'ПРОДАТЬ',uk:'ВЗЯТЬ В УПРАВЛЕНИЕ'};
+        var goals=Array.prototype.map.call(document.querySelectorAll('#f-goal .opt.on'),
+                    function(x){ return x.getAttribute('data-v'); });
+        if(!goals.length){ b.disabled=false; b.textContent='Отправить'; say('Отметьте, что нужно сделать'); return; }
         var files=document.getElementById('f-files');
-        var fnames=files&&files.files ? Array.prototype.map.call(files.files,function(f){return f.name;}) : [];
-        post({action:'request',token:TOKEN,property_id:pid,kind:'resale',
-              details:(goalV==='rent'?'СДАТЬ В АРЕНДУ':'ПРОДАТЬ')+
-                      ' · цена: '+(fv('f-price')||'по договорённости')+' ฿ · срочность: '+
-                      (urg?urg.value:'—')+(fv('f-note')?(' · '+fv('f-note')):'')+
-                      (fnames.length?(' · файлы: '+fnames.join(', ')):'')})
-          .then(function(r){
-            var f=document.getElementById('cl-form');
-            if(f){ f.innerHTML=''; document.body.style.overflow=''; }
-            if(r&&r.ok){
-              say(fnames.length
-                ? 'Заявка принята. Файлы пришлите менеджеру в ответ на его сообщение — приложим к карточке.'
-                : 'Заявка принята. Подготовим карточку и пришлём ссылку.');
-              reload();
-            }
-            else say('Не отправилось: '+((r&&r.error)||'ошибка'));
+        var list=files&&files.files ? Array.prototype.slice.call(files.files) : [];
+        var folder=(fv('f-folder')||'').trim();
+        b.textContent = list.length ? 'Загружаем файлы…' : '…';
+        /* 🔴 08.09: раньше в заявку уходили только ИМЕНА файлов — сами файлы
+           никуда не отправлялись. Теперь кладём их в карточку объекта. */
+        function sendOne(f){
+          return new Promise(function(res){
+            var rd=new FileReader();
+            rd.onload=function(){
+              post({action:'my_doc',token:TOKEN,file_name:f.name,mime:f.type,
+                    kind:docKindByName(f.name),property_id:pid,
+                    data:String(rd.result).split(',')[1]||''})
+                .then(function(r){ res(r&&r.ok?f.name:null); })
+                .catch(function(){ res(null); });
+            };
+            rd.onerror=function(){ res(null); };
+            rd.readAsDataURL(f);
           });
+        }
+        var big=list.filter(function(f){ return f.size>20*1024*1024; });
+        var ok=list.filter(function(f){ return f.size<=20*1024*1024; });
+        Promise.all(ok.map(sendOne)).then(function(done){
+          var loaded=done.filter(Boolean);
+          var jobs=[];
+          if(folder) jobs.push(post({action:'source_add',token:TOKEN,property_id:pid,url:folder}));
+          return Promise.all(jobs).then(function(res){ return {loaded:loaded, folderOk:!folder||!!(res[0]&&res[0].ok)}; });
+        }).then(function(st){
+          b.textContent='Отправляем заявку…';
+          return post({action:'request',token:TOKEN,property_id:pid,kind:'resale',
+            details:goals.map(function(g){return WORD[g];}).join(' + ')+
+                    ' · цена: '+(fv('f-price')||'по договорённости')+' ฿ · срочность: '+
+                    (urg?urg.value:'—')+(fv('f-note')?(' · '+fv('f-note')):'')+
+                    (st.loaded.length?(' · загружено файлов: '+st.loaded.length):'')+
+                    (folder?(' · папка: '+folder):'')})
+            .then(function(r){ return {r:r, st:st}; });
+        }).then(function(out){
+          var f=document.getElementById('cl-form');
+          if(f){ f.innerHTML=''; document.body.style.overflow=''; }
+          if(out.r&&out.r.ok){
+            var msg='Заявка принята. Подготовим карточку и пришлём ссылку.';
+            if(out.st.loaded.length) msg='Заявка принята, файлов загружено: '+out.st.loaded.length+'.';
+            if(big.length) msg+=' Файлы больше 20 МБ ('+big.length+') не прошли — пришлите ссылкой.';
+            if(folder && !out.st.folderOk) msg+=' Папку не приняли — проверьте ссылку.';
+            say(msg); reload();
+          }
+          else say('Не отправилось: '+((out.r&&out.r.error)||'ошибка'));
+        }).catch(function(){
+          if(b){ b.disabled=false; b.textContent='Отправить'; }
+          say('Не отправилось — попробуйте ещё раз.');
+        });
       });
     bindGoal();
   }
@@ -4228,7 +4304,9 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
        падала вся вкладка «Объект» */
     var curp=p.current||{};
     H+='<div class="grid">'+
-       '<div class="metric"><div class="k">Доход периода</div><div class="v pos">'+money(curp.income||0,cur)+'</div></div>'+
+       '<div class="metric"><div class="k">Доход периода<span class="sub" style="display:block;font-weight:400">'+
+         dmy((DATA.period||{}).start)+' — '+dmy((DATA.period||{}).end)+'</span></div>'+
+       '<div class="v pos">'+money(curp.income||0,cur)+'</div></div>'+
        '<div class="metric"><div class="k">Расходы периода</div><div class="v neg">'+money(curp.expenses||0,cur)+'</div></div>'+
        '</div>';
 
@@ -4465,7 +4543,33 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       dh+=line('Действует с',dmy(c.start_date));
       if(c.end_date) dh+=line('Действует до',dmy(c.end_date));
       dh+=line('Реквизиты выплаты',c.payout_set?'указаны':'не указаны');
-    }else dh='<div class="empty">Договора управления по этому объекту нет.</div>';
+    }else{
+      /* Эльнур 08.09: «написано — договора управления по этому объекту нет,
+         но как будто бы там должно что-то быть предложено, или что-то лежать
+         или предложить запросить». Даём путь, а не констатацию. */
+      dh='<div class="empty">Договора управления по этому объекту нет — '+
+         'поэтому бронь и отчёты по нему пока не работают.</div>'+
+         '<p class="sub">Порядок такой: берёте шаблон, собственник подписывает, '+
+         'подписанный файл загружаете здесь. Он ляжет в документы объекта, '+
+         'в кабинет собственника и в наш архив.</p>'+
+         (DATA.owner&&DATA.owner.is_staff===true
+           ? ('<p class="sub"><a href="#" class="lnk" data-uk="book" data-pid="'+(p.id||'')+
+              '">Взять шаблон и загрузить подписанный</a></p>')
+           : '<p class="sub">Напишите менеджеру — пришлём шаблон.</p>');
+    }
+    /* Подписанный договор виден здесь же, а не только ссылкой в документах. */
+    var ukDocs=(p.docs||[]).filter(function(x){
+      return String(x.kind||'')==='contract' ||
+             /управлен|management|договор/i.test(String(x.title||''));
+    });
+    if(ukDocs.length){
+      dh+='<h4 style="margin:14px 0 6px">Файлы договора</h4><table>'+
+          '<tr><th>Что</th><th>Когда</th></tr>'+
+          ukDocs.map(function(x){
+            return '<tr><td><a href="'+x.url+'" target="_blank" rel="noopener">'+
+                   esc(x.title||'договор')+'</a></td><td>'+dmy(x.created_at)+'</td></tr>'; }).join('')+
+          '</table>';
+    }
     H+=card('Договор управления', dh);
 
     // отчёты
@@ -4636,13 +4740,48 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   function renderRequests(){
     var rq=DATA.requests||[];
     if(!rq.length){ $('req-wrap').innerHTML='<div class="empty">Заявок пока не было.</div>'; return; }
-    var h='<table><tr><th>Дата</th><th>Заявка</th><th class="r">Статус</th></tr>';
+    /* Эльнур 08.09: «с ней я тоже ничего не могу сделать, только посмотреть,
+       не открыть не узнать, не принять, не отменить». Действия — прямо в строке. */
+    var isStaff=!!(DATA.owner&&DATA.owner.is_staff===true);
+    var h='<table><tr><th>Дата</th><th>Заявка</th><th class="r">Статус</th><th></th></tr>';
     rq.forEach(function(r){
+      var act='';
+      if(r.status!=='done' && r.status!=='cancelled'){
+        if(isStaff){
+          if(r.status!=='in_progress')
+            act+='<a href="#" class="lnk rq-set" data-id="'+r.id+'" data-st="in_progress">взять в работу</a> ';
+          act+='<a href="#" class="lnk rq-set" data-id="'+r.id+'" data-st="done">закрыть</a> ';
+        }
+        act+='<a href="#" class="lnk rq-set" data-id="'+r.id+'" data-st="cancelled">отменить</a>';
+      }
       h+='<tr><td>'+dmy(r.created_at)+'</td><td>'+esc(KINDS[r.kind]||r.kind)+
+         (r.property_id?('<br><span class="sub">'+esc(r.property_id)+'</span>'):'')+
          (r.details?'<br><span style="color:var(--dim);font-size:12px">'+esc(r.details)+'</span>':'')+
-         '</td><td class="r">'+esc(RSTAT[r.status]||r.status)+'</td></tr>';
+         '</td><td class="r">'+esc(RSTAT[r.status]||r.status)+'</td>'+
+         '<td class="r" style="white-space:nowrap">'+act+'</td></tr>';
     });
     $('req-wrap').innerHTML=h+'</table>';
+    Array.prototype.forEach.call($('req-wrap').querySelectorAll('.rq-set'),function(a){
+      a.onclick=function(e){
+        e.preventDefault();
+        var st=a.getAttribute('data-st'), id=a.getAttribute('data-id');
+        var WORD={in_progress:'взять в работу',done:'закрыть',cancelled:'отменить'};
+        clForm('<h3>Заявку '+WORD[st]+'?</h3>'+
+          '<div class="fgrid"><label class="wide">Комментарий, если нужен'+
+          '<input id="rq-note" type="text" placeholder="что решили — попадёт в историю заявки"></label></div>'+
+          '<div class="fbtns"><button type="button" class="btn" id="f-save">Да</button>'+
+          '<button type="button" class="btn ghost" id="f-cancel">Отмена</button></div>',
+          function(){
+            var b=document.getElementById('f-save');
+            if(b){ if(b.disabled) return; b.disabled=true; b.textContent='Сохраняем…'; }
+            post({action:'request_set',token:TOKEN,id:id,status:st,note:fv('rq-note')}).then(function(r){
+              var f=document.getElementById('cl-form');
+              if(r&&r.ok){ if(f){ f.innerHTML=''; document.body.style.overflow=''; } reload(); }
+              else { if(b){ b.disabled=false; b.textContent='Да'; } say((r&&r.error)||'Не вышло'); }
+            });
+          });
+      };
+    });
   }
 
   // ── модерация заявок с сайта (только для сотрудника) ──
@@ -5628,6 +5767,9 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       add: function(ids){ (ids||[]).forEach(function(i){ chosen[String(i)]=1; });
                           paint(); if(open) draw(); },
       clear: function(){ chosen={}; paint(); if(open) draw(); },
+      /* Список может пополниться уже после сборки — например, когда собрали
+         людей по тегу и в нём оказались те, кого в первой выдаче не было. */
+      setItems: function(items){ opts.items=items||[]; paint(); if(open) draw(); },
       count: function(){ return Object.keys(chosen).length; }
     };
   }
@@ -5768,10 +5910,12 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     box.innerHTML='<div class="ccard"><p class="sub">Готовим…</p></div>';
     Promise.all([
       post({action:'camp_channels',token:TOKEN}),
-      post({action:'camp_candidates',token:TOKEN})
+      post({action:'camp_candidates',token:TOKEN}),
+      post({action:'camp_tags',token:TOKEN})
     ]).then(function(res){
       CMP_CH=(res[0]&&res[0].channels)||[];
       var people=(res[1]&&res[1].rows)||[];
+      var TAGS=(res[2]&&res[2].tags)||[];
       // объекты с сайта — чтобы приложить ссылку одним выбором
       var objs=(DATA.properties||[]).map(function(pr){
         var id=(pr.object&&pr.object.plp_property_id)||pr.property_id||'';
@@ -5815,8 +5959,18 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         '<div class="fgrid"><label class="wide">Получатели<div id="cm-who"></div></label>'+
         '<label class="wide">Или вставьте номера списком'+
         '<textarea id="cm-paste" class="cmtext" rows="2" placeholder="+66 954 143 874, PLP-003816 — через запятую или с новой строки"></textarea></label></div>'+
+        /* Эльнур 08.09: «я бы сделал лучше собрать тег, и дать варианты тегов
+           и туда можно собрать номера под эти теги, нажал выбрал конкретному
+           кто под тегом ушло сообщение». Теги считаются по базе, не выдуманы. */
+        '<h4 style="margin-top:16px">Собрать по тегу</h4>'+
+        '<div class="filters" id="cm-tags">'+
+        (TAGS.length ? TAGS.map(function(t){
+           return '<span class="chipf cm-tag" data-tag="'+clEsc(t.tag)+'" title="'+clEsc(t.why)+'">'+
+                  clEsc(t.tag)+' · '+t.n+'</span>'; }).join('')
+         : '<span class="sub">Теги пока не собираются.</span>')+'</div>'+
+        '<span class="hintline" id="cm-tagnote">Нажмите тег — люди под ним добавятся к получателям.</span>'+
         '<div class="fbtns"><button type="button" class="btn ghost" id="cm-addpaste">Добавить из вставки</button>'+
-        '<button type="button" class="btn ghost" id="cm-all">Все, кто купил</button></div>';
+        '<button type="button" class="btn ghost" id="cm-selftest">Отправить себе на проверку</button></div>';
       h+='<div class="fbtns"><button type="button" class="btn" id="cm-save">Собрать рассылку</button></div></div>';
       box.innerHTML=h;
 
@@ -5864,8 +6018,41 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         xhr.send(f);
       };
       document.getElementById('cmp-cancel').onclick=function(){ box.innerHTML=''; };
-      document.getElementById('cm-all').onclick=function(){
-        pickWho.add(people.filter(function(p){return p.temp==='client';}).map(function(p){return p.code;}));
+      /* Нажали тег — тянем людей под ним с сервера и добавляем к получателям.
+         Раньше кнопка «Все, кто купил» брала людей из уже загруженного списка
+         по temp==='client' — а сервер на любой сегмент отдавал одних и тех же. */
+      Array.prototype.forEach.call(document.querySelectorAll('.cm-tag'),function(el){
+        el.onclick=function(){
+          var tag=el.getAttribute('data-tag');
+          var note=document.getElementById('cm-tagnote');
+          el.classList.add('on'); note.textContent='Собираем «'+tag+'»…';
+          post({action:'camp_candidates',token:TOKEN,tag:tag,limit:500}).then(function(d){
+            var rows=(d&&d.rows)||[];
+            if(!rows.length){ el.classList.remove('on'); note.textContent='Под тегом «'+tag+'» никого нет.'; return; }
+            /* людей из тега может не быть в исходном списке — доносим их туда */
+            var known={}; people.forEach(function(p){ known[p.code]=1; });
+            rows.forEach(function(r){ if(!known[r.code]){ people.push(r); known[r.code]=1; } });
+            pickWho.setItems(people.map(function(p){
+              return { id:p.code, title:(p.name||'Без имени'),
+                       sub:(TR[p.temp]||p.temp)+' · '+(p.phone||'') }; }));
+            pickWho.add(rows.map(function(r){ return r.code; }));
+            note.textContent='Добавлено по тегу «'+tag+'»: '+rows.length+'. '+
+                             'Список получателей выше — там можно снять лишних.';
+          });
+        };
+      });
+      /* Проверка текста на себе: уходит только в телеграм Эльнура, никому больше. */
+      document.getElementById('cm-selftest').onclick=function(){
+        var b=document.getElementById('cm-selftest');
+        var txt=(document.getElementById('cm-text').value||'')
+                  .replace(/\{имя\}/g,'Эльнур').replace(/\{код\}/g,'PLP-000000')
+                  .replace(/\{объект\}/g,'объект');
+        if(!txt.trim()){ say('Сначала напишите текст'); return; }
+        b.disabled=true; b.textContent='Отправляем…';
+        post({action:'camp_test',token:TOKEN,text:txt}).then(function(r){
+          b.disabled=false; b.textContent='Отправить себе на проверку';
+          say(r&&r.ok ? 'Отправили вам в телеграм — больше никому.' : ((r&&r.error)||'Не ушло'));
+        });
       };
       // вставка номеров списком: отмечаем найденных, о ненайденных честно говорим
       document.getElementById('cm-addpaste').onclick=function(){
@@ -6015,7 +6202,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       /* Каждый показатель — кнопка: ведёт туда, где с ним можно работать.
          Раньше обработчик искал класс bgo, которого разметка не ставила,
          и «Система» не нажималась (Эльнур 05.09). */
-      var GO={'просят_кабинет':['clients','hot'],'клиентов':['clients','client'],'горячих':['clients','hot'],
+      var GO={'просят_кабинет':['cabinets',''],'клиентов':['clients','client'],'горячих':['clients','hot'],
               'всего':['clients',''],'клиенты':['clients','client'],'тёплые':['clients','warm'],
               'холодные':['clients','cold'],'новых_за_неделю':['clients',''],'с_историей':['clients',''],
               'с_кабинетом':['clients',''],
@@ -6081,6 +6268,18 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
           else if(go==='coords'){ cabPage('staff');
             var sc=document.getElementById('sec-coords');
             if(sc) setTimeout(function(){ sc.scrollIntoView({behavior:'smooth'}); },120); }
+          /* 🔴 08.09: у «заявок на модерации» ветки не было вовсе — нажатие
+             не давало ничего. Эльнур: «нажал на квадратик заявки на модерацию
+             и она вообще ноль реакции». */
+          else if(go==='moderation'){ cabPage('staff');
+            var sm=document.getElementById('sec-moder');
+            if(sm){ sm.style.display='';
+              setTimeout(function(){ sm.scrollIntoView({behavior:'smooth'}); },120); } }
+          else if(go==='cabinets'){ cabPage('clients'); CL_TEMP=''; CL_Q='';
+            loadClients();
+            setTimeout(function(){ ctxCabinets(); },200); }
+          else { say('«'+(el.getAttribute('data-key')||'').replace(/_/g,' ')+
+                     '» — показатель без своего раздела.'); }
         };
       });
     });
@@ -6594,6 +6793,46 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
                sub:[p.district,p.id].filter(Boolean).join(' · ') };
     });
   }
+  /* Кабинеты собственников: кто заведён, сколько у него объектов, и можно
+     открыть его кабинет глазами сотрудника. Эльнур 08.09: «нажал на квадратик
+     с кабинетом и меня просто перекинуло на общий лист всех внесённых в базу». */
+  function ctxCabinets(){
+    clForm('<h3>Кабинеты собственников</h3><p class="sub">Снимаем список…</p>', null);
+    post({action:'cabinets',token:TOKEN}).then(function(d){
+      var rows=(d&&d.rows)||[];
+      var h='<h3>Кабинеты собственников</h3>'+
+        '<p class="sub">Заведён кабинет — значит человек видит свои объекты, отчёты и документы. '+
+        'Можно открыть его кабинет и посмотреть ровно то, что видит он.</p>';
+      if(!d||!d.ok){ h+='<p class="sub">Не удалось получить список.</p>'; }
+      else if(!rows.length){ h+='<div class="empty">Кабинетов пока нет.</div>'; }
+      else {
+        h+='<table class="ctable inner"><tr><th>Кто</th><th>Телефон</th>'+
+           '<th class="r">Объектов</th><th></th></tr>';
+        rows.forEach(function(r){
+          h+='<tr><td>'+clEsc(r.name)+'</td><td class="mono">'+clEsc(r.phone||'—')+'</td>'+
+             '<td class="r">'+(r.objects||0)+'</td>'+
+             '<td class="r"><a href="#" class="lnk cab-open" data-id="'+clEsc(r.id)+'" '+
+             'data-name="'+clEsc(r.name)+'">Открыть кабинет</a></td></tr>';
+        });
+        h+='</table>';
+      }
+      h+='<div class="fbtns"><button type="button" class="btn ghost" id="f-cancel">Закрыть</button></div>';
+      clForm(h, null);
+      Array.prototype.forEach.call(document.querySelectorAll('.cab-open'),function(a){
+        a.onclick=function(e){
+          e.preventDefault();
+          var f=document.getElementById('cl-form');
+          if(f){ f.innerHTML=''; document.body.style.overflow=''; }
+          CTX.asOwner=a.getAttribute('data-id'); CTX.asName=a.getAttribute('data-name');
+          say('Открываем кабинет: '+CTX.asName);
+          post({action:'data',token:TOKEN,as_owner:CTX.asOwner}).then(function(dd){
+            if(dd&&dd.ok){ DATA=dd; CUR=0; draw(); }
+            else say((dd&&dd.error)||'Не вышло открыть кабинет');
+          });
+        };
+      });
+    });
+  }
   function renderCtx(){
     var box=document.getElementById('cab-ctx'); if(!box) return;
     box.hidden=false;
@@ -7030,7 +7269,11 @@ window.openChat=openChat;window.closeChat=closeChat;window.clearChat=clearChat;w
         cabPage(t);
       };
     });
-    try{ renderCtx(); ctxCabinets(); paintCounts(); }catch(e){}
+    /* 🔴 08.09: здесь вызывался ctxCabinets(), которого в коде не было.
+       Исключение глотал общий try — и paintCounts() после него не выполнялся
+       НИКОГДА, счётчики в меню оставались пустыми. Вызываем каждое отдельно. */
+    try{ renderCtx(); }catch(e){ if(window.console) console.warn('контекст:',e); }
+    try{ paintCounts(); }catch(e){ if(window.console) console.warn('счётчики:',e); }
     try{ initFab(); }catch(e){}
     var bell=document.getElementById('bellBtn');
     if(bell){ bell.hidden=false; }          /* в общей шапке он скрыт: нужен только кабинету */

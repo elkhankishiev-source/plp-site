@@ -163,7 +163,19 @@ body{background:var(--bg)}
   :root:not([data-theme="light"]) .chipf{background:#191A12;color:#ECEFE0;border-color:rgba(236,239,224,.18)}
 }
 :root[data-theme="light"] .chipf{background:#ffffff;color:#0A0A0A;border-color:rgba(10,10,10,.14)}
+/* 🔴 08.09: выбранный ответ в анкете не закрашивался — Эльнур: «когда нажимаю
+   выбрать, ответы не фиксируются цветом». Правила темы задавались селектором
+   с большим весом (:root[data-theme] .chipf), чем .chipf.on, и перебивали
+   выбор. Повторяем выбранное состояние в каждой теме тем же весом. */
 .chipf.on{background:var(--green);color:var(--on-green);border-color:transparent}
+:root[data-theme="dark"] .chipf.on,
+:root[data-theme="light"] .chipf.on{background:var(--green);color:var(--on-green);border-color:transparent}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .chipf.on{background:var(--green);color:var(--on-green);border-color:transparent}
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]) .chipf.on{background:var(--green);color:var(--on-green);border-color:transparent}
+}
 
 /* Сообщение об ошибке в анкете должно читаться в обеих темах */
 .err,.df-status.err{color:#c0392b;font-weight:600}
