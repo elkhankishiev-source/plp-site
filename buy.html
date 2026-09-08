@@ -2029,6 +2029,18 @@ body{background:var(--bg)}
 
 /* PLP:UI:END */
 
+/* Что Дарья сделала руками: оффер, расчёт, свободные даты */
+.chat-tools .tool{border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:6px 0;background:var(--paper)}
+.chat-tools .tool b{display:block;font-size:.92rem}
+.chat-tools .tool span{display:block;color:var(--muted);font-size:.84rem;margin:2px 0 8px}
+.chat-tools .tool i{display:block;color:var(--muted);font-size:.78rem;font-style:normal;margin-top:8px;line-height:1.45}
+.chat-tools .tool dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0}
+.chat-tools .tool dt{color:var(--muted);font-size:.84rem}
+.chat-tools .tool dd{margin:0;font-weight:700;font-size:.88rem;text-align:right;font-variant-numeric:tabular-nums}
+.chat-tools .tool ul{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:6px}
+.chat-tools .tool ul button,.chat-tools .tool-go{display:inline-block;border:1px solid var(--line);background:transparent;
+  color:var(--ink);border-radius:999px;padding:6px 12px;font-size:.82rem;font-weight:600;cursor:pointer;text-decoration:none}
+.chat-tools .tool-go{background:var(--green);color:var(--on-green);border-color:var(--green)}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.6.0/maplibre-gl.min.css">
@@ -4007,6 +4019,9 @@ function askAI(txt, byVoice){
       var ids=(data.object_ids||[]).filter(function(id){return PL.byId&&PL.byId[id];});
       var delay=reduceMotion?200:Math.min(reply.length*14+250,1800);
       if(ids.length)setTimeout(function(){aiCards(ids);},delay);
+      /* Дарья не только отвечает, но и делает: оффер ссылкой, расчёт, свободные
+         даты. Эльнур 08.09: «написал и всё получил, заказал, сделал». */
+      if(data.cards&&data.cards.length)setTimeout(function(){aiTools(data.cards);},delay+200);
       if(data.suggest_lead&&!leadShown)setTimeout(function(){offerLead(false);},delay+400);
     })
     .catch(function(){finish();aiFail();});
@@ -4021,6 +4036,34 @@ function sendFree(){
   /* быстрый локальный расчёт доходности остаётся мгновенным; всё остальное — в ИИ */
   if(topic==='calc'){chatCalcReply(low);return;}
   askAI(txt);
+}
+/* то, что Дарья сделала руками: страница-оффер, расчёт, свободные даты */
+function aiTools(cards){
+  var w=document.createElement('div'); w.className='msg bot chat-tools'; var h='';
+  (cards||[]).slice(0,3).forEach(function(c){
+    if(c.type==='offer'&&c.url){
+      h+='<div class="tool"><b>Оффер по объекту</b><span>'+escHtml(c.title||'')+'</span>'+
+         '<a class="tool-go" href="'+escHtml(c.url)+'" target="_blank" rel="noopener">Открыть</a></div>';
+    }
+    if(c.type==='calc'&&c.rows&&c.rows.length){
+      h+='<div class="tool"><b>Ориентир доходности</b><span>'+escHtml(c.title||'')+'</span><dl>';
+      c.rows.forEach(function(r){ h+='<dt>'+escHtml(r[0])+'</dt><dd>'+escHtml(r[1])+'</dd>'; });
+      h+='</dl>'+(c.note?('<i>'+escHtml(c.note)+'</i>'):'')+'</div>';
+    }
+    if(c.type==='dates'){
+      var dd=function(x){ return String(x||'').split('-').reverse().join('.'); };
+      h+='<div class="tool"><b>Свободно '+escHtml(dd(c.from))+' — '+escHtml(dd(c.to))+'</b>';
+      if(c.items&&c.items.length){
+        h+='<ul>'+c.items.map(function(x){
+          return '<li><button type="button" onclick="closeChatToProp(\''+x.id+'\')">'+
+                 escHtml(x.title)+'</button></li>'; }).join('')+'</ul>';
+      }
+      if(c.note) h+='<i>'+escHtml(c.note)+'</i>';
+      h+='</div>';
+    }
+  });
+  if(!h) return;
+  w.innerHTML=h; cb.appendChild(w); cb.scrollTop=cb.scrollHeight;
 }
 function aiCards(ids){
   var items=ids.map(function(id){return PL.byId[id];}).filter(Boolean).slice(0,3);
@@ -6493,7 +6536,7 @@ addEventListener('keydown',function(e){
 /* ===== EXPORT (inline handlers) ===== */
 window.setLang=setLang;window.toggleNav=toggleNav;
 window.openQuiz=openQuiz;window.closeQuiz=closeQuiz;window.quizNext=quizNext;window.quizBack=quizBack;window.pickQuiz=pickQuiz;
-window.chatVoice=chatVoice;window.listenBar=listenBar;window.paintVoiceMode=paintVoiceMode;window.toggleVoiceMode=toggleVoiceMode;window.voiceBubble=voiceBubble;window.playAudio=playAudio;window.playSpeech=playSpeech;window.botVoice=botVoice;window.t=t;window.toggleFab=toggleFab;window.renderMapReal=renderMapReal;window.openChat=openChat;window.closeChat=closeChat;window.clearChat=clearChat;window.sendFree=sendFree;window.closeChatToProp=closeChatToProp;window.askAssistant=askAssistant;
+window.chatVoice=chatVoice;window.listenBar=listenBar;window.paintVoiceMode=paintVoiceMode;window.toggleVoiceMode=toggleVoiceMode;window.voiceBubble=voiceBubble;window.playAudio=playAudio;window.playSpeech=playSpeech;window.botVoice=botVoice;window.t=t;window.toggleFab=toggleFab;window.renderMapReal=renderMapReal;window.openChat=openChat;window.closeChat=closeChat;window.clearChat=clearChat;window.sendFree=sendFree;window.closeChatToProp=closeChatToProp;window.askAssistant=askAssistant;window.aiTools=aiTools;window.aiCards=aiCards;
 window.openRentRequest=openRentRequest;window.requestService=requestService;
 window.checkAvailability=checkAvailability;window.resetAvailability=resetAvailability;window.resetRentFilters=resetRentFilters;window.pushLead=pushLead;
 window.scrollCar=scrollCar;window.toggleFilter=toggleFilter;window.onSaleSearch=onSaleSearch;window.setSaleSort=setSaleSort;window.toggleFavOnly=toggleFavOnly;
