@@ -2070,6 +2070,7 @@ body{background:var(--bg)}
 </div><!-- /stage -->
 
 <!-- ===== CHAT WIDGET ===== -->
+<div class="fabwrap" id="fabWrap"><button type="button" class="fab" id="fab" onclick="openChat('hi')"><span class="av"><img src="../img/brand/plp-mark-ink.png" alt="" width="20" height="20"></span><span class="fabtxt" data-i18n="chat.fab">Дарья · на связи</span><span class="dot"></span></button><button type="button" class="fabmin" id="fabMin" onclick="event.stopPropagation();toggleFab()" aria-label="Свернуть" title="Свернуть">×</button></div>
 <div class="chatwin" id="chatwin" role="dialog" aria-label="Чат с менеджером">
   <div class="chathead">
     <span class="av"><img src="../img/brand/plp-mark-ink.png" alt="" width="20" height="20"></span>
@@ -3391,7 +3392,8 @@ function getSource(){var s={};try{s=JSON.parse(sessionStorage.getItem('pl_source
 /* ===== LEAD PIPELINE (мин. квалификация → amoCRM через n8n) ===== */
 /* Низкопривилегированный ключ ТОЛЬКО для формы сайта — не мастер, можно в публичном коде. */
 var LEAD_ENDPOINT='https://proplib.app.n8n.cloud/webhook/site-lead?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7';
-var CHAT_ENDPOINT='https://proplib.app.n8n.cloud/webhook/site-chat?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7';
+var VOICE_ENDPOINT='https://proplib.app.n8n.cloud/webhook/site-voice?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7',
+      CHAT_ENDPOINT='https://proplib.app.n8n.cloud/webhook/site-chat?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7';
 var AVAIL_ENDPOINT='https://proplib.app.n8n.cloud/webhook/check-availability?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7';
 function escHtml(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 /* Проверка контакта перед отправкой. Раньше её не было: человек мог ввести
@@ -3733,28 +3735,58 @@ function clearChat(){chatHist=[];leadShown=false;chatStarted=false;userMsgs=0;la
    никуда не отправляется. Где не поддерживается (Firefox) — кнопки просто нет. */
 var CHAT_REC=null;
 function chatVoice(){
-  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  var btn=document.getElementById('chatMic'), fld=document.getElementById('chatField');
-  if(!SR||!btn||!fld) return;
-  if(CHAT_REC){ try{ CHAT_REC.stop(); }catch(e){} return; }
-  var r=new SR();
-  r.lang=(PL.lang==='en')?'en-US':'ru-RU';
-  r.interimResults=true; r.continuous=false;
-  var base=fld.value ? (fld.value.replace(/\s+$/,'')+' ') : '';
-  r.onstart=function(){ CHAT_REC=r; btn.classList.add('rec'); btn.setAttribute('aria-label','Остановить запись'); };
-  r.onresult=function(e){
-    var txt='';
-    for(var i=e.resultIndex;i<e.results.length;i++) txt+=e.results[i][0].transcript;
-    fld.value=base+txt;
-  };
-  r.onerror=function(){ /* отказ в доступе к микрофону — молча возвращаем ввод текстом */ };
-  r.onend=function(){ CHAT_REC=null; btn.classList.remove('rec'); btn.setAttribute('aria-label','Сказать голосом'); fld.focus(); };
-  try{ r.start(); }catch(e){ CHAT_REC=null; btn.classList.remove('rec'); }
+  /* Эльнур 08.09: «хотел общение в режиме диалога — чтобы клиент мог отправить
+     голосовое, а не диктовать текст». Пишем звук и расшифровываем на сервере:
+     встроенное распознавание браузера в Safari просто молчало. */
+  var btn=document.getElementById('chatMic');
+  if(window.__rec && window.__rec.state==='recording'){ window.__rec.stop(); return; }
+  if(!navigator.mediaDevices || !window.MediaRecorder){ botT('Голосовые тут не поддерживаются — напишите текстом.',300); return; }
+  navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
+    var rec=new MediaRecorder(stream), chunks=[];
+    window.__rec=rec;
+    if(btn) btn.classList.add('rec');
+    rec.ondataavailable=function(e){ if(e.data && e.data.size) chunks.push(e.data); };
+    rec.onstop=function(){
+      stream.getTracks().forEach(function(t){ t.stop(); });
+      if(btn) btn.classList.remove('rec');
+      var blob=new Blob(chunks,{type:'audio/webm'});
+      if(blob.size<2000){ return; }
+      var fr=new FileReader();
+      fr.onload=function(){
+        me('🎤 голосовое сообщение');
+        fetch(VOICE_ENDPOINT,{method:'POST',headers:{'Content-Type':'text/plain'},
+              body:JSON.stringify({action:'stt',audio:fr.result})})
+          .then(function(r){return r.json();})
+          .then(function(d){
+            if(d&&d.ok&&d.text){ me(d.text); userMsgs++; askAI(d.text); }
+            else botT((d&&d.error)||'Не расслышала — попробуйте ещё раз или напишите текстом.',300);
+          })
+          .catch(function(){ botT('Голос не дошёл — напишите текстом.',300); });
+      };
+      fr.readAsDataURL(blob);
+    };
+    rec.start();
+    setTimeout(function(){ if(rec.state==='recording') rec.stop(); }, 60000);
+  }).catch(function(){ botT('Не дали доступ к микрофону.',300); });
 }
-/* показываем кнопку только если браузер умеет распознавать речь */
+/* озвучка ответа: кнопка 🔊 под сообщением Дарьи */
+function speak(btn, text){
+  if(!text) return;
+  btn.disabled=true; var was=btn.textContent; btn.textContent='…';
+  fetch(VOICE_ENDPOINT,{method:'POST',headers:{'Content-Type':'text/plain'},
+        body:JSON.stringify({action:'tts',text:text})})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      btn.disabled=false; btn.textContent=was;
+      if(d&&d.ok&&d.audio){ new Audio(d.audio).play(); }
+      else botT((d&&d.error)||'Голос сейчас недоступен.',200);
+    })
+    .catch(function(){ btn.disabled=false; btn.textContent=was; });
+}
+
 (function(){
   try{
-    if(window.SpeechRecognition||window.webkitSpeechRecognition){
+    if(navigator.mediaDevices && window.MediaRecorder){
       var b=document.getElementById('chatMic'); if(b) b.hidden=false;
     }
   }catch(e){}
