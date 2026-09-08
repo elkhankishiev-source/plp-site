@@ -1189,7 +1189,9 @@ a.lnk,.lnk{color:var(--olive)}
 .cal-w,.cal-g{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
 .cal-w span{font-size:.68rem;color:var(--muted);text-align:center;text-transform:uppercase;letter-spacing:.06em}
 .cal-d,.cal-e{display:flex;align-items:center;justify-content:center;height:34px;border-radius:9px;
-  font-size:.85rem;background:var(--paper);border:1px solid rgba(var(--ink-rgb),.07)}
+  font-size:.85rem;background:rgba(210,213,179,.16);
+  border:1px solid rgba(var(--ink-rgb),.035);transition:background .15s,border-color .15s}
+.cal-d:hover{background:rgba(210,213,179,.30);border-color:rgba(var(--ink-rgb),.06)}
 .cal-e{background:transparent;border-color:transparent}
 .cal-d.busy{background:var(--green);color:var(--on-green);font-weight:700;border-color:transparent}
 .hintline{margin:0 0 10px;font-size:.78rem;color:var(--muted);line-height:1.45}
@@ -2312,8 +2314,10 @@ body{background:var(--bg)}
         <label class="wide">Что нужно<div id="r-kind"></div></label>
       </div>
       <div id="r-dates" class="fgrid" style="display:none">
-        <label>Заезд<input id="r-from" type="date"></label>
-        <label>Выезд<input id="r-to" type="date"></label>
+        <label class="wide">Заезд и выезд
+          <button type="button" class="dateline" id="r-range"><span id="r-range-t">Выберите даты</span><i>▾</i></button>
+          <input type="hidden" id="r-from"><input type="hidden" id="r-to">
+          <div class="rangecal" id="r-rcal" hidden></div></label>
         <label>Гостей<input id="r-guests" type="number" min="1" max="20"></label>
         <label>Сумма, ฿<input id="r-amount" type="number" min="0" step="1000"></label>
       </div>
@@ -2941,6 +2945,69 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     if(obj) obj.addEventListener('change', function(){ rcDraw(); });
     rcDraw(); rcLabel();
   }
+  /* Заявка на бронь: заезд и выезд в одной графе, как везде на сайте.
+     Эльнур 08.09: «заезд выезд везде должны проставляться в одном поле». */
+  var RANGES={};
+  function reqRangeDraw(k){
+    var o=RANGES[k]; if(!o) return;
+    var cal=document.getElementById(o.cal); if(!cal) return;
+    var A=$(o.from), B=$(o.to);
+    var today=rcISO(new Date());
+    var base=o.m || (A.value?new Date(A.value+'T00:00:00'):new Date());
+    o.m=new Date(base.getFullYear(), base.getMonth(), 1);
+    var y=o.m.getFullYear(), m=o.m.getMonth();
+    var start=(new Date(y,m,1).getDay()+6)%7, days=new Date(y,m+1,0).getDate();
+    var MN=['январь','февраль','март','апрель','май','июнь','июль','август','сентябрь','октябрь','ноябрь','декабрь'];
+    var cells='';
+    for(var i=0;i<start;i++) cells+='<span class="cal-e"></span>';
+    for(var d=1;d<=days;d++){
+      var iso=y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+      var cls='cal-d';
+      if(iso<today) cls+=' off';
+      else if(iso===A.value||iso===B.value) cls+=' edge';
+      else if(A.value&&B.value&&iso>A.value&&iso<B.value) cls+=' in';
+      cells+='<span class="'+cls+'" data-rd="'+iso+'">'+d+'</span>';
+    }
+    cal.innerHTML='<div class="cal-h"><button type="button" class="cal-nav" data-rq="-1">‹</button>'+
+      '<b>'+MN[m]+' '+y+'</b><button type="button" class="cal-nav" data-rq="1">›</button></div>'+
+      '<div class="cal-w"><span>пн</span><span>вт</span><span>ср</span><span>чт</span><span>пт</span><span>сб</span><span>вс</span></div>'+
+      '<div class="cal-g">'+cells+'</div>';
+  }
+  function reqRangeLabel(k){
+    var o=RANGES[k]; if(!o) return;
+    var t=document.getElementById(o.label); if(!t) return;
+    var a=$(o.from).value, b=$(o.to).value;
+    if(a&&b){
+      var n=Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/86400000);
+      t.textContent=clDate(a)+' — '+clDate(b)+(n>0?(' · '+n+' '+plural(n,'ночь','ночи','ночей')):'');
+    } else if(a){ t.textContent='Заезд '+clDate(a)+' — выберите выезд'; }
+    else { t.textContent='Выберите даты'; }
+  }
+  /* k — короткое имя набора полей: 'r' у заявки в кабинете, 'q' у заявки за клиента */
+  function bindReqRange(k, ids){
+    RANGES[k]=RANGES[k]||{m:null, from:ids.from, to:ids.to, btn:ids.btn, cal:ids.cal, label:ids.label};
+    var o=RANGES[k];
+    var btn=document.getElementById(o.btn), cal=document.getElementById(o.cal);
+    if(!btn||!cal) return;
+    if(btn.dataset.wired){ reqRangeLabel(k); reqRangeDraw(k); return; }
+    btn.dataset.wired='1';
+    btn.onclick=function(){ cal.hidden=!cal.hidden; btn.classList.toggle('open',!cal.hidden); if(!cal.hidden) reqRangeDraw(k); };
+    cal.onclick=function(e){
+      var nav=e.target.closest&&e.target.closest('[data-rq]');
+      if(nav){ o.m=new Date(o.m.getFullYear(), o.m.getMonth()+Number(nav.getAttribute('data-rq')),1); reqRangeDraw(k); return; }
+      var day=e.target.closest&&e.target.closest('[data-rd]');
+      if(!day) return;
+      var iso=day.getAttribute('data-rd');
+      if(iso<rcISO(new Date())) return;
+      var A=$(o.from), B=$(o.to);
+      if(!A.value || (A.value&&B.value) || iso<=A.value){ A.value=iso; B.value=''; }
+      else { B.value=iso; cal.hidden=true; btn.classList.remove('open'); }
+      reqRangeDraw(k); reqRangeLabel(k);
+    };
+    reqRangeLabel(k); reqRangeDraw(k);
+  }
+  var REQ_R={from:'r-from',to:'r-to',btn:'r-range',cal:'r-rcal',label:'r-range-t'};
+  var REQ_Q={from:'q-from',to:'q-to',btn:'q-range',cal:'q-rcal',label:'q-range-t'};
   function ukBookForm(pid, pre){
     pre=pre||{};
     var objs=(DATA.properties||[]).map(function(x){ return {id:x.id, name:(x.name||x.id)}; });
@@ -3656,13 +3723,25 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     var p=(DATA.properties||[])[CUR]||{};
     var hour=new Date().getHours();
     var greet = hour<5?'Доброй ночи':hour<12?'Доброе утро':hour<18?'Добрый день':'Добрый вечер';
-    var first = String(o.name||'').trim().split(/\s+/)[0] || '';
+    /* Эльнур 08.09: сервер подставляет владельцем выбранного клиента, но здороваться
+       надо с тем, кто на самом деле вошёл — viewed_by. */
+    var me = String(o.viewed_by || o.name || '').trim();
+    var first = me.split(/\s+/)[0] || '';
     var ini = first ? first.slice(0,1).toUpperCase() : '·';
 
-    /* 1. Шапка: надзаголовок, приветствие, действие и аватар */
+    /* 1. Шапка: надзаголовок, приветствие, действие и аватар.
+       Эльнур 08.09: «выбираю лида Константина — он мне пишет доброе утро,
+       Константин, но я-то Эльнур». Сотрудник остаётся собой и видит, чей
+       кабинет открыт. */
+    var viewing = o.viewed_by
+      ? String((o.viewing && (o.viewing.name||o.viewing.code)) || o.viewed_as || o.name || '')
+      : '';
+    var eyebrow = viewing ? ('Смотрите кабинет · ' + viewing) : 'Кабинет владельца';
     var h='<div class="ov-head">'+
-      '<div><span class="eyebrow">Кабинет владельца</span>'+
-        '<h1>'+esc(greet+(first?', '+first:''))+'</h1></div>'+
+      '<div><span class="eyebrow">'+esc(eyebrow)+'</span>'+
+        '<h1>'+esc(greet+(first?', '+first:''))+'</h1>'+
+        (viewing?('<p class="sub" style="margin:6px 0 0">Данные ниже — по клиенту '+esc(viewing)+'.</p>'):'')+
+      '</div>'+
       '<div class="ov-act">'+
         /* Эльнур 06.09: «не надо туда добавлять выгрузить объект, эта функция
          спрятана в соответствующем блоке» — в шапке остаётся только отчёт. */
@@ -5204,8 +5283,10 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       '<input id="q-own" type="text" placeholder="например: организовать трансфер из аэропорта"></label>'+
       '</div>'+
       '<div class="fgrid" id="q-dates" style="display:none">'+
-      '<label>Заезд<input id="q-from" type="date"></label>'+
-      '<label>Выезд<input id="q-to" type="date"></label>'+
+      '<label class="wide">Заезд и выезд'+
+      '<button type="button" class="dateline" id="q-range"><span id="q-range-t">Выберите даты</span><i>▾</i></button>'+
+      '<input type="hidden" id="q-from"><input type="hidden" id="q-to">'+
+      '<div class="rangecal" id="q-rcal" hidden></div></label>'+
       '<label>Гостей<input id="q-guests" type="number" min="1" max="20"></label>'+
       '<label>Сумма, ฿<input id="q-amount" type="number" min="0" step="1000"></label>'+
       '</div>'+
@@ -5237,6 +5318,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     Q_KIND=pickList('q-kind',{ multi:false, placeholder:'что нужно', items:KINDS,
       onChange:function(ids){
         document.getElementById('q-dates').style.display=(ids[0]==='booking')?'':'none';
+        if(ids[0]==='booking') bindReqRange('q', REQ_Q);
         document.getElementById('q-own-wrap').style.display=(ids[0]==='own')?'':'none';
       }});
     Q_OBJ=pickList('q-obj',{ multi:false, placeholder:'без объекта', items:REQ_ALLOBJ });
@@ -6920,6 +7002,7 @@ window.openChat=openChat;window.closeChat=closeChat;window.clearChat=clearChat;w
     REQ_KIND=pickList('r-kind',{ multi:false, placeholder:'что нужно', items:REQ_KINDS,
       onChange:function(ids){
         document.getElementById('r-dates').style.display = (ids[0]==='booking') ? '' : 'none';
+        if(ids[0]==='booking') bindReqRange('r', REQ_R);
         showCal();
       } });
 
@@ -7014,6 +7097,7 @@ window.openChat=openChat;window.closeChat=closeChat;window.clearChat=clearChat;w
         $('r-details').value='';
         if($('r-from')) $('r-from').value='';
         if($('r-to')) $('r-to').value='';
+        reqRangeLabel('r'); reqRangeDraw('r');
         showCal(); loadData();
       } else {
         err.textContent=(d&&d.error) ? d.error : 'Не удалось отправить заявку.';
