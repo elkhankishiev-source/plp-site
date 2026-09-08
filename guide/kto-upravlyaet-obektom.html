@@ -1097,6 +1097,17 @@ input.bad{border-color:#d98a84!important;background:var(--paper)6f5}
 .fab .dot{width:8px;height:8px;border-radius:50%;background:#5fce8f;box-shadow:0 0 0 3px rgba(95,206,143,.3);animation:fabdot 2.4s infinite}
 @keyframes fabdot{0%,100%{box-shadow:0 0 0 3px rgba(95,206,143,.3)}50%{box-shadow:0 0 0 6px rgba(95,206,143,.12)}}
 @media(prefers-reduced-motion:reduce){.fab .dot,.msg{animation:none}}
+/* Голосовое сообщение — как в мессенджере: кружок «играть», дорожка, длительность.
+   Эльнур 08.09: «он не выполнил то, что я хотел» — микрофон писал текст под
+   диктовку, а нужен был обмен голосовыми. */
+.vm{display:flex;align-items:center;gap:10px;min-width:190px}
+.vm-play{flex:none;width:34px;height:34px;border-radius:50%;border:0;cursor:pointer;
+  background:var(--green);color:var(--on-green);font-size:.9rem;line-height:1;padding:0;margin:0}
+.msg.me .vm-play{background:rgba(255,255,255,.9);color:#14140f}
+.vm-wave{flex:1;height:3px;border-radius:2px;background:currentColor;opacity:.35;position:relative}
+.vm-wave i{position:absolute;left:0;top:0;bottom:0;width:0;background:currentColor;opacity:1;border-radius:2px;display:block}
+.vm-time{flex:none;font-size:.72rem;opacity:.75;font-variant-numeric:tabular-nums}
+.vm-text{margin-top:8px;font-size:.9rem;opacity:.9}
 .msg.bot .sayb{display:block;margin-top:6px;background:none;border:0;padding:0;
   font-size:13px;line-height:1;opacity:.55;cursor:pointer}
 .msg.bot .sayb:hover{opacity:1}
@@ -3743,7 +3754,7 @@ function renderBotText(txt){
 /* фолбэк при сбое ИИ: реплика-подсказка + прямой контакт WhatsApp */
 function aiFail(reply){if(reply)renderBotText(reply);bot(t('chat.aifail'));}
 /* основной путь свободного вопроса — живой ИИ-бэкенд (brain_core, персона Дарья) */
-function askAI(txt){
+function askAI(txt, byVoice){
   setChatBusy(true);
   var ty=typingEl();
   var body=JSON.stringify({message:txt,history:buildAIHistory(),lang:PL.lang,context:{object_id:chatObjCtx()}});
@@ -3760,7 +3771,8 @@ function askAI(txt){
       if(!data||data.ok===false){aiFail(data&&data.reply);return;}
       if(data.lead_summary)lastLeadSummary=String(data.lead_summary).slice(0,500);
       var reply=data.reply||t('chat.r.generic');
-      renderBotText(reply);
+      /* спросили голосом — отвечаем голосовым, а не текстом с кнопкой «послушать» */
+      if(byVoice) botVoice(reply); else renderBotText(reply);
       var ids=(data.object_ids||[]).filter(function(id){return PL.byId&&PL.byId[id];});
       var delay=reduceMotion?200:Math.min(reply.length*14+250,1800);
       if(ids.length)setTimeout(function(){aiCards(ids);},delay);
@@ -3794,56 +3806,138 @@ function clearChat(){chatHist=[];leadShown=false;chatStarted=false;userMsgs=0;la
 /* Голосовой ввод в чате (Эльнур 06.09). Распознаёт сам браузер — запись
    никуда не отправляется. Где не поддерживается (Firefox) — кнопки просто нет. */
 var CHAT_REC=null;
+/* ===== ОБМЕН ГОЛОСОВЫМИ =====
+   Эльнур 08.09: «я хотел общение в режиме диалога, чтобы ИИ чат мог отправить
+   голосовое сообщение, и клиент тоже мог отправить голосовое, а не текст под
+   диктовку». Поэтому: нажал — записалось, в переписке появилось ваше голосовое,
+   которое можно переслушать; ответ приходит тоже голосовым, а текст под ним —
+   чтобы можно было прочитать. */
+function vmSecs(n){ n=Math.max(0,Math.round(n||0)); return Math.floor(n/60)+':'+('0'+(n%60)).slice(-2); }
+/* пузырь с голосовым: играет из своего источника, показывает дорожку и время */
+function voiceBubble(kind, play, dur, text){
+  var d=document.createElement('div'); d.className='msg '+kind;
+  var w=document.createElement('div'); w.className='vm';
+  var b=document.createElement('button'); b.type='button'; b.className='vm-play'; b.textContent='▶';
+  var wave=document.createElement('span'); wave.className='vm-wave';
+  var fill=document.createElement('i'); wave.appendChild(fill);
+  var tm=document.createElement('span'); tm.className='vm-time'; tm.textContent=vmSecs(dur);
+  w.appendChild(b); w.appendChild(wave); w.appendChild(tm);
+  d.appendChild(w);
+  if(text){ var tx=document.createElement('div'); tx.className='vm-text'; tx.textContent=text; d.appendChild(tx); }
+  cb.appendChild(d); cb.scrollTop=cb.scrollHeight;
+  var ctl=null;
+  b.onclick=function(){
+    if(ctl && ctl.stop){ ctl.stop(); ctl=null; b.textContent='▶'; fill.style.width='0'; return; }
+    b.textContent='⏸';
+    ctl=play({
+      progress:function(p){ fill.style.width=Math.round(Math.min(1,p)*100)+'%'; },
+      time:function(sec){ tm.textContent=vmSecs(sec); },
+      done:function(){ b.textContent='▶'; fill.style.width='0'; ctl=null; }
+    });
+  };
+  return { el:d, start:function(){ b.onclick(); } };
+}
+/* проигрывание записанного файла */
+function playAudio(url){
+  return function(cbs){
+    var a=new Audio(url);
+    a.ontimeupdate=function(){ if(a.duration) cbs.progress(a.currentTime/a.duration); cbs.time(a.currentTime); };
+    a.onended=function(){ cbs.done(); };
+    a.play();
+    return { stop:function(){ try{ a.pause(); }catch(e){} } };
+  };
+}
+/* проигрывание ответа голосом самого браузера */
+function playSpeech(text){
+  return function(cbs){
+    if(!window.speechSynthesis){ cbs.done(); return null; }
+    try{ speechSynthesis.cancel(); }catch(e){}
+    var u=new SpeechSynthesisUtterance(text);
+    u.lang=(PL.lang==='en')?'en-US':'ru-RU'; u.rate=1.02;
+    var vs=speechSynthesis.getVoices()||[];
+    var v=vs.filter(function(x){ return x.lang && x.lang.indexOf(u.lang.slice(0,2))===0; })[0];
+    if(v) u.voice=v;
+    var t0=Date.now(), total=Math.max(2, text.length/14);
+    var tick=setInterval(function(){
+      var el=(Date.now()-t0)/1000;
+      cbs.progress(el/total); cbs.time(el);
+    }, 200);
+    u.onend=function(){ clearInterval(tick); cbs.done(); };
+    u.onerror=function(){ clearInterval(tick); cbs.done(); };
+    speechSynthesis.speak(u);
+    return { stop:function(){ clearInterval(tick); try{ speechSynthesis.cancel(); }catch(e){} } };
+  };
+}
+/* ответ голосом: пузырь играет сам, текст читаемый под ним */
+function botVoice(text){
+  var v=voiceBubble('bot', playSpeech(text), Math.max(2, text.length/14), text);
+  chatHist.push({r:'bot',h:escHtml(text)}); saveHist();
+  setTimeout(function(){ try{ v.start(); }catch(e){} }, 200);
+  return v;
+}
 function chatVoice(){
-  /* Эльнур 08.09: «хотел общение в режиме диалога». Где браузер умеет слушать сам
-     (Chrome, Android) — пользуемся этим: бесплатно и сразу. Где не умеет (Safari) —
-     пишем звук и расшифровываем на сервере. */
   var btn=document.getElementById('chatMic');
-  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(SR && !window.__forceServerVoice){
-    if(window.__sr){ try{ window.__sr.stop(); }catch(e){} return; }
-    var r=new SR();
-    r.lang=(typeof LANG!=='undefined'&&LANG==='en')?'en-US':'ru-RU';
-    r.interimResults=false; r.continuous=false;
-    r.onstart=function(){ window.__sr=r; if(btn) btn.classList.add('rec'); };
-    r.onresult=function(e){
-      var txt=''; for(var i=e.resultIndex;i<e.results.length;i++) txt+=e.results[i][0].transcript;
-      txt=txt.trim();
-      if(txt){ me(txt); userMsgs++; askAI(txt); }
-    };
-    r.onerror=function(){ window.__forceServerVoice=true; };
-    r.onend=function(){ window.__sr=null; if(btn) btn.classList.remove('rec'); };
-    try{ r.start(); return; }catch(e){ window.__sr=null; }
-  }
   if(window.__rec && window.__rec.state==='recording'){ window.__rec.stop(); return; }
-  if(!navigator.mediaDevices || !window.MediaRecorder){ botT('Голосовые тут не поддерживаются — напишите текстом.',300); return; }
+  if(!navigator.mediaDevices || !window.MediaRecorder){
+    botT('Этот браузер не умеет записывать голос — напишите текстом.',300); return;
+  }
   navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
-    var rec=new MediaRecorder(stream), chunks=[];
+    var rec=new MediaRecorder(stream), chunks=[], t0=Date.now();
     window.__rec=rec;
     if(btn) btn.classList.add('rec');
+    /* распознаём параллельно: где браузер умеет — бесплатно и сразу */
+    var SR=window.SpeechRecognition||window.webkitSpeechRecognition, heard='';
+    var sr=null;
+    if(SR){
+      try{
+        sr=new SR(); sr.lang=(PL.lang==='en')?'en-US':'ru-RU';
+        sr.interimResults=false; sr.continuous=true;
+        sr.onresult=function(e){
+          for(var i=e.resultIndex;i<e.results.length;i++) heard+=e.results[i][0].transcript;
+        };
+        sr.onerror=function(){};
+        sr.start();
+      }catch(e){ sr=null; }
+    }
     rec.ondataavailable=function(e){ if(e.data && e.data.size) chunks.push(e.data); };
     rec.onstop=function(){
       stream.getTracks().forEach(function(t){ t.stop(); });
+      if(sr){ try{ sr.stop(); }catch(e){} }
       if(btn) btn.classList.remove('rec');
+      var secs=(Date.now()-t0)/1000;
       var blob=new Blob(chunks,{type:'audio/webm'});
-      if(blob.size<2000){ return; }
-      var fr=new FileReader();
-      fr.onload=function(){
-        me('🎤 голосовое сообщение');
-        fetch(VOICE_ENDPOINT,{method:'POST',headers:{'Content-Type':'text/plain'},
-              body:JSON.stringify({action:'stt',audio:fr.result})})
-          .then(function(r){return r.json();})
-          .then(function(d){
-            if(d&&d.ok&&d.text){ me(d.text); userMsgs++; askAI(d.text); }
-            else botT((d&&d.error)||'Не расслышала — попробуйте ещё раз или напишите текстом.',300);
-          })
-          .catch(function(){ botT('Голос не дошёл — напишите текстом.',300); });
-      };
-      fr.readAsDataURL(blob);
+      if(blob.size<1500 || secs<0.6){ return; }
+      var url=URL.createObjectURL(blob);
+      /* ваше голосовое — сразу в переписке, его можно переслушать */
+      var mine=voiceBubble('me', playAudio(url), secs, '');
+      chatHist.push({r:'me',h:'голосовое сообщение'}); saveHist();
+      function go(text){
+        if(!text){
+          botT('Не разобрала голос. Скажите ещё раз или напишите текстом.',300); return;
+        }
+        var tx=document.createElement('div'); tx.className='vm-text'; tx.textContent=text;
+        mine.el.appendChild(tx);
+        userMsgs++; askAI(text, true);
+      }
+      setTimeout(function(){
+        heard=heard.trim();
+        if(heard){ go(heard); return; }
+        /* браузер не расслышал — просим сервер */
+        var fr=new FileReader();
+        fr.onload=function(){
+          fetch(VOICE_ENDPOINT,{method:'POST',headers:{'Content-Type':'text/plain'},
+                body:JSON.stringify({action:'stt',audio:fr.result})})
+            .then(function(r){return r.json();})
+            .then(function(d){ go(d&&d.ok&&d.text ? d.text : ''); })
+            .catch(function(){ go(''); });
+        };
+        fr.onerror=function(){ go(''); };
+        fr.readAsDataURL(blob);
+      }, 400);
     };
     rec.start();
     setTimeout(function(){ if(rec.state==='recording') rec.stop(); }, 60000);
-  }).catch(function(){ botT('Не дали доступ к микрофону.',300); });
+  }).catch(function(){ botT('Не дали доступ к микрофону — напишите текстом.',300); });
 }
 /* Озвучка ответа. Сначала пробуем голос самого браузера — он есть почти везде
    и ничего не стоит. Если браузер не умеет, просим сервер собрать аудио. */
@@ -3877,9 +3971,12 @@ function speak(btn, text){
 }
 
 (function(){
+  /* Микрофон показываем только там, где он действительно работает: браузер
+     умеет записывать звук. Мёртвой кнопки быть не должно. */
   try{
-    if(navigator.mediaDevices && window.MediaRecorder){
-      var b=document.getElementById('chatMic'); if(b) b.hidden=false;
+    if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder){
+      var b=document.getElementById('chatMic');
+      if(b){ b.hidden=false; b.title='Записать голосовое'; }
     }
   }catch(e){}
 })();
@@ -6117,7 +6214,7 @@ addEventListener('keydown',function(e){
 /* ===== EXPORT (inline handlers) ===== */
 window.setLang=setLang;window.toggleNav=toggleNav;
 window.openQuiz=openQuiz;window.closeQuiz=closeQuiz;window.quizNext=quizNext;window.quizBack=quizBack;window.pickQuiz=pickQuiz;
-window.t=t;window.toggleFab=toggleFab;window.renderMapReal=renderMapReal;window.openChat=openChat;window.closeChat=closeChat;window.clearChat=clearChat;window.sendFree=sendFree;window.closeChatToProp=closeChatToProp;window.askAssistant=askAssistant;
+window.chatVoice=chatVoice;window.voiceBubble=voiceBubble;window.playAudio=playAudio;window.playSpeech=playSpeech;window.botVoice=botVoice;window.t=t;window.toggleFab=toggleFab;window.renderMapReal=renderMapReal;window.openChat=openChat;window.closeChat=closeChat;window.clearChat=clearChat;window.sendFree=sendFree;window.closeChatToProp=closeChatToProp;window.askAssistant=askAssistant;
 window.openRentRequest=openRentRequest;window.requestService=requestService;
 window.checkAvailability=checkAvailability;window.resetAvailability=resetAvailability;window.resetRentFilters=resetRentFilters;window.pushLead=pushLead;
 window.scrollCar=scrollCar;window.toggleFilter=toggleFilter;window.onSaleSearch=onSaleSearch;window.setSaleSort=setSaleSort;window.toggleFavOnly=toggleFavOnly;
