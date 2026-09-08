@@ -5406,18 +5406,27 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     if(j.findings) h+='<p class="sub" style="margin:8px 0 0">'+esc(j.findings)+'</p>';
     h+='<p class="sub" style="margin:8px 0 0">Папка: <a href="'+esc(j.folder_url||'')+'" target="_blank" rel="noopener">открыть на Диске</a></p>';
     body.innerHTML=h;
-    if(j.status==='parsed'){
+    /* «Папка закрыта» тоже надо чем-то закрыть — иначе строка висит вечно
+       (Эльнур 08.09: «как нам снять уведомление вечное»). */
+    if(j.status==='parsed' || j.status==='error'){
       var bar=document.createElement('div'); bar.className='clbar';
+      var bad=(j.status==='error');
       var ok=document.createElement('button'); ok.type='button'; ok.className='btn'; ok.textContent='Принять';
-      var no=document.createElement('button'); no.type='button'; no.className='btn ghost'; no.textContent='Отклонить';
+      var no=document.createElement('button'); no.type='button'; no.className='btn ghost';
+      no.textContent = bad ? 'Убрать' : 'Отклонить';
+      if(bad) ok.style.display='none';   /* принимать нечего: папка не открылась */
       var st2=document.createElement('span'); st2.className='sub';
       function go(yes,btn){
         btn.disabled=true; st2.textContent='Сохраняем…';
         post({action:'intake_decide',token:TOKEN,id:j.id,ok:yes}).then(function(r){
-          if(r&&r.ok){ st2.textContent = yes
-            ? ('Принято. Папка закреплена за объектом'+(r.linked?'':' (ссылка уже была)')+
-               ', снимки заберём при ближайшей выгрузке.')
-            : 'Отклонено.';
+          if(r&&r.ok){ st2.textContent = !yes ? (bad?'Убрали из списка.':'Отклонено.')
+            : (r.property_id
+               ? ('Принято. Папка закреплена за объектом'+(r.linked?'':' — ссылка там уже была')+
+                  ', снимки заберём при ближайшей выгрузке.')
+               /* объект появляется только после публикации заявки — так и говорим,
+                  а не обещаем снимки, которым некуда лечь */
+               : 'Принято. Объект ещё не заведён: опубликуйте заявку ниже, в «Заявках с сайта», — '+
+                 'после этого снимки лягут в карточку.');
             setTimeout(loadIntake,900);
           } else { st2.textContent=(r&&r.error)||'не сохранилось'; btn.disabled=false; }
         })['catch'](function(){ st2.textContent='сеть не ответила'; btn.disabled=false; });
