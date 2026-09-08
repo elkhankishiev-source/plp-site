@@ -328,7 +328,7 @@
    "name": "HYTHE by Botanica",
    "district": "Лаян",
    "type": "Кондо",
-   "price_from": null,
+   "price_from": 10994860,
    "units": [
     {
      "тип": "1 спальня",
@@ -480,7 +480,7 @@
    "name": "Manor",
    "district": "Банг Тао",
    "type": "Вилла",
-   "price_from": 26900000,
+   "price_from": 28500000,
    "units": []
   },
   {
@@ -784,7 +784,7 @@
    "name": "Zenithy La Ville · Oasis Collection",
    "district": "Ко Кео",
    "type": "Вилла",
-   "price_from": 20940000,
+   "price_from": 26530500,
    "units": []
   },
   {
