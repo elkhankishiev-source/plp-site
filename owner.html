@@ -1490,6 +1490,31 @@ html,*{-webkit-tap-highlight-color:transparent}
   .header .burger{width:36px;height:36px}
 }
 
+/* Путь владельца: пронумерованные этапы, пройденное отмечено */
+.path{border:1px solid rgba(var(--ink-rgb),.10);border-radius:16px;padding:16px 18px;
+  background:var(--warm);margin:14px 0 4px}
+.path-lead{margin:0 0 4px;font-weight:600}
+.path-l{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:2px;counter-reset:none}
+.path-l li{display:flex;gap:12px;align-items:flex-start;padding:10px 0;
+  border-bottom:1px solid rgba(var(--ink-rgb),.06)}
+.path-l li:last-child{border-bottom:0}
+.path-n{flex:none;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-size:13px;font-weight:700;
+  background:rgba(var(--ink-rgb),.07);color:var(--dim)}
+.path-l li.ok .path-n{background:var(--green);color:var(--on-green)}
+.path-l li.now .path-n{background:var(--ink-block);color:var(--on-ink)}
+.path-t{display:flex;flex-direction:column;gap:2px;min-width:0}
+.path-t .sub{font-size:12.5px}
+.path-l li.wait .path-t b,.path-l li.wait .path-t .sub{color:var(--dim)}
+.path-l li.now .path-t b{color:var(--ink)}
+.path-t .lnk{margin-top:4px;align-self:flex-start}
+/* Строка уведомления: слева суть, справа чем её закрыть */
+.bell-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;width:100%;
+  padding:10px 12px;border:1px solid rgba(var(--ink-rgb),.10);border-radius:12px;
+  background:var(--warm);margin-bottom:8px;text-align:left}
+.bell-go{flex:1;min-width:180px;display:flex;flex-direction:column;cursor:pointer}
+.bell-go u{text-decoration:none;font-size:12px;color:var(--dim)}
+.bell-acts{display:flex;gap:6px;flex-wrap:wrap;flex:none}
 /* Карточка на плюсик: заголовок виден всегда, содержимое раскрывается */
 details.fold>summary{cursor:pointer;list-style:none;display:flex;align-items:baseline;gap:8px}
 details.fold>summary::-webkit-details-marker{display:none}
@@ -3591,6 +3616,8 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         if(rsl){ e.preventDefault();
           resaleForm(rsl.getAttribute('data-resale'), rsl.getAttribute('data-goal')||''); return; }
         /* правка и удаление операции: строку можно поправить прямо в таблице */
+        var pg=t.closest && t.closest('.path-go');
+        if(pg){ e.preventDefault(); cabPage(pg.getAttribute('data-go')); return; }
         var need=t.closest && t.closest('[data-need]');
         if(need){ e.preventDefault();
           var fi=document.getElementById('doc-file');
@@ -4253,6 +4280,60 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
            '<p class="sub" style="margin:10px 0 0">Нажмите на заезд — подробности и что можно сделать.</p></div>';
   }
 
+  /* ===== ПУТЬ ВЛАДЕЛЬЦА =====
+     Эльнур 08.09: «прежде всего мы сопровождаем владельца на подписание, чтобы он
+     подписал, договор у нас уже есть, инструкцию сопровождения мы даём. Когда
+     клиент заходит, текст для него такой: если хотите, чтобы ваш объект приносил
+     вам пассивный доход, необходимо пройти следующие этапы, и перечисляем что
+     надо, по порядку».
+     Этапы не выдуманы: каждый отмечается по тому, что реально есть в базе. */
+  function ownerPath(p){
+    p=p||{};
+    var ct=p.contract||{}, docs=p.docs||[], rates=p.rates||[], bk=p.bookings||[], st=p.statements||[];
+    var hasPhoto=!!((p.media&&(p.media.gallery||[]).length)||p.photo);
+    var hasContract=!!(ct.status==='active');
+    var hasPack=!!(rates.length || docs.some(function(d){
+      return /опись|инструкц|правил|inventory|house\s*rules/i.test(String(d.title||'')); }));
+    var onSite=!!p.on_site;
+    var hasBooking=bk.some(function(b){ return b.status!=='cancelled'; });
+    var hasReport=st.length>0;
+    var steps=[
+      {t:'Знакомство и осмотр',
+       d:'Смотрим объект: состояние, что уже есть из мебели и техники, какие снимки годятся для витрины.',
+       ok:hasPhoto, now:!hasPhoto},
+      {t:'Договор управления',
+       d:'Берёте шаблон, подписываете, подписанный загружаете здесь же. Без него бронь по объекту не проходит.',
+       ok:hasContract, now:hasPhoto&&!hasContract, go:'contract'},
+      {t:'Готовим объект к гостям',
+       d:'Опись имущества, комплект белья и посуды, инструкции для гостей, ключи и доступы, ставки за ночь.',
+       ok:hasPack, now:hasContract&&!hasPack, go:'docs'},
+      {t:'Объект на витрине',
+       d:'Собираем карточку: снимки, описание, цены и календарь. Ссылку можно отправлять клиентам.',
+       ok:onSite, now:hasPack&&!onSite},
+      {t:'Первые брони',
+       d:'Заезды приходят к нам, вы видите их в кабинете. Делать ничего не нужно — мы ведём гостя сами.',
+       ok:hasBooking, now:onSite&&!hasBooking, go:'calendar'},
+      {t:'Отчёт и выплата',
+       d:'Раз в месяц: что пришло, что потрачено, сколько к выплате. Отчёт можно распечатать или сохранить в PDF.',
+       ok:hasReport, now:hasBooking&&!hasReport, go:'docs'}
+    ];
+    var doneN=steps.filter(function(x){return x.ok;}).length;
+    if(doneN===steps.length) return '';   /* всё пройдено — не мозолим глаза */
+    var h='<div class="path"><p class="path-lead">Чтобы объект приносил пассивный доход, '+
+      'нужно пройти несколько этапов. Мы ведём вас по ним — от вас только подпись и ключи.</p>'+
+      '<p class="sub">Пройдено '+doneN+' из '+steps.length+'.</p><ol class="path-l">';
+    steps.forEach(function(x,i){
+      h+='<li class="'+(x.ok?'ok':(x.now?'now':'wait'))+'">'+
+         '<span class="path-n">'+(x.ok?'✓':(i+1))+'</span>'+
+         '<span class="path-t"><b>'+esc(x.t)+'</b><span class="sub">'+esc(x.d)+'</span>'+
+         (x.now&&x.go==='contract'
+            ? ('<button type="button" class="btn-mini" data-uk="book" data-pid="'+(p.id||'')+
+               '" style="margin-top:6px">Взять шаблон и подписать</button>')
+            : (x.now&&x.go ? ('<a href="#" class="lnk path-go" data-go="'+x.go+'">Перейти</a>') : ''))+
+         '</span></li>';
+    });
+    return h+'</ol></div>';
+  }
   function renderPortfolio(){
     var t=DATA.totals, o=DATA.owner||{};
     if(!t){ $('portfolio').innerHTML=''; return; }
@@ -4265,6 +4346,10 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     var first = me.split(/\s+/)[0] || '';
     var ini = first ? first.slice(0,1).toUpperCase() : '·';
 
+    /* Путь владельца — сразу под приветствием: человек должен видеть,
+       что от него нужно, а не искать это по разделам. */
+    var pathHtml='';
+    try{ pathHtml=ownerPath((DATA.properties||[])[CUR]); }catch(e){}
     /* 1. Шапка: надзаголовок, приветствие, действие и аватар.
        Эльнур 08.09: «выбираю лида Константина — он мне пишет доброе утро,
        Константин, но я-то Эльнур». Сотрудник остаётся собой и видит, чей
@@ -4283,6 +4368,8 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
          спрятана в соответствующем блоке» — в шапке остаётся только отчёт. */
         '<button type="button" class="btn-mini" id="ov-report">Скачать отчёт</button>'+
         '<span class="ava">'+esc(ini)+'</span></div></div>';
+
+    h+=pathHtml;
 
     /* 2. Какой объект показываем */
     var addr=[p.district, p.bedrooms?('спален: '+p.bedrooms):'', p.stage].filter(Boolean).join(' · ');
@@ -7298,20 +7385,36 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       (p.bookings||[]).forEach(function(b){
         if(b.status==='hold')
           out.push({tab:'calendar',t:'Бронь ждёт подтверждения',s:obj+' · '+dmy(b.check_in)+
-                    (b.check_out?(' — '+dmy(b.check_out)):'')+(b.guest_name?(' · '+b.guest_name):'')});
+                    (b.check_out?(' — '+dmy(b.check_out)):'')+(b.guest_name?(' · '+b.guest_name):''),
+                    act:[{t:'Подтвердить',a:'book_ok',id:b.booking_id,pid:p.id,
+                          ci:b.check_in,co:b.check_out,who:b.guest_name},
+                         {t:'Снять',a:'book_cancel',id:b.booking_id,pid:p.id,
+                          ci:b.check_in,co:b.check_out,who:b.guest_name}]});
         /* Эльнур 06.09: «если ничего нового, всё разобрано — зачем колокольчик горит».
            Будущий заезд не требует действия: это расписание, а не уведомление. */
       });
       (p.requests||[]).forEach(function(r){
-        if(!r.done_at) out.push({tab:'actions',t:'Заявка без ответа',s:obj+' · '+(r.kind||r.title||'запрос')});
+        if(!r.done_at) out.push({tab:'actions',t:'Заявка без ответа',
+          s:obj+' · '+(KINDS[r.kind]||r.kind||r.title||'запрос'),
+          act:r.id?[{t:'Закрыть',a:'req_done',id:r.id},{t:'Отменить',a:'req_cancel',id:r.id}]:null});
       });
-      (p.services||p.works||[]).forEach(function(w){
+      (p.services||p.works||p.tasks||[]).forEach(function(w){
         /* только просроченные работы: открытая работа со сроком в будущем — план, а не тревога */
         var over = w.due_date && String(w.due_date).slice(0,10) < new Date().toISOString().slice(0,10);
         if(w.status && w.status!=='done' && over)
-          out.push({tab:'service',t:'Работа просрочена',s:obj+' · '+(w.kind||'работа')+
-                    (w.due_date?(' до '+dmy(w.due_date)):'')});
+          out.push({tab:'service',t:'Работа просрочена',s:obj+' · '+(KINDS[w.kind]||w.kind||'работа')+
+                    (w.due_date?(' до '+dmy(w.due_date)):''),
+                    /* Эльнур 08.09: «если есть апрув, то должен быть и удалить,
+                       как нам снять уведомление вечное». Закрыть можно прямо тут. */
+                    act:[{t:'Сделано',a:'task_done',id:w.id,cost:w.cost_thb},
+                         {t:'Снять',a:'task_del',id:w.id}]});
       });
+    });
+    (DATA.requests||[]).forEach(function(r){
+      if(r.status==='done'||r.status==='cancelled') return;
+      out.push({tab:'actions',t:'Заявка без ответа',
+        s:(KINDS[r.kind]||r.kind||'запрос')+(r.plp_property_id?(' · '+r.plp_property_id):''),
+        act:r.id?[{t:'Закрыть',a:'req_done',id:r.id},{t:'Отменить',a:'req_cancel',id:r.id}]:null});
     });
     (DATA.moderation||[]).forEach(function(m){
       /* уже опубликованные и отклонённые внимания не ждут */
@@ -7320,6 +7423,24 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       out.push({tab:'staff',t:'Заявка с сайта на модерации',s:(m.address||m.name||'новый объект')});
     });
     return out;
+  }
+  var BELL_ACT={};
+  /* Действия из окна уведомлений: закрыть работу, заявку или бронь — не уходя
+     в раздел. Эльнур 08.09: «как нам снять уведомление вечное». */
+  function bellDo(a){
+    if(a.a==='task_done')
+      return post({action:'uk_task_done',token:TOKEN,id:a.id,cost:(a.cost||'')});
+    if(a.a==='task_del')
+      return post({action:'uk_task_delete',token:TOKEN,id:a.id});
+    if(a.a==='req_done')
+      return post({action:'request_set',token:TOKEN,id:a.id,status:'done'});
+    if(a.a==='req_cancel')
+      return post({action:'request_set',token:TOKEN,id:a.id,status:'cancelled'});
+    if(a.a==='book_ok'||a.a==='book_cancel')
+      return post({action:'uk_booking_save',token:TOKEN,property_id:a.pid,booking_id:a.id,
+                   check_in:a.ci,check_out:a.co,guest:a.who,
+                   status:(a.a==='book_ok'?'upcoming':'cancelled')});
+    return Promise.resolve({ok:false,error:'не понял действие'});
   }
   function bellOpen(){
     var items=bellItems();
@@ -7331,17 +7452,37 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
              '<div class="fbtns"><button type="button" class="btn ghost" id="f-cancel">Закрыть</button></div>');
       return;
     }
-    var rows=items.slice(0,20).map(function(it){
-      return '<button type="button" class="bell-row" data-go="'+it.tab+'">'+
-             '<span><b>'+clEsc(it.t)+'</b><u>'+clEsc(it.s)+'</u></span><i>→</i></button>';
+    BELL_ACT={};
+    var rows=items.slice(0,20).map(function(it,n){
+      var acts='';
+      (it.act||[]).forEach(function(a,k){
+        var key='b'+n+'_'+k; BELL_ACT[key]=a;
+        acts+='<button type="button" class="btn-mini bell-do" data-k="'+key+'">'+clEsc(a.t)+'</button>';
+      });
+      return '<div class="bell-row" data-go="'+it.tab+'">'+
+             '<span class="bell-go" data-go="'+it.tab+'"><b>'+clEsc(it.t)+'</b><u>'+clEsc(it.s)+'</u></span>'+
+             '<span class="bell-acts">'+acts+'<button type="button" class="btn-mini ghost bell-open" '+
+             'data-go="'+it.tab+'">Открыть</button></span></div>';
     }).join('');
-    clForm('<h3>Что ждёт внимания</h3><div class="bell-list">'+rows+'</div>'+
+    clForm('<h3>Что ждёт внимания</h3>'+
+      '<p class="sub">Каждое уведомление можно закрыть прямо здесь — тогда оно и погаснет.</p>'+
+      '<div class="bell-list">'+rows+'</div>'+
       '<div class="fbtns"><button type="button" class="btn ghost" id="f-cancel">Закрыть</button></div>');
-    Array.prototype.forEach.call(document.querySelectorAll('.bell-row'),function(b){
+    Array.prototype.forEach.call(document.querySelectorAll('.bell-open,.bell-go'),function(b){
       b.onclick=function(){
         var box=document.getElementById('cl-form');
         if(box){ box.innerHTML=''; document.body.style.overflow=''; }
         cabPage(b.getAttribute('data-go'));
+      };
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('.bell-do'),function(b){
+      b.onclick=function(){
+        var a=BELL_ACT[b.getAttribute('data-k')]; if(!a) return;
+        b.disabled=true; b.textContent='…';
+        bellDo(a).then(function(r){
+          if(r&&r.ok){ reload(); setTimeout(function(){ try{ bellOpen(); }catch(e){} },900); }
+          else { b.disabled=false; b.textContent=a.t; say((r&&r.error)||'Не вышло'); }
+        });
       };
     });
   }
