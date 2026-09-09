@@ -40,7 +40,7 @@ KINDS = {
 ORDER = ['cover', 'exterior', 'interior', 'facilities', 'master', 'plans', 'progress']
 IMG = re.compile(r'\.(jpe?g|png|webp|heic)$', re.I)
 MAX_W = 2000          # шире держать незачем: витрина отдаёт превью 760–1600
-MAX_BYTES = 900_000   # тяжелее — пережимаем, чтобы не жечь место и трафик
+MAX_BYTES = 500_000   # 09.09: опущен с 900k — хранилище было занято на 69%, средний файл ~350k
 
 
 def looks_like_image(data: bytes) -> bool:
