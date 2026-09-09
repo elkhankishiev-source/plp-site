@@ -3642,6 +3642,7 @@ function getSource(){var s={};try{s=JSON.parse(sessionStorage.getItem('pl_source
 /* ===== LEAD PIPELINE (мин. квалификация → amoCRM через n8n) ===== */
 /* Низкопривилегированный ключ ТОЛЬКО для формы сайта — не мастер, можно в публичном коде. */
 var LEAD_ENDPOINT='https://proplib.app.n8n.cloud/webhook/site-lead?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7';
+var CTX_ENDPOINT='https://proplib.app.n8n.cloud/webhook/site-context?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7';
 var VOICE_ENDPOINT='https://proplib.app.n8n.cloud/webhook/site-voice?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7',
       CHAT_ENDPOINT='https://proplib.app.n8n.cloud/webhook/site-chat?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7';
 var AVAIL_ENDPOINT='https://proplib.app.n8n.cloud/webhook/check-availability?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7';
@@ -3750,6 +3751,28 @@ function pushLead(p){
 }
 /* Реальная отправка в n8n → brain_core → amoCRM (3 воронки: Продажа/Аренда/УК).
    Content-Type: text/plain — иначе CORS preflight, который вебхук не обрабатывает. */
+/* 09.09: переход в бота с переносом контекста. Ключ просим только когда есть
+   что переносить: объект, цель или бюджет. Пустую ссылку не даём, в боте с ней
+   всё равно начинать сначала. Готовую ссылку кладём в botLink и подставляем
+   там, где предлагаем бота. */
+var botLink='https://t.me/elnurphuket_bot';
+function botLinkWithContext(extra){
+  var ctx=Object.assign({
+    object_id:(pendingIntent&&pendingIntent.property_id)||null,
+    goal:(pendingIntent&&pendingIntent.goal)||lastTopic||null,
+    last_topic:lastTopic||null,
+    funnel:(pendingIntent&&pendingIntent.funnel)||null,
+    dates:(typeof rentSelDates!=='undefined'&&rentSelDates)?rentSelDates:null,
+    viewed:viewedList().slice(0,5),
+    page:location.href
+  }, extra||{});
+  var has=['object_id','goal','budget','district','dates','last_topic'].some(function(k){return ctx[k];});
+  if(!has) return Promise.resolve(botLink);
+  return fetch(CTX_ENDPOINT,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(ctx)})
+    .then(function(r){return r.json();})
+    .then(function(d){ return (d&&d.ok&&d.url)?d.url:botLink; })
+    ['catch'](function(){ return botLink; });
+}
 function sendLead(lead,p){
   var contact=(lead.contact||'').trim();
   // Клик-намерение без контакта (Получить КП / Смотреть / подборка / сравнение / район / бронь):
@@ -3934,6 +3957,15 @@ function showLead(){
     f.remove();me(t('lead.sent'));var gv=goal.value,bv=budget.value;
     lead.__send.then(function(){
       bot(t('chat.thanks'));
+      /* ссылка в бота с перенесённым контекстом: человек продолжит там,
+         где остановился, а не начнёт заново */
+      botLinkWithContext({goal:gv,budget:bv,funnel:lead.funnel,object_id:lead.property_id})
+        .then(function(u){
+          if(u && u.indexOf('start=ctx')>0){
+            var d=bot('',true); d.innerHTML='Продолжить в Telegram: <a class="lnk" href="'+
+              escHtml(u)+'" target="_blank" rel="noopener">открыть консьержа</a>';
+          }
+        });
       note('amoCRM · '+lead.funnel_title+' · '+(lead.utm_source||lead.referrer||'direct')+(lead.property_id?(' · '+lead.property_id):'')+' · '+gv+'/'+bv);
     }).catch(function(){bot(t('chat.neterr'));});
   };
