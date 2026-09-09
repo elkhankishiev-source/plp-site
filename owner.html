@@ -2404,6 +2404,13 @@ body{background:var(--bg)}
         </div>
         <div id="m-count" class="sub" style="margin:8px 0 0"></div>
       </div>
+      <div id="tq-wrap" class="intake" style="display:none">
+        <h4 style="margin:0 0 6px">Лента касаний</h4>
+        <p class="sub" style="margin:0 0 10px">Что двойник собирается написать сам: прогрев, напоминание,
+        повод. Ответы на входящие сюда не попадают, там человек ждёт и медлить нельзя.
+        Отправляется только то, что вы утвердили.</p>
+        <div id="tq-list"></div>
+      </div>
       <div id="in-wrap" class="intake" style="display:none">
         <h4 style="margin:0 0 6px">Разбор папок</h4>
         <p class="sub" style="margin:0 0 10px">Собственник прислал одну ссылку — система сама раскрыла
@@ -5443,6 +5450,52 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
      система, решает человек: полный автомат нам уже трижды выходил боком. */
   var IN_RU={exterior:'фасады и виды',interior:'интерьеры',plans:'планировки',
              master:'генплан',facilities:'инфраструктура',other:'без разбора'};
+  /* 09.09 Эльнур: «нужен рычаг управления двойником, чтобы он не пошёл не туда».
+     Проактивное касание сначала ложится черновиком, здесь его видно и можно
+     поправить текст или снять до отправки. */
+  function loadTouch(){
+    var w=document.getElementById('tq-wrap'), box=document.getElementById('tq-list');
+    if(!w||!box) return;
+    post({action:'touch_list',token:TOKEN,status:'draft'}).then(function(d){
+      var rows=(d&&d.ok&&d.rows)||[];
+      if(!rows.length){ w.style.display='none'; return; }
+      w.style.display=''; box.innerHTML='';
+      rows.forEach(function(r){ box.appendChild(touchCard(r)); });
+    })['catch'](function(){ w.style.display='none'; });
+  }
+  function touchCard(r){
+    var d=document.createElement('div'); d.className='msub';
+    var who=(r.name||r.code||r.phone||'—');
+    var ta=document.createElement('textarea');
+    ta.className='cmtext'; ta.rows=3; ta.value=r.body||'';
+    var head=document.createElement('div'); head.className='ms-t';
+    head.innerHTML='<b>'+esc(who)+'</b><u>'+esc(r.occasion||'без повода')+' · '+
+      esc(r.channel==='telegram'?'Telegram':'WhatsApp')+(r.phone?(' · '+esc(r.phone)):'')+'</u>';
+    var msg=document.createElement('div'); msg.className='sub';
+    var btns=document.createElement('div'); btns.className='fbtns';
+    function act(decision, body){
+      btns.querySelectorAll('button').forEach(function(b){ b.disabled=true; });
+      msg.textContent='Записываю…';
+      post({action:'touch_decide',token:TOKEN,id:r.id,decision:decision,body:body||''}).then(function(x){
+        if(x&&x.ok){ msg.textContent = decision==='approve' ? 'Утверждено, уйдёт ближайшей отправкой.'
+                                     : decision==='cancel' ? 'Снято, не отправим.' : 'Текст сохранён.';
+          if(decision!=='edit') setTimeout(loadTouch, 800);
+          else btns.querySelectorAll('button').forEach(function(b){ b.disabled=false; });
+        } else { msg.textContent=(x&&x.error)||'Не вышло';
+          btns.querySelectorAll('button').forEach(function(b){ b.disabled=false; }); }
+      })['catch'](function(){ msg.textContent='Сеть не ответила';
+        btns.querySelectorAll('button').forEach(function(b){ b.disabled=false; }); });
+    }
+    var bOk=document.createElement('button'); bOk.type='button'; bOk.className='btn'; bOk.textContent='Отправить';
+    bOk.onclick=function(){ act('edit', ta.value.trim()); setTimeout(function(){ act('approve'); }, 400); };
+    var bEd=document.createElement('button'); bEd.type='button'; bEd.className='btn ghost'; bEd.textContent='Сохранить текст';
+    bEd.onclick=function(){ act('edit', ta.value.trim()); };
+    var bNo=document.createElement('button'); bNo.type='button'; bNo.className='btn ghost'; bNo.textContent='Снять';
+    bNo.onclick=function(){ act('cancel'); };
+    btns.appendChild(bOk); btns.appendChild(bEd); btns.appendChild(bNo);
+    d.appendChild(head); d.appendChild(ta); d.appendChild(btns); d.appendChild(msg);
+    return d;
+  }
   function loadIntake(){
     var w=document.getElementById('in-wrap'), box=document.getElementById('in-list');
     if(!w||!box) return;
@@ -5521,6 +5574,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     var box=document.getElementById('m-list'); if(!box) return;
     box.innerHTML='<p class="sub">Загружаем…</p>';
     loadIntake();
+    loadTouch();
     post({action:'mod_list',token:TOKEN,status:MOD_STATUS}).then(function(d){
       if(!d||!d.ok){ box.innerHTML='<p class="sub">Не удалось загрузить заявки.</p>'; return; }
       var items=d.items||[];
