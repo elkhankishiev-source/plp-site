@@ -180,6 +180,36 @@ check('рассылка: каналы', {'action': 'camp_channels'}, want_key='r
 check('модерация объектов', {'action': 'mod_list'}, want_key='rows')
 check('разбор папок', {'action': 'intake_list'}, want_key='rows')
 check('лента касаний', {'action': 'touch_list', 'status': 'draft'}, want_key='rows')
+
+# 09.09: фирменные документы. Проверяем, что бланк собирается и не пуст —
+# молча сломанный отчёт замечают только когда его уже отправили клиенту.
+print('\n— фирменные документы —')
+import urllib.request as _u
+_UK = ''
+try:
+    import re as _re, pathlib as _pl, json as _json
+    _k = _re.search(r'API_KEY = "([^"]+)"', _pl.Path.home().joinpath('plp_diag.py').read_text()).group(1)
+    _v = _json.load(_u.urlopen(_u.Request('https://proplib.app.n8n.cloud/api/v1/variables?limit=100',
+                                          headers={'X-N8N-API-KEY': _k})))['data']
+    _UK = {x['key']: x['value'] for x in _v}.get('PLP_UK_KEY', '')
+except Exception:
+    _UK = ''
+
+def _doc(label, qs, must):
+    global fail_count
+    try:
+        h = _u.urlopen('https://proplib.app.n8n.cloud/webhook/document?key=%s&%s' % (_UK, qs), timeout=60).read().decode()
+        ok = must in h and len(h) > 1500
+        print(('✅ ' if ok else '❌ ') + label + (' ' if ok else ' — не собрался'))
+        if not ok:
+            fail_count += 1
+    except Exception as e:
+        fail_count += 1
+        print('❌ ' + label + ' — ' + str(e)[:60])
+if _UK:
+    _doc('годовой свод', 'type=year&property_id=%s&year=2026' % DEMO_OBJ, 'ГОДОВОЙ СВОД')
+else:
+    print('… ключ УК не получен, документы не проверял')
 check('каноны', {'action': 'canon'}, want_key='rows')
 
 print('\nитог: работает %d, сломано %d' % (ok_count, fail_count))
