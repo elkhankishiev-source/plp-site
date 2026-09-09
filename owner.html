@@ -4476,8 +4476,13 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
 
     /* 2. Какой объект показываем */
     var addr=[p.district, p.bedrooms?('спален: '+p.bedrooms):'', p.stage].filter(Boolean).join(' · ');
+    /* 🔴 09.09 Эльнур: «почему сразу объект подписан, хотя я его не выбирал».
+       У штаба в кабинете все объекты, и первый открывался молча — выглядело
+       так, будто он назначен. Говорим прямо: это выбор, и его можно сменить. */
+    var _staffPick = (DATA.owner && DATA.owner.is_staff===true && t.properties>1);
     h+='<div class="ov-obj"><span class="eyebrow">'+
-        (t.properties>1?'Объект '+(CUR+1)+' из '+t.properties:'Ваш объект')+
+        (_staffPick ? ('Открыт объект '+(CUR+1)+' из '+t.properties+' — выберите нужный в шапке')
+                    : (t.properties>1?'Объект '+(CUR+1)+' из '+t.properties:'Ваш объект'))+
         (p.id?' · '+esc(p.id):'')+'</span>'+
       '<h2>'+esc(p.name||'—')+'</h2>'+
       (addr?'<p class="sub">'+esc(addr)+'</p>':'')+'</div>';
