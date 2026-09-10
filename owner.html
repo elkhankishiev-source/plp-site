@@ -1928,6 +1928,18 @@ body{background:var(--bg)}
 
 .lnk.danger{color:#a33}
 .cmpacts{white-space:nowrap}
+
+.filters{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chipf{display:inline-block;max-width:100%;padding:4px 10px;border:1px solid var(--line,#dcdcd2);
+  border-radius:999px;cursor:pointer;font-size:13px;line-height:1.3;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;user-select:none}
+.chipf.on{background:var(--brand,#D2D5B3);border-color:var(--brand,#D2D5B3);font-weight:600}
+.hintline{display:block;margin:8px 0 0;font-size:13px;line-height:1.45;color:var(--muted,#75786a);
+  overflow-wrap:anywhere}
+.pickbulk{display:flex;gap:12px;align-items:center;padding:6px 10px;border-bottom:1px solid var(--line,#e6e5dd)}
+.pickbulk .lnk{background:none;border:0;padding:0;cursor:pointer;font-size:13px}
+.picknum{margin-left:auto;font-size:12px;color:var(--muted,#75786a)}
+.cmtext{width:100%;box-sizing:border-box;resize:vertical}
 </style>
 <!-- Leaflet подгружается только при открытии раздела с картой: см. ensureLeaflet() -->
 </head>
@@ -2850,6 +2862,9 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     if(fw) fw.style.display=(id==='app')?'':'none';
   }
   function post(body){
+    /* подменяемая точка для проверок: тест подставляет свои ответы и кликает
+       по форме, не трогая живые сценарии. В бою хука нет и путь обычный. */
+    if(window.__postStub) return Promise.resolve(window.__postStub(body));
     return fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})
       .then(function(r){return r.json();});
   }
@@ -6522,6 +6537,13 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       '<button type="button" class="pickbtn"><span class="pickval"></span><span class="pickarr">▾</span></button>'+
       '<div class="pickdrop" hidden>'+
         '<input type="search" class="picksearch" placeholder="начните вводить">'+
+        /* 🔴 10.09 Эльнур: «нужна кнопка отметить всех, отменить всех, чтобы
+           не тыкать по одному». Отмечаем ровно то, что сейчас видно в списке:
+           если человек искал — отметятся найденные, а не вся база. */
+        (opts.multi ? '<div class="pickbulk">'+
+            '<button type="button" class="lnk pickall">отметить всех</button>'+
+            '<button type="button" class="lnk picknone">снять всех</button>'+
+            '<span class="picknum"></span></div>' : '')+
         '<div class="picklist"></div>'+
       '</div>';
     var btn=el.querySelector('.pickbtn'), drop=el.querySelector('.pickdrop'),
@@ -6559,7 +6581,20 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         return !q || (it.title+' '+(it.sub||'')).toLowerCase().indexOf(q)>=0; });
       drawRows(rows, q);
     }
+    var lastRows=[];
+    function bulkWire(){
+      var a=el.querySelector('.pickall'), n=el.querySelector('.picknone');
+      if(a) a.onclick=function(e){ e.preventDefault();
+        lastRows.forEach(function(it){ chosen[String(it.id)]=1; }); paint(); draw(); };
+      if(n) n.onclick=function(e){ e.preventDefault(); chosen={}; paint(); draw(); };
+    }
+    function bulkNum(){
+      var s2=el.querySelector('.picknum');
+      if(s2) s2.textContent='выбрано: '+Object.keys(chosen).length;
+    }
     function drawRows(rows, q){
+      lastRows=rows||[];
+      bulkWire(); bulkNum();
       if(!rows.length){
         list.innerHTML='<div class="pickempty">'+
           (opts.remote && (q||'').length>=2 ? 'ищем в базе…' : 'ничего не нашлось')+'</div>';
@@ -6578,7 +6613,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
           var id=b.getAttribute('data-id');
           if(opts.multi){ if(chosen[id]) delete chosen[id]; else chosen[id]=1; draw(); }
           else { chosen={}; chosen[id]=1; toggle(false); }
-          paint();
+          paint(); bulkNum();
           if(opts.onChange) opts.onChange(Object.keys(chosen));
         };
       });
@@ -6741,6 +6776,9 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
            (c.status==='running'
               ? ' · <a href="#" class="lnk cmp-stop" data-id="'+c.id+'">остановить</a>'
               : '')+
+           ((c.status==='draft'||c.status==='paused')
+              ? ' · <a href="#" class="lnk cmp-edit" data-id="'+c.id+'">изменить</a>'
+              : '')+
            ((c.status==='draft'||c.status==='approved'||c.status==='paused')
               ? ' · <a href="#" class="lnk danger cmp-del" data-id="'+c.id+'" data-name="'+clEsc(c.name)+'">удалить</a>'
               : '')+
@@ -6752,6 +6790,35 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       box.innerHTML=h+'</table>';
       Array.prototype.forEach.call(box.querySelectorAll('.cmp-open'),function(a){
         a.onclick=function(e){ e.preventDefault(); campOpen(a.getAttribute('data-id')); };
+      });
+      /* 🔴 10.09: черновик можно было только выбросить. Меняем название,
+         текст и темп; получателей не трогаем, текст им пересобирается. */
+      Array.prototype.forEach.call(box.querySelectorAll('.cmp-edit'),function(a){
+        a.onclick=function(e){ e.preventDefault();
+          var id=a.getAttribute('data-id');
+          post({action:'camp_preview',token:TOKEN,id:id,limit:1}).then(function(d){
+            var c=((d&&d.data)||{}).campaign||{};
+            clForm('<h3>Изменить рассылку</h3><div class="fgrid">'+
+              '<label class="wide">Название<input id="f-cname" type="text" value="'+clEsc(c.name||'')+'"></label>'+
+              '<label>Сколько в день<input id="f-cday" type="number" min="1" max="50" value="'+(c.per_day||20)+'"></label>'+
+              '</div><label class="wide">Текст<textarea id="f-ctext" class="cmtext" rows="8">'+
+              clEsc(c.template||'')+'</textarea></label>'+
+              '<p class="sub">Подстановки: {имя}, {объект}, {код}. Получатели останутся те же — '+
+              'текст им пересоберётся заново.</p>'+
+              '<div class="fbtns"><button type="button" class="btn" id="f-save">Сохранить</button>'+
+              '<button type="button" class="btn ghost" id="f-cancel">Отмена</button></div>',
+              function(){
+                post({action:'camp_edit',token:TOKEN,id:id,name:fv('f-cname'),
+                      template:document.getElementById('f-ctext').value,
+                      per_day:fv('f-cday')}).then(function(r){
+                  if(!r||r.ok===false){ say((r&&r.error)||'Не сохранилось'); return; }
+                  var f=document.getElementById('cl-form');
+                  if(f){ f.innerHTML=''; document.body.style.overflow=''; }
+                  say('Сохранили'); loadCamps();
+                });
+              });
+          });
+        };
       });
       Array.prototype.forEach.call(box.querySelectorAll('.cmp-del'),function(a){
         a.onclick=function(e){ e.preventDefault();
@@ -6781,6 +6848,9 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       });
     });
   }
+  /* даёт открыть форму рассылки из проверки, не заходя в кабинет —
+     тем же способом, что и конструктор оффера */
+  window.__campForm=function(){ return campForm(); };
   function campForm(){
     var box=document.getElementById('cmp-form');
     box.innerHTML='<div class="ccard"><p class="sub">Готовим…</p></div>';
@@ -6897,14 +6967,29 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       /* Нажали тег — тянем людей под ним с сервера и добавляем к получателям.
          Раньше кнопка «Все, кто купил» брала людей из уже загруженного списка
          по temp==='client' — а сервер на любой сегмент отдавал одних и тех же. */
+      /* 🔴 10.09 Эльнур: «выбрал загорелось, отменил и так же горит… по тегу
+         тоже не работает, и как понять кто в нём сидит, не показывает».
+         Тег теперь переключатель: второй клик снимает подсветку И убирает
+         людей, которых этот тег привёл. Под тегом показываем имена. */
+      var TAGGED={};   /* тег → коды людей, которых он добавил */
       Array.prototype.forEach.call(document.querySelectorAll('.cm-tag'),function(el){
         el.onclick=function(){
           var tag=el.getAttribute('data-tag');
           var note=document.getElementById('cm-tagnote');
+          if(el.classList.contains('on')){
+            var was=TAGGED[tag]||[];
+            var keep=pickWho.get().filter(function(c){ return was.indexOf(c)<0; });
+            pickWho.set(keep);
+            delete TAGGED[tag];
+            el.classList.remove('on');
+            note.textContent='Тег «'+tag+'» снят. Получателей осталось: '+keep.length+'.';
+            return;
+          }
           el.classList.add('on'); note.textContent='Собираем «'+tag+'»…';
           post({action:'camp_candidates',token:TOKEN,tag:tag,limit:500}).then(function(d){
             var rows=(d&&d.rows)||[];
             if(!rows.length){ el.classList.remove('on'); note.textContent='Под тегом «'+tag+'» никого нет.'; return; }
+            TAGGED[tag]=rows.map(function(r){ return r.code; });
             /* людей из тега может не быть в исходном списке — доносим их туда */
             var known={}; people.forEach(function(p){ known[p.code]=1; });
             rows.forEach(function(r){ if(!known[r.code]){ people.push(r); known[r.code]=1; } });
@@ -6912,8 +6997,11 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
               return { id:p.code, title:(p.name||'Без имени'),
                        sub:(TR[p.temp]||p.temp)+' · '+(p.phone||'') }; }));
             pickWho.add(rows.map(function(r){ return r.code; }));
-            note.textContent='Добавлено по тегу «'+tag+'»: '+rows.length+'. '+
-                             'Список получателей выше — там можно снять лишних.';
+            /* Показываем, КТО именно попал под тег: имена, а не только число */
+            var who=rows.slice(0,12).map(function(r){ return (r.name||r.code); }).join(', ');
+            note.innerHTML='<b>Тег «'+clEsc(tag)+'»: '+rows.length+' чел.</b> '+
+              clEsc(who)+(rows.length>12?(' и ещё '+(rows.length-12)):'')+
+              '. Нажмите тег ещё раз, чтобы снять их.';
           });
         };
       });
@@ -8302,6 +8390,30 @@ window.chatVoice=chatVoice;window.listenBar=listenBar;window.paintVoiceMode=pain
       ? (nav && nav.querySelector('a[data-tab="'+name+'"]')) : body2;
     cabScrollTo(target || body2);
   }
+  /* 🔴 10.09 Эльнур: «каждый пункт меню в моём кабинете лагает».
+     Замер: любой раздел — это запрос в n8n на 1–2 секунды, а первый заход в
+     кабинет тянет 113 КБ пять секунд. Пока ответ не пришёл, раздел выглядит
+     мёртвым. Лечим двумя способами: раздел сразу говорит «загружаем», и пока
+     человек читает первый экран, мы тихо, по одному, подтягиваем остальные —
+     к моменту нажатия данные уже лежат.
+     Грузим по одному: десять запросов разом кладут исполнителя n8n. */
+  function cabPrefetch(){
+    var queue=['camp','clients','board','mine','staff'];
+    (function next(){
+      var name=queue.shift();
+      if(!name) return;
+      if(CAB_LOADED[name]) return next();
+      CAB_LOADED[name]=1;
+      try{
+        if(name==='staff'){ loadModeration(); loadCoords(); loadOpenIssues(); }
+        else if(name==='clients') loadClients();
+        else if(name==='board') loadBoard();
+        else if(name==='camp') loadCamps();
+        else if(name==='mine') loadMine();
+      }catch(e){}
+      setTimeout(next, 1200);
+    })();
+  }
   /* прокрутка под липкую шапку: элемент встаёт сразу под ней, а не под неё */
   function cabScrollTo(el){
     if(!el || !el.getBoundingClientRect) return;
@@ -8483,6 +8595,8 @@ window.chatVoice=chatVoice;window.listenBar=listenBar;window.paintVoiceMode=pain
          или Telegram, пароль там вообще не нужен. Экран смены пароля больше не
          показываем; сменить его по желанию можно в настройках. */
       draw(); markStale(false);
+      /* пока человек смотрит первый экран — тихо подтягиваем остальные разделы */
+      setTimeout(function(){ try{ cabPrefetch(); }catch(e){} }, 1500);
       /* Справочник статей с тарифами — один раз на загрузку кабинета.
          Эльнур 08.09: «уже шаблонно должен быть список вариантов
          с зафиксированными тарифами». */
