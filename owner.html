@@ -1925,6 +1925,9 @@ body{background:var(--bg)}
 .pubname{font-weight:700;font-size:16px}
 .pubprice{font-weight:700}
 .pubbody .btn{align-self:flex-start;margin-top:4px}
+
+.lnk.danger{color:#a33}
+.cmpacts{white-space:nowrap}
 </style>
 <!-- Leaflet подгружается только при открытии раздела с картой: см. ensureLeaflet() -->
 </head>
@@ -6731,11 +6734,50 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
            '<td class="sub">'+clEsc(c['from']||'—')+'</td>'+
            '<td>'+(c['отправлено']||0)+' из '+(c['всего']||0)+'</td>'+
            '<td>'+(c['ждут']||0)+'</td><td>'+(c['не дошло']||0)+'</td>'+
-           '<td><a href="#" class="lnk cmp-open" data-id="'+c.id+'">открыть</a></td></tr>';
+           /* 🔴 10.09 Эльнур: «открыл рассылку — там сразу список на утверждение,
+              а как удалить, отменить». Действия видны прямо в строке, а не
+              где-то внутри. Что можно сделать — зависит от состояния. */
+           '<td class="cmpacts"><a href="#" class="lnk cmp-open" data-id="'+c.id+'">открыть</a>'+
+           (c.status==='running'
+              ? ' · <a href="#" class="lnk cmp-stop" data-id="'+c.id+'">остановить</a>'
+              : '')+
+           ((c.status==='draft'||c.status==='approved'||c.status==='paused')
+              ? ' · <a href="#" class="lnk danger cmp-del" data-id="'+c.id+'" data-name="'+clEsc(c.name)+'">удалить</a>'
+              : '')+
+           ((c.status==='paused'||c.status==='approved')&&(c['отправлено']||0)>0
+              ? ' · <a href="#" class="lnk cmp-close" data-id="'+c.id+'">закрыть</a>'
+              : '')+
+           '</td></tr>';
       });
       box.innerHTML=h+'</table>';
       Array.prototype.forEach.call(box.querySelectorAll('.cmp-open'),function(a){
         a.onclick=function(e){ e.preventDefault(); campOpen(a.getAttribute('data-id')); };
+      });
+      Array.prototype.forEach.call(box.querySelectorAll('.cmp-del'),function(a){
+        a.onclick=function(e){ e.preventDefault();
+          var nm=a.getAttribute('data-name')||'рассылку';
+          askYes('Удалить «'+nm+'»? Отправленного по ней нет, восстановить будет нельзя.',
+            function(){
+              post({action:'camp_delete',token:TOKEN,id:a.getAttribute('data-id')}).then(function(r){
+                say(r&&r.ok ? 'Удалили' : ((r&&r.error)||'Не получилось'));
+                document.getElementById('cmp-form').innerHTML='';
+                loadCamps();
+              });
+            });
+        };
+      });
+      Array.prototype.forEach.call(box.querySelectorAll('.cmp-stop'),function(a){
+        a.onclick=function(e){ e.preventDefault();
+          askYes('Остановить рассылку? Отправка прекратится, уже ушедшее останется.',
+            function(){ post({action:'camp_stop',token:TOKEN,id:a.getAttribute('data-id')})
+              .then(function(){ loadCamps(); }); });
+        };
+      });
+      Array.prototype.forEach.call(box.querySelectorAll('.cmp-close'),function(a){
+        a.onclick=function(e){ e.preventDefault();
+          post({action:'camp_close',token:TOKEN,id:a.getAttribute('data-id')})
+            .then(function(){ loadCamps(); });
+        };
       });
     });
   }
@@ -7204,6 +7246,18 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     requestAnimationFrame(function(){ b.classList.add('on'); });
     clearTimeout(SAY_T);
     SAY_T=setTimeout(function(){ b.classList.remove('on'); },4000);
+  }
+  /* Спросить «да или нет» перед необратимым. Своё окно, а не системное:
+     системный confirm блокирует страницу и ломает наши же проверки. */
+  function askYes(text, onYes){
+    clForm('<h3>Подтвердите</h3><p class="sub">'+clEsc(text)+'</p>'+
+      '<div class="fbtns"><button type="button" class="btn" id="f-save">Да</button>'+
+      '<button type="button" class="btn ghost" id="f-cancel">Отмена</button></div>',
+      function(){
+        var f=document.getElementById('cl-form');
+        if(f){ f.innerHTML=''; document.body.style.overflow=''; }
+        try{ onYes(); }catch(e){}
+      });
   }
   function clForm(html, onSave){
     var box=document.getElementById('cl-form');
