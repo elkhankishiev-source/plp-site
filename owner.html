@@ -4634,7 +4634,11 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
                                  {t:'Снять',a:'task_del',id:k.id}]:null)});
     });
     var st=(p.statements||[])[0];
-    if(st) items.push({t:'Отчёт за '+String(st.period||'').slice(0,7)+' готов', s:'Смотреть в разделе «Документы»', a:'Открыть', go:'docs'});
+    /* 🔴 10.09: пустой черновик объявлялся как «Отчёт готов». У Александра договор
+       начался 29 августа, за два дня дохода не было — и кабинет встречал его
+       сообщением о готовом отчёте с нулями. Объявляем только то, в чём есть цифры. */
+    var stEmpty = st && !Number(st.income) && !Number(st.expenses) && !Number(st.net);
+    if(st && !stEmpty) items.push({t:'Отчёт за '+String(st.period||'').slice(0,7)+' готов', s:'Смотреть в разделе «Документы»', a:'Открыть', go:'docs'});
     if(!items.length) return '';
     return '<div class="card"><span class="eyebrow">Объект сейчас</span><h2>Статус и задачи</h2>'+
       items.map(function(i,n){
