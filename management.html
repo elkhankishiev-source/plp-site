@@ -4013,8 +4013,28 @@ function buildAIHistory(){
   }).filter(function(x){return x.content;});
 }
 /* рендер живого текста Дарьи: печать через textContent (безопасно), в историю — экранированный HTML */
+/* 🔴 10.09. Эльнур открыл чат и увидел в ответе сырой машинный вывод:
+   ```json { "reply": "…" } прямо в реплике Дарьи, плюс звёздочки markdown,
+   потому что мы печатаем текстом, а не размеченным html. Модель иногда
+   отдаёт и человеческий текст, и структуру рядом. Клиент машинного вывода
+   видеть не должен НИКОГДА — режем на нашей стороне, даже если сервер
+   пропустил. Это второй рубеж, первый чиним в самом ответе. */
+function cleanBotText(txt){
+  var s=String(txt||'');
+  /* всё, что начинается с ограды кода или с голого объекта с ключом reply — обрезаем */
+  var cut=s.search(/```|\{\s*"(reply|answer|object_ids|lead_score)"/);
+  if(cut>0) s=s.slice(0,cut);
+  else if(cut===0){
+    /* ответ целиком машинный: вытаскиваем из него человеческую часть */
+    var m=s.match(/"reply"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+    s=m?m[1].replace(/\\n/g,'\n').replace(/\\"/g,'"').replace(/\\\\/g,'\\'):'';
+  }
+  s=s.replace(/\*\*(.+?)\*\*/g,'$1').replace(/__(.+?)__/g,'$1');
+  s=s.replace(/^#{1,6}\s+/gm,'').replace(/`/g,'');
+  return s.replace(/\n{3,}/g,'\n\n').trim();
+}
 function renderBotText(txt){
-  txt=String(txt||'');
+  txt=cleanBotText(txt);
   var d=bot('',true);chatHist.push({r:'bot',h:escHtml(txt)});saveHist();
   if(reduceMotion){d.textContent=txt;cb.scrollTop=cb.scrollHeight;return;}
   var i=0;(function tick(){d.textContent=txt.slice(0,++i);cb.scrollTop=cb.scrollHeight;if(i<txt.length)setTimeout(tick,14);})();
