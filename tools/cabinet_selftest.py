@@ -24,7 +24,7 @@ def call(body):
     return json.load(urllib.request.urlopen(r, timeout=120))
 
 
-def check(name, body, want_key=None):
+def check(name, body, want_key=None, want_error=False):
     global ok_count, fail_count
     try:
         d = call(body)
@@ -32,7 +32,11 @@ def check(name, body, want_key=None):
         fail_count += 1
         print('❌ %-34s связь: %s' % (name, str(e)[:60]))
         return None
-    good = (d.get('ok') is True) or (want_key and d.get(want_key) is not None)
+    # want_error: проверяем именно ОТКАЗ — гард должен срабатывать, а не молчать
+    if want_error:
+        good = (d.get('ok') is False) and bool(d.get('error'))
+    else:
+        good = (d.get('ok') is True) or (want_key and d.get(want_key) is not None)
     if good:
         ok_count += 1
         print('✅ %-34s %s' % (name, json.dumps(d, ensure_ascii=False)[:70]))
@@ -180,6 +184,20 @@ check('рассылка: каналы', {'action': 'camp_channels'}, want_key='r
 check('модерация объектов', {'action': 'mod_list'}, want_key='rows')
 check('разбор папок', {'action': 'intake_list'}, want_key='rows')
 check('лента касаний', {'action': 'touch_list', 'status': 'draft'}, want_key='rows')
+
+# 10.09: встречи. До этого дня встреча не оставляла следа нигде — договорились
+# и забыли. Проверяем и запись, и отказы: без телефона и в прошлое пускать нельзя.
+_TEST_PHONE = '66954143874'   # номер Эльнура: на реальных не тестируем
+_when = (__import__('datetime').datetime.utcnow()
+         + __import__('datetime').timedelta(days=3)).strftime('%Y-%m-%dT09:00:00+07:00')
+check('встречи: назначить', {'action': 'meeting_set', 'phone': _TEST_PHONE,
+      'when': _when, 'kind': 'online', 'note': 'самопроверка кабинета'}, want_key='id')
+check('встречи: список', {'action': 'meeting_list', 'phone': _TEST_PHONE}, want_key='meetings')
+check('встречи: без телефона отбивается',
+      {'action': 'meeting_set', 'when': _when}, want_error=True)
+check('встречи: прошлое отбивается',
+      {'action': 'meeting_set', 'phone': _TEST_PHONE, 'when': '2020-01-01T10:00:00+07:00'},
+      want_error=True)
 
 # 09.09: фирменные документы. Проверяем, что бланк собирается и не пуст —
 # молча сломанный отчёт замечают только когда его уже отправили клиенту.
