@@ -5833,6 +5833,10 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       }
       /* Закрытый оффер: собираем страницу под этого человека и объект.
          Ссылка живёт ограниченное время, на странице стоит наш водяной знак. */
+      /* 🔴 10.09. Встречи не учитывались нигде: договорились — и следа нет.
+         Здесь менеджер ставит встречу и отмечает, чем она кончилась. */
+      h+='<h4>Встречи</h4><div id="cl-meets"><p class="sub">загружаю…</p></div>'+
+         '<p class="sub"><a href="#" class="lnk" id="cl-meet">Назначить встречу</a></p>';
       h+='<h4>Персональное предложение</h4>'+
          '<p class="sub"><a href="#" class="lnk" id="cl-offer">Собрать оффер по объекту</a>'+
          ' · <a href="#" class="lnk" id="cl-offers">показать выданные</a></p>'+
@@ -5992,6 +5996,9 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       if(at) at.onclick=function(e){ e.preventDefault(); taskForm(code); };
       var rq=document.getElementById('cl-req');
       if(rq) rq.onclick=function(e){ e.preventDefault(); reqForClient(code, c.name); };
+      var mt=document.getElementById('cl-meet');
+      if(mt) mt.onclick=function(e){ e.preventDefault(); meetForm(code, c.phone); };
+      loadMeets(c.phone);
       var of=document.getElementById('cl-offer');
       if(of) of.onclick=function(e){ e.preventDefault(); offerForm(code); };
       var ol=document.getElementById('cl-offers');
@@ -7319,6 +7326,66 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
                  :'<span class="sub">· не действует</span>')+'</li>';
       }).join('')+'</ul>';
     });
+  }
+  /* Встречи клиента: список ближайших и прошедших, плюс отметка результата. */
+  var MEET_ST={'назначена':'назначена','подтверждена':'подтверждена','состоялась':'состоялась',
+               'перенесена':'перенесена','отменена':'отменена','не пришёл':'не пришёл'};
+  var MEET_KIND={online:'созвон',tour:'тур по объектам',office:'встреча в офисе'};
+  function loadMeets(phone){
+    var box=document.getElementById('cl-meets');
+    if(!box) return;
+    if(!phone){ box.innerHTML='<p class="sub">У клиента нет номера — встречу не привязать.</p>'; return; }
+    post({action:'meeting_list',token:TOKEN,phone:phone}).then(function(r){
+      var rows=(r&&r.meetings)||[];
+      if(!rows.length){ box.innerHTML='<p class="sub">Встреч пока не было.</p>'; return; }
+      var h='<ul class="tlist">';
+      rows.forEach(function(m){
+        var d=new Date(m.meet_at);
+        var when=isNaN(d)?String(m.meet_at||''):
+          d.toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+        var live=(m.status==='назначена'||m.status==='подтверждена');
+        h+='<li><b>'+clEsc(when)+'</b> · '+clEsc(MEET_KIND[m.kind]||m.kind)+
+           ' · '+clEsc(m.status)+
+           (m.property_id?(' · '+clEsc(m.property_id)):'')+
+           (m.note?('<br><span class="sub">'+clEsc(m.note)+'</span>'):'')+
+           (live?(' <a href="#" class="lnk meet-mark" data-id="'+m.id+'" data-st="состоялась">состоялась</a>'+
+                  ' · <a href="#" class="lnk meet-mark" data-id="'+m.id+'" data-st="не пришёл">не пришёл</a>'+
+                  ' · <a href="#" class="lnk meet-mark" data-id="'+m.id+'" data-st="отменена">отменить</a>'):'')+
+           '</li>';
+      });
+      box.innerHTML=h+'</ul>';
+      Array.prototype.forEach.call(box.querySelectorAll('.meet-mark'),function(a){
+        a.onclick=function(e){ e.preventDefault();
+          post({action:'meeting_mark',token:TOKEN,id:a.getAttribute('data-id'),status:a.getAttribute('data-st')})
+            .then(function(){ loadMeets(phone); }); };
+      });
+    });
+  }
+  function meetForm(code, phone){
+    if(!phone){ say('У клиента нет номера — сначала заполните телефон'); return; }
+    clForm('<h3>Встреча с '+clEsc(code)+'</h3><div class="fgrid">'+
+      '<label>Дата<input id="f-mdate" type="date"></label>'+
+      '<label>Время<input id="f-mtime" type="time" value="11:00"></label>'+
+      '<label>Формат<select id="f-mkind"><option value="online">созвон</option>'+
+      '<option value="tour">тур по объектам</option>'+
+      '<option value="office">встреча в офисе</option></select></label>'+
+      '<label>Объект<input id="f-mobj" type="text" placeholder="PLP-ESTELLA"></label>'+
+      '<label class="wide">Заметка<input id="f-mnote" type="text" placeholder="о чём договорились"></label></div>'+
+      '<div class="fbtns"><button type="button" class="btn" id="f-save">Назначить</button>'+
+      '<button type="button" class="btn ghost" id="f-cancel">Отмена</button></div>',
+      function(){
+        var d=fv('f-mdate'), t=fv('f-mtime')||'11:00';
+        if(!d){ say('Выберите дату'); return; }
+        post({action:'meeting_set',token:TOKEN,code:code,phone:phone,
+              when:d+'T'+t+':00+07:00',kind:fv('f-mkind'),
+              property:fv('f-mobj'),note:fv('f-mnote')})
+          .then(function(r){
+            if(!r||r.ok===false){ say((r&&r.error)||'Не получилось назначить'); return; }
+            document.getElementById('cl-form').innerHTML='';
+            document.body.style.overflow='';
+            loadMeets(phone);
+          });
+      });
   }
   function taskForm(code){
     clForm('<h3>Задача по '+code+'</h3><div class="fgrid">'+
