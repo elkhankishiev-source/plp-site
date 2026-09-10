@@ -2824,6 +2824,11 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   var LS='plp_owner_session';
   var $=function(id){return document.getElementById(id);};
   var DATA=null, CUR=0, TOKEN=null, DEMO_MODE=false;
+  /* какой объект человек смотрел в прошлый раз — иначе кабинет каждый раз
+     открывается на первом по списку, а у сотрудника первым идёт чужой
+     объект в управлении (Эльнур 10.09: «почему у меня висит Манор, если
+     я его не выбирал»). */
+  var PROP_LS='plp_owner_prop';
 
 
 
@@ -4708,7 +4713,16 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
                  sub:(x.relation==='каталог'?'каталог':'в управлении')+
                      (x.district?(' · '+x.district):'') }; }),
       onChange:function(ids){
-        CUR=Number(ids[0])||0; renderProp(); renderObjEdit(); window.scrollTo(0,0);
+        /* 🔴 10.09 Эльнур: «там где выбор проекта нет перехода дальше».
+           Перерисовывали только карточку объекта, а открытая вкладка
+           (финансы, календарь, документы) оставалась от прежнего объекта —
+           выглядело так, будто выбор не сработал. Перерисовываем всё, как
+           это делают остальные точки переключения. */
+        CUR=Number(ids[0]); if(isNaN(CUR)) CUR=0;
+        try{ localStorage.setItem(PROP_LS, String(CUR)); }catch(e){}
+        renderProp(); renderObjEdit();
+        try{ renderPortfolio(); cabPage(CAB_TAB); paintCounts(); }catch(e){}
+        window.scrollTo(0,0);
       }});
     PROP_PICK.set([String(CUR)]);
   }
@@ -8380,7 +8394,10 @@ window.chatVoice=chatVoice;window.listenBar=listenBar;window.paintVoiceMode=pain
       if(raw){
         var c=JSON.parse(raw);
         if(c && c.token===TOKEN && c.data && (Date.now()-c.at) < 7*24*3600e3){
-          DATA=c.data; CUR=0;   /* из памяти браузера — всегда сначала */
+          DATA=c.data;
+          CUR=0;
+          try{ var _p=localStorage.getItem(PROP_LS);
+               if(_p!==null && Number(_p) < (DATA.properties||[]).length) CUR=Number(_p); }catch(e){}
           draw(); shown=true; markStale(true);
         }
       }
@@ -8402,8 +8419,10 @@ window.chatVoice=chatVoice;window.listenBar=listenBar;window.paintVoiceMode=pain
         try{localStorage.removeItem(LS);localStorage.removeItem(CACHE);}catch(e){}
         TOKEN=null; gateStep('phone');
         $('gate-err').textContent=(d&&d.error==='expired')?'Вход истёк — получите новый код.':''; return; }
-      var keepCur = window.__cabKeep ? window.__cabKeep.cur : 0;
-      DATA=d; CUR=(keepCur < (d.properties||[]).length) ? keepCur : 0;
+      var keepCur = window.__cabKeep ? window.__cabKeep.cur : null;
+      if(keepCur===null){ try{ var _v=localStorage.getItem(PROP_LS); if(_v!==null) keepCur=Number(_v); }catch(e){} }
+      DATA=d;
+      CUR=(keepCur!==null && !isNaN(keepCur) && keepCur < (d.properties||[]).length) ? keepCur : 0;
       try{ localStorage.setItem(CACHE, JSON.stringify({token:TOKEN,at:Date.now(),data:d})); }catch(e){}
       /* 🔴 10.09 Эльнур: «кабинету не надо сменять пароль, бред, у него доступ
          через код подтверждения, не усложняй». Вход в кабинет — по коду из СМС
