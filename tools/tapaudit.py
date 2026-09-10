@@ -93,6 +93,19 @@ WALK = r"""
     s.push(tray ? hash(tray.outerHTML) : '0');
     s.push(modal ? hash(modal.className + String(modal.innerHTML.length)) : '0');
     s.push(hash(document.body.className + '|' + (document.documentElement.getAttribute('data-theme') || '')));
+    /* 🔴 10.09. Подсказки-вопросы у консультанта ставят текст в поле чата,
+       а поле лежит в другом блоке — отпечаток ближней карточки его не видел,
+       и живые кнопки выглядели мёртвыми. Смотрим на окно чата глобально. */
+    var chf = document.getElementById('chatField');
+    var chw = document.getElementById('chatwin');
+    s.push(chf ? hash(String(chf.value || '')) : '0');
+    s.push(chw ? String(chw.className) : '0');
+    /* то же для списков с множественным выбором: счётчик выбранных */
+    var nums = [];
+    Array.prototype.forEach.call(document.querySelectorAll('.picknum, .pickval'), function (n) {
+      nums.push(n.textContent || '');
+    });
+    s.push(hash(nums.join('\u0001')));
     s.push(String(window.scrollY | 0));
     return s.join('|');
   }
@@ -110,6 +123,21 @@ WALK = r"""
       if (i < FROM || i >= TO) return;
       if (!el || el.disabled) return;
       var label = (el.textContent || el.getAttribute('aria-label') || el.className || '').replace(/\s+/g, ' ').trim().slice(0, 46);
+      /* 🔴 10.09. Обход жал по всему подряд, включая кнопки внутри закрытых
+         панелей и модалок: они физически не видны, нажатие ничего не меняет,
+         и список «мёртвых» распухал ложными. Невидимое помечаем отдельно —
+         его проверяют, когда панель открыта. */
+      var r = el.getBoundingClientRect();
+      if (!el.offsetParent && getComputedStyle(el).position !== 'fixed') {
+        out.push({ label: label, kind: 'скрыт', ok: true, note: 'не виден: панель закрыта' }); return;
+      }
+      if (r.width < 2 || r.height < 2) {
+        out.push({ label: label, kind: 'скрыт', ok: true, note: 'нулевой размер' }); return;
+      }
+      /* где именно живёт кнопка — чтобы потом искать её в разметке */
+      var box0 = el.closest('section, .card, .modal, .panel, #app') || el.parentElement;
+      var where = (box0 && (box0.id || box0.className) || '').toString().replace(/\s+/g,' ').slice(0, 40);
+      var self = (el.id ? '#'+el.id : '') + (el.className ? '.'+String(el.className).replace(/\s+/g,'.') : '');
       var key = i;
       if (el.tagName === 'A' && el.getAttribute('href') && el.getAttribute('href').indexOf('#') !== 0) {
         out.push({ label: label, kind: 'ссылка', ok: true, note: el.getAttribute('href').slice(0, 60) }); return;
@@ -118,7 +146,8 @@ WALK = r"""
       try { el.click(); } catch (e) { out.push({ label: label, ok: false, note: 'ошибка клика: ' + e.message.slice(0, 60) }); return; }
       var b2 = snap(), s2 = sig(el);
       var moved = (b1.len !== b2.len) || (b1.open !== b2.open) || (b1.net !== b2.net) || (s1 !== s2);
-      out.push({ label: label, kind: el.tagName.toLowerCase(), ok: moved, note: moved ? '' : 'реакции нет' });
+      out.push({ label: label, kind: el.tagName.toLowerCase(), ok: moved,
+                 note: moved ? '' : 'реакции нет', where: where, sel: self.slice(0, 70) });
     });
   }
   pass();
@@ -200,14 +229,28 @@ def main():
     print(' ' * 40, end='\r')
     dead = [x for x in items if not x.get('ok')]
     links = [x for x in items if x.get('kind') == 'ссылка']
+    hidden = [x for x in items if x.get('kind') == 'скрыт']
     print('%s: кликабельных элементов %d, проверено %d' % (page, total, len(items)))
     print('  ссылки (переход, не клик): %d' % len(links))
-    print('  ответили на нажатие: %d' % (len(items) - len(links) - len(dead)))
+    print('  скрыты (панель закрыта): %d' % len(hidden))
+    print('  ответили на нажатие: %d' % (len(items) - len(links) - len(hidden) - len(dead)))
     print('  БЕЗ РЕАКЦИИ: %d' % len(dead))
     from collections import Counter
     cnt = Counter((d['label'], d.get('note', '')) for d in dead)
-    for (label, note), n in cnt.most_common():
-        print('    ✗ %-46s %s%s' % (label, note, (' ×%d' % n) if n > 1 else ''))
+    def why(d):
+        sel = (d.get('sel') or '')
+        lab = (d.get('label') or '').strip()
+        if '.off' in sel:  return 'выключена намеренно: нечего показывать'
+        if '.on' in sel:   return 'уже выбрана — повторный клик ничего не меняет'
+        if lab in ('‹', '›'): return 'край карусели'
+        if lab in ('↑',):  return 'страница уже наверху'
+        if 'prng-h' in sel: return 'ручка бегунка — работает перетаскиванием'
+        if 'reset' in sel or lab in ('⟲', 'Сбросить'): return 'сбрасывать нечего'
+        return 'НАДО РАЗОБРАТЬ'
+    real = [d for d in dead if why(d) == 'НАДО РАЗОБРАТЬ']
+    for d in dead:
+        print('    ✗ %-40s %-16s %s' % (d['label'][:40], (d.get('where') or '')[:16], why(d)))
+    print('  из них требуют разбора: %d' % len(real))
     if errors:
         print('  ошибки страницы: %d' % len(errors))
         for e in list(dict.fromkeys(errors))[:6]:

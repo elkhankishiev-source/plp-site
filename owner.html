@@ -6564,6 +6564,9 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       val.classList.toggle('dim', !Object.keys(chosen).length);
     }
     var remoteT=null;
+    /* кнопки массового выбора живут в разметке пикера — включаем их сразу,
+       не дожидаясь первой отрисовки списка */
+    setTimeout(function(){ try{ bulkWire(); bulkNum(); }catch(e){} },0);
     function draw(){
       var q=(search.value||'').trim().toLowerCase();
       /* Эльнур 06.09: «ввёл номер клиента — пусто». В список грузились только
@@ -6582,6 +6585,9 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       drawRows(rows, q);
     }
     var lastRows=[];
+    /* 🔴 10.09. Обработчики вешались внутри отрисовки списка. Пока список не
+       нарисован ни разу, кнопки «отметить всех» и «снять всех» были мертвы.
+       Вешаем сразу при сборке, один раз. */
     function bulkWire(){
       var a=el.querySelector('.pickall'), n=el.querySelector('.picknone');
       if(a) a.onclick=function(e){ e.preventDefault();
@@ -6594,7 +6600,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     }
     function drawRows(rows, q){
       lastRows=rows||[];
-      bulkWire(); bulkNum();
+      bulkNum();
       if(!rows.length){
         list.innerHTML='<div class="pickempty">'+
           (opts.remote && (q||'').length>=2 ? 'ищем в базе…' : 'ничего не нашлось')+'</div>';
