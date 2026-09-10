@@ -18,7 +18,7 @@ import http.server, json, os, re, socketserver, subprocess, sys, tempfile, threa
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
-PORT = 8907
+PORT = 8791
 
 INJECT = r"""
 <script>
