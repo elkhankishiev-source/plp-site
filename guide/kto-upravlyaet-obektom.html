@@ -3822,12 +3822,19 @@ function offerLead(direct){
   if(direct){showLead();return;}
   bot(t('chat.offerLead'));chips([{t:t('chat.offerBtn'),fn:showLead}]);
 }
+/* 🔴 10.09. Первый вопрос-подсказка работал, остальные три выглядели мёртвыми:
+   чат уже открыт, поле заполняется через четверть секунды, и человек, нажав
+   вторую подсказку, четверть секунды не видит НИЧЕГО. Теперь текст встаёт в
+   поле сразу, а отправка идёт следующим кадром — реакция мгновенная. */
 function askAssistant(q){
   openChat('assistant');
-  setTimeout(function(){
-    var inp=document.getElementById('chatField');
-    if(inp){ inp.value=q; if(typeof sendFree==='function') sendFree(); }
-  },260);
+  var inp=document.getElementById('chatField');
+  if(inp) inp.value=q;
+  var go=function(){
+    var f=document.getElementById('chatField');
+    if(f){ f.value=q; if(typeof sendFree==='function') sendFree(); }
+  };
+  if(inp) requestAnimationFrame(go); else setTimeout(go,260);
 }
 function openChat(ctx){
   document.getElementById('chatwin').classList.add('open');
