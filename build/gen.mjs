@@ -982,23 +982,58 @@ function objectPage(o, benchmarks, ratesBy) {
   const waLink = 'https://wa.me/' + WA + '?text=' + waText;
   const backLink = '../#object=' + encodeURIComponent(pub);   /* в каталоге объект живёт под публичным кодом */
 
-  const ld = {
-    '@context': 'https://schema.org',
-    '@type': ['Residence', 'Product'],
+  /* 🔴 10.09.2026. Search Console слал письма: «отсутствует поле aggregateRating»,
+     «отсутствует поле review» — по два на каждый обход. Причина: карточки были
+     объявлены типом Product, и Google применял к ним правила ИНТЕРНЕТ-МАГАЗИНА,
+     где у товара обязаны быть рейтинг и отзывы. У нас их нет, и выдумывать их
+     нельзя — на поддельных отзывах мы уже горели (Михаил и Виолетта, которых
+     не существовало). Поэтому убираем сам повод: объект — не товар на полке.
+     Теперь страница описана как объявление о недвижимости (RealEstateListing),
+     сам объект — как жильё (Residence), а цена — отдельным предложением Offer,
+     которое ссылается на объект. Всё это валидная разметка schema.org, цена и
+     наличие остаются на месте, а требований магазина к ней больше нет.
+     Застройщик переехал из brand (свойство товара) в additionalProperty. */
+  const idRes = url + '#residence';
+  const residence = {
+    '@type': 'Residence',
+    '@id': idRes,
     name: o.name,
     description: truncate(noContacts(usp), 500),
     url,
     image: img,
     address: { '@type': 'PostalAddress', addressRegion: 'Phuket', addressLocality: ru, addressCountry: 'TH' },
   };
-  if (o.developer) ld.brand = { '@type': 'Organization', name: o.developer };
-  if (o.bedrooms_max != null) ld.numberOfRooms = o.bedrooms_max;
-  if (o.area_max != null) ld.floorSize = { '@type': 'QuantitativeValue', value: o.area_max, unitCode: 'MTK' };
-  if (priceTHB) ld.offers = {
-    '@type': 'Offer', priceCurrency: 'THB', price: priceTHB,
+  if (o.developer) residence.additionalProperty = {
+    '@type': 'PropertyValue', name: 'Застройщик', value: String(o.developer),
+  };
+  if (o.bedrooms_max != null) residence.numberOfRooms = o.bedrooms_max;
+  if (o.area_max != null) residence.floorSize = { '@type': 'QuantitativeValue', value: o.area_max, unitCode: 'MTK' };
+
+  const graph = [
+    {
+      '@type': 'RealEstateListing',
+      '@id': url + '#listing',
+      url,
+      name: o.name,
+      description: truncate(noContacts(usp), 500),
+      about: { '@id': idRes },
+      /* datePosted намеренно нет: он подставлялся датой сборки, то есть «сегодня»
+         на каждом прогоне. Это неправда про объявление и вдобавок трогало все
+         47 файлов при любой пересборке. */
+    },
+    residence,
+  ];
+  if (priceTHB) graph.push({
+    '@type': 'Offer',
+    '@id': url + '#offer',
+    itemOffered: { '@id': idRes },
+    priceCurrency: 'THB',
+    price: priceTHB,
     availability: o.status === 'sold' ? 'https://schema.org/SoldOut' : 'https://schema.org/InStock',
     url,
-  };
+    seller: { '@type': 'RealEstateAgent', name: 'Property Library Phuket', url: SITE_BASE },
+  });
+  const ld = { '@context': 'https://schema.org', '@graph': graph };
 
   // Материалы застройщика: показываем только то, что реально заполнено в базе,
   // и только http(s) — чтобы мусорное поле не уехало в разметку.
@@ -1247,9 +1282,13 @@ if(dark) i.src='../img/brand/plp-mark-white.png';})();</script>
 // -------------------------------------------------------------------- sitemap
 function sitemap(objects) {
   const today = new Date().toISOString().slice(0, 10);
-  // 02.09: якоря заменены отдельными страницами — их и индексируем.
-  // Раньше генератор перезаписывал sitemap и терял разделы, собранные скриптами.
-  const anchors = ['#quiz', '#about', '#faq', '#contacts'];
+  /* 🔴 10.09: Search Console прислал «Страница с переадресацией» и не индексировал
+     часть адресов. В карту сайта уходили ЯКОРЯ главной — /#quiz, /#about, /#faq,
+     /#contacts. Это не отдельные страницы: Google открывает их, получает ту же
+     главную и считает дублями. Комментарий от 02.09 прямо говорил, что якоря
+     заменены отдельными страницами, но список так и остался в коде.
+     Якорей в карте больше нет; сами разделы на главной никуда не делись. */
+  const anchors = [];
   const pages = [
     ['buy.html', '0.9'], ['rent.html', '0.9'], ['management.html', '0.8'],
     ['add-property.html', '0.8'],
@@ -1261,7 +1300,7 @@ function sitemap(objects) {
   ];
   const parts = [];
   parts.push('<?xml version="1.0" encoding="UTF-8"?>');
-  parts.push('<!-- Сгенерировано build/gen.mjs. Главная + якоря + отдельные страницы объектов. -->');
+  parts.push('<!-- Сгенерировано build/gen.mjs. Главная, разделы и страницы объектов. Якорей нет: это не отдельные страницы. -->');
   parts.push('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">');
   parts.push(`  <url><loc>${SITE_BASE}/</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>`);
   for (const a of anchors) {
