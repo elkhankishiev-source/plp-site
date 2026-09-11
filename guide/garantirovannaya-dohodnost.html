@@ -4507,7 +4507,7 @@ function wireStay(p){
   function ask(){
     if(!a.value||!b.value||b.value<=a.value){ box.innerHTML=''; return; }
     box.innerHTML='<span class="stay-wait">'+t('stay.wait')+'</span>';
-    fetch('https://proplib.app.n8n.cloud/webhook/uk-owner',{method:'POST',
+    fetch('https://167-172-66-20.sslip.io/ukowner',{method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({action:'stay_quote',property_id:p.property_id,from:a.value,to:b.value})})
       .then(function(r){return r.json();})
@@ -6624,7 +6624,7 @@ addEventListener('hashchange',function(){if(isObjectHash())openFromHash();});
     /* Адрес задан явно: LEAD_ENDPOINT объявлена внутри замыкания и в глобальной
        области недоступна — на этом трекер молча не запускался. Ключ тот же, что
        у site-lead, и он и так виден в исходнике страницы. */
-    var URL_ = 'https://proplib.app.n8n.cloud/webhook/site-events?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7';
+    var URL_ = 'https://167-172-66-20.sslip.io/siteevents?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7';
     var T0 = Date.now(), EV = [], SENT = false, hit50 = false, hit90 = false;
 
     var sid;
