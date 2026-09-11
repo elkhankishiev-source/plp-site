@@ -1295,7 +1295,7 @@ function sitemap(objects) {
     ...['bang-tao','layan','surin','kamala','rawai','kata','nai-yang','koh-kaew']
         .map(d => ['districts/' + d + '.html', '0.8']),
     ...['inostranec-mozhet-kupit','leasehold-ili-freehold','skolko-oformlyaetsya-sdelka',
-        'rashody-pri-pokupke','kupit-udalenno','stoimost-uslug']
+        'nalogi-i-rashody','kupit-udalenno','stoimost-uslug']
         .map(g => ['guide/' + g + '.html', '0.6']),
   ];
   const parts = [];
