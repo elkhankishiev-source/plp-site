@@ -2831,7 +2831,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   if(v){ try{ fillNavSections(); }catch(e){} }
   document.body.style.overflow=v?"hidden":"";}
 (function(){
-  var API='https://167-172-66-20.sslip.io/ukowner';
+  var API='https://api.property-library.com/ukowner';
   /* Хранилище: сюда кладём файл для рассылки. Ключ публичный и ограничен
      на стороне базы — писать можно только в свои папки. */
   var SB='https://dyxufgjrumebvrhadjun.supabase.co';
@@ -8205,7 +8205,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
    Поведение здесь короче: приветствие, переписка, отправка в тот же site-chat
    с контекстом кабинета. Полный перенос логики сайта требует вынести чат в
    общий файл — это отдельная работа, чтобы не трогать живую главную. */
-var CHAT_ENDPOINT='https://n8n-167-172-66-20.sslip.io/webhook/site-chat?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7';
+var CHAT_ENDPOINT='https://hub.property-library.com/webhook/site-chat?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7';
 var chatStarted=false, chatHist=[];
 
 function cabChatContext(){
@@ -8703,7 +8703,7 @@ window.chatVoice=chatVoice;window.listenBar=listenBar;window.paintVoiceMode=pain
         chan=picked('o-chan'), note=$('reg-note').value.trim();
     $('reg-send').disabled=true; $('reg-send').textContent='Отправляем…';
     // заявка идёт в тот же приём, что и заявки с сайта — попадает в CRM и к менеджеру
-    fetch('https://n8n-167-172-66-20.sslip.io/webhook/site-lead?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7',
+    fetch('https://hub.property-library.com/webhook/site-lead?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7',
       {method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({
         name:name, contact:phone, phone:phone, funnel:'management', goal:goal||'управление',
         district:area||'', beds:beds||'', lang:'ru', source:'owner_cabinet',

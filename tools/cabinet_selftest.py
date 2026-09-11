@@ -9,7 +9,7 @@
 """
 import json, sys, urllib.request
 
-URL = 'https://167-172-66-20.sslip.io/ukowner'
+URL = 'https://api.property-library.com/ukowner'
 import os as _os
 # токен штаба НЕ хранить в репозитории (11.09.2026): ~/.plp_staff_token или PLP_STAFF_TOKEN
 TOKEN = (_os.environ.get('PLP_STAFF_TOKEN') or (open(_os.path.expanduser('~/.plp_staff_token')).read().strip() if _os.path.exists(_os.path.expanduser('~/.plp_staff_token')) else ''))
