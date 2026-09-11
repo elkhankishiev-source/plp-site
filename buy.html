@@ -3730,11 +3730,11 @@ function getSource(){var s={};try{s=JSON.parse(sessionStorage.getItem('pl_source
 
 /* ===== LEAD PIPELINE (мин. квалификация → amoCRM через n8n) ===== */
 /* Низкопривилегированный ключ ТОЛЬКО для формы сайта — не мастер, можно в публичном коде. */
-var LEAD_ENDPOINT='https://proplib.app.n8n.cloud/webhook/site-lead?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7';
-var CTX_ENDPOINT='https://proplib.app.n8n.cloud/webhook/site-context?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7';
-var VOICE_ENDPOINT='https://proplib.app.n8n.cloud/webhook/site-voice?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7',
-      CHAT_ENDPOINT='https://proplib.app.n8n.cloud/webhook/site-chat?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7';
-var AVAIL_ENDPOINT='https://proplib.app.n8n.cloud/webhook/check-availability?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7';
+var LEAD_ENDPOINT='https://n8n-167-172-66-20.sslip.io/webhook/site-lead?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7';
+var CTX_ENDPOINT='https://n8n-167-172-66-20.sslip.io/webhook/site-context?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7';
+var VOICE_ENDPOINT='https://n8n-167-172-66-20.sslip.io/webhook/site-voice?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7',
+      CHAT_ENDPOINT='https://n8n-167-172-66-20.sslip.io/webhook/site-chat?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7';
+var AVAIL_ENDPOINT='https://n8n-167-172-66-20.sslip.io/webhook/check-availability?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7';
 function escHtml(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 /* Проверка контакта перед отправкой. Раньше её не было: человек мог ввести
    «12» или «телеграм» — форма отвечала «спасибо», а заявка до нас не доходила.
