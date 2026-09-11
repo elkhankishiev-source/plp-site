@@ -10,7 +10,10 @@
 import json, sys, urllib.request
 
 URL = 'https://167-172-66-20.sslip.io/ukowner'
-TOKEN = 'fc67954e51f6a2a37b6f390f647564914d6106385f1a3c3409c856ecab836f06'
+import os as _os
+# токен штаба НЕ хранить в репозитории (11.09.2026): ~/.plp_staff_token или PLP_STAFF_TOKEN
+TOKEN = (_os.environ.get('PLP_STAFF_TOKEN') or (open(_os.path.expanduser('~/.plp_staff_token')).read().strip() if _os.path.exists(_os.path.expanduser('~/.plp_staff_token')) else ''))
+if not TOKEN: sys.exit('нет токена штаба: положи в ~/.plp_staff_token')
 DEMO_OBJ = 'PLP-DEMO'
 DEMO_CLIENT = 'PLP-001555'          # служебная запись «ТЕСТ» на номер Эльнура
 
