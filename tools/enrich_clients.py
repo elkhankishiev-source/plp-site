@@ -17,7 +17,7 @@ c = json.load(open('/tmp/.sb'))
 URL, KEY = c['url'], c['key']
 H = {'apikey': KEY, 'Authorization': 'Bearer ' + KEY, 'Content-Type': 'application/json'}
 AMO_KEY = pathlib.Path('/Users/elnurkhankishiev/.plp_amo_proxy').read_text().strip()
-PROXY = 'https://proplib.app.n8n.cloud/webhook/amo-proxy'
+PROXY = 'https://n8n-167-172-66-20.sslip.io/webhook/amo-proxy'
 
 
 def req(method, path, body=None):
