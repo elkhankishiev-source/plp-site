@@ -67,7 +67,7 @@ def anthropic_key():
     src = open(os.path.expanduser('~/plp_diag.py'), encoding='utf-8').read()
     api = re.search(r'API_KEY\s*=\s*"([^"]+)"', src).group(1)
     v = json.load(urllib.request.urlopen(urllib.request.Request(
-        'https://proplib.app.n8n.cloud/api/v1/variables?limit=100',
+        'https://hub.property-library.com/api/v1/variables?limit=100',
         headers={'X-N8N-API-KEY': api}), timeout=60))
     for x in v['data']:
         if x['key'] == 'ANTHROPIC_API_KEY' and x.get('value'):

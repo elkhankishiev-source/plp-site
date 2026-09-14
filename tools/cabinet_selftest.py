@@ -210,7 +210,7 @@ _UK = ''
 try:
     import re as _re, pathlib as _pl, json as _json
     _k = _re.search(r'API_KEY = "([^"]+)"', _pl.Path.home().joinpath('plp_diag.py').read_text()).group(1)
-    _v = _json.load(_u.urlopen(_u.Request('https://proplib.app.n8n.cloud/api/v1/variables?limit=100',
+    _v = _json.load(_u.urlopen(_u.Request('https://hub.property-library.com/api/v1/variables?limit=100',
                                           headers={'X-N8N-API-KEY': _k})))['data']
     _UK = {x['key']: x['value'] for x in _v}.get('PLP_UK_KEY', '')
 except Exception:
@@ -219,7 +219,7 @@ except Exception:
 def _doc(label, qs, must):
     global fail_count
     try:
-        h = _u.urlopen('https://proplib.app.n8n.cloud/webhook/document?key=%s&%s' % (_UK, qs), timeout=60).read().decode()
+        h = _u.urlopen('https://hub.property-library.com/webhook/document?key=%s&%s' % (_UK, qs), timeout=60).read().decode()
         ok = must in h and len(h) > 1500
         print(('✅ ' if ok else '❌ ') + label + (' ' if ok else ' — не собрался'))
         if not ok:

@@ -17,7 +17,7 @@
 """
 import argparse, json, os, pathlib, re, subprocess, sys, urllib.request
 
-SCOUT = 'https://proplib.app.n8n.cloud/webhook/drive-scout'
+SCOUT = 'https://hub.property-library.com/webhook/drive-scout'
 KEYFILE = os.path.expanduser('~/.plp_webhook_key')
 IMG = re.compile(r'\.(jpe?g|png|webp)$', re.I)
 MAX_PER_KIND = 10          # больше витрине не нужно, а место и трафик бережём

@@ -85,7 +85,7 @@ def creds():
     m = re.search(r'API_KEY = "([^"]+)"', diag.read_text()) if diag.exists() else None
     if not m:
         sys.exit('нет ключей: задайте SUPABASE_URL и SUPABASE_SERVICE_KEY')
-    req = urllib.request.Request('https://proplib.app.n8n.cloud/api/v1/variables?limit=200',
+    req = urllib.request.Request('https://hub.property-library.com/api/v1/variables?limit=200',
                                  headers={'X-N8N-API-KEY': m.group(1)})
     data = json.load(urllib.request.urlopen(req, timeout=30))
     v = {x['key']: x['value'] for x in data['data']}
