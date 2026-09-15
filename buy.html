@@ -2150,7 +2150,7 @@ section#rent,section#sale{padding-top:10px}
       <a href="/rent" data-i18n="nav.rent">Аренда</a>
       <a href="/#map" data-i18n="nav.map">Районы</a>
       <a href="/management">Управление</a>
-      <a href="/#about" data-i18n="nav.about">О нас</a>
+      <a href="/about" data-i18n="nav.about">О нас</a>
     </nav>
     <div class="htools">
       <div class="lang" role="group" aria-label="Язык">
@@ -2179,7 +2179,7 @@ section#rent,section#sale{padding-top:10px}
     <a href="/#map" onclick="toggleNav(false)" data-i18n="nav.map">Районы</a>
     <a href="/management">Управление</a>
     <a href="/add-property">Разместить объект</a>
-    <a href="/#about" onclick="toggleNav(false)" data-i18n="nav.about">О нас</a>
+    <a href="/about" onclick="toggleNav(false)" data-i18n="nav.about">О нас</a>
     <!-- Эльнур 06.09: язык и оформление на телефоне живут здесь, одинаково
          на сайте и в кабинете. В шапке их на узком экране нет. -->
     <div class="mtools">
@@ -2250,13 +2250,12 @@ section#rent,section#sale{padding-top:10px}
   </div>
 </section>
 
-<!-- ===== ADVANTAGES ===== -->
+<!-- ===== НАШ ПОДХОД (15.09: «Преимущества», «Ценности» и «Сервис» сведены в один блок; ценности и сервис — на /about) ===== -->
 
 <section id="do" style="padding-top:0">
   <div class="container">
     <div class="reveal">
-      <div class="srv-strip"><div class="srv-head"><span class="kicker" data-i18n="srv.lab">Сервис</span><h3 data-i18n="srv.h2">Не только сделка</h3><p data-i18n="srv.p">Встретим, довезём, поможем на месте. Условия согласуем лично — напишите, что нужно.</p></div><div class="srv-cards"><button type="button" class="srv-card" onclick="requestService('transfer')"><b data-i18n="srv.transfer">Трансфер на просмотр</b><span data-i18n="srv.transfer.d">Показываем объекты — забираем и привозим</span><i data-i18n="srv.cta">Оставить заявку</i></button><button type="button" class="srv-card" onclick="requestService('meet')"><b data-i18n="srv.meet">Встреча в аэропорту</b><span data-i18n="srv.meet.d">Встретим рейс и довезём до жилья</span><i data-i18n="srv.cta">Оставить заявку</i></button><button type="button" class="srv-card" onclick="requestService('clean')"><b data-i18n="srv.clean">Уборка</b><span data-i18n="srv.clean.d">Для тех, кто уже живёт в нашем объекте</span><i data-i18n="srv.cta">Оставить заявку</i></button></div></div>
-      <span class="kicker" data-i18n="do.lab">Преимущества</span>
+      <span class="kicker" data-i18n="appr.lab">Наш подход</span>
       <h2 data-i18n="do.h2">С нами легко выбрать, купить и переехать</h2>
     </div>
     <div class="adv">
@@ -2266,14 +2265,6 @@ section#rent,section#sale{padding-top:10px}
       <div class="c reveal"><span class="ic">🧭</span><h4 data-i18n="do.4t">Сопровождение на всех этапах</h4><p data-i18n="do.4p">Показы, документы и даже помощь после покупки — на нас.</p></div>
       <div class="c reveal"><span class="ic">⚖️</span><h4 data-i18n="do.5t">Юридическая поддержка</h4><p data-i18n="do.5p">Сделки сопровождают юристы по тайскому рынку.</p></div>
       <div class="c reveal"><span class="ic">🌍</span><h4 data-i18n="do.6t">Удалённое оформление</h4><p data-i18n="do.6p">Купить или арендовать можно за тысячи километров.</p></div>
-    </div>
-    <div class="reveal" style="margin-top:28px">
-      <span class="kicker" data-i18n="val.lab">Наши ценности</span>
-      <h3 data-i18n="val.h2">Почему с нами спокойно</h3>
-      <div class="values">
-        <span class="val" data-i18n="val.1">Честно и на равных</span><span class="val" data-i18n="val.2">Без давления</span><span class="val" data-i18n="val.3">Простым языком</span>
-        <span class="val" data-i18n="val.4">На стороне клиента</span><span class="val" data-i18n="val.5">Сервис до и после сделки</span><span class="val" data-i18n="val.6">Прозрачные цифры</span><span class="val" data-i18n="val.7">Заботимся, а не продаём</span><span class="val" data-i18n="val.8">Эксклюзивные условия</span><span class="val" data-i18n="val.9">Консьерж на связи 24/7</span>
-      </div>
     </div>
   </div>
 </section>
@@ -2298,7 +2289,7 @@ section#rent,section#sale{padding-top:10px}
           <li><a href="/buy" data-i18n="ft.buy">Покупка</a></li>
           <li><a href="/rent" data-i18n="nav.rent">Аренда</a></li>
           <li><a href="/#map" data-i18n="nav.map">Районы</a></li>
-          <li><a href="/#about" data-i18n="nav.about">О нас</a></li>
+          <li><a href="/about" data-i18n="nav.about">О нас</a></li>
           <li><a href="/#faq">FAQ</a></li>
           <!-- Эльнур 08.09: «выгрузить объект должно быть на сайте, чтобы можно было
                кинуть эту форму лиду в переписке и он через сайт всё сделал» -->
@@ -2518,7 +2509,7 @@ ru: {
   "who.p1":"В 2011 году я впервые оказался на Пхукете — и сразу почувствовал, что это место особенное. Несколько раз я возвращался сюда снова и снова, пока однажды не решил остаться.",
   "who.p2":"Более 5 лет я помогаю другим людям сделать этот остров своим домом — так же, как когда-то сделал это сам. Вам не придётся разбираться в рынке, переговорах и документах — мы всё объясним простыми словами и пройдём с вами путь до ключей в руках.",
   "who.m1":"реализованных проектов","who.m2v":"450+ млн ฿","who.m2":"помог инвестировать за год","who.m3":"средняя доходность — прогноз, не гарантия","who.m4v":"5+ лет","who.m4":"в сфере недвижимости",
-  "who.cta":"Задать вопрос",
+  "who.cta":"Задать вопрос","who.more":"Подробнее о нас","appr.lab":"Наш подход",
   "steps.lab":"Пошаговый процесс","steps.h2":"Сопровождаем на каждом этапе",
   "st.1t":"Разбираемся в задаче","st.1p":"Цель, бюджет, сроки, нужна ли аренда. Присылаем 3–5 вариантов с расчётом, а не весь каталог.","st.2t":"Встреча на 20 минут","st.2p":"Онлайн или в офисе на Пхукете. Показываем объекты, считаем доходность, отвечаем на вопросы. Ни к чему не обязывает.","st.3t":"Смотрим объекты","st.3p":"Забираем и возим сами. Если вы не на острове — снимаем видео с площадки и показываем готовые дома того же застройщика.","st.4t":"Проверяем документы","st.4p":"Разрешение на строительство, землю, право собственности и репутацию застройщика. Что нашли — говорим, даже если это против сделки.","st.5t":"Бронируем лот","st.5p":"Резервация закрепляет за вами конкретный юнит и цену, пока готовится договор.","st.6t":"Договор и оплата","st.6p":"Разбираем договор по пунктам, помогаем с переводом денег и ведём платежи по графику застройщика.","st.7t":"Приёмка и ключи","st.7p":"Проверяем объект перед передачей, добиваемся устранения замечаний, оформляем передачу и счётчики.","st.8t":"Дальше — с вами","st.8p":"Мебель, визы, сдача в аренду и управление. Доход и расходы видны в личном кабинете, а не в переписке.",
   "serv.lab":"Организуем всё","serv.h2":"Услуги под ключ — от строительства до юристов",
@@ -2696,7 +2687,7 @@ en: {
   "who.p1":"In 2011 I first came to Phuket — and immediately felt this place was special. I kept coming back until one day I decided to stay.",
   "who.p2":"For more than 5 years I have been helping people make this island their home — just as I once did myself. You will not need to figure out the market, negotiations or paperwork — we explain everything in plain words and walk with you all the way to the keys.",
   "who.m1":"projects realized","who.m2v":"450+ mln ฿","who.m2":"invested with my help in a year","who.m3":"average yield — a forecast, not a guarantee","who.m4v":"5+ years","who.m4":"in real estate",
-  "who.cta":"Ask a question",
+  "who.cta":"Ask a question","who.more":"More about us","appr.lab":"Our approach",
   "steps.lab":"Step by step","steps.h2":"With you at every stage",
   "st.1t":"We work out the task","st.1p":"Goal, budget, timing, whether you will rent it out. We send 3–5 options with the numbers, not the whole catalogue.","st.2t":"A 20-minute meeting","st.2p":"Online or at our Phuket office. We show properties, work out the yield and answer questions. No obligation.","st.3t":"We view properties","st.3p":"We pick you up and drive you. Not on the island? We film the site and show finished homes by the same developer.","st.4t":"We check the papers","st.4p":"Construction permit, land, title and the developer\u2019s record. Whatever we find, we tell you — even when it argues against the deal.","st.5t":"We reserve the unit","st.5p":"The reservation holds your specific unit and price while the contract is prepared.","st.6t":"Contract and payment","st.6p":"We go through the contract clause by clause, help with the transfer and track payments against the developer schedule.","st.7t":"Handover and keys","st.7p":"We inspect before handover, push for defects to be fixed, and handle the transfer and utility meters.","st.8t":"And after that","st.8p":"Furniture, visas, renting out and management. Income and costs live in your account, not in a chat thread.",
   "serv.lab":"We organise everything","serv.h2":"Turnkey services — from construction to legal",

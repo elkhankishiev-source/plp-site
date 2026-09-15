@@ -2094,7 +2094,7 @@ body{background:var(--bg)}
       <a href="/rent" data-i18n="nav.rent">Аренда</a>
       <a href="/#map" data-i18n="nav.map">Районы</a>
       <a href="/management">Управление</a>
-      <a href="/#about" data-i18n="nav.about">О нас</a>
+      <a href="/about" data-i18n="nav.about">О нас</a>
     </nav>
     <div class="htools">
       <div class="lang" role="group" aria-label="Язык">
@@ -2123,7 +2123,7 @@ body{background:var(--bg)}
     <a href="#map" onclick="toggleNav(false)" data-i18n="nav.map">Районы</a>
     <a href="/management">Управление</a>
     <a href="/add-property">Разместить объект</a>
-    <a href="#about" onclick="toggleNav(false)" data-i18n="nav.about">О нас</a>
+    <a href="/about" onclick="toggleNav(false)" data-i18n="nav.about">О нас</a>
     <!-- Эльнур 06.09: язык и оформление на телефоне живут здесь, одинаково
          на сайте и в кабинете. В шапке их на узком экране нет. -->
     <div class="mtools">
@@ -2360,7 +2360,7 @@ body{background:var(--bg)}
   </div>
 </section>
 
-<!-- ===== CASES ===== -->
+<!-- PLP:PART:cases:START --><!-- ===== CASES ===== -->
 <!-- Кейсы взяты из нашей базы знаний (Notion, «Кейсы и успешные сделки»).
      Имена не указываем: в источнике их нет, а придумывать имена под отзывы нельзя.
      У каждой сделки подписан срок — без срока рост цены ничего не значит. -->
@@ -2380,7 +2380,7 @@ body{background:var(--bg)}
       <div class="case reveal"><div class="top"><span class="av"><svg viewBox="0 0 40 46" aria-hidden="true"><rect width="40" height="46" fill="#E2E7E4"/><path d="M20 27.5c7 0 12 5 12 12v6.5H8V39.5c0-7 5-12 12-12z" fill="#8C8F6E"/><circle cx="20" cy="18" r="8.2" fill="#F2D8BC"/><circle cx="17.2" cy="17.4" r="1.05" fill="#3B2F2A"/><circle cx="22.8" cy="17.4" r="1.05" fill="#3B2F2A"/><path d="M17.4 21.8h5.2" stroke="#3B2F2A" stroke-width="1.1" fill="none" stroke-linecap="round"/><path d="M11 15c0-6 4-9 9-9s9 3 9 9c0 1-1 2-1 2 0-4-3-6-8-6s-8 2-8 6c0 0-1-1-1-2z" fill="#4A3B2A"/></svg></span><div><b data-i18n="cs.6n">Квартира, которая платит за себя</b><span data-i18n="cs.6w">Кредит застройщика 5% на 5 лет</span></div></div><div class="grid"><div><b data-i18n="cs.6buy">฿14 млн</b><span data-i18n="cs.buy">цена покупки</span></div><div><b data-i18n="cs.6r">฿70 тыс/мес</b><span data-i18n="cs.rent">доход от аренды</span></div><div><b data-i18n="cs.6now">฿15,4 млн</b><span data-i18n="cs.now">цена сейчас</span></div><div><b>+10%</b><span data-i18n="cs.6t">аренда кроет половину платежа</span></div></div></div>
     </div>
   </div>
-</section>
+</section><!-- PLP:PART:cases:END -->
 
 <!-- ===== RENT ===== -->
 <section id="map" aria-labelledby="map-title" style="padding-top:0">
@@ -2444,12 +2444,11 @@ body{background:var(--bg)}
   </div>
 </section>
 
-<!-- ===== ADVANTAGES ===== -->
+<!-- ===== НАШ ПОДХОД (15.09: «Преимущества», «Ценности» и «Сервис» сведены в один блок; ценности и сервис — на /about) ===== -->
 <section id="do" style="padding-top:0">
   <div class="container">
     <div class="reveal">
-      <div class="srv-strip"><div class="srv-head"><span class="kicker" data-i18n="srv.lab">Сервис</span><h3 data-i18n="srv.h2">Не только сделка</h3><p data-i18n="srv.p">Встретим, довезём, поможем на месте. Условия согласуем лично — напишите, что нужно.</p></div><div class="srv-cards"><button type="button" class="srv-card" onclick="requestService('transfer')"><b data-i18n="srv.transfer">Трансфер на просмотр</b><span data-i18n="srv.transfer.d">Показываем объекты — забираем и привозим</span><i data-i18n="srv.cta">Оставить заявку</i></button><button type="button" class="srv-card" onclick="requestService('meet')"><b data-i18n="srv.meet">Встреча в аэропорту</b><span data-i18n="srv.meet.d">Встретим рейс и довезём до жилья</span><i data-i18n="srv.cta">Оставить заявку</i></button><button type="button" class="srv-card" onclick="requestService('clean')"><b data-i18n="srv.clean">Уборка</b><span data-i18n="srv.clean.d">Для тех, кто уже живёт в нашем объекте</span><i data-i18n="srv.cta">Оставить заявку</i></button></div></div>
-      <span class="kicker" data-i18n="do.lab">Преимущества</span>
+      <span class="kicker" data-i18n="appr.lab">Наш подход</span>
       <h2 data-i18n="do.h2">С нами легко выбрать, купить и переехать</h2>
     </div>
     <div class="adv">
@@ -2459,14 +2458,6 @@ body{background:var(--bg)}
       <div class="c reveal"><span class="ic">🧭</span><h4 data-i18n="do.4t">Сопровождение на всех этапах</h4><p data-i18n="do.4p">Показы, документы и даже помощь после покупки — на нас.</p></div>
       <div class="c reveal"><span class="ic">⚖️</span><h4 data-i18n="do.5t">Юридическая поддержка</h4><p data-i18n="do.5p">Сделки сопровождают юристы по тайскому рынку.</p></div>
       <div class="c reveal"><span class="ic">🌍</span><h4 data-i18n="do.6t">Удалённое оформление</h4><p data-i18n="do.6p">Купить или арендовать можно за тысячи километров.</p></div>
-    </div>
-    <div class="reveal" style="margin-top:28px">
-      <span class="kicker" data-i18n="val.lab">Наши ценности</span>
-      <h3 data-i18n="val.h2">Почему с нами спокойно</h3>
-      <div class="values">
-        <span class="val" data-i18n="val.1">Честно и на равных</span><span class="val" data-i18n="val.2">Без давления</span><span class="val" data-i18n="val.3">Простым языком</span>
-        <span class="val" data-i18n="val.4">На стороне клиента</span><span class="val" data-i18n="val.5">Сервис до и после сделки</span><span class="val" data-i18n="val.6">Прозрачные цифры</span><span class="val" data-i18n="val.7">Заботимся, а не продаём</span><span class="val" data-i18n="val.8">Эксклюзивные условия</span><span class="val" data-i18n="val.9">Консьерж на связи 24/7</span>
-      </div>
     </div>
   </div>
 </section>
@@ -2485,39 +2476,14 @@ body{background:var(--bg)}
       <h2 id="about-title" data-i18n="who.h2">Здравствуйте! Меня зовут Эльнур Ханкишиев</h2>
       <p class="sub" data-i18n="who.p1">В 2011 году я впервые оказался на Пхукете — и сразу почувствовал, что это место особенное. Несколько раз я возвращался сюда снова и снова, пока однажды не решил остаться.</p>
       <p class="sub" data-i18n="who.p2">Более 5 лет я помогаю другим людям сделать этот остров своим домом — так же, как когда-то сделал это сам. Вам не придётся разбираться в рынке, переговорах и документах — мы всё объясним простыми словами и пройдём с вами путь до ключей в руках.</p>
-      <div class="metrics">
-        <div><b>237+</b><span data-i18n="who.m1">закрытых сделок</span></div>
-        <div><b data-i18n="who.m2v">450+ млн ฿</b><span data-i18n="who.m2">помог инвестировать за год</span></div>
-        <div><b>6–12%</b><span data-i18n="who.m3">средняя доходность</span></div>
-        <div><b data-i18n="who.m4v">5+ лет</b><span data-i18n="who.m4">в сфере недвижимости</span></div>
-      </div>
       <div class="hero-cta">
-        <button type="button" class="btn btn-green" onclick="openChat('about')" data-i18n="who.cta">Задать вопрос</button>
+        <a class="btn btn-green" href="/about" data-i18n="who.more">Подробнее о нас</a>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ===== STEPS ===== -->
-<section id="steps" style="padding-top:0">
-  <div class="container">
-    <div class="reveal">
-      <span class="kicker" data-i18n="steps.lab">Пошаговый процесс</span>
-      <h2 data-i18n="steps.h2">Сопровождаем на каждом этапе</h2>
-    </div>
-    <div class="steps">
-      <div class="step reveal"><div class="n">01</div><h4 data-i18n="st.1t">Разбираемся в задаче</h4><p data-i18n="st.1p">Цель, бюджет, сроки, нужна ли аренда. Присылаем 3–5 вариантов с расчётом, а не весь каталог.</p></div>
-      <div class="step reveal"><div class="n">02</div><h4 data-i18n="st.2t">Встреча на 20 минут</h4><p data-i18n="st.2p">Онлайн или в офисе на Пхукете. Показываем объекты, считаем доходность, отвечаем на вопросы. Ни к чему не обязывает.</p></div>
-      <div class="step reveal"><div class="n">03</div><h4 data-i18n="st.3t">Смотрим объекты</h4><p data-i18n="st.3p">Забираем и возим сами. Если вы не на острове — снимаем видео с площадки и показываем готовые дома того же застройщика.</p></div>
-      <div class="step reveal"><div class="n">04</div><h4 data-i18n="st.4t">Проверяем документы</h4><p data-i18n="st.4p">Разрешение на строительство, землю, право собственности и репутацию застройщика. Что нашли — говорим, даже если это против сделки.</p></div>
-      <div class="step reveal"><div class="n">05</div><h4 data-i18n="st.5t">Бронируем лот</h4><p data-i18n="st.5p">Резервация закрепляет за вами конкретный юнит и цену, пока готовится договор.</p></div>
-      <div class="step reveal"><div class="n">06</div><h4 data-i18n="st.6t">Договор и оплата</h4><p data-i18n="st.6p">Разбираем договор по пунктам, помогаем с переводом денег и ведём платежи по графику застройщика.</p></div>
-      <div class="step reveal"><div class="n">07</div><h4 data-i18n="st.7t">Приёмка и ключи</h4><p data-i18n="st.7p">Проверяем объект перед передачей, добиваемся устранения замечаний, оформляем передачу и счётчики.</p></div>
-      <div class="step reveal"><div class="n">08</div><h4 data-i18n="st.8t">Дальше — с вами</h4><p data-i18n="st.8p">Мебель, визы, сдача в аренду и управление. Доход и расходы видны в личном кабинете, а не в переписке.</p></div>
-    </div>
-    </div>
-  </div>
-</section>
+<!-- ===== STEPS: 15.09 переехали на /about (build/parts/about-steps.html) ===== -->
 
 <!-- ===== SERVICES ===== -->
 <section style="padding-top:0">
@@ -2598,7 +2564,7 @@ body{background:var(--bg)}
 
 </section>
 
-<!-- ===== FINAL CTA ===== -->
+<!-- PLP:PART:final:START --><!-- ===== FINAL CTA ===== -->
 <div class="container reveal">
   <div class="final">
     <h2 data-i18n="cta.h2">Поможем выбрать, купить и переехать</h2>
@@ -2614,6 +2580,7 @@ body{background:var(--bg)}
     достаточно нажать «Начать», дальше он спросит сам.</p>
   </div>
 </div>
+<!-- PLP:PART:final:END -->
 
 <!-- PLP:OBJECT-INDEX:START — сгенерировано build/gen.mjs, вручную не править -->
 <section class="obj-index" id="all-objects"><div class="container"><details class="oi-box"><summary><b>Объекты в каталоге</b><span class="oi-n">47</span></summary><p class="sub">Все проекты, с которыми мы работаем, — с ценами от застройщика и условиями рассрочки.</p><ul class="oi-list"><li><a href="object/ayana">AYANA Heights Seaview Residences</a><span class="oi-d">Лаян</span><span class="oi-p">3,7 млн ฿</span></li><li><a href="object/bellaguna">Bellaguna Lake Residences</a><span class="oi-d">Лагуна</span><span class="oi-p">14,1 млн ฿</span></li><li><a href="object/clover">Clover Residence</a><span class="oi-d">Банг Тао</span><span class="oi-p">66,3 млн ฿</span></li><li><a href="object/eden-park">Eden · Park Residences</a><span class="oi-d">Банг Тао</span><span class="oi-p">11,9 млн ฿</span></li><li><a href="object/eden-res">Eden Residences</a><span class="oi-d">Банг Тао</span><span class="oi-p">13,9 млн ฿</span></li><li><a href="object/eden-etro">ETRO Residences Phuket</a><span class="oi-d">Банг Тао</span></li><li><a href="object/everprime">Ever Prime</a><span class="oi-d">Карон</span></li><li><a href="object/fantasy-rawai">Fantasy Plus Rawai</a><span class="oi-d">Равай</span><span class="oi-p">5,7 млн ฿</span></li><li><a href="object/eden">Gardens of Eden</a><span class="oi-d">Банг Тао</span><span class="oi-p">7,8 млн ฿</span></li><li><a href="object/hythe">HYTHE by Botanica</a><span class="oi-d">Лаян</span><span class="oi-p">11,0 млн ฿</span></li><li><a href="object/manor">Manor</a><span class="oi-d">Банг Тао</span><span class="oi-p">28,5 млн ฿</span></li><li><a href="object/mono-champaca">Mono Champaca, Таланг</a><span class="oi-d">Таланг</span><span class="oi-p">17,9 млн ฿</span></li><li><a href="object/mori1">MORI 1</a><span class="oi-d">Банг Тао</span><span class="oi-p">16,5 млн ฿</span></li><li><a href="object/mori-valley">MORI The Valley</a><span class="oi-d">Банг Тао</span><span class="oi-p">16,7 млн ฿</span></li><li><a href="object/panora-villa">Panora Villas, Сурин — перепродажа</a><span class="oi-d">Сурин</span><span class="oi-p">19,9 млн ฿</span></li><li><a href="object/peylaa">PEYLAA Phuket, Autograph Collection Residences</a><span class="oi-d">Банг Тао</span><span class="oi-p">7,9 млн ฿</span></li><li><a href="object/sudara">Sudara Phuket</a><span class="oi-d">Банг Тао</span></li><li><a href="object/sunhills-layan">SUN HILLS Layan</a><span class="oi-d">Лаян</span><span class="oi-p">3,3 млн ฿</span></li><li><a href="object/balcony">The BALCONY Nai Yang</a><span class="oi-d">Най Янг</span><span class="oi-p">6,1 млн ฿</span></li><li><a href="object/gens-botanica">The GENS by Botanica, у Blue Tree</a><span class="oi-d">Банг Тао</span><span class="oi-p">5,5 млн ฿</span></li><li><a href="object/liberty">The Liberty by Wallaya Villas</a><span class="oi-d">Банг Тао</span><span class="oi-p">8,2 млн ฿</span></li><li><a href="object/modeva">The Modeva Bang-Tao</a><span class="oi-d">Банг Тао</span><span class="oi-p">4,8 млн ฿</span></li><li><a href="object/panora-condo">The Panora Phuket, корпус D — перепродажа</a><span class="oi-d">Сурин</span><span class="oi-p">4,4 млн ฿</span></li><li><a href="object/intercontinental">The Residences at InterContinental Phuket Resort</a><span class="oi-d">Камала</span><span class="oi-p">13,6 млн ฿</span></li><li><a href="object/standard">The Standard Residences Phuket Bang Tao</a><span class="oi-d">Банг Тао</span></li><li><a href="object/adora">The Title Adora Rawai</a><span class="oi-d">Равай</span><span class="oi-p">5,3 млн ฿</span></li><li><a href="object/biancana">The Title Biancana Surin</a><span class="oi-d">Сурин</span><span class="oi-p">6,2 млн ฿</span></li><li><a href="object/casademonte">The Title Casa De Monte</a><span class="oi-d">Ко Кео</span><span class="oi-p">11,8 млн ฿</span></li><li><a href="object/cielo">The Title Cielo Rawai</a><span class="oi-d">Равай</span><span class="oi-p">6,2 млн ฿</span></li><li><a href="object/coralina">The Title Coralina Kamala</a><span class="oi-d">Камала</span><span class="oi-p">4,8 млн ฿</span></li><li><a href="object/halo1">The Title Halo 1 Naiyang</a><span class="oi-d">Най Янг</span><span class="oi-p">5,1 млн ฿</span></li><li><a href="object/heritage">The Title Heritage Bang-Tao</a><span class="oi-d">Банг Тао</span><span class="oi-p">5,5 млн ฿</span></li><li><a href="object/katabello">The Title Katabello</a><span class="oi-d">Ката</span><span class="oi-p">4,3 млн ฿</span></li><li><a href="object/legendary">The Title Legendary Bang-Tao</a><span class="oi-d">Банг Тао</span><span class="oi-p">6,7 млн ฿</span></li><li><a href="object/serenity">The Title Serenity Naiyang</a><span class="oi-d">Най Янг</span><span class="oi-p">5,2 млн ฿</span></li><li><a href="object/sierra">The Title Sierra</a><span class="oi-d">Банг Тао</span><span class="oi-p">2,9 млн ฿</span></li><li><a href="object/estella">The Title Villa Estella Naiyang</a><span class="oi-d">Най Янг</span><span class="oi-p">22,4 млн ฿</span></li><li><a href="object/kirara">The Title Villa Kirara Bang-Tao</a><span class="oi-d">Банг Тао</span><span class="oi-p">29,0 млн ฿</span></li><li><a href="object/vivana">The Title Vivana Kamala</a><span class="oi-d">Камала</span><span class="oi-p">4,2 млн ฿</span></li><li><a href="object/vivi">The Title VIVI</a><span class="oi-d">Банг Тао</span><span class="oi-p">4,3 млн ฿</span></li><li><a href="object/vivi-r3">The Title VIVI, Банг Тао — перепродажа, 3 этаж</a><span class="oi-d">Банг Тао</span></li><li><a href="object/vivi-r5">The Title VIVI, Банг Тао — перепродажа, 5 этаж</a><span class="oi-d">Банг Тао</span></li><li><a href="object/zero-bangtao">The ZERO Bang Tao</a><span class="oi-d">Банг Тао</span><span class="oi-p">5,1 млн ฿</span></li><li><a href="object/zero-naiyang">The ZERO Nai Yang</a><span class="oi-d">Най Янг</span><span class="oi-p">4,4 млн ฿</span></li><li><a href="object/tonino-ov">Tonino Lamborghini Ocean Valley Villas</a><span class="oi-d">Ao Por</span><span class="oi-p">70,8 млн ฿</span></li><li><a href="object/vibe-karon">Vibe Residence Karon</a><span class="oi-d">Карон</span></li><li><a href="object/zenithy">Zenithy La Ville · Oasis Collection</a><span class="oi-d">Ко Кео</span><span class="oi-p">26,5 млн ฿</span></li></ul></details></div></section>
@@ -2634,7 +2601,7 @@ body{background:var(--bg)}
           <li><a href="#sale" data-i18n="ft.buy">Покупка</a></li>
           <li><a href="/rent" data-i18n="nav.rent">Аренда</a></li>
           <li><a href="#map" data-i18n="nav.map">Районы</a></li>
-          <li><a href="#about" data-i18n="nav.about">О нас</a></li>
+          <li><a href="/about" data-i18n="nav.about">О нас</a></li>
           <li><a href="#faq">FAQ</a></li>
           <!-- Эльнур 08.09: «выгрузить объект должно быть на сайте, чтобы можно было
                кинуть эту форму лиду в переписке и он через сайт всё сделал» -->
@@ -2853,7 +2820,7 @@ ru: {
   "who.p1":"В 2011 году я впервые оказался на Пхукете — и сразу почувствовал, что это место особенное. Несколько раз я возвращался сюда снова и снова, пока однажды не решил остаться.",
   "who.p2":"Более 5 лет я помогаю другим людям сделать этот остров своим домом — так же, как когда-то сделал это сам. Вам не придётся разбираться в рынке, переговорах и документах — мы всё объясним простыми словами и пройдём с вами путь до ключей в руках.",
   "who.m1":"реализованных проектов","who.m2v":"450+ млн ฿","who.m2":"помог инвестировать за год","who.m3":"средняя доходность — прогноз, не гарантия","who.m4v":"5+ лет","who.m4":"в сфере недвижимости",
-  "who.cta":"Задать вопрос",
+  "who.cta":"Задать вопрос","who.more":"Подробнее о нас","appr.lab":"Наш подход",
   "steps.lab":"Пошаговый процесс","steps.h2":"Сопровождаем на каждом этапе",
   "st.1t":"Разбираемся в задаче","st.1p":"Цель, бюджет, сроки, нужна ли аренда. Присылаем 3–5 вариантов с расчётом, а не весь каталог.","st.2t":"Встреча на 20 минут","st.2p":"Онлайн или в офисе на Пхукете. Показываем объекты, считаем доходность, отвечаем на вопросы. Ни к чему не обязывает.","st.3t":"Смотрим объекты","st.3p":"Забираем и возим сами. Если вы не на острове — снимаем видео с площадки и показываем готовые дома того же застройщика.","st.4t":"Проверяем документы","st.4p":"Разрешение на строительство, землю, право собственности и репутацию застройщика. Что нашли — говорим, даже если это против сделки.","st.5t":"Бронируем лот","st.5p":"Резервация закрепляет за вами конкретный юнит и цену, пока готовится договор.","st.6t":"Договор и оплата","st.6p":"Разбираем договор по пунктам, помогаем с переводом денег и ведём платежи по графику застройщика.","st.7t":"Приёмка и ключи","st.7p":"Проверяем объект перед передачей, добиваемся устранения замечаний, оформляем передачу и счётчики.","st.8t":"Дальше — с вами","st.8p":"Мебель, визы, сдача в аренду и управление. Доход и расходы видны в личном кабинете, а не в переписке.",
   "serv.lab":"Организуем всё","serv.h2":"Услуги под ключ — от строительства до юристов",
@@ -3031,7 +2998,7 @@ en: {
   "who.p1":"In 2011 I first came to Phuket — and immediately felt this place was special. I kept coming back until one day I decided to stay.",
   "who.p2":"For more than 5 years I have been helping people make this island their home — just as I once did myself. You will not need to figure out the market, negotiations or paperwork — we explain everything in plain words and walk with you all the way to the keys.",
   "who.m1":"projects realized","who.m2v":"450+ mln ฿","who.m2":"invested with my help in a year","who.m3":"average yield — a forecast, not a guarantee","who.m4v":"5+ years","who.m4":"in real estate",
-  "who.cta":"Ask a question",
+  "who.cta":"Ask a question","who.more":"More about us","appr.lab":"Our approach",
   "steps.lab":"Step by step","steps.h2":"With you at every stage",
   "st.1t":"We work out the task","st.1p":"Goal, budget, timing, whether you will rent it out. We send 3–5 options with the numbers, not the whole catalogue.","st.2t":"A 20-minute meeting","st.2p":"Online or at our Phuket office. We show properties, work out the yield and answer questions. No obligation.","st.3t":"We view properties","st.3p":"We pick you up and drive you. Not on the island? We film the site and show finished homes by the same developer.","st.4t":"We check the papers","st.4p":"Construction permit, land, title and the developer\u2019s record. Whatever we find, we tell you — even when it argues against the deal.","st.5t":"We reserve the unit","st.5p":"The reservation holds your specific unit and price while the contract is prepared.","st.6t":"Contract and payment","st.6p":"We go through the contract clause by clause, help with the transfer and track payments against the developer schedule.","st.7t":"Handover and keys","st.7p":"We inspect before handover, push for defects to be fixed, and handle the transfer and utility meters.","st.8t":"And after that","st.8p":"Furniture, visas, renting out and management. Income and costs live in your account, not in a chat thread.",
   "serv.lab":"We organise everything","serv.h2":"Turnkey services — from construction to legal",

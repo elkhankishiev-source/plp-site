@@ -132,7 +132,7 @@ window.addEventListener('load',function(){
   // страница лежит в подпапке — ресурсы и ссылки на уровень выше
   html=html.replace(/href="#top"/g,'href="../index.html"');
   html=html.replace(/href="#(why|sale|rent|map|quiz|about|faq|do|steps|contacts)"/g,'href="../index.html#$1"');
-  html=html.replace(/(href|src)="(img\/|object\/|favicon|buy\.html|rent\.html|owner\.html|management\.html|add-property\.html|districts\/|guide\/|offer\.html|privacy\.html|rules\.html|terms\.html|index\.html)/g,'$1="../$2');
+  html=html.replace(/(href|src)="(img\/|object\/|favicon|buy\.html|rent\.html|owner\.html|management\.html|add-property\.html|about\.html|districts\/|guide\/|offer\.html|privacy\.html|rules\.html|terms\.html|index\.html)/g,'$1="../$2');
   html=html.replace('</body>',autoFilter+'\n</body>');
   fs.writeFileSync(path.join(outDir,d.slug+'.html'),html);
   made.push(d.slug);
