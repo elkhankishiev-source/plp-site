@@ -89,7 +89,7 @@ const M_LIST = `<section id="list-property" style="padding-top:22px"><div class=
           <h2 style="font-size:clamp(24px,3.4vw,34px);margin:0">Разместить объект</h2>
           <!-- ссылку на этот раздел удобно отправить собственнику: бот, WhatsApp, письмо -->
           <button type="button" class="share-btn" data-share="/management#list-property"
-                  data-share-title="Разместить объект — Property Library">🔗 Поделиться</button>
+                  data-share-title="Разместить объект — Property Library"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.6" y1="10.5" x2="15.4" y2="6.5"></line><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"></line></svg><span>Поделиться</span></button>
         </div>
         <p class="sub" style="margin:0 0 14px;max-width:52ch">Зачем это вам: объект попадает к тем, кто уже ищет
         жильё на Пхукете — на сайт, в каталог консьерж-бота и в подборки, которые мы отправляем клиентам.
