@@ -1772,9 +1772,9 @@ body{background:var(--bg)}
 .footer li{margin-bottom:4px;font-size:.74rem;line-height:1.35}
 .footer a{color:var(--muted)}
 .footer a:hover{color:var(--ink)}
-.footer .logo,.footer .lname{font-size:.82rem}
-.footer .logo .chip{width:24px;height:24px;border-radius:7px}
-.footer .logo .chip img{width:15px}
+.footer .logo,.footer .lname{font-size:1.05rem;font-weight:700}   /* 15.09: логотип в подвале заметный */
+.footer .logo .chip{width:40px;height:40px;border-radius:11px}
+.footer .logo .chip img{width:26px}
 .footer-grid{display:grid;gap:10px 16px;grid-template-columns:repeat(2,1fr)}
 .footer-grid>:first-child{grid-column:1/-1}
 @media(min-width:800px){
@@ -2031,6 +2031,14 @@ body{background:var(--bg)}
 .stateshots img{flex:0 0 116px;height:86px;object-fit:cover;border-radius:10px;display:block;
   background:var(--paper)}
 
+/* 15.09 Эльнур: в бургере — тумблер «Сайт | Кабинет», как в шапке. В шапке он прячется до 900px,
+   в меню показываем всегда. */
+.mnav .mswch{display:inline-flex!important;align-self:flex-start;margin:10px 0 2px;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.22);border-radius:999px;padding:3px}
+.mnav .mswch a,.mnav .mswch b{display:block;padding:7px 16px;border-radius:999px;text-decoration:none;
+  font-size:.88rem;font-weight:600;color:rgba(255,255,255,.78)}
+.mnav .mswch b{background:var(--green);color:var(--on-green)}
+
 /* PLP:UI:END */
 
 /* Что Дарья сделала руками: оффер, расчёт, свободные даты */
@@ -2144,7 +2152,7 @@ section#rent,section#sale{padding-top:10px}
         <span id="mThemeIco">◐</span><span data-i18n="nav.theme">Оформление</span>
       </button>
     </div>
-    <a href="/owner" onclick="toggleNav(false)" data-i18n="nav.cabinet">Кабинет</a>
+    <span class="swch mswch" role="group" aria-label="Сайт или кабинет"><b>Сайт</b><a href="/owner" onclick="toggleNav(false)" data-i18n="nav.cabinet">Кабинет</a></span>
     <button type="button" class="mwa" onclick="toggleNav(false);openChat('hi')" data-i18n="nav.chat">Чат с консультантом</button>
   </div>
 </div>
