@@ -2042,6 +2042,21 @@ body{background:var(--bg)}
 .chat-tools .tool ul button,.chat-tools .tool-go{display:inline-block;border:1px solid var(--line);background:transparent;
   color:var(--ink);border-radius:999px;padding:6px 12px;font-size:.82rem;font-weight:600;cursor:pointer;text-decoration:none}
 .chat-tools .tool-go{background:var(--green);color:var(--on-green);border-color:var(--green)}
+
+/* 15.09: светлая тема — карточки белые на почти белом фоне (разница 9 из 255), рамки нет,
+   тень 6%: края пропадали. На тёмной край даёт сам контраст фона, поэтому всё ниже —
+   только для светлой. Кольцо рисуем тенью (без сдвига вёрстки), слабые рамки усиливаем. */
+:root{--ring:0 0 0 0 transparent}
+:root[data-theme="light"]{--ring:0 0 0 1px rgba(10,10,10,.09)}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]){--ring:0 0 0 1px rgba(10,10,10,.09)}}
+.why-card,.car .prop,.prop,.serv-card,.adv .c,.step,.case{box-shadow:var(--ring),var(--shadow-sm)}
+.why-card:hover,.car .prop:hover,.adv .c:hover,.step:hover,.case:hover,.srv-card:hover{box-shadow:var(--ring),var(--shadow)}
+.prop.soon:hover{box-shadow:var(--ring),var(--shadow-sm)}
+@media (hover:none){.prop:hover,.car .prop:hover{box-shadow:var(--ring),var(--shadow-sm)}}
+:root[data-theme="light"] :is(.zwrap:not(.open),.zbud,.footer,.val,.srv-card,.oi-box,.faq-item,.fpan){border-color:rgba(10,10,10,.12)}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]) :is(.zwrap:not(.open),.zbud,.footer,.val,.srv-card,.oi-box,.faq-item,.fpan){border-color:rgba(10,10,10,.12)}
+}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.6.0/maplibre-gl.min.css">
