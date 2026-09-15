@@ -29,12 +29,17 @@ cd plp-site
 
 # 1. правим index.html
 
-# 2. пересобираем всё, что из него растёт
-node build/gen.mjs          # каталог объектов из базы + страницы объектов + sitemap
-node build/mkpages.mjs      # buy.html, rent.html
-node build/mkdistricts.mjs  # districts/*.html — 8 районов
-node build/mkextra.mjs      # management.html + guide/*.html
-node build/addprop.mjs      # add-property.html
+# 2. пересобираем всё, что из него растёт — ОДНОЙ командой
+node build/all.mjs
+# Внутри по порядку: gen (каталог из базы + страницы объектов + sitemap),
+# mkshared (шапка/меню/подвал из build/parts), mkpages (buy, rent),
+# mkdistricts (districts/*), mkextra (management + guide/*), mktheme (тема и
+# защита от мигания), mklinks (чистые адреса без .html: /buy, /object/heritage).
+# Порядок важен: mkshared обязан идти до mkpages/mkdistricts/mkextra, а mklinks —
+# последним. Запуск шагов поодиночке даёт «поломку» вида /buy → buy.html —
+# это не ошибка скриптов, а пропущенный mklinks.
+# add-property.html в сборку НЕ входит: он правится руками, генератор
+# build/addprop.mjs устарел и намеренно не запускается.
 
 # 3. проверяем, что скрипты на странице целы (частая ошибка)
 python3 -c "
@@ -96,7 +101,9 @@ build/gen.mjs         каталог из Supabase, страницы объек�
 build/mkpages.mjs     buy.html и rent.html — каталог сеткой с картой
 build/mkdistricts.mjs 8 страниц районов
 build/mkextra.mjs     management.html и гайды (тексты в build/faq.json)
-build/addprop.mjs     add-property.html — пошаговая форма приёма объекта
+build/all.mjs         вся сборка одной командой (порядок шагов внутри)
+build/mklinks.mjs     чистые адреса без .html на всех страницах
+build/addprop.mjs     УСТАРЕЛ, не запускать: add-property.html правится руками
 img/                  картинки, включая img/brand/ — логотипы
 CNAME                 привязка домена, не удалять
 ```
