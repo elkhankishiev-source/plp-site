@@ -112,7 +112,7 @@ setTimeout(function(){
     var tab = q.get('tab');
     function open(t){ var a = nav.querySelector('a[data-tab="'+t+'"]'); if(a){ a.click(); } return a; }
     if (q.get('mode') === 'shot') {
-      if (tab) { open(tab); var b2=document.getElementById('cab-body'); if(b2) b2.scrollIntoView({block:'start'}); window.scrollBy(0,-120); }
+      if (tab && tab !== 'entry') { open(tab); var b2=document.getElementById('cab-body'); if(b2) b2.scrollIntoView({block:'start'}); window.scrollBy(0,-120); }
       return;
     }
     var pid = q.get('pid'), all = (window.__DATA.properties||[]);
@@ -259,7 +259,7 @@ def main():
         if '--shots' in sys.argv and best:
             os.makedirs(SHOTS, exist_ok=True)
             for width, label in ((1400, 'mac'), (390, 'phone')):
-                for t in ['overview'] + OBJ_TABS:
+                for t in ['entry', 'overview'] + OBJ_TABS:
                     path = os.path.join(SHOTS, '%s-%s.png' % (label, t))
                     url, ww, hh = page_url(width, 1400 if width > 900 else 1700,
                                            'pid=%s&mode=shot&tab=%s' % (best['id'], t))

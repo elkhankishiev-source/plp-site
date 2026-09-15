@@ -1129,6 +1129,14 @@ button#send-code,button#send-code-2,button#do-login,button#do-reg{
 .ctx-f>span{display:block;font-size:.68rem;letter-spacing:.09em;text-transform:uppercase;
   color:var(--muted);margin-bottom:5px}
 .ctx-note{margin:9px 0 0;font-size:.8rem;color:var(--muted)}
+/* 15.09 Эльнур: «на самом верху фильтр тонкий аккуратный: лид/клиент компании и объект» */
+.cab-ctx{padding:6px 10px;border-radius:12px;margin-bottom:16px}
+.cab-ctx .ctx-row{gap:6px 14px}
+.cab-ctx .ctx-f{display:flex;align-items:center;gap:8px;min-width:0}
+.cab-ctx .ctx-f>span{margin:0;white-space:nowrap;font-size:.62rem}
+.cab-ctx .ctx-f>div{flex:1;min-width:0}
+.cab-ctx .pickbtn{min-height:32px;padding-top:5px;padding-bottom:5px;font-size:.84rem}
+.cab-ctx .ctx-note{margin:3px 2px 1px;font-size:.7rem}
 .nav-n{margin-left:8px;color:var(--olive);font-size:.82rem;font-weight:800}
 .bellbtn{position:relative;display:inline-flex;align-items:center;justify-content:center;
   width:34px;height:34px;border-radius:11px;border:1px solid rgba(var(--ink-rgb),.14);
@@ -1217,8 +1225,8 @@ a.lnk,.lnk{color:var(--olive)}
    а содержимое возвращаем во вторую колонку. */
 @media(min-width:1000px){
   #app{display:grid;grid-template-columns:230px minmax(0,1fr);gap:26px;align-items:start}
-  #cab-ctx{grid-column:1/-1;order:-1}
-  #cab-hello{grid-column:1/-1;order:-2}   /* 15.09: приветствие отдельно, над выбором и разделами */
+  #cab-ctx{grid-column:1/-1;order:-2}
+  #cab-hello{grid-column:1/-1;order:-1}   /* 15.09: сверху фильтр, под ним приветствие, ниже разделы */
   #cab-nav{grid-column:1;position:sticky;top:96px}
   #cab-body{grid-column:2;margin:0}
   .wrap{max-width:1180px}
@@ -2242,7 +2250,6 @@ body{background:var(--bg)}
   </div>
 
   <div id="app" style="display:none">
-    <div id="cab-hello"></div>
     <div id="cab-ctx" class="cab-ctx" hidden data-build="05.09-4">
       <div class="ctx-row">
         <label class="ctx-f" id="ctx-lead-w"><span>Лид / клиент компании</span><div id="ctx-lead"></div></label>
@@ -2251,6 +2258,7 @@ body{background:var(--bg)}
       <p class="ctx-note" id="ctx-note"></p>
       <div id="as-banner" class="as-banner" hidden></div>
     </div>
+    <div id="cab-hello"></div>
     <div id="cab-nav" class="cab-nav" aria-label="Разделы кабинета">
       <a data-tab="overview">Обзор</a>
       <a data-tab="calendar">Бронирования</a>
