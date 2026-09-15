@@ -49,8 +49,17 @@ function apply(file, variant) {
     html = html.slice(0, i + open.length) + '\n' + body + '\n' + html.slice(j);
     done++;
   }
+  /* 15.09: подвал и меню пишут ссылки якорями (#sale, #map, #about, #faq). На главной они
+     ведут к разделам, а в кабинете и анкете таких разделов нет — ссылки были мёртвыми.
+     Якорь, которого на странице нет, ведём на главную к этому разделу. */
+  let fixed = 0;
+  html = html.replace(/href="#([a-zA-Z][\w-]*)"/g, (all, id) => {
+    if (html.includes('id="' + id + '"')) return all;
+    fixed++;
+    return id === 'top' ? 'href="/"' : 'href="/#' + id + '"';
+  });
   fs.writeFileSync(full, html);
-  console.log(`${file}: обновлено частей ${done}/${MARKS.length}`);
+  console.log(`${file}: обновлено частей ${done}/${MARKS.length}` + (fixed ? `, якорей на главную: ${fixed}` : ''));
   return done;
 }
 
