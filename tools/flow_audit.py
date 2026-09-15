@@ -496,7 +496,7 @@ def main():
     tok = cab_check.token()
     data = cab_check.fetch_data(tok) if tok else {'ok': True, 'owner': {'name': 'Тест', 'is_staff': True}, 'properties': [], 'totals': {}}
     jpg, pdf = make_files()
-    srv = cab_check.serve(cab_check.build_page().replace('setTimeout(function(){\n  var q = new URLSearchParams', 'if(false)setTimeout(function(){\n  var q = new URLSearchParams'), data)
+    srv = cab_check.serve(cab_check.build_page(stub=False).replace('setTimeout(function(){\n  var q = new URLSearchParams', 'if(false)setTimeout(function(){\n  var q = new URLSearchParams'), data)
     report = {'started': time.strftime('%Y-%m-%d %H:%M'), 'scenarios': []}
     try:
         with sync_playwright() as pw:

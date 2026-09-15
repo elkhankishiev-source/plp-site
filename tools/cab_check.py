@@ -170,10 +170,12 @@ def page_url(width, height, qs):
     return ('http://127.0.0.1:%d/__wrap.html?w=%d&h=%d&src=%s' % (PORT, width, height, quote(inner, safe=''))), 520, height
 
 
-def build_page():
+def build_page(stub=True):
+    """stub=False — без подмены сети внутри страницы: запросы идут наружу и их перехватывает
+    Playwright (flow_audit/journeys), иначе действия кабинета не видны в записи."""
     html = open(os.path.join(ROOT, 'owner.html'), encoding='utf-8').read()
     i = html.lower().find('<head>') + 6
-    html = html[:i] + STUB + html[i:]
+    html = html[:i] + (STUB if stub else '') + html[i:]
     k = html.rfind('</body>')          # в кабинете первое </body> живёт внутри JS-строки
     probe = PROBE.replace('__OBJ_TABS__', json.dumps(OBJ_TABS))
     return html[:k] + probe + html[k:]
