@@ -1129,14 +1129,12 @@ button#send-code,button#send-code-2,button#do-login,button#do-reg{
 .ctx-f>span{display:block;font-size:.68rem;letter-spacing:.09em;text-transform:uppercase;
   color:var(--muted);margin-bottom:5px}
 .ctx-note{margin:9px 0 0;font-size:.8rem;color:var(--muted)}
-/* 15.09 Эльнур: «на самом верху фильтр тонкий аккуратный: лид/клиент компании и объект» */
-.cab-ctx{padding:6px 10px;border-radius:12px;margin-bottom:16px}
-.cab-ctx .ctx-row{gap:6px 14px}
-.cab-ctx .ctx-f{display:flex;align-items:center;gap:8px;min-width:0}
-.cab-ctx .ctx-f>span{margin:0;white-space:nowrap;font-size:.62rem}
-.cab-ctx .ctx-f>div{flex:1;min-width:0}
-.cab-ctx .pickbtn{min-height:32px;padding-top:5px;padding-bottom:5px;font-size:.84rem}
-.cab-ctx .ctx-note{margin:3px 2px 1px;font-size:.7rem}
+/* 15.09 Эльнур: фильтр как был — подписи над полями, ровно в две колонки — только тоньше и наверху */
+.cab-ctx{padding:8px 12px 7px;border-radius:12px;margin-bottom:16px}
+.cab-ctx .ctx-row{gap:8px 12px}
+.cab-ctx .ctx-f>span{margin-bottom:3px;font-size:.62rem}
+.cab-ctx .pickbtn{padding-top:6px;padding-bottom:6px;font-size:.86rem}
+.cab-ctx .ctx-note{margin:5px 0 0;font-size:.72rem}
 .nav-n{margin-left:8px;color:var(--olive);font-size:.82rem;font-weight:800}
 .bellbtn{position:relative;display:inline-flex;align-items:center;justify-content:center;
   width:34px;height:34px;border-radius:11px;border:1px solid rgba(var(--ink-rgb),.14);
@@ -1664,9 +1662,9 @@ body{background:var(--bg)}
 .footer li{margin-bottom:4px;font-size:.74rem;line-height:1.35}
 .footer a{color:var(--muted)}
 .footer a:hover{color:var(--ink)}
-.footer .logo,.footer .lname{font-size:.82rem}
-.footer .logo .chip{width:24px;height:24px;border-radius:7px}
-.footer .logo .chip img{width:15px}
+.footer .logo,.footer .lname{font-size:1.05rem;font-weight:700}   /* 15.09: логотип в подвале заметный */
+.footer .logo .chip{width:40px;height:40px;border-radius:11px}
+.footer .logo .chip img{width:26px}
 .footer-grid{display:grid;gap:10px 16px;grid-template-columns:repeat(2,1fr)}
 .footer-grid>:first-child{grid-column:1/-1}
 @media(min-width:800px){
@@ -1923,6 +1921,14 @@ body{background:var(--bg)}
 .stateshots img{flex:0 0 116px;height:86px;object-fit:cover;border-radius:10px;display:block;
   background:var(--paper)}
 
+/* 15.09 Эльнур: в бургере — тумблер «Сайт | Кабинет», как в шапке. В шапке он прячется до 900px,
+   в меню показываем всегда. */
+.mnav .mswch{display:inline-flex!important;align-self:flex-start;margin:10px 0 2px;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.22);border-radius:999px;padding:3px}
+.mnav .mswch a,.mnav .mswch b{display:block;padding:7px 16px;border-radius:999px;text-decoration:none;
+  font-size:.88rem;font-weight:600;color:rgba(255,255,255,.78)}
+.mnav .mswch b{background:var(--green);color:var(--on-green)}
+
 /* PLP:UI:END */
 /* Разбор документа: то, что система прочитала, разложенное по пунктам */
 .docread{border:1px solid var(--line);border-radius:14px;margin:8px 0;background:var(--paper)}
@@ -2030,7 +2036,7 @@ body{background:var(--bg)}
         <span id="mThemeIco">◐</span><span data-i18n="nav.theme">Оформление</span>
       </button>
     </div>
-    <a href="/" onclick="toggleNav(false)">На сайт</a>
+    <span class="swch mswch" role="group" aria-label="Сайт или кабинет"><a href="/" onclick="toggleNav(false)">Сайт</a><b>Кабинет</b></span>
     <button type="button" class="mwa" onclick="toggleNav(false);openChat('hi')" data-i18n="nav.chat">Чат с консультантом</button>
   </div>
 </div>
@@ -3916,7 +3922,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
           var f=document.getElementById('cl-form');
           if(f){ f.innerHTML=''; document.body.style.overflow=''; }
           post({action:'uk_tariffs',token:TOKEN,property_id:pid}).then(function(t){
-            if(t&&t.ok){ DATA.tariffs=t.rows||[]; try{ renderProp(); cabPage(CAB_TAB); }catch(e){} }
+            if(t&&t.ok){ DATA.tariffs=t.rows||[]; try{ renderProp(); cabPage(CAB_TAB,true); }catch(e){} }
             say('Тарифы сохранены: '+jobs.length);
           });
         });
@@ -6618,7 +6624,10 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         var it=(opts.items||[]).filter(function(x){return String(x.id)===ids[0];})[0];
         return it ? it.title : ids[0];
       }
-      return 'выбрано: ' + ids.length;
+      /* 15.09 Эльнур: «выбрано 2 объекта, а каких?» — перечисляем названия */
+      var names=ids.map(function(id){ var x=(opts.items||[]).filter(function(y){return String(y.id)===id;})[0];
+                                       return x ? x.title : id; });
+      return ids.length + ': ' + names.join(', ');
     }
     function paint(){
       val.textContent = label();
@@ -8685,7 +8694,7 @@ window.chatVoice=chatVoice;window.listenBar=listenBar;window.paintVoiceMode=pain
          с зафиксированными тарифами». */
       post({action:'uk_tariffs',token:TOKEN,
             property_id:((DATA.properties||[])[CUR]||{}).id||''}).then(function(t){
-        if(t&&t.ok){ DATA.tariffs=t.rows||[]; try{ renderProp(); cabPage(CAB_TAB); }catch(e){} }
+        if(t&&t.ok){ DATA.tariffs=t.rows||[]; try{ renderProp(); cabPage(CAB_TAB,true); }catch(e){} }
       });
     }).catch(function(){
       if(shown){ markStale(false, 'нет связи — показаны последние данные'); return; }
