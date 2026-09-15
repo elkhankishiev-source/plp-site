@@ -1869,6 +1869,11 @@ body{background:var(--bg)}
 .fav{background:rgba(20,21,15,.55)}
 .fav.on{background:#F4F6EA;color:#c9564b}
 .cmpb.on{background:var(--green);color:var(--on-green)}
+/* 15.09: на компьютере в светлой теме правило .prop .fav (стекло = белое) побеждало общее
+   по точности: белый кружок, почти белое сердце и «Сравнить» — не видно. Та же точность, но позже. */
+.prop .fav,.prop .cmpb{background:rgba(20,21,15,.55);color:#F4F6EA}
+.prop .fav.on{background:#F4F6EA;color:#c9564b}
+.prop .cmpb.on{background:var(--green);color:var(--on-green)}
 /* шторка меню всегда тёмная (--ink-block), поэтому и текст в ней светлый:
    раньше контейнер наследовал цвет темы и на тёмном фоне пропадал */
 .mnav .sheet,.mnav .mtools{color:var(--on-ink)}
