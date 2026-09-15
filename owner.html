@@ -4999,11 +4999,11 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         if(p.district) facts.push(esc(p.district));
         if(p.bedrooms) facts.push(esc(p.bedrooms)+' сп.');
         if(ab.area_sqm) facts.push(esc(ab.area_sqm)+' м²');
-        var money='';
-        if(ec.rent_price_month_thb) money=Number(ec.rent_price_month_thb).toLocaleString('ru-RU')+' ฿/мес';
+        var pubPrice='';  /* 15.09: было «money» — перекрывало общую money() и роняло всю карточку: брони, финансы, расходы, документы, обслуживание открывались пустыми */
+        if(ec.rent_price_month_thb) pubPrice=Number(ec.rent_price_month_thb).toLocaleString('ru-RU')+' ฿/мес';
         else if((p.rates||[]).length){
           var hi=(p.rates||[]).filter(function(r){return r.season==='high';})[0]||p.rates[0];
-          if(hi&&hi.nightly_thb) money='от '+Number(hi.nightly_thb).toLocaleString('ru-RU')+' ฿/ночь';
+          if(hi&&hi.nightly_thb) pubPrice='от '+Number(hi.nightly_thb).toLocaleString('ru-RU')+' ฿/ночь';
         }
         var cardInner=
           '<div class="pubcard">'+
@@ -5011,7 +5011,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
             '<div class="pubbody">'+
               '<div class="pubname">'+esc(p.name||p.id)+'</div>'+
               (facts.length?'<div class="sub">'+facts.join(' · ')+'</div>':'')+
-              (money?'<div class="pubprice">'+esc(money)+'</div>':'')+
+              (pubPrice?'<div class="pubprice">'+esc(pubPrice)+'</div>':'')+
               (ab.usp?'<p class="sub">'+esc(String(ab.usp).slice(0,180))+'</p>':'')+
               '<p class="sub">Это то, что видит клиент. Ссылку можно отправлять как есть.</p>'+
               '<a class="btn ghost" href="'+esc(pageUrl)+'" target="_blank" rel="noopener">Открыть страницу</a>'+
