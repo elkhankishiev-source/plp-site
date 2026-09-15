@@ -1291,7 +1291,7 @@ function sitemap(objects) {
   const anchors = [];
   const pages = [
     ['buy.html', '0.9'], ['rent.html', '0.9'], ['management.html', '0.8'],
-    ['add-property.html', '0.8'],
+    ['add-property.html', '0.8'], ['about.html', '0.7'],
     ...['bang-tao','layan','surin','kamala','rawai','kata','nai-yang','koh-kaew']
         .map(d => ['districts/' + d + '.html', '0.8']),
     ...['inostranec-mozhet-kupit','leasehold-ili-freehold','skolko-oformlyaetsya-sdelka',
