@@ -103,6 +103,12 @@ setTimeout(function(){
       ok('не шире экрана: '+where, sw <= vw + 1, 'ширина '+sw+' при экране '+vw+': '+wide.slice(0,6).join(', '));
     }
     widthOk('вход');
+    /* 15.09 Эльнур: разделов кабинета в бургере быть не должно */
+    try { toggleNav(true); } catch(e){}
+    var mn = document.getElementById('mnav'), labels = Array.prototype.map.call(nav.querySelectorAll('a[data-tab]'), function(a){ return txt(a); });
+    var dup = mn ? Array.prototype.filter.call(mn.querySelectorAll('a,button'), function(b){ return labels.indexOf(txt(b)) >= 0; }).map(txt) : [];
+    ok('в бургере нет разделов кабинета', !dup.length, dup.join(', '));
+    try { toggleNav(false); } catch(e){}
     var tab = q.get('tab');
     function open(t){ var a = nav.querySelector('a[data-tab="'+t+'"]'); if(a){ a.click(); } return a; }
     if (q.get('mode') === 'shot') {

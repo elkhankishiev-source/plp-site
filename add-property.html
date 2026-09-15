@@ -1800,10 +1800,6 @@ body{background:var(--bg)}
 .stateshots img{flex:0 0 116px;height:86px;object-fit:cover;border-radius:10px;display:block;
   background:var(--paper)}
 
-/* 15.09 Эльнур: пункт «Кабинет» / «На сайт» в бургере дублировал переключатель «Сайт | Кабинет»
-   в шапке. Переключатель прячется только до 900px — там пункт в меню и нужен, шире — нет. */
-@media(min-width:901px){.mnav .mnav-sw{display:none}}
-
 /* PLP:UI:END */
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
@@ -1870,7 +1866,7 @@ body{background:var(--bg)}
         <span id="mThemeIco">◐</span><span data-i18n="nav.theme">Оформление</span>
       </button>
     </div>
-    <a class="mnav-sw" href="/owner" onclick="toggleNav(false)" data-i18n="nav.cabinet">Кабинет</a>
+    <a href="/owner" onclick="toggleNav(false)" data-i18n="nav.cabinet">Кабинет</a>
     <button type="button" class="mwa" onclick="toggleNav(false);openChat('hi')" data-i18n="nav.chat">Чат с консультантом</button>
   </div>
 </div>

@@ -308,7 +308,3 @@ body{background:var(--bg)}
 .stateshots{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
 .stateshots img{flex:0 0 116px;height:86px;object-fit:cover;border-radius:10px;display:block;
   background:var(--paper)}
-
-/* 15.09 Эльнур: пункт «Кабинет» / «На сайт» в бургере дублировал переключатель «Сайт | Кабинет»
-   в шапке. Переключатель прячется только до 900px — там пункт в меню и нужен, шире — нет. */
-@media(min-width:901px){.mnav .mnav-sw{display:none}}

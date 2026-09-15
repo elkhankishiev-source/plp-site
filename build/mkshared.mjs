@@ -17,11 +17,11 @@ const HEADTH = P('head-theme.html');
 const VARIANTS = {
   site: {
     switch: '<b>Сайт</b><a href="owner.html" data-i18n="nav.cabinet">Кабинет</a>',
-    mnav:   '<a class="mnav-sw" href="owner.html" onclick="toggleNav(false)" data-i18n="nav.cabinet">Кабинет</a>',
+    mnav:   '<a href="owner.html" onclick="toggleNav(false)" data-i18n="nav.cabinet">Кабинет</a>',
   },
   cabinet: {
     switch: '<a href="index.html">Сайт</a><b>Кабинет</b>',
-    mnav:   '<a class="mnav-sw" href="index.html" onclick="toggleNav(false)">На сайт</a>',
+    mnav:   '<a href="index.html" onclick="toggleNav(false)">На сайт</a>',
   },
 };
 

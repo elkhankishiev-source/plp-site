@@ -1915,10 +1915,6 @@ body{background:var(--bg)}
 .stateshots img{flex:0 0 116px;height:86px;object-fit:cover;border-radius:10px;display:block;
   background:var(--paper)}
 
-/* 15.09 Эльнур: пункт «Кабинет» / «На сайт» в бургере дублировал переключатель «Сайт | Кабинет»
-   в шапке. Переключатель прячется только до 900px — там пункт в меню и нужен, шире — нет. */
-@media(min-width:901px){.mnav .mnav-sw{display:none}}
-
 /* PLP:UI:END */
 /* Разбор документа: то, что система прочитала, разложенное по пунктам */
 .docread{border:1px solid var(--line);border-radius:14px;margin:8px 0;background:var(--paper)}
@@ -2026,7 +2022,7 @@ body{background:var(--bg)}
         <span id="mThemeIco">◐</span><span data-i18n="nav.theme">Оформление</span>
       </button>
     </div>
-    <a class="mnav-sw" href="/" onclick="toggleNav(false)">На сайт</a>
+    <a href="/" onclick="toggleNav(false)">На сайт</a>
     <button type="button" class="mwa" onclick="toggleNav(false);openChat('hi')" data-i18n="nav.chat">Чат с консультантом</button>
   </div>
 </div>
@@ -2816,31 +2812,9 @@ setTimeout(function(){ try{ paintThemeBtn(); }catch(e){} },0);
 
 /* Меню открывается классом open (как на сайте) — из-за "on" панель не
    появлялась, а прокрутка страницы оставалась заблокированной. */
-/* В кабинете мобильное меню показывает и разделы кабинета: на телефоне это
-   единственная быстрая навигация, без неё меню просто повторяет сайт. */
-function fillNavSections(){
-  var nav=document.getElementById('cab-nav'), sheet=document.querySelector('#mnav .sheet');
-  if(!nav||!sheet) return;
-  var links=[].slice.call(nav.querySelectorAll('a[data-tab]'));
-  if(!links.length) return;
-  var old=sheet.querySelector('.mgroup'), oldBox=sheet.querySelector('.msec');
-  if(old) old.remove();
-  if(oldBox) oldBox.remove();
-  var ttl=document.createElement('div'); ttl.className='mgroup'; ttl.textContent='Разделы кабинета';
-  var box=document.createElement('div'); box.className='msec';
-  links.forEach(function(a){
-    var b=document.createElement('button'); b.type='button';
-    b.textContent=(a.textContent||'').trim();
-    b.className=a.classList.contains('on')?'on':'';
-    b.onclick=function(){ toggleNav(false); a.click(); };
-    box.appendChild(b);
-  });
-  var anchor=sheet.querySelector('.mtools');
-  sheet.insertBefore(ttl, anchor||null);
-  sheet.insertBefore(box, anchor||null);
-}
+/* 15.09 Эльнур: разделов кабинета в бургере быть не должно — они уже есть на странице
+   списком. Копия разделов в меню удалена (была с 34d5d56). */
 function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.toggle("open",!!v);
-  if(v){ try{ fillNavSections(); }catch(e){} }
   document.body.style.overflow=v?"hidden":"";}
 (function(){
   var API='https://api.property-library.com/ukowner';
