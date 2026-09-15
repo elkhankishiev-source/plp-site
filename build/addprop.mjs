@@ -6,6 +6,13 @@
 import fs from 'node:fs';
 import path from 'node:path';
 const ROOT='/Users/elnurkhankishiev/plp-site';
+/* 15.09: предохранитель. README звал этот скрипт по привычке, а он затирает
+   живой add-property.html (сверка 15.09: 1778 строк расхождения). Без явного
+   ADDPROP_FORCE=1 выходим, ничего не записав. */
+if (process.env.ADDPROP_FORCE !== '1') {
+  console.error('build/addprop.mjs устарел и затирает живой add-property.html — не запускается. Правьте страницу руками (см. README).');
+  process.exit(1);
+}
 const SITE='https://property-library.com';
 const SB='https://dyxufgjrumebvrhadjun.supabase.co';
 const ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR5eHVmZ2pydW1lYnZyaGFkanVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyMzcxOTYsImV4cCI6MjA5MzgxMzE5Nn0.VLIX0d-OGqZfDpS6WWaBaGkEsTxWa4iQhCozRqOcEAo';
