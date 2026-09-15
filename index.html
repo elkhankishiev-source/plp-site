@@ -814,27 +814,11 @@ input.bad{border-color:#d98a84!important;background:var(--paper)6f5}
 @media(min-width:900px){.pdfband{grid-template-columns:1.15fr .85fr;padding:30px 40px}}
 .pdfband h2{font-size:clamp(1.5rem,3.4vw,2.3rem)}
 .pdfband p{font-size:1rem;color:#4E3A35;margin:10px 0 18px;max-width:420px}
-.pdfband .imgs{position:relative;height:165px}
-/* Каталог показываем как настоящую обложку: тёмная страница с нашим знаком,
-   названием и подписью, из-под неё выглядывает разворот с фото объекта. */
-.pdfband .imgs{position:relative;height:200px;min-width:0}
-.pdfband .imgs .pg{position:absolute;border-radius:12px;box-shadow:var(--shadow-lg);overflow:hidden}
-.pdfband .pg-cover{z-index:2;left:4%;top:14px;width:50%;aspect-ratio:3/4;max-height:172px;transform:rotate(-4deg);
-  background:linear-gradient(160deg,#3E4232,#22251C 70%);color:#fff;
-  display:flex;flex-direction:column;justify-content:space-between;padding:13px 14px;
-  border:1px solid rgba(var(--glass-rgb),.1)}
-.pdfband .pgc-top{display:flex;align-items:center;gap:7px}
-.pdfband .pgc-top em{font-style:normal;font-size:.62rem;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.72)}
-.pdfband .pgc-mid b{display:block;font-size:1.02rem;line-height:1.2;font-weight:700}
-.pdfband .pgc-mid span{display:block;font-size:.72rem;color:rgba(255,255,255,.66);margin-top:3px}
-.pdfband .pgc-bot{display:flex;flex-direction:column;gap:2px;font-size:.64rem;color:rgba(255,255,255,.55)}
-.pdfband .pgc-bot span:first-child{color:var(--green);font-weight:700}
-.pdfband .pg-shot{z-index:1;right:2%;top:30px;width:52%;aspect-ratio:4/3;transform:rotate(5deg)}
-.pdfband .pg-shot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-
-@media(max-width:520px){.pdfband .imgs{height:176px;max-width:300px}
-  .pdfband .pg-cover{width:54%;max-height:156px}
-  .pdfband .pg-shot{width:54%}}
+/* 15.09: справа — готовый мокап каталога (книга + фото-карточка) одной картинкой.
+   Скругление и тень как у карточек сайта, размер держит колонку, на телефоне — по ширине полосы. */
+.pdfband .imgs{position:relative;min-width:0;display:flex;justify-content:center}
+.pdfband .pdf-mock{display:block;width:100%;max-width:440px;height:auto;border-radius:16px;box-shadow:var(--shadow-lg)}
+@media(max-width:899px){.pdfband .imgs{margin-top:4px}.pdfband .pdf-mock{max-width:420px}}
 
 /* ===== rent extras ===== */
 .rentband{background:var(--ink-block);color:var(--on-ink);border-radius:22px;padding:26px 26px;margin-top:24px;display:grid;gap:18px;align-items:center}
@@ -2330,7 +2314,7 @@ body{background:var(--bg)}
         <p data-i18n="pdf.p">Все лучшие предложения в одном PDF: цены, метражи, фото, планировки и бонусы.</p>
         <button type="button" class="btn btn-primary" onclick="openChat('catalog')" data-i18n="pdf.cta">Получить каталог</button>
       </div>
-      <div class="imgs" aria-hidden="true"><div class="pg pg-shot"><img src="img/thumb/PLP-BIANCANA.jpg" alt="" loading="lazy" decoding="async"></div><div class="pg pg-cover"><span class="pgc-top"><img src="img/brand/plp-mark-white.png" alt="" width="30" height="30"><em data-i18n="pdf.cover3">Property Library Phuket</em></span><span class="pgc-mid"><b data-i18n="pdf.cover">Каталог объектов</b><span data-i18n="pdf.cover2">Пхукет · 2026</span></span><span class="pgc-bot"><span data-i18n="pdf.pg2">23 страницы</span><span data-i18n="pdf.cover4">цены · планировки · рассрочка</span></span></div></div>
+      <div class="imgs" aria-hidden="true"><img class="pdf-mock" src="img/catalog-mock.jpg" srcset="img/catalog-mock-700.jpg 700w, img/catalog-mock.jpg 1400w" sizes="(max-width:900px) 88vw, 36vw" alt="" width="1400" height="950" loading="lazy" decoding="async"></div>
     </div>
   </div>
 </section>
