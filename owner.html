@@ -2882,6 +2882,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     var ids = NO_PICK ? [] : ((CTX.objs&&CTX.objs.length)?CTX.objs:[CUR]).map(String);
     try{ if(CTX_PICK) CTX_PICK.set(ids); }catch(e){}
     try{ if(PROP_PICK) PROP_PICK.set(ids.length===1?ids:[]); }catch(e){}
+    try{ var _p=(ids.length===1)?((DATA.properties||[])[Number(ids[0])]||{}).id:''; if(REQ_OBJ && _p) REQ_OBJ.set([_p]); }catch(e){}
     try{ ctxNote(); }catch(e){}
   }
   /* разделы объекта показываем только по одному выбранному объекту */
@@ -8941,6 +8942,9 @@ window.chatVoice=chatVoice;window.listenBar=listenBar;window.paintVoiceMode=pain
 
     REQ_OBJ=pickList('r-obj',{ multi:false, placeholder:'выберите объект', items:REQ_ALLOBJ,
       onChange:function(){ showCal(); } });
+    /* 15.09: объект заявки по умолчанию — тот, что выбран в шапке кабинета */
+    try{ var _sp=(!NO_PICK && !(CTX.objs&&CTX.objs.length>1)) ? ((DATA.properties||[])[CUR]||{}).id : '';
+         if(_sp && REQ_OBJ) REQ_OBJ.set([_sp]); }catch(e){}
     REQ_KIND=pickList('r-kind',{ multi:false, placeholder:'что нужно', items:REQ_KINDS,
       onChange:function(ids){
         document.getElementById('r-dates').style.display = (ids[0]==='booking') ? '' : 'none';
