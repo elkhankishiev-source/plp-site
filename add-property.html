@@ -43,10 +43,10 @@
     var url = location.origin + path;
     var title = b.getAttribute('data-share-title') || document.title;
     var done = function(){
-      var was = b.textContent;
+      var was = b.innerHTML;   /* 15.09: в кнопке живёт svg-иконка, восстанавливаем разметку целиком */
       b.textContent = '✓ Ссылка скопирована';
       b.classList.add('ok');
-      setTimeout(function(){ b.textContent = was; b.classList.remove('ok'); }, 2200);
+      setTimeout(function(){ b.innerHTML = was; b.classList.remove('ok'); }, 2200);
     };
     if(navigator.share){ navigator.share({title:title, url:url}).catch(function(){}); return; }
     if(navigator.clipboard && navigator.clipboard.writeText){

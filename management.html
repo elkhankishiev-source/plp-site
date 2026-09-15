@@ -43,10 +43,10 @@
     var url = location.origin + path;
     var title = b.getAttribute('data-share-title') || document.title;
     var done = function(){
-      var was = b.textContent;
+      var was = b.innerHTML;   /* 15.09: в кнопке живёт svg-иконка, восстанавливаем разметку целиком */
       b.textContent = '✓ Ссылка скопирована';
       b.classList.add('ok');
-      setTimeout(function(){ b.textContent = was; b.classList.remove('ok'); }, 2200);
+      setTimeout(function(){ b.innerHTML = was; b.classList.remove('ok'); }, 2200);
     };
     if(navigator.share){ navigator.share({title:title, url:url}).catch(function(){}); return; }
     if(navigator.clipboard && navigator.clipboard.writeText){
@@ -1600,6 +1600,10 @@ body:has(.mnav.open) .fab{opacity:0;pointer-events:none;transition:opacity .2s}
    выделение и подсветка тапа (Эльнур 06.09). Свой цвет выделения — в нашей палитре. */
 ::selection{background:var(--green);color:var(--on-green)}
 ::-moz-selection{background:var(--green);color:var(--on-green)}
+/* 15.09: на зелёных полосах выделение сливалось с фоном — Эльнур «не мог выделить текст» в блоке
+   каталога, хотя выделение работало. Там выделение тёмное, в палитре. */
+.pdfband ::selection,.trust ::selection,.rentband.on-green ::selection,.calc-out .big ::selection{background:var(--ink);color:var(--paper)}
+.pdfband ::-moz-selection,.trust ::-moz-selection,.rentband.on-green ::-moz-selection,.calc-out .big ::-moz-selection{background:var(--ink);color:var(--paper)}
 .prop,.zone,.zprop,.mobj,.msub-h,.openrow,.bcell,.cab-nav a,.fbtn,.chipf,.opt,.mdot,.unit{
   -webkit-tap-highlight-color:transparent}
 .prop,.zone,.zprop,.mobj{user-select:none}
@@ -2179,7 +2183,7 @@ body{background:var(--bg)}
           <h2 style="font-size:clamp(24px,3.4vw,34px);margin:0">Разместить объект</h2>
           <!-- ссылку на этот раздел удобно отправить собственнику: бот, WhatsApp, письмо -->
           <button type="button" class="share-btn" data-share="/management#list-property"
-                  data-share-title="Разместить объект — Property Library">🔗 Поделиться</button>
+                  data-share-title="Разместить объект — Property Library"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.6" y1="10.5" x2="15.4" y2="6.5"></line><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"></line></svg><span>Поделиться</span></button>
         </div>
         <p class="sub" style="margin:0 0 14px;max-width:52ch">Зачем это вам: объект попадает к тем, кто уже ищет
         жильё на Пхукете — на сайт, в каталог консьерж-бота и в подборки, которые мы отправляем клиентам.
