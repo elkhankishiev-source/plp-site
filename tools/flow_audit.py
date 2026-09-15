@@ -29,7 +29,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cab_check  # noqa: E402  (сервер страниц и снимок данных кабинета)
 
 ROOT = cab_check.ROOT
-OUT = '/tmp/plp_flow_audit.json'
+OUT = os.environ.get('AUDIT_OUT', '/tmp/plp_flow_audit.json')
+cab_check.PORT = int(os.environ.get('AUDIT_PORT', cab_check.PORT))
 TEST_DIR = '/tmp/plp_flow_files'
 BASE = 'http://127.0.0.1:%d' % cab_check.PORT
 
@@ -45,6 +46,8 @@ SCENARIOS = {
     'owner-login':     ('/owner.html', 'desktop', 'gate'),
     'owner-staff':     ('/__cab.html', 'desktop', 'staff'),
     'owner-staff-mobile': ('/__cab.html', 'mobile', 'staff'),
+    'cabinet-desktop': ('/__cab.html', 'desktop', 'staff'),
+    'cabinet-mobile':  ('/__cab.html', 'mobile', 'staff'),
 }
 
 SUBMIT_RE = re.compile(r'отправ|сохран|далее|дальше|войти|получ|остав|заброн|запис|размест|добав|созда|принят|принять|'
@@ -220,6 +223,8 @@ class Recorder:
             or host in ('api.telegram.org',)
         if not external:
             return route.continue_()
+        if 'supabase.co' in host and request.method == 'GET' and '/storage/' in path:
+            return route.continue_()   # фото объектов — чтение, не действие
         body = None
         raw = request.post_data or ''
         try:
@@ -327,11 +332,20 @@ def run_scenario(pw, name, data, jpg, pdf, max_actions=420, budget_s=720):
         except Exception:
             before = None
         n_req, n_dlg, n_pop, n_err, n_dl, n_ch = len(rec.reqs), len(events['dialogs']), len(events['popups']), len(events['errors']), len(events['downloads']), events['choosers']
+        how = 'мышью'
         try:
-            page.locator('[data-audit-id="%s"]' % it['id']).first.click(timeout=2500, no_wait_after=True)
-            page.wait_for_timeout(650)
+            page.locator('[data-audit-id="%s"]' % it['id']).first.click(timeout=1200, no_wait_after=True)
         except Exception as e:
-            rec_i.update(verdict='не нажалась', note=str(e).split('\n')[0][:120]); results.append(rec_i); continue
+            # элемент перекрыт или вне экрана — жмём так, как это сделал бы сам обработчик
+            try:
+                ok_js = page.evaluate("(id) => { const el = document.querySelector('[data-audit-id=\"' + id + '\"]'); if (!el) return false; el.scrollIntoView({block:'center'}); el.click(); return true; }", it['id'])
+                how = 'скриптом (перекрыт или вне экрана)'
+                if not ok_js:
+                    raise e
+            except Exception as e2:
+                rec_i.update(verdict='не нажалась', note=str(e2).split('\n')[0][:120]); results.append(rec_i); continue
+        page.wait_for_timeout(650)
+        rec_i['how'] = how
         try:
             after = page.evaluate(SNAP_JS, [it['id'], MSG_SEL])
         except Exception:
@@ -366,13 +380,112 @@ def run_scenario(pw, name, data, jpg, pdf, max_actions=420, budget_s=720):
         results.append(rec_i)
         if nav and urlparse(nav).path != home:
             boot()
-        try:
-            page.keyboard.press('Escape')
-        except Exception:
-            pass
     ctx.close(); browser.close()
     return {'scenario': name, 'path': path, 'device': device, 'mode': mode, 'actions': results,
             'requests_total': len(rec.reqs), 'elapsed_s': round(time.time() - start), 'errors': events['errors'][:30]}
+
+
+CAB_WALK_JS = r"""
+() => {
+  const vis = el => { const r = el.getBoundingClientRect(); if (r.width < 3 || r.height < 3) return false;
+    let e = el; while (e && e.nodeType === 1) { const st = getComputedStyle(e);
+      if (st.display === 'none' || st.visibility === 'hidden' || e.hidden) return false; e = e.parentElement; } return true; };
+  const txt = el => (el.innerText || el.value || el.getAttribute('aria-label') || el.getAttribute('title') || '').replace(/\s+/g, ' ').trim().slice(0, 60);
+  const roots = [document.getElementById('cl-form'), document.getElementById('cab-body')].filter(Boolean);
+  const SEL = 'button, a[href="#"], a:not([href]), [onclick], .lnk, .opt, .chipf, .msub-h, [data-a], [data-uk], [data-rep], .bcell, .unit, input[type=checkbox], label.rf-check';
+  const SKIP = '.pickall, .picknone, .pickitem, .pickbtn, .foldh, .picker *, #cab-nav *, .fab, .chathead *';
+  const out = []; let n = 0;
+  roots.forEach(root => root.querySelectorAll(SEL).forEach(el => {
+    if (!vis(el) || el.matches(SKIP) || el.closest('.picker')) return;
+    const card = el.closest('#cl-form, .card, [id^="sec-"], #portfolio');
+    const head = card ? card.querySelector('.foldh span, h3, h2, .eyebrow') : null;
+    const inForm = !!el.closest('#cl-form');
+    const label = txt(el);
+    const where = (inForm ? 'окно: ' : '') + (head ? txt(head) : (card && card.id) || '');
+    const id = 'c' + (++n); el.setAttribute('data-audit-id', id);
+    out.push({ id, label, where, inForm, tag: el.tagName.toLowerCase(), elid: el.id || '',
+               cls: String(el.className || '').split(/\s+/).slice(0, 2).join('.'),
+               sig: (inForm ? 'F|' : '') + where + '|' + label + '|' + (el.id || '') });
+  }));
+  return out;
+}
+"""
+
+
+def run_cabinet(pw, data, jpg, pdf, device='desktop', budget_s=900):
+    """Кабинет штаба: раздел за разделом, все окна раскрыты, каждая кнопка и каждая форма."""
+    browser = pw.chromium.launch(channel='chrome', headless=True)
+    ctx = (browser.new_context(viewport={'width': 390, 'height': 844}, device_scale_factor=2, is_mobile=True, has_touch=True, locale='ru-RU')
+           if device == 'mobile' else browser.new_context(viewport={'width': 1400, 'height': 900}, locale='ru-RU'))
+    rec = Recorder(data)
+    ctx.route('**/*', rec.handle)
+    page = ctx.new_page()
+    ev = {'dialogs': [], 'popups': [], 'errors': [], 'downloads': [], 'choosers': 0}
+    page.on('dialog', lambda d: (ev['dialogs'].append(d.message[:120]), d.accept('тест') if d.type == 'prompt' else d.accept()))
+    page.on('pageerror', lambda e: ev['errors'].append(str(e)[:160]))
+    page.on('download', lambda d: ev['downloads'].append(d.suggested_filename))
+    ctx.on('page', lambda p: (ev['popups'].append(p.url), p.close()))
+    def chooser(fc):
+        ev['choosers'] += 1
+        try: fc.set_files(jpg)
+        except Exception: pass
+    page.on('filechooser', chooser)
+
+    def boot():
+        page.goto(BASE + '/__cab.html', wait_until='domcontentloaded', timeout=60000)
+        page.wait_for_timeout(1500)
+        page.evaluate("() => { try { localStorage.setItem('plp_owner_sel', JSON.stringify(['PLP-DEMO'])); } catch(e){} }")
+        page.evaluate("(d) => window.__cabDemo && window.__cabDemo(d)", data)
+        page.wait_for_timeout(1200)
+        page.add_style_tag(content='*{transition:none!important;animation:none!important}')
+
+    boot()
+    tabs = page.evaluate("() => Array.from(document.querySelectorAll('#cab-nav a[data-tab]')).map(a => [a.getAttribute('data-tab'), (a.innerText||'').replace(/\\s+\\d+$/,'').trim()])")
+    results, start = [], time.time()
+    for tab, tab_name in tabs:
+        if time.time() - start > budget_s: break
+        done = set()
+        for _round in range(60):
+            if time.time() - start > budget_s: break
+            # раздел открыт, все окна раскрыты
+            page.evaluate("""(t) => { const nav = document.getElementById('cab-nav'), body = document.getElementById('cab-body');
+                const a = nav && nav.querySelector('a[data-tab="' + t + '"]');
+                if (a && (window.CAB_TAB !== t || body.hidden)) { if (body.hidden || !a.classList.contains('on')) a.click(); }
+                document.querySelectorAll('#cab-body .foldh').forEach(h => { const i = h.querySelector('.foldi'); if (i && i.textContent.trim() === '+') h.click(); }); }""", tab)
+            page.wait_for_timeout(250)
+            items = page.evaluate(CAB_WALK_JS)
+            # сначала то, что внутри открытой формы; «Отмена/Закрыть» — в самом конце
+            items.sort(key=lambda x: (0 if x['inForm'] else 1, 1 if re.search(r'отмен|закры|×', x['label'] or '', re.I) else 0))
+            todo = [x for x in items if x['sig'] not in done]
+            if not todo: break
+            it = todo[0]; done.add(it['sig'])
+            r = {'label': it['label'], 'where': tab_name + ' · ' + it['where'], 'tag': it['tag'], 'cls': it['cls']}
+            filled = page.evaluate(FILL_JS, it['id']) if (it['inForm'] or SUBMIT_RE.search(it['label'] or '')) else 0
+            before = page.evaluate(SNAP_JS, [it['id'], MSG_SEL])
+            nr, nd, npop, ne, nch = len(rec.reqs), len(ev['dialogs']), len(ev['popups']), len(ev['errors']), ev['choosers']
+            try:
+                page.locator('[data-audit-id="%s"]' % it['id']).first.click(timeout=1200, no_wait_after=True)
+            except Exception:
+                try: page.evaluate("(id) => document.querySelector('[data-audit-id=\"' + id + '\"]').click()", it['id'])
+                except Exception as e:
+                    r.update(verdict='не нажалась', note=str(e)[:100]); results.append(r); continue
+            page.wait_for_timeout(700)
+            after = page.evaluate(SNAP_JS, [it['id'], MSG_SEL])
+            reqs = rec.reqs[nr:]
+            r.update(filled=filled, requests=[{k: q[k] for k in ('method', 'host', 'path', 'action', 'keys', 'has_file', 'query')} for q in reqs],
+                     dialogs=ev['dialogs'][nd:], popups=ev['popups'][npop:], errors=ev['errors'][ne:], file_chosen=ev['choosers'] - nch,
+                     messages=[m for m in after['msgs'] if m not in before['msgs']][:4])
+            changed = before['box'] != after['box'] or before['open'] != after['open'] or before['bodyLen'] != after['bodyLen']
+            if r['errors']: r['verdict'] = 'ошибка страницы'
+            elif reqs or r['popups'] or r['dialogs'] or r['file_chosen']: r['verdict'] = 'работает'
+            elif r['messages'] or changed: r['verdict'] = 'отвечает на экране'
+            else: r['verdict'] = 'нет реакции'
+            results.append(r)
+            if urlparse(page.url).path != '/__cab.html':
+                boot()
+    ctx.close(); browser.close()
+    return {'scenario': 'cabinet-' + device, 'path': '/owner', 'device': device, 'mode': 'staff', 'actions': results,
+            'requests_total': len(rec.reqs), 'elapsed_s': round(time.time() - start), 'errors': ev['errors'][:30]}
 
 
 def main():
@@ -390,7 +503,7 @@ def main():
             for name in want:
                 t0 = time.time()
                 try:
-                    r = run_scenario(pw, name, data, jpg, pdf)
+                    r = run_cabinet(pw, data, jpg, pdf, device=SCENARIOS[name][1]) if name.startswith('cabinet') else run_scenario(pw, name, data, jpg, pdf)
                 except Exception as e:
                     r = {'scenario': name, 'fatal': str(e)[:300], 'actions': []}
                 report['scenarios'].append(r)

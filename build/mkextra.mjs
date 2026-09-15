@@ -53,7 +53,7 @@ function page({file,depth,title,desc,body,jsonld}){
   const up=depth?'../':'';
   html=html.replace(/href="#top"/g,'href="'+up+'index.html"');
   html=html.replace(/href="#(why|sale|rent|map|quiz|about|faq|do|steps|contacts)"/g,'href="'+up+'index.html#$1"');
-  if(depth) html=html.replace(/(href|src)="(img\/|favicon|buy\.html|rent\.html|owner\.html|privacy\.html|rules\.html|terms\.html|index\.html)/g,'$1="../$2');
+  if(depth) html=html.replace(/(href|src)="(img\/|favicon|buy\.html|rent\.html|owner\.html|management\.html|add-property\.html|districts\/|guide\/|offer\.html|privacy\.html|rules\.html|terms\.html|index\.html)/g,'$1="../$2');
   if(jsonld) html=html.replace('</head>','<script type="application/ld+json">'+JSON.stringify(jsonld)+'</script>\n</head>');
   fs.writeFileSync(path.join(ROOT,file),html);
   return file;

@@ -2093,7 +2093,7 @@ body{background:var(--bg)}
       <a href="/buy" data-i18n="nav.sale">Продажа</a>
       <a href="/rent" data-i18n="nav.rent">Аренда</a>
       <a href="/#map" data-i18n="nav.map">Районы</a>
-      <a href="/districts/management">Управление</a>
+      <a href="/management">Управление</a>
       <a href="/#about" data-i18n="nav.about">О нас</a>
     </nav>
     <div class="htools">
@@ -2121,8 +2121,8 @@ body{background:var(--bg)}
     <a href="/buy" data-i18n="nav.sale">Продажа</a>
     <a href="/rent" data-i18n="nav.rent">Аренда</a>
     <a href="/#map" onclick="toggleNav(false)" data-i18n="nav.map">Районы</a>
-    <a href="/districts/management">Управление</a>
-    <a href="/districts/add-property">Разместить объект</a>
+    <a href="/management">Управление</a>
+    <a href="/add-property">Разместить объект</a>
     <a href="/#about" onclick="toggleNav(false)" data-i18n="nav.about">О нас</a>
     <!-- Эльнур 06.09: язык и оформление на телефоне живут здесь, одинаково
          на сайте и в кабинете. В шапке их на узком экране нет. -->
@@ -6599,7 +6599,8 @@ window.openQuiz=openQuiz;window.closeQuiz=closeQuiz;window.quizNext=quizNext;win
 window.chatVoice=chatVoice;window.listenBar=listenBar;window.paintVoiceMode=paintVoiceMode;window.toggleVoiceMode=toggleVoiceMode;window.voiceBubble=voiceBubble;window.playAudio=playAudio;window.playSpeech=playSpeech;window.botVoice=botVoice;window.t=t;window.toggleFab=toggleFab;window.renderMapReal=renderMapReal;window.openChat=openChat;window.closeChat=closeChat;window.clearChat=clearChat;window.sendFree=sendFree;window.closeChatToProp=closeChatToProp;window.askAssistant=askAssistant;window.aiTools=aiTools;window.aiCards=aiCards;window.askBooking=askBooking;
 window.openRentRequest=openRentRequest;window.requestService=requestService;
 window.checkAvailability=checkAvailability;window.resetAvailability=resetAvailability;window.resetRentFilters=resetRentFilters;window.pushLead=pushLead;
-window.scrollCar=scrollCar;window.toggleFilter=toggleFilter;window.onSaleSearch=onSaleSearch;window.setSaleSort=setSaleSort;window.toggleFavOnly=toggleFavOnly;
+window.scrollCar=scrollCar;window.toggleFilter=toggleFilter;window.onSaleSearch=onSaleSearch;window.setSaleSort=setSaleSort;window.setRentSort=setRentSort;window.onRentSearch=onRentSearch;   /* 15.09: поиск и сортировка аренды вызываются из разметки — без экспорта падали */
+window.toggleFavOnly=toggleFavOnly;
 window.setCur=setCur;   /* кнопка валюты вызывается из разметки — без экспорта не работала */
 window.cycleTheme=cycleTheme;window.setTheme=setTheme;window.themeNow=themeNow;window.paintThemeBtn=paintThemeBtn;
 window.toggleFav=toggleFav;window.toggleCmp=toggleCmp;window.openCompare=openCompare;window.closeCompare=closeCompare;window.cmpLead=cmpLead;window.favLead=favLead;
