@@ -102,6 +102,8 @@ build/mkpages.mjs     buy.html и rent.html — каталог сеткой с �
 build/mkdistricts.mjs 8 страниц районов
 build/mkextra.mjs     management.html и гайды (тексты в build/faq.json)
 build/all.mjs         вся сборка одной командой (порядок шагов внутри)
+tools/ui_parity.py    сверка вида: что не видно на компьютере/телефоне в светлой/тёмной теме
+tools/cab_check.py    кабинет на реальных данных по ключу штаба, без входа (--shots — скриншоты)
 build/mklinks.mjs     чистые адреса без .html на всех страницах
 build/addprop.mjs     УСТАРЕЛ, не запускать: add-property.html правится руками
 img/                  картинки, включая img/brand/ — логотипы

@@ -1218,6 +1218,7 @@ a.lnk,.lnk{color:var(--olive)}
 @media(min-width:1000px){
   #app{display:grid;grid-template-columns:230px minmax(0,1fr);gap:26px;align-items:start}
   #cab-ctx{grid-column:1/-1;order:-1}
+  #cab-hello{grid-column:1/-1;order:-2}   /* 15.09: приветствие отдельно, над выбором и разделами */
   #cab-nav{grid-column:1;position:sticky;top:96px}
   #cab-body{grid-column:2;margin:0}
   .wrap{max-width:1180px}
@@ -1914,6 +1915,10 @@ body{background:var(--bg)}
 .stateshots img{flex:0 0 116px;height:86px;object-fit:cover;border-radius:10px;display:block;
   background:var(--paper)}
 
+/* 15.09 Эльнур: пункт «Кабинет» / «На сайт» в бургере дублировал переключатель «Сайт | Кабинет»
+   в шапке. Переключатель прячется только до 900px — там пункт в меню и нужен, шире — нет. */
+@media(min-width:901px){.mnav .mnav-sw{display:none}}
+
 /* PLP:UI:END */
 /* Разбор документа: то, что система прочитала, разложенное по пунктам */
 .docread{border:1px solid var(--line);border-radius:14px;margin:8px 0;background:var(--paper)}
@@ -2021,7 +2026,7 @@ body{background:var(--bg)}
         <span id="mThemeIco">◐</span><span data-i18n="nav.theme">Оформление</span>
       </button>
     </div>
-    <a href="/" onclick="toggleNav(false)">На сайт</a>
+    <a class="mnav-sw" href="/" onclick="toggleNav(false)">На сайт</a>
     <button type="button" class="mwa" onclick="toggleNav(false);openChat('hi')" data-i18n="nav.chat">Чат с консультантом</button>
   </div>
 </div>
@@ -2241,6 +2246,7 @@ body{background:var(--bg)}
   </div>
 
   <div id="app" style="display:none">
+    <div id="cab-hello"></div>
     <div id="cab-ctx" class="cab-ctx" hidden data-build="05.09-4">
       <div class="ctx-row">
         <label class="ctx-f" id="ctx-lead-w"><span>Лид / клиент компании</span><div id="ctx-lead"></div></label>
@@ -2250,7 +2256,7 @@ body{background:var(--bg)}
       <div id="as-banner" class="as-banner" hidden></div>
     </div>
     <div id="cab-nav" class="cab-nav" aria-label="Разделы кабинета">
-      <a data-tab="overview" class="on">Обзор</a>
+      <a data-tab="overview">Обзор</a>
       <a data-tab="calendar">Бронирования</a>
       <a data-tab="money">Финансы</a>
       <a data-tab="costs">Расходы на содержание</a>
@@ -2270,6 +2276,7 @@ body{background:var(--bg)}
       <b>Это пример.</b> Так кабинет выглядит, когда объект уже работает: цифры и брони вымышленные.
       <a href="/owner" style="color:var(--acc)">Вернуться ко входу</a>
     </div>
+    <div id="sel-ask" class="card" style="display:none"></div>
     <div id="portfolio"></div>
     <div class="tabs" id="prop-tabs"></div>
     <div id="prop"></div>
@@ -2849,6 +2856,57 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
      объект в управлении (Эльнур 10.09: «почему у меня висит Манор, если
      я его не выбирал»). */
   var PROP_LS='plp_owner_prop';
+  /* 15.09 Эльнур: «у меня там постоянно первый объект». Выбор в шапке нигде не
+     запоминался, а во вкладке «Объект» запоминался НОМЕРОМ в списке — после
+     перезагрузки открывался первый. Теперь выбор один на весь кабинет и хранится
+     кодами объектов. Ничего не выбрано — разделы объекта просят выбрать, а не
+     подставляют первый молча. */
+  var SEL_LS='plp_owner_sel', NO_PICK=false, CTX_PICK=null;
+  function selSave(){
+    try{
+      var all=(DATA&&DATA.properties)||[];
+      var idx=(CTX.objs&&CTX.objs.length)?CTX.objs:(NO_PICK?[]:[CUR]);
+      localStorage.setItem(SEL_LS, JSON.stringify(idx.map(function(i){ return all[i]&&all[i].id; }).filter(Boolean)));
+    }catch(e){}
+  }
+  function selRestore(){
+    var all=(DATA&&DATA.properties)||[], pids=[], idx=[];
+    try{ pids=JSON.parse(localStorage.getItem(SEL_LS)||'[]')||[]; }catch(e){}
+    pids.forEach(function(pid){
+      for(var i=0;i<all.length;i++){ if(String(all[i].id)===String(pid)){ idx.push(i); break; } }
+    });
+    if(all.length<=1) idx=all.length?[0]:[];
+    CTX.objs = idx.length>1 ? idx : [];
+    CTX.obj  = idx.length===1 ? idx[0] : null;
+    NO_PICK  = all.length>1 && !idx.length;
+    return idx.length ? idx[0] : 0;
+  }
+  function selApply(ids){
+    var all=(DATA&&DATA.properties)||[];
+    var idx=(ids||[]).map(Number).filter(function(i){ return !isNaN(i)&&i>=0&&i<all.length; });
+    CTX.objs = idx.length>1 ? idx : [];
+    CTX.obj  = idx.length===1 ? idx[0] : null;
+    NO_PICK  = all.length>1 && !idx.length;
+    if(idx.length) CUR=idx[0];
+    selSave(); selPaint();
+  }
+  function selPaint(){
+    var ids = NO_PICK ? [] : ((CTX.objs&&CTX.objs.length)?CTX.objs:[CUR]).map(String);
+    try{ if(CTX_PICK) CTX_PICK.set(ids); }catch(e){}
+    try{ if(PROP_PICK) PROP_PICK.set(ids.length===1?ids:[]); }catch(e){}
+    try{ ctxNote(); }catch(e){}
+  }
+  /* разделы объекта показываем только по одному выбранному объекту */
+  function selNeed(){
+    return ((DATA&&DATA.properties)||[]).length>1 && (NO_PICK || (CTX.objs&&CTX.objs.length>1));
+  }
+  /* обзор считает ровно то, что выбрано: один объект, отмеченные или весь портфель */
+  function selScope(){
+    var all=(DATA&&DATA.properties)||[];
+    if(CTX.objs&&CTX.objs.length) return CTX.objs.map(function(i){ return all[i]; }).filter(Boolean);
+    if(!NO_PICK && all.length>1 && all[CUR]) return [all[CUR]];
+    return all;
+  }
 
 
 
@@ -4191,7 +4249,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   var CHART_RANGE=6, CHART_OPEN=null;   /* по умолчанию полгода — Эльнур 05.09 */
   function allMonths(){
     var by={};
-    (DATA.properties||[]).forEach(function(p){
+    selScope().forEach(function(p){
       (p.months||[]).forEach(function(m){
         /* строка без месяца роняла весь обзор: график падал и вместе с ним
            уходили привязки нажатий. Такие строки просто пропускаем. */
@@ -4385,7 +4443,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   /* Ближайшие заезды — карточками с плашкой даты, а не строкой таблицы */
   function nextStays(){
     var rows=[];
-    (DATA.properties||[]).forEach(function(p){
+    selScope().forEach(function(p){
       (p.bookings||[]).forEach(function(b){
         if(!b.check_in) return;
         rows.push({ci:b.check_in, co:b.check_out, who:b.guest_name||'Гость',
@@ -4503,7 +4561,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   }
   function renderPortfolio(){
     var t=DATA.totals, o=DATA.owner||{};
-    if(!t){ $('portfolio').innerHTML=''; return; }
+    if(!t){ $('portfolio').innerHTML=''; var hz=document.getElementById('cab-hello'); if(hz) hz.innerHTML=''; return; }
     var p=(DATA.properties||[])[CUR]||{};
     var hour=new Date().getHours();
     var greet = hour<5?'Доброй ночи':hour<12?'Доброе утро':hour<18?'Добрый день':'Добрый вечер';
@@ -4521,7 +4579,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       ? String((o.viewing && (o.viewing.name||o.viewing.code)) || o.viewed_as || o.name || '')
       : '';
     var eyebrow = viewing ? ('Смотрите кабинет · ' + viewing) : 'Кабинет владельца';
-    var h='<div class="ov-head">'+
+    var hello='<div class="ov-head">'+
       '<div><span class="eyebrow">'+esc(eyebrow)+'</span>'+
         '<h1>'+esc(greet+(first?', '+first:''))+'</h1>'+
         (viewing?('<p class="sub" style="margin:6px 0 0">Данные ниже — по клиенту '+esc(viewing)+'.</p>'):'')+
@@ -4531,6 +4589,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
          спрятана в соответствующем блоке» — в шапке остаётся только отчёт. */
         '<button type="button" class="btn-mini" id="ov-report">Скачать отчёт</button>'+
         '<span class="ava">'+esc(ini)+'</span></div></div>';
+    var h='';
 
     /* Эльнур 08.09: «"Как объект начнёт приносить доход, пройдено 1 из 6" —
        эту функцию я бы лучше разместил в блоке бронирования». Переехала туда,
@@ -4541,13 +4600,23 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     /* 🔴 09.09 Эльнур: «почему сразу объект подписан, хотя я его не выбирал».
        У штаба в кабинете все объекты, и первый открывался молча — выглядело
        так, будто он назначен. Говорим прямо: это выбор, и его можно сменить. */
-    var _staffPick = (DATA.owner && DATA.owner.is_staff===true && t.properties>1);
-    h+='<div class="ov-obj"><span class="eyebrow">'+
-        (_staffPick ? ('Открыт объект '+(CUR+1)+' из '+t.properties+' — выберите нужный в шапке')
-                    : (t.properties>1?'Объект '+(CUR+1)+' из '+t.properties:'Ваш объект'))+
-        (p.id?' · '+esc(p.id):'')+'</span>'+
-      '<h2>'+esc(p.name||'—')+'</h2>'+
-      (addr?'<p class="sub">'+esc(addr)+'</p>':'')+'</div>';
+    var _multi = !!(CTX.objs && CTX.objs.length>1);
+    if(NO_PICK || _multi){
+      h+='<div class="ov-obj"><span class="eyebrow">'+
+          (_multi ? ('Отмечено объектов: '+CTX.objs.length+' — показатели суммируются')
+                  : ('Все объекты · '+t.properties))+'</span>'+
+        '<h2>'+(_multi?'Несколько объектов':'Объект не выбран')+'</h2>'+
+        '<p class="sub">'+(_multi
+          ? 'Разделы объекта открываются по одному — оставьте в шапке один.'
+          : 'Показатели ниже — по всему портфелю. Выберите объект в шапке, и разделы покажут его данные.')+
+        '</p></div>';
+    } else {
+      h+='<div class="ov-obj"><span class="eyebrow">'+
+          (t.properties>1?'Выбранный объект':'Ваш объект')+
+          (p.id?' · '+esc(p.id):'')+'</span>'+
+        '<h2>'+esc(p.name||'—')+'</h2>'+
+        (addr?'<p class="sub">'+esc(addr)+'</p>':'')+'</div>';
+    }
 
     /* 3. Четыре показателя в ряд */
     h+='<div class="ov-kpi">'+kpiCards(t,p)+'</div>';
@@ -4559,9 +4628,10 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     h+=nextStays();
 
     /* 6. Объект сейчас: статус и задачи */
-    h+=nowBlock(p);
+    if(!NO_PICK && !_multi) h+=nowBlock(p);
 
     $('portfolio').innerHTML=h;
+    var hb=document.getElementById('cab-hello'); if(hb) hb.innerHTML=hello;
     var rb=document.getElementById('ov-report');
     if(rb) rb.onclick=function(){ buildReport(); };
     bindNowActions(p);
@@ -4741,13 +4811,13 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
            (финансы, календарь, документы) оставалась от прежнего объекта —
            выглядело так, будто выбор не сработал. Перерисовываем всё, как
            это делают остальные точки переключения. */
-        CUR=Number(ids[0]); if(isNaN(CUR)) CUR=0;
-        try{ localStorage.setItem(PROP_LS, String(CUR)); }catch(e){}
-        renderProp(); renderObjEdit();
-        try{ renderPortfolio(); cabPage(CAB_TAB); paintCounts(); }catch(e){}
-        window.scrollTo(0,0);
+        selApply(ids.length?[ids[0]]:[]);
+        ensureCard(CUR, function(){
+          renderProp(); renderObjEdit();
+          try{ renderPortfolio(); cabPage(CAB_TAB,true); paintCounts(); }catch(e){}
+        });
       }});
-    PROP_PICK.set([String(CUR)]);
+    selPaint();
   }
 
   // ── карточка одного объекта, по разделам ────────────────────
@@ -6558,7 +6628,9 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     function label(){
       var ids=Object.keys(chosen);
       if(!ids.length) return opts.placeholder || 'выбрать';
-      if(!opts.multi){
+      /* 15.09: один отмеченный пункт называем по имени, а не «выбрано: 1» —
+         в шапке кабинета должно быть видно, КАКОЙ объект открыт */
+      if(!opts.multi || ids.length===1){
         var it=(opts.items||[]).filter(function(x){return String(x.id)===ids[0];})[0];
         return it ? it.title : ids[0];
       }
@@ -7873,7 +7945,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
           CTX.asOwner=a.getAttribute('data-id'); CTX.asName=a.getAttribute('data-name');
           say('Открываем кабинет: '+CTX.asName);
           post({action:'data',token:TOKEN,as_owner:CTX.asOwner}).then(function(dd){
-            if(dd&&dd.ok){ DATA=dd; CUR=0; draw(); }
+            if(dd&&dd.ok){ DATA=dd; CUR=selRestore(); draw(); }
             else say((dd&&dd.error)||'Не вышло открыть кабинет');
           });
         };
@@ -7892,15 +7964,14 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       /* Эльнур 07.09: «если у него 10 объектов и надо посчитать общий доход —
          не открывать же каждый и складывать самому». Отмечаем несколько —
          показатели считаются по отмеченным. */
-      pickList(host,{ multi:true, placeholder:'все объекты', items:ctxObjects(),
+      CTX_PICK=pickList(host,{ multi:true, placeholder:'выберите объект', items:ctxObjects(),
         onChange:function(ids){
-          CTX.objs = ids.map(Number).filter(function(x){ return !isNaN(x); });
-          CTX.obj = CTX.objs.length===1 ? CTX.objs[0] : null;
-          if(CTX.obj!=null){ CUR=CTX.obj; }
-          else if(CTX.objs.length) CUR=CTX.objs[0];
-          ctxNote();
-          try{ renderProp(); renderPortfolio(); cabPage(CAB_TAB); paintCounts(); }catch(e){}
+          selApply(ids);
+          ensureCard(CUR, function(){
+            try{ renderProp(); renderPortfolio(); renderObjEdit(); cabPage(CAB_TAB,true); paintCounts(); }catch(e){}
+          });
         }});
+      selPaint();
     }
     if(ctxIsStaff()){
       var lh=document.getElementById('ctx-lead');
@@ -7953,8 +8024,8 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     buildCtxObj(mine, code ? (mine.length?'объекты этого человека':'у человека объектов нет')
                            : 'все объекты');
     if(code && mine.length===1){
-      CTX.obj=Number(mine[0].id); CUR=CTX.obj; ctxNote();
-      try{ renderProp(); renderPortfolio(); }catch(e){}
+      selApply([mine[0].id]);
+      try{ renderProp(); renderPortfolio(); cabPage(CAB_TAB,true); }catch(e){}
     }
   }
 
@@ -7977,16 +8048,15 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
   function buildCtxObj(items, placeholder){
     var host=document.getElementById('ctx-obj'); if(!host) return;
     host.__built=1;
-    pickList(host,{ multi:false, placeholder:placeholder, items:items,
+    CTX_PICK=pickList(host,{ multi:false, placeholder:placeholder, items:items,
       onChange:function(ids){
         var v=ids[0];
-        if(v==null){ CTX.obj=null; ctxNote(); return; }
-        if(/^\d+$/.test(String(v))){ CTX.obj=Number(v); CUR=CTX.obj; }
-        ctxNote();
+        selApply(v==null?[]:[v]);
         ensureCard(CUR, function(){
-          try{ renderProp(); renderPortfolio(); paintCounts(); }catch(e){}
+          try{ renderProp(); renderPortfolio(); renderObjEdit(); cabPage(CAB_TAB,true); paintCounts(); }catch(e){}
         });
       }});
+    selPaint();
   }
   function ctxNote(){
     var n=document.getElementById('ctx-note'); if(!n) return;
@@ -8295,11 +8365,11 @@ function askDaria(txt, byVoice){
 
 window.chatVoice=chatVoice;window.listenBar=listenBar;window.paintVoiceMode=paintVoiceMode;window.toggleVoiceMode=toggleVoiceMode;window.voiceBubble=voiceBubble;window.playAudio=playAudio;window.playSpeech=playSpeech;window.openChat=openChat;window.closeChat=closeChat;window.clearChat=clearChat;window.toggleFab=toggleFab;window.sendFree=sendFree;
 
-  function cabPage(name){
+  function cabPage(name, quiet){
     CAB_TAB=name;
     var body=document.getElementById('cab-body'); if(!body) return;
     Array.prototype.forEach.call(body.children, function(el){
-      if(el.id==='demo-note') return;                 // подсказка о демо видна всегда
+      if(el.id==='demo-note' || el.id==='sel-ask') return;   // подсказки живут своими правилами
       var t=TAB_OF[el.id];
       if(!t){                                          // блоки без прописки — в раздел объекта
         el.style.display=(name==='object')?'':'none'; return;
@@ -8333,8 +8403,22 @@ window.chatVoice=chatVoice;window.listenBar=listenBar;window.paintVoiceMode=pain
       }
       el.style.display=(TAB_OF[id]===name)?'':'none';
     });
+    /* 15.09: разделы объекта — только по одному выбранному объекту */
+    var OBJ_TABS={calendar:1,money:1,costs:1,docs:1,service:1,object:1};
+    var ask=document.getElementById('sel-ask'), need=selNeed() && OBJ_TABS[name];
+    if(ask){
+      ask.innerHTML = (CTX.objs&&CTX.objs.length>1)
+        ? '<h3 style="margin:0 0 6px">Отмечено несколько объектов</h3><p class="sub" style="margin:0">Разделы объекта открываются по одному. Оставьте в шапке кабинета один объект.</p>'
+        : '<h3 style="margin:0 0 6px">Объект не выбран</h3><p class="sub" style="margin:0">Выберите объект в шапке кабинета — раздел покажет данные именно по нему.</p>';
+      ask.style.display = need ? '' : 'none';
+    }
+    if(need){
+      Array.prototype.forEach.call(body.children, function(el){
+        if(el.id!=='sel-ask' && el.id!=='demo-note') el.style.display='none';
+      });
+    }
     var body2=document.getElementById('cab-body');
-    if(body2) body2.hidden=false;
+    if(body2 && !quiet) body2.hidden=false;
     var nav=document.getElementById('cab-nav');
     if(nav && body2 && window.matchMedia && window.matchMedia('(max-width:900px)').matches){
       /* На телефоне содержимое раздела встаёт сразу под своим пунктом, а пункт
@@ -8370,7 +8454,7 @@ window.chatVoice=chatVoice;window.listenBar=listenBar;window.paintVoiceMode=pain
       }
     }
     if(nav) Array.prototype.forEach.call(nav.querySelectorAll('a[data-tab]'), function(a){
-      a.classList.toggle('on', a.getAttribute('data-tab')===name);
+      a.classList.toggle('on', a.getAttribute('data-tab')===name && !(body2&&body2.hidden));
     });
     try{ if(PLPMAP_OWNER) setTimeout(function(){ COMAP && COMAP.invalidateSize(); },80); }catch(e){}
     /* Эльнур 06.09: «кабинет долго грузится». Раньше при входе улетало
@@ -8399,7 +8483,7 @@ window.chatVoice=chatVoice;window.listenBar=listenBar;window.paintVoiceMode=pain
        страницы: на телефоне — к самому пункту, на большом экране — к телу. */
     var target = (window.matchMedia && window.matchMedia('(max-width:900px)').matches)
       ? (nav && nav.querySelector('a[data-tab="'+name+'"]')) : body2;
-    cabScrollTo(target || body2);
+    if(!quiet) cabScrollTo(target || body2);
   }
   /* 🔴 10.09 Эльнур: «каждый пункт меню в моём кабинете лагает».
      Замер: любой раздел — это запрос в n8n на 1–2 секунды, а первый заход в
@@ -8484,9 +8568,16 @@ window.chatVoice=chatVoice;window.listenBar=listenBar;window.paintVoiceMode=pain
     var first = nav.querySelector('a[data-tab]');
     var want = first ? first.getAttribute('data-tab') : 'overview';
     if(keep && keep.tab && nav.querySelector('a[data-tab="'+keep.tab+'"]')) want = keep.tab;
-    cabPage(want);
+    /* 15.09 Эльнур: «обзор изначально тоже должен быть свёрнут, как и все остальные».
+       При входе ни один раздел не раскрыт; приветствие стоит отдельно над списком.
+       После сохранения возвращаем туда, где человек работал. */
+    if(keep && keep.open!==false){ cabPage(want); }
+    else {
+      cabPage(want, true);
+      var cb=document.getElementById('cab-body'); if(cb) cb.hidden=true;
+      Array.prototype.forEach.call(nav.querySelectorAll('a[data-tab]'), function(a){ a.classList.remove('on'); });
+    }
     if(keep){
-      if(keep.open===false){ var cb=document.getElementById('cab-body'); if(cb) cb.hidden=true; }
       if(keep.y) setTimeout(function(){ window.scrollTo(0, keep.y); }, 0);
     }
   }
@@ -8538,7 +8629,7 @@ window.chatVoice=chatVoice;window.listenBar=listenBar;window.paintVoiceMode=pain
     return true;
   };
   window.__cabDemo=function(data){
-    DATA=data; CUR=0; TOKEN='demo';
+    DATA=data; CUR=selRestore(); TOKEN='demo';
     try{ show('app'); }catch(e){}
     try{ draw(); }catch(e){ if(window.console) console.warn('кабинет:', e); }
     return true;
@@ -8554,7 +8645,7 @@ window.chatVoice=chatVoice;window.listenBar=listenBar;window.paintVoiceMode=pain
     return post({action:'data',token:TOKEN,as_client:(CTX.lead||undefined)}).then(function(d){
       if(!d||!d.ok) return;
       var keepCur=CUR;
-      DATA=d; CUR=(keepCur<(d.properties||[]).length)?keepCur:0;
+      DATA=d; CUR=selRestore();
       try{ localStorage.setItem(CACHE, JSON.stringify({token:TOKEN,at:Date.now(),data:d})); }catch(e){}
       try{ paintCounts(); }catch(e){}
     }).catch(function(){});
@@ -8572,9 +8663,7 @@ window.chatVoice=chatVoice;window.listenBar=listenBar;window.paintVoiceMode=pain
         var c=JSON.parse(raw);
         if(c && c.token===TOKEN && c.data && (Date.now()-c.at) < 7*24*3600e3){
           DATA=c.data;
-          CUR=0;
-          try{ var _p=localStorage.getItem(PROP_LS);
-               if(_p!==null && Number(_p) < (DATA.properties||[]).length) CUR=Number(_p); }catch(e){}
+          CUR=selRestore();
           draw(); shown=true; markStale(true);
         }
       }
@@ -8596,10 +8685,8 @@ window.chatVoice=chatVoice;window.listenBar=listenBar;window.paintVoiceMode=pain
         try{localStorage.removeItem(LS);localStorage.removeItem(CACHE);}catch(e){}
         TOKEN=null; gateStep('phone');
         $('gate-err').textContent=(d&&d.error==='expired')?'Вход истёк — получите новый код.':''; return; }
-      var keepCur = window.__cabKeep ? window.__cabKeep.cur : null;
-      if(keepCur===null){ try{ var _v=localStorage.getItem(PROP_LS); if(_v!==null) keepCur=Number(_v); }catch(e){} }
       DATA=d;
-      CUR=(keepCur!==null && !isNaN(keepCur) && keepCur < (d.properties||[]).length) ? keepCur : 0;
+      CUR=selRestore();
       try{ localStorage.setItem(CACHE, JSON.stringify({token:TOKEN,at:Date.now(),data:d})); }catch(e){}
       /* 🔴 10.09 Эльнур: «кабинету не надо сменять пароль, бред, у него доступ
          через код подтверждения, не усложняй». Вход в кабинет — по коду из СМС
