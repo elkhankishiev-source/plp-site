@@ -604,8 +604,16 @@
    "name": "Residences at Garrya",
    "district": "Лагуна",
    "type": "Кондо",
-   "price_from": null,
-   "units": []
+   "price_from": 33680000,
+   "units": [
+    {
+     "name": "2 спальни",
+     "beds": 2,
+     "code": null,
+     "area": 115,
+     "from": 33680000
+    }
+   ]
   },
   {
    "id": "PLP-HALO1",
