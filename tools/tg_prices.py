@@ -19,7 +19,7 @@
     python3 tools/tg_prices.py PLP-CORALINA    # один объект
     python3 tools/tg_prices.py --apply         # записать в public.objects
 """
-import asyncio, json, os, re, sys, urllib.request, urllib.parse, datetime
+import asyncio, json, os, re, sys, urllib.request, urllib.parse, urllib.error, datetime
 
 ENV = os.path.expanduser('~/.plp_site_supabase.env')
 CREDS = os.path.expanduser('~/.tg_creds.json')
@@ -52,6 +52,39 @@ def sb(path):
     req = urllib.request.Request(env['SUPABASE_URL'].rstrip('/') + '/rest/v1/' + path,
                                  headers={'apikey': key, 'Authorization': 'Bearer ' + key})
     return json.loads(urllib.request.urlopen(req, timeout=90).read()), env
+
+
+def sources(env):
+    """Каналы застройщиков из реестра источников: {объект: имя канала}."""
+    key = env['SUPABASE_SERVICE_KEY']
+    req = urllib.request.Request(env['SUPABASE_URL'].rstrip('/') +
+                                 "/rest/v1/object_sources?select=project_key,kind,url&kind=eq.tg&limit=500",
+                                 headers={'apikey': key, 'Authorization': 'Bearer ' + key})
+    out = {}
+    for r in json.loads(urllib.request.urlopen(req, timeout=60).read()):
+        m = re.search(r't\.me/(?:s/)?([A-Za-z0-9_]{4,})', str(r.get('url') or ''))
+        if m:
+            out[r['project_key']] = m.group(1).lower()
+    return out
+
+
+def remember_channel(env, pid, name, username):
+    """Нашли канал — записываем в реестр, чтобы в следующий раз не угадывать."""
+    if not username:
+        return
+    key = env['SUPABASE_SERVICE_KEY']
+    base = env['SUPABASE_URL'].rstrip('/') + '/rest/v1/object_sources'
+    body = {'project_key': pid, 'project_name': name, 'kind': 'tg',
+            'url': 'https://t.me/' + username, 'note': 'канал застройщика: прайсы и наличие',
+            'added_by': 'tools/tg_prices.py', 'last_checked': datetime.date.today().isoformat()}
+    try:
+        r = urllib.request.Request(base, data=json.dumps(body, ensure_ascii=False).encode(), method='POST',
+                                   headers={'apikey': key, 'Authorization': 'Bearer ' + key,
+                                            'Content-Type': 'application/json', 'Prefer': 'return=minimal'})
+        urllib.request.urlopen(r, timeout=30)
+    except urllib.error.HTTPError as ex:
+        if ex.code not in (409, 400):
+            raise
 
 
 def patch(env, pid, body):
@@ -116,10 +149,77 @@ def parse_units(path):
             if bare:
                 beds = int(bare[-1])
         out.append({'status': r['status'], 'price': int(price), 'area': area, 'beds': beds})
+    if not out:
+        out = parse_columns(path)      # прайс без столбца статуса — читаем колонками
     return out
 
 
-async def collect(objs):
+def parse_columns(path):
+    """Вторая раскладка прайса: столбца статуса нет, а текст идёт колонками
+    (так у Hythe: сначала все номера квартир, потом типы, потом площади, потом цены).
+    Порядок текста тут бесполезен — собираем строки по КООРДИНАТАМ слов на странице.
+    Такой файл и есть перечень свободного: его публикуют как «available units»."""
+    import fitz
+    out = []
+    for page in fitz.open(path):
+        words = page.get_text('words')          # (x0, y0, x1, y1, слово, …)
+        if not words: continue
+        rows = {}
+        for w in words:
+            key = round(w[1] / 4)               # строка — слова на одной высоте
+            rows.setdefault(key, []).append((w[0], w[4]))
+        for key in sorted(rows):
+            cells = [t for _, t in sorted(rows[key])]
+            line = ' '.join(cells)
+            if not re.search(r'\b[A-Z]{1,2}\d{3,4}[A-Z]?\b', line): continue
+            nums = []
+            for c in cells:
+                cc = c.replace(',', '').replace(' ', '')
+                if re.fullmatch(r'\d+(?:\.\d+)?', cc): nums.append(float(cc))
+            price = next((v for v in reversed(nums) if v >= 1_000_000), None)
+            if not price: continue
+            persq = next((v for v in nums if 20_000 <= v < 1_000_000), None)
+            area = None
+            if persq:
+                area = next((v for v in nums if 10 <= v <= 3000 and abs(price / v - persq) <= persq * 0.08), None)
+            if area is None:
+                area = next((v for v in nums if 20 <= v <= 3000), None)
+            m = re.search(r'\b(\d)\s*B[R-]', line) or re.search(r'(\d)\s*bed', line, re.I)
+            st = 'sold' if re.search(r'\bsold|reserved\b', line, re.I) else 'available'
+            out.append({'status': st, 'price': int(price), 'area': area,
+                        'beds': int(m.group(1)) if m else None})
+    return out
+
+
+async def one_channel(cl, hit, pid):
+    """Свежий прайс и отдельный пост SOLD OUT в канале проекта."""
+    newest, soldout = None, None
+    async for m in cl.iter_messages(hit.entity, limit=150):
+        # только отдельный пост «SOLD OUT», иначе «башня А sold out» закроет весь проект
+        if m.text and re.fullmatch(r'\W*sold\s*out\W*', m.text.strip(), re.I) and soldout is None:
+            soldout = m.date
+        nm = (m.file.name if (m.document and m.file and m.file.name) else '') or ''
+        if nm.lower().endswith('.pdf') and re.search(r'price', nm, re.I) and not re.search(r'master', nm, re.I):
+            if newest is None:
+                newest = (m.date, nm, m)
+    entry = {'channel': hit.name, 'username': str(getattr(hit.entity, 'username', '') or ''),
+             'soldout': soldout.strftime('%Y-%m-%d') if soldout else None}
+    if newest:
+        dt, nm, m = newest
+        path = os.path.join(CACHE, re.sub(r'[^A-Za-z0-9._-]+', '_', pid + '_' + nm))
+        os.makedirs(CACHE, exist_ok=True)
+        if not os.path.exists(path):
+            await m.download_media(path)
+        entry['file'] = os.path.basename(path)
+        entry['as_of'] = dt.strftime('%Y-%m-%d')
+        try:
+            entry['units'] = parse_units(path)
+        except Exception as ex:
+            entry['error'] = str(ex)[:80]
+    return entry
+
+
+async def collect(objs, known=None):
     from telethon import TelegramClient
     c = json.load(open(CREDS))
     cl = TelegramClient(SESSION, c['api_id'], c['api_hash'])
@@ -128,12 +228,20 @@ async def collect(objs):
         print('Telegram: рабочий аккаунт не залогинен — прайсы не читаю')
         return {}
     dialogs = [d async for d in cl.iter_dialogs(limit=800) if d.is_channel]
+    known = known or {}
     os.makedirs(CACHE, exist_ok=True)
     res = {}
     for o in objs:
         pid = o['plp_property_id']
         if pid in ALIAS and ALIAS[pid] is None:
             continue
+        # 16.09: канал объекта записан в реестре источников — берём его, а не угадываем
+        uname = known.get(pid)
+        if uname:
+            hit = next((d for d in dialogs if str(getattr(d.entity, 'username', '') or '').lower() == uname), None)
+            if hit:
+                res[pid] = await one_channel(cl, hit, pid)
+                continue
         needle = ALIAS.get(pid) or re.sub(r'^(the\s+title|the)\s+', '', str(o['name']), flags=re.I)
         needle = re.sub(r'[,–—].*$', '', needle).strip()
         # общие слова названий («villa», «the title», район) канал не опознают:
@@ -153,34 +261,26 @@ async def collect(objs):
         if not hit:
             res[pid] = {'channel': None}
             continue
-        newest, soldout = None, None
-        async for m in cl.iter_messages(hit.entity, limit=150):
-            # только отдельный пост «SOLD OUT», иначе «башня А sold out» закроет весь проект
-            if m.text and re.fullmatch(r'\W*sold\s*out\W*', m.text.strip(), re.I) and soldout is None:
-                soldout = m.date
-            nm = (m.file.name if (m.document and m.file and m.file.name) else '') or ''
-            if nm.lower().endswith('.pdf') and re.search(r'price', nm, re.I) and not re.search(r'master', nm, re.I):
-                if newest is None:
-                    newest = (m.date, nm, m)
-        entry = {'channel': hit.name, 'soldout': soldout.strftime('%Y-%m-%d') if soldout else None}
-        if newest:
-            dt, nm, m = newest
-            path = os.path.join(CACHE, re.sub(r'[^A-Za-z0-9._-]+', '_', pid + '_' + nm))
-            if not os.path.exists(path):
-                await m.download_media(path)
-            entry['file'] = os.path.basename(path)
-            entry['as_of'] = dt.strftime('%Y-%m-%d')
-            try:
-                entry['units'] = parse_units(path)
-            except Exception as ex:
-                entry['error'] = str(ex)[:80]
-        res[pid] = entry
+        res[pid] = await one_channel(cl, hit, pid)
     await cl.disconnect()
     return res
 
 
-def summarize(u):
+RULES = {}
+try:
+    RULES = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'price_rules.json')))
+except Exception:
+    pass
+
+
+def summarize(u, pid=None):
     av = [x for x in u if x['status'] == 'available']
+    # правило объекта: в одном прайсе бывают две разные серии (виллы и компактные дома)
+    rule = RULES.get(pid or '', {})
+    if rule.get('min_area'):
+        keep = [x for x in av if x.get('area') and x['area'] >= rule['min_area']]
+        if keep:
+            av = keep
     if not av:
         return None
     tiers, byb = [], {}
@@ -199,7 +299,8 @@ def main():
                    '&on_site=eq.true&purpose=not.in.(' + urllib.parse.quote('аренда') + ',rent)')
     if ONLY:
         rows = [r for r in rows if r['plp_property_id'] in ONLY]
-    data = asyncio.run(collect(rows))
+    known = sources(env)
+    data = asyncio.run(collect(rows, known))
     money = lambda v: f'{v:,}'.replace(',', ' ') + ' ฿'
     changed = 0
     for o in rows:
@@ -208,7 +309,9 @@ def main():
         if not e.get('channel'):
             print('%-20s канала нет' % pid)
             continue
-        s = summarize(e.get('units') or [])
+        if APPLY and pid not in known and e.get('username'):
+            remember_channel(env, pid, o['name'], e['username'])
+        s = summarize(e.get('units') or [], pid)
         # «SOLD OUT» свежее прайса — значит прайс уже не про наличие (так было у Estella:
         # в прайсе одна свободная вилла, а через месяц канал написал SOLD OUT)
         if s and e.get('soldout') and e.get('as_of') and e['soldout'] > e['as_of']:

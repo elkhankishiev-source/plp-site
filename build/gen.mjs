@@ -1143,7 +1143,9 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
      не показываем — предлагаем поискать юнит на вторичном рынке. */
   const soldOut = String(o.stage || '') === 'Sold out';
   const soldOutLine = soldOut
-    ? '<div class="price">Цена по запросу<small>у застройщика распродано — ищем юнит на вторичном рынке</small></div>'
+    ? (priceFmt
+        ? '<div class="price">от ' + htmlEsc(priceFmt) + '<small>у застройщика распродано — это предложение от владельца, ищем и другие</small></div>'
+        : '<div class="price">Цена по запросу<small>у застройщика распродано — ищем через владельцев</small></div>')
     : '';
 
   /* ===== ЧТО ПРЕДЛАГАЕТ ЗАСТРОЙЩИК =====

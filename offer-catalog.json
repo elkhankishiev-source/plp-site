@@ -18,7 +18,7 @@
    "name": "Mono Champaca, Таланг",
    "district": "Таланг",
    "type": "Вилла",
-   "price_from": 17900000,
+   "price_from": 18800000,
    "units": []
   },
   {
@@ -138,7 +138,7 @@
    "name": "The Title Casa De Monte",
    "district": "Ко Кео",
    "type": "Вилла",
-   "price_from": 11779000,
+   "price_from": 30276000,
    "units": [
     {
      "beds": 3,
@@ -154,7 +154,7 @@
      "area_sqm": 424,
      "price_from_thb": 42343000,
      "area": 424,
-     "from": 12081000
+     "from": 42343000
     }
    ]
   },
@@ -280,7 +280,7 @@
    "name": "The Title Villa Estella Naiyang",
    "district": "Най Янг",
    "type": "Вилла",
-   "price_from": 22418000,
+   "price_from": 22300000,
    "units": [
     {
      "beds": 3,
@@ -309,8 +309,21 @@
    "name": "Fantasy Plus Rawai",
    "district": "Равай",
    "type": "Кондо",
-   "price_from": 5700000,
-   "units": []
+   "price_from": 3570000,
+   "units": [
+    {
+     "name": "1 спальня",
+     "beds": 1,
+     "area": 34,
+     "from": 3570000
+    },
+    {
+     "name": "2 спальни",
+     "beds": 2,
+     "area": 52,
+     "from": 5460000
+    }
+   ]
   },
   {
    "id": "PLP-HALO1",
@@ -381,7 +394,7 @@
    "name": "HYTHE by Botanica",
    "district": "Лаян",
    "type": "Кондо",
-   "price_from": 10994860,
+   "price_from": 10880000,
    "units": [
     {
      "тип": "1 спальня",
@@ -727,8 +740,21 @@
    "name": "The Standard Residences Phuket Bang Tao",
    "district": "Банг Тао",
    "type": "Кондо",
-   "price_from": null,
-   "units": []
+   "price_from": 21930000,
+   "units": [
+    {
+     "name": "2 спальни",
+     "beds": 2,
+     "area": 99.95,
+     "from": 21930000
+    },
+    {
+     "name": "3 спальни",
+     "beds": 3,
+     "area": 167.05,
+     "from": 33030000
+    }
+   ]
   },
   {
    "id": "PLP-SUDARA",
@@ -891,8 +917,15 @@
    "name": "Zenithy La Ville · Oasis Collection",
    "district": "Ко Кео",
    "type": "Вилла",
-   "price_from": 26530500,
-   "units": []
+   "price_from": 19900000,
+   "units": [
+    {
+     "name": "4 спальни",
+     "beds": 4,
+     "area": 351.61,
+     "from": 19900000
+    }
+   ]
   },
   {
    "id": "PLP-ZERO-BANGTAO",
