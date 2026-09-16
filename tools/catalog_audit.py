@@ -15,16 +15,32 @@
     python3 tools/catalog_audit.py --errors   # только ошибки
     python3 tools/catalog_audit.py --short    # одна строка для сборки
 """
-import json, sys, urllib.request
+import json, os, sys, urllib.request
 
+# 16.09: ключи брались из временного файла /tmp/.sb — он пропал, и проверка полгода
+# молча отвечала «база не ответила». Читаем оттуда же, откуда читает сборка сайта.
+ENV = os.path.expanduser('~/.plp_site_supabase.env')
 SB = '/tmp/.sb'
 
 
-def rows():
+def creds():
+    if os.path.exists(ENV):
+        env = {}
+        for line in open(ENV):
+            if '=' in line and not line.strip().startswith('#'):
+                k, v = line.strip().split('=', 1)
+                env[k] = v.strip().strip('"').strip("'")
+        if env.get('SUPABASE_URL') and env.get('SUPABASE_SERVICE_KEY'):
+            return env['SUPABASE_URL'], env['SUPABASE_SERVICE_KEY']
     d = json.load(open(SB))
-    h = {'apikey': d['key'], 'Authorization': 'Bearer ' + d['key'],
+    return d['url'], d['key']
+
+
+def rows():
+    url, key = creds()
+    h = {'apikey': key, 'Authorization': 'Bearer ' + key,
          'Content-Type': 'application/json'}
-    r = urllib.request.Request(d['url'].rstrip('/') + '/rest/v1/rpc/catalog_audit',
+    r = urllib.request.Request(url.rstrip('/') + '/rest/v1/rpc/catalog_audit',
                                data=b'{}', headers=h)
     return json.load(urllib.request.urlopen(r, timeout=90))
 

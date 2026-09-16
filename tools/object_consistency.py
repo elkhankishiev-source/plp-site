@@ -20,8 +20,23 @@ import json, os, re, sys, urllib.request
 
 ENV = os.path.expanduser('~/.plp_site_supabase.env')
 Q = 'plp_property_id,name,usp,usp_en,handover_date,stage,status,price_from_thb,price_to_thb,bedrooms_min,bedrooms_max,area_min,area_max,on_site'
-STAGE_WORDS = {'Ready': 'сдан', 'Construction': 'строится', 'Pre-sale': 'старт продаж',
-               'Resale': 'вторичка', 'Sold out': 'распродан', 'Announced': 'анонсирован'}
+# 16.09: на сайте четыре группы продажи — старт продаж, строится, готово к заезду,
+# вторичка. Сторож сверяет описание с группой, а не с сырым словом стадии: «анонсирован»
+# и «старт продаж» — одна полка, спорить им не о чем.
+STAGE_GROUP = {'Ready': 'ready', 'Construction': 'construction', 'Pre-sale': 'presale',
+               'Announced': 'presale', 'Resale': 'resale', 'Sold out': 'resale'}
+GROUP_RU = {'ready': 'готово к заезду', 'construction': 'строится',
+            'presale': 'старт продаж', 'resale': 'вторичка'}
+GROUP_WORDS = {
+    'ready':        r'сдан\w*|готов\w* к заезду|готовое жиль|введ[её]н в эксплуатац',
+    'construction': r'строится|идёт строительство|в стадии строительства',
+    'presale':      r'старт продаж|пресейл|предпродаж',
+    'resale':       r'вторичн\w*|вторичк\w*|перепродаж\w*|переуступ\w*',
+}
+# что друг другу не противоречит: пресейл — это та же стройка, вторичка почти всегда
+# уже готова, а распроданный у застройщика проект и есть вторичный рынок
+OK_PAIRS = {('presale', 'construction'), ('construction', 'presale'),
+            ('resale', 'ready'), ('ready', 'resale')}
 
 
 def sb():
@@ -99,16 +114,13 @@ def check(o):
         qf = (m - 1) // 3 + 1
         if qs and qf not in qs and (not ys or y in ys):
             bad.append((pid, 'квартал сдачи', 'в полях %dQ %d' % (qf, y), 'в описании %s' % ', '.join('%dQ' % x for x in sorted(qs))))
-    stage = o.get('stage')
-    if stage in STAGE_WORDS:
-        mine, others = STAGE_WORDS[stage], [w for k, w in STAGE_WORDS.items() if k != stage]
-        found = [w for w in others if re.search(r'\b' + w, txt, re.I)]
-        # у вторички «проект распродан застройщиком, купить можно только на вторичном
-        # рынке» — это объяснение, а не спор с полем
-        if stage == 'Resale' and re.search(r'вторичн', txt, re.I):
-            found = [w for w in found if w != 'распродан']
-        if found and not re.search(r'\b' + mine, txt, re.I):
-            bad.append((pid, 'стадия', 'в полях «%s»' % mine, 'в описании «%s»' % found[0]))
+    grp = STAGE_GROUP.get(o.get('stage'))
+    if grp:
+        found = [g for g, w in GROUP_WORDS.items()
+                 if g != grp and (grp, g) not in OK_PAIRS and re.search(w, txt, re.I)]
+        if found and not re.search(GROUP_WORDS[grp], txt, re.I):
+            bad.append((pid, 'стадия', 'в полях «%s»' % GROUP_RU[grp],
+                        'в описании «%s»' % GROUP_RU[found[0]]))
     pf = o.get('price_from_thb')
     prices = money_in(txt)
     if pf and prices:
