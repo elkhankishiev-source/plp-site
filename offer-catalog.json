@@ -138,7 +138,7 @@
    "name": "The Title Casa De Monte",
    "district": "Ко Кео",
    "type": "Вилла",
-   "price_from": 11779000,
+   "price_from": 30276000,
    "units": [
     {
      "beds": 3,
@@ -286,7 +286,7 @@
      "beds": 3,
      "name": "3 спальни",
      "area_sqm": 265,
-     "price_from_thb": 18600000,
+     "price_from_thb": 22418000,
      "area": 265,
      "from": 18600000
     }
