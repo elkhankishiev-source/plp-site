@@ -72,3 +72,20 @@ for (const [f, v] of targets) {
   total += apply(f, v);
 }
 console.log('всего вставок:', total);
+
+/* 16.09: add-property.html носит копию каталога и раньше застывала — в ней месяцами
+   жили старые цены и ссылки на фото с сайта застройщика. Держим копию свежей. */
+(function syncAddPropCatalog(){
+  const idxPath = path.join(ROOT, 'index.html');
+  const apPath = path.join(ROOT, 'add-property.html');
+  if (!fs.existsSync(apPath)) return;
+  const idx = fs.readFileSync(idxPath, 'utf8');
+  const ap = fs.readFileSync(apPath, 'utf8');
+  const S = '/* PLP:AUTO-CATALOG:START', E = 'PLP:AUTO-CATALOG:END';
+  const i = idx.indexOf(S), e = idx.indexOf(E);
+  const j = ap.indexOf(S), k = ap.indexOf(E);
+  if (i < 0 || e < 0 || j < 0 || k < 0) return;
+  const block = idx.slice(i, idx.indexOf('*/', e) + 2);
+  const out = ap.slice(0, j) + block + ap.slice(ap.indexOf('*/', k) + 2);
+  if (out !== ap) { fs.writeFileSync(apPath, out); console.log('add-property.html: каталог обновлён из index.html'); }
+})();
