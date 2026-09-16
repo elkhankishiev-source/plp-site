@@ -274,7 +274,7 @@
    "name": "Gardens of Eden",
    "district": "Банг Тао",
    "type": "Кондо",
-   "price_from": 7800000,
+   "price_from": null,
    "units": []
   },
   {
@@ -709,6 +709,35 @@
      "code": null,
      "area": 83.56,
      "from": 14325000
+    }
+   ]
+  },
+  {
+   "id": "PLP-QABALAH",
+   "pub": "PLP-QABALAH",
+   "url": "https://property-library.com/object/qabalah",
+   "name": "Villa Qabalah",
+   "district": "Таланг",
+   "type": "Вилла",
+   "price_from": null,
+   "units": [
+    {
+     "beds": 2,
+     "name": "Moss",
+     "area_sqm": 237.8,
+     "area": 237.8
+    },
+    {
+     "beds": 3,
+     "name": "Fern",
+     "area_sqm": 369,
+     "area": 369
+    },
+    {
+     "beds": 4,
+     "name": "Pine",
+     "area_sqm": 573.8,
+     "area": 573.8
     }
    ]
   },
