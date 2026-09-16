@@ -55,7 +55,7 @@
    "name": "AYANA Heights Seaview Residences",
    "district": "Лаян",
    "type": "Кондо",
-   "price_from": 3661800,
+   "price_from": 5426101,
    "units": [
     {
      "beds": 1,
@@ -63,7 +63,7 @@
      "area_sqm": 32,
      "price_from_thb": 3661800,
      "area": 32,
-     "from": 3661800
+     "from": 5426101
     }
    ]
   },
@@ -101,7 +101,7 @@
    "name": "Bellaguna Lake Residences",
    "district": "Лагуна",
    "type": "Кондо",
-   "price_from": 14120000,
+   "price_from": null,
    "units": []
   },
   {
@@ -250,7 +250,7 @@
    "name": "ETRO Residences Phuket",
    "district": "Банг Тао",
    "type": "Кондо",
-   "price_from": null,
+   "price_from": 182600000,
    "units": []
   },
   {
@@ -907,7 +907,7 @@
    "id": "PLP-VIVI-A304",
    "pub": "PLP-VIVI-R3",
    "url": "https://property-library.com/object/vivi-r3",
-   "name": "The Title VIVI, Банг Тао — перепродажа, 3 этаж",
+   "name": "The Title VIVI, Банг Тао — 3 этаж",
    "district": "Банг Тао",
    "type": "Кондо",
    "price_from": null,
@@ -917,7 +917,7 @@
    "id": "PLP-VIVI-A507",
    "pub": "PLP-VIVI-R5",
    "url": "https://property-library.com/object/vivi-r5",
-   "name": "The Title VIVI, Банг Тао — перепродажа, 5 этаж",
+   "name": "The Title VIVI, Банг Тао — 5 этаж",
    "district": "Банг Тао",
    "type": "Кондо",
    "price_from": null,
@@ -1015,7 +1015,7 @@
    "id": "RESALE-PANORA",
    "pub": "PLP-PANORA-VILLA",
    "url": "https://property-library.com/object/panora-villa",
-   "name": "Panora Villas, Сурин — перепродажа",
+   "name": "Panora Villas, Сурин",
    "district": "Сурин",
    "type": "Вилла",
    "price_from": 19850000,
@@ -1025,7 +1025,7 @@
    "id": "RESALE-PANORA-CONDO",
    "pub": "PLP-PANORA-CONDO",
    "url": "https://property-library.com/object/panora-condo",
-   "name": "The Panora Phuket, корпус D — перепродажа",
+   "name": "The Panora Phuket, корпус D",
    "district": "Сурин",
    "type": "Кондо",
    "price_from": 4425400,

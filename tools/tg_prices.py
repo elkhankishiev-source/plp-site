@@ -174,13 +174,27 @@ def parse_units(path):
             hint = int(m.group(1)) if m else None
     except Exception:
         pass
+    def sane(rows):
+        """Доля строк, где цена за метр похожа на правду: 20 тыс.—600 тыс. ฿/м².
+        Так отличаем таблицу юнитов от страницы с условиями оплаты, где тоже есть
+        крупные числа (у AYANA из неё прилетал «взнос 1 500 000» вместо цены)."""
+        got = [r for r in rows if r.get('area') and r['area'] > 5]
+        if not got:
+            return 0.0
+        ok = sum(1 for r in got if 20_000 <= r['price'] / r['area'] <= 600_000)
+        return ok / len(got)
     if hint:
         if abs(av(col) - hint) < abs(av(out) - hint):
             return col
         return out
-    if not out or av(col) > av(out):
+    if not out:
         return col
-    return out
+    if not col:
+        return out
+    sc, so = sane(col), sane(out)
+    if abs(sc - so) > 0.15:
+        return col if sc > so else out
+    return col if av(col) > av(out) else out
 
 
 def parse_columns(path):
@@ -200,7 +214,11 @@ def parse_columns(path):
         for key in sorted(rows):
             cells = [t for _, t in sorted(rows[key])]
             line = ' '.join(cells)
-            if not re.search(r'\b[A-Z]{1,3}[- ]?\d{2,4}[A-Z]?\b', line): continue
+            # номер юнита: буквы и сразу цифры (A201, B-201, CKA201). Раньше под шаблон
+            # попадала строка «1 - 30 SEP 2026» из условий оплаты, и в цену уезжал взнос.
+            if not re.search(r'\b[A-Z]{1,3}-?\d{3,4}[A-Z]?\b', line): continue
+            if re.search(r'\b(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)\b', line, re.I) \
+               and len(re.findall(r'\d', line)) < 12: continue
             nums = []
             for c in cells:
                 cc = c.replace(',', '').replace(' ', '')
@@ -213,7 +231,11 @@ def parse_columns(path):
                 area = next((v for v in nums if 10 <= v <= 3000 and abs(price / v - persq) <= persq * 0.08), None)
             if area is None:
                 area = next((v for v in nums if 20 <= v <= 3000), None)
-            m = re.search(r'\b(\d)\s*B[R-]', line) or re.search(r'(\d)\s*bed', line, re.I)
+            # спальни: сначала раскладка «2B+2B», потом «2 bed», и только потом «2BR».
+            # Иначе номер этажа в соседней колонке («B 4 B-402») читался как спальни.
+            m = (re.search(r'\b(\d)\s*B\s*\+\s*\d\s*B\b', line)
+                 or re.search(r'(\d)\s*bed', line, re.I)
+                 or re.search(r'\b(\d)\s*BR\b', line))
             st = 'sold' if re.search(r'\bsold|reserved\b', line, re.I) else 'available'
             out.append({'status': st, 'price': int(price), 'area': area,
                         'beds': int(m.group(1)) if m else None})
