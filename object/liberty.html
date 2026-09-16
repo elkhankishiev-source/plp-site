@@ -3,6 +3,64 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- PLP:HEADTHEME:START -->
+<meta name="color-scheme" content="light dark">
+<!-- цвет системных полей браузера = фон страницы. Без этого при прокрутке и
+     оттягивании из-под страницы проглядывает чужой цвет — кажется, что фон мигает. -->
+<meta name="theme-color" content="#f7f6f1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0C0D09" media="(prefers-color-scheme: dark)">
+<script>
+(function(){
+  function paintChrome(){
+    try{
+      var bg=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+      if(!bg && document.body) bg=getComputedStyle(document.body).backgroundColor;
+      if(!bg || bg==='rgba(0, 0, 0, 0)') return;
+      var list=document.querySelectorAll('meta[name="theme-color"]');
+      for(var i=0;i<list.length;i++) list[i].parentNode.removeChild(list[i]);
+      var m=document.createElement('meta'); m.setAttribute('name','theme-color');
+      m.setAttribute('content',bg); document.head.appendChild(m);
+    }catch(e){}
+  }
+  /* Кнопка «поделиться»: на телефоне открывает системное меню, на компьютере
+     кладёт ссылку в буфер и говорит об этом. Эльнур 07.09: «сайтом надо
+     пользоваться, он не просто для красоты». */
+  document.addEventListener('click', function(e){
+    var b = e.target && e.target.closest && e.target.closest('[data-share]');
+    if(!b) return;
+    e.preventDefault();
+    var path = b.getAttribute('data-share') || location.pathname;
+    var url = location.origin + path;
+    var title = b.getAttribute('data-share-title') || document.title;
+    var done = function(){
+      var was = b.innerHTML;   /* 15.09: в кнопке живёт svg-иконка, восстанавливаем разметку целиком */
+      b.textContent = '✓ Ссылка скопирована';
+      b.classList.add('ok');
+      setTimeout(function(){ b.innerHTML = was; b.classList.remove('ok'); }, 2200);
+    };
+    if(navigator.share){ navigator.share({title:title, url:url}).catch(function(){}); return; }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(url).then(done).catch(function(){ prompt('Скопируйте ссылку:', url); });
+    } else prompt('Скопируйте ссылку:', url);
+  });
+  window.paintChrome=paintChrome;
+  /* Адрес без .html: страницы и так открываются коротким адресом, но если
+     человек пришёл по старой ссылке, приводим строку браузера к чистому виду.
+     Эльнур 07.09: «мне не нравится html в адресе, я ни у кого её не видел». */
+  try{
+    var pth=location.pathname;
+    if(/\.html$/.test(pth)){
+      var clean=pth.replace(/index\.html$/,'').replace(/\.html$/,'');
+      if(clean==='') clean='/';
+      history.replaceState(null,'',clean+location.search+location.hash);
+    }
+  }catch(e){}
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',paintChrome);
+  else paintChrome();
+  try{ matchMedia('(prefers-color-scheme: dark)').addEventListener('change',paintChrome); }catch(e){}
+})();
+</script>
+<!-- PLP:HEADTHEME:END -->
 <script>(function(){try{var v=localStorage.getItem('pl_theme');
 if(v==='dark'||v==='light')document.documentElement.setAttribute('data-theme',v);}catch(e){}})();</script>
 <title>The Liberty by Wallaya Villas — Банг Тао, Пхукет | Property Library</title>
@@ -27,6 +85,22 @@ if(v==='dark'||v==='light')document.documentElement.setAttribute('data-theme',v)
 <meta name="twitter:image" content="https://property-library.com/img/PLP-LIBERTY.jpg">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"RealEstateListing","@id":"https://property-library.com/object/liberty#listing","url":"https://property-library.com/object/liberty","name":"The Liberty by Wallaya Villas","description":"The Liberty by Wallaya Villas — премиальный кондоминиум на Чёнг Талае, в одной из наиболее востребованных локаций Пхукета. Комплекс расположен на участке площадью 12 800 квадратных метров и включает пять корпусов с 324 апартаментами. Все квартиры сдаются с полной меблировкой, стартовая цена составляет 135 000 бат за квадратный метр. Один из корпусов предназначен для проживания с домашними животными.","about":{"@id":"https://property-library.com/object/liberty#residence"}},{"@type":"Residence","@id":"https://property-library.com/object/liberty#residence","name":"The Liberty by Wallaya Villas","description":"The Liberty by Wallaya Villas — премиальный кондоминиум на Чёнг Талае, в одной из наиболее востребованных локаций Пхукета. Комплекс расположен на участке площадью 12 800 квадратных метров и включает пять корпусов с 324 апартаментами. Все квартиры сдаются с полной меблировкой, стартовая цена составляет 135 000 бат за квадратный метр. Один из корпусов предназначен для проживания с домашними животными.","url":"https://property-library.com/object/liberty","image":"https://property-library.com/img/PLP-LIBERTY.jpg","address":{"@type":"PostalAddress","addressRegion":"Phuket","addressLocality":"Банг Тао","addressCountry":"TH"},"additionalProperty":{"@type":"PropertyValue","name":"Застройщик","value":"Wallaya Villas"},"numberOfRooms":2,"floorSize":{"@type":"QuantitativeValue","value":119,"unitCode":"MTK"}},{"@type":"Offer","@id":"https://property-library.com/object/liberty#offer","itemOffered":{"@id":"https://property-library.com/object/liberty#residence"},"priceCurrency":"THB","price":8235000,"availability":"https://schema.org/InStock","url":"https://property-library.com/object/liberty","seller":{"@type":"RealEstateAgent","name":"Property Library Phuket","url":"https://property-library.com"}}]}</script>
 <style>
+/* PLP:ANTIFLICKER */
+/* Мигание фона на телефоне — сводная защита. Эльнур 06.09: «фон в мобильной
+   версии везде мигает, ищи по всем страницам». Три источника:
+   1) размытие фона (backdrop-filter) под липкими элементами — браузер
+      перерисовывает весь экран на каждом кадре прокрутки;
+   2) долгое проявление блоков при прокрутке;
+   3) отложенные картинки без фона — на их месте на миг светится подложка. */
+@media(max-width:900px){
+  .header,#toTop,.badge,.pm-tag,.car .tag,.btn-glass,.hero-float,.fbtn,.chipf,
+  .modal-overlay,.mnav,.sheet,.pm-card,.toolbox{
+    backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+  .reveal{transition-duration:.35s!important}
+}
+.pic-photo,.thumb-photo,.prgs img,.simi-c i,.pm-img img{background-color:var(--warm,#EFEEE7)}
+/* PLP:ANTIFLICKER */
+html{background:var(--bg);overscroll-behavior-y:none}
 /* Эльнур 05.09: сайт — единая система. Страница объекта живёт в тех же
    цветах и с тем же набором блоков, что и карточка на сайте. */
 :root{--green:#D2D5B3;--green-deep:#5F6242;--olive:#5F6242;--ink:#22251C;--paper:#FBFBF7;
@@ -62,6 +136,8 @@ header.top{padding:18px 0;border-bottom:1px solid var(--line)}
 .unitc span{display:block;font-size:12px;color:var(--muted);margin-top:2px}
 .unitc u{display:block;text-decoration:none;font-weight:700;font-size:13px;margin-top:3px}
 .prgs{display:flex;gap:8px;overflow-x:auto;margin-top:10px;padding-bottom:6px}
+.prg-l{margin:0 0 6px;padding-left:18px;color:var(--ink)}
+.prg-l li{margin:3px 0}
 .prgs img{flex:0 0 190px;height:130px;object-fit:cover;border-radius:11px;display:block}
 h1{font-size:clamp(24px,4vw,34px);line-height:1.2;margin:8px 0 4px}
 .loc{color:var(--muted);margin:0 0 14px}
@@ -120,9 +196,9 @@ if(dark) i.src='../img/brand/plp-mark-white.png';})();</script>
   <h1>The Liberty by Wallaya Villas</h1>
   <p class="loc">Банг Тао, Пхукет · 2500 м до пляжа</p>
   <div class="price">от 8 235 000 ฿<small>стартовая цена застройщика</small></div>
-  <div class="chips"><div class="chip"><span class="k">Тип</span><span class="v">Кондо</span></div><div class="chip"><span class="k">Спальни</span><span class="v">1–2</span></div><div class="chip"><span class="k">Площадь</span><span class="v">61–119 м²</span></div><div class="chip"><span class="k">Сдача</span><span class="v">2Q 2028</span></div><div class="chip"><span class="k">Стадия</span><span class="v">в продаже</span></div><div class="chip"><span class="k">Доходность</span><span class="v">6–12%/год</span></div><div class="chip"><span class="k">До пляжа</span><span class="v">2500 м до пляжа</span></div><div class="chip"><span class="k">Застройщик</span><span class="v">Wallaya Villas</span></div></div>
+  <div class="chips"><div class="chip"><span class="k">Тип</span><span class="v">Кондо</span></div><div class="chip"><span class="k">Спальни</span><span class="v">1–2</span></div><div class="chip"><span class="k">Площадь</span><span class="v">61–119 м²</span></div><div class="chip"><span class="k">Сдача</span><span class="v">2Q 2028</span></div><div class="chip"><span class="k">Стадия</span><span class="v">старт продаж</span></div><div class="chip"><span class="k">Доходность</span><span class="v">6–12%/год</span></div><div class="chip"><span class="k">До пляжа</span><span class="v">2500 м до пляжа</span></div><div class="chip"><span class="k">Застройщик</span><span class="v">Wallaya Villas</span></div></div>
   
-  <section class="promo"><h2>Что рядом и что нового</h2><p>[нужно от Эльнура]</p></section>
+  
   <div class="yield">
     <div class="num">6–12%</div>
     <div class="lbl">Ориентир по району (Банг Тао, кондо), при активном управлении. Точный расчёт по вашему объекту делает специалист.</div>
@@ -133,7 +209,7 @@ if(dark) i.src='../img/brand/plp-mark-white.png';})();</script>
   <section class="desc"><h2>Как платить</h2><dl class="pairs"><dt>План застройщика</dt><dd>Резервационный депозит (сумма уточняется) → 30% контракт в течение 30 дней (минус резервация) → 30% завершение надземной конструкции → 15% завершение архитектуры → 15% завершение меблировки → 10% Transfer Date (регистрация). Leasehold = базовая цена. Freehold = +10,000 THB/м² сверху. Transfer fee: Leasehold 1.1% / Freehold 3.3% — платит покупатель. Остальные налоги (Stamp Duty, Business Tax, Withholding Tax) — застройщик. Launch Price = Presale × 1.10. Цена растёт по этажам: 135k → 141k → 147k → 153k → 159k → 165k THB/м². CAM Fee 80 THB/м²/мес (1 год вперёд). Sinking Fund 1,000 THB/м² единоразово. Доп: Electric install 10K + Water install 10K, электро 7 THB/unit, вода 50 THB/куб.м.</dd><dt>Первый взнос</dt><dd>30%</dd><dt>Обслуживание</dt><dd>80 ฿ за м² в год</dd></dl><p class="fine">Точный график под ваш юнит и сроки считает специалист — цифры застройщика меняются.</p></section>
   <section class="desc"><h2>Форма владения</h2><p>Фрихолд или лизхолд — на выбор</p><p class="fine">Что это значит для иностранца — в <a href="../guide/leasehold-ili-freehold">разборе форм владения</a>.</p></section>
   <section class="desc"><h2>Район: Банг Тао</h2><div class="tags"><span>2500 м до пляжа</span></div><p>Building A — 9,170 м² | 54 юнита. Building B — 8,494 м² | 78 юнитов. Building C — 7,293 м² | 66 юнитов (Pet Friendly). Building D — 7,329 м² | 60 юнитов. Building E — 7,576 м² | 66 юнитов.</p><p><a class="lnk" href="../districts/bang-tao">Весь район: цены, пляжи, что рядом</a></p></section>
-  
+  <section class="desc"><h2>Ход строительства</h2><div class="chip"><span class="k">Срок сдачи</span><span class="v">2Q 2028 · осталось около 19 мес.</span></div><div class="chip"><span class="k">Стадия</span><span class="v">старт продаж</span></div></section>
   <section class="desc"><h2>Об объекте</h2><p>The Liberty by Wallaya Villas — премиальный кондоминиум на Чёнг Талае, в одной из наиболее востребованных локаций Пхукета. Комплекс расположен на участке площадью 12 800 квадратных метров и включает пять корпусов с 324 апартаментами. Все квартиры сдаются с полной меблировкой, стартовая цена составляет 135 000 бат за квадратный метр. Один из корпусов предназначен для проживания с домашними животными.</p></section>
   <section class="desc" lang="en"><h2>About</h2><p>The Liberty by Wallaya Villas — a premium condominium complex in Cherng Talay comprising 5 buildings and 324 units. Starting price 135,000 THB/m² fully furnished. Building C is pet-friendly. Project land area: 8 rai (12,800 m²). Designed for comfortable modern living and high investment potential in one of Phuket&#39;s most sought-after locations.</p></section>
   <section class="desc"><h2>Материалы застройщика</h2><div class="cta"><a class="btn ghost" href="https://maps.app.goo.gl/tKzfcemSP3CuGEN5A" rel="noopener nofollow" target="_blank">На карте</a></div></section>
@@ -143,7 +219,7 @@ if(dark) i.src='../img/brand/plp-mark-white.png';})();</script>
     <button type="button" class="btn ghost" id="shareBtn">Поделиться</button>
     <a class="btn wa" href="https://wa.me/66955492587?text=The%20Liberty%20by%20Wallaya%20Villas%20%E2%80%94%20%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D0%B5%D1%81%D1%83%D0%B5%D1%82%20%D1%8D%D1%82%D0%BE%D1%82%20%D0%BE%D0%B1%D1%8A%D0%B5%D0%BA%D1%82.%20https%3A%2F%2Fproperty-library.com%2Fobject%2Fliberty" rel="noopener" target="_blank">WhatsApp</a>
   </div>
-  <section class="desc"><h2>Похожие объекты</h2><div class="simi"><a class="simi-c" href="gens-botanica"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/INTAKE-BOTANICA/01.jpg?width=520&amp;resize=contain&amp;quality=72" alt="" loading="lazy" decoding="async"><b>The GENS by Botanica, у Blue Tree</b><span>Банг Тао · от 5 458 000 ฿</span></a><a class="simi-c" href="adora"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-ADORA/01.jpg?width=520&amp;resize=contain&amp;quality=72" alt="" loading="lazy" decoding="async"><b>The Title Adora Rawai</b><span>Равай · от 5 332 000 ฿</span></a><a class="simi-c" href="balcony"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BALCONY/01.jpg?width=520&amp;resize=contain&amp;quality=72" alt="" loading="lazy" decoding="async"><b>The BALCONY Nai Yang</b><span>Най Янг · от 6 087 270 ฿</span></a></div></section>
+  <section class="desc"><h2>Похожие объекты</h2><div class="simi"><a class="simi-c" href="sierra"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-SIERRA/01.jpg?width=520&amp;resize=contain&amp;quality=72" alt="" loading="lazy" decoding="async"><b>The Title Sierra</b><span>Банг Тао · старт продаж · от 2 906 700 ฿</span></a><a class="simi-c" href="peylaa"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-PEYLAA/01.jpg?width=520&amp;resize=contain&amp;quality=72" alt="" loading="lazy" decoding="async"><b>PEYLAA Phuket, Autograph Collection Residences</b><span>Банг Тао · строится · от 7 900 000 ฿</span></a><a class="simi-c" href="eden"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-EDEN/01.jpg?width=520&amp;resize=contain&amp;quality=72" alt="" loading="lazy" decoding="async"><b>Gardens of Eden</b><span>Банг Тао · строится · от 7 800 000 ฿</span></a></div></section>
 </main>
 <script>
 /* «Поделиться»: на телефоне системное меню, на компьютере ссылка в буфер */

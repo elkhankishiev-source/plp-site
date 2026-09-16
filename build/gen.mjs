@@ -360,54 +360,8 @@ function buildCatalog(objects, benchmarks, preserve) {
       // числовой диапазон спален — по нему работает фильтр «Спальни»
       bmin: (o.bedrooms_min === 0 || o.bedrooms_min) ? o.bedrooms_min : null,
       bmax: (o.bedrooms_max === 0 || o.bedrooms_max) ? o.bedrooms_max : null,
-      stage_key: (function(){
-        var st = String(o.stage || '').toLowerCase();
-        /* 🔴 08.09: Estella стояла как «старт продаж», а сдача у неё через 84 дня.
-           Эльнур: «ты как вообще придумал такое, такое сплошь и рядом, ну так
-           нельзя ведь». Дата сдачи — факт из договора, стадия — слово; когда они
-           спорят, верим дате. Расхождение печатаем при сборке, чтобы поправить
-           в базе, а не заклеивать здесь. */
-        if (o.handover_date) {
-          const hd = new Date(o.handover_date);
-          if (!isNaN(hd)) {
-            const days = Math.round((hd - new Date()) / 86400000);
-            const isPre = /pre-?sale|старт|анонс/.test(st);
-            const isBuild = /construction|строит/.test(st);
-            if (days < 0 && (isPre || isBuild)) {
-              console.error('[gen] ⚠ ' + o.plp_property_id + ': стадия «' + o.stage +
-                '», а сдача была ' + String(o.handover_date).slice(0, 10) + ' — показываю «готов»');
-              return 'ready';
-            }
-            if (days >= 0 && days <= 365 && isPre) {
-              console.error('[gen] ⚠ ' + o.plp_property_id + ': стадия «' + o.stage +
-                '», а до сдачи ' + days + ' дн. — показываю «строится»');
-              return 'construction';
-            }
-          }
-        }
-        if (st === 'ready') return 'ready';
-        if (st === 'announced') return 'announced';
-        if (st === 'sold out') return 'resale';
-        if (st === 'construction') return 'construction';
-        if (st === 'pre-sale' || st === 'presale') return 'presale';
-        if (st === 'resale' || String(o.purpose||'').toLowerCase() === 'resale') return 'resale';
-        /* часть объектов описывает стадию словами («Строится, сдача 08.2028»).
-           Раньше такие оставались вообще без плашки — читаем смысл. */
-        if (/распродан|sold\s*out/.test(st) || String(o.status||'') === 'sold') return 'resale';
-        /* Эльнур 08.09: «раздел вторички я бы прям так и отметил в фильтре».
-           Часть карточек говорит об этом только названием. */
-        if (/перепродаж|вторичк|resale|переуступ/i.test(String(o.name || ''))) return 'resale';
-        if (/стро|constru|off-?plan/.test(st)) return 'construction';
-        if (/готов|ready|заселени/.test(st)) return 'ready';
-        if (/старт|pre-?sale|презентац/.test(st)) return 'presale';
-        /* 08.09: стадия не заполнена — «сдан» из одной даты больше не выводим.
-           Эльнур: Tonino стоял «сдан 2025», хотя это лишь заявленный срок.
-           Пустая стадия честнее догадки: витрина покажет «В продаже». */
-        return '';
-      })(),
-      /* Эльнур 08.09: «старт продаж писать на всех проектах это не верно».
-         Плашка «Старт продаж» живёт, только пока старт свежий — дальше объект
-         просто «в продаже». Дату старта храним в базе, а не гадаем. */
+      stage_key: saleGroup(o),
+      /* дата старта продаж — справочно: группу она не меняет (см. saleGroup) */
       saleStart: o.sale_started_on || null,
       /* короткая приписка к стадии: «сдан в декабре 2025», «2 октября —
          презентация сдачи». Эльнур: «доп отметки это прикольно» */
@@ -539,6 +493,68 @@ function unitsOf(o) {
     area: t.area_sqm || null,
     from: t.price_from_thb || null,
   }));
+}
+
+/* ===== ЧЕТЫРЕ ГРУППЫ ПРОДАЖИ =====
+   Эльнур 16.09.2026: «есть проекты в стройке, есть старт продаж, пресейл, есть
+   сданные, готовые к заезду, и есть те, что перепродаются… вторичка. Это чёткое
+   разделение, которое должно быть».
+
+   Группа одна на весь сайт: карточка, фильтр, плашка, страница объекта и
+   заголовок раздела берут её отсюда. Внутри группы допустимы уточнения
+   («сдача через 60 дн.», «скоро старт продаж») — но группу они не меняют.
+
+     presale      — старт продаж (пресейл): продажи открыты на раннем этапе
+     construction — строится
+     ready        — готово к заезду
+     resale       — вторичка: объект уже куплен и перепродаётся
+
+   Свежесть старта продаж группу НЕ переключает: у большинства проектов даты
+   старта в базе нет, и объект молча уезжал в «в продаже» — так вся группа
+   «старт продаж» и пропала с витрины. Слово выбираем по стадии из базы,
+   а спор стадии с датой сдачи разбираем ниже и печатаем при сборке. */
+function saleGroup(o) {
+  const st = String(o.stage || '').toLowerCase();
+  const isPre = /pre-?sale|presale|старт|анонс|announced/.test(st);
+  const isBuild = /construction|стро|off-?plan/.test(st);
+  const isResale = st === 'resale' || st === 'sold out' || /распродан|sold\s*out|перепродаж|вторичк|переуступ/.test(st) ||
+    String(o.purpose || '').toLowerCase() === 'resale' || String(o.status || '') === 'sold' ||
+    /перепродаж|вторичк|resale|переуступ/i.test(String(o.name || ''));
+  if (isResale) return 'resale';
+  /* 🔴 08.09: Estella стояла как «старт продаж», а сдача у неё через 84 дня.
+     Эльнур: «ты как вообще придумал такое». Дата сдачи — факт из договора,
+     стадия — слово; когда они спорят, верим дате и говорим об этом вслух. */
+  if (o.handover_date) {
+    const hd = new Date(o.handover_date);
+    if (!isNaN(hd)) {
+      const days = Math.round((hd - new Date()) / 86400000);
+      if (days < 0 && (isPre || isBuild)) {
+        console.error('[gen] ⚠ ' + o.plp_property_id + ': стадия «' + o.stage +
+          '», а сдача была ' + String(o.handover_date).slice(0, 10) + ' — показываю «готово к заезду»');
+        return 'ready';
+      }
+      if (days >= 0 && days <= 365 && isPre) {
+        console.error('[gen] ⚠ ' + o.plp_property_id + ': стадия «' + o.stage +
+          '», а до сдачи ' + days + ' дн. — показываю «строится»');
+        return 'construction';
+      }
+    }
+  }
+  if (st === 'ready' || /готов|ready|заселени/.test(st)) return 'ready';
+  if (isBuild) return 'construction';
+  if (isPre) return 'presale';
+  /* 08.09: стадия не заполнена — «готово» из одной даты не выводим.
+     Пустая стадия честнее догадки. */
+  return '';
+}
+
+const GROUP_RU = { presale:'старт продаж', construction:'строится', ready:'готово к заезду', resale:'вторичка' };
+const GROUP_EN = { presale:'Pre-sale', construction:'Under construction', ready:'Ready to move in', resale:'Resale' };
+
+/* Анонс — та же группа «старт продаж», но продажи ещё не открыты: это уточнение
+   внутри группы, а не пятая полка. */
+function saleSoon(o) {
+  return /announced|анонс/i.test(String(o.stage || '')) && !o.price_from_thb;
 }
 
 /* ===== ПОРЯДОК ВЫДАЧИ КАТАЛОГА =====
@@ -731,9 +747,7 @@ function buildRentals(objects, preserve, ratesBy) {
       bmax: (o.bedrooms_max === 0 || o.bedrooms_max) ? o.bedrooms_max : null,
       area: areaLabel(o),
       tag: rentTag(o),
-      /* Эльнур 08.09: «старт продаж писать на всех проектах это не верно».
-         Плашка «Старт продаж» живёт, только пока старт свежий — дальше объект
-         просто «в продаже». Дату старта храним в базе, а не гадаем. */
+      /* дата старта продаж — справочно: группу она не меняет (см. saleGroup) */
       saleStart: o.sale_started_on || null,
       /* короткая приписка к стадии: «сдан в декабре 2025», «2 октября —
          презентация сдачи». Эльнур: «доп отметки это прикольно» */
@@ -1097,11 +1111,86 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
         (u.from ? '<u>от ' + new Intl.NumberFormat('ru-RU').format(u.from) + ' ฿</u>' : '') + '</div>').join('') +
       '</div></section>'
     : '';
-  const bp = o.build_progress && Array.isArray(o.build_progress.photos) ? o.build_progress : null;
-  const progressBlock = bp && bp.photos.length
-    ? '<section class="desc"><h2>Ход строительства' + (bp.as_of ? ' <small style="font-weight:400;color:var(--muted)">' + htmlEsc(bp.as_of) + '</small>' : '') + '</h2>' +
-      '<div class="prgs">' + bp.photos.slice(0, 6).map(u => '<img src="' + htmlEsc(thumbUrl(u, 760, 74)) + '" alt="" loading="lazy" decoding="async">').join('') + '</div>' +
-      '</section>'
+  /* ===== ЧТО ПРЕДЛАГАЕТ ЗАСТРОЙЩИК =====
+     Эльнур 16.09.2026 про заголовок «Что рядом и что нового»: «я бы исправил
+     по соответствию». В поле лежат условия застройщика на сегодня: скидки,
+     рассрочка, мебельный пакет. Иногда — новость про соседнюю площадку:
+     такой текст идёт под своим заголовком.
+     Служебные пометки наружу не выпускаем: «уточнить у застройщика»,
+     «[нужно от Эльнура]» и догадки с меткой (estimated) — это не предложение. */
+  const promoBlock = (function () {
+    let txt = noContacts(String(o.current_promo || '')).trim();
+    if (!txt) return '';
+    if (/\(estimated\)/i.test(txt)) return '';
+    if (/^\s*(уточнить|нужно|\[|—|-)\s*/i.test(txt) && txt.length < 60) return '';
+    txt = txt.replace(/\s*\((?:источник|source)\s*:[^)]*\)/ig, '')
+             .replace(/\s*\(сообщение застройщика[^)]*\)/ig, '')
+             .trim().replace(/\s*\.\s*$/, '.');
+    if (txt.length < 12) return '';
+    const aboutArea = /(рядом|поблизости|в соседнем|неподалёку|открыл|открывает|строит)/i.test(txt) &&
+                      !/(скидк|рассрочк|спец|акци|бонус|подар|первоначальн|цены|цена)/i.test(txt);
+    const h = aboutArea ? 'Что нового рядом' : 'Предложение застройщика';
+    return '<section class="promo"><h2>' + h + '</h2><p>' + htmlEsc(txt) + '</p></section>';
+  })();
+
+  /* ===== ХОД СТРОЙКИ =====
+     Эльнур 16.09.2026: «ход строительства должен быть у всех, кому он важен —
+     сроки строительства это важный пункт». Блок собирается для каждого
+     строящегося и предпродажного объекта: срок сдачи есть всегда, отчёт
+     застройщика и снимки — когда они есть.
+     В базе две формы отчёта: {as_of, photos, source} и {'на 2026-09-07':
+     {сделано, в работе, готовность}} — читаем обе. */
+  const grp = saleGroup(o);
+  const bpRaw = o.build_progress && typeof o.build_progress === 'object' ? o.build_progress : null;
+  const bpPhotos = bpRaw && Array.isArray(bpRaw.photos) ? bpRaw.photos : [];
+  const bpReport = (function () {
+    if (!bpRaw) return null;
+    const k = Object.keys(bpRaw).find(x => /^на\s|^as of/i.test(x) && bpRaw[x] && typeof bpRaw[x] === 'object');
+    return k ? { on: k.replace(/^на\s*/i, ''), body: bpRaw[k] } : null;
+  })();
+  const ruDate = v => {
+    const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(v || ''));
+    return m ? m[3] + '.' + m[2] + '.' + m[1] : String(v || '');
+  };
+  const daysLeft = (function () {
+    if (!o.handover_date) return null;
+    const hd = new Date(o.handover_date); if (isNaN(hd)) return null;
+    return Math.round((hd - new Date()) / 86400000);
+  })();
+  const leftWord = (function () {
+    if (daysLeft == null || daysLeft < 0) return '';
+    if (daysLeft <= 90) return 'осталось ' + daysLeft + ' дн.';
+    const mo = Math.round(daysLeft / 30);
+    return 'осталось около ' + mo + ' мес.';
+  })();
+  const progressRows = [
+    { k: 'Срок сдачи', v: dl.ru ? (dl.ru + (leftWord ? ' · ' + leftWord : '')) : '' },
+    { k: 'Стадия', v: GROUP_RU[grp] || '' },
+    { k: 'Отчёт застройщика', v: bpReport ? ('на ' + ruDate(bpReport.on)) : (bpRaw && bpRaw.as_of ? 'на ' + ruDate(bpRaw.as_of) : '') },
+    { k: 'Готовность', v: bpReport && bpReport.body['готовность'] ? String(bpReport.body['готовность']) : '' },
+  ];
+  const listOf = (title, arr) => Array.isArray(arr) && arr.length
+    ? '<h3 class="sub-h">' + title + '</h3><ul class="prg-l">' +
+      arr.map(x => '<li>' + htmlEsc(String(x)) + '</li>').join('') + '</ul>'
+    : '';
+  const progressBody =
+    chipRow(progressRows) +
+    (bpReport ? (listOf('Сделано', bpReport.body['сделано']) + listOf('В работе', bpReport.body['в работе'])) : '') +
+    (o.stage_note && !/^(идут продажи|строится)$/i.test(String(o.stage_note).trim())
+      ? '<p>' + htmlEsc(noContacts(String(o.stage_note))) + '</p>' : '') +
+    (bpPhotos.length
+      ? '<div class="prgs">' + bpPhotos.slice(0, 6).map(u =>
+          '<img src="' + htmlEsc(thumbUrl(u, 760, 74)) + '" alt="" loading="lazy" decoding="async">').join('') + '</div>'
+      : '') +
+    (bpRaw && bpRaw.source ? '<p class="fine">Источник: ' + htmlEsc(String(bpRaw.source)) + '</p>' : '');
+  /* Показываем строящимся и предпродажным, а также любому объекту, по которому
+     застройщик прислал отчёт. Одна строка «стадия» блоком не считается: нужен
+     срок сдачи, отчёт, снимки или приписка — иначе блока нет. */
+  const progressHas = Boolean(dl.ru || bpReport || bpPhotos.length || o.stage_note);
+  const progressWorth = (grp === 'construction' || grp === 'presale' || bpPhotos.length || bpReport);
+  const progressBlock = (progressWorth && progressHas)
+    ? '<section class="desc"><h2>' + (grp === 'ready' ? 'Как шло строительство' : 'Ход строительства') +
+      '</h2>' + progressBody + '</section>'
     : '';
 
   /* 16.09 Эльнур: «страница объекта должна быть богаче карточки». Всё ниже — из той же
@@ -1170,18 +1259,48 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
       '</section>'
     : '';
 
+  /* ===== ПОХОЖИЕ ОБЪЕКТЫ =====
+     Эльнур 16.09.2026: «примерно одинаковый концепт, цена-качество, любые схожие
+     критерии: большие виллы, школьные, современные кондо, первая линия, ближе к
+     первой. Это не только цена». Считаем близость по нескольким признакам и
+     показываем три самых близких — а не первые попавшиеся в бюджете ±40%. */
+  const beachClass = m => m == null ? null : (m <= 300 ? 0 : m <= 800 ? 1 : m <= 2000 ? 2 : 3);
+  const areaClass = a => !a ? null : (a < 60 ? 0 : a < 120 ? 1 : a < 250 ? 2 : 3);
+  const myGrp = grp, myBeach = beachClass(o.distance_beach_m), myArea = areaClass(o.area_min || o.area_max);
+  const kinship = x => {
+    let sc = 0;
+    if (String(x.type || '') === String(o.type || '')) sc += 30;          // вилла к вилле, кондо к кондо
+    if ((x.district || x.beach || '') === en && en) sc += 22;             // тот же район
+    const xb = beachClass(x.distance_beach_m);
+    if (myBeach != null && xb != null) sc += xb === myBeach ? 16 : (Math.abs(xb - myBeach) === 1 ? 7 : 0);
+    if (priceTHB && x.price_from_thb) {
+      const d = Math.abs(x.price_from_thb - priceTHB) / priceTHB;
+      sc += d <= 0.2 ? 20 : d <= 0.4 ? 12 : d <= 0.7 ? 4 : 0;
+    }
+    const xa = areaClass(x.area_min || x.area_max);
+    if (myArea != null && xa != null && xa === myArea) sc += 12;          // тот же размер жилья
+    if (saleGroup(x) === myGrp) sc += 10;                                 // та же стадия: сравнивать честно
+    const bo = (o.bedrooms_min != null && x.bedrooms_min != null) &&
+      Math.max(o.bedrooms_min, x.bedrooms_min) <= Math.min(o.bedrooms_max || o.bedrooms_min, x.bedrooms_max || x.bedrooms_min);
+    if (bo) sc += 10;                                                     // спальни пересекаются
+    if (String(x.developer || '') === String(o.developer || '') && o.developer) sc += 6;
+    return sc;
+  };
   const similar = (Array.isArray(allObjects) ? allObjects : [])
-    .filter(x => x && x.plp_property_id !== pid && String(x.type || '') === String(o.type || '') &&
-      (!priceTHB || !x.price_from_thb || Math.abs(x.price_from_thb - priceTHB) <= priceTHB * 0.4))
-    .slice(0, 3);
+    .filter(x => x && x.plp_property_id !== pid && !/аренда|rent/i.test(String(x.purpose || '')))
+    .map(x => ({ x, sc: kinship(x) }))
+    .filter(r => r.sc >= 45)                 // ниже — это уже «просто другой объект»
+    .sort((a, b) => b.sc - a.sc)
+    .slice(0, 3).map(r => r.x);
   const similarBlock = similar.length >= 2
     ? '<section class="desc"><h2>Похожие объекты</h2><div class="simi">' +
       similar.map(x => {
         const xp = pubOf(x), xru = DISTRICT_RU[x.district || x.beach || ''] || (x.district || x.beach || '');
         const xi = thumbUrl(x.main_image_url, 520, 72) || ('../img/' + xp + '.jpg');
+        const xg = GROUP_RU[saleGroup(x)] || '';
         return '<a class="simi-c" href="' + htmlEsc(slugOf(xp)) + '">' +
           '<img src="' + htmlEsc(xi) + '" alt="" loading="lazy" decoding="async">' +
-          '<b>' + htmlEsc(x.name) + '</b><span>' + htmlEsc(xru) +
+          '<b>' + htmlEsc(x.name) + '</b><span>' + htmlEsc([xru, xg].filter(Boolean).join(' · ')) +
           (x.price_from_thb ? ' · от ' + money(x.price_from_thb) : '') + '</span></a>';
       }).join('') + '</div></section>'
     : '';
@@ -1191,18 +1310,9 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
     { k: 'Спальни', v: beds },
     { k: 'Площадь', v: area },
     { k: 'Сдача', v: dl.ru },
-    // 08.09: стадия — тем же правилом, что и плашка в каталоге, иначе страница
+    // 16.09: стадия — одной функцией saleGroup на весь сайт, иначе страница
     // объекта и карточка спорят между собой («старт продаж» против «в продаже»)
-    { k: 'Стадия', v: (function(){
-        const W = { Ready:'сдан', Construction:'строится', 'Pre-sale':'старт продаж',
-                    Resale:'вторичка', 'Sold out':'распродан', Announced:'анонсирован' };
-        if (o.stage === 'Pre-sale') {
-          const st = o.sale_started_on ? new Date(o.sale_started_on) : null;
-          const fresh = st && !isNaN(st) && (Date.now() - st) / 86400000 <= 120;
-          return fresh ? 'старт продаж' : 'в продаже';
-        }
-        return W[o.stage] || (o.stage ? '' : 'в продаже');
-      })() },
+    { k: 'Стадия', v: GROUP_RU[saleGroup(o)] || '' },
     /* 🔴 10.09 Эльнур: «зашёл на карточку, а там доходность 7% до вычета расходов,
    мы такое не согласовывали». Показывали o.roi — цифру из буклета застройщика,
    да ещё с пометкой про расходы. Теперь одна цифра на всю карточку: ориентир
@@ -1279,6 +1389,8 @@ header.top{padding:18px 0;border-bottom:1px solid var(--line)}
 .unitc span{display:block;font-size:12px;color:var(--muted);margin-top:2px}
 .unitc u{display:block;text-decoration:none;font-weight:700;font-size:13px;margin-top:3px}
 .prgs{display:flex;gap:8px;overflow-x:auto;margin-top:10px;padding-bottom:6px}
+.prg-l{margin:0 0 6px;padding-left:18px;color:var(--ink)}
+.prg-l li{margin:3px 0}
 .prgs img{flex:0 0 190px;height:130px;object-fit:cover;border-radius:11px;display:block}
 h1{font-size:clamp(24px,4vw,34px);line-height:1.2;margin:8px 0 4px}
 .loc{color:var(--muted);margin:0 0 14px}
@@ -1339,7 +1451,7 @@ if(dark) i.src='../img/brand/plp-mark-white.png';})();</script>
   ${rentLine || (priceFmt ? '<div class="price">от ' + htmlEsc(priceFmt) + '<small>стартовая цена застройщика</small></div>' : '')}
   <div class="chips">${chips}</div>
   ${o.stage_note ? '<p class="stgnote">' + htmlEsc(o.stage_note) + '</p>' : ''}
-  ${o.current_promo ? '<section class="promo"><h2>Что рядом и что нового</h2><p>' + htmlEsc(noContacts(o.current_promo)) + '</p></section>' : ''}
+  ${promoBlock}
   <div class="yield">
     <div class="num">${yr.low}${DASH}${yr.high}%</div>
     <div class="lbl">${yr.scope === 'district'

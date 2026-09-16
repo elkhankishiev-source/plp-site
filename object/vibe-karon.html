@@ -3,6 +3,64 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- PLP:HEADTHEME:START -->
+<meta name="color-scheme" content="light dark">
+<!-- цвет системных полей браузера = фон страницы. Без этого при прокрутке и
+     оттягивании из-под страницы проглядывает чужой цвет — кажется, что фон мигает. -->
+<meta name="theme-color" content="#f7f6f1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0C0D09" media="(prefers-color-scheme: dark)">
+<script>
+(function(){
+  function paintChrome(){
+    try{
+      var bg=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+      if(!bg && document.body) bg=getComputedStyle(document.body).backgroundColor;
+      if(!bg || bg==='rgba(0, 0, 0, 0)') return;
+      var list=document.querySelectorAll('meta[name="theme-color"]');
+      for(var i=0;i<list.length;i++) list[i].parentNode.removeChild(list[i]);
+      var m=document.createElement('meta'); m.setAttribute('name','theme-color');
+      m.setAttribute('content',bg); document.head.appendChild(m);
+    }catch(e){}
+  }
+  /* Кнопка «поделиться»: на телефоне открывает системное меню, на компьютере
+     кладёт ссылку в буфер и говорит об этом. Эльнур 07.09: «сайтом надо
+     пользоваться, он не просто для красоты». */
+  document.addEventListener('click', function(e){
+    var b = e.target && e.target.closest && e.target.closest('[data-share]');
+    if(!b) return;
+    e.preventDefault();
+    var path = b.getAttribute('data-share') || location.pathname;
+    var url = location.origin + path;
+    var title = b.getAttribute('data-share-title') || document.title;
+    var done = function(){
+      var was = b.innerHTML;   /* 15.09: в кнопке живёт svg-иконка, восстанавливаем разметку целиком */
+      b.textContent = '✓ Ссылка скопирована';
+      b.classList.add('ok');
+      setTimeout(function(){ b.innerHTML = was; b.classList.remove('ok'); }, 2200);
+    };
+    if(navigator.share){ navigator.share({title:title, url:url}).catch(function(){}); return; }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(url).then(done).catch(function(){ prompt('Скопируйте ссылку:', url); });
+    } else prompt('Скопируйте ссылку:', url);
+  });
+  window.paintChrome=paintChrome;
+  /* Адрес без .html: страницы и так открываются коротким адресом, но если
+     человек пришёл по старой ссылке, приводим строку браузера к чистому виду.
+     Эльнур 07.09: «мне не нравится html в адресе, я ни у кого её не видел». */
+  try{
+    var pth=location.pathname;
+    if(/\.html$/.test(pth)){
+      var clean=pth.replace(/index\.html$/,'').replace(/\.html$/,'');
+      if(clean==='') clean='/';
+      history.replaceState(null,'',clean+location.search+location.hash);
+    }
+  }catch(e){}
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',paintChrome);
+  else paintChrome();
+  try{ matchMedia('(prefers-color-scheme: dark)').addEventListener('change',paintChrome); }catch(e){}
+})();
+</script>
+<!-- PLP:HEADTHEME:END -->
 <script>(function(){try{var v=localStorage.getItem('pl_theme');
 if(v==='dark'||v==='light')document.documentElement.setAttribute('data-theme',v);}catch(e){}})();</script>
 <title>Vibe Residence Karon — Карон, Пхукет | Property Library</title>
@@ -25,6 +83,22 @@ if(v==='dark'||v==='light')document.documentElement.setAttribute('data-theme',v)
 <meta name="twitter:image" content="https://property-library.com/img/PLP-VIBE-KARON.jpg">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"RealEstateListing","@id":"https://property-library.com/object/vibe-karon#listing","url":"https://property-library.com/object/vibe-karon","name":"Vibe Residence Karon","description":"Vibe Residence Karon — жилой комплекс, расположенный в районе Карон на острове Пхукет. Проект находится на стадии подготовки к продажам, официальный старт продаж ожидается в ближайшее время. Подробные сведения о планировках, площадях и стоимости будут доступны после официального открытия продаж.","about":{"@id":"https://property-library.com/object/vibe-karon#residence"}},{"@type":"Residence","@id":"https://property-library.com/object/vibe-karon#residence","name":"Vibe Residence Karon","description":"Vibe Residence Karon — жилой комплекс, расположенный в районе Карон на острове Пхукет. Проект находится на стадии подготовки к продажам, официальный старт продаж ожидается в ближайшее время. Подробные сведения о планировках, площадях и стоимости будут доступны после официального открытия продаж.","url":"https://property-library.com/object/vibe-karon","image":"https://property-library.com/img/PLP-VIBE-KARON.jpg","address":{"@type":"PostalAddress","addressRegion":"Phuket","addressLocality":"Карон","addressCountry":"TH"},"additionalProperty":{"@type":"PropertyValue","name":"Застройщик","value":"ESM Company Group"}}]}</script>
 <style>
+/* PLP:ANTIFLICKER */
+/* Мигание фона на телефоне — сводная защита. Эльнур 06.09: «фон в мобильной
+   версии везде мигает, ищи по всем страницам». Три источника:
+   1) размытие фона (backdrop-filter) под липкими элементами — браузер
+      перерисовывает весь экран на каждом кадре прокрутки;
+   2) долгое проявление блоков при прокрутке;
+   3) отложенные картинки без фона — на их месте на миг светится подложка. */
+@media(max-width:900px){
+  .header,#toTop,.badge,.pm-tag,.car .tag,.btn-glass,.hero-float,.fbtn,.chipf,
+  .modal-overlay,.mnav,.sheet,.pm-card,.toolbox{
+    backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+  .reveal{transition-duration:.35s!important}
+}
+.pic-photo,.thumb-photo,.prgs img,.simi-c i,.pm-img img{background-color:var(--warm,#EFEEE7)}
+/* PLP:ANTIFLICKER */
+html{background:var(--bg);overscroll-behavior-y:none}
 /* Эльнур 05.09: сайт — единая система. Страница объекта живёт в тех же
    цветах и с тем же набором блоков, что и карточка на сайте. */
 :root{--green:#D2D5B3;--green-deep:#5F6242;--olive:#5F6242;--ink:#22251C;--paper:#FBFBF7;
@@ -60,6 +134,8 @@ header.top{padding:18px 0;border-bottom:1px solid var(--line)}
 .unitc span{display:block;font-size:12px;color:var(--muted);margin-top:2px}
 .unitc u{display:block;text-decoration:none;font-weight:700;font-size:13px;margin-top:3px}
 .prgs{display:flex;gap:8px;overflow-x:auto;margin-top:10px;padding-bottom:6px}
+.prg-l{margin:0 0 6px;padding-left:18px;color:var(--ink)}
+.prg-l li{margin:3px 0}
 .prgs img{flex:0 0 190px;height:130px;object-fit:cover;border-radius:11px;display:block}
 h1{font-size:clamp(24px,4vw,34px);line-height:1.2;margin:8px 0 4px}
 .loc{color:var(--muted);margin:0 0 14px}
@@ -118,7 +194,7 @@ if(dark) i.src='../img/brand/plp-mark-white.png';})();</script>
   <h1>Vibe Residence Karon</h1>
   <p class="loc">Карон, Пхукет</p>
   
-  <div class="chips"><div class="chip"><span class="k">Тип</span><span class="v">Кондо</span></div><div class="chip"><span class="k">Сдача</span><span class="v">4Q 2028</span></div><div class="chip"><span class="k">Стадия</span><span class="v">анонсирован</span></div><div class="chip"><span class="k">Доходность</span><span class="v">6–12%/год</span></div><div class="chip"><span class="k">Застройщик</span><span class="v">ESM Company Group</span></div></div>
+  <div class="chips"><div class="chip"><span class="k">Тип</span><span class="v">Кондо</span></div><div class="chip"><span class="k">Сдача</span><span class="v">4Q 2028</span></div><div class="chip"><span class="k">Стадия</span><span class="v">старт продаж</span></div><div class="chip"><span class="k">Доходность</span><span class="v">6–12%/год</span></div><div class="chip"><span class="k">Застройщик</span><span class="v">ESM Company Group</span></div></div>
   <p class="stgnote">Три малоэтажных корпуса в 300 метрах от пляжа Карон, сдача — декабрь 2028 года.</p>
   
   <div class="yield">
@@ -131,7 +207,7 @@ if(dark) i.src='../img/brand/plp-mark-white.png';})();</script>
   
   <section class="desc"><h2>Форма владения</h2><p>Фрихолд в рамках иностранной квоты; сверх квоты — лизхолд 30 лет с продлениями</p><p class="fine">Что это значит для иностранца — в <a href="../guide/leasehold-ili-freehold">разборе форм владения</a>.</p></section>
   <section class="desc"><h2>Район: Карон</h2><p>Пляж Карон — один из самых длинных на острове, рядом Ката и вьюпоинт с видом на три залива. Патонг в 15 минутах.</p></section>
-  <section class="desc"><h2>Ход строительства</h2><div class="prgs"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-VIBE-KARON/progress/6a92cc6b4b765d3a.jpg?width=760&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></div></section>
+  <section class="desc"><h2>Ход строительства</h2><div class="chip"><span class="k">Срок сдачи</span><span class="v">4Q 2028 · осталось около 28 мес.</span></div><div class="chip"><span class="k">Стадия</span><span class="v">старт продаж</span></div><p>Три малоэтажных корпуса в 300 метрах от пляжа Карон, сдача — декабрь 2028 года.</p><div class="prgs"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-VIBE-KARON/progress/6a92cc6b4b765d3a.jpg?width=760&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></div></section>
   <section class="desc"><h2>Об объекте</h2><p>Vibe Residence Karon — жилой комплекс, расположенный в районе Карон на острове Пхукет. Проект находится на стадии подготовки к продажам, официальный старт продаж ожидается в ближайшее время. Подробные сведения о планировках, площадях и стоимости будут доступны после официального открытия продаж.</p></section>
   
   
@@ -141,7 +217,7 @@ if(dark) i.src='../img/brand/plp-mark-white.png';})();</script>
     <button type="button" class="btn ghost" id="shareBtn">Поделиться</button>
     <a class="btn wa" href="https://wa.me/66955492587?text=Vibe%20Residence%20Karon%20%E2%80%94%20%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D0%B5%D1%81%D1%83%D0%B5%D1%82%20%D1%8D%D1%82%D0%BE%D1%82%20%D0%BE%D0%B1%D1%8A%D0%B5%D0%BA%D1%82.%20https%3A%2F%2Fproperty-library.com%2Fobject%2Fvibe-karon" rel="noopener" target="_blank">WhatsApp</a>
   </div>
-  <section class="desc"><h2>Похожие объекты</h2><div class="simi"><a class="simi-c" href="gens-botanica"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/INTAKE-BOTANICA/01.jpg?width=520&amp;resize=contain&amp;quality=72" alt="" loading="lazy" decoding="async"><b>The GENS by Botanica, у Blue Tree</b><span>Банг Тао · от 5 458 000 ฿</span></a><a class="simi-c" href="adora"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-ADORA/01.jpg?width=520&amp;resize=contain&amp;quality=72" alt="" loading="lazy" decoding="async"><b>The Title Adora Rawai</b><span>Равай · от 5 332 000 ฿</span></a><a class="simi-c" href="ayana"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-AYANA/cover/cd20db3eba083be6.jpg?width=520&amp;resize=contain&amp;quality=72" alt="" loading="lazy" decoding="async"><b>AYANA Heights Seaview Residences</b><span>Лаян · от 3 661 800 ฿</span></a></div></section>
+  
 </main>
 <script>
 /* «Поделиться»: на телефоне системное меню, на компьютере ссылка в буфер */
