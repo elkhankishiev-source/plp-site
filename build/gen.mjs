@@ -456,6 +456,8 @@ function unitsOf(o) {
   const named = (Array.isArray(o.unit_types) ? o.unit_types.slice(0, 12) : []).map(u => {
     const n = Object.assign({}, u);
     if (n.area == null && n.area_sqm != null) n.area = n.area_sqm;
+    if (n.from == null && n.price_from_thb != null) n.from = n.price_from_thb;
+    if (n.code == null && n.type_code != null) n.code = n.type_code;
     if (n.beds == null && n.bedrooms != null) n.beds = n.bedrooms;
     if (n.rentLow == null && n.rent_low_thb_month != null) n.rentLow = n.rent_low_thb_month;
     if (n.rentHigh == null && n.rent_high_thb_month != null) n.rentHigh = n.rent_high_thb_month;
@@ -1184,7 +1186,7 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
         '<button type="button" class="' + (i ? '' : 'on') + '" data-src="' + htmlEsc(u) + '" aria-label="Фото ' + (i + 1) + '">' +
         '<img src="' + htmlEsc(u) + '" alt="" loading="lazy" decoding="async"></button>').join('') + '</div>'
     : '';
-  const unitList = unitsOf(o) || [];
+  let unitList = unitsOf(o) || [];
   /* 16.09 Эльнур: «карточка должна нести максимум пользы: чтобы можно было прогреться
      и выбрать, какая именно планировка нужна и в какую она стоимость». Поэтому тип
      жилья, его площадь, число спален, цена «от» и сам чертёж стоят рядом, а не в
@@ -1198,18 +1200,82 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
      обезличиваются при заливке (tools/photos.py), а в прайсе у каждого типа есть код
      («L2C», «SA», «1BM»). Чертёж встаёт рядом со своей ценой только при точном
      совпадении кода — угадывать по числу спален больше не пробуем. */
+  /* имя файла чертежа несёт либо код типа («Type_SA»), либо метраж и число спален
+     («1BEDROOM PLUS 50.00 SQ.M»). Сначала пробуем код — он точнее, потом метраж:
+     совпадение по площади ±2 м² при том же числе спален. Ничего не подходит — чертёж
+     остаётся в общей сетке, выдумывать соответствие нельзя. */
+  const planName = p => decodeURIComponent((p.split('/').pop() || ''))
+      .replace(/-[0-9a-f]{8}\.[a-z0-9]+$/i, '').replace(/[_-]+/g, ' ');
   const planFor = (u) => {
     const code = String(u.code || '').toUpperCase();
-    if (!code) return null;
-    const rx = new RegExp('(^|[^A-Z0-9])' + code.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '([^A-Z0-9]|$)', 'i');
-    return planShots.find(p => rx.test(decodeURIComponent((p.split('/').pop() || '').replace(/-[0-9a-f]{8}\.[a-z]+$/i, '')))) || null;
+    if (code) {
+      const rx = new RegExp('(^|[^A-Z0-9])' + code.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '([^A-Z0-9]|$)', 'i');
+      const hit = planShots.find(p => rx.test(planName(p)));
+      if (hit) return hit;
+    }
+    const area = Number(u.area);
+    if (!area) return null;
+    for (const p of planShots) {
+      const nm = planName(p);
+      const m = /(\d{2,4}(?:[.,]\d{1,2})?)\s*(?:sq\.?\s?m|sqm|м²|m2)/i.exec(nm);
+      if (!m) continue;
+      const a = Number(String(m[1]).replace(',', '.'));
+      if (Math.abs(a - area) > 2) continue;
+      if (u.beds != null) {
+        const b = /(\d)\s*(?:bedroom|bed|br\b|спал)/i.exec(nm);
+        if (b && Number(b[1]) !== Number(u.beds)) continue;
+      }
+      return p;
+    }
+    return null;
   };
+  /* 17.09 Эльнур: «информация в соответствии планировки, на которую ткнул». Чертёж
+     застройщика сам подписан: число спален и метраж вынесены в имя файла при заливке.
+     Если таких подписанных чертежей больше, чем строк прайса, список планировок строим
+     по ним: у каждой свой чертёж и своя площадь, а цена берётся по числу спален. */
+  const fromPlans = (function () {
+    const out = [];
+    for (const p of planShots) {
+      const nm = planName(p);
+      const ma = /(\d{2,4}(?:[.,]\d{1,2})?)\s*(?:sq\.?\s?m|sqm|м²|m2)/i.exec(nm);
+      if (!ma) continue;
+      const area = Number(String(ma[1]).replace(',', '.'));
+      if (!(area > 12 && area < 3000)) continue;
+      const mb = /(\d)\s*(?:br\b|bedroom|bed\b|спал)/i.exec(nm);
+      const beds = mb ? Number(mb[1]) : null;
+      const mt = /type[ _-]?([A-Z0-9][A-Z0-9.\-]{0,6})/i.exec(nm);
+      out.push({ area, beds, code: mt ? mt[1].toUpperCase() : null, shot: p });
+    }
+    const seen = new Set(), uniq = [];
+    for (const x of out.sort((a, b) => (a.beds || 9) - (b.beds || 9) || a.area - b.area)) {
+      const k = (x.beds || '?') + ':' + x.area.toFixed(1);
+      if (seen.has(k)) continue;
+      seen.add(k); uniq.push(x);
+    }
+    return uniq.slice(0, 12);
+  })();
+  const priceForBeds = {};
+  for (const t of (Array.isArray(o.price_tiers) ? o.price_tiers : [])) {
+    const b = t && t.bedrooms, pr = t && (t.price_from_thb || t.price_thb);
+    if (b == null || !pr || t.kind === 'penthouse') continue;
+    if (!priceForBeds[b] || pr < priceForBeds[b]) priceForBeds[b] = pr;
+  }
+  if (fromPlans.length > unitList.length) {
+    unitList = fromPlans.map(x => ({
+      name: (x.beds === 0 ? 'Студия' : x.beds ? (x.beds + (x.beds === 1 ? ' спальня' : x.beds < 5 ? ' спальни' : ' спален')) : 'Планировка')
+            + (x.code ? ' · тип ' + x.code : ''),
+      beds: x.beds, area: x.area, shot: x.shot,
+      from: x.beds != null ? priceForBeds[x.beds] || null : null,
+    }));
+  }
   const money0 = v => new Intl.NumberFormat('ru-RU').format(Math.round(v)) + ' ฿';
   const unitsBlock = unitList.length
     ? '<section class="desc"><h2>Планировки и цены</h2><div class="units">' +
       unitList.map(u => {
-        const shot = planFor(u);
-        const line = [u.area ? (u.area + ' м²') : '', (u.beds != null ? u.beds + ' сп.' : ''), u.plot ? ('участок ' + u.plot) : '']
+        const shot = u.shot || planFor(u);
+        const line = [u.area ? (u.area + ' м²') : '', (u.beds != null ? u.beds + ' сп.' : ''),
+                      u.plot ? ('участок ' + u.plot) : '',
+                      u.free ? ('свободно ' + u.free) : '']
           .filter(Boolean).join(' · ');
         return '<div class="unitc">' +
           (shot ? '<a class="uplan" href="' + htmlEsc(thumbUrl(shot, 1600, 82)) + '" target="_blank" rel="noopener">' +
@@ -1222,8 +1288,12 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
           '</div>';
       }).join('') +
       '</div>' +
-      (planShots.length ? '<h3 class="sub-h">Чертежи планировок</h3>' +
-         shotGrid(planShots).replace('grid-shots', 'grid-shots plans') : '') +
+      (function () {
+        const used = new Set(unitList.map(u => u.shot || planFor(u)).filter(Boolean));
+        const rest = planShots.filter(p => !used.has(p));
+        return rest.length ? '<h3 class="sub-h">Другие планировки</h3>' +
+          shotGrid(rest).replace('grid-shots', 'grid-shots plans') : '';
+      })() +
       (priceTHB ? '<p class="fine">Цены по прайсу застройщика на дату сверки, за свободные юниты.</p>' : '') +
       '</section>'
     : (planShots.length
@@ -1529,7 +1599,7 @@ header.top{padding:18px 0;border-bottom:1px solid var(--line)}
 .shots button.on{border-color:var(--green-deep)}
 .shots img{width:100%;height:100%;object-fit:cover;display:block}
 /* планировка и её цена — одной карточкой: чертёж, тип, метраж, цена «от» */
-.units{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin-top:12px}
+.units{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin-top:12px;align-items:start}
 .unitc{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column}
 .unitc .uplan{display:block;margin:-2px -4px 9px;border-radius:10px;overflow:hidden;background:var(--paper)}
 .unitc .uplan img{width:100%;height:150px;object-fit:contain;display:block;background:var(--paper)}
