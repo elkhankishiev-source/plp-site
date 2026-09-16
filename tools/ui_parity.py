@@ -27,8 +27,9 @@ from urllib.parse import quote, urlparse, parse_qs
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 PORT = 8794
-PAGES = ['index.html', 'buy.html', 'rent.html', 'management.html',
-         'districts/bang-tao.html', 'guide/kakaya-dohodnost.html', 'add-property.html']
+PAGES = ['index.html', 'about.html', 'buy.html', 'rent.html', 'management.html',
+         'districts/bang-tao.html', 'guide/kakaya-dohodnost.html', 'add-property.html',
+         'object/heritage.html']
 BAD, GOOD = 1.8, 3.0
 
 PROBE = r"""<script>

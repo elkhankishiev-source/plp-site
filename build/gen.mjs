@@ -931,7 +931,7 @@ function chipRow(items) {
   ).join('');
 }
 
-function objectPage(o, benchmarks, ratesBy) {
+function objectPage(o, benchmarks, ratesBy, allObjects) {
   const pid = o.plp_property_id;
   const pub = pubOf(o);            /* публичный код: он же в адресе и на странице */
   const slug = slugOf(pub);
@@ -1104,6 +1104,88 @@ function objectPage(o, benchmarks, ratesBy) {
       '</section>'
     : '';
 
+  /* 16.09 Эльнур: «страница объекта должна быть богаче карточки». Всё ниже — из той же
+     базы, что и карточка: планировки, инфраструктура, как платить, форма владения,
+     район и похожие объекты. Ничего не выдумываем: нет данных — блока нет. */
+  const groupsAll = Array.isArray(o.photo_groups) ? o.photo_groups.filter(g => Array.isArray(g.urls) && g.urls.length) : [];
+  const groupBy = re => groupsAll.filter(g => re.test(String(g.key || '') + ' ' + String(g.name || '')));
+  const shotGrid = (urls, w) => '<div class="grid-shots">' + urls.slice(0, 8).map(u =>
+      '<a href="' + htmlEsc(thumbUrl(u, 1600, 82)) + '" target="_blank" rel="noopener">' +
+      '<img src="' + htmlEsc(thumbUrl(u, w || 620, 74)) + '" alt="" loading="lazy" decoding="async"></a>').join('') + '</div>';
+
+  const planGroups = groupBy(/plan|план|master|мастер|floor|unit/i);
+  const plansBlock = planGroups.length
+    ? '<section class="desc"><h2>Планировки и мастер-план</h2>' +
+      planGroups.map(g => '<h3 class="sub-h">' + htmlEsc(g.name || 'Планировки') + '</h3>' + shotGrid(g.urls)).join('') +
+      '<p class="fine">Нажмите на изображение, чтобы открыть крупно.</p></section>'
+    : '';
+
+  const facGroups = groupBy(/facil|инфраструктур|amenit|общие|территор/i);
+  const amenList = String(o.amenities || '').split(/[,;·\n]+/).map(x => x.trim()).filter(x => x.length > 1).slice(0, 18);
+  /* «что рядом» в базе часто описывает саму территорию проекта (бассейны, лобби, парковка),
+     а не окрестности — такой текст читается в инфраструктуре, а не в блоке района */
+  const nearbyRaw = noContacts(String(o.nearby || '')).trim();
+  const nearbyIsFacilities = /facilit|pool|lobby|parking|gym|sauna|onsen|rooftop|бассейн|лобби|паркинг|спортзал|сауна/i.test(nearbyRaw);
+  const facBlock = (facGroups.length || amenList.length || (nearbyRaw && nearbyIsFacilities))
+    ? '<section class="desc"><h2>Инфраструктура проекта</h2>' +
+      (amenList.length ? '<div class="tags">' + amenList.map(a => '<span>' + htmlEsc(a) + '</span>').join('') + '</div>' : '') +
+      (nearbyRaw && nearbyIsFacilities ? '<p>' + htmlEsc(nearbyRaw) + '</p>' : '') +
+      facGroups.map(g => shotGrid(g.urls)).join('') + '</section>'
+    : '';
+
+  const payLines = [
+    o.payment_plan ? ['План застройщика', noContacts(String(o.payment_plan))] : null,
+    (!o.payment_plan && o.payment_schedule) ? ['График', noContacts(String(o.payment_schedule))] : null,
+    o.first_payment ? ['Первый взнос', String(o.first_payment).replace(/%$/, '') + '%'] : null,
+    o.maintenance_fee_thb_sqm ? ['Обслуживание', new Intl.NumberFormat('ru-RU').format(o.maintenance_fee_thb_sqm) + ' ฿ за м² в год'] : null,
+  ].filter(Boolean);
+  const payBlock = payLines.length
+    ? '<section class="desc"><h2>Как платить</h2><dl class="pairs">' +
+      payLines.map(([k, v]) => '<dt>' + htmlEsc(k) + '</dt><dd>' + htmlEsc(v) + '</dd>').join('') +
+      '</dl><p class="fine">Точный график под ваш юнит и сроки считает специалист — цифры застройщика меняются.</p></section>'
+    : '';
+
+  const ownRaw = String(o.ownership || '').trim();
+  const ownRu = !ownRaw ? '' :
+    /both/i.test(ownRaw) ? 'Фрихолд или лизхолд — на выбор' :
+    /^leasehold/i.test(ownRaw) ? 'Лизхолд' :
+    /^freehold/i.test(ownRaw) ? 'Фрихолд' : ownRaw;
+  const ownBlock = ownRu
+    ? '<section class="desc"><h2>Форма владения</h2><p>' + htmlEsc(ownRu) +
+      '</p><p class="fine">Что это значит для иностранца — в <a href="../guide/leasehold-ili-freehold">разборе форм владения</a>.</p></section>'
+    : '';
+
+  const distSlug = String(en || '').toLowerCase().replace(/[^a-z]+/g, '-').replace(/^-|-$/g, '');
+  const hasDistPage = distSlug && fs.existsSync(path.join(ROOT, 'districts', distSlug + '.html'));
+  const areaBits = [
+    o.distance_beach_m ? (o.distance_beach_m + ' м до пляжа') : '',
+    o.distance_airport_km ? (o.distance_airport_km + ' км до аэропорта') : '',
+  ].filter(Boolean);
+  const nearbyTxt = nearbyIsFacilities ? '' : nearbyRaw;
+  const areaBlock = (areaBits.length || nearbyTxt || hasDistPage)
+    ? '<section class="desc"><h2>Район: ' + htmlEsc(ru) + '</h2>' +
+      (areaBits.length ? '<div class="tags">' + areaBits.map(a => '<span>' + htmlEsc(a) + '</span>').join('') + '</div>' : '') +
+      (nearbyTxt ? '<p>' + htmlEsc(nearbyTxt) + '</p>' : '') +
+      (hasDistPage ? '<p><a class="lnk" href="../districts/' + distSlug + '">Весь район: цены, пляжи, что рядом</a></p>' : '') +
+      '</section>'
+    : '';
+
+  const similar = (Array.isArray(allObjects) ? allObjects : [])
+    .filter(x => x && x.plp_property_id !== pid && String(x.type || '') === String(o.type || '') &&
+      (!priceTHB || !x.price_from_thb || Math.abs(x.price_from_thb - priceTHB) <= priceTHB * 0.4))
+    .slice(0, 3);
+  const similarBlock = similar.length >= 2
+    ? '<section class="desc"><h2>Похожие объекты</h2><div class="simi">' +
+      similar.map(x => {
+        const xp = pubOf(x), xru = DISTRICT_RU[x.district || x.beach || ''] || (x.district || x.beach || '');
+        const xi = thumbUrl(x.main_image_url, 520, 72) || ('../img/' + xp + '.jpg');
+        return '<a class="simi-c" href="' + htmlEsc(slugOf(xp)) + '">' +
+          '<img src="' + htmlEsc(xi) + '" alt="" loading="lazy" decoding="async">' +
+          '<b>' + htmlEsc(x.name) + '</b><span>' + htmlEsc(xru) +
+          (x.price_from_thb ? ' · от ' + money(x.price_from_thb) : '') + '</span></a>';
+      }).join('') + '</div></section>'
+    : '';
+
   const chips = chipRow([
     { k: 'Тип', v: t.ru },
     { k: 'Спальни', v: beds },
@@ -1216,6 +1298,21 @@ h1{font-size:clamp(24px,4vw,34px);line-height:1.2;margin:8px 0 4px}
 section.desc{margin:26px 0}
 section.desc h2{font-size:18px;margin:0 0 10px;color:var(--ink)}
 section.desc p{color:var(--text);opacity:.94;white-space:pre-line}
+.sub-h{font-size:14px;color:var(--muted);font-weight:600;margin:16px 0 8px}
+.grid-shots{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.grid-shots img{width:100%;height:120px;object-fit:cover;border-radius:11px;display:block;background:#eceadf}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+.tags span{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:13px}
+.pairs{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;margin:0}
+.pairs dt{color:var(--muted);font-size:13px}
+.pairs dd{margin:0;font-size:15px}
+.fine{color:var(--muted);font-size:13px;margin:10px 0 0}
+.lnk{color:var(--green-deep);font-weight:600;text-decoration:none;border-bottom:1px solid currentColor}
+.simi{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.simi-c{display:block;text-decoration:none;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.simi-c img{width:100%;height:120px;object-fit:cover;display:block}
+.simi-c b{display:block;padding:10px 12px 0;font-size:14px}
+.simi-c span{display:block;padding:2px 12px 12px;font-size:13px;color:var(--muted)}
 .cta{display:flex;flex-wrap:wrap;gap:12px;margin:28px 0}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 22px;border-radius:14px;font-weight:600;text-decoration:none;border:1px solid var(--line);cursor:pointer}
 .btn.wa{background:#25D366;color:#0b2b18;border-color:#25D366}
@@ -1250,17 +1347,36 @@ if(dark) i.src='../img/brand/plp-mark-white.png';})();</script>
       : 'Ориентир по Пхукету в целом — по этому району отдельной статистики у нас пока нет'}, при активном управлении. Точный расчёт по вашему объекту делает специалист.</div>
   </div>
   ${unitsBlock}
+  ${plansBlock}
+  ${facBlock}
+  ${payBlock}
+  ${ownBlock}
+  ${areaBlock}
   ${progressBlock}
   ${usp ? '<section class="desc"><h2>Об объекте</h2><p>' + htmlEsc(noContacts(usp)) + '</p></section>' : ''}
   ${uspEn ? '<section class="desc" lang="en"><h2>About</h2><p>' + htmlEsc(uspEn) + '</p></section>' : ''}
   ${materials}
   <div class="cta">
-    <a class="btn wa" href="${htmlEsc(waLink)}" rel="noopener" target="_blank">WhatsApp — узнать детали</a>
-    <a class="btn primary" href="${htmlEsc(backLink)}">Открыть карточку на сайте</a>
+    <a class="btn primary" href="${htmlEsc(backLink)}&ask=1">Задать вопрос по объекту</a>
     <a class="btn ghost" href="${htmlEsc(backLink)}">Рассчитать доходность</a>
+    <button type="button" class="btn ghost" id="shareBtn">Поделиться</button>
+    <a class="btn wa" href="${htmlEsc(waLink)}" rel="noopener" target="_blank">WhatsApp</a>
   </div>
+  ${similarBlock}
 </main>
 <script>
+/* «Поделиться»: на телефоне системное меню, на компьютере ссылка в буфер */
+(function(){
+  var b=document.getElementById('shareBtn'); if(!b) return;
+  b.onclick=function(){
+    var url=location.href, title=document.title;
+    if(navigator.share){ navigator.share({title:title,url:url}).catch(function(){}); return; }
+    var was=b.textContent;
+    function done(){ b.textContent='✓ Ссылка скопирована'; setTimeout(function(){ b.textContent=was; },2200); }
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(url).then(done).catch(function(){ prompt('Скопируйте ссылку:', url); }); }
+    else prompt('Скопируйте ссылку:', url);
+  };
+})();
 /* миниатюры листают главный кадр — как в карточке на сайте */
 (function(){
   var main=document.getElementById('mainShot');
@@ -1338,7 +1454,8 @@ async function main() {
     'bedrooms_min,bedrooms_max,' +
     'brochure_url,floorplan_url,video_url,website_url,map_url,current_promo,' +
     'season_rates,occupancy_est_pct,maintenance_fee_thb_sqm,lat,lng,coord_source,last_synced_at,availability,' +
-    'first_payment,payment_plan,payment_schedule,main_image_url,gallery_urls,unit_types,price_tiers,build_progress,photo_groups,hot_rank,public_code');
+    'first_payment,payment_plan,payment_schedule,main_image_url,gallery_urls,unit_types,price_tiers,build_progress,photo_groups,hot_rank,public_code,' +
+    'ownership,amenities,nearby,distance_airport_km');
   const benchmarks = await sbGet(env,
     'rental_benchmarks?select=district,unit_type,disp_yield_low_pct,disp_yield_high_pct,net_yield_low_pct,net_yield_high_pct');
 
@@ -1450,7 +1567,7 @@ async function main() {
   let pages = 0;
   for (const o of pageList) {
     const slug = slugOf(pubOf(o));
-    fs.writeFileSync(path.join(OBJDIR, slug + '.html'), objectPage(o, benchmarks, ratesBy));
+    fs.writeFileSync(path.join(OBJDIR, slug + '.html'), objectPage(o, benchmarks, ratesBy, pageList));
     pages++;
   }
   // 30.08: удаляем страницы объектов, которых больше нет в каталоге.

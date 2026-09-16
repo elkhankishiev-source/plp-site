@@ -3,64 +3,6 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- PLP:HEADTHEME:START -->
-<meta name="color-scheme" content="light dark">
-<!-- цвет системных полей браузера = фон страницы. Без этого при прокрутке и
-     оттягивании из-под страницы проглядывает чужой цвет — кажется, что фон мигает. -->
-<meta name="theme-color" content="#f7f6f1" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0C0D09" media="(prefers-color-scheme: dark)">
-<script>
-(function(){
-  function paintChrome(){
-    try{
-      var bg=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
-      if(!bg && document.body) bg=getComputedStyle(document.body).backgroundColor;
-      if(!bg || bg==='rgba(0, 0, 0, 0)') return;
-      var list=document.querySelectorAll('meta[name="theme-color"]');
-      for(var i=0;i<list.length;i++) list[i].parentNode.removeChild(list[i]);
-      var m=document.createElement('meta'); m.setAttribute('name','theme-color');
-      m.setAttribute('content',bg); document.head.appendChild(m);
-    }catch(e){}
-  }
-  /* Кнопка «поделиться»: на телефоне открывает системное меню, на компьютере
-     кладёт ссылку в буфер и говорит об этом. Эльнур 07.09: «сайтом надо
-     пользоваться, он не просто для красоты». */
-  document.addEventListener('click', function(e){
-    var b = e.target && e.target.closest && e.target.closest('[data-share]');
-    if(!b) return;
-    e.preventDefault();
-    var path = b.getAttribute('data-share') || location.pathname;
-    var url = location.origin + path;
-    var title = b.getAttribute('data-share-title') || document.title;
-    var done = function(){
-      var was = b.textContent;
-      b.textContent = '✓ Ссылка скопирована';
-      b.classList.add('ok');
-      setTimeout(function(){ b.textContent = was; b.classList.remove('ok'); }, 2200);
-    };
-    if(navigator.share){ navigator.share({title:title, url:url}).catch(function(){}); return; }
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(url).then(done).catch(function(){ prompt('Скопируйте ссылку:', url); });
-    } else prompt('Скопируйте ссылку:', url);
-  });
-  window.paintChrome=paintChrome;
-  /* Адрес без .html: страницы и так открываются коротким адресом, но если
-     человек пришёл по старой ссылке, приводим строку браузера к чистому виду.
-     Эльнур 07.09: «мне не нравится html в адресе, я ни у кого её не видел». */
-  try{
-    var pth=location.pathname;
-    if(/\.html$/.test(pth)){
-      var clean=pth.replace(/index\.html$/,'').replace(/\.html$/,'');
-      if(clean==='') clean='/';
-      history.replaceState(null,'',clean+location.search+location.hash);
-    }
-  }catch(e){}
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',paintChrome);
-  else paintChrome();
-  try{ matchMedia('(prefers-color-scheme: dark)').addEventListener('change',paintChrome); }catch(e){}
-})();
-</script>
-<!-- PLP:HEADTHEME:END -->
 <script>(function(){try{var v=localStorage.getItem('pl_theme');
 if(v==='dark'||v==='light')document.documentElement.setAttribute('data-theme',v);}catch(e){}})();</script>
 <title>The Title Biancana Surin — Сурин, Пхукет | Property Library</title>
@@ -85,22 +27,6 @@ if(v==='dark'||v==='light')document.documentElement.setAttribute('data-theme',v)
 <meta name="twitter:image" content="https://property-library.com/img/PLP-BIANCANA.jpg">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"RealEstateListing","@id":"https://property-library.com/object/biancana#listing","url":"https://property-library.com/object/biancana","name":"The Title Biancana Surin","description":"«Зе Тайтл Бьянкана Сурин» — первый проект одноимённой серии в районе Сурин на острове Пхукет. Комплекс состоит из четырёх корпусов и предлагает апартаменты площадью от 31 до 131 квадратного метра. Стоимость юнитов варьируется от 6,30 до 27,61 миллиона батов. Проект находится в стадии активных продаж.","about":{"@id":"https://property-library.com/object/biancana#residence"}},{"@type":"Residence","@id":"https://property-library.com/object/biancana#residence","name":"The Title Biancana Surin","description":"«Зе Тайтл Бьянкана Сурин» — первый проект одноимённой серии в районе Сурин на острове Пхукет. Комплекс состоит из четырёх корпусов и предлагает апартаменты площадью от 31 до 131 квадратного метра. Стоимость юнитов варьируется от 6,30 до 27,61 миллиона батов. Проект находится в стадии активных продаж.","url":"https://property-library.com/object/biancana","image":"https://property-library.com/img/PLP-BIANCANA.jpg","address":{"@type":"PostalAddress","addressRegion":"Phuket","addressLocality":"Сурин","addressCountry":"TH"},"additionalProperty":{"@type":"PropertyValue","name":"Застройщик","value":"Rhom Bho Property (AssetWise) — The Title"},"numberOfRooms":2,"floorSize":{"@type":"QuantitativeValue","value":131,"unitCode":"MTK"}},{"@type":"Offer","@id":"https://property-library.com/object/biancana#offer","itemOffered":{"@id":"https://property-library.com/object/biancana#residence"},"priceCurrency":"THB","price":6235950,"availability":"https://schema.org/InStock","url":"https://property-library.com/object/biancana","seller":{"@type":"RealEstateAgent","name":"Property Library Phuket","url":"https://property-library.com"}}]}</script>
 <style>
-/* PLP:ANTIFLICKER */
-/* Мигание фона на телефоне — сводная защита. Эльнур 06.09: «фон в мобильной
-   версии везде мигает, ищи по всем страницам». Три источника:
-   1) размытие фона (backdrop-filter) под липкими элементами — браузер
-      перерисовывает весь экран на каждом кадре прокрутки;
-   2) долгое проявление блоков при прокрутке;
-   3) отложенные картинки без фона — на их месте на миг светится подложка. */
-@media(max-width:900px){
-  .header,#toTop,.badge,.pm-tag,.car .tag,.btn-glass,.hero-float,.fbtn,.chipf,
-  .modal-overlay,.mnav,.sheet,.pm-card,.toolbox{
-    backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
-  .reveal{transition-duration:.35s!important}
-}
-.pic-photo,.thumb-photo,.prgs img,.simi-c i,.pm-img img{background-color:var(--warm,#EFEEE7)}
-/* PLP:ANTIFLICKER */
-html{background:var(--bg);overscroll-behavior-y:none}
 /* Эльнур 05.09: сайт — единая система. Страница объекта живёт в тех же
    цветах и с тем же набором блоков, что и карточка на сайте. */
 :root{--green:#D2D5B3;--green-deep:#5F6242;--olive:#5F6242;--ink:#22251C;--paper:#FBFBF7;
@@ -155,6 +81,21 @@ h1{font-size:clamp(24px,4vw,34px);line-height:1.2;margin:8px 0 4px}
 section.desc{margin:26px 0}
 section.desc h2{font-size:18px;margin:0 0 10px;color:var(--ink)}
 section.desc p{color:var(--text);opacity:.94;white-space:pre-line}
+.sub-h{font-size:14px;color:var(--muted);font-weight:600;margin:16px 0 8px}
+.grid-shots{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.grid-shots img{width:100%;height:120px;object-fit:cover;border-radius:11px;display:block;background:#eceadf}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+.tags span{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:13px}
+.pairs{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;margin:0}
+.pairs dt{color:var(--muted);font-size:13px}
+.pairs dd{margin:0;font-size:15px}
+.fine{color:var(--muted);font-size:13px;margin:10px 0 0}
+.lnk{color:var(--green-deep);font-weight:600;text-decoration:none;border-bottom:1px solid currentColor}
+.simi{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.simi-c{display:block;text-decoration:none;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.simi-c img{width:100%;height:120px;object-fit:cover;display:block}
+.simi-c b{display:block;padding:10px 12px 0;font-size:14px}
+.simi-c span{display:block;padding:2px 12px 12px;font-size:13px;color:var(--muted)}
 .cta{display:flex;flex-wrap:wrap;gap:12px;margin:28px 0}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 22px;border-radius:14px;font-weight:600;text-decoration:none;border:1px solid var(--line);cursor:pointer}
 .btn.wa{background:#25D366;color:#0b2b18;border-color:#25D366}
@@ -187,17 +128,36 @@ if(dark) i.src='../img/brand/plp-mark-white.png';})();</script>
     <div class="lbl">Ориентир по району (Сурин, кондо), при активном управлении. Точный расчёт по вашему объекту делает специалист.</div>
   </div>
   <section class="desc"><h2>Что можно купить</h2><div class="units"><div class="unitc"><b>1 спальня</b><span>от 33 м² · 1 сп.</span><u>от 6 235 950 ฿</u></div><div class="unitc"><b>2 спальни</b><span>от 62 м² · 2 сп.</span><u>от 12 493 900 ฿</u></div></div></section>
+  <section class="desc"><h2>Планировки и мастер-план</h2><h3 class="sub-h">Планировки</h3><div class="grid-shots"><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/plans/01.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/plans/01.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/plans/02.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/plans/02.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/plans/7b0b3d65b83af428.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/plans/7b0b3d65b83af428.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/plans/8923b69a791c6ec5.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/plans/8923b69a791c6ec5.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/plans/3422c1f4d29d34ee.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/plans/3422c1f4d29d34ee.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/plans/2fd1f92851b57b76.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/plans/2fd1f92851b57b76.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/plans/7d95945c7e12bc8e.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/plans/7d95945c7e12bc8e.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a></div><p class="fine">Нажмите на изображение, чтобы открыть крупно.</p></section>
+  <section class="desc"><h2>Инфраструктура проекта</h2><div class="tags"><span>Бассейн</span><span>Фитнес-зал</span><span>Спа</span><span>Сауна</span><span>Лаунж</span><span>Сад</span><span>Лобби</span><span>Охрана 24/7</span><span>EV-парковка</span><span>Лифт</span><span>Коворкинг</span><span>Детский клуб</span><span>Pet-friendly</span></div><div class="grid-shots"><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/01.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/01.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/02.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/02.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/03.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/03.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/04.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/04.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/exterior/192e363e2e0ed63a.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/exterior/192e363e2e0ed63a.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/exterior/5a4729b2d1f5f6d9.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/exterior/5a4729b2d1f5f6d9.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/exterior/eb219e66e57cd931.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/exterior/eb219e66e57cd931.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/exterior/266c708c07da305f.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/exterior/266c708c07da305f.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a></div><div class="grid-shots"><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/plans/04.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/plans/04.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/plans/05.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/plans/05.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/facilities/e0410b29f8050365.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/facilities/e0410b29f8050365.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/facilities/081a455db36c4dbe.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/facilities/081a455db36c4dbe.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/facilities/b1d1e1e7ffa4a25a.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/facilities/b1d1e1e7ffa4a25a.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/facilities/d72f5ec1e739d60b.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/facilities/d72f5ec1e739d60b.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/facilities/c7c887dabfc79af9.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/facilities/c7c887dabfc79af9.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/facilities/7e8930abe7628fd4.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BIANCANA/facilities/7e8930abe7628fd4.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a></div></section>
+  <section class="desc"><h2>Как платить</h2><dl class="pairs"><dt>План застройщика</dt><dd>Резервация → 25% при контракте → 25% → 25% → 25% при передаче. 0% рассрочка в период строительства.</dd><dt>Первый взнос</dt><dd>25%</dd><dt>Обслуживание</dt><dd>80 ฿ за м² в год</dd></dl><p class="fine">Точный график под ваш юнит и сроки считает специалист — цифры застройщика меняются.</p></section>
+  <section class="desc"><h2>Форма владения</h2><p>Лизхолд</p><p class="fine">Что это значит для иностранца — в <a href="../guide/leasehold-ili-freehold">разборе форм владения</a>.</p></section>
+  <section class="desc"><h2>Район: Сурин</h2><div class="tags"><span>300 м до пляжа</span></div><p>Пляж Сурин — один из самых престижных на западном побережье, рядом Бангтао и Камала. Рестораны и бары вдоль набережной, Лагуна и Boat Avenue в 10 минутах, аэропорт около 30 минут.</p><p><a class="lnk" href="../districts/surin">Весь район: цены, пляжи, что рядом</a></p></section>
   
   <section class="desc"><h2>Об объекте</h2><p>«Зе Тайтл Бьянкана Сурин» — первый проект одноимённой серии в районе Сурин на острове Пхукет. Комплекс состоит из четырёх корпусов и предлагает апартаменты площадью от 31 до 131 квадратного метра. Стоимость юнитов варьируется от 6,30 до 27,61 миллиона батов. Проект находится в стадии активных продаж.</p></section>
   <section class="desc" lang="en"><h2>About</h2><p>The first-ever The Title project in Surin (coming soon). Buildings A/B/C/D, sales active (dozens of units already SOLD). Areas 31–131 m², prices 6.30–27.61M THB. Related to The Olive Nai Yang (same developer).</p></section>
   
   <div class="cta">
-    <a class="btn wa" href="https://wa.me/66955492587?text=The%20Title%20Biancana%20Surin%20%E2%80%94%20%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D0%B5%D1%81%D1%83%D0%B5%D1%82%20%D1%8D%D1%82%D0%BE%D1%82%20%D0%BE%D0%B1%D1%8A%D0%B5%D0%BA%D1%82.%20https%3A%2F%2Fproperty-library.com%2Fobject%2Fbiancana" rel="noopener" target="_blank">WhatsApp — узнать детали</a>
-    <a class="btn primary" href="../#object=PLP-BIANCANA">Открыть карточку на сайте</a>
+    <a class="btn primary" href="../#object=PLP-BIANCANA&ask=1">Задать вопрос по объекту</a>
     <a class="btn ghost" href="../#object=PLP-BIANCANA">Рассчитать доходность</a>
+    <button type="button" class="btn ghost" id="shareBtn">Поделиться</button>
+    <a class="btn wa" href="https://wa.me/66955492587?text=The%20Title%20Biancana%20Surin%20%E2%80%94%20%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D0%B5%D1%81%D1%83%D0%B5%D1%82%20%D1%8D%D1%82%D0%BE%D1%82%20%D0%BE%D0%B1%D1%8A%D0%B5%D0%BA%D1%82.%20https%3A%2F%2Fproperty-library.com%2Fobject%2Fbiancana" rel="noopener" target="_blank">WhatsApp</a>
   </div>
+  <section class="desc"><h2>Похожие объекты</h2><div class="simi"><a class="simi-c" href="gens-botanica"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/INTAKE-BOTANICA/01.jpg?width=520&amp;resize=contain&amp;quality=72" alt="" loading="lazy" decoding="async"><b>The GENS by Botanica, у Blue Tree</b><span>Банг Тао · от 5 458 000 ฿</span></a><a class="simi-c" href="adora"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-ADORA/01.jpg?width=520&amp;resize=contain&amp;quality=72" alt="" loading="lazy" decoding="async"><b>The Title Adora Rawai</b><span>Равай · от 5 332 000 ฿</span></a><a class="simi-c" href="balcony"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BALCONY/01.jpg?width=520&amp;resize=contain&amp;quality=72" alt="" loading="lazy" decoding="async"><b>The BALCONY Nai Yang</b><span>Най Янг · от 6 087 270 ฿</span></a></div></section>
 </main>
 <script>
+/* «Поделиться»: на телефоне системное меню, на компьютере ссылка в буфер */
+(function(){
+  var b=document.getElementById('shareBtn'); if(!b) return;
+  b.onclick=function(){
+    var url=location.href, title=document.title;
+    if(navigator.share){ navigator.share({title:title,url:url}).catch(function(){}); return; }
+    var was=b.textContent;
+    function done(){ b.textContent='✓ Ссылка скопирована'; setTimeout(function(){ b.textContent=was; },2200); }
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(url).then(done).catch(function(){ prompt('Скопируйте ссылку:', url); }); }
+    else prompt('Скопируйте ссылку:', url);
+  };
+})();
 /* миниатюры листают главный кадр — как в карточке на сайте */
 (function(){
   var main=document.getElementById('mainShot');

@@ -3,64 +3,6 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- PLP:HEADTHEME:START -->
-<meta name="color-scheme" content="light dark">
-<!-- цвет системных полей браузера = фон страницы. Без этого при прокрутке и
-     оттягивании из-под страницы проглядывает чужой цвет — кажется, что фон мигает. -->
-<meta name="theme-color" content="#f7f6f1" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0C0D09" media="(prefers-color-scheme: dark)">
-<script>
-(function(){
-  function paintChrome(){
-    try{
-      var bg=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
-      if(!bg && document.body) bg=getComputedStyle(document.body).backgroundColor;
-      if(!bg || bg==='rgba(0, 0, 0, 0)') return;
-      var list=document.querySelectorAll('meta[name="theme-color"]');
-      for(var i=0;i<list.length;i++) list[i].parentNode.removeChild(list[i]);
-      var m=document.createElement('meta'); m.setAttribute('name','theme-color');
-      m.setAttribute('content',bg); document.head.appendChild(m);
-    }catch(e){}
-  }
-  /* Кнопка «поделиться»: на телефоне открывает системное меню, на компьютере
-     кладёт ссылку в буфер и говорит об этом. Эльнур 07.09: «сайтом надо
-     пользоваться, он не просто для красоты». */
-  document.addEventListener('click', function(e){
-    var b = e.target && e.target.closest && e.target.closest('[data-share]');
-    if(!b) return;
-    e.preventDefault();
-    var path = b.getAttribute('data-share') || location.pathname;
-    var url = location.origin + path;
-    var title = b.getAttribute('data-share-title') || document.title;
-    var done = function(){
-      var was = b.textContent;
-      b.textContent = '✓ Ссылка скопирована';
-      b.classList.add('ok');
-      setTimeout(function(){ b.textContent = was; b.classList.remove('ok'); }, 2200);
-    };
-    if(navigator.share){ navigator.share({title:title, url:url}).catch(function(){}); return; }
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(url).then(done).catch(function(){ prompt('Скопируйте ссылку:', url); });
-    } else prompt('Скопируйте ссылку:', url);
-  });
-  window.paintChrome=paintChrome;
-  /* Адрес без .html: страницы и так открываются коротким адресом, но если
-     человек пришёл по старой ссылке, приводим строку браузера к чистому виду.
-     Эльнур 07.09: «мне не нравится html в адресе, я ни у кого её не видел». */
-  try{
-    var pth=location.pathname;
-    if(/\.html$/.test(pth)){
-      var clean=pth.replace(/index\.html$/,'').replace(/\.html$/,'');
-      if(clean==='') clean='/';
-      history.replaceState(null,'',clean+location.search+location.hash);
-    }
-  }catch(e){}
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',paintChrome);
-  else paintChrome();
-  try{ matchMedia('(prefers-color-scheme: dark)').addEventListener('change',paintChrome); }catch(e){}
-})();
-</script>
-<!-- PLP:HEADTHEME:END -->
 <script>(function(){try{var v=localStorage.getItem('pl_theme');
 if(v==='dark'||v==='light')document.documentElement.setAttribute('data-theme',v);}catch(e){}})();</script>
 <title>The Modeva Bang-Tao — Банг Тао, Пхукет | Property Library</title>
@@ -85,22 +27,6 @@ if(v==='dark'||v==='light')document.documentElement.setAttribute('data-theme',v)
 <meta name="twitter:image" content="https://property-library.com/img/PLP-MODEVA.jpg">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"RealEstateListing","@id":"https://property-library.com/object/modeva#listing","url":"https://property-library.com/object/modeva","name":"The Modeva Bang-Tao","description":"Кондоминиум с 1-спальными апартаментами площадью 29-32 кв.м в районе Бангтао, Таланг, Пхукет","about":{"@id":"https://property-library.com/object/modeva#residence"}},{"@type":"Residence","@id":"https://property-library.com/object/modeva#residence","name":"The Modeva Bang-Tao","description":"Кондоминиум с 1-спальными апартаментами площадью 29-32 кв.м в районе Бангтао, Таланг, Пхукет","url":"https://property-library.com/object/modeva","image":"https://property-library.com/img/PLP-MODEVA.jpg","address":{"@type":"PostalAddress","addressRegion":"Phuket","addressLocality":"Банг Тао","addressCountry":"TH"},"additionalProperty":{"@type":"PropertyValue","name":"Застройщик","value":"Rhom Bho Property PLC"},"numberOfRooms":3,"floorSize":{"@type":"QuantitativeValue","value":148,"unitCode":"MTK"}},{"@type":"Offer","@id":"https://property-library.com/object/modeva#offer","itemOffered":{"@id":"https://property-library.com/object/modeva#residence"},"priceCurrency":"THB","price":4750200,"availability":"https://schema.org/InStock","url":"https://property-library.com/object/modeva","seller":{"@type":"RealEstateAgent","name":"Property Library Phuket","url":"https://property-library.com"}}]}</script>
 <style>
-/* PLP:ANTIFLICKER */
-/* Мигание фона на телефоне — сводная защита. Эльнур 06.09: «фон в мобильной
-   версии везде мигает, ищи по всем страницам». Три источника:
-   1) размытие фона (backdrop-filter) под липкими элементами — браузер
-      перерисовывает весь экран на каждом кадре прокрутки;
-   2) долгое проявление блоков при прокрутке;
-   3) отложенные картинки без фона — на их месте на миг светится подложка. */
-@media(max-width:900px){
-  .header,#toTop,.badge,.pm-tag,.car .tag,.btn-glass,.hero-float,.fbtn,.chipf,
-  .modal-overlay,.mnav,.sheet,.pm-card,.toolbox{
-    backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
-  .reveal{transition-duration:.35s!important}
-}
-.pic-photo,.thumb-photo,.prgs img,.simi-c i,.pm-img img{background-color:var(--warm,#EFEEE7)}
-/* PLP:ANTIFLICKER */
-html{background:var(--bg);overscroll-behavior-y:none}
 /* Эльнур 05.09: сайт — единая система. Страница объекта живёт в тех же
    цветах и с тем же набором блоков, что и карточка на сайте. */
 :root{--green:#D2D5B3;--green-deep:#5F6242;--olive:#5F6242;--ink:#22251C;--paper:#FBFBF7;
@@ -155,6 +81,21 @@ h1{font-size:clamp(24px,4vw,34px);line-height:1.2;margin:8px 0 4px}
 section.desc{margin:26px 0}
 section.desc h2{font-size:18px;margin:0 0 10px;color:var(--ink)}
 section.desc p{color:var(--text);opacity:.94;white-space:pre-line}
+.sub-h{font-size:14px;color:var(--muted);font-weight:600;margin:16px 0 8px}
+.grid-shots{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.grid-shots img{width:100%;height:120px;object-fit:cover;border-radius:11px;display:block;background:#eceadf}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+.tags span{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:13px}
+.pairs{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;margin:0}
+.pairs dt{color:var(--muted);font-size:13px}
+.pairs dd{margin:0;font-size:15px}
+.fine{color:var(--muted);font-size:13px;margin:10px 0 0}
+.lnk{color:var(--green-deep);font-weight:600;text-decoration:none;border-bottom:1px solid currentColor}
+.simi{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.simi-c{display:block;text-decoration:none;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.simi-c img{width:100%;height:120px;object-fit:cover;display:block}
+.simi-c b{display:block;padding:10px 12px 0;font-size:14px}
+.simi-c span{display:block;padding:2px 12px 12px;font-size:13px;color:var(--muted)}
 .cta{display:flex;flex-wrap:wrap;gap:12px;margin:28px 0}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 22px;border-radius:14px;font-weight:600;text-decoration:none;border:1px solid var(--line);cursor:pointer}
 .btn.wa{background:#25D366;color:#0b2b18;border-color:#25D366}
@@ -187,17 +128,36 @@ if(dark) i.src='../img/brand/plp-mark-white.png';})();</script>
     <div class="lbl">Ориентир по району (Банг Тао, кондо), при активном управлении. Точный расчёт по вашему объекту делает специалист.</div>
   </div>
   <section class="desc"><h2>Что можно купить</h2><div class="units"><div class="unitc"><b>1 Bedroom</b><span>от 41 м² · 1 сп.</span></div><div class="unitc"><b>1 Bedroom Plus</b><span>от 55 м² · 1 сп.</span></div><div class="unitc"><b>2 Bedroom</b><span>от 65 м² · 2 сп.</span></div><div class="unitc"><b>2 Bedroom Plus</b><span>от 93 м² · 2 сп.</span></div><div class="unitc"><b>2 Bedroom Duplex</b><span>от 112 м² · 2 сп.</span></div><div class="unitc"><b>3 Bedroom Duplex</b><span>от 146 м² · 3 сп.</span></div><div class="unitc"><b>Penthouse 2BR</b><span>от 96 м² · 2 сп.</span></div><div class="unitc"><b>Penthouse 3BR</b><span>от 138 м² · 3 сп.</span></div></div></section>
+  <section class="desc"><h2>Планировки и мастер-план</h2><h3 class="sub-h">Мастер-план</h3><div class="grid-shots"><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/plans/02.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/plans/02.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/master/ebe919cdaf99c0af.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/master/ebe919cdaf99c0af.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/master/7f0714aa84e8d3f3.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/master/7f0714aa84e8d3f3.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/master/080addf1e949d737.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/master/080addf1e949d737.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/master/f730f6b48e41ff37.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/master/f730f6b48e41ff37.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/master/f1c96876fa1780ff.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/master/f1c96876fa1780ff.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/master/83599f7ef02e3d80.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/master/83599f7ef02e3d80.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/master/5a2ca8c1cdd754cd.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/master/5a2ca8c1cdd754cd.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a></div><h3 class="sub-h">Планировки</h3><div class="grid-shots"><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/plans/e8277717907451d6.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/plans/e8277717907451d6.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/plans/7c1990d3e4c22ac7.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/plans/7c1990d3e4c22ac7.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/plans/ceff44cb1de83784.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/plans/ceff44cb1de83784.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/plans/ac4c8d2d86b72d51.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/plans/ac4c8d2d86b72d51.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/plans/4572178d26023f98.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/plans/4572178d26023f98.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/plans/59e6a375339be347.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/plans/59e6a375339be347.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/plans/10b0fb34b6a5965f.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/plans/10b0fb34b6a5965f.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/plans/6f8aa7fc5aceef8e.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/plans/6f8aa7fc5aceef8e.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a></div><p class="fine">Нажмите на изображение, чтобы открыть крупно.</p></section>
+  <section class="desc"><h2>Инфраструктура проекта</h2><div class="grid-shots"><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/exterior/6f26338579d7cc89.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/exterior/6f26338579d7cc89.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/exterior/7c8b9678b9eee305.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/exterior/7c8b9678b9eee305.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/exterior/63427c5c6f817c70.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/exterior/63427c5c6f817c70.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/exterior/e3b41ca04357cf0a.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/exterior/e3b41ca04357cf0a.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/exterior/a2f07fe6f5511f6f.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/exterior/a2f07fe6f5511f6f.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/exterior/145f3751eeca6c0b.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/exterior/145f3751eeca6c0b.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/exterior/6864cda7237175f1.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/exterior/6864cda7237175f1.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/exterior/af9f29b5e58f0cff.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/exterior/af9f29b5e58f0cff.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a></div><div class="grid-shots"><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/facilities/2257207cfc06c511.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/facilities/2257207cfc06c511.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/facilities/cd5ae97f1d266e63.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/facilities/cd5ae97f1d266e63.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/facilities/702e79828f46ab97.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/facilities/702e79828f46ab97.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/facilities/f7a6637c3f175aa8.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/facilities/f7a6637c3f175aa8.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/facilities/6d145316e1975fd8.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/facilities/6d145316e1975fd8.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/facilities/0db0cac4e105f82e.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/facilities/0db0cac4e105f82e.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a><a href="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/facilities/d910c8c116c44376.jpg?width=1600&amp;resize=contain&amp;quality=82" target="_blank" rel="noopener"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/facilities/d910c8c116c44376.jpg?width=620&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></a></div></section>
+  <section class="desc"><h2>Как платить</h2><dl class="pairs"><dt>График</dt><dd>Стандартная схема The Title: бронь 100 000 ฿ → 25% при подписании договора (в течение 30 дней) → далее равные платежи по этапам стройки → остаток на передаче и регистрации. Точный график по конкретному юниту подтверждаем у застройщика.</dd><dt>Обслуживание</dt><dd>85 ฿ за м² в год</dd></dl><p class="fine">Точный график под ваш юнит и сроки считает специалист — цифры застройщика меняются.</p></section>
+  <section class="desc"><h2>Форма владения</h2><p>Фрихолд или лизхолд — на выбор</p><p class="fine">Что это значит для иностранца — в <a href="../guide/leasehold-ili-freehold">разборе форм владения</a>.</p></section>
+  <section class="desc"><h2>Район: Банг Тао</h2><p>Лагуна Пхукет с полями для гольфа, Boat Avenue с рынком и ресторанами, торговый центр Porto de Phuket, пляжные клубы Catch и Xana, парк Blue Tree. Международные школы UWC и HeadStart в 10–15 минутах. Аэропорт около 25 минут.</p><p><a class="lnk" href="../districts/bang-tao">Весь район: цены, пляжи, что рядом</a></p></section>
   <section class="desc"><h2>Ход строительства <small style="font-weight:400;color:var(--muted)">2026-08-10</small></h2><div class="prgs"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/progress/01.jpg?width=760&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/progress/02.jpg?width=760&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/progress/03.jpg?width=760&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/progress/04.jpg?width=760&amp;resize=contain&amp;quality=74" alt="" loading="lazy" decoding="async"></div></section>
   <section class="desc"><h2>Об объекте</h2><p>Кондоминиум с 1-спальными апартаментами площадью 29-32 кв.м в районе Бангтао, Таланг, Пхукет</p></section>
   <section class="desc" lang="en"><h2>About</h2><p>A condominium with 1-bedroom apartments of 29–32 m² in the Bang Tao area, Thalang, Phuket.</p></section>
   
   <div class="cta">
-    <a class="btn wa" href="https://wa.me/66955492587?text=The%20Modeva%20Bang-Tao%20%E2%80%94%20%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D0%B5%D1%81%D1%83%D0%B5%D1%82%20%D1%8D%D1%82%D0%BE%D1%82%20%D0%BE%D0%B1%D1%8A%D0%B5%D0%BA%D1%82.%20https%3A%2F%2Fproperty-library.com%2Fobject%2Fmodeva" rel="noopener" target="_blank">WhatsApp — узнать детали</a>
-    <a class="btn primary" href="../#object=PLP-MODEVA">Открыть карточку на сайте</a>
+    <a class="btn primary" href="../#object=PLP-MODEVA&ask=1">Задать вопрос по объекту</a>
     <a class="btn ghost" href="../#object=PLP-MODEVA">Рассчитать доходность</a>
+    <button type="button" class="btn ghost" id="shareBtn">Поделиться</button>
+    <a class="btn wa" href="https://wa.me/66955492587?text=The%20Modeva%20Bang-Tao%20%E2%80%94%20%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D0%B5%D1%81%D1%83%D0%B5%D1%82%20%D1%8D%D1%82%D0%BE%D1%82%20%D0%BE%D0%B1%D1%8A%D0%B5%D0%BA%D1%82.%20https%3A%2F%2Fproperty-library.com%2Fobject%2Fmodeva" rel="noopener" target="_blank">WhatsApp</a>
   </div>
+  <section class="desc"><h2>Похожие объекты</h2><div class="simi"><a class="simi-c" href="gens-botanica"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/INTAKE-BOTANICA/01.jpg?width=520&amp;resize=contain&amp;quality=72" alt="" loading="lazy" decoding="async"><b>The GENS by Botanica, у Blue Tree</b><span>Банг Тао · от 5 458 000 ฿</span></a><a class="simi-c" href="adora"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-ADORA/01.jpg?width=520&amp;resize=contain&amp;quality=72" alt="" loading="lazy" decoding="async"><b>The Title Adora Rawai</b><span>Равай · от 5 332 000 ฿</span></a><a class="simi-c" href="ayana"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-AYANA/cover/cd20db3eba083be6.jpg?width=520&amp;resize=contain&amp;quality=72" alt="" loading="lazy" decoding="async"><b>AYANA Heights Seaview Residences</b><span>Лаян · от 3 661 800 ฿</span></a></div></section>
 </main>
 <script>
+/* «Поделиться»: на телефоне системное меню, на компьютере ссылка в буфер */
+(function(){
+  var b=document.getElementById('shareBtn'); if(!b) return;
+  b.onclick=function(){
+    var url=location.href, title=document.title;
+    if(navigator.share){ navigator.share({title:title,url:url}).catch(function(){}); return; }
+    var was=b.textContent;
+    function done(){ b.textContent='✓ Ссылка скопирована'; setTimeout(function(){ b.textContent=was; },2200); }
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(url).then(done).catch(function(){ prompt('Скопируйте ссылку:', url); }); }
+    else prompt('Скопируйте ссылку:', url);
+  };
+})();
 /* миниатюры листают главный кадр — как в карточке на сайте */
 (function(){
   var main=document.getElementById('mainShot');
