@@ -841,8 +841,21 @@
    "name": "Vibe Residence Karon",
    "district": "Карон",
    "type": "Кондо",
-   "price_from": null,
-   "units": []
+   "price_from": 5746000,
+   "units": [
+    {
+     "name": "1 спальня",
+     "beds": 1,
+     "area": 34,
+     "from": 5746000
+    },
+    {
+     "name": "2 спальни",
+     "beds": 2,
+     "area": 62,
+     "from": 10478000
+    }
+   ]
   },
   {
    "id": "PLP-VIVANA",
@@ -917,13 +930,13 @@
    "name": "Zenithy La Ville · Oasis Collection",
    "district": "Ко Кео",
    "type": "Вилла",
-   "price_from": 19900000,
+   "price_from": 26530500,
    "units": [
     {
-     "name": "4 спальни",
-     "beds": 4,
+     "name": "3 спальни",
+     "beds": 3,
      "area": 351.61,
-     "from": 19900000
+     "from": 26530500
     }
    ]
   },
