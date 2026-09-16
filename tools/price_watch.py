@@ -31,7 +31,7 @@ def tg(text):
 def main():
     out = subprocess.run([sys.executable, os.path.join(ROOT, 'tools', 'tg_prices.py')],
                          capture_output=True, text=True, timeout=1800).stdout
-    diff, nochan, soldout = [], [], []
+    diff, nochan, nolist, soldout = [], [], [], []
     for line in out.splitlines():
         if '≠' in line:
             m = re.match(r'(\S+)\s+.*?прайс (\S+):\s+свободно (\d+)\s+от (.+?) \(было (.+?)\)', line)
@@ -42,18 +42,25 @@ def main():
                 diff.append('• ' + line.strip())
         elif 'РАСПРОДАНО' in line:
             soldout.append('• ' + line.split()[0] + ' — застройщик пишет SOLD OUT')
-        elif 'канала нет' in line or 'прайса нет' in line:
+        elif 'канала нет' in line:
             nochan.append(line.split()[0])
+        elif 'прайса нет' in line:
+            nolist.append(line.split()[0])
     today = datetime.date.today().strftime('%d.%m.%Y')
     parts = ['Сверка цен с застройщиками · %s' % today]
     parts.append('Разошлось: %d' % len(diff))
     parts += diff[:20] if diff else ['Все цены совпадают с прайсами.']
     if soldout:
         parts.append(''); parts += soldout
+    if nolist:
+        parts.append('')
+        parts.append('Канал есть, но прайс файлом не выкладывают (%d): %s'
+                     % (len(nolist), ', '.join(nolist[:12])))
+        parts.append('У них цена — из папки на Диске: tools/drive_pull.py --price')
     if nochan:
         parts.append('')
-        parts.append('Свежего прайса нет у %d объектов: %s' % (len(nochan), ', '.join(nochan[:12])))
-        parts.append('Им нужна ссылка на канал или папку застройщика — тогда подтянется само.')
+        parts.append('Канала застройщика нет вовсе (%d): %s' % (len(nochan), ', '.join(nochan[:12])))
+        parts.append('Нужна ссылка на канал или папку — дальше подтянется само.')
     parts.append('')
     parts.append('Ничего не изменено. Правки: tools/tg_prices.py --apply')
     text = '\n'.join(parts)

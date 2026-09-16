@@ -675,8 +675,12 @@ function syncListOffers(html, catalog) {
       const p = by[pid];
       if (!p) return all;
       const thb = p.calc && p.calc.priceTHB ? p.calc.priceTHB : null;
-      if (p.soldOut || !thb) {
+      if (!thb) {
         return head + '"@type": "Offer", "priceCurrency": "THB", "availability": "https://schema.org/SoldOut"}';
+      }
+      if (p.soldOut) {
+        return head + '"@type": "Offer", "price": "' + Math.round(thb) +
+          '", "priceCurrency": "THB", "availability": "https://schema.org/LimitedAvailability"}';
       }
       return head + '"@type": "Offer", "price": "' + Math.round(thb) +
         '", "priceCurrency": "THB", "availability": "https://schema.org/InStock"}';
@@ -1076,13 +1080,17 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
     },
     residence,
   ];
-  if (priceTHB && String(o.stage || '') !== 'Sold out') graph.push({
+  if (priceTHB) graph.push({
     '@type': 'Offer',
     '@id': url + '#offer',
     itemOffered: { '@id': idRes },
     priceCurrency: 'THB',
     price: priceTHB,
-    availability: o.status === 'sold' ? 'https://schema.org/SoldOut' : 'https://schema.org/InStock',
+    /* у застройщика распродано, но наш юнит есть — это «ограниченное наличие»,
+       а не «продано»: иначе поисковик прячет живое предложение */
+    availability: String(o.stage || '') === 'Sold out'
+      ? 'https://schema.org/LimitedAvailability'
+      : (o.status === 'sold' ? 'https://schema.org/SoldOut' : 'https://schema.org/InStock'),
     url,
     seller: { '@type': 'RealEstateAgent', name: 'Property Library Phuket', url: SITE_BASE },
   });
