@@ -1929,6 +1929,9 @@ body{background:var(--bg)}
   font-size:.88rem;font-weight:600;color:rgba(255,255,255,.78)}
 .mnav .mswch b{background:var(--green);color:var(--on-green)}
 
+/* знак бренда не квадратный — высоту всегда считает браузер, иначе он сплющивается */
+.logo .chip img,.brand img,.av img,.fab .av img{height:auto!important;object-fit:contain}
+
 /* PLP:UI:END */
 /* Разбор документа: то, что система прочитала, разложенное по пунктам */
 .docread{border:1px solid var(--line);border-radius:14px;margin:8px 0;background:var(--paper)}
@@ -1992,10 +1995,10 @@ body{background:var(--bg)}
 </header>
 <!-- PLP:HEADER:END -->
 <!-- ===== CHAT WIDGET ===== -->
-<div class="fabwrap" id="fabWrap"><button type="button" class="fab" id="fab" onclick="openChat('hi')"><span class="av"><img src="img/brand/plp-mark-ink.png" alt="" width="20" height="20"></span><span class="fabtxt" data-i18n="chat.fab">Дарья · на связи</span><span class="dot"></span></button><button type="button" class="fabmin" id="fabMin" onclick="event.stopPropagation();toggleFab()" aria-label="Свернуть" title="Свернуть">×</button></div>
+<div class="fabwrap" id="fabWrap"><button type="button" class="fab" id="fab" onclick="openChat('hi')"><span class="av"><img src="img/brand/plp-mark-ink.png" alt="" width="20"></span><span class="fabtxt" data-i18n="chat.fab">Дарья · на связи</span><span class="dot"></span></button><button type="button" class="fabmin" id="fabMin" onclick="event.stopPropagation();toggleFab()" aria-label="Свернуть" title="Свернуть">×</button></div>
 <div class="chatwin" id="chatwin" role="dialog" aria-label="Чат с менеджером">
   <div class="chathead">
-    <span class="av"><img src="img/brand/plp-mark-ink.png" alt="" width="20" height="20"></span>
+    <span class="av"><img src="img/brand/plp-mark-ink.png" alt="" width="20"></span>
     <div><b data-i18n="chat.name">Дарья</b><div class="st2"><span class="dot"></span> <span data-i18n="chat.sub">персональный менеджер · отвечает сразу</span></div></div>
     <button type="button" class="clr" onclick="clearChat()" title="Очистить историю">⟲</button>
     <button type="button" class="x" onclick="closeChat()" aria-label="Закрыть">×</button>

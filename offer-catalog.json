@@ -31,20 +31,18 @@
    "price_from": 5332000,
    "units": [
     {
-     "beds": 1,
      "name": "1 спальня",
-     "area_sqm": 43,
-     "price_from_thb": 5332000,
+     "beds": 1,
+     "code": "1BL",
      "area": 43,
      "from": 5332000
     },
     {
-     "beds": 2,
      "name": "2 спальни",
-     "area_sqm": 81,
-     "price_from_thb": 11664000,
-     "area": 81,
-     "from": 11664000
+     "beds": 2,
+     "code": "2BM",
+     "area": 67,
+     "from": 10586000
     }
    ]
   },
@@ -55,15 +53,21 @@
    "name": "AYANA Heights Seaview Residences",
    "district": "Лаян",
    "type": "Кондо",
-   "price_from": 5426101,
+   "price_from": 15447768,
    "units": [
     {
-     "beds": 1,
-     "name": "1 спальня",
-     "area_sqm": 32,
-     "price_from_thb": 3661800,
-     "area": 32,
-     "from": 5426101
+     "name": "2 спальни",
+     "beds": 2,
+     "code": null,
+     "area": 75.51,
+     "from": 15447768
+    },
+    {
+     "name": "3 спальни",
+     "beds": 3,
+     "code": null,
+     "area": 112.89,
+     "from": 23096052
     }
    ]
   },
@@ -74,23 +78,28 @@
    "name": "The BALCONY Nai Yang",
    "district": "Най Янг",
    "type": "Кондо",
-   "price_from": 6087270,
+   "price_from": 6082545,
    "units": [
     {
-     "beds": 1,
      "name": "1 спальня",
-     "area_sqm": 33,
-     "price_from_thb": 6087270,
+     "beds": 1,
+     "code": null,
      "area": 33,
-     "from": 6087270
+     "from": 6082545
     },
     {
-     "beds": 2,
      "name": "2 спальни",
-     "area_sqm": 50.64,
-     "price_from_thb": 8916810,
-     "area": 50.64,
-     "from": 8916810
+     "beds": 2,
+     "code": null,
+     "area": 50.9,
+     "from": 8785665
+    },
+    {
+     "name": "Пентхаус · 2 сп.",
+     "beds": 2,
+     "code": null,
+     "area": 52.14,
+     "from": 9623565
     }
    ]
   },
@@ -114,18 +123,16 @@
    "price_from": 6115200,
    "units": [
     {
-     "beds": 1,
      "name": "1 спальня",
-     "area_sqm": 33,
-     "price_from_thb": 6235950,
-     "area": 33,
+     "beds": 1,
+     "code": "1BM",
+     "area": 31,
      "from": 6115200
     },
     {
-     "beds": 2,
      "name": "2 спальни",
-     "area_sqm": 62,
-     "price_from_thb": 12493900,
+     "beds": 2,
+     "code": "2BM",
      "area": 62,
      "from": 12493900
     }
@@ -141,18 +148,16 @@
    "price_from": 30276000,
    "units": [
     {
-     "beds": 3,
      "name": "3 спальни",
-     "area_sqm": 297,
-     "price_from_thb": 30276000,
+     "beds": 3,
+     "code": null,
      "area": 297,
      "from": 30276000
     },
     {
-     "beds": 4,
      "name": "4 спальни",
-     "area_sqm": 424,
-     "price_from_thb": 42343000,
+     "beds": 4,
+     "code": null,
      "area": 424,
      "from": 42343000
     }
@@ -168,22 +173,17 @@
    "price_from": 6191000,
    "units": [
     {
-     "area": 31,
+     "name": "1 спальня",
      "beds": 1,
-     "name": "1 Bedroom",
-     "note": "31–51 м²"
+     "code": "1BLAC",
+     "area": 41,
+     "from": 6191000
     },
     {
-     "area": 51,
-     "beds": 1,
-     "name": "1 Bedroom Plus",
-     "note": "51–61 м²"
-    },
-    {
-     "area": 69,
+     "name": "2 спальни",
      "beds": 2,
-     "name": "2 Bedroom",
-     "note": "69–148 м²",
+     "code": "2BMC",
+     "area": 72,
      "from": 11304000
     }
    ]
@@ -208,26 +208,30 @@
    "price_from": 4693524,
    "units": [
     {
-     "beds": 1,
      "name": "1 спальня",
-     "area_sqm": 31,
-     "price_from_thb": 4767552,
+     "beds": 1,
+     "code": "1BM",
      "area": 31,
      "from": 4693524
     },
     {
-     "beds": 2,
      "name": "2 спальни",
-     "area_sqm": 64,
-     "price_from_thb": 9379584,
+     "beds": 2,
+     "code": null,
      "area": 64,
      "from": 9379584
     },
     {
+     "name": "Пентхаус · 2 сп.",
+     "beds": 2,
+     "code": "PH07-2",
+     "area": 109,
+     "from": 18083844
+    },
+    {
+     "name": "Пентхаус · 3 сп.",
      "beds": 3,
-     "name": "3 спальни",
-     "area_sqm": 128,
-     "price_from_thb": 21217248,
+     "code": "PH09-1",
      "area": 128,
      "from": 21217248
     }
@@ -293,10 +297,9 @@
    "price_from": 22300000,
    "units": [
     {
-     "beds": 3,
      "name": "3 спальни",
-     "area_sqm": 265,
-     "price_from_thb": 22418000,
+     "beds": 3,
+     "code": null,
      "area": 265,
      "from": 18600000
     }
@@ -324,12 +327,14 @@
     {
      "name": "1 спальня",
      "beds": 1,
+     "code": null,
      "area": 34,
      "from": 3570000
     },
     {
      "name": "2 спальни",
      "beds": 2,
+     "code": null,
      "area": 52,
      "from": 5460000
     }
@@ -342,23 +347,21 @@
    "name": "The Title Halo 1 Naiyang",
    "district": "Най Янг",
    "type": "Кондо",
-   "price_from": 5137480,
+   "price_from": 5136160,
    "units": [
     {
-     "beds": 1,
      "name": "1 спальня",
-     "area_sqm": 36,
-     "price_from_thb": 3850000,
-     "area": 36,
-     "from": 3850000
+     "beds": 1,
+     "code": "A1",
+     "area": 35.88,
+     "from": 5136160
     },
     {
-     "beds": 2,
      "name": "2 спальни",
-     "area_sqm": 59,
-     "price_from_thb": 7500000,
-     "area": 59,
-     "from": 7500000
+     "beds": 2,
+     "code": null,
+     "area": 58.42,
+     "from": 7594600
     }
    ]
   },
@@ -372,26 +375,23 @@
    "price_from": 5588573,
    "units": [
     {
-     "beds": 1,
      "name": "1 спальня",
-     "area_sqm": 35.8,
-     "price_from_thb": 5525730,
-     "area": 35.8,
+     "beds": 1,
+     "code": "SA",
+     "area": 38.85,
      "from": 5588573
     },
     {
-     "beds": 2,
      "name": "2 спальни",
-     "area_sqm": 64.68,
-     "price_from_thb": 11002068,
+     "beds": 2,
+     "code": "XLC",
      "area": 64.68,
      "from": 11002068
     },
     {
-     "beds": 3,
      "name": "3 спальни",
-     "area_sqm": 122.04,
-     "price_from_thb": 20887146,
+     "beds": 3,
+     "code": null,
      "area": 122.04,
      "from": 20887146
     }
@@ -448,26 +448,23 @@
    "price_from": 4620000,
    "units": [
     {
-     "beds": 1,
      "name": "1 спальня",
-     "area_sqm": 28,
-     "price_from_thb": 4256000,
+     "beds": 1,
+     "code": "1BS",
      "area": 28,
      "from": 4620000
     },
     {
+     "name": "Пентхаус · 2 сп.",
      "beds": 2,
-     "name": "2 спальни",
-     "area_sqm": 121,
-     "price_from_thb": 17666000,
+     "code": "PH16",
      "area": 121,
      "from": 17666000
     },
     {
+     "name": "Пентхаус · 3 сп.",
      "beds": 3,
-     "name": "3 спальни",
-     "area_sqm": 100,
-     "price_from_thb": 13300000,
+     "code": "PH22",
      "area": 100,
      "from": 13300000
     }
@@ -533,16 +530,14 @@
      "name": "1 спальня",
      "area_sqm": 42.9,
      "price_from_thb": 6679500,
-     "area": 42.9,
-     "from": 6153600
+     "area": 42.9
     },
     {
      "beds": 2,
      "name": "2 спальни",
      "area_sqm": 85.3,
      "price_from_thb": 12886300,
-     "area": 85.3,
-     "from": 12886300
+     "area": 85.3
     }
    ]
   },
@@ -556,18 +551,16 @@
    "price_from": 8235000,
    "units": [
     {
-     "beds": 1,
      "name": "1 спальня",
-     "area_sqm": 61,
-     "price_from_thb": 8235000,
+     "beds": 1,
+     "code": null,
      "area": 61,
      "from": 8235000
     },
     {
-     "beds": 2,
      "name": "2 спальни",
-     "area_sqm": 96,
-     "price_from_thb": 12960000,
+     "beds": 2,
+     "code": null,
      "area": 96,
      "from": 12960000
     }
@@ -664,18 +657,16 @@
    "price_from": 7900000,
    "units": [
     {
-     "beds": 1,
      "name": "1 спальня",
-     "area_sqm": 45.57,
-     "price_from_thb": 7900000,
+     "beds": 1,
+     "code": null,
      "area": 45.57,
      "from": 7900000
     },
     {
-     "beds": 2,
      "name": "2 спальни",
-     "area_sqm": 83.56,
-     "price_from_thb": 14325000,
+     "beds": 2,
+     "code": null,
      "area": 83.56,
      "from": 14325000
     }
@@ -691,26 +682,23 @@
    "price_from": 5221467,
    "units": [
     {
-     "beds": 1,
      "name": "1 спальня",
-     "area_sqm": 36.35,
-     "price_from_thb": 5221467,
+     "beds": 1,
+     "code": "1BL",
      "area": 36.35,
      "from": 5221467
     },
     {
-     "beds": 2,
      "name": "2 спальни",
-     "area_sqm": 56.45,
-     "price_from_thb": 8108715,
+     "beds": 2,
+     "code": "2BS",
      "area": 56.45,
      "from": 8108715
     },
     {
-     "beds": 3,
      "name": "3 спальни",
-     "area_sqm": 112.55,
-     "price_from_thb": 13826768,
+     "beds": 3,
+     "code": "3B",
      "area": 112.55,
      "from": 13826768
     }
@@ -723,21 +711,19 @@
    "name": "The Title Sierra",
    "district": "Банг Тао",
    "type": "Кондо",
-   "price_from": 4700000,
+   "price_from": 2906700,
    "units": [
     {
-     "beds": 1,
      "name": "1 спальня",
-     "area_sqm": 28.4,
-     "price_from_thb": 2906700,
+     "beds": 1,
+     "code": "1BS",
      "area": 28.4,
      "from": 2906700
     },
     {
-     "beds": 2,
      "name": "2 спальни",
-     "area_sqm": 55.7,
-     "price_from_thb": 6523800,
+     "beds": 2,
+     "code": "2BSC",
      "area": 55.7,
      "from": 6523800
     }
@@ -755,12 +741,14 @@
     {
      "name": "2 спальни",
      "beds": 2,
+     "code": null,
      "area": 99.95,
      "from": 21930000
     },
     {
      "name": "3 спальни",
      "beds": 3,
+     "code": null,
      "area": 167.05,
      "from": 33030000
     }
@@ -856,12 +844,14 @@
     {
      "name": "1 спальня",
      "beds": 1,
+     "code": null,
      "area": 34,
      "from": 5746000
     },
     {
      "name": "2 спальни",
      "beds": 2,
+     "code": null,
      "area": 62,
      "from": 10478000
     }
@@ -877,20 +867,39 @@
    "price_from": 4142362,
    "units": [
     {
-     "beds": 1,
      "name": "1 спальня",
-     "area_sqm": 33,
-     "price_from_thb": 4232629,
-     "area": 33,
+     "beds": 1,
+     "code": "1BM5",
+     "area": 32.5,
      "from": 4142362
     },
     {
-     "beds": 2,
      "name": "2 спальни",
-     "area_sqm": 60,
-     "price_from_thb": 7990467,
+     "beds": 2,
+     "code": "2BM2",
      "area": 60,
      "from": 7990467
+    },
+    {
+     "name": "Пентхаус · 1 сп.",
+     "beds": 1,
+     "code": "1BM3",
+     "area": 32.5,
+     "from": 4846826
+    },
+    {
+     "name": "Пентхаус · 2 сп.",
+     "beds": 2,
+     "code": "PH01",
+     "area": 81,
+     "from": 11988000
+    },
+    {
+     "name": "Пентхаус · 3 сп.",
+     "beds": 3,
+     "code": "PH05",
+     "area": 113.5,
+     "from": 16798000
     }
    ]
   },
@@ -904,10 +913,9 @@
    "price_from": 4300000,
    "units": [
     {
-     "beds": 1,
      "name": "1 спальня",
-     "area_sqm": 27,
-     "price_from_thb": 3500000,
+     "beds": 1,
+     "code": null,
      "area": 27,
      "from": 3500000
     }
@@ -945,6 +953,7 @@
     {
      "name": "3 спальни",
      "beds": 3,
+     "code": null,
      "area": 351.61,
      "from": 26530500
     }
@@ -960,26 +969,23 @@
    "price_from": 5147687,
    "units": [
     {
-     "beds": 1,
      "name": "1 спальня",
-     "area_sqm": 34,
-     "price_from_thb": 5069036,
+     "beds": 1,
+     "code": null,
      "area": 34,
      "from": 5069036
     },
     {
-     "beds": 2,
      "name": "2 спальни",
-     "area_sqm": 53,
-     "price_from_thb": 8216863,
+     "beds": 2,
+     "code": null,
      "area": 53,
      "from": 8216863
     },
     {
-     "beds": 3,
      "name": "3 спальни",
-     "area_sqm": 78,
-     "price_from_thb": 14487752,
+     "beds": 3,
+     "code": null,
      "area": 78,
      "from": 14487752
     }

@@ -483,7 +483,12 @@ function unitsOf(o) {
     if (b == null || !t.price_from_thb) continue;
     if (!priceByBeds[b] || t.price_from_thb < priceByBeds[b]) priceByBeds[b] = t.price_from_thb;
   }
-  if (named.length) {
+  /* «1 спальня», «2 спальни» — это не тип, а просто число комнат: такие записи
+     ничего не добавляют к прайсу, зато лишают карточку кода типа и чертежа.
+     Если в прайсе есть тиры, показываем их. */
+  const generic = named.length && named.every(u =>
+    /^(студия|\d+\s*(спальн|bedroom))/i.test(String(u.name || '').trim()));
+  if (named.length && !(generic && tiers.length)) {
     // Цену «от» из прайса подставляем только там, где планировка с таким числом
     // спален одна. Иначе AURA, SELENE и MYRRHA получали одинаковый ценник —
     // это цена группы «3 спальни», а не конкретного типа.
@@ -495,19 +500,26 @@ function unitsOf(o) {
     });
   }
   if (!tiers.length) return null;
+  /* пентхаус — отдельная полка, а не «2 спальни»: у Katabello так выходило, что
+     двухспальная стоила дороже трёхспальной, потому что это были пентхаусы */
   const byBeds = new Map();
   for (const t of tiers) {
     const b = t.bedrooms;
     if (b == null) continue;
-    const cur = byBeds.get(b);
-    if (!cur || (t.price_from_thb && t.price_from_thb < cur.price_from_thb)) byBeds.set(b, t);
+    const key = (t.kind === 'penthouse' ? 'ph' : 'flat') + ':' + b;
+    const cur = byBeds.get(key);
+    if (!cur || (t.price_from_thb && t.price_from_thb < cur.price_from_thb)) byBeds.set(key, t);
   }
-  return [...byBeds.entries()].sort((a, c) => a[0] - c[0]).map(([b, t]) => ({
-    name: b === 0 ? 'Студия' : b + (b === 1 ? ' спальня' : b < 5 ? ' спальни' : ' спален'),
-    beds: b,
-    area: t.area_sqm || null,
-    from: t.price_from_thb || null,
-  }));
+  const word = b => b === 0 ? 'Студия' : b + (b === 1 ? ' спальня' : b < 5 ? ' спальни' : ' спален');
+  return [...byBeds.values()]
+    .sort((a, c) => (a.kind === 'penthouse') - (c.kind === 'penthouse') || a.bedrooms - c.bedrooms)
+    .map(t => ({
+      name: t.name || word(t.bedrooms),
+      beds: t.bedrooms,
+      code: t.code || null,          // по коду типа встаёт чертёж застройщика
+      area: t.area_sqm || null,
+      from: t.price_from_thb || null,
+    }));
 }
 
 /* ===== ЧЕТЫРЕ ГРУППЫ ПРОДАЖИ =====
@@ -1149,16 +1161,27 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
       /plan|план|unit|тип/i.test(String(g.key || '') + ' ' + String(g.name || '')) &&
       !/master|мастер|siteplan|генплан/i.test(String(g.key || '') + ' ' + String(g.name || '')))
     .flatMap(g => g.urls.filter(u => typeof u === 'string'));
-  /* 🔴 16.09: попытка привязать чертёж к типу по имени файла дала ошибку — в хранилище
-     имена обезличены, и к «1 спальня 35,8 м²» встал чертёж «1 BEDROOM 49 SQ.M.».
-     Пока застройщик не даёт разметку, чертежи показываем отдельной сеткой под типами. */
+  /* 16.09 Эльнур: «сохраняй имена чертежей и свяжи их с типами». Имена теперь не
+     обезличиваются при заливке (tools/photos.py), а в прайсе у каждого типа есть код
+     («L2C», «SA», «1BM»). Чертёж встаёт рядом со своей ценой только при точном
+     совпадении кода — угадывать по числу спален больше не пробуем. */
+  const planFor = (u) => {
+    const code = String(u.code || '').toUpperCase();
+    if (!code) return null;
+    const rx = new RegExp('(^|[^A-Z0-9])' + code.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '([^A-Z0-9]|$)', 'i');
+    return planShots.find(p => rx.test(decodeURIComponent((p.split('/').pop() || '').replace(/-[0-9a-f]{8}\.[a-z]+$/i, '')))) || null;
+  };
   const money0 = v => new Intl.NumberFormat('ru-RU').format(Math.round(v)) + ' ฿';
   const unitsBlock = unitList.length
     ? '<section class="desc"><h2>Планировки и цены</h2><div class="units">' +
       unitList.map(u => {
+        const shot = planFor(u);
         const line = [u.area ? (u.area + ' м²') : '', (u.beds != null ? u.beds + ' сп.' : ''), u.plot ? ('участок ' + u.plot) : '']
           .filter(Boolean).join(' · ');
         return '<div class="unitc">' +
+          (shot ? '<a class="uplan" href="' + htmlEsc(thumbUrl(shot, 1600, 82)) + '" target="_blank" rel="noopener">' +
+                  '<img src="' + htmlEsc(thumbUrl(shot, 520, 74)) + '" alt="Планировка ' + htmlEsc(u.name || '') +
+                  '" loading="lazy" decoding="async"></a>' : '') +
           '<b>' + htmlEsc(u.name || 'Тип') + '</b>' +
           (line ? '<span>' + htmlEsc(line) + '</span>' : '') +
           (u.from ? '<u>от ' + money0(u.from) + '</u>' : '<u class="req">цена по запросу</u>') +
@@ -1460,7 +1483,9 @@ a{color:inherit}
 .wrap{max-width:920px;margin:0 auto;padding:0 20px}
 header.top{padding:18px 0;border-bottom:1px solid var(--line)}
 .brand{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:600;letter-spacing:.02em;color:var(--ink)}
-.brand img{display:block;border-radius:6px}
+/* знак бренда не квадратный: жёсткая высота 24px его сплющивала (Эльнур 16.09:
+   «по этой ссылке лого обрезан»). Ширину задаём, высоту считает браузер. */
+.brand img{display:block;width:26px;height:auto;border-radius:6px}
 .brand small{color:var(--muted);font-weight:400}
 .hero{position:relative;border-radius:var(--r);overflow:hidden;margin:24px 0;border:1px solid var(--line);background:var(--card)}
 .hero img{display:block;width:100%;height:auto;max-height:520px;object-fit:cover}
@@ -1530,7 +1555,7 @@ footer a{color:var(--green-deep);text-decoration:none}
 </style>
 </head>
 <body>
-<header class="top"><div class="wrap"><a class="brand" href="../" aria-label="Property Library — на главную"><img id="brandMark" src="../img/brand/plp-mark-ink.png" alt="" width="24" height="24">Property Library Phuket <small>· недвижимость на Пхукете</small></a></div></header>
+<header class="top"><div class="wrap"><a class="brand" href="../" aria-label="Property Library — на главную"><img id="brandMark" src="../img/brand/plp-mark-ink.png" alt="" width="26">Property Library Phuket <small>· недвижимость на Пхукете</small></a></div></header>
 <script>(function(){var i=document.getElementById('brandMark');if(!i)return;
 var d=document.documentElement.getAttribute('data-theme');
 var dark = d==='dark' || (d!=='light' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);

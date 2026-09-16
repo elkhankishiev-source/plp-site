@@ -280,7 +280,11 @@ def main():
             small, forced = shrink(data)
             ext = '.jpg' if forced else p.suffix.lower().replace('.jpeg', '.jpg')
             mime = forced or (mimetypes.guess_type(p.name)[0] or 'image/jpeg')
-            key = 'objects/%s/%s/%s%s' % (pid, k, h, ext)
+            # 16.09 Эльнур: «сохраняй имена чертежей и свяжи их с типами». Имя файла у
+            # застройщика несёт тип и метраж («TYPE_A2_1_BED_31.2SQM.jpg») — раньше оно
+            # терялось, оставался хэш, и планировку не с чем было связать.
+            stem = re.sub(r'[^A-Za-z0-9._-]+', '-', p.stem)[:70].strip('-') or h
+            key = 'objects/%s/%s/%s-%s%s' % (pid, k, stem, h[:8], ext)
             if st.exists(key):
                 url = st.url + '/storage/v1/object/public/' + BUCKET + '/' + key
             else:

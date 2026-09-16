@@ -156,7 +156,16 @@ def parse_units(path):
             bare = [v for k, v in nums if k < pk and float(v).is_integer() and 1 <= v <= 6]
             if bare:
                 beds = int(bare[-1])
-        out.append({'status': r['status'], 'price': int(price), 'area': area, 'beds': beds})
+        ph = bool(re.search(r'\bPH\b|\bPH-|penthouse|пентхаус', ' '.join(head), re.I))
+        # код типа сразу за номером квартиры: D405 → XLC. Им подписаны чертежи застройщика.
+        code = None
+        for i, c in enumerate(head[:4]):
+            if re.fullmatch(r'[A-Z]{1,3}-?\d{3,4}[A-Z]?', c):
+                nxt = head[i + 1] if i + 1 < len(head) else ''
+                if re.fullmatch(r'[A-Z0-9][A-Z0-9.\-]{1,7}', nxt) and not re.fullmatch(r'\d+([.,]\d+)?', nxt):
+                    code = nxt
+                break
+        out.append({'status': r['status'], 'price': int(price), 'area': area, 'beds': beds, 'ph': ph, 'code': code})
     col = parse_columns(path)          # второй способ: строки по координатам слов
     av = lambda x: sum(1 for r in x if r['status'] == 'available')
     # 🔴 16.09: у Vibe столбец статуса идёт ПОСЛЕ цены, и разбор по ячейкам приписывал
@@ -237,7 +246,21 @@ def parse_columns(path):
                  or re.search(r'(\d)\s*bed', line, re.I)
                  or re.search(r'\b(\d)\s*BR\b', line))
             st = 'sold' if re.search(r'\bsold|reserved\b', line, re.I) else 'available'
-            out.append({'status': st, 'price': int(price), 'area': area,
+            # 🔴 16.09 Эльнур: «у Katabello 2 спальни 121 м² за 17 млн, а 3 спальни за 12 —
+            # таких квартир там нет». Это были пентхаусы: они попадали в обычные полки
+            # по числу спален и ломали и площадь, и цену. Помечаем их отдельно.
+            ph = bool(re.search(r'\bPH\b|\bPH-|penthouse|пентхаус', line, re.I))
+            # код типа («L2C», «S1A», «1BL») — им подписаны чертежи у застройщика,
+            # по нему планировка на сайте встаёт рядом со своей ценой
+            code = None
+            toks = [t for _, t in sorted(rows[key])]
+            for i, t in enumerate(toks):
+                if re.fullmatch(r'[A-Z]{1,3}-?\d{3,4}[A-Z]?', t):        # номер квартиры
+                    nxt = toks[i + 1] if i + 1 < len(toks) else ''
+                    if re.fullmatch(r'[A-Z0-9][A-Z0-9.\-]{1,7}', nxt) and not re.fullmatch(r'\d+([.,]\d+)?', nxt):
+                        code = nxt
+                    break
+            out.append({'status': st, 'price': int(price), 'area': area, 'ph': ph, 'code': code,
                         'beds': int(m.group(1)) if m else None})
     return out
 
@@ -338,10 +361,17 @@ def summarize(u, pid=None):
     tiers, byb = [], {}
     for x in av:
         if x['beds']:
-            byb.setdefault(x['beds'], []).append(x)
-    for b in sorted(byb):
-        m = min(byb[b], key=lambda x: x['price'])
-        tiers.append({'bedrooms': b, 'area_sqm': m['area'], 'price_from_thb': m['price']})
+            byb.setdefault((bool(x.get('ph')), x['beds']), []).append(x)
+    for key in sorted(byb, key=lambda k: (k[0], k[1])):
+        ph, b = key
+        m = min(byb[key], key=lambda x: x['price'])
+        row = {'bedrooms': b, 'area_sqm': m['area'], 'price_from_thb': m['price']}
+        if m.get('code'):
+            row['code'] = m['code']
+        if ph:
+            row['name'] = 'Пентхаус · %d сп.' % b
+            row['kind'] = 'penthouse'
+        tiers.append(row)
     return {'from': min(x['price'] for x in av), 'to': max(x['price'] for x in av),
             'avail': len(av), 'sold_rows': len(u) - len(av), 'tiers': tiers}
 

@@ -316,3 +316,6 @@ body{background:var(--bg)}
 .mnav .mswch a,.mnav .mswch b{display:block;padding:7px 16px;border-radius:999px;text-decoration:none;
   font-size:.88rem;font-weight:600;color:rgba(255,255,255,.78)}
 .mnav .mswch b{background:var(--green);color:var(--on-green)}
+
+/* знак бренда не квадратный — высоту всегда считает браузер, иначе он сплющивается */
+.logo .chip img,.brand img,.av img,.fab .av img{height:auto!important;object-fit:contain}
