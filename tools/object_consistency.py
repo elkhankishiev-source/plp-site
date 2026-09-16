@@ -112,9 +112,18 @@ def quarters_in(text):
     return q
 
 
+# 16.09: в одном проекте бывают две линейки — виллы и коммерция (Casa de Monte).
+# Предложение про коммерцию говорит о СВОЁМ метраже и своей цене: это не спор с полями.
+OTHER_LINE = re.compile(r'коммерч|commercial|торгов\w*\s+помещ|офисн\w*|shophouse', re.I)
+
+
 def check(o):
     bad = []
-    txt = ' '.join([str(o.get('usp') or ''), str(o.get('usp_en') or '')])
+    parts = [str(o.get('usp') or ''), str(o.get('usp_en') or '')]
+    keep = []
+    for part in parts:
+        keep.append(' '.join(s for s in re.split(r'(?<=[.;])\s+', part) if not OTHER_LINE.search(s)))
+    txt = ' '.join(keep)
     if not txt.strip():
         return bad
     pid = o['plp_property_id']

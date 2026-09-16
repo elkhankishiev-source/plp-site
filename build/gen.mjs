@@ -565,7 +565,7 @@ function saleGroup(o) {
   return '';
 }
 
-const GROUP_RU = { presale:'старт продаж', construction:'строится', ready:'готово к заезду', resale:'вторичка' };
+const GROUP_RU = { presale:'старт продаж', construction:'строится', ready:'готово к заезду', resale:'перепродажа' };
 const GROUP_EN = { presale:'Pre-sale', construction:'Under construction', ready:'Ready to move in', resale:'Resale' };
 
 /* Анонс — та же группа «старт продаж», но продажи ещё не открыты: это уточнение
@@ -1360,7 +1360,11 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
     { k: 'Сдача', v: dl.ru },
     // 16.09: стадия — одной функцией saleGroup на весь сайт, иначе страница
     // объекта и карточка спорят между собой («старт продаж» против «в продаже»)
-    { k: 'Стадия', v: soldOut ? 'распродано — по запросу' : (GROUP_RU[saleGroup(o)] || '') },
+    { k: 'Стадия', v: soldOut ? 'распродано у застройщика' :
+        (saleGroup(o) === 'resale'
+          ? (String(o.stage || '') === 'Ready' || (o.handover_date && new Date(o.handover_date) < new Date())
+             ? 'вторичка' : 'переуступка')
+          : (GROUP_RU[saleGroup(o)] || '')) },
     /* 🔴 10.09 Эльнур: «зашёл на карточку, а там доходность 7% до вычета расходов,
    мы такое не согласовывали». Показывали o.roi — цифру из буклета застройщика,
    да ещё с пометкой про расходы. Теперь одна цифра на всю карточку: ориентир

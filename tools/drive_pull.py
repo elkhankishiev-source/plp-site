@@ -334,6 +334,9 @@ def price_from_drive(pid, link, tok, apply=False):
         print('     свободно %d, от %s до %s' % (s2['avail'], money(s2['from']), money(s2['to'])))
         for t in s2['tiers']:
             print('       %s сп. · %s м² · от %s' % (t['bedrooms'], t['area_sqm'], money(t['price_from_thb'])))
+        if apply and TP.RULES.get(pid, {}).get('manual'):
+            print('     ⌁ цена ведётся руками: %s' % TP.RULES[pid].get('why', '')[:90])
+            return s2
         if apply:
             # предохранитель: в папке застройщика лежат прайсы соседних проектов
             # (у Panora — виллы и кондо в одной папке). Резкое расхождение с текущей

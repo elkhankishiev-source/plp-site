@@ -19,7 +19,7 @@
     python3 tools/tg_prices.py PLP-CORALINA    # один объект
     python3 tools/tg_prices.py --apply         # записать в public.objects
 """
-import asyncio, json, os, re, sys, urllib.request, urllib.parse, urllib.error, datetime
+import asyncio, json, os, re, sys, unicodedata, urllib.request, urllib.parse, urllib.error, datetime
 
 ENV = os.path.expanduser('~/.plp_site_supabase.env')
 CREDS = os.path.expanduser('~/.tg_creds.json')
@@ -36,7 +36,15 @@ ALIAS = {
     'PLP-ZERO-BANGTAO': 'The Zero Bang Tao', 'PLP-ZERO-NAIYANG': 'The Zero Bang Tao',
     'PLP-SUNHILLS-LAYAN': 'Sun Hills Lakeside', 'PLP-VIBE-KARON': 'VIBE', 'PLP-FANTASY-RAWAI': 'Fantasea',
     'PLP-AYANA': 'AYANA Phuket', 'PLP-MANOR': None, 'PLP-STANDARD': None,
+    'PLP-VIBE-KARON': 'VIBE_RESIDENCE',
 }
+
+def plain(name):
+    """Название канала стилизованными буквами (𝐕𝐈𝐁𝐄_𝐑𝐄𝐒𝐈𝐃𝐄𝐍𝐂𝐄) не совпадало ни с чем:
+    для машины это другие символы. Приводим к обычным буквам перед сравнением."""
+    s = unicodedata.normalize('NFKD', str(name or ''))
+    return ''.join(c for c in s if not unicodedata.combining(c)).lower()
+
 STAT = re.compile(r'^(available|sold|reserved|booked|hold|sold out)$', re.I)
 BEDRX = [(r'(\d)\s*beds?\b', None), (r'three\s*bedroom|3\s*bedroom', 3),
          (r'two\s*bedroom|2\s*bedroom', 2), (r'one\s*bedroom|1\s*bedroom|studio', 1)]
@@ -149,8 +157,29 @@ def parse_units(path):
             if bare:
                 beds = int(bare[-1])
         out.append({'status': r['status'], 'price': int(price), 'area': area, 'beds': beds})
-    if not out:
-        out = parse_columns(path)      # прайс без столбца статуса — читаем колонками
+    col = parse_columns(path)          # второй способ: строки по координатам слов
+    av = lambda x: sum(1 for r in x if r['status'] == 'available')
+    # 🔴 16.09: у Vibe столбец статуса идёт ПОСЛЕ цены, и разбор по ячейкам приписывал
+    # статус соседней строке: 8 свободных вместо 23. В шапке прайса обычно написано,
+    # сколько свободно — по ней и выбираем, какой разбор верен.
+    hint = None
+    try:
+        import fitz
+        head = fitz.open(path)[0].get_text()[:400]
+        m = re.search(r'(\d{1,4})\s*(?:units?\s*)?(?:-|—|:)?\s*(\d{1,4})\s*available', head, re.I)
+        if m:
+            hint = int(m.group(2))
+        else:
+            m = re.search(r'available\D{0,10}(\d{1,4})', head, re.I)
+            hint = int(m.group(1)) if m else None
+    except Exception:
+        pass
+    if hint:
+        if abs(av(col) - hint) < abs(av(out) - hint):
+            return col
+        return out
+    if not out or av(col) > av(out):
+        return col
     return out
 
 
@@ -171,7 +200,7 @@ def parse_columns(path):
         for key in sorted(rows):
             cells = [t for _, t in sorted(rows[key])]
             line = ' '.join(cells)
-            if not re.search(r'\b[A-Z]{1,2}\d{3,4}[A-Z]?\b', line): continue
+            if not re.search(r'\b[A-Z]{1,3}[- ]?\d{2,4}[A-Z]?\b', line): continue
             nums = []
             for c in cells:
                 cc = c.replace(',', '').replace(' ', '')
@@ -238,7 +267,8 @@ async def collect(objs, known=None):
         # 16.09: канал объекта записан в реестре источников — берём его, а не угадываем
         uname = known.get(pid)
         if uname:
-            hit = next((d for d in dialogs if str(getattr(d.entity, 'username', '') or '').lower() == uname), None)
+            hit = next((d for d in dialogs if str(getattr(d.entity, 'username', '') or '').lower() == uname
+                        or plain(d.name) == uname), None)
             if hit:
                 res[pid] = await one_channel(cl, hit, pid)
                 continue
@@ -253,7 +283,7 @@ async def collect(objs, known=None):
         key = [w for w in words if w not in STOP] or words
         best, score = None, 0
         for d in dialogs:
-            nm = (d.name or '').lower()
+            nm = plain(d.name)
             sc = sum(1 for w in key if w in nm) * 2 + sum(1 for w in words if w in nm)
             if sc > score and key[0] in nm:   # первое слово — имя проекта, по нему и опознаём
                 best, score = d, sc
@@ -330,7 +360,15 @@ def main():
         print('%-20s %-24s прайс %s: свободно %-4d от %s (было %s) %s' % (
             pid, e['channel'][:24], e.get('as_of', '?'), s['avail'], money(s['from']),
             money(old) if old else '—', mark))
-        if APPLY and (mark == '≠' or FORCE):
+        # предохранитель: правку больше четверти цены руками не подтверждали — не пишем.
+        # Так в карточку не уедет прайс соседнего проекта из той же папки или канала.
+        if RULES.get(pid, {}).get('manual'):
+            print('     ⌁ цена ведётся руками: %s' % RULES[pid].get('why', '')[:90])
+            continue
+        big = old and abs(s['from'] - old) > old * 0.25
+        if big and not FORCE:
+            print('     ⚠ расхождение больше четверти — не записываю, нужно подтверждение')
+        if APPLY and (mark == '≠' or FORCE) and not (big and not FORCE):
             patch(env, pid, {'price_from_thb': s['from'], 'price_to_thb': s['to'],
                              'price_tiers': s['tiers'], 'availability': 'свободно %d' % s['avail'],
                              'last_synced_at': datetime.datetime.utcnow().isoformat() + 'Z'})
