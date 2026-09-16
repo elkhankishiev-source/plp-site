@@ -128,11 +128,18 @@ header.top{padding:18px 0;border-bottom:1px solid var(--line)}
 .shots button{flex:0 0 96px;height:68px;padding:0;border:2px solid transparent;border-radius:10px;overflow:hidden;background:#eceadf;cursor:pointer}
 .shots button.on{border-color:var(--green-deep)}
 .shots img{width:100%;height:100%;object-fit:cover;display:block}
-.units{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-.unitc{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:10px 13px;min-width:150px}
-.unitc b{display:block;font-size:14px}
-.unitc span{display:block;font-size:12px;color:var(--muted);margin-top:2px}
-.unitc u{display:block;text-decoration:none;font-weight:700;font-size:13px;margin-top:3px}
+/* планировка и её цена — одной карточкой: чертёж, тип, метраж, цена «от» */
+.units{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin-top:12px}
+.unitc{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column}
+.unitc .uplan{display:block;margin:-2px -4px 9px;border-radius:10px;overflow:hidden;background:var(--paper)}
+.unitc .uplan img{width:100%;height:150px;object-fit:contain;display:block;background:var(--paper)}
+.unitc b{display:block;font-size:14.5px}
+.unitc span{display:block;font-size:12.5px;color:var(--muted);margin-top:3px}
+.unitc u{display:block;text-decoration:none;font-weight:700;font-size:14px;margin-top:auto;padding-top:7px}
+.unitc u.req{font-weight:600;color:var(--muted)}
+.unitc small{display:block;font-size:11.5px;color:var(--muted);margin-top:4px;line-height:1.35}
+@media(max-width:560px){.units{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:9px}
+  .unitc{padding:10px 11px}.unitc .uplan img{height:120px}}
 .prgs{display:flex;gap:8px;overflow-x:auto;margin-top:10px;padding-bottom:6px}
 .prg-l{margin:0 0 6px;padding-left:18px;color:var(--ink)}
 .prg-l li{margin:3px 0}
@@ -157,6 +164,7 @@ section.desc h2{font-size:18px;margin:0 0 10px;color:var(--ink)}
 section.desc p{color:var(--text);opacity:.94;white-space:pre-line}
 .sub-h{font-size:14px;color:var(--muted);font-weight:600;margin:16px 0 8px}
 .grid-shots{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.grid-shots.plans img{object-fit:contain;background:var(--paper);height:150px;padding:4px}
 .grid-shots img{width:100%;height:120px;object-fit:cover;border-radius:11px;display:block;background:#eceadf}
 .tags{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
 .tags span{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:13px}
@@ -217,7 +225,7 @@ if(dark) i.src='../img/brand/plp-mark-white.png';})();</script>
     <button type="button" class="btn ghost" id="shareBtn">Поделиться</button>
     <a class="btn wa" href="https://wa.me/66955492587?text=The%20GENS%20by%20Botanica%2C%20%D1%83%20Blue%20Tree%20%E2%80%94%20%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D0%B5%D1%81%D1%83%D0%B5%D1%82%20%D1%8D%D1%82%D0%BE%D1%82%20%D0%BE%D0%B1%D1%8A%D0%B5%D0%BA%D1%82.%20https%3A%2F%2Fproperty-library.com%2Fobject%2Fgens-botanica" rel="noopener" target="_blank">WhatsApp</a>
   </div>
-  <section class="desc"><h2>Похожие объекты</h2><div class="simi"><a class="simi-c" href="modeva"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/01.jpg?width=520&amp;resize=contain&amp;quality=72" alt="" loading="lazy" decoding="async"><b>The Modeva Bang-Tao</b><span>Банг Тао · строится · от 4 750 200 ฿</span></a><a class="simi-c" href="zero-bangtao"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-ZERO-BANGTAO/exterior/c89b25feead6ed06.jpg?width=520&amp;resize=contain&amp;quality=72" alt="" loading="lazy" decoding="async"><b>The ZERO Bang Tao</b><span>Банг Тао · строится · от 5 147 687 ฿</span></a><a class="simi-c" href="heritage"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-HERITAGE/01.jpg?width=520&amp;resize=contain&amp;quality=72" alt="" loading="lazy" decoding="async"><b>The Title Heritage Bang-Tao</b><span>Банг Тао · готово к заезду · от 5 588 573 ฿</span></a></div></section>
+  <section class="desc"><h2>Похожие объекты</h2><div class="simi"><a class="simi-c" href="modeva"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-MODEVA/exterior/63427c5c6f817c70.jpg?width=520&amp;resize=contain&amp;quality=72" alt="" loading="lazy" decoding="async"><b>The Modeva Bang-Tao</b><span>Банг Тао · строится · от 4 750 200 ฿</span></a><a class="simi-c" href="zero-bangtao"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-ZERO-BANGTAO/exterior/c89b25feead6ed06.jpg?width=520&amp;resize=contain&amp;quality=72" alt="" loading="lazy" decoding="async"><b>The ZERO Bang Tao</b><span>Банг Тао · строится · от 5 147 687 ฿</span></a><a class="simi-c" href="heritage"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-HERITAGE/01.jpg?width=520&amp;resize=contain&amp;quality=72" alt="" loading="lazy" decoding="async"><b>The Title Heritage Bang-Tao</b><span>Банг Тао · готово к заезду · от 5 588 573 ฿</span></a></div></section>
 </main>
 <script>
 /* «Поделиться»: на телефоне системное меню, на компьютере ссылка в буфер */
