@@ -74,6 +74,20 @@ def money_in(text):
 
 HAND_NEAR = r'(?:сдач\w*|сда[её]тся|сдан\w*|заверш\w*|готовност\w*|ввод\w*|handover|completion|ready|delivery)'
 
+# 16.09: в одном предложении живут две даты — «строительство началось в июле 2025,
+# завершение — декабрь 2026». Сторож брал первую и пять раз кричал на верные карточки.
+# Кусок про НАЧАЛО стройки вырезаем: срок сдачи ищем только в остатке.
+START_RE = re.compile(
+    r'(?:строительств\w*|стройк\w*|construction)[^.;]{0,25}?'
+    r'(?:начал\w*|стартовал\w*|started|began|start)\w*[^.;,]{0,45}|'
+    r'\bconstruction\s+(?:[a-z\u0430-\u044f]{3,10}\.?\s+)?20[2-3]\d\s*(?:\u2192|->|-|\u2014)',
+    re.I)
+
+
+def handover_text(text):
+    """Текст без упоминаний о начале стройки — в нём ищем срок сдачи."""
+    return START_RE.sub(' ', text)
+
 
 def years_in(text):
     """Год сдачи — только рядом со словами о сдаче: иначе год награды или основания
@@ -107,10 +121,11 @@ def check(o):
     hd = (o.get('handover_date') or '')[:10]
     if hd:
         y, m = int(hd[:4]), int(hd[5:7] or 1)
-        ys = years_in(txt)
+        htxt = handover_text(txt)
+        ys = years_in(htxt)
         if ys and y not in ys and all(abs(v - y) >= 1 for v in ys):
             bad.append((pid, 'срок сдачи', 'в полях %s' % hd, 'в описании %s' % ', '.join(map(str, sorted(ys)))))
-        qs = quarters_in(txt)
+        qs = quarters_in(htxt)
         qf = (m - 1) // 3 + 1
         if qs and qf not in qs and (not ys or y in ys):
             bad.append((pid, 'квартал сдачи', 'в полях %dQ %d' % (qf, y), 'в описании %s' % ', '.join('%dQ' % x for x in sorted(qs))))

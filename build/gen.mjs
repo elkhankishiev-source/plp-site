@@ -513,6 +513,8 @@ function unitsOf(o) {
    старта в базе нет, и объект молча уезжал в «в продаже» — так вся группа
    «старт продаж» и пропала с витрины. Слово выбираем по стадии из базы,
    а спор стадии с датой сдачи разбираем ниже и печатаем при сборке. */
+const warned = new Set();
+function warnOnce(id, msg) { if (warned.has(id)) return; warned.add(id); console.error(msg); }
 function saleGroup(o) {
   const st = String(o.stage || '').toLowerCase();
   const isPre = /pre-?sale|presale|старт|анонс|announced/.test(st);
@@ -529,12 +531,12 @@ function saleGroup(o) {
     if (!isNaN(hd)) {
       const days = Math.round((hd - new Date()) / 86400000);
       if (days < 0 && (isPre || isBuild)) {
-        console.error('[gen] ⚠ ' + o.plp_property_id + ': стадия «' + o.stage +
+        warnOnce(o.plp_property_id, '[gen] ⚠ ' + o.plp_property_id + ': стадия «' + o.stage +
           '», а сдача была ' + String(o.handover_date).slice(0, 10) + ' — показываю «готово к заезду»');
         return 'ready';
       }
       if (days >= 0 && days <= 365 && isPre) {
-        console.error('[gen] ⚠ ' + o.plp_property_id + ': стадия «' + o.stage +
+        warnOnce(o.plp_property_id, '[gen] ⚠ ' + o.plp_property_id + ': стадия «' + o.stage +
           '», а до сдачи ' + days + ' дн. — показываю «строится»');
         return 'construction';
       }
