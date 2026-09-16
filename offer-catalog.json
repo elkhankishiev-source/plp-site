@@ -723,7 +723,7 @@
    "name": "The Title Sierra",
    "district": "Банг Тао",
    "type": "Кондо",
-   "price_from": 2906700,
+   "price_from": 4700000,
    "units": [
     {
      "beds": 1,
@@ -920,7 +920,7 @@
    "name": "The Title VIVI, Банг Тао — 3 этаж",
    "district": "Банг Тао",
    "type": "Кондо",
-   "price_from": null,
+   "price_from": 4300000,
    "units": []
   },
   {
@@ -930,7 +930,7 @@
    "name": "The Title VIVI, Банг Тао — 5 этаж",
    "district": "Банг Тао",
    "type": "Кондо",
-   "price_from": null,
+   "price_from": 4300000,
    "units": []
   },
   {

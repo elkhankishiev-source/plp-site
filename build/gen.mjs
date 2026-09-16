@@ -1140,13 +1140,41 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
         '<img src="' + htmlEsc(u) + '" alt="" loading="lazy" decoding="async"></button>').join('') + '</div>'
     : '';
   const unitList = unitsOf(o) || [];
+  /* 16.09 Эльнур: «карточка должна нести максимум пользы: чтобы можно было прогреться
+     и выбрать, какая именно планировка нужна и в какую она стоимость». Поэтому тип
+     жилья, его площадь, число спален, цена «от» и сам чертёж стоят рядом, а не в
+     двух разных блоках на разных концах страницы. */
+  const planShots = (Array.isArray(o.photo_groups) ? o.photo_groups : [])
+    .filter(g => g && Array.isArray(g.urls) &&
+      /plan|план|unit|тип/i.test(String(g.key || '') + ' ' + String(g.name || '')) &&
+      !/master|мастер|siteplan|генплан/i.test(String(g.key || '') + ' ' + String(g.name || '')))
+    .flatMap(g => g.urls.filter(u => typeof u === 'string'));
+  /* 🔴 16.09: попытка привязать чертёж к типу по имени файла дала ошибку — в хранилище
+     имена обезличены, и к «1 спальня 35,8 м²» встал чертёж «1 BEDROOM 49 SQ.M.».
+     Пока застройщик не даёт разметку, чертежи показываем отдельной сеткой под типами. */
+  const money0 = v => new Intl.NumberFormat('ru-RU').format(Math.round(v)) + ' ฿';
   const unitsBlock = unitList.length
-    ? '<section class="desc"><h2>Что можно купить</h2><div class="units">' +
-      unitList.map(u => '<div class="unitc"><b>' + htmlEsc(u.name || 'Тип') + '</b>' +
-        '<span>' + [u.area ? ('от ' + u.area + ' м²') : '', (u.beds != null ? u.beds + ' сп.' : '')].filter(Boolean).join(' · ') + '</span>' +
-        (u.from ? '<u>от ' + new Intl.NumberFormat('ru-RU').format(u.from) + ' ฿</u>' : '') + '</div>').join('') +
-      '</div></section>'
-    : '';
+    ? '<section class="desc"><h2>Планировки и цены</h2><div class="units">' +
+      unitList.map(u => {
+        const line = [u.area ? (u.area + ' м²') : '', (u.beds != null ? u.beds + ' сп.' : ''), u.plot ? ('участок ' + u.plot) : '']
+          .filter(Boolean).join(' · ');
+        return '<div class="unitc">' +
+          '<b>' + htmlEsc(u.name || 'Тип') + '</b>' +
+          (line ? '<span>' + htmlEsc(line) + '</span>' : '') +
+          (u.from ? '<u>от ' + money0(u.from) + '</u>' : '<u class="req">цена по запросу</u>') +
+          (u.note ? '<small>' + htmlEsc(String(u.note).slice(0, 90)) + '</small>' : '') +
+          '</div>';
+      }).join('') +
+      '</div>' +
+      (planShots.length ? '<h3 class="sub-h">Чертежи планировок</h3>' +
+         shotGrid(planShots).replace('grid-shots', 'grid-shots plans') : '') +
+      (priceTHB ? '<p class="fine">Цены по прайсу застройщика на дату сверки, за свободные юниты.</p>' : '') +
+      '</section>'
+    : (planShots.length
+        ? '<section class="desc"><h2>Планировки</h2>' + shotGrid(planShots).replace('grid-shots', 'grid-shots plans') +
+          '<p class="fine">Нажмите на чертёж, чтобы открыть крупно.</p></section>'
+        : '');
+
   /* Распроданный проект остаётся на витрине: цену из прайса, которого уже нет,
      не показываем — предлагаем поискать юнит на вторичном рынке. */
   const soldOut = String(o.stage || '') === 'Sold out';
@@ -1246,14 +1274,19 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
      район и похожие объекты. Ничего не выдумываем: нет данных — блока нет. */
   const groupsAll = Array.isArray(o.photo_groups) ? o.photo_groups.filter(g => Array.isArray(g.urls) && g.urls.length) : [];
   const groupBy = re => groupsAll.filter(g => re.test(String(g.key || '') + ' ' + String(g.name || '')));
-  const shotGrid = (urls, w) => '<div class="grid-shots">' + urls.slice(0, 8).map(u =>
+  /* объявление функцией, а не стрелкой: сетку кадров зовёт блок планировок,
+     который стоит выше по коду */
+  function shotGrid(urls, w) {
+    return '<div class="grid-shots">' + urls.slice(0, 8).map(u =>
       '<a href="' + htmlEsc(thumbUrl(u, 1600, 82)) + '" target="_blank" rel="noopener">' +
       '<img src="' + htmlEsc(thumbUrl(u, w || 620, 74)) + '" alt="" loading="lazy" decoding="async"></a>').join('') + '</div>';
+  }
 
-  const planGroups = groupBy(/plan|план|master|мастер|floor|unit/i);
-  const plansBlock = planGroups.length
-    ? '<section class="desc"><h2>Планировки и мастер-план</h2>' +
-      planGroups.map(g => '<h3 class="sub-h">' + htmlEsc(g.name || 'Планировки') + '</h3>' + shotGrid(g.urls)).join('') +
+  /* мастер-план — про весь проект, чертежи квартир — рядом с ценой на них */
+  const masterGroups = groupBy(/master|мастер|siteplan|генплан/i);
+  const plansBlock = masterGroups.length
+    ? '<section class="desc"><h2>Мастер-план</h2>' +
+      masterGroups.map(g => shotGrid(g.urls)).join('') +
       '<p class="fine">Нажмите на изображение, чтобы открыть крупно.</p></section>'
     : '';
 
@@ -1437,11 +1470,18 @@ header.top{padding:18px 0;border-bottom:1px solid var(--line)}
 .shots button{flex:0 0 96px;height:68px;padding:0;border:2px solid transparent;border-radius:10px;overflow:hidden;background:#eceadf;cursor:pointer}
 .shots button.on{border-color:var(--green-deep)}
 .shots img{width:100%;height:100%;object-fit:cover;display:block}
-.units{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-.unitc{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:10px 13px;min-width:150px}
-.unitc b{display:block;font-size:14px}
-.unitc span{display:block;font-size:12px;color:var(--muted);margin-top:2px}
-.unitc u{display:block;text-decoration:none;font-weight:700;font-size:13px;margin-top:3px}
+/* планировка и её цена — одной карточкой: чертёж, тип, метраж, цена «от» */
+.units{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin-top:12px}
+.unitc{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column}
+.unitc .uplan{display:block;margin:-2px -4px 9px;border-radius:10px;overflow:hidden;background:var(--paper)}
+.unitc .uplan img{width:100%;height:150px;object-fit:contain;display:block;background:var(--paper)}
+.unitc b{display:block;font-size:14.5px}
+.unitc span{display:block;font-size:12.5px;color:var(--muted);margin-top:3px}
+.unitc u{display:block;text-decoration:none;font-weight:700;font-size:14px;margin-top:auto;padding-top:7px}
+.unitc u.req{font-weight:600;color:var(--muted)}
+.unitc small{display:block;font-size:11.5px;color:var(--muted);margin-top:4px;line-height:1.35}
+@media(max-width:560px){.units{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:9px}
+  .unitc{padding:10px 11px}.unitc .uplan img{height:120px}}
 .prgs{display:flex;gap:8px;overflow-x:auto;margin-top:10px;padding-bottom:6px}
 .prg-l{margin:0 0 6px;padding-left:18px;color:var(--ink)}
 .prg-l li{margin:3px 0}
@@ -1466,6 +1506,7 @@ section.desc h2{font-size:18px;margin:0 0 10px;color:var(--ink)}
 section.desc p{color:var(--text);opacity:.94;white-space:pre-line}
 .sub-h{font-size:14px;color:var(--muted);font-weight:600;margin:16px 0 8px}
 .grid-shots{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.grid-shots.plans img{object-fit:contain;background:var(--paper);height:150px;padding:4px}
 .grid-shots img{width:100%;height:120px;object-fit:cover;border-radius:11px;display:block;background:#eceadf}
 .tags{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
 .tags span{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:13px}
