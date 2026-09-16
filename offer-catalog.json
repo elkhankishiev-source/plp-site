@@ -254,6 +254,16 @@
    "units": []
   },
   {
+   "id": "PLP-EDEN-LAKE",
+   "pub": "PLP-EDEN-LAKE",
+   "url": "https://property-library.com/object/eden-lake",
+   "name": "Eden · Lake Residences",
+   "district": "Банг Тао",
+   "type": "Кондо",
+   "price_from": null,
+   "units": []
+  },
+  {
    "id": "PLP-EDEN-PARK",
    "pub": "PLP-EDEN-PARK",
    "url": "https://property-library.com/object/eden-park",
@@ -299,7 +309,7 @@
    "name": "Ever Prime",
    "district": "Карон",
    "type": "Кондо",
-   "price_from": null,
+   "price_from": 6420000,
    "units": []
   },
   {
@@ -763,7 +773,7 @@
    "name": "Sudara Phuket",
    "district": "Банг Тао",
    "type": "Кондо",
-   "price_from": null,
+   "price_from": 10660000,
    "units": []
   },
   {
