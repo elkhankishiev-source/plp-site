@@ -111,7 +111,7 @@
    "name": "The Title Biancana Surin",
    "district": "Сурин",
    "type": "Кондо",
-   "price_from": 6235950,
+   "price_from": 6115200,
    "units": [
     {
      "beds": 1,
@@ -119,7 +119,7 @@
      "area_sqm": 33,
      "price_from_thb": 6235950,
      "area": 33,
-     "from": 6235950
+     "from": 6115200
     },
     {
      "beds": 2,
@@ -138,7 +138,7 @@
    "name": "The Title Casa De Monte",
    "district": "Ко Кео",
    "type": "Вилла",
-   "price_from": 30276000,
+   "price_from": 11779000,
    "units": [
     {
      "beds": 3,
@@ -154,7 +154,7 @@
      "area_sqm": 424,
      "price_from_thb": 42343000,
      "area": 424,
-     "from": 42343000
+     "from": 12081000
     }
    ]
   },
@@ -205,7 +205,7 @@
    "name": "The Title Coralina Kamala",
    "district": "Камала",
    "type": "Кондо",
-   "price_from": 4767552,
+   "price_from": 4693524,
    "units": [
     {
      "beds": 1,
@@ -213,7 +213,7 @@
      "area_sqm": 31,
      "price_from_thb": 4767552,
      "area": 31,
-     "from": 4767552
+     "from": 4693524
     },
     {
      "beds": 2,
@@ -346,7 +346,7 @@
    "name": "The Title Heritage Bang-Tao",
    "district": "Банг Тао",
    "type": "Кондо",
-   "price_from": 5525730,
+   "price_from": 5588573,
    "units": [
     {
      "beds": 1,
@@ -354,7 +354,7 @@
      "area_sqm": 35.8,
      "price_from_thb": 5525730,
      "area": 35.8,
-     "from": 5525730
+     "from": 5588573
     },
     {
      "beds": 2,
@@ -422,7 +422,7 @@
    "name": "The Title Katabello",
    "district": "Ката",
    "type": "Кондо",
-   "price_from": 4256000,
+   "price_from": 4620000,
    "units": [
     {
      "beds": 1,
@@ -430,7 +430,7 @@
      "area_sqm": 28,
      "price_from_thb": 4256000,
      "area": 28,
-     "from": 4256000
+     "from": 4620000
     },
     {
      "beds": 2,
@@ -503,7 +503,7 @@
    "name": "The Title Legendary Bang-Tao",
    "district": "Банг Тао",
    "type": "Кондо",
-   "price_from": 6679500,
+   "price_from": 6153600,
    "units": [
     {
      "beds": 1,
@@ -511,7 +511,7 @@
      "area_sqm": 42.9,
      "price_from_thb": 6679500,
      "area": 42.9,
-     "from": 6679500
+     "from": 6153600
     },
     {
      "beds": 2,
@@ -825,7 +825,7 @@
    "name": "The Title Vivana Kamala",
    "district": "Камала",
    "type": "Кондо",
-   "price_from": 4232629,
+   "price_from": 4142362,
    "units": [
     {
      "beds": 1,
@@ -833,7 +833,7 @@
      "area_sqm": 33,
      "price_from_thb": 4232629,
      "area": 33,
-     "from": 4232629
+     "from": 4142362
     },
     {
      "beds": 2,

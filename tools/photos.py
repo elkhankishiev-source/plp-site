@@ -81,6 +81,17 @@ def creds():
     key = os.environ.get('SUPABASE_SERVICE_KEY')
     if url and key:
         return url.rstrip('/'), key
+    # 16.09: ключи n8n отвечали 401, и инструмент не работал вовсе. Сначала берём
+    # файл ключей сборки сайта — тот же, что читают все инструменты репозитория.
+    envf = pathlib.Path.home() / '.plp_site_supabase.env'
+    if envf.exists():
+        env = {}
+        for line in envf.read_text().splitlines():
+            if '=' in line and not line.strip().startswith('#'):
+                k, v = line.split('=', 1)
+                env[k.strip()] = v.strip().strip('"').strip("'")
+        if env.get('SUPABASE_URL') and env.get('SUPABASE_SERVICE_KEY'):
+            return env['SUPABASE_URL'].rstrip('/'), env['SUPABASE_SERVICE_KEY']
     diag = pathlib.Path.home() / 'plp_diag.py'
     m = re.search(r'API_KEY = "([^"]+)"', diag.read_text()) if diag.exists() else None
     if not m:
