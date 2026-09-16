@@ -24,6 +24,7 @@
     python3 tools/drive_pull.py PLP-HYTHE --vision     # готовит кадры для чтения глазами
     python3 tools/drive_pull.py PLP-HYTHE --price      # разобрать прайс: «от», «до», тиры
     python3 tools/drive_pull.py PLP-HALO1 --photos     # скачать снимки и планы по видам
+    python3 tools/drive_pull.py PLP-HERITAGE --plans   # только чертежи планировок, с именами
     python3 tools/drive_pull.py PLP-HYTHE --price --apply   # и записать в карточку
 """
 import datetime, json, os, re, sys, urllib.parse, urllib.request, urllib.error
@@ -403,6 +404,71 @@ def photos(pid, link, tok, per_kind=14):
     print('   python3 tools/photos.py %s --id %s' % (base, pid))
 
 
+def plans(pid, link, tok, limit=26):
+    """Чертежи планировок с исходными именами: по ним карточка типа находит свой чертёж
+    (имя вида «Type_L2C.jpg» совпадает с кодом типа из прайса)."""
+    fid = folder_id(link)
+    if not fid:
+        print('  ссылка не похожа на папку Диска'); return 0
+    # 🔴 17.09: чертежи у половины застройщиков лежат PDF-файлами («6. Unit Plan/…pdf»),
+    # а инструмент брал только картинки и отвечал «чертежей нет». Берём и PDF: каждая
+    # страница такого файла — отдельная планировка, сохраняем её кадром.
+    files = [f for f in walk(tok, fid) if not f.get('error')
+             and (str(f.get('mimeType', '')).startswith('image/') or f.get('mimeType') == 'application/pdf')]
+    want = [f for f in files if kind_of(f) == 'unitplan' and
+            not re.search(r'master|мастер|siteplan|генплан', f['path'], re.I)]
+    if not want:
+        print('  чертежей планировок в папке нет'); return 0
+    # приоритет — файлы, в имени которых есть код типа или метраж
+    want.sort(key=lambda f: (0 if re.search(r'unit[_ ]?plan|тип', f['path'], re.I) else 1,
+                             0 if re.search(r'type[_ -]?[A-Z0-9.]{1,6}|\d{2,3}\s?(sq|м²|m2)', f['name'], re.I) else 1,
+                             f['name']))
+    out = os.path.join(CACHE, pid, 'plans_named', 'plans')
+    os.makedirs(out, exist_ok=True)
+    got = 0
+    for f in want:
+        if got >= limit: break
+        safe = re.sub(r'[^A-Za-z0-9._-]+', '_', f['name'])[:60]
+        try:
+            if f.get('mimeType') == 'application/pdf':
+                raw = os.path.join(CACHE, pid, 'plans_pdf_' + safe)
+                os.makedirs(os.path.dirname(raw), exist_ok=True)
+                if not os.path.exists(raw): fetch(tok, f, raw)
+                import fitz
+                doc = fitz.open(raw)
+                stem = re.sub(r'\.pdf$', '', safe, flags=re.I)
+                # у сканированных буклетов текста нет вовсе — тогда не отсеиваем страницы
+                has_text = any(doc[k].get_text().strip() for k in range(min(doc.page_count, 6)))
+                for i in range(doc.page_count):
+                    if got >= limit: break
+                    # титульные страницы буклета — не планировки: у настоящего чертежа
+                    # в тексте есть тип и метраж
+                    txt = doc[i].get_text().lower()
+                    if has_text and doc.page_count > 2 and not re.search(r'sq\.?\s?m|sqm|м²|bedroom|type|тип|план', txt):
+                        continue
+                    # тип и метраж написаны НА чертеже — вносим их в имя файла,
+                    # иначе страницу «Unit_Plan_Part2_03» не с чем связать
+                    label = ''
+                    mt = re.search(r'\b(?:type|тип)\s*[:\-]?\s*([A-Z0-9][A-Z0-9.\-]{0,6})\b', doc[i].get_text(), re.I)
+                    ma = re.search(r'(\d{2,4}(?:[.,]\d{1,2})?)\s*(?:sq\.?\s?m|sqm|м²|m2)', doc[i].get_text(), re.I)
+                    mb = re.search(r'(\d)\s*(?:bedroom|bed\b|спальн)', doc[i].get_text(), re.I)
+                    if mb: label += '_' + mb.group(1) + 'BR'
+                    if mt: label += '_TYPE-' + re.sub(r'[^A-Za-z0-9.\-]', '', mt.group(1))
+                    if ma: label += '_' + str(ma.group(1)).replace(',', '.') + 'SQM'
+                    png = os.path.join(out, '%s_%02d%s.png' % (stem, i + 1, label))
+                    if not os.path.exists(png):
+                        doc[i].get_pixmap(dpi=130).save(png)
+                    got += 1
+            else:
+                dest = os.path.join(out, safe)
+                if not os.path.exists(dest): fetch(tok, f, dest)
+                got += 1
+        except Exception as ex:
+            print('   ✗ %s: %s' % (f['name'][:40], str(ex)[:40]))
+    print('  чертежей скачано: %d → %s' % (got, out))
+    return got
+
+
 def main():
     args = [a for a in sys.argv[1:] if not a.startswith('--')]
     want_files = '--files' in sys.argv
@@ -410,6 +476,7 @@ def main():
     want_vision = '--vision' in sys.argv
     want_price = '--price' in sys.argv
     want_photos = '--photos' in sys.argv
+    want_plans = '--plans' in sys.argv
     do_apply = '--apply' in sys.argv
     if '--url' in sys.argv:
         link = sys.argv[sys.argv.index('--url') + 1]
@@ -427,7 +494,9 @@ def main():
         link, src = link_for(pid)
         if not link:
             print('=' * 78); print('%s · ссылки на папку нет ни в реестре, ни в карточке' % pid); continue
-        if want_photos:
+        if want_plans:
+            print('=' * 78); print('%s · %s' % (pid, link)); plans(pid, link, tok)
+        elif want_photos:
             print('=' * 78); print('%s · %s' % (pid, link)); photos(pid, link, tok)
         elif want_price:
             print('=' * 78); print('%s · %s' % (pid, link)); price_from_drive(pid, link, tok, do_apply)

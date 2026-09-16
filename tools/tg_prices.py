@@ -372,8 +372,35 @@ def summarize(u, pid=None):
             row['name'] = 'Пентхаус · %d сп.' % b
             row['kind'] = 'penthouse'
         tiers.append(row)
+    # 17.09 Эльнур: «цены за конкретную планировку». В прайсе каждая строка — юнит со
+    # своей площадью: сводим их в список планировок (площадь → минимальная цена и сколько
+    # таких свободно). По площади карточка находит свой чертёж.
+    layouts = {}
+    for x in av:
+        if not x.get('area') or not (10 < x['area'] < 3000):
+            continue
+        key = (x.get('beds'), round(float(x['area']) * 2) / 2, bool(x.get('ph')))
+        cur = layouts.get(key)
+        if not cur or x['price'] < cur['price_from_thb']:
+            layouts[key] = {'beds': key[0], 'area_sqm': key[1], 'price_from_thb': x['price'],
+                            'code': x.get('code'), 'penthouse': key[2], 'free': 0}
+        layouts[key]['free'] += 1
+    # показываем не только однокомнатные: по четыре планировки на каждую комнатность
+    per = {}
+    lay = []
+    for r in sorted(layouts.values(), key=lambda r: ((r['beds'] or 9), -r['free'], r['area_sqm'])):
+        k = (r['beds'], r['penthouse'])
+        per[k] = per.get(k, 0) + 1
+        if per[k] > 4:
+            continue
+        lay.append(r)
+    lay = sorted(lay, key=lambda r: ((r['beds'] or 9), r['penthouse'], r['area_sqm']))[:16]
+    for r in lay:
+        b = r['beds']
+        base = 'Студия' if b == 0 else (('%d спальня' % b) if b == 1 else ('%d спальни' % b if (b or 0) < 5 else '%d спален' % b)) if b else 'Планировка'
+        r['name'] = ('Пентхаус · ' + base) if r.pop('penthouse', False) else base
     return {'from': min(x['price'] for x in av), 'to': max(x['price'] for x in av),
-            'avail': len(av), 'sold_rows': len(u) - len(av), 'tiers': tiers}
+            'avail': len(av), 'sold_rows': len(u) - len(av), 'tiers': tiers, 'layouts': lay}
 
 
 def main():
@@ -421,9 +448,12 @@ def main():
         if big and not FORCE:
             print('     ⚠ расхождение больше четверти — не записываю, нужно подтверждение')
         if APPLY and (mark == '≠' or FORCE) and not (big and not FORCE):
-            patch(env, pid, {'price_from_thb': s['from'], 'price_to_thb': s['to'],
-                             'price_tiers': s['tiers'], 'availability': 'свободно %d' % s['avail'],
-                             'last_synced_at': datetime.datetime.utcnow().isoformat() + 'Z'})
+            body = {'price_from_thb': s['from'], 'price_to_thb': s['to'],
+                    'price_tiers': s['tiers'], 'availability': 'свободно %d' % s['avail'],
+                    'last_synced_at': datetime.datetime.utcnow().isoformat() + 'Z'}
+            if s.get('layouts'):
+                body['unit_types'] = s['layouts']
+            patch(env, pid, body)
             changed += 1
     if APPLY:
         print('\nзаписано карточек: %d — пересобрать сайт: node build/all.mjs' % changed)
