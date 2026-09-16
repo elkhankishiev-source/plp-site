@@ -3,64 +3,6 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- PLP:HEADTHEME:START -->
-<meta name="color-scheme" content="light dark">
-<!-- цвет системных полей браузера = фон страницы. Без этого при прокрутке и
-     оттягивании из-под страницы проглядывает чужой цвет — кажется, что фон мигает. -->
-<meta name="theme-color" content="#f7f6f1" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0C0D09" media="(prefers-color-scheme: dark)">
-<script>
-(function(){
-  function paintChrome(){
-    try{
-      var bg=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
-      if(!bg && document.body) bg=getComputedStyle(document.body).backgroundColor;
-      if(!bg || bg==='rgba(0, 0, 0, 0)') return;
-      var list=document.querySelectorAll('meta[name="theme-color"]');
-      for(var i=0;i<list.length;i++) list[i].parentNode.removeChild(list[i]);
-      var m=document.createElement('meta'); m.setAttribute('name','theme-color');
-      m.setAttribute('content',bg); document.head.appendChild(m);
-    }catch(e){}
-  }
-  /* Кнопка «поделиться»: на телефоне открывает системное меню, на компьютере
-     кладёт ссылку в буфер и говорит об этом. Эльнур 07.09: «сайтом надо
-     пользоваться, он не просто для красоты». */
-  document.addEventListener('click', function(e){
-    var b = e.target && e.target.closest && e.target.closest('[data-share]');
-    if(!b) return;
-    e.preventDefault();
-    var path = b.getAttribute('data-share') || location.pathname;
-    var url = location.origin + path;
-    var title = b.getAttribute('data-share-title') || document.title;
-    var done = function(){
-      var was = b.textContent;
-      b.textContent = '✓ Ссылка скопирована';
-      b.classList.add('ok');
-      setTimeout(function(){ b.textContent = was; b.classList.remove('ok'); }, 2200);
-    };
-    if(navigator.share){ navigator.share({title:title, url:url}).catch(function(){}); return; }
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(url).then(done).catch(function(){ prompt('Скопируйте ссылку:', url); });
-    } else prompt('Скопируйте ссылку:', url);
-  });
-  window.paintChrome=paintChrome;
-  /* Адрес без .html: страницы и так открываются коротким адресом, но если
-     человек пришёл по старой ссылке, приводим строку браузера к чистому виду.
-     Эльнур 07.09: «мне не нравится html в адресе, я ни у кого её не видел». */
-  try{
-    var pth=location.pathname;
-    if(/\.html$/.test(pth)){
-      var clean=pth.replace(/index\.html$/,'').replace(/\.html$/,'');
-      if(clean==='') clean='/';
-      history.replaceState(null,'',clean+location.search+location.hash);
-    }
-  }catch(e){}
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',paintChrome);
-  else paintChrome();
-  try{ matchMedia('(prefers-color-scheme: dark)').addEventListener('change',paintChrome); }catch(e){}
-})();
-</script>
-<!-- PLP:HEADTHEME:END -->
 <script>(function(){try{var v=localStorage.getItem('pl_theme');
 if(v==='dark'||v==='light')document.documentElement.setAttribute('data-theme',v);}catch(e){}})();</script>
 <title>The GENS by Botanica, у Blue Tree — Банг Тао, Пхукет | Property Library</title>
@@ -83,22 +25,6 @@ if(v==='dark'||v==='light')document.documentElement.setAttribute('data-theme',v)
 <meta name="twitter:image" content="https://property-library.com/img/PLP-GENS-BOTANICA.jpg">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"RealEstateListing","@id":"https://property-library.com/object/gens-botanica#listing","url":"https://property-library.com/object/gens-botanica","name":"The GENS by Botanica, у Blue Tree","description":"The GENS by Botanica — жилой комплекс в районе Блю Три на севере Пхукета, в двух минутах ходьбы от одноимённого парка и напротив международных школ. Комплекс состоит из двух восьмиэтажных корпусов на 120 квартир. В продаже остаются однокомнатные квартиры от 5 458 000 батов и двухкомнатные от 9 954 000 батов; предусмотрена возможность объединить две однокомнатные в двухкомнатную с видовыми характеристиками. Сдача запланирована на август 2028 года, оформление возможно в полную собственность. На в…","about":{"@id":"https://property-library.com/object/gens-botanica#residence"}},{"@type":"Residence","@id":"https://property-library.com/object/gens-botanica#residence","name":"The GENS by Botanica, у Blue Tree","description":"The GENS by Botanica — жилой комплекс в районе Блю Три на севере Пхукета, в двух минутах ходьбы от одноимённого парка и напротив международных школ. Комплекс состоит из двух восьмиэтажных корпусов на 120 квартир. В продаже остаются однокомнатные квартиры от 5 458 000 батов и двухкомнатные от 9 954 000 батов; предусмотрена возможность объединить две однокомнатные в двухкомнатную с видовыми характеристиками. Сдача запланирована на август 2028 года, оформление возможно в полную собственность. На в…","url":"https://property-library.com/object/gens-botanica","image":"https://property-library.com/img/PLP-GENS-BOTANICA.jpg","address":{"@type":"PostalAddress","addressRegion":"Phuket","addressLocality":"Банг Тао","addressCountry":"TH"},"additionalProperty":{"@type":"PropertyValue","name":"Застройщик","value":"Botanica"},"numberOfRooms":2},{"@type":"Offer","@id":"https://property-library.com/object/gens-botanica#offer","itemOffered":{"@id":"https://property-library.com/object/gens-botanica#residence"},"priceCurrency":"THB","price":5458000,"availability":"https://schema.org/InStock","url":"https://property-library.com/object/gens-botanica","seller":{"@type":"RealEstateAgent","name":"Property Library Phuket","url":"https://property-library.com"}}]}</script>
 <style>
-/* PLP:ANTIFLICKER */
-/* Мигание фона на телефоне — сводная защита. Эльнур 06.09: «фон в мобильной
-   версии везде мигает, ищи по всем страницам». Три источника:
-   1) размытие фона (backdrop-filter) под липкими элементами — браузер
-      перерисовывает весь экран на каждом кадре прокрутки;
-   2) долгое проявление блоков при прокрутке;
-   3) отложенные картинки без фона — на их месте на миг светится подложка. */
-@media(max-width:900px){
-  .header,#toTop,.badge,.pm-tag,.car .tag,.btn-glass,.hero-float,.fbtn,.chipf,
-  .modal-overlay,.mnav,.sheet,.pm-card,.toolbox{
-    backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
-  .reveal{transition-duration:.35s!important}
-}
-.pic-photo,.thumb-photo,.prgs img,.simi-c i,.pm-img img{background-color:var(--warm,#EFEEE7)}
-/* PLP:ANTIFLICKER */
-html{background:var(--bg);overscroll-behavior-y:none}
 /* Эльнур 05.09: сайт — единая система. Страница объекта живёт в тех же
    цветах и с тем же набором блоков, что и карточка на сайте. */
 :root{--green:#D2D5B3;--green-deep:#5F6242;--olive:#5F6242;--ink:#22251C;--paper:#FBFBF7;
@@ -153,6 +79,21 @@ h1{font-size:clamp(24px,4vw,34px);line-height:1.2;margin:8px 0 4px}
 section.desc{margin:26px 0}
 section.desc h2{font-size:18px;margin:0 0 10px;color:var(--ink)}
 section.desc p{color:var(--text);opacity:.94;white-space:pre-line}
+.sub-h{font-size:14px;color:var(--muted);font-weight:600;margin:16px 0 8px}
+.grid-shots{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.grid-shots img{width:100%;height:120px;object-fit:cover;border-radius:11px;display:block;background:#eceadf}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+.tags span{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:13px}
+.pairs{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;margin:0}
+.pairs dt{color:var(--muted);font-size:13px}
+.pairs dd{margin:0;font-size:15px}
+.fine{color:var(--muted);font-size:13px;margin:10px 0 0}
+.lnk{color:var(--green-deep);font-weight:600;text-decoration:none;border-bottom:1px solid currentColor}
+.simi{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.simi-c{display:block;text-decoration:none;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.simi-c img{width:100%;height:120px;object-fit:cover;display:block}
+.simi-c b{display:block;padding:10px 12px 0;font-size:14px}
+.simi-c span{display:block;padding:2px 12px 12px;font-size:13px;color:var(--muted)}
 .cta{display:flex;flex-wrap:wrap;gap:12px;margin:28px 0}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 22px;border-radius:14px;font-weight:600;text-decoration:none;border:1px solid var(--line);cursor:pointer}
 .btn.wa{background:#25D366;color:#0b2b18;border-color:#25D366}
@@ -186,16 +127,35 @@ if(dark) i.src='../img/brand/plp-mark-white.png';})();</script>
   </div>
   
   
+  <section class="desc"><h2>Инфраструктура проекта</h2><div class="tags"><span>Pet-friendly (корпус А</span><span>2–3 этажи)</span><span>возможность объединить два 1BR в видовой 2BR</span></div></section>
+  <section class="desc"><h2>Как платить</h2><dl class="pairs"><dt>План застройщика</dt><dd>Бронь 100 000 ฿ за 1 спальню, 200 000 ฿ за 2 спальни. Далее: 30% при подписании договора, 15% в январе 2027, 15% в июне 2027, 15% в ноябре 2027, 15% в апреле 2028, 10% в октябре 2028. Обслуживание 70 ฿/м² в месяц, единоразовый взнос в фонд 700 ฿/м². График может сдвигаться вслед за стройкой. [источник: Payment Terms застройщика]</dd><dt>Первый взнос</dt><dd>30%</dd></dl><p class="fine">Точный график под ваш юнит и сроки считает специалист — цифры застройщика меняются.</p></section>
+  <section class="desc"><h2>Форма владения</h2><p>Фрихолд</p><p class="fine">Что это значит для иностранца — в <a href="../guide/leasehold-ili-freehold">разборе форм владения</a>.</p></section>
+  <section class="desc"><h2>Район: Банг Тао</h2><p>2 минуты до Blue Tree; через дорогу школы HeadStart и Kajonkiet</p><p><a class="lnk" href="../districts/bang-tao">Весь район: цены, пляжи, что рядом</a></p></section>
+  
   <section class="desc"><h2>Об объекте</h2><p>The GENS by Botanica — жилой комплекс в районе Блю Три на севере Пхукета, в двух минутах ходьбы от одноимённого парка и напротив международных школ. Комплекс состоит из двух восьмиэтажных корпусов на 120 квартир. В продаже остаются однокомнатные квартиры от 5 458 000 батов и двухкомнатные от 9 954 000 батов; предусмотрена возможность объединить две однокомнатные в двухкомнатную с видовыми характеристиками. Сдача запланирована на август 2028 года, оформление возможно в полную собственность. На втором и третьем этажах корпуса А разрешено проживание с домашними животными.</p></section>
   <section class="desc" lang="en"><h2>About</h2><p>Private launch next to Blue Tree: 2 minutes to the park, HeadStart and Kajonkiet schools across the road. Two 8-storey buildings, 120 units, completion August 2028. Entry from 5.46M THB for 34 sq.m. Pet-friendly on floors 2-3 of building A; two 1BR units can be combined into a 2BR with a view.</p></section>
   <section class="desc"><h2>Материалы застройщика</h2><div class="cta"><a class="btn ghost" href="https://maps.app.goo.gl/3mUrQU4gRRzntE3p9" rel="noopener nofollow" target="_blank">На карте</a></div></section>
   <div class="cta">
-    <a class="btn wa" href="https://wa.me/66955492587?text=The%20GENS%20by%20Botanica%2C%20%D1%83%20Blue%20Tree%20%E2%80%94%20%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D0%B5%D1%81%D1%83%D0%B5%D1%82%20%D1%8D%D1%82%D0%BE%D1%82%20%D0%BE%D0%B1%D1%8A%D0%B5%D0%BA%D1%82.%20https%3A%2F%2Fproperty-library.com%2Fobject%2Fgens-botanica" rel="noopener" target="_blank">WhatsApp — узнать детали</a>
-    <a class="btn primary" href="../#object=PLP-GENS-BOTANICA">Открыть карточку на сайте</a>
+    <a class="btn primary" href="../#object=PLP-GENS-BOTANICA&ask=1">Задать вопрос по объекту</a>
     <a class="btn ghost" href="../#object=PLP-GENS-BOTANICA">Рассчитать доходность</a>
+    <button type="button" class="btn ghost" id="shareBtn">Поделиться</button>
+    <a class="btn wa" href="https://wa.me/66955492587?text=The%20GENS%20by%20Botanica%2C%20%D1%83%20Blue%20Tree%20%E2%80%94%20%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D0%B5%D1%81%D1%83%D0%B5%D1%82%20%D1%8D%D1%82%D0%BE%D1%82%20%D0%BE%D0%B1%D1%8A%D0%B5%D0%BA%D1%82.%20https%3A%2F%2Fproperty-library.com%2Fobject%2Fgens-botanica" rel="noopener" target="_blank">WhatsApp</a>
   </div>
+  <section class="desc"><h2>Похожие объекты</h2><div class="simi"><a class="simi-c" href="adora"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-ADORA/01.jpg?width=520&amp;resize=contain&amp;quality=72" alt="" loading="lazy" decoding="async"><b>The Title Adora Rawai</b><span>Равай · от 5 332 000 ฿</span></a><a class="simi-c" href="ayana"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-AYANA/cover/cd20db3eba083be6.jpg?width=520&amp;resize=contain&amp;quality=72" alt="" loading="lazy" decoding="async"><b>AYANA Heights Seaview Residences</b><span>Лаян · от 3 661 800 ฿</span></a><a class="simi-c" href="balcony"><img src="https://dyxufgjrumebvrhadjun.supabase.co/storage/v1/render/image/public/object-media/objects/PLP-BALCONY/01.jpg?width=520&amp;resize=contain&amp;quality=72" alt="" loading="lazy" decoding="async"><b>The BALCONY Nai Yang</b><span>Най Янг · от 6 087 270 ฿</span></a></div></section>
 </main>
 <script>
+/* «Поделиться»: на телефоне системное меню, на компьютере ссылка в буфер */
+(function(){
+  var b=document.getElementById('shareBtn'); if(!b) return;
+  b.onclick=function(){
+    var url=location.href, title=document.title;
+    if(navigator.share){ navigator.share({title:title,url:url}).catch(function(){}); return; }
+    var was=b.textContent;
+    function done(){ b.textContent='✓ Ссылка скопирована'; setTimeout(function(){ b.textContent=was; },2200); }
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(url).then(done).catch(function(){ prompt('Скопируйте ссылку:', url); }); }
+    else prompt('Скопируйте ссылку:', url);
+  };
+})();
 /* миниатюры листают главный кадр — как в карточке на сайте */
 (function(){
   var main=document.getElementById('mainShot');
