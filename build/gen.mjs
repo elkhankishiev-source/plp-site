@@ -372,6 +372,7 @@ function buildCatalog(objects, benchmarks, preserve) {
       bmin: (o.bedrooms_min === 0 || o.bedrooms_min) ? o.bedrooms_min : null,
       bmax: (o.bedrooms_max === 0 || o.bedrooms_max) ? o.bedrooms_max : null,
       stage_key: saleGroup(o),
+      promo: promoShort(o),
       /* 16.09 Эльнур: «некоторые распроданы, но мы можем ставить его как продан, но по
          запросу — можно ведь найти там нужный юнит, это шанс». Распроданный проект с
          витрины не убираем: цену застройщика, которой уже нет, не показываем, зовём в диалог. */
@@ -542,6 +543,34 @@ function unitsOf(o) {
    а спор стадии с датой сдачи разбираем ниже и печатаем при сборке. */
 const warned = new Set();
 function warnOnce(id, msg) { if (warned.has(id)) return; warned.add(id); console.error(msg); }
+/* 16.09 Эльнур: «спецофферы тоже классно записывать в проекты… карточка должна быть
+   максимально полезной». Длинный текст акции живёт на странице объекта, а в каталоге
+   нужна одна строка: гарантия дохода, скидка или рассрочка — то, за что цепляется глаз. */
+function promoShort(o) {
+  /* 🔴 в JS «\w» не видит кириллицу (память: regex-cyrillic-trap) — пишем [а-яё] явно */
+  const t = noContacts(String(o.current_promo || '')).trim();
+  if (!t || /\(estimated\)/i.test(t) || /^\s*(уточнить|нужно|\[)/i.test(t)) return null;
+  const YEARS = { 'один': 1, 'два': 2, 'две': 2, 'три': 3, 'четыре': 4, 'пять': 5, 'шесть': 6, 'семь': 7, 'десять': 10 };
+  let m = /гарантирован[а-яё]*\s+доход[а-яё]*\s+(\d{1,2})\s*%[^.]{0,60}?(\d+|один|два|две|три|четыре|пять|шесть|семь|десять)\s*(?:года|лет|год)/i.exec(t);
+  if (m) {
+    const n = /^\d+$/.test(m[2]) ? +m[2] : YEARS[m[2].toLowerCase()];
+    const word = n === 1 ? 'год' : (n < 5 ? 'года' : 'лет');
+    return 'Гарантия дохода ' + m[1] + '% на ' + n + ' ' + word;
+  }
+  m = /гарантирован[а-яё]*\s+доход[а-яё]*\s+(\d{1,2})\s*%/i.exec(t);
+  if (m) return 'Гарантия дохода ' + m[1] + '%';
+  m = /скидк[а-яё]*\s+(\d{1,2})\s*%[^.]{0,40}?до\s+(\d{1,2}\s+[а-яё]+|\d{2}\.\d{2})/i.exec(t);
+  if (m) return 'Скидка ' + m[1] + '% до ' + m[2];
+  m = /скидк[а-яё]*\s+(\d{1,2})\s*%/i.exec(t);
+  if (m) return 'Скидка ' + m[1] + '%';
+  m = /скидк[а-яё]*\s+([\d\s]{6,12})\s*(?:฿|бат)/i.exec(t);
+  if (m) return 'Скидка ' + m[1].trim() + ' ฿';
+  if (/рассрочк[а-яё]*/i.test(t)) return 'Рассрочка от застройщика';
+  if (/мебел[а-яё]*\s+(?:в подарок|пакет)/i.test(t)) return 'Мебельный пакет в подарок';
+  if (/спец[а-яё-]*\s*(?:цена|условия|предложение)/i.test(t)) return 'Спецпредложение застройщика';
+  return 'Спецусловия застройщика';
+}
+
 function saleGroup(o) {
   const st = String(o.stage || '').toLowerCase();
   const isPre = /pre-?sale|presale|старт|анонс|announced/.test(st);
@@ -1008,11 +1037,15 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
      указывали .html — две версии одной страницы. Везде чистый. */
   const url = SITE_BASE + '/object/' + slug;
   /* og-картинка тоже по публичному коду: адрес файла попадает в мессенджеры */
-  const img = SITE_BASE + '/img/' + pub + '.jpg';
+  /* если кадра объекта нет (карточка только заведена) — общая обложка сайта:
+     ссылка в мессенджере всё равно должна открываться картинкой, а не строкой */
+  const hasOwnImg = fs.existsSync(path.join(ROOT, 'img', pub + '.jpg'));
+  const img = SITE_BASE + (hasOwnImg ? '/img/' + pub + '.jpg' : '/img/og-default.jpg');
   // Реальные размеры картинки: WhatsApp без og:image:width/height часто вообще
   // не рисует превью, а соврать нельзя — высота у карточек разная (674…1167).
   const imgDim = jpegSize(path.join(ROOT, 'img', pub + '.jpg'))
-              || jpegSize(path.join(ROOT, 'img', pid + '.jpg'));
+              || jpegSize(path.join(ROOT, 'img', pid + '.jpg'))
+              || jpegSize(path.join(ROOT, 'img', 'og-default.jpg'));
   const en = o.district || o.beach || '';
   const ru = DISTRICT_RU[en] || en;
   const t = typeLabel(o.type);

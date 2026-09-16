@@ -47,6 +47,26 @@
    ]
   },
   {
+   "id": "PLP-ANGSANA-BEACH",
+   "pub": "PLP-ANGSANA-BEACH",
+   "url": "https://property-library.com/object/angsana-beach",
+   "name": "Angsana Beachfront Residences",
+   "district": "Лагуна",
+   "type": "Кондо",
+   "price_from": null,
+   "units": []
+  },
+  {
+   "id": "PLP-ANGSANA-TOPAZ",
+   "pub": "PLP-ANGSANA-TOPAZ",
+   "url": "https://property-library.com/object/angsana-topaz",
+   "name": "Angsana Golf Residences Topaz",
+   "district": "Лагуна",
+   "type": "Кондо",
+   "price_from": null,
+   "units": []
+  },
+  {
    "id": "PLP-AYANA",
    "pub": "PLP-AYANA",
    "url": "https://property-library.com/object/ayana",
@@ -108,6 +128,16 @@
    "pub": "PLP-BELLAGUNA",
    "url": "https://property-library.com/object/bellaguna",
    "name": "Bellaguna Lake Residences",
+   "district": "Лагуна",
+   "type": "Кондо",
+   "price_from": null,
+   "units": []
+  },
+  {
+   "id": "PLP-BELLAGUNA-GOLF",
+   "pub": "PLP-BELLAGUNA-GOLF",
+   "url": "https://property-library.com/object/bellaguna-golf",
+   "name": "Bellaguna Golf Residences",
    "district": "Лагуна",
    "type": "Кондо",
    "price_from": null,
@@ -339,6 +369,16 @@
      "from": 5460000
     }
    ]
+  },
+  {
+   "id": "PLP-GARRYA",
+   "pub": "PLP-GARRYA",
+   "url": "https://property-library.com/object/garrya",
+   "name": "Residences at Garrya",
+   "district": "Лагуна",
+   "type": "Кондо",
+   "price_from": null,
+   "units": []
   },
   {
    "id": "PLP-HALO1",
