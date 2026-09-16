@@ -200,7 +200,7 @@ function fallbackCalc(o) {
     downPct,
     // План застройщика — дословно из базы. Не разбираем на строки: формулировки у всех
     // разные, любой разбор — выдумка. Таблица рядом остаётся прикидкой.
-    paymentPlan: o.payment_plan || o.payment_schedule || '',
+    paymentPlan: noContacts(o.payment_plan || o.payment_schedule || ''),
     estimated: true,
     seasons: {
       high: { rent: high, occ, months: 4 },
@@ -221,6 +221,12 @@ const OUR = /(elnurphuket_bot|property_library_phuket|property-library\.com)/i;
 function noContacts(text) {
   if (!text) return text;
   let s = String(text);
+  /* 16.09 Эльнур: «мы не размещаем на сайте конфиденциальную информацию — номера,
+     ссылки, почту застройщика» и «странно размещать снимки и источники, откуда снимки».
+     Пометки «[источник: sunhills-layan.com]», «(по сообщению застройщика)», «(estimated)»
+     — наша кухня: они остаются в базе, но на витрину не идут. */
+  s = s.replace(/\s*[\[(](?:источник|source|по сообщению|по данным|estimated)[^\])]*[\])]/gi, '');
+  s = s.replace(/\s*—\s*(?:источник|source)\s*:[^.;]*/gi, '');
   s = s.replace(/(?:https?:\/\/)?(?:www\.)?t\.me\/[A-Za-z0-9_]+/gi, m => OUR.test(m) ? m : '');
   s = s.replace(/@[A-Za-z][A-Za-z0-9_]{3,}/g, m => OUR.test(m) ? m : '');
   s = s.replace(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g, m => OUR.test(m) ? m : '');
@@ -285,6 +291,11 @@ function shortDev(dev) {
 // Всё остальное в calc (сезоны, расходы) правится руками и переживает пересборку.
 function withFacts(calc, o) {
   const c = Object.assign({}, calc);
+  /* 🔴 16.09 Эльнур: «ты пишешь цены „от“, а юниты уже проданы, таких цен уже нет».
+     Причина была глубже данных: расчёт цены сохранялся из ПРОШЛОЙ версии index.html
+     и переживал любую правку базы. Цена на витрине жила своей жизнью месяцами.
+     Из старого расчёта бережём настройки (ставки, загрузку), цену берём из базы. */
+  if (Number(o.price_from_thb) > 0) c.priceTHB = Number(o.price_from_thb);
   let buildYears = 0;
   if (o.handover_date) {
     const months = (new Date(o.handover_date) - new Date()) / (1000 * 60 * 60 * 24 * 30.44);
@@ -292,7 +303,7 @@ function withFacts(calc, o) {
   }
   c.buildYears = buildYears;
   if (Number(o.first_payment) > 0) c.downPct = Number(o.first_payment);
-  c.paymentPlan = o.payment_plan || o.payment_schedule || '';
+  c.paymentPlan = noContacts(o.payment_plan || o.payment_schedule || '');
   // Сдан по-настоящему — только stage='Ready' (канон №38). Если стройка идёт,
   // а дата сдачи в базе уже прошла — это устаревшая дата, а не сданный объект.
   c.ready = o.stage === 'Ready';
@@ -361,6 +372,10 @@ function buildCatalog(objects, benchmarks, preserve) {
       bmin: (o.bedrooms_min === 0 || o.bedrooms_min) ? o.bedrooms_min : null,
       bmax: (o.bedrooms_max === 0 || o.bedrooms_max) ? o.bedrooms_max : null,
       stage_key: saleGroup(o),
+      /* 16.09 Эльнур: «некоторые распроданы, но мы можем ставить его как продан, но по
+         запросу — можно ведь найти там нужный юнит, это шанс». Распроданный проект с
+         витрины не убираем: цену застройщика, которой уже нет, не показываем, зовём в диалог. */
+      soldOut: String(o.stage || '') === 'Sold out',
       /* дата старта продаж — справочно: группу она не меняет (см. saleGroup) */
       saleStart: o.sale_started_on || null,
       /* короткая приписка к стадии: «сдан в декабре 2025», «2 октября —
@@ -647,8 +662,30 @@ function emitCatalogBlock(catalog) {
     MARK_END;
 }
 
+/* 16.09 Эльнур: «ты пишешь цены „от“, а юниты уже проданы». На главной в разметке
+   для поисковиков цены были вписаны руками и устарели (Heritage 5 049 900 против
+   5 588 573 в прайсе). Теперь сборка подставляет туда цену из базы, а у
+   распроданного проекта пишет «распродано» и цену не называет вовсе. */
+function syncListOffers(html, catalog) {
+  const by = {};
+  for (const p of catalog) by[p.property_id] = p;
+  return html.replace(
+    /("url":\s*"[^"]*#object=([A-Z0-9_-]+)"[\s\S]{0,600}?"offers":\s*\{)[^}]*\}/g,
+    (all, head, pid) => {
+      const p = by[pid];
+      if (!p) return all;
+      const thb = p.calc && p.calc.priceTHB ? p.calc.priceTHB : null;
+      if (p.soldOut || !thb) {
+        return head + '"@type": "Offer", "priceCurrency": "THB", "availability": "https://schema.org/SoldOut"}';
+      }
+      return head + '"@type": "Offer", "price": "' + Math.round(thb) +
+        '", "priceCurrency": "THB", "availability": "https://schema.org/InStock"}';
+    });
+}
+
 // заменить (или врезать) блок каталога в index.html
 function writeIndex(html, catalog) {
+  html = syncListOffers(html, catalog);
   const block = emitCatalogBlock(catalog);
   const s = html.indexOf(MARK_START);
   const e = html.indexOf(MARK_END);
@@ -1039,7 +1076,7 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
     },
     residence,
   ];
-  if (priceTHB) graph.push({
+  if (priceTHB && String(o.stage || '') !== 'Sold out') graph.push({
     '@type': 'Offer',
     '@id': url + '#offer',
     itemOffered: { '@id': idRes },
@@ -1051,28 +1088,17 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
   });
   const ld = { '@context': 'https://schema.org', '@graph': graph };
 
-  // Материалы застройщика: показываем только то, что реально заполнено в базе,
-  // и только http(s) — чтобы мусорное поле не уехало в разметку.
-  /* 07.09, канон showcase_privacy: внутренние рабочие ссылки на витрину не выносим.
-     Диск, Dropbox, SharePoint и наше хранилище — это кухня агентства: там лежат
-     прайсы с наличием, комиссии и переписка с застройщиком. Клиенту показываем
-     только публичное: сайт проекта, карту, тур. Раньше 39 страниц объектов
-     публиковали прямую ссылку на папку застройщика. */
+  /* 16.09 Эльнур: «мы не размещаем на сайте конфиденциальную информацию — номера,
+     ссылки, почту застройщика». Раньше здесь висели кнопки на сайт проекта, тур и
+     презентацию: человек уходил к застройщику с нашей же страницы. Остаётся только
+     карта — она никуда не уводит. Прайсы, папки Диска и каналы застройщика были и
+     остаются кухней агентства (канон showcase_privacy). */
   const PRIVATE_HOST = /(drive\.google|docs\.google|dropbox|sharepoint|onedrive|supabase\.co\/storage)/i;
   const linkOk = (u) => typeof u === 'string' && /^https?:\/\//i.test(u.trim()) && !PRIVATE_HOST.test(u);
-  const matLinks = [
-    { u: o.brochure_url, t: 'Сейл-кит и презентация' },
-    { u: o.floorplan_url, t: 'Планировки' },
-    { u: o.video_url, t: '3D-тур и видео' },
-    { u: o.website_url, t: 'Сайт проекта' },
-    { u: o.map_url, t: 'На карте' },
-  ].filter((x) => linkOk(x.u));
-  const materials = matLinks.length
-    ? '<section class="desc"><h2>Материалы застройщика</h2><div class="cta">' +
-      matLinks.map((x) => '<a class="btn ghost" href="' + htmlEsc(x.u.trim()) +
-        '" rel="noopener nofollow" target="_blank">' + htmlEsc(x.t) + '</a>').join('') +
-      '</div></section>'
+  const mapLink = linkOk(o.map_url)
+    ? '<p><a class="lnk" href="' + htmlEsc(String(o.map_url).trim()) + '" rel="noopener nofollow" target="_blank">Показать на карте</a></p>'
     : '';
+  const materials = '';
 
   // Галерея, планировки и ход стройки — те же данные, что и в карточке на сайте.
   /* 07.09: страницы объектов тянули ОРИГИНАЛЫ по 2–19 МБ — за месяц это
@@ -1113,6 +1139,13 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
         (u.from ? '<u>от ' + new Intl.NumberFormat('ru-RU').format(u.from) + ' ฿</u>' : '') + '</div>').join('') +
       '</div></section>'
     : '';
+  /* Распроданный проект остаётся на витрине: цену из прайса, которого уже нет,
+     не показываем — предлагаем поискать юнит на вторичном рынке. */
+  const soldOut = String(o.stage || '') === 'Sold out';
+  const soldOutLine = soldOut
+    ? '<div class="price">Цена по запросу<small>у застройщика распродано — ищем юнит на вторичном рынке</small></div>'
+    : '';
+
   /* ===== ЧТО ПРЕДЛАГАЕТ ЗАСТРОЙЩИК =====
      Эльнур 16.09.2026 про заголовок «Что рядом и что нового»: «я бы исправил
      по соответствию». В поле лежат условия застройщика на сегодня: скидки,
@@ -1184,12 +1217,15 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
       ? '<div class="prgs">' + bpPhotos.slice(0, 6).map(u =>
           '<img src="' + htmlEsc(thumbUrl(u, 760, 74)) + '" alt="" loading="lazy" decoding="async">').join('') + '</div>'
       : '') +
-    (bpRaw && bpRaw.source ? '<p class="fine">Источник: ' + htmlEsc(String(bpRaw.source)) + '</p>' : '');
+    /* откуда снимки — наша кухня: канал застройщика на витрине не называем */
+    '';
   /* Показываем строящимся и предпродажным, а также любому объекту, по которому
      застройщик прислал отчёт. Одна строка «стадия» блоком не считается: нужен
      срок сдачи, отчёт, снимки или приписка — иначе блока нет. */
   const progressHas = Boolean(dl.ru || bpReport || bpPhotos.length || o.stage_note);
-  const progressWorth = (grp === 'construction' || grp === 'presale' || bpPhotos.length || bpReport);
+  /* у сданного проекта блока стройки нет: в канале застройщика лежат уже снимки
+     шоурумов, а не работ — это не «ход строительства» */
+  const progressWorth = (grp === 'construction' || grp === 'presale');
   const progressBlock = (progressWorth && progressHas)
     ? '<section class="desc"><h2>' + (grp === 'ready' ? 'Как шло строительство' : 'Ход строительства') +
       '</h2>' + progressBody + '</section>'
@@ -1257,7 +1293,7 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
     ? '<section class="desc"><h2>Район: ' + htmlEsc(ru) + '</h2>' +
       (areaBits.length ? '<div class="tags">' + areaBits.map(a => '<span>' + htmlEsc(a) + '</span>').join('') + '</div>' : '') +
       (nearbyTxt ? '<p>' + htmlEsc(nearbyTxt) + '</p>' : '') +
-      (hasDistPage ? '<p><a class="lnk" href="../districts/' + distSlug + '">Весь район: цены, пляжи, что рядом</a></p>' : '') +
+      (hasDistPage ? '<p><a class="lnk" href="../districts/' + distSlug + '">Весь район: цены, пляжи, что рядом</a></p>' : '') + mapLink +
       '</section>'
     : '';
 
@@ -1314,7 +1350,7 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
     { k: 'Сдача', v: dl.ru },
     // 16.09: стадия — одной функцией saleGroup на весь сайт, иначе страница
     // объекта и карточка спорят между собой («старт продаж» против «в продаже»)
-    { k: 'Стадия', v: GROUP_RU[saleGroup(o)] || '' },
+    { k: 'Стадия', v: soldOut ? 'распродано — по запросу' : (GROUP_RU[saleGroup(o)] || '') },
     /* 🔴 10.09 Эльнур: «зашёл на карточку, а там доходность 7% до вычета расходов,
    мы такое не согласовывали». Показывали o.roi — цифру из буклета застройщика,
    да ещё с пометкой про расходы. Теперь одна цифра на всю карточку: ориентир
@@ -1450,7 +1486,7 @@ if(dark) i.src='../img/brand/plp-mark-white.png';})();</script>
   ${shots}
   <h1>${htmlEsc(o.name)}</h1>
   <p class="loc">${htmlEsc(ru)}, Пхукет${distBeach ? ' · ' + htmlEsc(distBeach) : ''}</p>
-  ${rentLine || (priceFmt ? '<div class="price">от ' + htmlEsc(priceFmt) + '<small>стартовая цена застройщика</small></div>' : '')}
+  ${rentLine || soldOutLine || (priceFmt ? '<div class="price">от ' + htmlEsc(priceFmt) + '<small>цена по прайсу застройщика на дату сверки</small></div>' : '')}
   <div class="chips">${chips}</div>
   ${o.stage_note ? '<p class="stgnote">' + htmlEsc(o.stage_note) + '</p>' : ''}
   ${promoBlock}
