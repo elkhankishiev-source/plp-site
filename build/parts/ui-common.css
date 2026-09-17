@@ -45,7 +45,9 @@ body{background:var(--bg)}
 }
 
 /* подвал: один вид на обеих страницах и обеих ширинах */
-.footer{padding:20px 0 14px;color:var(--muted)}
+/* 17.09 Эльнур: подвал на фоне страницы, не отдельной белой плитой — отделяет одна тонкая линия.
+   Так же пропадает «пустая полоса» под подвалом на коротких страницах (вход в кабинет). */
+.footer{padding:20px 0 14px;color:var(--muted);background:transparent;border-top:1px solid rgba(var(--ink-rgb),.09)}
 .footer h3{font-size:.68rem;opacity:.75;margin-bottom:6px}
 .footer li{margin-bottom:4px;font-size:.74rem;line-height:1.35}
 .footer a{color:var(--muted)}
