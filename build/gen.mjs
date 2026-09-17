@@ -152,6 +152,29 @@ function typeRu(t) { return typeLabel(t).ru; }
 function slugOf(pid) { return String(pid).replace(/^PLP-/, '').toLowerCase(); }
 function pubOf(o) { return (o && o.public_code) || (o && o.plp_property_id) || ''; }
 
+/* ЛЕНТА КАДРОВ — одна на карточку и на страницу (канон 17.09).
+   Эльнур: «когда я на сайте открыл объект, скопировал ссылку и по ней перешёл —
+   там разная информация и фото и подача, это как вообще?». Расходились именно
+   кадры: карточка брала первые восемь из общей ленты (восемь фасадов подряд),
+   страница — по кругу из каждого раздела. Теперь правило одно и живёт здесь. */
+function heroGallery(o, limit = 8) {
+  const all = Array.isArray(o.gallery_urls) ? o.gallery_urls.filter(u => /^https?:/.test(u)) : [];
+  const gs = (Array.isArray(o.photo_groups) ? o.photo_groups : [])
+    .map(g => (Array.isArray(g.urls) ? g.urls.filter(u => /^https?:/.test(u)) : []))
+    .filter(a => a.length);
+  if (gs.length < 2) return all.slice(0, limit);
+  const out = [];
+  for (let round = 0; out.length < limit; round++) {
+    let added = false;
+    for (const arr of gs) {
+      if (arr[round] && !out.includes(arr[round])) { out.push(arr[round]); added = true; }
+      if (out.length >= limit) break;
+    }
+    if (!added) break;
+  }
+  return out;
+}
+
 // диапазон доходности из rental_benchmarks: (district,type) → (district,Кондо) → медиана по Пхукету
 function yieldRange(benchmarks, district, type) {
   const tr = typeRu(type);
@@ -403,8 +426,7 @@ function buildCatalog(objects, benchmarks, preserve) {
       /* «полный» снимок для окна — тоже превью, просто крупнее: оригинал
          на 19 МБ никому на экране не нужен */
       photoFull: thumbUrl(o.main_image_url, 1600, 80),
-      photos: Array.isArray(o.gallery_urls)
-        ? o.gallery_urls.slice(0, 8).map(u => thumbUrl(u, 1280, 78)) : null,
+      photos: heroGallery(o).length ? heroGallery(o).map(u => thumbUrl(u, 1280, 78)) : null,
       // Планировки: человек выбирает тип и сразу видит его площадь и спальни.
       // Где застройщик не давал названий планировок, берём тиры из прайса
       // (минимальная цена на каждый тип спальни) — Эльнур 05.09: «продаётся
@@ -862,8 +884,7 @@ function buildRentals(objects, preserve, ratesBy) {
       /* «полный» снимок для окна — тоже превью, просто крупнее: оригинал
          на 19 МБ никому на экране не нужен */
       photoFull: thumbUrl(o.main_image_url, 1600, 80),
-      photos: Array.isArray(o.gallery_urls)
-        ? o.gallery_urls.slice(0, 8).map(u => thumbUrl(u, 1280, 78)) : null,
+      photos: heroGallery(o).length ? heroGallery(o).map(u => thumbUrl(u, 1280, 78)) : null,
       groups: Array.isArray(o.photo_groups)
         ? o.photo_groups.map(g => Object.assign({}, g, {
             urls: Array.isArray(g.urls) ? g.urls.map(u => thumbUrl(u, 1280, 78)) : g.urls }))
@@ -1162,24 +1183,7 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
   /* 07.09: восемь кадров подряд — это восемь фасадов, а интерьеров клиент
      не видит вовсе. Берём по кругу из каждого раздела: территория, интерьеры,
      инфраструктура, мастер-план — тогда в ленте показан весь объект. */
-  const galleryAll = Array.isArray(o.gallery_urls) ? o.gallery_urls.filter(u => /^https?:/.test(u)) : [];
-  const galleryRaw = (function () {
-    const gs = Array.isArray(o.photo_groups) ? o.photo_groups
-      .map(g => (Array.isArray(g.urls) ? g.urls.filter(u => /^https?:/.test(u)) : []))
-      .filter(a => a.length) : [];
-    if (gs.length < 2) return galleryAll.slice(0, 8);
-    const out = [];
-    for (let round = 0; out.length < 8; round++) {
-      let added = false;
-      for (const arr of gs) {
-        if (arr[round] && !out.includes(arr[round])) { out.push(arr[round]); added = true; }
-        if (out.length >= 8) break;
-      }
-      if (!added) break;
-    }
-    return out;
-  })();
-  const gallery = galleryRaw.map(u => thumbUrl(u, 1280, 78));
+  const gallery = heroGallery(o).map(u => thumbUrl(u, 1280, 78));
   const heroSrc = thumbUrl(o.main_image_url, 1600, 80) || (gallery[0] || ('../img/' + pub + '.jpg'));
   const shots = gallery.length > 1
     ? '<div class="shots">' + gallery.map((u, i) =>
@@ -1675,21 +1679,31 @@ if(dark) i.src='../img/brand/plp-mark-white.png';})();</script>
   <div class="chips">${chips}</div>
   ${o.stage_note ? '<p class="stgnote">' + htmlEsc(o.stage_note) + '</p>' : ''}
   ${promoBlock}
+  ${/* ЕДИНЫЙ ПОРЯДОК БЛОКОВ — канон 17.09. Эльнур: «карточка объекта и страница
+        объекта расходится инфа, мы можем как-то по одному единому концепту,
+        стандарту наполнять эту инф… но должен быть единый концепт, зафиксированный».
+        Порядок один и тот же здесь и в карточке на главной (см. ORDER в index.html):
+        что это → сколько стоит и какие планировки → как это выглядит (чертежи,
+        мастер-план) → как платить и чем владеешь → что вокруг → как идёт стройка →
+        сколько приносит → район → что похожего.
+        Раньше «Об объекте» стояло ПОСЛЕ платежей, района и стройки — человек доходил
+        до описания последним, отсюда «немного в кашу». */''}
+  ${usp ? '<section class="desc"><h2>Об объекте</h2><p>' + htmlEsc(noContacts(usp)) + '</p>' +
+     (uspEn ? '<details class="desc-en"><summary>In English</summary><p lang="en">' + htmlEsc(uspEn) + '</p></details>' : '') +
+     '</section>' : (uspEn ? '<section class="desc" lang="en"><h2>About</h2><p>' + htmlEsc(uspEn) + '</p></section>' : '')}
+  ${unitsBlock}
+  ${plansBlock}
+  ${payBlock}
+  ${ownBlock}
+  ${facBlock}
+  ${progressBlock}
   <div class="yield">
     <div class="num">${yr.low}${DASH}${yr.high}%</div>
     <div class="lbl">${yr.scope === 'district'
       ? 'Ориентир по району (' + htmlEsc(ru) + ', ' + htmlEsc(t.ru.toLowerCase()) + ')'
       : 'Ориентир по Пхукету в целом — по этому району отдельной статистики у нас пока нет'}, при активном управлении. Точный расчёт по вашему объекту делает специалист.</div>
   </div>
-  ${unitsBlock}
-  ${plansBlock}
-  ${facBlock}
-  ${payBlock}
-  ${ownBlock}
   ${areaBlock}
-  ${progressBlock}
-  ${usp ? '<section class="desc"><h2>Об объекте</h2><p>' + htmlEsc(noContacts(usp)) + '</p></section>' : ''}
-  ${uspEn ? '<section class="desc" lang="en"><h2>About</h2><p>' + htmlEsc(uspEn) + '</p></section>' : ''}
   ${materials}
   <div class="cta">
     <a class="btn primary" href="${htmlEsc(backLink)}&ask=1">Задать вопрос по объекту</a>

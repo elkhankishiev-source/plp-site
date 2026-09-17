@@ -185,3 +185,7 @@ begin
   return jsonb_build_object('ok', true, 'on_site', true, 'ready', v_r,
     'msg', 'Объект выйдет на витрину после ближайшей пересборки каталога.');
 end $$;
+
+-- 7. Старая шестиаргументная версия остаётся рядом с новой и делает выбор функции
+--    неоднозначным. Закон одного экземпляра: лишнюю убираем.
+drop function if exists public.client_doc_add(text,text,text,text,bigint,text);
