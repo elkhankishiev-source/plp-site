@@ -35,12 +35,20 @@ ENVF = os.path.expanduser('~/.plp_site_supabase.env')
 CACHE = os.path.expanduser('~/plp_drive_cache')
 API = 'https://www.googleapis.com/drive/v3/files'
 
+# 🔴 17.09. Порядок здесь — это приоритет: kind_of() возвращает ПЕРВОЕ совпадение
+# по всему пути файла. «price» и «brochure» стояли выше «unitplan», и настоящие
+# чертежи уходили в мусор: «PEYLAA Floor Plan with Price.pdf» читался как прайс,
+# «SALES_KIT_HALO.pdf» — как буклет, «Unit Price List/…Layout.pdf» — снова как прайс.
+# Из-за этого по пяти объектам инструмент честно печатал «чертежей в папке нет»,
+# хотя они там были. Планировки и мастер-план теперь разбираются ПЕРВЫМИ, а мастер
+# выше планировок: «Master Plan» не должен попасть в планировки юнитов.
 KIND = [
+    ('master',   r'master ?plan|мастер|site ?plan|генплан|masterplan'),
+    ('unitplan', r'unit ?plans?|floor ?plans?|villas? ?plans?|house ?plans?|планировк|'
+                 r'layout|поэтажн|\bтип[аоы]?\b|architecture plans?|sales ?kit'),
     ('price',    r'price|прайс|pricelist|наличи|availab'),
     ('factsheet',r'factsheet|fact sheet|спецификац|specification'),
     ('brochure', r'brochure|буклет|e-?book|presentation|презентац|profile'),
-    ('unitplan', r'unit plan|floor ?plan|планировк|layout|тип'),
-    ('master',   r'master ?plan|мастер|site ?plan|генплан'),
     ('facility', r'facilit|инфраструктур|amenit|common'),
     ('progress', r'progress|ход стро|стройк|construction'),
     ('contract', r'contract|договор|agreement|reserv'),
@@ -196,19 +204,33 @@ def sb(path):
     return json.loads(urllib.request.urlopen(r, timeout=90).read())
 
 
-def link_for(pid):
-    """Ссылка на папку: сначала реестр источников, потом поле карточки."""
-    rows = sb('object_sources?select=url,kind,note&project_key=eq.' + urllib.parse.quote(pid))
-    for r in rows:
-        if folder_id(r.get('url')) and re.search(r'drive|диск', str(r.get('kind') or ''), re.I):
-            return r['url'], 'реестр источников'
-    for r in rows:
-        if folder_id(r.get('url')): return r['url'], 'реестр источников'
-    o = sb('objects?select=brochure_url,floorplan_url&plp_property_id=eq.' + urllib.parse.quote(pid))
+def links_for(pid):
+    """ВСЕ папки объекта, а не первая попавшаяся.
+
+    🔴 17.09: у PEYLAA две папки — в первой TIF-ы шоу-юнита, планы и мастер-план
+    во второй, и обход возвращал «ничего нет». У PANORA-CONDO в реестре стоит
+    ссылка на ФАЙЛ прайса, она выигрывала у настоящей папки в brochure_url.
+    Берём все ссылки и обходим по очереди."""
+    out, seen = [], set()
+    rows = sb('object_sources?select=url,kind,note&project_key=' + urllib.parse.quote('eq.' + pid))
+    named = [r for r in rows if re.search(r'drive|диск', str(r.get('kind') or ''), re.I)]
+    for r in named + rows:
+        u = r.get('url')
+        if folder_id(u) and folder_id(u) not in seen:
+            seen.add(folder_id(u)); out.append((u, 'реестр источников'))
+    o = sb('objects?select=brochure_url,floorplan_url&plp_property_id=' + urllib.parse.quote('eq.' + pid))
     if o:
         for f in ('brochure_url', 'floorplan_url'):
-            if folder_id(o[0].get(f)): return o[0][f], 'карточка объекта (%s)' % f
-    return None, None
+            u = o[0].get(f)
+            if folder_id(u) and folder_id(u) not in seen:
+                seen.add(folder_id(u)); out.append((u, 'карточка объекта (%s)' % f))
+    return out
+
+
+def link_for(pid):
+    """Первая папка — для тех мест, где нужна одна ссылка."""
+    all_ = links_for(pid)
+    return all_[0] if all_ else (None, None)
 
 
 def report(pid, link, tok, want_files):
@@ -319,7 +341,21 @@ def price_from_drive(pid, link, tok, apply=False):
     if not cand:
         print('  прайса в текстовом виде нет — смотрите --vision (файл может быть картинкой)')
         return None
-    for f in cand[:3]:
+    # 🔴 17.09 Эльнур: «Аяна Хайтс от 15 млн бат, откуда это вообще». В базе стояла
+    # цена из прайса, действительного 1–31 августа 2024 года. Свежий прайс у них лежит
+    # НЕ одним файлом, а восемью — по корпусу B/C/D/E/F/H плюс таунхаусы, — а инструмент
+    # читал по одному и на первом же отвечал «свободных строк нет». Сливаем все прайсы
+    # папки по номеру юнита: точно так же устроены термшиты Laguna.
+    # папка Диска возвращает одни и те же файлы по нескольку раз (ярлыки и вложенность):
+    # сначала убираем дубли по имени, ПОТОМ берём первые N — иначе весь лимит
+    # съедали три копии одного файла, и до прайсов корпусов дело не доходило
+    seen_name, uniq = set(), []
+    for f in cand:
+        if f['name'] in seen_name:
+            continue
+        seen_name.add(f['name']); uniq.append(f)
+    merged = {}
+    for f in uniq[:16]:
         raw = os.path.join(CACHE, pid, re.sub(r'[^A-Za-z0-9._-]+', '_', f['name'])[:70])
         os.makedirs(os.path.dirname(raw), exist_ok=True)
         try:
@@ -327,12 +363,17 @@ def price_from_drive(pid, link, tok, apply=False):
             units = TP.parse_units(raw)
         except Exception as ex:
             print('   ✗ %s: %s' % (f['name'][:44], str(ex)[:60])); continue
-        s2 = TP.summarize(units, pid)
-        if not s2:
-            print('   ▸ %s · свободных строк нет' % f['name'][:60]); continue
+        free = sum(1 for u in units if u.get('status') == 'available')
+        print('   ▸ %-54s %s · строк %d, свободно %d'
+              % (f['name'][:54], f.get('modifiedTime', '')[:10], len(units), free))
+        for u in units:
+            key = str(u.get('code') or '') + '|' + str(u.get('area') or '') + '|' + str(u.get('price') or '')
+            merged.setdefault(key, u)
+    s2 = TP.summarize(list(merged.values()), pid) if merged else None
+    for _ in ([1] if s2 else []):
         money = lambda v: f'{v:,}'.replace(',', ' ') + ' ฿'
-        print('   ▸ %s · %s' % (f['name'][:60], f.get('modifiedTime', '')[:10]))
-        print('     свободно %d, от %s до %s' % (s2['avail'], money(s2['from']), money(s2['to'])))
+        print('   итого по папке: свободно %d, от %s до %s'
+              % (s2['avail'], money(s2['from']), money(s2['to'])))
         for t in s2['tiers']:
             print('       %s сп. · %s м² · от %s' % (t['bedrooms'], t['area_sqm'], money(t['price_from_thb'])))
         if apply and TP.RULES.get(pid, {}).get('manual'):
@@ -417,6 +458,16 @@ def plans(pid, link, tok, limit=26):
              and (str(f.get('mimeType', '')).startswith('image/') or f.get('mimeType') == 'application/pdf')]
     want = [f for f in files if kind_of(f) == 'unitplan' and
             not re.search(r'master|мастер|siteplan|генплан', f['path'], re.I)]
+    # 17.09: у части застройщиков отдельной папки планировок нет вовсе — чертежи
+    # живут страницами буклета или сейл-кита (HALO: планы на страницах 6–20 из 21).
+    # Если своих файлов нет, разбираем буклет: страницы без планов отсеются дальше,
+    # там уже есть проверка «есть ли на странице код типа или метраж».
+    if not want:
+        want = [f for f in files if f.get('mimeType') == 'application/pdf'
+                and kind_of(f) in ('brochure', 'factsheet', 'price')
+                and not re.search(r'master|мастер|siteplan|генплан', f['path'], re.I)]
+        if want:
+            print('  своей папки чертежей нет — разбираю буклет: %s' % want[0]['name'][:60])
     if not want:
         print('  чертежей планировок в папке нет'); return 0
     # приоритет — файлы, в имени которых есть код типа или метраж

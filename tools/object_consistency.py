@@ -19,7 +19,9 @@
 import json, os, re, sys, urllib.request
 
 ENV = os.path.expanduser('~/.plp_site_supabase.env')
-Q = 'plp_property_id,name,usp,usp_en,handover_date,stage,status,price_from_thb,price_to_thb,bedrooms_min,bedrooms_max,area_min,area_max,on_site'
+Q = ('plp_property_id,name,usp,usp_en,ai_pitch_hook,ai_story,stage_note,'
+     'handover_date,stage,status,price_from_thb,price_to_thb,'
+     'bedrooms_min,bedrooms_max,area_min,area_max,on_site')
 # 16.09: на сайте четыре группы продажи — старт продаж, строится, готово к заезду,
 # вторичка. Сторож сверяет описание с группой, а не с сырым словом стадии: «анонсирован»
 # и «старт продаж» — одна полка, спорить им не о чем.
@@ -119,7 +121,13 @@ OTHER_LINE = re.compile(r'коммерч|commercial|торгов\w*\s+помещ
 
 def check(o):
     bad = []
-    parts = [str(o.get('usp') or ''), str(o.get('usp_en') or '')]
+    # 🔴 17.09: сторож читал только usp и usp_en и печатал «расхождений 0», пока
+    # в ai_pitch_hook и ai_story у Heritage стояло «сдача Q1 2026» и «1BR от 5.05M»,
+    # а у Kirara — «Completion Q2 2026». Эти поля читает мозг двойника: именно из них
+    # клиенту уезжали протухшие сроки и цены. Теперь они сверяются наравне с описанием.
+    parts = [str(o.get('usp') or ''), str(o.get('usp_en') or ''),
+             str(o.get('ai_pitch_hook') or ''), str(o.get('ai_story') or ''),
+             str(o.get('stage_note') or '')]
     keep = []
     for part in parts:
         keep.append(' '.join(s for s in re.split(r'(?<=[.;])\s+', part) if not OTHER_LINE.search(s)))

@@ -511,8 +511,15 @@ function unitsOf(o) {
   /* «1 спальня», «2 спальни» — это не тип, а просто число комнат: такие записи
      ничего не добавляют к прайсу, зато лишают карточку кода типа и чертежа.
      Если в прайсе есть тиры, показываем их. */
+  /* 🔴 17.09 Эльнур: «когда мы нажимаем на тип планировки, там нет цены от,
+     в Модева точно нет». У Модевы восемь настоящих типов застройщика со своими
+     ценами (1BMA, 1BL, 2BP, 3BDPAC…), но подписаны они по числу спален — и правило
+     ниже выбрасывало их целиком, оставляя три строки из прайса. Теперь запись
+     считается пустой, только если у неё НЕТ ни кода типа, ни своей площади:
+     код и площадь — это и есть «какая конкретно планировка и в какую стоимость». */
   const generic = named.length && named.every(u =>
-    /^(студия|\d+\s*(спальн|bedroom))/i.test(String(u.name || '').trim()));
+    /^(студия|\d+\s*(спальн|bedroom))/i.test(String(u.name || '').trim()) &&
+    !u.code && !u.area);
   if (named.length && !(generic && tiers.length)) {
     // Цену «от» из прайса подставляем только там, где планировка с таким числом
     // спален одна. Иначе AURA, SELENE и MYRRHA получали одинаковый ценник —
@@ -527,24 +534,45 @@ function unitsOf(o) {
   if (!tiers.length) return null;
   /* пентхаус — отдельная полка, а не «2 спальни»: у Katabello так выходило, что
      двухспальная стоила дороже трёхспальной, потому что это были пентхаусы */
+  /* 🔴 17.09 Эльнур: «пентхаус две спальни 17,7 дороже, чем три спальни пентхаус
+     13,3 млн бат, как?». Это не ошибка прайса: у Katabello двухспальный пентхаус
+     121 м² с садом стоит 17,67 млн, а трёхспальный 100 м² — 13,3 млн, то есть
+     146 000 против 133 000 ฿ за метр. Одна цифра площади на группу этого не
+     показывала. Собираем вилку площадей: «100–138 м²» рядом с «от 13 300 000»
+     объясняет разницу сразу. */
   const byBeds = new Map();
+  const spanByKey = new Map();
   for (const t of tiers) {
     const b = t.bedrooms;
     if (b == null) continue;
     const key = (t.kind === 'penthouse' ? 'ph' : 'flat') + ':' + b;
+    const a = Number(t.area_sqm);
+    if (a > 0) {
+      const sp = spanByKey.get(key) || { min: a, max: a };
+      sp.min = Math.min(sp.min, a); sp.max = Math.max(sp.max, a);
+      spanByKey.set(key, sp);
+    }
     const cur = byBeds.get(key);
     if (!cur || (t.price_from_thb && t.price_from_thb < cur.price_from_thb)) byBeds.set(key, t);
   }
   const word = b => b === 0 ? 'Студия' : b + (b === 1 ? ' спальня' : b < 5 ? ' спальни' : ' спален');
   return [...byBeds.values()]
     .sort((a, c) => (a.kind === 'penthouse') - (c.kind === 'penthouse') || a.bedrooms - c.bedrooms)
-    .map(t => ({
-      name: t.name || word(t.bedrooms),
-      beds: t.bedrooms,
-      code: t.code || null,          // по коду типа встаёт чертёж застройщика
-      area: t.area_sqm || null,
-      from: t.price_from_thb || null,
-    }));
+    .map(t => {
+      const key = (t.kind === 'penthouse' ? 'ph' : 'flat') + ':' + t.bedrooms;
+      const sp = spanByKey.get(key);
+      return {
+        name: t.name || word(t.bedrooms),
+        beds: t.bedrooms,
+        code: t.code || null,          // по коду типа встаёт чертёж застройщика
+        area: t.area_sqm || null,
+        /* вилка площадей группы: одно число врало — у Katabello «1 спальня 28 м²»
+           стояла в шапке, а в списке минимальная планировка была 37 м² */
+        areaMin: sp ? sp.min : null,
+        areaMax: sp ? sp.max : null,
+        from: t.price_from_thb || null,
+      };
+    });
 }
 
 /* ===== ЧЕТЫРЕ ГРУППЫ ПРОДАЖИ =====
@@ -992,10 +1020,13 @@ function writeObjectIndex(html, objects) {
 
   const block = MARK_OI_START + '\n' +
     '<section class="obj-index" id="all-objects"><div class="container">' +
-    '<details class="oi-box"><summary><b>Объекты в каталоге</b>' +
+    /* 17.09 Эльнур: «на карте 64 объекта, а раздел объекты в каталоге 54, странно».
+       Врало не число, а подпись: здесь только продажа, на карте продажа плюс аренда.
+       Называем вслух, что считаем. */
+    '<details class="oi-box"><summary><b>Объекты в продаже</b>' +
     '<span class="oi-n">' + total + '</span></summary>' +
     '<p class="sub">Все проекты, с которыми мы работаем, — с ценами от застройщика ' +
-    'и условиями рассрочки.</p>' +
+    'и условиями рассрочки. Объекты в аренду — в разделе «Аренда»; на карте показаны и те, и другие.</p>' +
     '<ul class="oi-list">' + rows + '</ul></details>' +
     '</div></section>\n' + MARK_OI_END;
 
@@ -1273,11 +1304,17 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
     }));
   }
   const money0 = v => new Intl.NumberFormat('ru-RU').format(Math.round(v)) + ' ฿';
+  const num = v => String(Math.round(Number(v) * 10) / 10).replace('.', ',');
   const unitsBlock = unitList.length
     ? '<section class="desc"><h2>Планировки и цены</h2><div class="units">' +
       unitList.map(u => {
         const shot = u.shot || planFor(u);
-        const line = [u.area ? (u.area + ' м²') : '', (u.beds != null ? u.beds + ' сп.' : ''),
+        /* 17.09: одно число площади врало — у Katabello в шапке «1 спальня 28 м²»,
+           а в списке минимальная планировка 37 м². Показываем вилку группы. */
+        const areaTxt = (u.areaMin && u.areaMax && u.areaMax - u.areaMin > 0.5)
+          ? (num(u.areaMin) + '–' + num(u.areaMax) + ' м²')
+          : (u.area ? (u.area + ' м²') : '');
+        const line = [areaTxt, (u.beds != null ? u.beds + ' сп.' : ''),
                       u.plot ? ('участок ' + u.plot) : '',
                       u.free ? ('свободно ' + u.free) : '']
           .filter(Boolean).join(' · ');
