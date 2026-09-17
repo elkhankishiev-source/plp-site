@@ -3558,9 +3558,19 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         '</div></div></div>'+
       '<div class="fbtns"><button type="button" class="btn ghost" id="f-cancel">Закрыть</button></div>', null);
     var tpl=document.getElementById('bk-tpl');
+    /* 17.09: раньше эта кнопка ВСЕГДА отвечала «попросите его в офисе» — ссылка на
+       образец была объявлена пустой строкой и нигде не заполнялась. Теперь образец
+       лежит в приватном хранилище, а сервер отдаёт временную ссылку: в публичный
+       репозиторий она не попадает. */
     if(tpl) tpl.onclick=function(e){
-      if(!UK_TEMPLATE){ e.preventDefault(); say('Шаблон ещё не заведён — попросите его в офисе.'); }
-      else tpl.href=UK_TEMPLATE;
+      e.preventDefault();
+      if(UK_TEMPLATE){ window.open(UK_TEMPLATE,'_blank','noopener'); return; }
+      var was=tpl.textContent; tpl.textContent='Готовим образец…';
+      post({action:'uk_template',token:TOKEN,format:'pdf'}).then(function(r){
+        tpl.textContent=was;
+        if(r&&r.ok&&r.url){ UK_TEMPLATE=r.url; window.open(r.url,'_blank','noopener'); }
+        else say((r&&r.msg)||(r&&r.error)||'Образец пока не отдаётся — напишите нам, пришлём files.');
+      });
     };
     var pick=document.getElementById('bk-pick'), fi=document.getElementById('bk-file'),
         st=document.getElementById('bk-state');
@@ -3596,7 +3606,11 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     pre=pre||{};
     var blk=bookBlocked(pid);
     if(blk && !pre.booking_id){ bookNeedContract(pid, blk); return; }
-    var objs=(DATA.properties||[]).map(function(x){ return {id:x.id, name:(x.name||x.id)}; });
+    /* 17.09: на витрине имя объекта обезличено («Clover · вилла, 3 спальни»), поэтому
+       в кабинете к нему добавляем внутренний код — иначе три одинаковых строки.
+       Кабинет за входом, здесь настоящий номер показывать можно. */
+    var objs=(DATA.properties||[]).map(function(x){
+      return {id:x.id, name:(x.name?(x.name+' · '+x.id):x.id)}; });
     clForm('<h3>'+(pre.booking_id?'Правка брони':'Новая бронь')+'</h3><div class="fgrid">'+
       '<label class="wide">Объект<select id="b-obj">'+objs.map(function(o){
          return '<option value="'+clEsc(o.id)+'"'+((o.id===pid)?' selected':'')+'>'+clEsc(o.name)+'</option>';}).join('')+'</select></label>'+
@@ -8931,6 +8945,10 @@ window.chatVoice=chatVoice;window.listenBar=listenBar;window.paintVoiceMode=pain
     {id:'docs',     title:'Документы'},
     {id:'payout',   title:'Вопрос по выплате'},
     {id:'resale',   title:'Выставить на перепродажу'},
+    /* 17.09: этих двух видов не было, и настоящая заявка «СДАТЬ В АРЕНДУ»
+       записалась видом «перепродажа». Путь владельца начинается здесь. */
+    {id:'rent_start',  title:'Хочу сдавать через вас'},
+    {id:'uk_contract', title:'Договор управления'},
     {id:'other',    title:'Другое'}
   ];
   var REQ_CLIENT=null, REQ_ALLOBJ=[];
