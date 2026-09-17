@@ -2394,26 +2394,6 @@
    ]
   },
   {
-   "id": "PLP-VIVI-A304",
-   "pub": "PLP-VIVI-R3",
-   "url": "https://property-library.com/object/vivi-r3",
-   "name": "The Title VIVI, Банг Тао — 3 этаж",
-   "district": "Банг Тао",
-   "type": "Кондо",
-   "price_from": 4300000,
-   "units": []
-  },
-  {
-   "id": "PLP-VIVI-A507",
-   "pub": "PLP-VIVI-R5",
-   "url": "https://property-library.com/object/vivi-r5",
-   "name": "The Title VIVI, Банг Тао — 5 этаж",
-   "district": "Банг Тао",
-   "type": "Кондо",
-   "price_from": 4300000,
-   "units": []
-  },
-  {
    "id": "PLP-ZENITHY",
    "pub": "PLP-ZENITHY",
    "url": "https://property-library.com/object/zenithy",
@@ -2503,26 +2483,6 @@
      "площадь_м2": "91,0–100,9"
     }
    ]
-  },
-  {
-   "id": "RESALE-PANORA",
-   "pub": "PLP-PANORA-VILLA",
-   "url": "https://property-library.com/object/panora-villa",
-   "name": "Panora Villas, Сурин",
-   "district": "Сурин",
-   "type": "Вилла",
-   "price_from": 19850000,
-   "units": []
-  },
-  {
-   "id": "RESALE-PANORA-CONDO",
-   "pub": "PLP-PANORA-CONDO",
-   "url": "https://property-library.com/object/panora-condo",
-   "name": "The Panora Phuket, корпус D",
-   "district": "Сурин",
-   "type": "Кондо",
-   "price_from": 4425400,
-   "units": []
   }
  ]
 }
