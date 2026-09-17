@@ -2600,9 +2600,11 @@ function paintThemeBtn(){
   b.title = v==='light' ? 'Светлое оформление' : v==='dark' ? 'Тёмное оформление' : 'Как в системе';
   var dark = v==='dark' || (v==='system' && window.matchMedia &&
              window.matchMedia('(prefers-color-scheme: dark)').matches);
+  /* 17.09: подложка знака — фирменный оливковый, он один на обе темы. Белый знак
+     на тёмной теме ложился на светло-бежевое. На подложке знак всегда чернильный. */
   document.querySelectorAll('.logo .chip img').forEach(function(img){
-    var want = dark ? 'img/brand/plp-mark-white.png' : 'img/brand/plp-mark-ink.png';
-    if(img.getAttribute('src')!==want) img.setAttribute('src',want);
+    if(img.getAttribute('src')!=='img/brand/plp-mark-ink.png')
+      img.setAttribute('src','img/brand/plp-mark-ink.png');
   });
 }
 /* Язык в кабинете. Кнопки RU/EN в шапке и в бургере раньше вызывали setLang,

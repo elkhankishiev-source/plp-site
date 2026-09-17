@@ -113,7 +113,7 @@ create or replace function public.uk_contract_set(
   p_long numeric default null, p_start date default null, p_end date default null,
   p_status text default 'active', p_payout text default null)
 returns jsonb language plpgsql security definer set search_path to 'public' as $$
-declare v_may jsonb; v_id bigint; v_own uuid;
+declare v_may jsonb; v_id uuid; v_own uuid;   -- id договора — uuid, не число
 begin
   v_may := uk_may_touch(p_token, p_property);
   if not (v_may->>'ok')::boolean then return v_may; end if;
