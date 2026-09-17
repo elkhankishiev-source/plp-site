@@ -8,6 +8,6 @@ Disallow: /admin.html
 Disallow: /owner.html
 
 # черновик новой главной — в поиск не пускаем
-Disallow: /draft.html
+# draft.html вынесен из репозитория 17.09 — старый черновик с ключами вебхуков
 
 Sitemap: https://property-library.com/sitemap.xml

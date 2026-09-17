@@ -6,3 +6,16 @@ site_rent.html
 tz_*.txt
 *.bak
 .audit_tmp.html
+
+# 🔴 17.09: репозиторий сайта ПУБЛИЧНЫЙ, и GitHub Pages отдаёт его целиком —
+# любой файл отсюда лежит по адресу property-library.com/<путь>. В tools/units_owners.json
+# лежали ФИО собственников, их мобильные и имена детей: файл был доступен по прямой
+# ссылке. Внутреннее сюда не кладём, оно живёт в ~/plp-internal и ~/.plp_*.
+tools/units_owners.json
+SITE-TODO.md
+ca3.json
+ca4.json
+campedit.sql
+draft.html
+build/prices_last_check.json
+tools/link_units.py

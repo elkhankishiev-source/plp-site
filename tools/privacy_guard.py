@@ -9,6 +9,10 @@
 Bayside 2205, Katabello F302. Показывали чужое жильё по его адресу в доме.
 
 Что проверяет:
+  0. в РЕПОЗИТОРИИ нет файлов с персональными данными. Репозиторий сайта публичный,
+     и GitHub Pages отдаёт его целиком: любой файл лежит по адресу
+     property-library.com/<путь>. 17.09 так лежал tools/units_owners.json —
+     ФИО собственников, их мобильные и имена детей, 42 телефона одним файлом;
   1. в публичных текстах карточки-юнита нет номера квартиры застройщика;
   2. public_code юнита непрозрачен — из него не читается тот же номер;
   3. в публичных текстах нет имени владельца (из owner_ref), телефона, почты;
@@ -31,6 +35,9 @@ UNIT = re.compile(r'(?<![\w-])([A-Z]{1,2}[\s-]?\d{2,4}|\d{4})(?![\w%-])')
 YEAR = re.compile(r'^(19|20)\d\d$')
 PHONE = re.compile(r'(?<!\d)(?:\+?\d[\s()-]?){9,}\d')
 MAIL = re.compile(r'[\w.+-]+@[\w-]+\.[a-z]{2,}', re.I)
+# наши собственные номера — их публикация не нарушение
+OURS = {'955492587', '954143874', '509498386'}
+REAL_PHONE = re.compile(r'\+\d{1,3}[\s()-]?\d{2,4}[\s()-]?\d{2,4}[\s()-]?\d{2,4}')
 
 
 def sb(q):
@@ -102,6 +109,44 @@ def main():
         for v in unit_no(code.replace('PLP-', '')):
             bad.append((pid, 'public_code', 'наш код повторяет номер квартиры: %s' % code))
             break
+    # 0. весь репозиторий: что угодно отсюда отдаётся по прямому адресу
+    import subprocess
+    repo = []
+    try:
+        tracked = subprocess.run(['git', 'ls-files'], cwd=ROOT, capture_output=True,
+                                 text=True, timeout=60).stdout.split()
+    except Exception:
+        tracked = []
+    SKIP_EXT = ('.png', '.jpg', '.jpeg', '.webp', '.gif', '.svg', '.ico', '.pdf', '.woff', '.woff2')
+    for rel in tracked:
+        if rel.lower().endswith(SKIP_EXT):
+            continue
+        f = os.path.join(ROOT, rel)
+        try:
+            txt = open(f, encoding='utf-8', errors='ignore').read()
+        except Exception:
+            continue
+        # телефон человека — только международный формат: «+79…», «+66…».
+        # Длинные числа в разметке (хэши, координаты, ключи) телефонами не считаем.
+        phones = {re.sub(r'\D', '', m.group(0)) for m in REAL_PHONE.finditer(txt)}
+        phones = {x for x in phones if x[-9:] not in OURS}
+        if len(phones) >= 3:
+            repo.append((rel, 'телефоны людей: %d разных' % len(phones)))
+            continue
+        # имя человека засчитываем только рядом с телефоном: в разметке «Например,
+        # Александр» — это подсказка в поле, а не данные клиента
+        if phones:
+            for n in names:
+                for m in re.finditer(r'\b' + re.escape(n) + r'\b', txt):
+                    # «Например, Александр» в поле формы — подсказка, а не данные клиента
+                    before = txt[max(0, m.start() - 24):m.start()].lower()
+                    if re.search(r'например|e\.g\.|for example|placeholder', before):
+                        continue
+                    repo.append((rel, 'имя «%s» рядом с телефоном' % n)); break
+                else:
+                    continue
+                break
+
     # собранные страницы: то же самое, но уже глазами посетителя
     pages = []
     for f in ['rent.html', 'index.html', 'offer-catalog.json', 'llms.txt', 'sitemap.xml'] + \
@@ -114,13 +159,16 @@ def main():
             if re.search(r'\b' + re.escape(n) + r'\b', txt):
                 pages.append((os.path.relpath(p, ROOT), 'имя «%s»' % n))
     if short:
-        total = len(bad) + len(pages)
+        total = len(bad) + len(pages) + len(repo)
         print('[личные данные] %s: карточек-юнитов проверено %d, засветов %d%s' % (
             'ок' if not total else 'ЕСТЬ ЗАСВЕТ',
             sum(1 for o in objs if o.get('parent_object_id') or o.get('owner_ref') or (o.get('purpose') or '') == 'аренда'),
-            total, '' if not total else ' — ' + (bad[0][0] + ': ' + bad[0][2] if bad else pages[0][1])))
+            total, '' if not total else ' — ' + (repo[0][0] + ': ' + repo[0][1] if repo
+                                                else bad[0][0] + ': ' + bad[0][2] if bad else pages[0][1])))
     else:
-        print('Сторож витрины: засветов %d\n' % (len(bad) + len(pages)))
+        print('Сторож витрины: засветов %d\n' % (len(bad) + len(pages) + len(repo)))
+        for f, what in repo:
+            print('  🔴 в репозитории %-34s %s' % (f, what))
         for pid, f, what in bad:
             print('  %-22s %-14s %s' % (pid, f, what))
         for f, what in pages:
@@ -128,7 +176,7 @@ def main():
         if bad or pages:
             print('\nЛечится в public.objects: имя = комплекс + тип жилья, номер квартиры живёт '
                   'только в client_objects.unit и виден в кабинете.')
-    return 1 if (bad or pages) else 0
+    return 1 if (bad or pages or repo) else 0
 
 
 if __name__ == '__main__':
