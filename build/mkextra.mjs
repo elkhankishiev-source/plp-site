@@ -210,5 +210,32 @@ for(const f of faq){
     jsonld:{'@context':'https://schema.org','@type':'FAQPage','mainEntity':[{'@type':'Question','name':f.q,
       'acceptedAnswer':{'@type':'Answer','text':f.a}}]}}));
 }
+/* 17.09 Эльнур: «справочник покупателя классный блок, не видел его у нас, может
+   пусть он будет там где-то, где ФАК… это надо как-то объединить со справочником».
+   Короткий ответ живёт на главной, полный разбор — здесь; связывает их оглавление,
+   на которое ведут все двенадцать ссылок «Подробно в справочнике». */
+{
+  const items = faq.filter(f => slugs[f.n]).map(f =>
+    `<li style="margin:0"><a href="${slugs[f.n]}.html" style="display:block;padding:14px 16px;` +
+    `background:var(--card,#fff);border:1px solid var(--line,#e7e7e2);border-radius:14px;` +
+    `text-decoration:none;color:inherit"><b style="display:block;font-size:17px;line-height:1.35">` +
+    `${esc(f.q)}</b><span style="display:block;margin-top:6px;font-size:14px;opacity:.75;` +
+    `line-height:1.5">${esc(f.a.slice(0, 150))}…</span></a></li>`).join('');
+  const body = `<section style="padding-bottom:0"><div class="container" style="max-width:760px">
+    <p class="kicker">Справочник покупателя</p>
+    <h1 style="font-size:clamp(26px,3.8vw,38px);margin:0 0 10px">Что нужно знать до покупки на Пхукете</h1>
+    <p style="font-size:18px;line-height:1.7;margin:0 0 22px">${faq.length} разборов: собственность,
+      налоги, сроки, доходность, риски и управление. Коротко о том же — в блоке
+      «Нас часто спрашивают» на главной.</p>
+    <ul style="list-style:none;padding:0;margin:0;display:grid;gap:10px">${items}</ul>
+  </div></section>
+  ${SALE}`;
+  made.push(page({file:'guide/index.html',depth:1,
+    title:'Справочник покупателя недвижимости на Пхукете — Property Library Phuket',
+    desc:'Собственность, налоги, сроки сделки, доходность, риски и управление — ' + faq.length + ' разборов простым языком.',
+    body,
+    jsonld:{'@context':'https://schema.org','@type':'FAQPage','mainEntity':faq.map(f=>({'@type':'Question',
+      'name':f.q,'acceptedAnswer':{'@type':'Answer','text':f.a}}))}}));
+}
 console.log('создано страниц:',made.length);
 console.log(made.join('\n'));
