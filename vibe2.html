@@ -2085,18 +2085,30 @@ body{background:var(--bg)}
   <div style="display:flex;justify-content:flex-end;margin:0 0 10px">
     <a class="btn btn-ghost" href="/offers/vibe2/Vibe2_Karon.pdf" download style="font-size:14px">Скачать PDF</a>
   </div>
-  <iframe id="offerFrame" src="/offers/vibe2/page.htm?v=mu5snxxy.5br" title="Vibe II · Карон — закрытый предстарт" loading="eager"
-    style="display:block;width:100%;max-width:794px;margin:0 auto;height:4600px;border:0;border-radius:14px;background:#EFECE2;box-shadow:0 2px 18px rgba(23,24,15,.08)"></iframe>
+  <div id="offerBox" style="width:100%;max-width:794px;margin:0 auto;overflow:hidden;border-radius:14px;background:#EFECE2;box-shadow:0 2px 18px rgba(23,24,15,.08);height:4531px">
+    <iframe id="offerFrame" src="/offers/vibe2/page.htm?v=mu5szjc5.y3" title="Vibe II · Карон — закрытый предстарт" loading="eager" scrolling="no"
+      style="display:block;width:794px;height:4531px;border:0;transform-origin:0 0"></iframe>
+  </div>
 </div></section>
 <script>
+/* Лист оффера показываем ровно как в PDF: ширина листа 794px (210 мм), на узком экране
+   уменьшаем его целиком, а не перестраиваем в колонку. Эльнур 18.09: «как в PDF, рядом». */
 (function () {
-  var f = document.getElementById('offerFrame');
-  function set(h) { if (h > 300) f.style.height = Math.ceil(h) + 'px'; }
-  /* тот же домен: высоту читаем сами; сообщение из рамки — запасной путь */
-  function fit() { try { var d = f.contentDocument, w = d.querySelector('.w') || d.body; set(w.getBoundingClientRect().height); } catch (e) {} }
+  var box = document.getElementById('offerBox'), f = document.getElementById('offerFrame'), H = 4531;
+  function layout() {
+    var k = Math.min(1, box.clientWidth / 794);
+    f.style.transform = k < 1 ? 'scale(' + k + ')' : '';
+    f.style.height = H + 'px';
+    box.style.height = Math.ceil(H * k) + 'px';
+  }
+  function fit() {
+    try { var d = f.contentDocument, w = d.querySelector('.w') || d.body; var h = w.getBoundingClientRect().height; if (h > 300) H = Math.ceil(h); } catch (e) {}
+    layout();
+  }
   f.addEventListener('load', function () { fit(); setTimeout(fit, 700); setTimeout(fit, 2000); });
-  addEventListener('resize', function () { setTimeout(fit, 150); });
-  addEventListener('message', function (e) { if (e && e.data && e.data.plpOfferHeight) set(e.data.plpOfferHeight); });
+  addEventListener('resize', layout);
+  addEventListener('message', function (e) { if (e && e.data && e.data.plpOfferHeight > 300) { H = Math.ceil(e.data.plpOfferHeight); layout(); } });
+  layout();
 })();
 </script>
 </main>
