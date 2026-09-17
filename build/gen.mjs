@@ -1804,7 +1804,7 @@ if(dark) i.src='../img/brand/plp-mark-white.png';})();</script>
   });
 })();
 </script>
-<footer><div class="wrap">Property Library Phuket · <a href="https://wa.me/${WA}" rel="noopener" target="_blank">WhatsApp +66 95 549 2587</a> · <a href="../">на главную</a><br>Данные носят справочный характер и не являются офертой.</div></footer>
+<footer><div class="wrap">Property Library Phuket · <a href="https://wa.me/${WA}?text=${encodeURIComponent('Здравствуйте! Пишу со страницы «' + String(o.name || '') + '» на property-library.com')}" rel="noopener" target="_blank">WhatsApp +66 95 549 2587</a> · <a href="../">на главную</a><br>Данные носят справочный характер и не являются офертой.</div></footer>
 </body>
 </html>
 `;
