@@ -1,13 +1,13 @@
 User-agent: *
 Allow: /
+Disallow: /tools/
+Disallow: /build/
+Disallow: /.github/
 
 # админка УК — под ключом, но в поиске ей не место
 Disallow: /admin.html
 
 # кабинет собственника — только по личному коду, в поиске ему не место
 Disallow: /owner.html
-
-# черновик новой главной — в поиск не пускаем
-# draft.html вынесен из репозитория 17.09 — старый черновик с ключами вебхуков
 
 Sitemap: https://property-library.com/sitemap.xml
