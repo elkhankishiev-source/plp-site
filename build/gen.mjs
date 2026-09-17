@@ -299,6 +299,17 @@ function plotOf(o) {
   return fmtPlot(nums);
 }
 
+/* Полное имя застройщика на витрине — без реквизитов и лишних пометок.
+   17.09: на странице PEYLAA в поле «Юридическое лицо» и в разметке для поисковиков
+   печаталось «(рег.0105566213897)», у Mono Champaca — «(на рынке с 1999 г.)».
+   Юридическое имя нужно, регистрационный номер посетителю — нет. */
+function legalDev(dev) {
+  if (!dev) return '';
+  return String(dev).split(' — ')[0].split(' – ')[0]
+    .replace(/\s*\((?=[^)]*(?:рег|reg\.|тин|tax|на рынке|since|\d{6,}))[^)]*\)/gi, '')
+    .replace(/\s{2,}/g, ' ').trim();
+}
+
 function shortDev(dev) {
   if (!dev) return '';
   let d = String(dev).split(' — ')[0].split(' – ')[0].trim();
@@ -452,7 +463,7 @@ function buildCatalog(objects, benchmarks, preserve) {
             urls: Array.isArray(g.urls) ? g.urls.map(u => thumbUrl(u, 1280, 78)) : g.urls }))
         : null,
       developer: shortDev(o.developer) || null,
-      developerFull: o.developer || null,
+      developerFull: legalDev(o.developer) || null,
       calc: withFacts(keep.calc || fallbackCalc(o), o),
     };
   });
@@ -1160,7 +1171,7 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
     address: { '@type': 'PostalAddress', addressRegion: 'Phuket', addressLocality: ru, addressCountry: 'TH' },
   };
   if (o.developer) residence.additionalProperty = {
-    '@type': 'PropertyValue', name: 'Застройщик', value: String(o.developer),
+    '@type': 'PropertyValue', name: 'Застройщик', value: legalDev(o.developer),
   };
   if (o.bedrooms_max != null) residence.numberOfRooms = o.bedrooms_max;
   if (o.area_max != null) residence.floorSize = { '@type': 'QuantitativeValue', value: o.area_max, unitCode: 'MTK' };
@@ -1576,7 +1587,7 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
     { k: 'Застройщик', v: shortDev(o.developer) },
     // Полное юридическое название — отдельной строкой и только если оно
     // действительно длиннее короткого: реквизиты нужны, но не вместо имени.
-    { k: 'Юридическое лицо', v: (o.developer && shortDev(o.developer) !== String(o.developer).trim()) ? o.developer : '' },
+    { k: 'Юридическое лицо', v: (o.developer && shortDev(o.developer) !== legalDev(o.developer)) ? legalDev(o.developer) : '' },
   ]);
 
   return `<!doctype html>
