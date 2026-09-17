@@ -1744,7 +1744,7 @@ if(dark) i.src='../img/brand/plp-mark-white.png';})();</script>
   ${materials}
   <div class="cta">
     <a class="btn primary" href="${htmlEsc(backLink)}&ask=1">Задать вопрос по объекту</a>
-    <a class="btn ghost" href="${htmlEsc(backLink)}">Рассчитать доходность</a>
+    <a class="btn ghost" href="${htmlEsc(backLink)}&calc=1">Рассчитать доходность</a>
     <button type="button" class="btn ghost" id="shareBtn">Поделиться</button>
     <a class="btn wa" href="${htmlEsc(waLink)}" rel="noopener" target="_blank">WhatsApp</a>
   </div>
