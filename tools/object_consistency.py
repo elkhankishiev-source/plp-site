@@ -21,7 +21,7 @@ import json, os, re, sys, urllib.request
 ENV = os.path.expanduser('~/.plp_site_supabase.env')
 Q = ('plp_property_id,name,usp,usp_en,ai_pitch_hook,ai_story,stage_note,'
      'handover_date,stage,status,price_from_thb,price_to_thb,'
-     'bedrooms_min,bedrooms_max,area_min,area_max,on_site')
+     'bedrooms_min,bedrooms_max,area_min,area_max,on_site,current_promo')
 # 16.09: на сайте четыре группы продажи — старт продаж, строится, готово к заезду,
 # вторичка. Сторож сверяет описание с группой, а не с сырым словом стадии: «анонсирован»
 # и «старт продаж» — одна полка, спорить им не о чем.
@@ -160,6 +160,24 @@ def check(o):
         if abs(lo - pf) > pf * 0.05:
             f = lambda v: ('%.2f' % (v / 1e6)).rstrip('0').rstrip('.') + ' млн ฿'
             bad.append((pid, 'цена «от»', 'в полях ' + f(pf), 'в описании ' + f(lo)))
+    # 🔴 17.09 Эльнур: «фантазия равай скидки 1 млн — грубая ошибка, такие штуки
+    # вообще убирай везде». На витрине как «акции» стояли: заглушка «[нужно от
+    # Эльнура]», заметки «уточнить у застройщика», догадки с пометкой (estimated),
+    # акция со сроком до 31.10.2025 и «цена со скидкой 5 700 000» на карточке,
+    # где написано «от 3 570 000». Одиннадцать штук.
+    promo = str(o.get('current_promo') or '').strip()
+    if promo:
+        if re.search(r'нужно от|уточнить|запросить|todo|\[|по договорённости', promo, re.I):
+            bad.append((pid, 'акция', 'заглушка на витрине', promo[:60]))
+        elif re.search(r'\(estimated\)|предположительно', promo, re.I):
+            bad.append((pid, 'акция', 'догадка, не подтверждено', promo[:60]))
+        else:
+            md = re.search(r'скидк\w*\s+([\d\s]{6,})\s*฿', promo)
+            mp = re.search(r'цена\s+([\d\s]{6,})\s*฿', promo, re.I)
+            if md and mp and pf:
+                price = int(re.sub(r'\D', '', mp.group(1)))
+                if price > pf * 1.2:
+                    bad.append((pid, 'акция', 'цена со скидкой %s' % price, 'а в карточке «от %s»' % int(pf)))
     bmin, bmax = o.get('bedrooms_min'), o.get('bedrooms_max')
     mb = re.search(r'от\s+(\d)\s*до\s+(\d)\s+спал|(\d)\s*[–-]\s*(\d)\s*(?:сп|спал|br\b)', txt, re.I)
     if mb and bmin and bmax:
