@@ -6,6 +6,7 @@
 наличие». Порядок такой:
   1. каналы застройщиков (tools/tg_prices.py) — цена и наличие по свободным юнитам;
   2. папки на Диске (tools/drive_pull.py) — там, где канала нет;
+  2б. термшиты Banyan Group (tools/laguna_prices.py) — цены Laguna лежат папкой прайсов;
   3. пересборка сайта со всеми проверками; если проверка падает — не публикуем;
   4. выкладка и короткий отчёт в Telegram: что изменилось и что ждёт подтверждения.
 
@@ -68,6 +69,19 @@ def main():
                 changed.append('• %s: цена обновлена с Диска' % pid)
             if '⚠ не записываю' in line and pid:
                 waiting.append('• %s: прайс с Диска расходится больше чем на четверть' % pid)
+
+    # 17.09: у Banyan Group (Laguna) цены живут не в канале, а папкой термшитов —
+    # свой вход, но та же запись и тот же предохранитель. Без этого шага пять карточек
+    # Laguna застыли бы на числах, снятых один раз руками.
+    lag = run([PY3, os.path.join(ROOT, 'tools', 'laguna_prices.py'), '--fetch']
+              + (['--apply'] if APPLY else []))
+    for line in lag.splitlines():
+        m = re.match(r'(PLP-\S+)\s+(\d{4}-\d\d-\d\d)\s+(.+?฿|—)\s{2,}(.+?฿)\s+(\d+) из (\d+)', line)
+        if not m:
+            continue
+        row = ('• %s: %s → %s (термшит от %s, свободно %s из %s)'
+               % (m.group(1), m.group(3).strip(), m.group(4).strip(), m.group(2), m.group(5), m.group(6)))
+        (waiting if 'нужен «го»' in line else changed).append(row)
 
     built = published = ''
     if APPLY:
