@@ -72,26 +72,26 @@
 </script>
 <!-- PLP:HEADTHEME:END -->
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<title>Купить недвижимость на Пхукете — виллы и апартаменты | Property Library</title>
-<meta name="description" content="Виллы, апартаменты и кондо на Пхукете от застройщиков и собственников. Проверенные объекты, расчёт доходности, сопровождение сделки.">
+<title>Справочник покупателя недвижимости на Пхукете — Property Library Phuket</title>
+<meta name="description" content="Собственность, налоги, сроки сделки, доходность, риски и управление — 12 разборов простым языком.">
 
 <!-- ===== SEO / SOCIAL ===== -->
-<link rel="canonical" href="https://property-library.com/buy">
+<link rel="canonical" href="https://property-library.com/guide/index">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Property Library Phuket">
 <meta name="robots" content="index,follow">
 
 <!-- Favicons -->
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
-<link rel="apple-touch-icon" href="favicon.svg">
-<link rel="mask-icon" href="favicon.svg" color="#D2D5B3">
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="apple-touch-icon" href="../favicon.svg">
+<link rel="mask-icon" href="../favicon.svg" color="#D2D5B3">
 
 <!-- Open Graph -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Property Library Phuket">
-<meta property="og:title" content="Купить недвижимость на Пхукете — виллы и апартаменты | Property Library">
-<meta property="og:description" content="Виллы, апартаменты и кондо на Пхукете от застройщиков и собственников. Проверенные объекты, расчёт доходности, сопровождение сделки.">
-<meta property="og:url" content="https://property-library.com/buy">
+<meta property="og:title" content="Справочник покупателя недвижимости на Пхукете — Property Library Phuket">
+<meta property="og:description" content="Собственность, налоги, сроки сделки, доходность, риски и управление — 12 разборов простым языком.">
+<meta property="og:url" content="https://property-library.com/guide/index">
 <meta property="og:image" content="https://property-library.com/img/PLP-HERITAGE.jpg">
 <meta property="og:image:secure_url" content="https://property-library.com/img/PLP-HERITAGE.jpg">
 <meta property="og:image:type" content="image/jpeg">
@@ -2091,62 +2091,7 @@ body{background:var(--bg)}
 <link rel="preconnect" href="https://tiles.openfreemap.org" crossorigin>
 <link rel="preconnect" href="https://tile.openstreetmap.org" crossorigin>
 <link rel="preconnect" href="https://server.arcgisonline.com" crossorigin>
-
-<style>
-.catalog{padding-top:14px}
-.catalog .filterbar{margin-top:12px}
-.catalog .container>.reveal{margin-bottom:0}
-.catalog .arrows{display:none}
-.catalog .found{margin:14px 0 4px;font-size:.92rem;color:var(--muted)}
-.catalog .found b{color:var(--ink);font-size:1.05rem}
-/* Эльнур 05.09: карта сбоку мешала, а снизу — не видно подсветки при наведении.
-   Ставим её НАД лентой и делаем липкой: пока листаешь карточки, карта остаётся
-   в кадре и метка загорается на глазах. */
-.catrow{display:flex;flex-direction:column-reverse;margin-top:8px}
-.catmap{position:sticky;top:66px;z-index:12;margin:0 0 14px;
-  background:var(--bg,#F7F6F1);padding-bottom:10px}
-.catmap-h{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}
-.catmap-h b{font-size:1.05rem}
-.catmap-h span{font-size:.85rem;color:var(--muted)}
-.catmap-fold{margin-left:auto;background:none;border:0;font:inherit;font-size:.82rem;font-weight:600;
-  color:var(--muted);cursor:pointer;text-decoration:underline;padding:0}
-.catmap-fold:hover{color:var(--ink)}
-.catmap.folded .plpwrap{display:none}
-.catmap.folded{padding-bottom:0;margin-bottom:12px}
-/* Эльнур 05.09: на странице продажи объекты тоже лентой, как на главной —
-   вертикальная сетка оставляла пустые места и растягивала страницу.
-   Карта рядом остаётся, подсветка при прокрутке ленты работает как прежде. */
-.catalog .car{display:flex;gap:16px;overflow-x:auto;padding:2px 2px 10px;
-  scroll-snap-type:x proximity;scrollbar-width:none;-webkit-overflow-scrolling:touch}
-.catalog .car::-webkit-scrollbar{display:none}
-.catalog .car .prop{flex:0 0 290px;width:290px!important;min-width:0;scroll-snap-align:start}
-.catalog .arrows{display:flex!important}
-@media(max-width:600px){.catalog .car .prop{flex-basis:80vw;width:80vw!important}}
-.catalog .car .prop.hl{outline:2px solid var(--ink);outline-offset:2px}
-.catalog .car .prop.hl{outline:2px solid var(--ink);outline-offset:2px}
-.catmap .plpmap{height:min(30vh,260px);margin:0;border-radius:16px;overflow:hidden}
-@media(max-width:700px){.catmap{position:static;margin-bottom:14px}
-  .catmap .plpmap{height:min(34vh,260px)}}
-.catmap .plpwrap{margin:0}
-.catmap .capt{font-size:.8rem;color:var(--muted);margin:8px 0 0}
-</style>
-
-<style>
-#rentFilters{flex-direction:row!important;flex-wrap:wrap;align-items:center;gap:8px!important;margin-top:12px!important}
-#rentFilters .rf-lab,#rentFilters>span.kicker{display:none}
-#rentFilters .rf-more{margin-top:0;margin-left:auto}
-#rentDateFilter{margin-top:10px}
-#rentDateFilter .df-status{font-size:.8rem;margin-top:6px}
-section#rent,section#sale{padding-top:10px}
-@media(max-width:700px){
-  /* на телефоне блок дат и фильтры не должны занимать весь экран */
-  #rentDateFilter .df-fields{gap:8px}
-  #rentFilters{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-left:-14px;margin-right:-14px;padding:2px 14px 6px}
-  #rentFilters::-webkit-scrollbar{display:none}
-  #rentFilters .rf-more{margin-left:8px}
-  #rentDateFilter .df-status{display:none}
-}
-</style>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Может ли иностранец купить недвижимость в Таиланде?","acceptedAnswer":{"@type":"Answer","text":"Да. Квартиру в кондоминиуме иностранец оформляет во фрихолд — полная собственность навсегда, если в доме не выбрана иностранная квота (по закону до 49% площадей). Когда квота выбрана, ту же квартиру берут в лизхолд — это тоже рабочий и законный вариант. С землёй иначе: участок оформляется в лизхолд, а само строение — во фрихолд, то есть дом принадлежит вам. Мы разбираем схему по конкретному объекту и показываем, что именно вы получаете на бумаге."}},{"@type":"Question","name":"Leasehold или Freehold — что выбрать?","acceptedAnswer":{"@type":"Answer","text":"Фрихолд — полная собственность, доступна в кондоминиумах в рамках иностранной квоты; такие лоты легче перепродать. Лизхолд — долгосрочное право на 30 лет с продлениями, по нему оформляют землю под виллой, а также квартиры сверх квоты. У виллы обычно так: земля в лизхолд, дом во фрихолд. Для инвестиций чаще берут фрихолд-кондо, для жизни — виллу. Условия продления читает независимый юрист до подписания — на этом мы не экономим."}},{"@type":"Question","name":"Какие налоги и расходы, кроме цены объекта?","acceptedAnswer":{"@type":"Answer","text":"При переоформлении платится transfer fee 2% от оценочной стоимости. Дальше зависит от срока владения продавца: до пяти лет — специальный бизнес-налог 3,3%, дольше — гербовый сбор 0,5%; плюс подоходный налог продавца. По практике расходы делят пополам, но это предмет договорённости, и мы её ведём. Отдельно: разовый взнос в фонд дома, коммунальные за год вперёд у части застройщиков, подключение воды и электричества."}},{"@type":"Question","name":"Сколько времени занимает сделка?","acceptedAnswer":{"@type":"Answer","text":"Готовый объект — от одного до трёх месяцев: бронирование, юридическая проверка, договор, перевод денег, переоформление в земельном департаменте. Новостройка — от года до четырёх: платите по этапам стройки, право оформляете при передаче. Ключевые точки, где вы нужны лично: просмотр перед договором и приёмка. Остальное решается удалённо."}},{"@type":"Question","name":"Я не в Таиланде. Можно купить удалённо?","acceptedAnswer":{"@type":"Answer","text":"Да, это обычная практика. Показы по видеосвязи, документы подписываются дистанционно, на переоформление оформляется доверенность на юриста. Оплата — банковским переводом с пометкой о назначении: она понадобится, когда будете выводить деньги обратно. Рекомендуем приехать хотя бы раз — на просмотр или на приёмку. Многие наши клиенты покупали, не прилетая, и впервые видели объект уже на ключах."}},{"@type":"Question","name":"Сколько стоят ваши услуги?","acceptedAnswer":{"@type":"Answer","text":"Вам — ничего. Мы аккредитованное независимое агентство: работаем со всеми крупными застройщиками острова и предлагаем то, что выгодно вам, а не то, что нужно продать конкретному отделу продаж. Цена для вас не выше прямой, а условия часто лучше — мы их выбиваем. Плюс независимое сравнение проектов, проверка объекта и застройщика, сопровождение сделки и жизнь после неё: личный кабинет с отчётами, документами и графиком платежей, управление и помощь с продажей, когда захотите выйти."}},{"@type":"Question","name":"Какую доходность реально приносит объект?","acceptedAnswer":{"@type":"Answer","text":"Ориентир по рынку — 6–12% годовых; точная цифра зависит от сезона, формата аренды и управления. Загрузка в высокий сезон, с ноября по апрель, доходит до 80–95%, в низкий держится на 50–70%. Но цифра сильно зависит от того, как выстроена работа: правильный формат под район, сезонные ставки, каналы бронирования, расходы и налоги. Когда этим занимается специалист и объект под управлением, доходность выходит выше средней по рынку — и без вашего участия. Мы считаем по конкретному лоту и объясняем каждую строку; гарантированной доходности не бывает, это прогноз."}},{"@type":"Question","name":"Что такое гарантированная доходность от застройщика?","acceptedAnswer":{"@type":"Answer","text":"Это программа, где застройщик платит фиксированный процент — обычно 5–7% годовых на три-пять лет — независимо от загрузки. Плюс: предсказуемость. Минус: обычно ограничивается ваше личное проживание, а после окончания программы доход зависит уже от рынка. Мы всегда показываем обе картины: с программой и без, чтобы вы решали с открытыми глазами."}},{"@type":"Question","name":"Кто занимается объектом, пока меня нет на Пхукете?","acceptedAnswer":{"@type":"Answer","text":"Управляющая компания: поиск и заселение гостей, уборка и бельё, бассейн и сад, мелкий ремонт, коммунальные, отчётность. Комиссия по рынку 15–20% от дохода и удерживается из него — платить отдельно ничего не нужно. Каждый месяц в личном кабинете вы видите доход, расходы построчно с чеками и сумму к выплате, а деньги приходят на ваш счёт — тайский или зарубежный."}},{"@type":"Question","name":"Даёт ли покупка визу или ВНЖ?","acceptedAnswer":{"@type":"Answer","text":"Нет, автоматически не даёт — это важно понимать заранее. Для长 длительного пребывания есть отдельные пути: Thailand Elite от пяти лет, LTR-виза, рабочая или бизнес-виза, туристическая с продлением. Покупка от 10 млн бат может учитываться в некоторых программах. Мы сводим с иммиграционным юристом и подбираем маршрут под вашу задачу — жить постоянно, приезжать на сезон или просто владеть."}},{"@type":"Question","name":"Что если застройщик не достроит?","acceptedAnswer":{"@type":"Answer","text":"Риск реален, и мы его снижаем ещё до договора: смотрим сданные проекты застройщика, темп стройки и историю переносов, проверяем право на землю (нужен Chanote — высший тип свидетельства), разрешение на строительство и экологическое заключение. Оплата идёт по этапам — вы платите за сделанное. Ход стройки виден в кабинете: фото и проценты готовности с датой. Юридическую проверку ведёт независимый юрист, не застройщик."}},{"@type":"Question","name":"Можно ли перепродать объект до сдачи?","acceptedAnswer":{"@type":"Answer","text":"Да, переуступка договора — обычная практика на Пхукете. Условия задаёт застройщик: у одних она возможна после определённой доли оплаты, у других есть сбор за переоформление. Мы проверяем это до сделки и говорим заранее, на каких условиях вы сможете выйти. Продажу берём на себя: карточка на сайте, показы, переговоры, документы."}}]}</script>
 </head>
 <body>
 
@@ -2159,7 +2104,7 @@ section#rent,section#sale{padding-top:10px}
 <!-- PLP:HEADER:START -->
 <header class="header">
   <div class="container header-inner">
-    <a class="logo" href="/" aria-label="Property Library — на главную"><span class="chip"><img src="img/brand/plp-mark-ink.png" alt="Property Library Phuket" width="24"></span><span class="lname">Property <span>Library</span></span></a>
+    <a class="logo" href="/" aria-label="Property Library — на главную"><span class="chip"><img src="../img/brand/plp-mark-ink.png" alt="Property Library Phuket" width="24"></span><span class="lname">Property <span>Library</span></span></a>
     <nav class="nav" aria-label="Основное меню">
       <a href="/buy" data-i18n="nav.sale">Продажа</a>
       <a href="/rent" data-i18n="nav.rent">Аренда</a>
@@ -2213,10 +2158,23 @@ section#rent,section#sale{padding-top:10px}
 <!-- PLP:MNAV:END -->
 
 <main id="top">
-<section style="padding:22px 0 0"><div class="container"><h1 style="font-size:clamp(24px,3.2vw,34px);margin:0 0 6px">Купить недвижимость на Пхукете</h1><p class="sub" style="max-width:62ch;margin:0;font-size:.95rem">Проверенные виллы и апартаменты от застройщиков и собственников. Каждый объект смотрим лично перед тем, как показать.</p></div></section>
-<section class="catalog" id="sale">
+<section style="padding-bottom:0"><div class="container" style="max-width:760px">
+    <p class="kicker">Справочник покупателя</p>
+    <h1 style="font-size:clamp(26px,3.8vw,38px);margin:0 0 10px">Что нужно знать до покупки на Пхукете</h1>
+    <p style="font-size:18px;line-height:1.7;margin:0 0 22px">12 разборов: собственность,
+      налоги, сроки, доходность, риски и управление. Коротко о том же — в блоке
+      «Нас часто спрашивают» на главной.</p>
+    <ul style="list-style:none;padding:0;margin:0;display:grid;gap:10px"><li style="margin:0"><a href="/guide/inostranec-mozhet-kupit" style="display:block;padding:14px 16px;background:var(--card,#fff);border:1px solid var(--line,#e7e7e2);border-radius:14px;text-decoration:none;color:inherit"><b style="display:block;font-size:17px;line-height:1.35">Может ли иностранец купить недвижимость в Таиланде?</b><span style="display:block;margin-top:6px;font-size:14px;opacity:.75;line-height:1.5">Да. Квартиру в кондоминиуме иностранец оформляет во фрихолд — полная собственность навсегда, если в доме не выбрана иностранная квота (по закону до 49…</span></a></li><li style="margin:0"><a href="/guide/leasehold-ili-freehold" style="display:block;padding:14px 16px;background:var(--card,#fff);border:1px solid var(--line,#e7e7e2);border-radius:14px;text-decoration:none;color:inherit"><b style="display:block;font-size:17px;line-height:1.35">Leasehold или Freehold — что выбрать?</b><span style="display:block;margin-top:6px;font-size:14px;opacity:.75;line-height:1.5">Фрихолд — полная собственность, доступна в кондоминиумах в рамках иностранной квоты; такие лоты легче перепродать. Лизхолд — долгосрочное право на 30 …</span></a></li><li style="margin:0"><a href="/guide/nalogi-i-rashody" style="display:block;padding:14px 16px;background:var(--card,#fff);border:1px solid var(--line,#e7e7e2);border-radius:14px;text-decoration:none;color:inherit"><b style="display:block;font-size:17px;line-height:1.35">Какие налоги и расходы, кроме цены объекта?</b><span style="display:block;margin-top:6px;font-size:14px;opacity:.75;line-height:1.5">При переоформлении платится transfer fee 2% от оценочной стоимости. Дальше зависит от срока владения продавца: до пяти лет — специальный бизнес-налог …</span></a></li><li style="margin:0"><a href="/guide/skolko-oformlyaetsya-sdelka" style="display:block;padding:14px 16px;background:var(--card,#fff);border:1px solid var(--line,#e7e7e2);border-radius:14px;text-decoration:none;color:inherit"><b style="display:block;font-size:17px;line-height:1.35">Сколько времени занимает сделка?</b><span style="display:block;margin-top:6px;font-size:14px;opacity:.75;line-height:1.5">Готовый объект — от одного до трёх месяцев: бронирование, юридическая проверка, договор, перевод денег, переоформление в земельном департаменте. Новос…</span></a></li><li style="margin:0"><a href="/guide/kupit-udalenno" style="display:block;padding:14px 16px;background:var(--card,#fff);border:1px solid var(--line,#e7e7e2);border-radius:14px;text-decoration:none;color:inherit"><b style="display:block;font-size:17px;line-height:1.35">Я не в Таиланде. Можно купить удалённо?</b><span style="display:block;margin-top:6px;font-size:14px;opacity:.75;line-height:1.5">Да, это обычная практика. Показы по видеосвязи, документы подписываются дистанционно, на переоформление оформляется доверенность на юриста. Оплата — б…</span></a></li><li style="margin:0"><a href="/guide/stoimost-uslug" style="display:block;padding:14px 16px;background:var(--card,#fff);border:1px solid var(--line,#e7e7e2);border-radius:14px;text-decoration:none;color:inherit"><b style="display:block;font-size:17px;line-height:1.35">Сколько стоят ваши услуги?</b><span style="display:block;margin-top:6px;font-size:14px;opacity:.75;line-height:1.5">Вам — ничего. Мы аккредитованное независимое агентство: работаем со всеми крупными застройщиками острова и предлагаем то, что выгодно вам, а не то, чт…</span></a></li><li style="margin:0"><a href="/guide/kakaya-dohodnost" style="display:block;padding:14px 16px;background:var(--card,#fff);border:1px solid var(--line,#e7e7e2);border-radius:14px;text-decoration:none;color:inherit"><b style="display:block;font-size:17px;line-height:1.35">Какую доходность реально приносит объект?</b><span style="display:block;margin-top:6px;font-size:14px;opacity:.75;line-height:1.5">Ориентир по рынку — 6–12% годовых; точная цифра зависит от сезона, формата аренды и управления. Загрузка в высокий сезон, с ноября по апрель, доходит …</span></a></li><li style="margin:0"><a href="/guide/garantirovannaya-dohodnost" style="display:block;padding:14px 16px;background:var(--card,#fff);border:1px solid var(--line,#e7e7e2);border-radius:14px;text-decoration:none;color:inherit"><b style="display:block;font-size:17px;line-height:1.35">Что такое гарантированная доходность от застройщика?</b><span style="display:block;margin-top:6px;font-size:14px;opacity:.75;line-height:1.5">Это программа, где застройщик платит фиксированный процент — обычно 5–7% годовых на три-пять лет — независимо от загрузки. Плюс: предсказуемость. Мину…</span></a></li><li style="margin:0"><a href="/guide/kto-upravlyaet-obektom" style="display:block;padding:14px 16px;background:var(--card,#fff);border:1px solid var(--line,#e7e7e2);border-radius:14px;text-decoration:none;color:inherit"><b style="display:block;font-size:17px;line-height:1.35">Кто занимается объектом, пока меня нет на Пхукете?</b><span style="display:block;margin-top:6px;font-size:14px;opacity:.75;line-height:1.5">Управляющая компания: поиск и заселение гостей, уборка и бельё, бассейн и сад, мелкий ремонт, коммунальные, отчётность. Комиссия по рынку 15–20% от до…</span></a></li><li style="margin:0"><a href="/guide/viza-i-vnzh" style="display:block;padding:14px 16px;background:var(--card,#fff);border:1px solid var(--line,#e7e7e2);border-radius:14px;text-decoration:none;color:inherit"><b style="display:block;font-size:17px;line-height:1.35">Даёт ли покупка визу или ВНЖ?</b><span style="display:block;margin-top:6px;font-size:14px;opacity:.75;line-height:1.5">Нет, автоматически не даёт — это важно понимать заранее. Для长 длительного пребывания есть отдельные пути: Thailand Elite от пяти лет, LTR-виза, рабоча…</span></a></li><li style="margin:0"><a href="/guide/risk-nedostroya" style="display:block;padding:14px 16px;background:var(--card,#fff);border:1px solid var(--line,#e7e7e2);border-radius:14px;text-decoration:none;color:inherit"><b style="display:block;font-size:17px;line-height:1.35">Что если застройщик не достроит?</b><span style="display:block;margin-top:6px;font-size:14px;opacity:.75;line-height:1.5">Риск реален, и мы его снижаем ещё до договора: смотрим сданные проекты застройщика, темп стройки и историю переносов, проверяем право на землю (нужен …</span></a></li><li style="margin:0"><a href="/guide/pereprodazha-do-sdachi" style="display:block;padding:14px 16px;background:var(--card,#fff);border:1px solid var(--line,#e7e7e2);border-radius:14px;text-decoration:none;color:inherit"><b style="display:block;font-size:17px;line-height:1.35">Можно ли перепродать объект до сдачи?</b><span style="display:block;margin-top:6px;font-size:14px;opacity:.75;line-height:1.5">Да, переуступка договора — обычная практика на Пхукете. Условия задаёт застройщик: у одних она возможна после определённой доли оплаты, у других есть …</span></a></li></ul>
+  </div></section>
+  <section id="sale" aria-labelledby="sale-title">
   <div class="container">
-    
+    <div class="head-row reveal">
+      <div>
+        <span class="kicker" data-i18n="sale.lab">Продажа</span>
+        <h2 id="sale-title" data-i18n="sale.h2">Проверенные объекты в продаже</h2>
+        <p class="sub" data-i18n="sale.sub">Каждый проект проходит нашу внутреннюю проверку перед публикацией. Нажмите на карточку — внутри детали и калькулятор доходности.</p>
+      </div>
+    </div>
     <div class="filterbar reveal" id="saleFilters">
       <span class="chipf on" data-facet="budget" data-val="" onclick="toggleFilter(this)" data-i18n="f.budget.all">Все бюджеты</span><span class="chipf" data-facet="budget" data-val="b1" onclick="toggleFilter(this)" data-i18n="f.b1">฿3–5 млн</span><span class="chipf" data-facet="budget" data-val="b2" onclick="toggleFilter(this)" data-i18n="f.b2">฿5–10 млн</span><span class="chipf" data-facet="budget" data-val="b3" onclick="toggleFilter(this)" data-i18n="f.b3">฿10–15 млн</span><span class="chipf" data-facet="budget" data-val="b4" onclick="toggleFilter(this)" data-i18n="f.b4">฿15–20 млн</span><span class="chipf" data-facet="budget" data-val="b5" onclick="toggleFilter(this)" data-i18n="f.b5">฿20–25 млн</span><span class="chipf" data-facet="budget" data-val="b6" onclick="toggleFilter(this)" data-i18n="f.b6">฿25–30 млн</span><span class="chipf" data-facet="budget" data-val="b7" onclick="toggleFilter(this)" data-i18n="f.b7">฿30 млн+</span><span class="chipf" data-facet="type" data-val="Вилла" onclick="toggleFilter(this)" data-i18n="f.type.villa">Вилла</span><span class="chipf" data-facet="type" data-val="Кондо" onclick="toggleFilter(this)" data-i18n="f.type.condo">Кондо</span><span class="chipf" data-facet="stage" data-val="presale" onclick="toggleFilter(this)" data-i18n="f.st.presale">Старт продаж</span><span class="chipf" data-facet="stage" data-val="construction" onclick="toggleFilter(this)" data-i18n="f.st.build">Строится</span><span class="chipf" data-facet="stage" data-val="ready" onclick="toggleFilter(this)" data-i18n="f.st.ready">Готово к заезду</span><span class="chipf" data-facet="stage" data-val="resale" onclick="toggleFilter(this)" data-i18n="f.st.resale">Перепродажа</span><span class="chipf" data-facet="stage" data-val="soon" onclick="toggleFilter(this)" data-i18n="f.st.soon">Скоро сдача</span><span class="chipf" data-facet="stage" data-val="few" onclick="toggleFilter(this)" data-i18n="f.st.few">Последние юниты</span>
     </div>
@@ -2237,7 +2195,7 @@ section#rent,section#sale{padding-top:10px}
     <p class="found" id="saleFound"></p>
     <div class="carwrap reveal">
       <div class="arrows carnav"><button type="button" onclick="scrollCar('saleCar',-1)" aria-label="Назад">‹</button><button type="button" onclick="scrollCar('saleCar',1)" aria-label="Вперёд">›</button></div>
-      <div class="catrow"><div><div class="car" id="saleCar"></div></div></div>
+      <div class="car" id="saleCar"></div>
       <div class="noresult" id="saleNoResult" data-i18n="noresult">Под выбранные фильтры ничего не нашлось — сбросьте часть условий.</div>
     </div>
   </div>
@@ -2246,107 +2204,14 @@ section#rent,section#sale{padding-top:10px}
 <!-- ===== CATALOG PDF ===== -->
 
 
-<section id="quiz" style="padding-top:0">
-  <div class="container">
-    <div class="quizband reveal">
-      <div>
-        <span class="kicker" data-i18n="quiz.lab">Подбор за 10 минут</span>
-        <h2 data-i18n="quiz.h2">Пройдите квиз — пришлём подборку под ваши задачи</h2>
-        <p data-i18n="quiz.sub">8 коротких шагов: цель, бюджет, район, тип, спальни и сроки. В конце соберём контакт и сразу покажем подходящий объект.</p>
-        <button type="button" class="btn btn-green" onclick="openQuiz()" data-i18n="quiz.cta">Начать подбор</button>
-      </div>
-      <div class="qprev" aria-hidden="true">
-        <div class="qcell"><div class="k" data-i18n="quiz.step">Шаг</div><div class="v" data-i18n="q.1">Какая у вас цель?</div></div>
-        <div class="qcell"><div class="k" data-i18n="quiz.step">Шаг</div><div class="v" data-i18n="q.2">На какой бюджет ориентируетесь?</div></div>
-        <div class="qcell"><div class="k" data-i18n="quiz.step">Шаг</div><div class="v" data-i18n="q.3">Какой район интересен?</div></div>
-        <div class="qcell"><div class="k" data-i18n="quiz.step">Шаг</div><div class="v" data-i18n="q.6">Когда планируете сделку?</div></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ===== НАШ ПОДХОД (15.09: «Преимущества», «Ценности» и «Сервис» сведены в один блок; ценности и сервис — на /about) ===== -->
-
-<section id="do" style="padding-top:0">
-  <div class="container">
-    <div class="reveal">
-      <span class="kicker" data-i18n="appr.lab">Наш подход</span>
-      <h2 data-i18n="do.h2">С нами легко выбрать, купить и переехать</h2>
-    </div>
-    <div class="adv">
-      <div class="c reveal"><span class="ic">⭐</span><h4 data-i18n="do.1t">Эксклюзивные объекты</h4><p data-i18n="do.1p">Уникальные варианты жилья, которых нет в открытом доступе.</p></div>
-      <div class="c reveal"><span class="ic">🤝</span><h4 data-i18n="do.2t">Партнёрство с застройщиками</h4><p data-i18n="do.2p">Выгодные условия и дополнительные бонусы для наших клиентов.</p></div>
-      <div class="c reveal"><span class="ic">🎯</span><h4 data-i18n="do.3t">Консультация под цели</h4><p data-i18n="do.3p">Поможем понять рынок и подберём недвижимость под ваши задачи.</p></div>
-      <div class="c reveal"><span class="ic">🧭</span><h4 data-i18n="do.4t">Сопровождение на всех этапах</h4><p data-i18n="do.4p">Показы, документы и даже помощь после покупки — на нас.</p></div>
-      <div class="c reveal"><span class="ic">⚖️</span><h4 data-i18n="do.5t">Юридическая поддержка</h4><p data-i18n="do.5p">Сделки сопровождают юристы по тайскому рынку.</p></div>
-      <div class="c reveal"><span class="ic">🌍</span><h4 data-i18n="do.6t">Удалённое оформление</h4><p data-i18n="do.6p">Купить или арендовать можно за тысячи километров.</p></div>
-    </div>
-  </div>
-</section>
-
-<!-- ===== ABOUT / FOUNDER ===== -->
-
-<section class="obj-index" id="all-objects"><div class="container"><details class="oi-box"><summary><b>Объекты в каталоге</b><span class="oi-n">53</span></summary><p class="sub">Все проекты, с которыми мы работаем, — с ценами от застройщика и условиями рассрочки.</p><ul class="oi-list"><li><a href="object/angsana-beach">Angsana Beachfront Residences</a><span class="oi-d">Лагуна</span><span class="oi-p">84 млн ฿</span></li><li><a href="object/angsana-topaz">Angsana Golf Residences Topaz</a><span class="oi-d">Лагуна</span><span class="oi-p">26,8 млн ฿</span></li><li><a href="object/ayana">AYANA Heights Seaview Residences</a><span class="oi-d">Лаян</span><span class="oi-p">15,4 млн ฿</span></li><li><a href="object/bellaguna-golf">Bellaguna Golf Residences</a><span class="oi-d">Лагуна</span><span class="oi-p">10,0 млн ฿</span></li><li><a href="object/bellaguna">Bellaguna Lake Residences</a><span class="oi-d">Лагуна</span><span class="oi-p">16,3 млн ฿</span></li><li><a href="object/clover">Clover Residence</a><span class="oi-d">Банг Тао</span><span class="oi-p">66,3 млн ฿</span></li><li><a href="object/eden-lake">Eden · Lake Residences</a><span class="oi-d">Банг Тао</span></li><li><a href="object/eden-park">Eden · Park Residences</a><span class="oi-d">Банг Тао</span><span class="oi-p">11,9 млн ฿</span></li><li><a href="object/eden-res">Eden Residences</a><span class="oi-d">Банг Тао</span><span class="oi-p">13,9 млн ฿</span></li><li><a href="object/eden-etro">ETRO Residences Phuket</a><span class="oi-d">Банг Тао</span><span class="oi-p">182,6 млн ฿</span></li><li><a href="object/everprime">Ever Prime</a><span class="oi-d">Карон</span><span class="oi-p">6,4 млн ฿</span></li><li><a href="object/fantasy-rawai">Fantasy Plus Rawai</a><span class="oi-d">Равай</span><span class="oi-p">3,6 млн ฿</span></li><li><a href="object/eden">Gardens of Eden</a><span class="oi-d">Банг Тао</span></li><li><a href="object/hythe">HYTHE by Botanica</a><span class="oi-d">Лаян</span><span class="oi-p">10,9 млн ฿</span></li><li><a href="object/manor">Manor</a><span class="oi-d">Банг Тао</span><span class="oi-p">28,5 млн ฿</span></li><li><a href="object/mono-champaca">Mono Champaca, Таланг</a><span class="oi-d">Таланг</span><span class="oi-p">18,8 млн ฿</span></li><li><a href="object/mori1">MORI 1</a><span class="oi-d">Банг Тао</span><span class="oi-p">16,5 млн ฿</span></li><li><a href="object/mori-valley">MORI The Valley</a><span class="oi-d">Банг Тао</span><span class="oi-p">16,7 млн ฿</span></li><li><a href="object/panora-villa">Panora Villas, Сурин</a><span class="oi-d">Сурин</span><span class="oi-p">19,9 млн ฿</span></li><li><a href="object/peylaa">PEYLAA Phuket, Autograph Collection Residences</a><span class="oi-d">Банг Тао</span><span class="oi-p">7,9 млн ฿</span></li><li><a href="object/garrya">Residences at Garrya</a><span class="oi-d">Лагуна</span><span class="oi-p">16,4 млн ฿</span></li><li><a href="object/sudara">Sudara Phuket</a><span class="oi-d">Банг Тао</span><span class="oi-p">10,7 млн ฿</span></li><li><a href="object/sunhills-layan">SUN HILLS Layan</a><span class="oi-d">Лаян</span><span class="oi-p">3,3 млн ฿</span></li><li><a href="object/balcony">The BALCONY Nai Yang</a><span class="oi-d">Най Янг</span><span class="oi-p">6,1 млн ฿</span></li><li><a href="object/gens-botanica">The GENS by Botanica, у Blue Tree</a><span class="oi-d">Банг Тао</span><span class="oi-p">5,5 млн ฿</span></li><li><a href="object/liberty">The Liberty by Wallaya Villas</a><span class="oi-d">Банг Тао</span><span class="oi-p">8,2 млн ฿</span></li><li><a href="object/modeva">The Modeva Bang-Tao</a><span class="oi-d">Банг Тао</span><span class="oi-p">4,8 млн ฿</span></li><li><a href="object/panora-condo">The Panora Phuket, корпус D</a><span class="oi-d">Сурин</span><span class="oi-p">4,4 млн ฿</span></li><li><a href="object/intercontinental">The Residences at InterContinental Phuket Resort</a><span class="oi-d">Камала</span><span class="oi-p">15,7 млн ฿</span></li><li><a href="object/standard">The Standard Residences Phuket Bang Tao</a><span class="oi-d">Банг Тао</span><span class="oi-p">21,9 млн ฿</span></li><li><a href="object/adora">The Title Adora Rawai</a><span class="oi-d">Равай</span><span class="oi-p">5,3 млн ฿</span></li><li><a href="object/biancana">The Title Biancana Surin</a><span class="oi-d">Сурин</span><span class="oi-p">6,1 млн ฿</span></li><li><a href="object/casademonte">The Title Casa De Monte</a><span class="oi-d">Ко Кео</span><span class="oi-p">30,3 млн ฿</span></li><li><a href="object/cielo">The Title Cielo Rawai</a><span class="oi-d">Равай</span><span class="oi-p">6,2 млн ฿</span></li><li><a href="object/coralina">The Title Coralina Kamala</a><span class="oi-d">Камала</span><span class="oi-p">4,7 млн ฿</span></li><li><a href="object/halo1">The Title Halo 1 Naiyang</a><span class="oi-d">Най Янг</span><span class="oi-p">5,1 млн ฿</span></li><li><a href="object/heritage">The Title Heritage Bang-Tao</a><span class="oi-d">Банг Тао</span><span class="oi-p">5,6 млн ฿</span></li><li><a href="object/katabello">The Title Katabello</a><span class="oi-d">Ката</span><span class="oi-p">4,6 млн ฿</span></li><li><a href="object/legendary">The Title Legendary Bang-Tao</a><span class="oi-d">Банг Тао</span><span class="oi-p">6,2 млн ฿</span></li><li><a href="object/serenity">The Title Serenity Naiyang</a><span class="oi-d">Най Янг</span><span class="oi-p">5,2 млн ฿</span></li><li><a href="object/sierra">The Title Sierra</a><span class="oi-d">Банг Тао</span><span class="oi-p">2,9 млн ฿</span></li><li><a href="object/estella">The Title Villa Estella Naiyang</a><span class="oi-d">Най Янг</span><span class="oi-p">22,3 млн ฿</span></li><li><a href="object/kirara">The Title Villa Kirara Bang-Tao</a><span class="oi-d">Банг Тао</span><span class="oi-p">29,0 млн ฿</span></li><li><a href="object/vivana">The Title Vivana Kamala</a><span class="oi-d">Камала</span><span class="oi-p">4,1 млн ฿</span></li><li><a href="object/vivi">The Title VIVI</a><span class="oi-d">Банг Тао</span><span class="oi-p">4,3 млн ฿</span></li><li><a href="object/vivi-r3">The Title VIVI, Банг Тао — 3 этаж</a><span class="oi-d">Банг Тао</span><span class="oi-p">4,3 млн ฿</span></li><li><a href="object/vivi-r5">The Title VIVI, Банг Тао — 5 этаж</a><span class="oi-d">Банг Тао</span><span class="oi-p">4,3 млн ฿</span></li><li><a href="object/zero-bangtao">The ZERO Bang Tao</a><span class="oi-d">Банг Тао</span><span class="oi-p">5,1 млн ฿</span></li><li><a href="object/zero-naiyang">The ZERO Nai Yang</a><span class="oi-d">Най Янг</span><span class="oi-p">4,4 млн ฿</span></li><li><a href="object/tonino-ov">Tonino Lamborghini Ocean Valley Villas</a><span class="oi-d">Ao Por</span><span class="oi-p">70,8 млн ฿</span></li><li><a href="object/vibe-karon">Vibe Residence Karon</a><span class="oi-d">Карон</span><span class="oi-p">5,7 млн ฿</span></li><li><a href="object/qabalah">Villa Qabalah</a><span class="oi-d">Таланг</span></li><li><a href="object/zenithy">Zenithy La Ville · Oasis Collection</a><span class="oi-d">Ко Кео</span><span class="oi-p">26,5 млн ฿</span></li></ul></details></div></section>
-<!-- PLP:OBJECT-INDEX:END -->
-
-<!-- ===== FOOTER ===== -->
-<!-- PLP:FOOTER:START -->
-<footer class="footer" id="contacts">
-  <div class="container">
-    <div class="footer-grid">
-      <div>
-        <a class="logo" href="/"><span class="chip"><img src="img/brand/plp-mark-ink.png" alt="Property Library Phuket" width="24"></span><span>Property <span>Library</span></span></a>
-        <p class="sub" style="font-size:.92rem;margin-top:12px" data-i18n="ft.tag">Мы уже выбрали Пхукет, поможем и вам. Все под ключ — от первого звонка до заезда и получения дохода.</p>
-      </div>
-      <div>
-        <h3 data-i18n="ft.menu">Меню</h3>
-        <ul>
-          <li><a href="/buy" data-i18n="ft.buy">Покупка</a></li>
-          <li><a href="/rent" data-i18n="nav.rent">Аренда</a></li>
-          <li><a href="/#map" data-i18n="nav.map">Районы</a></li>
-          <li><a href="/about" data-i18n="nav.about">О нас</a></li>
-          <li><a href="/#faq">FAQ</a></li>
-          <!-- Эльнур 08.09: «выгрузить объект должно быть на сайте, чтобы можно было
-               кинуть эту форму лиду в переписке и он через сайт всё сделал» -->
-          <li><a href="/add-property" data-i18n="ft.addobj">Сдать или продать свой объект</a></li>
-        </ul>
-      </div>
-      <div>
-        <h3 data-i18n="ft.contacts">Контакты</h3>
-        <ul>
-          <li><a href="tel:+66955492587">+(66) 95-549-2587</a></li>
-          <li><a href="mailto:info@property-library.com">info@property-library.com</a></li>
-          <li>Thep Krasattri, Cherngtaley, Bangtao, Phuket</li>
-        </ul>
-      </div>
-      <div>
-        <h3 data-i18n="ft.connect">Мы на связи</h3>
-        <ul>
-          <li><a href="https://t.me/elnurphuket_bot" target="_blank" rel="noopener" data-i18n="ft.bot">Консьерж в Telegram 24/7</a></li>
-          <li><a href="https://t.me/property_library_phuket" target="_blank" rel="noopener" data-i18n="ft.tg">Telegram-канал</a></li>
-          <li><a href="https://www.instagram.com/property.library.phuket/" target="_blank" rel="noopener">Instagram</a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <span data-i18n="ft.copy">Property Library Phuket © 2022</span>
-      <a href="/privacy" data-i18n="ft.policy">Политика конфиденциальности</a>
-      <a href="/rules" data-i18n="ft.rules">Правила бронирования и проживания</a>
-      <a href="/terms" data-i18n="ft.terms">Условия использования</a>
-    </div>
-  </div>
-</footer>
-<!-- PLP:FOOTER:END -->
-
-
 </main>
 </div><!-- /stage -->
 
 <!-- ===== CHAT WIDGET ===== -->
-<div class="fabwrap" id="fabWrap"><button type="button" class="fab" id="fab" onclick="openChat('hi')"><span class="av"><img src="img/brand/plp-mark-ink.png" alt="" width="20"></span><span class="fabtxt" data-i18n="chat.fab">Дарья · на связи</span><span class="dot"></span></button><button type="button" class="fabmin" id="fabMin" onclick="event.stopPropagation();toggleFab()" aria-label="Свернуть" title="Свернуть">×</button></div>
+<div class="fabwrap" id="fabWrap"><button type="button" class="fab" id="fab" onclick="openChat('hi')"><span class="av"><img src="../img/brand/plp-mark-ink.png" alt="" width="20"></span><span class="fabtxt" data-i18n="chat.fab">Дарья · на связи</span><span class="dot"></span></button><button type="button" class="fabmin" id="fabMin" onclick="event.stopPropagation();toggleFab()" aria-label="Свернуть" title="Свернуть">×</button></div>
 <div class="chatwin" id="chatwin" role="dialog" aria-label="Чат с менеджером">
   <div class="chathead">
-    <span class="av"><img src="img/brand/plp-mark-ink.png" alt="" width="20"></span>
+    <span class="av"><img src="../img/brand/plp-mark-ink.png" alt="" width="20"></span>
     <div><b data-i18n="chat.name">Дарья</b><div class="st2"><span class="dot"></span> <span data-i18n="chat.sub">персональный менеджер · отвечает сразу</span></div></div>
     <button type="button" class="clr" onclick="clearChat()" title="Очистить историю">⟲</button>
     <button type="button" class="x" onclick="closeChat()" aria-label="Закрыть">×</button>
@@ -6946,68 +6811,6 @@ addEventListener('hashchange',function(){if(isObjectHash())openFromHash();});
     ry=x*14;rx=-y*10;if(!raf)raf=requestAnimationFrame(paint);
   });
   band.addEventListener('mouseleave',function(){img.style.transform='';});
-})();
-</script>
-
-<script>
-/* Каталог и карта — одно целое: карта показывает то, что осталось после фильтров,
-   наведение на карточку подсвечивает метку и наоборот. */
-(function(){
-  function visiblePids(){
-    var out=[];
-    document.querySelectorAll('.catalog .car .prop').forEach(function(el){
-      if(el.style.display!=='none' && el.dataset.pid) out.push(el.dataset.pid);
-    });
-    return out;
-  }
-  /* счётчик найденного пишет сам сайт (#saleFound / #rentFound) — здесь только карта */
-  window.PLP_MAP_FILTER=function(){ return visiblePids(); };
-  function sync(){ if(window.renderMapReal){ try{ window.PLPMAP && window.drawPinsExternal && window.drawPinsExternal(); }catch(e){} } }
-
-  /* каталог зовёт нас после каждой фильтрации — обновляем счётчик и карту */
-  window.PLP_AFTER_FILTER=function(){ setTimeout(sync, 20); };
-  document.addEventListener('mouseover', function(e){
-    var card=e.target.closest && e.target.closest('.catalog .car .prop');
-    if(!card||!card.dataset.pid) return;
-    if(window.PLP_HIGHLIGHT) window.PLP_HIGHLIGHT(card.dataset.pid);
-  });
-  document.addEventListener('mouseout', function(e){
-    var card=e.target.closest && e.target.closest('.catalog .car .prop');
-    if(card && window.PLP_HIGHLIGHT) window.PLP_HIGHLIGHT(null);
-  });
-  /* Эльнур 04.09, как у Malina: объект подсвечивается на карте сам, при прокрутке.
-     Ведём карточку, которая ближе всего к середине экрана — без наведения мышью. */
-  (function(){
-    var last=null, tick=null;
-    function pick(){
-      tick=null;
-      var mid=innerHeight/2, best=null, bestD=1e9;
-      document.querySelectorAll('.catalog .car .prop[data-pid]').forEach(function(el){
-        var r=el.getBoundingClientRect();
-        if(r.bottom<0||r.top>innerHeight) return;
-        var d=Math.abs((r.top+r.bottom)/2-mid);
-        if(d<bestD){ bestD=d; best=el.dataset.pid; }
-      });
-      if(best!==last){ last=best; if(window.PLP_HIGHLIGHT) window.PLP_HIGHLIGHT(best); }
-    }
-    addEventListener('scroll', function(){ if(!tick) tick=requestAnimationFrame(pick); }, {passive:true});
-    addEventListener('load', function(){ setTimeout(pick,900); });
-  })();
-  window.addEventListener('load', function(){ setTimeout(sync,600); setTimeout(sync,1800); });
-  /* карту можно свернуть, если мешает — выбор запоминается */
-  (function(){
-    var box=document.querySelector('.catmap'), btn=document.getElementById('catmapFold');
-    if(!box||!btn) return;
-    try{ if(localStorage.getItem('plp_map_folded')==='1') box.classList.add('folded'); }catch(e){}
-    btn.textContent = box.classList.contains('folded') ? 'показать' : 'свернуть';
-    btn.onclick=function(){
-      var f=!box.classList.contains('folded');
-      box.classList.toggle('folded', f);
-      btn.textContent = f ? 'показать' : 'свернуть';
-      try{ localStorage.setItem('plp_map_folded', f?'1':'0'); }catch(e){}
-      if(!f && window.PLPMAP) setTimeout(function(){ try{ PLPMAP.invalidateSize(); }catch(e){} }, 60);
-    };
-  })();
 })();
 </script>
 </body>
