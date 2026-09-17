@@ -10,7 +10,9 @@
     раньше их не было, и настоящая заявка «СДАТЬ В АРЕНДУ» легла видом «перепродажа»;
   • действие uk_contract — запись подписанного договора (штаб), шаг 1 лестницы;
   • действие uk_publish — публикация на витрине ТОЛЬКО через uk_ready;
-  • действие uk_template — выдаёт образец договора из хранилища по временной ссылке.
+  • действия uk_template и uk_templates — выдают любой из пяти бланков PLP
+    (договор управления, опись и акт, бронь, аренда краткосрочная и долгосрочная)
+    из приватного хранилища по временной ссылке.
     До этого кнопка «Взять шаблон и подписать» всегда отвечала «попросите в офисе»:
     переменная со ссылкой была объявлена пустой и нигде не заполнялась.
 
@@ -56,13 +58,32 @@ if (action === 'uk_publish') {
     p_token: token, p_property: String(b.property_id || ''),
     p_on: b.on === false ? false : true }) }];
 }
-/* Образец договора управления — временная ссылка на файл в приватном хранилище.
-   Ссылку не зашиваем в страницу: owner.html лежит в публичном репозитории. */
+/* Бланки PLP — временная ссылка на файл в приватном хранилище. Ссылку не зашиваем
+   в страницу: owner.html лежит в публичном репозитории.
+   17.09 Эльнур: «там где-то ещё должны быть правила проживания, заселения,
+   выселения, контракт с проживающим». Нашлись все — папка «2.1 · Бланки УК и
+   шаблоны» на Диске: договор управления, опись и акт приёма-передачи, бронь и
+   резервация, договор аренды краткосрочный и долгосрочный. */
+const TPL = {
+  'management': ['plp-management-agreement.pdf', 'Договор управления PLP'],
+  'management-docx': ['plp-management-agreement.docx', 'Договор управления PLP (для правки)'],
+  'inventory': ['plp-inventory.docx', 'Опись и акт приёма-передачи'],
+  'booking':   ['plp-booking.docx', 'Бронь и резервация'],
+  'lease-short': ['plp-lease-short.docx', 'Договор аренды, краткосрочный'],
+  'lease-long':  ['plp-lease-long.docx', 'Договор аренды, долгосрочный'],
+};
+if (action === 'uk_templates') {
+  const s = await rpc.call(this, 'owner_session', { p_token: token });
+  if (!s || !s.ok) return [{ json: { ok: false, error: 'no_session' } }];
+  return [{ json: { ok: true, items: Object.keys(TPL).map(k => ({ key: k, title: TPL[k][1] })) } }];
+}
 if (action === 'uk_template') {
   const s = await rpc.call(this, 'owner_session', { p_token: token });
   if (!s || !s.ok) return [{ json: { ok: false, error: 'no_session' } }];
-  const want = String(b.format || 'pdf') === 'docx' ? 'docx' : 'pdf';
-  const key = 'templates/plp-management-agreement.' + want;
+  let want = String(b.doc || 'management');
+  if (!TPL[want] && String(b.format || '') === 'docx') want = 'management-docx';
+  if (!TPL[want]) want = 'management';
+  const key = 'templates/' + TPL[want][0];
   try {
     const r = await this.helpers.httpRequest({ timeout: 20000, method: 'POST',
       url: $vars.SUPABASE_URL + '/storage/v1/object/sign/client-docs/' + key,
@@ -70,7 +91,7 @@ if (action === 'uk_template') {
     const rel = (r && (r.signedURL || r.signedUrl)) || '';
     if (!rel) return [{ json: { ok: false, error: 'образец не найден' } }];
     return [{ json: { ok: true, url: $vars.SUPABASE_URL + '/storage/v1' + rel,
-                      name: 'Договор управления PLP (' + want.toUpperCase() + ')' } }];
+                      name: TPL[want][1] } }];
   } catch (e) { return [{ json: { ok: false, error: 'образец не отдался' } }]; }
 }
 """ + ANCHOR
