@@ -1,5 +1,5 @@
 {
- "updated": "2026-09-16",
+ "updated": "2026-09-17",
  "items": [
   {
    "id": "INTAKE-BOTANICA",
@@ -53,8 +53,16 @@
    "name": "Angsana Beachfront Residences",
    "district": "Лагуна",
    "type": "Кондо",
-   "price_from": null,
-   "units": []
+   "price_from": 84000000,
+   "units": [
+    {
+     "name": "2 спальни",
+     "beds": 2,
+     "code": "431",
+     "area": 301,
+     "from": 84000000
+    }
+   ]
   },
   {
    "id": "PLP-ANGSANA-TOPAZ",
@@ -63,8 +71,69 @@
    "name": "Angsana Golf Residences Topaz",
    "district": "Лагуна",
    "type": "Кондо",
-   "price_from": null,
-   "units": []
+   "price_from": 26760000,
+   "units": [
+    {
+     "beds": 2,
+     "code": "3505",
+     "free": 2,
+     "name": "2 спальни",
+     "area_sqm": 128,
+     "price_from_thb": 26760000,
+     "area": 128,
+     "from": 26760000
+    },
+    {
+     "beds": 2,
+     "code": "3702",
+     "free": 1,
+     "name": "Пентхаус · 2 спальни",
+     "area_sqm": 246,
+     "price_from_thb": 65720000,
+     "area": 246,
+     "from": 65720000
+    },
+    {
+     "beds": 3,
+     "code": "3201",
+     "free": 9,
+     "name": "3 спальни",
+     "area_sqm": 194,
+     "price_from_thb": 44910000,
+     "area": 194,
+     "from": 44910000
+    },
+    {
+     "beds": 3,
+     "code": "3101",
+     "free": 1,
+     "name": "3 спальни",
+     "area_sqm": 196,
+     "price_from_thb": 56910000,
+     "area": 196,
+     "from": 56910000
+    },
+    {
+     "beds": 3,
+     "code": "3703",
+     "free": 1,
+     "name": "Пентхаус · 3 спальни",
+     "area_sqm": 371,
+     "price_from_thb": 98220000,
+     "area": 371,
+     "from": 98220000
+    },
+    {
+     "beds": 3,
+     "code": "3704",
+     "free": 2,
+     "name": "Пентхаус · 3 спальни",
+     "area_sqm": 374,
+     "price_from_thb": 62060000,
+     "area": 374,
+     "from": 62060000
+    }
+   ]
   },
   {
    "id": "PLP-AYANA",
@@ -199,8 +268,129 @@
    "name": "Bellaguna Lake Residences",
    "district": "Лагуна",
    "type": "Кондо",
-   "price_from": null,
-   "units": []
+   "price_from": 16300000,
+   "units": [
+    {
+     "beds": 1,
+     "code": "4302",
+     "free": 8,
+     "name": "1 спальня",
+     "area_sqm": 73,
+     "price_from_thb": 19640000,
+     "area": 73,
+     "from": 19640000
+    },
+    {
+     "beds": 1,
+     "code": "4212",
+     "free": 24,
+     "name": "1 спальня",
+     "area_sqm": 75,
+     "price_from_thb": 16300000,
+     "area": 75,
+     "from": 16300000
+    },
+    {
+     "beds": 2,
+     "code": "5201",
+     "free": 3,
+     "name": "2 спальни",
+     "area_sqm": 104,
+     "price_from_thb": 28630000,
+     "area": 104,
+     "from": 28630000
+    },
+    {
+     "beds": 2,
+     "code": "4215",
+     "free": 20,
+     "name": "2 спальни",
+     "area_sqm": 122,
+     "price_from_thb": 25770000,
+     "area": 122,
+     "from": 25770000
+    },
+    {
+     "beds": 2,
+     "code": "4103",
+     "free": 3,
+     "name": "2 спальни",
+     "area_sqm": 156,
+     "price_from_thb": 38990000,
+     "area": 156,
+     "from": 38990000
+    },
+    {
+     "beds": 2,
+     "code": "5103",
+     "free": 3,
+     "name": "2 спальни",
+     "area_sqm": 157,
+     "price_from_thb": 39340000,
+     "area": 157,
+     "from": 39340000
+    },
+    {
+     "beds": 2,
+     "code": "4505",
+     "free": 6,
+     "name": "Пентхаус · 2 спальни",
+     "area_sqm": 173,
+     "price_from_thb": 47710000,
+     "area": 173,
+     "from": 47710000
+    },
+    {
+     "beds": 3,
+     "code": "5308",
+     "free": 2,
+     "name": "3 спальни",
+     "area_sqm": 161,
+     "price_from_thb": 41740000,
+     "area": 161,
+     "from": 41740000
+    },
+    {
+     "beds": 3,
+     "code": "4104",
+     "free": 2,
+     "name": "3 спальни",
+     "area_sqm": 318,
+     "price_from_thb": 87800000,
+     "area": 318,
+     "from": 87800000
+    },
+    {
+     "beds": 3,
+     "code": "4507",
+     "free": 2,
+     "name": "Пентхаус · 3 спальни",
+     "area_sqm": 270,
+     "price_from_thb": 76820000,
+     "area": 270,
+     "from": 76820000
+    },
+    {
+     "beds": 3,
+     "code": "4501",
+     "free": 1,
+     "name": "Пентхаус · 3 спальни",
+     "area_sqm": 273,
+     "price_from_thb": 83430000,
+     "area": 273,
+     "from": 83430000
+    },
+    {
+     "beds": 3,
+     "code": "4504",
+     "free": 2,
+     "name": "Пентхаус · 3 спальни",
+     "area_sqm": 353,
+     "price_from_thb": 105280000,
+     "area": 353,
+     "from": 105280000
+    }
+   ]
   },
   {
    "id": "PLP-BELLAGUNA-GOLF",
@@ -209,8 +399,30 @@
    "name": "Bellaguna Golf Residences",
    "district": "Лагуна",
    "type": "Кондо",
-   "price_from": null,
-   "units": []
+   "price_from": 10010000,
+   "units": [
+    {
+     "name": "1 спальня",
+     "beds": 1,
+     "code": "2204",
+     "area": 54,
+     "from": 10010000
+    },
+    {
+     "name": "2 спальни",
+     "beds": 2,
+     "code": "2213",
+     "area": 87,
+     "from": 17040000
+    },
+    {
+     "name": "3 спальни",
+     "beds": 3,
+     "code": "3102",
+     "area": 258,
+     "from": 44960000
+    }
+   ]
   },
   {
    "id": "PLP-BIANCANA",
@@ -604,14 +816,97 @@
    "name": "Residences at Garrya",
    "district": "Лагуна",
    "type": "Кондо",
-   "price_from": 33680000,
+   "price_from": 16360000,
    "units": [
     {
-     "name": "2 спальни",
+     "beds": 1,
+     "code": "6403",
+     "free": 5,
+     "name": "1 спальня",
+     "area_sqm": 57,
+     "price_from_thb": 16360000,
+     "area": 57,
+     "from": 16360000
+    },
+    {
      "beds": 2,
-     "code": null,
-     "area": 115,
+     "code": "2201",
+     "free": 7,
+     "name": "2 спальни",
+     "area_sqm": 93,
+     "price_from_thb": 33680000,
+     "area": 93,
      "from": 33680000
+    },
+    {
+     "beds": 2,
+     "code": "3303",
+     "free": 2,
+     "name": "2 спальни",
+     "area_sqm": 95,
+     "price_from_thb": 37350000,
+     "area": 95,
+     "from": 37350000
+    },
+    {
+     "beds": 2,
+     "code": "3203",
+     "free": 2,
+     "name": "2 спальни",
+     "area_sqm": 113,
+     "price_from_thb": 32950000,
+     "area": 113,
+     "from": 32950000
+    },
+    {
+     "beds": 2,
+     "code": "3101",
+     "free": 2,
+     "name": "2 спальни",
+     "area_sqm": 115,
+     "price_from_thb": 29900000,
+     "area": 115,
+     "from": 29900000
+    },
+    {
+     "beds": 2,
+     "code": "2401",
+     "free": 3,
+     "name": "Пентхаус · 2 спальни",
+     "area_sqm": 96,
+     "price_from_thb": 67380000,
+     "area": 96,
+     "from": 67380000
+    },
+    {
+     "beds": 2,
+     "code": "4403",
+     "free": 1,
+     "name": "Пентхаус · 2 спальни",
+     "area_sqm": 99,
+     "price_from_thb": 67690000,
+     "area": 99,
+     "from": 67690000
+    },
+    {
+     "beds": 2,
+     "code": "5501",
+     "free": 6,
+     "name": "Пентхаус · 2 спальни",
+     "area_sqm": 239,
+     "price_from_thb": 74630000,
+     "area": 239,
+     "from": 74630000
+    },
+    {
+     "beds": 3,
+     "code": "5504",
+     "free": 1,
+     "name": "Пентхаус · 3 спальни",
+     "area_sqm": 316,
+     "price_from_thb": 120220000,
+     "area": 316,
+     "from": 120220000
     }
    ]
   },
