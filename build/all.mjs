@@ -21,7 +21,7 @@ try {
    Сверка вида (компьютер/телефон × светлая/тёмная) и кабинет на реальных данных.
    Сборку не валят — это отчёт. Быстрая сборка без них: PLP_FAST=1 node build/all.mjs */
 if (!process.env.PLP_FAST) {
-  for (const [tool, name] of [['tools/object_consistency.py', 'карточки'], ['tools/privacy_guard.py', 'личные данные'], ['tools/ui_parity.py', 'вид'], ['tools/cab_check.py', 'кабинет']]) {
+  for (const [tool, name] of [['tools/object_consistency.py', 'карточки'], ['tools/privacy_guard.py', 'личные данные'], ['tools/uk_path.py', 'путь объекта'], ['tools/ui_parity.py', 'вид'], ['tools/cab_check.py', 'кабинет']]) {
     try {
       execFileSync('python3', [tool, '--short'], { cwd: '/Users/elnurkhankishiev/plp-site', stdio: 'inherit' });
     } catch (e) { /* замечания уже напечатаны строкой выше */ }
