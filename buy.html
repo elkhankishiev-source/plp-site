@@ -766,7 +766,7 @@ input.bad{border-color:#d98a84!important;background:var(--paper)6f5}
 .arrows button{width:42px;height:42px;border-radius:50%;border:1px solid rgba(var(--ink-rgb),.1);background:var(--paper);font-size:1.1rem;box-shadow:var(--shadow-sm);transition:background .2s,transform .15s}
 .arrows button:hover{background:var(--green);transform:translateY(-1px)}
 .carwrap{margin-top:18px;position:relative}
-.car{display:flex;gap:20px;padding:6px 4px 12px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;cursor:grab}
+.car{display:flex;gap:20px;padding:6px 4px 12px;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:none;cursor:grab}
 .car::-webkit-scrollbar{display:none}
 /* Эльнур 16.09: «дошёл до последней карточки, а она наполовину торчит за экраном».
    При жёстком прилипании (scroll-snap mandatory) последняя карточка тянется левым краем
@@ -778,6 +778,20 @@ input.bad{border-color:#d98a84!important;background:var(--paper)6f5}
 .car.drag{cursor:grabbing;scroll-snap-type:none}
 /* Эльнур просил карточки в ленте чуть крупнее — на маке это 420–500 px */
 .car .prop{flex:0 0 clamp(420px,35%,500px);scroll-snap-align:start;background:var(--paper);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow-sm);transition:transform .25s,box-shadow .25s;cursor:pointer;display:flex;flex-direction:column}
+/* 🔴 17.09 Эльнур снова: «прокручиваю до последней карточки, и она возвращается
+   обратно на половину, и её не видно». Правка от 16.09 не работала: правило
+   .car>:last-child{scroll-snap-align:end} стояло ВЫШЕ .car .prop{scroll-snap-align:start}
+   при равной специфичности — побеждало второе, и последняя карточка по-прежнему
+   тянулась левым краем. Теперь правило ниже и адреснее, а прилипание мягкое. */
+.car > .prop:last-child{scroll-snap-align:end}
+/* Короткая форма запроса аренды прямо в карточке (17.09). */
+.bform{margin-top:10px;display:flex;flex-direction:column;gap:8px}
+.bform .bf-row{display:flex;gap:8px;flex-wrap:wrap}
+.bform .bf-row label{flex:1 1 140px}
+.bform label{display:block;font-size:.8rem;color:var(--muted)}
+.bform input,.bform textarea{width:100%;margin-top:4px;border:1px solid var(--line,rgba(var(--ink-rgb),.14));border-radius:12px;padding:10px 12px;font:inherit;font-size:.95rem;background:var(--paper);color:var(--ink)}
+.bform textarea{resize:vertical}
+.bform .tnote{margin:2px 0 0}
 @media(max-width:640px){.car .prop{flex:0 0 85vw}}
 .car .prop:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
 .car .pic{aspect-ratio:4/3;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:600;color:rgba(var(--ink-rgb),.45)}
@@ -1461,7 +1475,7 @@ select option{background:var(--paper);color:var(--ink)}
   .carnav button{width:34px;height:34px;font-size:1rem}
 }
 /* Ленты одинаково «прилипают»: карточка встаёт в начало, а не зависает посередине */
-.car,.zpick-car,.shots,.mapobjs{scroll-snap-type:x mandatory;scroll-padding-left:4px}
+.car,.zpick-car,.shots,.mapobjs{scroll-snap-type:x proximity;scroll-padding-left:4px}
 .car>*,.zpick-car>*,.shots>*{scroll-snap-align:start;scroll-snap-stop:always}
 
 /* Кнопки поверх фото лежат на светло-зелёной подложке карточки и наследовали
@@ -2565,7 +2579,7 @@ ru: {
   "u.area":"площадь","u.beds":"спальни","u.deadline":"сдача",
   "st.ready":"Готов","st.available":"Доступен","st.reserved":"Резерв","st.sold":"Продан","st.soon":"Скоро",
   "soon.t":"Скоро в каталоге","soon.p":"Наполняем витрину аренды: новые виллы и апартаменты появятся здесь. Оставьте запрос — подберём вручную уже сейчас.",
-  "book.title":"Запрос на аренду","book.req":"Оставить запрос на аренду",
+  "book.title":"Запрос на аренду","book.req":"Оставить запрос на аренду","bf.guests":"Гостей","bf.name":"Как к вам обращаться","bf.contact":"Куда ответить","bf.cph":"телефон, WhatsApp или @ник","bf.note":"Что важно","bf.nph":"пожелания, вопросы","bf.send":"Отправить запрос","bf.need":"Оставьте телефон, WhatsApp или почту — иначе не сможем ответить","bf.sending":"Отправляем…","bf.done":"Приняли. Проверим занятость у собственника и ответим — обычно в течение дня.",
   "u.req2":"Запросить (даты/цену)",
   "rent.dates.in":"Заезд","rent.dates.out":"Выезд","rent.dates.btn":"Показать свободные","rent.dates.reset":"Сбросить дату",
   "ft.addobj":"Сдать или продать свой объект",
@@ -2742,7 +2756,7 @@ en: {
   "u.area":"area","u.beds":"bedrooms","u.deadline":"completion",
   "st.ready":"Ready","st.available":"Available","st.reserved":"Reserved","st.sold":"Sold","st.soon":"Soon",
   "soon.t":"Coming to the catalogue","soon.p":"We are filling the rental showcase: new villas and apartments will appear here. Leave an enquiry — we will match one manually right now.",
-  "book.title":"Rental enquiry","book.req":"Leave a rental enquiry",
+  "book.title":"Rental enquiry","book.req":"Leave a rental enquiry","bf.guests":"Guests","bf.name":"Your name","bf.contact":"Where to reply","bf.cph":"phone, WhatsApp or @handle","bf.note":"Anything important","bf.nph":"wishes, questions","bf.send":"Send request","bf.need":"Leave a phone, WhatsApp or email so we can reply","bf.sending":"Sending…","bf.done":"Got it. We will check availability with the owner and reply, usually within a day.",
   "u.req2":"Request (dates/price)",
   "rent.dates.in":"Check-in","rent.dates.out":"Check-out","rent.dates.btn":"Show available","rent.dates.reset":"Reset dates",
   "ft.addobj":"List your property",
@@ -4774,12 +4788,41 @@ function wireStay(p){
 function wireBooking(p){
   try{ wireStay(p); }catch(e){}
   var req=document.getElementById('bReq');if(!req)return;
+  /* 🔴 17.09 Эльнур: «а самое интересное — как там отправить запрос на аренду то?».
+     Кнопка отправляла намерение и уводила в чат, а заявка без контакта до менеджера
+     не доезжала вовсе (sendLead без contact только запоминает объект). Теперь прямо
+     в карточке короткая форма: даты, гостей, как зовут и куда ответить — и заявка
+     уходит. Эльнур: «можно набрать даты в календаре, а можно по карточке нажать
+     и отправить запрос на объект, ответить на вопросы, и уйдёт заявка». */
   req.onclick=function(){
-    var note2=rentSelDates?('Даты: '+rentSelDates.check_in+' → '+rentSelDates.check_out):null;
-    pushLead({funnel:'rent',property_id:p.property_id,goal:'rent_request',note:note2,
-      check_in:rentSelDates?rentSelDates.check_in:null,check_out:rentSelDates?rentSelDates.check_out:null});
-    closeProp();lastTopic='rent';openChat('rentreq');
-    if(chatStarted){setTimeout(function(){note('amoCRM · '+t('book.title')+' · '+p.property_id+(note2?(' · '+note2):''));},300);}
+    var box=document.getElementById('bForm');
+    if(box){ box.hidden=!box.hidden; if(!box.hidden){ var f=box.querySelector('input'); if(f) f.focus(); } return; }
+    box=document.createElement('div'); box.id='bForm'; box.className='bform';
+    box.innerHTML=
+      '<div class="bf-row"><label>'+t('bf.guests')+'<input id="bfG" type="number" min="1" max="12" value="2"></label>'+
+      '<label>'+t('bf.name')+'<input id="bfN" type="text" autocomplete="name"></label></div>'+
+      '<label class="bf-full">'+t('bf.contact')+'<input id="bfC" type="text" inputmode="tel" '+
+        'autocomplete="tel" placeholder="'+t('bf.cph')+'"></label>'+
+      '<label class="bf-full">'+t('bf.note')+'<textarea id="bfT" rows="2" placeholder="'+t('bf.nph')+'"></textarea></label>'+
+      '<button type="button" class="btn btn-primary btn-block" id="bfSend">'+t('bf.send')+'</button>'+
+      '<p class="tnote" id="bfMsg"></p>';
+    req.parentNode.insertBefore(box, req.nextSibling);
+    document.getElementById('bfSend').onclick=function(){
+      var c=(document.getElementById('bfC').value||'').trim();
+      var msg=document.getElementById('bfMsg');
+      if(c.replace(/\D/g,'').length<7 && c.indexOf('@')<0){ msg.textContent=t('bf.need'); return; }
+      this.disabled=true; msg.textContent=t('bf.sending');
+      var d=rentSelDates||null;
+      var lead=pushLead({funnel:'rent',property_id:p.property_id,goal:'rent_request',
+        name:(document.getElementById('bfN').value||'').trim()||null,
+        contact:c, phone:c, guests:Number(document.getElementById('bfG').value||0)||null,
+        note:[(d?('Даты: '+d.check_in+' → '+d.check_out):''),
+              (document.getElementById('bfT').value||'').trim()].filter(Boolean).join(' · ')||null,
+        check_in:d?d.check_in:null, check_out:d?d.check_out:null});
+      var done=function(){ msg.textContent=t('bf.done'); box.querySelectorAll('input,textarea,button')
+        .forEach(function(x){x.disabled=true;}); };
+      if(lead&&lead.__send&&lead.__send.then) lead.__send.then(done)['catch'](done); else done();
+    };
   };
 }
 /* Условия оплаты и рассрочка — на виду, а не под спойлером калькулятора:
