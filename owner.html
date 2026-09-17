@@ -815,6 +815,9 @@ textarea{min-height:76px;resize:vertical}
 button{background:var(--ink-block);color:var(--on-ink);border:0;border-radius:999px;padding:12px 18px;font-size:15px;font-weight:700;cursor:pointer}
 #gate button,#pwd button{margin-top:14px;width:100%}
 #gate button.opt,#pwd button.opt{margin-top:0;width:auto}
+/* 17.09: в тёмной теме чёрная «Войти» сливалась с карточкой входа — там главная кнопка оливковая, как выбранный способ */
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) #gate button:not(.opt):not(.ghost),:root:not([data-theme="light"]) #pwd button:not(.opt):not(.ghost){background:var(--green);color:var(--on-green)}}
+:root[data-theme="dark"] #gate button:not(.opt):not(.ghost),:root[data-theme="dark"] #pwd button:not(.opt):not(.ghost){background:var(--green);color:var(--on-green)}
 button.ghost{background:transparent;border:2px solid var(--txt);color:var(--txt);font-weight:700}
 .alt{display:block;text-align:center;color:var(--dim);font-size:14px;margin-top:14px;
      text-decoration:none;border-bottom:1px dotted var(--dim);width:fit-content;margin-left:auto;margin-right:auto;cursor:pointer}
@@ -1657,7 +1660,9 @@ body{background:var(--bg)}
 }
 
 /* подвал: один вид на обеих страницах и обеих ширинах */
-.footer{padding:20px 0 14px;color:var(--muted)}
+/* 17.09 Эльнур: подвал на фоне страницы, не отдельной белой плитой — отделяет одна тонкая линия.
+   Так же пропадает «пустая полоса» под подвалом на коротких страницах (вход в кабинет). */
+.footer{padding:20px 0 14px;color:var(--muted);background:transparent;border-top:1px solid rgba(var(--ink-rgb),.09)}
 .footer h3{font-size:.68rem;opacity:.75;margin-bottom:6px}
 .footer li{margin-bottom:4px;font-size:.74rem;line-height:1.35}
 .footer a{color:var(--muted)}
