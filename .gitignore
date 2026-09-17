@@ -19,3 +19,4 @@ draft.html
 build/prices_last_check.json
 tools/link_units.py
 tools/sql/
+tools/ocr/plpocr
