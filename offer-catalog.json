@@ -1,5 +1,5 @@
 {
- "updated": "2026-09-17",
+ "updated": "2026-09-18",
  "items": [
   {
    "id": "INTAKE-BOTANICA",
@@ -373,6 +373,77 @@
      "price_from_thb": 9623565,
      "area": 52,
      "from": 9623565
+    }
+   ]
+  },
+  {
+   "id": "PLP-BAYSIDE",
+   "pub": "PLP-BAYSIDE",
+   "url": "https://property-library.com/object/bayside",
+   "name": "Laguna Beach Residences Bayside",
+   "district": "Банг Тао",
+   "type": "Кондо",
+   "price_from": 30250000,
+   "units": [
+    {
+     "beds": 2,
+     "code": "2101",
+     "free": 21,
+     "name": "2 спальни",
+     "area_sqm": 121,
+     "price_from_thb": 30250000,
+     "area": 121,
+     "from": 30250000
+    },
+    {
+     "beds": 2,
+     "code": "1502",
+     "free": 2,
+     "name": "2 спальни",
+     "area_sqm": 209,
+     "price_from_thb": 42030000,
+     "area": 209,
+     "from": 42030000
+    },
+    {
+     "beds": 3,
+     "code": "1516",
+     "free": 1,
+     "name": "3 спальни",
+     "area_sqm": 282,
+     "price_from_thb": 61210000,
+     "area": 282,
+     "from": 61210000
+    },
+    {
+     "beds": 3,
+     "code": "1503",
+     "free": 18,
+     "name": "3 спальни",
+     "area_sqm": 285,
+     "price_from_thb": 56420000,
+     "area": 285,
+     "from": 56420000
+    },
+    {
+     "beds": 3,
+     "code": "2517",
+     "free": 1,
+     "name": "3 спальни",
+     "area_sqm": 286,
+     "price_from_thb": 102470000,
+     "area": 286,
+     "from": 102470000
+    },
+    {
+     "beds": 3,
+     "code": "1512",
+     "free": 1,
+     "name": "3 спальни",
+     "area_sqm": 358,
+     "price_from_thb": 89660000,
+     "area": 358,
+     "from": 89660000
     }
    ]
   },
