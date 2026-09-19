@@ -24,6 +24,7 @@
  */
 
 import fs from 'node:fs';
+import { execSync } from 'node:child_process';
 import path from 'node:path';
 import os from 'node:os';
 import { fileURLToPath } from 'node:url';
@@ -1811,6 +1812,16 @@ if(dark) i.src='../img/brand/plp-mark-white.png';})();</script>
 }
 
 // -------------------------------------------------------------------- sitemap
+// 19.09.2026: дата изменения берётся из git, а не из даты сборки.
+// Раньше всем страницам ставилась дата билда, и поисковик переставал верить полю.
+function lastmodOf(rel) {
+  try {
+    const out = execSync('git log -1 --format=%cI -- ' + JSON.stringify(rel), { cwd: ROOT, encoding: 'utf8' }).trim();
+    if (out) return out.slice(0, 10);
+  } catch (e) {}
+  return new Date().toISOString().slice(0, 10);
+}
+
 function sitemap(objects) {
   const today = new Date().toISOString().slice(0, 10);
   /* 🔴 10.09: Search Console прислал «Страница с переадресацией» и не индексировал
@@ -1825,28 +1836,28 @@ function sitemap(objects) {
     ['add-property.html', '0.8'], ['about.html', '0.7'],
     ...['bang-tao','layan','surin','kamala','rawai','kata','nai-yang','koh-kaew']
         .map(d => ['districts/' + d + '.html', '0.8']),
-    ...['inostranec-mozhet-kupit','leasehold-ili-freehold','skolko-oformlyaetsya-sdelka',
-        'nalogi-i-rashody','kupit-udalenno','stoimost-uslug']
+    ['guide/index.html', '0.7'],
+    ...['garantirovannaya-dohodnost','inostranec-mozhet-kupit','kakaya-dohodnost','kto-upravlyaet-obektom','kupit-udalenno','leasehold-ili-freehold','nalogi-i-rashody','pereprodazha-do-sdachi','risk-nedostroya','skolko-oformlyaetsya-sdelka','stoimost-uslug','viza-i-vnzh']
         .map(g => ['guide/' + g + '.html', '0.6']),
   ];
   const parts = [];
   parts.push('<?xml version="1.0" encoding="UTF-8"?>');
   parts.push('<!-- Сгенерировано build/gen.mjs. Главная, разделы и страницы объектов. Якорей нет: это не отдельные страницы. -->');
   parts.push('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">');
-  parts.push(`  <url><loc>${SITE_BASE}/</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>`);
+  parts.push(`  <url><loc>${SITE_BASE}/</loc><lastmod>${lastmodOf('index.html')}</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>`);
   for (const a of anchors) {
     parts.push(`  <url><loc>${SITE_BASE}/${a}</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>`);
   }
   for (const [pg, pri] of pages) {
-    parts.push(`  <url><loc>${SITE_BASE}/${pg}</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>${pri}</priority></url>`);
+    parts.push(`  <url><loc>${SITE_BASE}/${pg}</loc><lastmod>${lastmodOf(pg)}</lastmod><changefreq>weekly</changefreq><priority>${pri}</priority></url>`);
   }
   // 30.08: правовые документы тоже индексируем — они часть сайта
   for (const doc of ['privacy.html', 'rules.html', 'terms.html']) {
-    parts.push(`  <url><loc>${SITE_BASE}/${doc}</loc><lastmod>${today}</lastmod><changefreq>yearly</changefreq><priority>0.3</priority></url>`);
+    parts.push(`  <url><loc>${SITE_BASE}/${doc}</loc><lastmod>${lastmodOf(doc)}</lastmod><changefreq>yearly</changefreq><priority>0.3</priority></url>`);
   }
   for (const o of objects) {
     const loc = SITE_BASE + '/object/' + slugOf(pubOf(o));
-    parts.push(`  <url><loc>${loc}</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>`);
+    parts.push(`  <url><loc>${loc}</loc><lastmod>${lastmodOf('object/' + slugOf(pubOf(o)) + '.html')}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>`);
   }
   parts.push('</urlset>');
   return parts.join('\n') + '\n';

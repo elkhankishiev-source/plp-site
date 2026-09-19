@@ -1,5 +1,5 @@
 {
- "updated": "2026-09-18",
+ "updated": "2026-09-19",
  "items": [
   {
    "id": "INTAKE-BOTANICA",
@@ -1102,9 +1102,9 @@
      "beds": 3,
      "name": "3 спальни",
      "area_sqm": 265,
-     "price_from_thb": 22418000,
+     "price_from_thb": 22300000,
      "area": 265,
-     "from": 18600000
+     "from": 22300000
     }
    ]
   },
