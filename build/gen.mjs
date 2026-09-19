@@ -55,6 +55,7 @@ function jpegSize(file) {
   } catch (e) { /* нет файла — просто не выводим размеры */ }
   return null;
 }
+const R2_BASE = 'https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev';
 const SITEMAP = path.join(ROOT, 'sitemap.xml');
 
 const SITE_BASE = 'https://property-library.com';
@@ -481,13 +482,20 @@ function buildCatalog(objects, benchmarks, preserve) {
    умеет отдавать уменьшённые копии, поэтому на витрину идут превью, а полный
    снимок открывается только в просмотрщике. Эльнур 06.09. */
 function thumbUrl(u, w, q) {
+  /* 19.09.2026: фотографии переехали в Cloudflare R2. У Supabase исходящий трафик платный
+     и 18.09 сайт из-за лимита сутки стоял без единой картинки; у R2 трафик бесплатный.
+     Размеры готовим заранее при переносе (760 и 1600 px, webp), поэтому преобразования
+     на лету больше нет вообще: меньше деталей, меньше того, что может отказать. */
   const s = String(u || '');
-  if (!s || s.indexOf('/storage/v1/object/public/') < 0) return s || null;
-  /* без resize=contain хранилище режет кадр по ширине, а высоту оставляет
-     исходной — обложка Balcony приходила 760×3300 «кустами». Эльнур 06.09. */
-  return s.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/')
-        + (s.indexOf('?') < 0 ? '?' : '&') + 'width=' + w + '&resize=contain&quality=' + q;
+  if (!s) return null;
+  const i = s.indexOf('/storage/v1/object/public/object-media/');
+  if (i < 0) return s;
+  const путь = s.slice(i + '/storage/v1/object/public/object-media/'.length).split('?')[0];
+  const база = путь.replace(/\.(jpg|jpeg|png|webp)$/i, '');
+  const размер = (w && w <= 900) ? '-760' : '-1600';
+  return R2_BASE + '/' + база + размер + '.webp';
 }
+
 function unitsOf(o) {
   /* Типы приходят из разных источников и называют поля по-разному
      (area/area_sqm, beds/bedrooms). Приводим к одному виду, а ставки аренды

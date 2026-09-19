@@ -1,0 +1,103 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""Публикация правок n8n: чтобы исправленное действительно исполнялось.
+
+Эльнур 18.09.2026 про непубликуемые правки: «чини, как ты вообще такое допустил».
+
+Что происходит. n8n 2.38 исполняет не то, что лежит в workflow_entity.nodes — это
+черновик. Исполняется ОПУБЛИКОВАННАЯ версия: строка workflow_history, на которую
+смотрит workflow_entity."activeVersionId". Правки через SQL и через публичный API
+меняют только черновик, поэтому «UPDATE 1» был, а поведение оставалось старым.
+
+Сверка это подтвердила ровно: из 70 активных сценариев черновик расходится с живой
+версией у восьми — и это те же восемь, куда я вносил правки:
+
+  WF_wa_wazzup       правка 329: старая реплика из истории Wazzup не считается свежей
+  WF_validator_PROD  разводка уведомлений по релевантности
+  WF_touch_send      отправка утверждённых касаний
+  WF_freshness       сверка цен и наличия уходит в отдел продаж, не в тех-чат
+  WF_site_lead       заявка в обход сервера уходит в тех-чат, не в отдел продаж
+  WF_ig_meta         разговор с покупателем уходит в отдел продаж
+  WF_meeting         встречи
+  WF_amo_write       запись в amoCRM
+
+Что делает скрипт. Переносит черновик в ту самую строку workflow_history, на которую
+уже смотрит activeVersionId. Новых версий не плодит, номер версии не трогает: меняется
+только содержимое живой версии. Перед этим складывает копию в таблицу
+workflow_history_bak_<дата>, из неё откат делается одной командой.
+
+    python3 n8n_publish.py             # показать расхождения
+    python3 n8n_publish.py --apply     # опубликовать и перезапустить n8n
+    python3 n8n_publish.py --rollback workflow_history_bak_20260919_1500
+"""
+import datetime, subprocess, sys
+
+KEY = '/Users/elnurkhankishiev/.ssh/plp_vps'
+VPS = open('/Users/elnurkhankishiev/.plp_vps_ip').read().strip()
+APPLY = '--apply' in sys.argv
+ROLLBACK = sys.argv[sys.argv.index('--rollback') + 1] if '--rollback' in sys.argv else None
+
+DIFF_WHERE = ('from workflow_entity w join workflow_history h on h."versionId"=w."activeVersionId" '
+              'where w.active=true and h.nodes::text <> w.nodes::text')
+
+
+def psql(sql):
+    r = subprocess.run(['ssh', '-i', KEY, 'root@' + VPS,
+                        'docker exec -i n8n-postgres-1 psql -U n8n -t -A -f /dev/stdin'],
+                       input=sql, capture_output=True, text=True, timeout=300)
+    if r.returncode:
+        raise RuntimeError(r.stderr.strip()[:400])
+    return r.stdout.strip()
+
+
+def diffs():
+    out = psql('select w.name, length(w.nodes::text), length(h.nodes::text) ' + DIFF_WHERE + ' order by w.name;')
+    return [ln.split('|') for ln in out.splitlines() if ln.strip()]
+
+
+def main():
+    if ROLLBACK:
+        if not ROLLBACK.startswith('workflow_history_bak_'):
+            print('имя копии должно начинаться с workflow_history_bak_')
+            return 1
+        n = psql('update workflow_history h set nodes=b.nodes, connections=b.connections, '
+                 '"updatedAt"=now() from %s b where b."versionId"=h."versionId"; ' % ROLLBACK)
+        print('откат: %s' % n)
+        subprocess.run(['ssh', '-i', KEY, 'root@' + VPS, 'docker restart n8n-n8n-1'],
+                       capture_output=True, timeout=300)
+        print('n8n перезапущен')
+        return 0
+
+    d = diffs()
+    if not d:
+        print('расхождений нет: живые версии совпадают с черновиками')
+        return 0
+    for name, dr, lv in d:
+        print('%-70s черновик %s / живая %s' % (name[:70], dr, lv))
+    if not APPLY:
+        print('\nЭто отчёт. Опубликовать: --apply')
+        return 0
+
+    bak = 'workflow_history_bak_' + datetime.datetime.now().strftime('%Y%m%d_%H%M')
+    psql('create table %s as select h.* %s;' % (bak, DIFF_WHERE))
+    print('\nкопия живых версий: %s' % bak)
+    psql('update workflow_history h set nodes=w.nodes, connections=w.connections, "updatedAt"=now() '
+         'from workflow_entity w where h."versionId"=w."activeVersionId" and w.active=true '
+         'and h.nodes::text <> w.nodes::text;')
+    left = diffs()
+    if left:
+        print('НЕ ОПУБЛИКОВАЛОСЬ: %s' % ', '.join(x[0] for x in left))
+        return 1
+    print('опубликовано: %d сценариев, расхождений не осталось' % len(d))
+    subprocess.run(['ssh', '-i', KEY, 'root@' + VPS, 'docker restart n8n-n8n-1'],
+                   capture_output=True, timeout=300)
+    st = subprocess.run(['ssh', '-i', KEY, 'root@' + VPS,
+                         "sleep 15; docker ps --filter name=n8n-n8n-1 --format '{{.Status}}'"],
+                        capture_output=True, text=True, timeout=300).stdout.strip()
+    print('n8n: %s' % st)
+    print('откат при беде: python3 n8n_publish.py --rollback %s' % bak)
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())
