@@ -3,6 +3,64 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- PLP:HEADTHEME:START -->
+<meta name="color-scheme" content="light dark">
+<!-- цвет системных полей браузера = фон страницы. Без этого при прокрутке и
+     оттягивании из-под страницы проглядывает чужой цвет — кажется, что фон мигает. -->
+<meta name="theme-color" content="#f7f6f1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0C0D09" media="(prefers-color-scheme: dark)">
+<script>
+(function(){
+  function paintChrome(){
+    try{
+      var bg=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+      if(!bg && document.body) bg=getComputedStyle(document.body).backgroundColor;
+      if(!bg || bg==='rgba(0, 0, 0, 0)') return;
+      var list=document.querySelectorAll('meta[name="theme-color"]');
+      for(var i=0;i<list.length;i++) list[i].parentNode.removeChild(list[i]);
+      var m=document.createElement('meta'); m.setAttribute('name','theme-color');
+      m.setAttribute('content',bg); document.head.appendChild(m);
+    }catch(e){}
+  }
+  /* Кнопка «поделиться»: на телефоне открывает системное меню, на компьютере
+     кладёт ссылку в буфер и говорит об этом. Эльнур 07.09: «сайтом надо
+     пользоваться, он не просто для красоты». */
+  document.addEventListener('click', function(e){
+    var b = e.target && e.target.closest && e.target.closest('[data-share]');
+    if(!b) return;
+    e.preventDefault();
+    var path = b.getAttribute('data-share') || location.pathname;
+    var url = location.origin + path;
+    var title = b.getAttribute('data-share-title') || document.title;
+    var done = function(){
+      var was = b.innerHTML;   /* 15.09: в кнопке живёт svg-иконка, восстанавливаем разметку целиком */
+      b.textContent = '✓ Ссылка скопирована';
+      b.classList.add('ok');
+      setTimeout(function(){ b.innerHTML = was; b.classList.remove('ok'); }, 2200);
+    };
+    if(navigator.share){ navigator.share({title:title, url:url}).catch(function(){}); return; }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(url).then(done).catch(function(){ prompt('Скопируйте ссылку:', url); });
+    } else prompt('Скопируйте ссылку:', url);
+  });
+  window.paintChrome=paintChrome;
+  /* Адрес без .html: страницы и так открываются коротким адресом, но если
+     человек пришёл по старой ссылке, приводим строку браузера к чистому виду.
+     Эльнур 07.09: «мне не нравится html в адресе, я ни у кого её не видел». */
+  try{
+    var pth=location.pathname;
+    if(/\.html$/.test(pth)){
+      var clean=pth.replace(/index\.html$/,'').replace(/\.html$/,'');
+      if(clean==='') clean='/';
+      history.replaceState(null,'',clean+location.search+location.hash);
+    }
+  }catch(e){}
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',paintChrome);
+  else paintChrome();
+  try{ matchMedia('(prefers-color-scheme: dark)').addEventListener('change',paintChrome); }catch(e){}
+})();
+</script>
+<!-- PLP:HEADTHEME:END -->
 <script>(function(){try{var v=localStorage.getItem('pl_theme');
 if(v==='dark'||v==='light')document.documentElement.setAttribute('data-theme',v);}catch(e){}})();</script>
 <title>The Title Villa Estella Naiyang · вилла — Най Янг, Пхукет | Property Library</title>
@@ -27,6 +85,22 @@ if(v==='dark'||v==='light')document.documentElement.setAttribute('data-theme',v)
 <meta name="twitter:image" content="https://property-library.com/img/PLP-ESTELLA-U1.jpg">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"RealEstateListing","@id":"https://property-library.com/object/estella-u1#listing","url":"https://property-library.com/object/estella-u1","name":"The Title Villa Estella Naiyang · вилла","description":"","about":{"@id":"https://property-library.com/object/estella-u1#residence"}},{"@type":"Residence","@id":"https://property-library.com/object/estella-u1#residence","name":"The Title Villa Estella Naiyang · вилла","description":"","url":"https://property-library.com/object/estella-u1","image":"https://property-library.com/img/PLP-ESTELLA-U1.jpg","address":{"@type":"PostalAddress","addressRegion":"Phuket","addressLocality":"Най Янг","addressCountry":"TH"},"additionalProperty":{"@type":"PropertyValue","name":"Застройщик","value":"Rhom Bho Property (AssetWise)"},"numberOfRooms":3,"floorSize":{"@type":"QuantitativeValue","value":265,"unitCode":"MTK"}}]}</script>
 <style>
+/* PLP:ANTIFLICKER */
+/* Мигание фона на телефоне — сводная защита. Эльнур 06.09: «фон в мобильной
+   версии везде мигает, ищи по всем страницам». Три источника:
+   1) размытие фона (backdrop-filter) под липкими элементами — браузер
+      перерисовывает весь экран на каждом кадре прокрутки;
+   2) долгое проявление блоков при прокрутке;
+   3) отложенные картинки без фона — на их месте на миг светится подложка. */
+@media(max-width:900px){
+  .header,#toTop,.badge,.pm-tag,.car .tag,.btn-glass,.hero-float,.fbtn,.chipf,
+  .modal-overlay,.mnav,.sheet,.pm-card,.toolbox{
+    backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+  .reveal{transition-duration:.35s!important}
+}
+.pic-photo,.thumb-photo,.prgs img,.simi-c i,.pm-img img{background-color:var(--warm,#EFEEE7)}
+/* PLP:ANTIFLICKER */
+html{background:var(--bg);overscroll-behavior-y:none}
 /* Эльнур 05.09: сайт — единая система. Страница объекта живёт в тех же
    цветах и с тем же набором блоков, что и карточка на сайте. */
 :root{--green:#D2D5B3;--green-deep:#5F6242;--olive:#5F6242;--ink:#22251C;--paper:#FBFBF7;
@@ -128,7 +202,7 @@ if(dark) i.src='../img/brand/plp-mark-white.png';})();</script>
     <img id="mainShot" src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ESTELLA/01-1600.webp" alt="The Title Villa Estella Naiyang · вилла" loading="lazy">
     <div class="badge">Вилла · Най Янг</div>
   </div>
-  <div class="shots"><button type="button" class="on" data-src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ESTELLA/01-1600.webp" aria-label="Фото 1"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ESTELLA/01-1600.webp" alt="" loading="lazy" decoding="async"></button><button type="button" class="" data-src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ESTELLA/plans/01-1600.webp" aria-label="Фото 2"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ESTELLA/plans/01-1600.webp" alt="" loading="lazy" decoding="async"></button><button type="button" class="" data-src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ESTELLA/plans/02-1600.webp" aria-label="Фото 3"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ESTELLA/plans/02-1600.webp" alt="" loading="lazy" decoding="async"></button><button type="button" class="" data-src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ESTELLA/interior/d9e195bd211c5eca-1600.webp" aria-label="Фото 4"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ESTELLA/interior/d9e195bd211c5eca-1600.webp" alt="" loading="lazy" decoding="async"></button><button type="button" class="" data-src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ESTELLA/facilities/4501dfca058df9b5-1600.webp" aria-label="Фото 5"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ESTELLA/facilities/4501dfca058df9b5-1600.webp" alt="" loading="lazy" decoding="async"></button><button type="button" class="" data-src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ESTELLA/02-1600.webp" aria-label="Фото 6"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ESTELLA/02-1600.webp" alt="" loading="lazy" decoding="async"></button><button type="button" class="" data-src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ESTELLA/master/e547539a5cfd229f-1600.webp" aria-label="Фото 7"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ESTELLA/master/e547539a5cfd229f-1600.webp" alt="" loading="lazy" decoding="async"></button><button type="button" class="" data-src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ESTELLA/interior/6f2334c6b0bb09d7-1600.webp" aria-label="Фото 8"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ESTELLA/interior/6f2334c6b0bb09d7-1600.webp" alt="" loading="lazy" decoding="async"></button></div>
+  <div class="shots"><button type="button" class="on" data-src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ESTELLA/interior/6f2334c6b0bb09d7-1600.webp" aria-label="Фото 1"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ESTELLA/interior/6f2334c6b0bb09d7-1600.webp" alt="" loading="lazy" decoding="async"></button><button type="button" class="" data-src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ESTELLA/facilities/4501dfca058df9b5-1600.webp" aria-label="Фото 2"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ESTELLA/facilities/4501dfca058df9b5-1600.webp" alt="" loading="lazy" decoding="async"></button><button type="button" class="" data-src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ESTELLA/01-1600.webp" aria-label="Фото 3"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ESTELLA/01-1600.webp" alt="" loading="lazy" decoding="async"></button><button type="button" class="" data-src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ESTELLA/02-1600.webp" aria-label="Фото 4"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ESTELLA/02-1600.webp" alt="" loading="lazy" decoding="async"></button><button type="button" class="" data-src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ESTELLA/interior/d9e195bd211c5eca-1600.webp" aria-label="Фото 5"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ESTELLA/interior/d9e195bd211c5eca-1600.webp" alt="" loading="lazy" decoding="async"></button><button type="button" class="" data-src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ESTELLA/master/e547539a5cfd229f-1600.webp" aria-label="Фото 6"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ESTELLA/master/e547539a5cfd229f-1600.webp" alt="" loading="lazy" decoding="async"></button><button type="button" class="" data-src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ESTELLA/plans/01-1600.webp" aria-label="Фото 7"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ESTELLA/plans/01-1600.webp" alt="" loading="lazy" decoding="async"></button><button type="button" class="" data-src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ESTELLA/plans/02-1600.webp" aria-label="Фото 8"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ESTELLA/plans/02-1600.webp" alt="" loading="lazy" decoding="async"></button></div>
   <h1>The Title Villa Estella Naiyang · вилла</h1>
   <p class="loc">Най Янг, Пхукет · 600 м до пляжа</p>
   
@@ -155,7 +229,7 @@ if(dark) i.src='../img/brand/plp-mark-white.png';})();</script>
     <button type="button" class="btn ghost" id="shareBtn">Поделиться</button>
     <a class="btn wa" href="https://wa.me/66955492587?text=The%20Title%20Villa%20Estella%20Naiyang%20%C2%B7%20%D0%B2%D0%B8%D0%BB%D0%BB%D0%B0%20%E2%80%94%20%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D0%B5%D1%81%D1%83%D0%B5%D1%82%20%D1%8D%D1%82%D0%BE%D1%82%20%D0%BE%D0%B1%D1%8A%D0%B5%D0%BA%D1%82.%20https%3A%2F%2Fproperty-library.com%2Fobject%2Festella-u1" rel="noopener" target="_blank">WhatsApp</a>
   </div>
-  <section class="desc"><h2>Похожие объекты</h2><div class="simi"><a class="simi-c" href="estella"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ESTELLA/01-760.webp" alt="" loading="lazy" decoding="async"><b>The Title Villa Estella Naiyang</b><span>Най Янг · перепродажа · от 22 300 000 ฿</span></a><a class="simi-c" href="serenity"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-SERENITY/01-760.webp" alt="" loading="lazy" decoding="async"><b>The Title Serenity Naiyang</b><span>Най Янг · готово к заезду · от 5 221 467 ฿</span></a></div></section>
+  <section class="desc"><h2>Похожие объекты</h2><div class="simi"><a class="simi-c" href="estella"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ESTELLA/02-760.webp" alt="" loading="lazy" decoding="async"><b>The Title Villa Estella Naiyang</b><span>Най Янг · перепродажа · от 22 300 000 ฿</span></a><a class="simi-c" href="serenity"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-SERENITY/01-760.webp" alt="" loading="lazy" decoding="async"><b>The Title Serenity Naiyang</b><span>Най Янг · готово к заезду · от 5 221 467 ฿</span></a></div></section>
 </main>
 <script>
 /* «Поделиться»: на телефоне системное меню, на компьютере ссылка в буфер */

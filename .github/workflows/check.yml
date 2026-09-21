@@ -44,6 +44,21 @@ jobs:
           for f in .check/*.js; do node --check "$f" || { echo "❌ сломан: $f"; exit 1; }; done
           echo "✅ скрипты всех страниц целы"
 
+      # 21.09: код витрины переехал из страниц в assets/ (build/mkassets.mjs).
+      # Без этой проверки главная защита перестала бы работать: сломанный
+      # assets/app.js уезжает к клиентам, а страницы при этом «целы».
+      - name: Общий код витрины
+        run: |
+          set -e
+          test -f assets/app.js || { echo "❌ нет assets/app.js — витрина без кода"; exit 1; }
+          test -f assets/catalog.js || { echo "❌ нет assets/catalog.js — витрина без каталога"; exit 1; }
+          test -f assets/app.css || { echo "❌ нет assets/app.css — витрина без стилей"; exit 1; }
+          for f in assets/*.js; do node --check "$f" || { echo "❌ сломан: $f"; exit 1; }; done
+          grep -q 'PL.PROPERTIES=\[' assets/catalog.js || { echo "❌ в каталоге нет объектов продажи"; exit 1; }
+          grep -q 'PL.RENTALS=\[' assets/catalog.js || { echo "❌ в каталоге нет аренды"; exit 1; }
+          grep -q 'assets/app.js?v=' index.html || { echo "❌ главная не подключает общий код"; exit 1; }
+          echo "✅ общий код витрины на месте и цел"
+
       - name: Сборочные скрипты
         run: for f in build/*.mjs; do node --check "$f" || exit 1; done
 
@@ -56,7 +71,7 @@ jobs:
           grep -q 'property-library.com/sitemap.xml' robots.txt || { echo "❌ в robots.txt чужая карта сайта"; fail=1; }
           grep -q '<loc>' sitemap.xml || { echo "❌ карта сайта пуста"; fail=1; }
           test -f 404.html || { echo "❌ нет страницы 404"; fail=1; }
-          if grep -rlE 'service_role|SUPABASE_SERVICE_KEY[[:space:]]*=[[:space:]]*ey' --include='*.html' . | grep -q .; then
+          if grep -rlE 'service_role|SUPABASE_SERVICE_KEY[[:space:]]*=[[:space:]]*ey' --include='*.html' --include='*.js' . | grep -q .; then
             echo "❌ в HTML попал сервисный ключ"; fail=1
           fi
           [ "$fail" = "0" ] && echo "✅ структура в порядке"
