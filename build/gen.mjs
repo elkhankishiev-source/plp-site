@@ -944,7 +944,7 @@ function rentTag(o) {
    season_rates собственника; помесячная — из season_rates или rent_price_month_thb.
    Ничего не пересчитываем из ночной в месячную и обратно: это разные рынки,
    умножение на 30 давало бы цену втрое выше настоящей. */
-function rentRates(o, ratesBy) {
+function rentRates(o, ratesBy, benchmarks) {
   const pid = o.plp_property_id;
   const sr = (o.season_rates && typeof o.season_rates === 'object') ? o.season_rates : {};
   const num = v => { const n = Number(v); return Number.isFinite(n) && n > 0 ? n : null; };
@@ -970,13 +970,41 @@ function rentRates(o, ratesBy) {
 
   /* уровень источника виден наружу: факт из договоров, ставка собственника
      или ориентир по рыночным объявлениям — чтобы витрина не выдавала одно за другое */
-  const level = (src === 'uk') ? 'uk' : (sr.level === 'market' ? 'market' : (src ? 'owner' : null));
-  return { night, nightMax, month, monthMax, rateSrc: (night || month) ? src : null,
-           rateLevel: (night || month) ? level : null,
+  let level = (src === 'uk') ? 'uk' : (sr.level === 'market' ? 'market' : (src ? 'owner' : null));
+
+  /* 21.09 Эльнур: «объекты аренды без ставки — потому что они ещё строятся,
+     поэтому надо ставить примерную цену по характерному объекту, который уже
+     работает в этой же локации».
+     Берём не соседний объект (у него своя планировка и своё состояние), а
+     ставку квадратного метра по району и типу жилья из rental_benchmarks —
+     она собрана по реальному рынку: ADR и загрузка AirDNA, листинги
+     Airbnb/Agoda/Booking, отчёты Knight Frank и C9 Hotelworks. Умножаем на
+     площадь лота и округляем до тысячи: это честный ориентир, а не цена.
+     Уровень пишем отдельным словом — district. Витрина обязана показать его
+     как ориентир района, иначе получится выдуманная цена конкретной квартиры,
+     а такого мы не делаем. */
+  let month2 = month, monthMax2 = monthMax;
+  if (!month && !night && Array.isArray(benchmarks)) {
+    const площадь = Number(o.area_sqm) || Number(o.area_min) || 0;
+    const b = benchmarks.find(x => String(x.district) === String(o.district)
+                                && String(x.unit_type) === String(typeRu(o.type)));
+    if (площадь > 0 && b && b.rate_sqm_low > 0) {
+      const круг = v => Math.round(v / 1000) * 1000;
+      month2 = круг(площадь * Number(b.rate_sqm_low));
+      const верх = Number(b.rate_sqm_high) || 0;
+      monthMax2 = верх > 0 ? круг(площадь * верх) : null;
+      level = 'district';
+      src = 'district';
+    }
+  }
+
+  return { night, nightMax, month: month2, monthMax: monthMax2,
+           rateSrc: (night || month2) ? src : null,
+           rateLevel: (night || month2) ? level : null,
            rateAsOf: (night || month) ? (sr.as_of || null) : null, minNights };
 }
 
-function buildRentals(objects, preserve, ratesBy) {
+function buildRentals(objects, preserve, ratesBy, benchmarks) {
   return objects.map((o, i) => {
     const pid = o.plp_property_id;
     const keep = preserve[pid] || {};
@@ -1042,7 +1070,7 @@ function buildRentals(objects, preserve, ratesBy) {
         : null,
       units: unitsOf(o),
       // ставки: что реально известно; чего нет — остаётся null, не выдумываем
-      ...rentRates(o, ratesBy),
+      ...rentRates(o, ratesBy, benchmarks),
     };
   });
 }
@@ -1262,7 +1290,7 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
   /* Аренда: вместо стартовой цены застройщика — ставка (ночь или месяц),
      источник тот же, что на витрине: uk_rates → season_rates. */
   const isRent = /аренда|rent/i.test(String(o.purpose || ''));
-  const rr = isRent ? rentRates(o, ratesBy) : null;
+  const rr = isRent ? rentRates(o, ratesBy, benchmarks) : null;
   let rentLine = '';
   if (rr && (rr.night || rr.month)) {
     const part = (lo, hi, unit) => !lo ? '' :
@@ -2006,7 +2034,10 @@ async function main() {
     'first_payment,payment_plan,payment_schedule,main_image_url,gallery_urls,unit_types,price_tiers,build_progress,photo_groups,hot_rank,public_code,' +
     'ownership,amenities,nearby,distance_airport_km,parent_object_id');
   const benchmarks = await sbGet(env,
-    'rental_benchmarks?select=district,unit_type,disp_yield_low_pct,disp_yield_high_pct,net_yield_low_pct,net_yield_high_pct');
+    'rental_benchmarks?select=district,unit_type,disp_yield_low_pct,disp_yield_high_pct,'
+    /* 21.09: ставки за квадратный метр нужны для ориентира аренды по району —
+       без них выборка возвращала только доходность, и ориентир не считался. */
+    + 'net_yield_low_pct,net_yield_high_pct,rate_sqm_low,rate_sqm_shoulder,rate_sqm_high');
 
   // объекты аренды: purpose IN (аренда,rent) И on_site=true.
   // 30.08: убрано исключение для PLP-TEST-RENT — тестовый эталон утекал на публичный сайт.
@@ -2073,6 +2104,12 @@ async function main() {
     if (!r.handover_date) r.handover_date = parent.handover_date;
     if (!r.developer) r.developer = parent.developer;
     if (r.distance_beach_m == null) r.distance_beach_m = parent.distance_beach_m;
+    /* 21.09: площадь у юнита часто пустая, а без неё не посчитать ориентир по
+       району (ставка за м² × площадь). Берём у проекта его минимальную площадь —
+       это осторожная оценка снизу, и она честнее, чем молчание. */
+    if (!r.area_sqm && !r.area_min) { r.area_min = parent.area_min || parent.area_sqm || null; }
+    if (!r.district) r.district = parent.district;
+    if (!r.type) r.type = parent.type;
     /* 21.09: юнит наследовал от проекта только стадию и срок сдачи, а ставку — нет.
        Из 45 карточек аренды без своей цены у 26 цена лежала строкой выше, у проекта:
        «Эстелла 100-180 тыс ฿/мес», «Кабала 120-220», «Легендари 35-65». Человек
@@ -2086,7 +2123,7 @@ async function main() {
       }
     }
   }
-  const rentList = buildRentals(rentals, rentPreserve, ratesBy);
+  const rentList = buildRentals(rentals, rentPreserve, ratesBy, benchmarks);
   // 30.08: пока в аренде нет объектов с on_site=true — показываем штатную карточку
   // «Скоро в каталоге» (ветка p.soon в renderRent), а не пустую полосу.
   if (!rentList.length) {
