@@ -5,11 +5,8 @@ import { execFileSync } from 'node:child_process';
 /* 06.09: mkshared обязан идти ДО mkpages/mkdistricts/mkextra — они копируют
    стили из index.html, и при старом порядке buy/rent/районы отставали на одну
    сборку: правка общей части появлялась на них только со второго прогона. */
-/* mkassets идёт предпоследним: он выносит общий код в assets/ и проставляет в
-   адресах отпечаток версии. Всё, что правит стили и каталог, должно отработать
-   ДО него, иначе браузер оставит у людей старый файл из кэша. */
 const steps = ['mkog.mjs', 'gen.mjs', 'mkshared.mjs', 'mkpages.mjs', 'mkdistricts.mjs', 'mkextra.mjs',
-               'mkabout.mjs', 'mkoffers.mjs', 'mktheme.mjs', 'mkpreview.mjs', 'mkassets.mjs', 'mken.mjs', 'mklinks.mjs'];
+               'mkabout.mjs', 'mkoffers.mjs', 'mktheme.mjs', 'mkpreview.mjs', 'mklinks.mjs'];
 for (const s of steps) {
   process.stdout.write(`— ${s}\n`);
   execFileSync('node', [`build/${s}`], { cwd: '/Users/elnurkhankishiev/plp-site', stdio: 'inherit' });
