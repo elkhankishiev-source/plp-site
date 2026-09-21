@@ -1176,6 +1176,21 @@ function rentPriceShort(p){
 function rentUnitAvailable(u){
   return (PL.RENTALS||[]).filter(function(p){ return rentRate(p,u); }).length;
 }
+/* 21.09 Эльнур: «я просил сделать карточки аренды в таком же стиле, как и продажи,
+   они выглядят классно, для чего их делать разными?» Состав страницы я выровнял
+   раньше, а карточку — нет: у продажи под названием стоят застройщик, плашка
+   состояния и приписка о стадии, у аренды не было ничего, и она выглядела
+   пустой. Плашка ниже — та же, что у продажи, только слова про аренду. */
+function rentBadge(p){
+  var en=PL.lang==='en';
+  if(p.notReady){
+    var d=p.handover?String(p.handover).slice(0,7).split('-').reverse().join('.'):'';
+    return '<span class="stbadge st-soon">'+(en?'Handover ':'СДАЧА ')+d+'</span>';
+  }
+  if(rentHasRate(p)) return '<span class="stbadge st-available">'+(en?'Available':'СВОБОДНА')+'</span>';
+  return '<span class="stbadge st-ready">'+(en?'Ready':'ГОТОВА К ЗАЕЗДУ')+'</span>';
+}
+
 function renderRent(){
   var car=document.getElementById('rentCar');if(!car)return;
   car.innerHTML=PL.RENTALS.map(function(p){
@@ -1193,10 +1208,13 @@ function renderRent(){
       '<div class="pic '+p.grad+'">'+picPhoto(p)+miniStrip(p)+'<span>'+t('ph.object')+'</span><span class="tag">'+loc(p.loc)+'</span><span class="roi">'+loc(p.tag)+'</span>'+
       '<button type="button" class="fav" onclick="event.stopPropagation();toggleFav(\''+p.property_id+'\')" aria-label="В избранное">♡</button>'+
       '<button type="button" class="cmpb" onclick="event.stopPropagation();toggleCmp(\''+p.property_id+'\')">'+t('u.cmp')+'</button></div>'+
-      '<div class="body"><div class="trow"><h3>'+p.title+'</h3></div>'+
+      '<div class="body">'+
+      '<div class="trow"><h3>'+p.title+(p.developer?' <small class="dev">('+p.developer+')</small>':'')+'</h3>'+rentBadge(p)+'</div>'+
+      stageLine(p)+
       '<p class="desc">'+loc(p.desc)+'</p>'+
       '<div class="price">'+rentPriceHTML(p)+'</div>'+
-      '<div class="meta"><span>🛏 '+p.beds+'</span><span>◫ '+areaOf(p)+'</span><span>'+loc(p.type)+'</span></div>'+
+      '<div class="meta"><span>🛏 '+p.beds+'</span><span>◫ '+areaOf(p)+'</span><span>'+loc(p.type)+'</span>'+
+        (p.beachM!=null?'<span>🌊 '+(p.beachM>=1000?(p.beachM/1000).toFixed(1).replace('.0','')+' км':p.beachM+' м')+' до моря</span>':'')+'</div>'+
       '<span class="amwarn"></span>'+
       '</div></div>';
   }).join('');
