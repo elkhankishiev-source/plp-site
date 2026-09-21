@@ -438,10 +438,22 @@ function loc(o){return (o&&(o[PL.lang]||o.ru))||'';}
    «Villa Estella · вилла, 3 спальни». Английского имени в данных нет, и заводить
    второе поле ради двух служебных слов незачем: в CRM и офферах имя должно
    остаться прежним. На английской версии переводим только эти слова. */
-var СЛУЖЕБНЫЕ=[[/·\s*квартира\s*\(/g,'· apartment ('],[/·\s*вилла,\s*/g,'· villa, '],
-  [/·\s*вилла\s*\(/g,'· villa ('],[/·\s*квартира\b/g,'· apartment'],[/·\s*вилла\b/g,'· villa'],
-  [/(\d+)\s*спальни\b/g,'$1 bedrooms'],[/(\d+)\s*спальня\b/g,'$1 bedroom'],
-  [/(\d+)\s*спален\b/g,'$1 bedrooms'],[/,\s*Таланг\b/g,', Thalang'],[/,\s*Пхукет\b/g,', Phuket']];
+/* Границу слова \b в JavaScript с кириллицей использовать нельзя: для движка
+   русская буква не «словесный символ», и /квартира\b/ не совпадает ни с чем.
+   Эта грабля у нас уже была записана, и я в неё всё равно наступил — первые
+   правила молча не срабатывали. Вместо \b проверяем, что дальше не буква. */
+var НЕБУКВА='(?![А-Яа-яЁёA-Za-z])';
+var СЛУЖЕБНЫЕ=[
+  [/·\s*квартира\s*\(/g,'· apartment ('], [/·\s*вилла,\s*/g,'· villa, '],
+  [/·\s*вилла\s*\(/g,'· villa ('],
+  [new RegExp('·\\s*квартира'+НЕБУКВА,'g'),'· apartment'],
+  [new RegExp('·\\s*вилла'+НЕБУКВА,'g'),'· villa'],
+  [new RegExp('(\\d+)\\s*спальни'+НЕБУКВА,'g'),'$1 bedrooms'],
+  [new RegExp('(\\d+)\\s*спальня'+НЕБУКВА,'g'),'$1 bedroom'],
+  [new RegExp('(\\d+)\\s*спален'+НЕБУКВА,'g'),'$1 bedrooms'],
+  [new RegExp(',\\s*Таланг'+НЕБУКВА,'g'),', Thalang'],
+  [new RegExp(',\\s*Пхукет'+НЕБУКВА,'g'),', Phuket'],
+];
 function titleOf(p){
   var t=(p&&p.title)||'';
   if(PL.lang!=='en') return t;
@@ -725,7 +737,7 @@ function picPhoto(p,full){
   var src = p.photo || (p.img ? (full ? p.img : p.img.replace('img/','img/thumb/')) : '');
   if(!src) return '';
   return '<img class="pic-photo" src="'+src+'" loading="lazy" decoding="async" alt="'+
-    ((p.title||'').replace(/"/g,'&quot;'))+'" onerror="this.remove()">';
+    (titleOf(p).replace(/"/g,'&quot;'))+'" onerror="this.remove()">';
 }
 /* Лента снимков в карточке: видно, что у объекта есть ещё фото, листается
    стрелками и пальцем. Показываем только если снимков правда несколько. */
@@ -1434,7 +1446,7 @@ function viewedPush(p){
   if(!p||!p.property_id) return;
   var list=viewedList().filter(function(v){ return v.id!==p.property_id; });
   list.unshift({
-    id:p.property_id, title:p.title,
+    id:p.property_id, title:titleOf(p),
     loc:(p.loc&&p.loc.ru)||'', type:(p.type&&p.type.ru)||'',
     price:p.funnel==='sale'?fmtBaht(thbOf(p)):null,
     kind:p.funnel, at:new Date().toISOString().slice(0,16).replace('T',' ')
@@ -1731,7 +1743,7 @@ function chatCalcReply(low){
   if((p.calc||{}).estimated || !(r.net>0)) return false;
   /* тот же гейт, что и в карточке: непроверенный срок окупаемости не называем */
   var cOk=!((p.calc||{}).estimated) && r.netY>=4 && r.netY<=15 && r.payback>0 && r.payback<=12;
-  botT(tpl('chat.r.calc',{o:p.title,d:loc(p.loc),n:fmtBt(r.net),y:(netYieldByLoc(p.loc)||r.netY.toFixed(1)),p:cOk?r.payback.toFixed(1):'—'}),700);
+  botT(tpl('chat.r.calc',{o:titleOf(p),d:loc(p.loc),n:fmtBt(r.net),y:(netYieldByLoc(p.loc)||r.netY.toFixed(1)),p:cOk?r.payback.toFixed(1):'—'}),700);
   setTimeout(function(){aiCards([p.property_id]);},2400);
   if(!leadShown)setTimeout(function(){offerLead(false);},3400);
   return true;
@@ -1878,7 +1890,7 @@ function aiCards(ids){
   var w=document.createElement('div');w.className='msg bot chat-cards';
   w.innerHTML=items.map(function(p){
     var price=p.funnel==='sale'?(fmtBaht(thbOf(p))+(p.roi?(' · ROI '+roiRange(p)):'')):rentPriceShort(p);
-    return '<button type="button" class="cc" onclick="closeChatToProp(\''+p.property_id+'\')">'+thumbDiv(p)+'<span class="ccb"><b>'+p.title+'</b><i>'+loc(p.loc)+' · '+loc(p.type)+'</i><u>'+price+'</u></span></button>';
+    return '<button type="button" class="cc" onclick="closeChatToProp(\''+p.property_id+'\')">'+thumbDiv(p)+'<span class="ccb"><b>'+titleOf(p)+'</b><i>'+loc(p.loc)+' · '+loc(p.type)+'</i><u>'+price+'</u></span></button>';
   }).join('');
   cb.appendChild(w);cb.scrollTop=cb.scrollHeight;
 }
@@ -2136,7 +2148,7 @@ function openProp(pid){
   if(tb){ tb.innerHTML=groupTabs(p); tb.style.display=tb.innerHTML?'':'none'; }
   var th=document.getElementById('pmThumbs');
   if(th){ th.innerHTML=photoStrip(p); th.style.display=th.innerHTML?'':'none'; }
-  document.getElementById('pmTitle').textContent=p.title;
+  document.getElementById('pmTitle').textContent=titleOf(p);
   document.getElementById('pmDesc').textContent=loc(p.desc);
   var _pid=document.getElementById('pmPid');
   // в аренде ID содержит номер юнита — на витрине не показываем
@@ -4016,8 +4028,12 @@ function renderMapReal(){
     var note=document.getElementById('plpNote');
     if(note){
       var hidden=PL.PROPERTIES.length+PL.RENTALS.length-all.length;
-      note.textContent='На карте '+pts.length+' объект'+plural(pts.length)+'. Нажмите метку — откроется карточка.'+
-        (hidden>0 ? ' Ещё '+hidden+' — без точного адреса, они в каталоге.' : '');
+      /* 21.09: подпись карты была только по-русски и оставалась такой на /en/ */
+      note.textContent = (PL.lang==='en')
+        ? (pts.length+' propert'+(pts.length===1?'y':'ies')+' on the map. Tap a pin to open the card.'+
+           (hidden>0 ? (' Another '+hidden+' have no exact address and live in the catalogue.') : ''))
+        : ('На карте '+pts.length+' объект'+plural(pts.length)+'. Нажмите метку — откроется карточка.'+
+           (hidden>0 ? (' Ещё '+hidden+' — без точного адреса, они в каталоге.') : ''));
     }
     if(!keepView){
       if(bounds.length>1) PLPMAP.fitBounds(bounds,{padding:[24,24]});
@@ -4225,9 +4241,14 @@ function renderZones(){
   if(note) note.textContent = totalFit
     /* 17.09: на одном экране три числа — 64 на карте, 53 в продаже и это.
        Здесь считается только то, что попало в выбранный бюджет: так и пишем. */
-    ? (totalFit+' '+plural(totalFit,'объект','объекта','объектов')+' в бюджете, '+zonesFit+' '+
-       plural(zonesFit,'район','района','районов'))
-    : 'в этом бюджете вариантов нет — расширьте рамки';
+    ? (PL.lang==='en'
+        ? (totalFit+' propert'+(totalFit===1?'y':'ies')+' in budget, '+
+           zonesFit+' area'+(zonesFit===1?'':'s'))
+        : (totalFit+' '+plural(totalFit,'объект','объекта','объектов')+' в бюджете, '+
+           zonesFit+' '+plural(zonesFit,'район','района','районов')))
+    : (PL.lang==='en'
+        ? 'nothing fits this budget — widen the range'
+        : 'в этом бюджете вариантов нет — расширьте рамки');
 
   host.innerHTML=zones.map(function(z){
     var pic=zonePic(z.d.ru);
@@ -4239,13 +4260,15 @@ function renderZones(){
       '<span class="z-b">'+
         '<b>'+escHTML(dName(z.d))+'</b>'+
         '<u>'+(z.fit.length
-                ? (z.fit.length+' '+plural(z.fit.length,'объект','объекта','объектов')+' в бюджете')
+                ? (PL.lang==='en'
+                    ? (z.fit.length+' propert'+(z.fit.length===1?'y':'ies')+' in budget')
+                    : (z.fit.length+' '+plural(z.fit.length,'объект','объекта','объектов')+' в бюджете'))
                 : (z.sale.length?'вне бюджета':'только аренда'))+'</u>'+
         '<em>'+(z.from?(t('u.from')+' '+fmtBaht(z.from)):'по запросу')+'</em>'+
       '</span>'+
       '<span class="z-m">'+
         (z.d.yield?('<span class="z-y">'+escHTML(z.d.yield)+'</span>'):'')+
-        '<span class="z-be">'+escHTML(loc(z.d.beach))+' до пляжа</span>'+
+        '<span class="z-be">'+escHTML(loc(z.d.beach))+(PL.lang==='en'?' to the beach':' до пляжа')+'</span>'+
         (z.rent.length?('<span class="z-r">аренда: '+z.rent.length+'</span>'):'')+
         '<span class="z-chev">'+(on?'▴':'▾')+'</span>'+
       '</span></button>'+
