@@ -2161,7 +2161,7 @@ body{background:var(--bg)}
       </div>
 
       <label for="reg-name">Как к вам обращаться</label>
-      <input id="reg-name" autocomplete="name" placeholder="Например, Пётр">
+      <input id="reg-name" autocomplete="name" placeholder="Например, Александр">
 
       <label for="reg-phone">Телефон для связи</label>
       <div class="phone-row">
@@ -4176,7 +4176,7 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
       '<p class="sub">В WhatsApp: чат → Экспорт чата → Без медиафайлов. '+
       'Откройте файл и вставьте сюда — даты сохраним как есть.</p>'+
       '<div class="fgrid"><label class="wide">Текст переписки'+
-      '<textarea id="h-text" class="cmtext" rows="8" placeholder="[12.03.2024, 14:03] Клиент: Здравствуйте..."></textarea></label>'+
+      '<textarea id="h-text" class="cmtext" rows="8" placeholder="[12.03.2024, 14:03] Константин: Здравствуйте..."></textarea></label>'+
       '<label>Кто мы в этой переписке<input id="h-me" type="text" value="Эльнур" '+
       'placeholder="как подписаны наши сообщения"></label></div>'+
       '<div class="fbtns"><button type="button" class="btn" id="f-save">Разобрать и добавить</button>'+
@@ -4587,8 +4587,8 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     var ini = first ? first.slice(0,1).toUpperCase() : '·';
 
     /* 1. Шапка: надзаголовок, приветствие, действие и аватар.
-       Эльнур 08.09: «выбираю лида — он мне пишет доброе утро,
-       <именем лида>, но я-то Эльнур». Сотрудник остаётся собой и видит, чей
+       Эльнур 08.09: «выбираю лида Константина — он мне пишет доброе утро,
+       Константин, но я-то Эльнур». Сотрудник остаётся собой и видит, чей
        кабинет открыт. */
     var viewing = o.viewed_by
       ? String((o.viewing && (o.viewing.name||o.viewing.code)) || o.viewed_as || o.name || '')
@@ -4774,8 +4774,8 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
                                  {t:'Снять',a:'task_del',id:k.id}]:null)});
     });
     var st=(p.statements||[])[0];
-    /* 🔴 10.09: пустой черновик объявлялся как «Отчёт готов». У одного собственника договор
-       начался за два дня до конца месяца, за два дня дохода не было — и кабинет встречал его
+    /* 🔴 10.09: пустой черновик объявлялся как «Отчёт готов». У Александра договор
+       начался 29 августа, за два дня дохода не было — и кабинет встречал его
        сообщением о готовом отчёте с нулями. Объявляем только то, в чём есть цифры. */
     var stEmpty = st && !Number(st.income) && !Number(st.expenses) && !Number(st.net);
     if(st && !stEmpty) items.push({t:'Отчёт за '+String(st.period||'').slice(0,7)+' готов', s:'Смотреть в разделе «Документы»', a:'Открыть', go:'docs'});

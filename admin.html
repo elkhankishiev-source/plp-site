@@ -415,12 +415,9 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
   "use strict";
   var BASE = "https://hub.property-library.com/webhook";
   var LS = "plp_uk_key";
-  /* 21.09: здесь были зашиты номер виллы и имя её собственника.
-   Страница админки отдаётся по прямой ссылке всем, кто её знает (robots и noindex
-   просят не индексировать, но файл всё равно открывается), то есть имя и номер
-   виллы лежали на публичном адресе. Оставляем публичный код объекта и название
-   комплекса; кто собственник, видно только внутри по ключу управляющего. */
-var PROPS = [ {id:"PLP-MANOR-R1", label:"Manor"} ];
+  var PROPS = [
+    {id:"PLP-MANOR-S14", label:"Manor S14 — Александр"}
+  ];
 
   var $ = function(s,r){return (r||document).querySelector(s);};
   var $$ = function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));};

@@ -82,30 +82,12 @@ def роль(phone):
 
 
 def сделка_по_номеру(phone):
-    """Сделка, в которую ляжет след касания.
-
-    21.09: раньше брали сделку по последнему ИЗМЕНЕНИЮ (`updated_at_crm`). Это и
-    развело заметки с реальностью: наша же ночная синхронизация трогает старые
-    карточки, они всплывают наверх, и 66 заметок о касаниях легли на сделки
-    2025 года, а на пятнадцати новых осталось пусто. Менеджер открывает свежую
-    сделку — она немая, а в позапрошлогодней лежит переписка этой недели.
-
-    Правильная цель — та сделка, которую человек ведёт СЕЙЧАС: сперва открытые
-    (не «успешно» 142 и не «отказ» 143), среди них самая новая по созданию.
-    Открытых нет — берём самую новую из закрытых, чтобы след не потерялся вовсе.
-    """
     cp = sb('/crm_contact_phones?phone_norm=eq.%s&select=contact_id' % phone)
     if not cp:
         return None
-    cid = cp[0]['contact_id']
-    открытые = sb('/crm_leads?contacts=cs.[%d]&is_deleted=is.false'
-                  '&status_id=not.in.(142,143)&select=id,name,created_at_crm'
-                  '&order=created_at_crm.desc&limit=1' % cid)
-    if открытые:
-        return открытые[0]
-    любые = sb('/crm_leads?contacts=cs.[%d]&is_deleted=is.false&select=id,name,created_at_crm'
-               '&order=created_at_crm.desc&limit=1' % cid)
-    return любые[0] if любые else None
+    L = sb('/crm_leads?contacts=cs.[%d]&is_deleted=is.false&select=id,name'
+           '&order=updated_at_crm.desc&limit=1' % cp[0]['contact_id'])
+    return L[0] if L else None
 
 
 def main():
@@ -144,28 +126,12 @@ def main():
         return 1
     ok = 0
     for t, сд, текст in план:
-        # 21.09: падало с HTTP 409 и обрывало весь прогон на первой же заметке —
-        # остальные касания оставались без следа. Ошибка одной записи не должна
-        # ронять остальные: печатаем и идём дальше.
-        try:
-            res = amo('POST', 'leads/%d/notes' % сд['id'],
-                      [{'note_type': 'common', 'params': {'text': текст}}])
-        except Exception as ex:
-            print('   ✗ %s → сделка %s: %s' % (t.get('phone'), сд['id'], str(ex)[:100]))
-            continue
+        res = amo('POST', 'leads/%d/notes' % сд['id'],
+                  [{'note_type': 'common', 'params': {'text': текст}}])
         если_ок = '"id"' in res
         if если_ок:
-            try:
-                # 21.09: на source_ref стоит уникальный индекс, а отметка состояла
-                # только из номера сделки. Второе касание того же человека давало
-                # то же значение и падало с 23505 — отметка не вставала, и крон
-                # каждые 20 минут писал в CRM ОДНУ И ТУ ЖЕ заметку заново.
-                # Номер касания делает отметку уникальной и заодно говорит, какое
-                # именно касание оставило след.
-                sb('/touch_queue?id=eq.%d' % t['id'], 'PATCH',
-                   {'source_ref': 'amo_note:%s:%s' % (сд['id'], t['id'])})
-            except Exception as ex:
-                print('   ⚠ заметка записана, но отметку поставить не вышло: %s' % str(ex)[:80])
+            sb('/touch_queue?id=eq.%d' % t['id'], 'PATCH',
+               {'source_ref': 'amo_note:%s' % сд['id']})
             ok += 1
         else:
             print('   ✗ %s: %s' % (t['phone'], res[:110]))

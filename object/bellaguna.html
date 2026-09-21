@@ -3,64 +3,6 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- PLP:HEADTHEME:START -->
-<meta name="color-scheme" content="light dark">
-<!-- цвет системных полей браузера = фон страницы. Без этого при прокрутке и
-     оттягивании из-под страницы проглядывает чужой цвет — кажется, что фон мигает. -->
-<meta name="theme-color" content="#f7f6f1" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0C0D09" media="(prefers-color-scheme: dark)">
-<script>
-(function(){
-  function paintChrome(){
-    try{
-      var bg=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
-      if(!bg && document.body) bg=getComputedStyle(document.body).backgroundColor;
-      if(!bg || bg==='rgba(0, 0, 0, 0)') return;
-      var list=document.querySelectorAll('meta[name="theme-color"]');
-      for(var i=0;i<list.length;i++) list[i].parentNode.removeChild(list[i]);
-      var m=document.createElement('meta'); m.setAttribute('name','theme-color');
-      m.setAttribute('content',bg); document.head.appendChild(m);
-    }catch(e){}
-  }
-  /* Кнопка «поделиться»: на телефоне открывает системное меню, на компьютере
-     кладёт ссылку в буфер и говорит об этом. Эльнур 07.09: «сайтом надо
-     пользоваться, он не просто для красоты». */
-  document.addEventListener('click', function(e){
-    var b = e.target && e.target.closest && e.target.closest('[data-share]');
-    if(!b) return;
-    e.preventDefault();
-    var path = b.getAttribute('data-share') || location.pathname;
-    var url = location.origin + path;
-    var title = b.getAttribute('data-share-title') || document.title;
-    var done = function(){
-      var was = b.innerHTML;   /* 15.09: в кнопке живёт svg-иконка, восстанавливаем разметку целиком */
-      b.textContent = '✓ Ссылка скопирована';
-      b.classList.add('ok');
-      setTimeout(function(){ b.innerHTML = was; b.classList.remove('ok'); }, 2200);
-    };
-    if(navigator.share){ navigator.share({title:title, url:url}).catch(function(){}); return; }
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(url).then(done).catch(function(){ prompt('Скопируйте ссылку:', url); });
-    } else prompt('Скопируйте ссылку:', url);
-  });
-  window.paintChrome=paintChrome;
-  /* Адрес без .html: страницы и так открываются коротким адресом, но если
-     человек пришёл по старой ссылке, приводим строку браузера к чистому виду.
-     Эльнур 07.09: «мне не нравится html в адресе, я ни у кого её не видел». */
-  try{
-    var pth=location.pathname;
-    if(/\.html$/.test(pth)){
-      var clean=pth.replace(/index\.html$/,'').replace(/\.html$/,'');
-      if(clean==='') clean='/';
-      history.replaceState(null,'',clean+location.search+location.hash);
-    }
-  }catch(e){}
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',paintChrome);
-  else paintChrome();
-  try{ matchMedia('(prefers-color-scheme: dark)').addEventListener('change',paintChrome); }catch(e){}
-})();
-</script>
-<!-- PLP:HEADTHEME:END -->
 <script>(function(){try{var v=localStorage.getItem('pl_theme');
 if(v==='dark'||v==='light')document.documentElement.setAttribute('data-theme',v);}catch(e){}})();</script>
 <title>Bellaguna Lake Residences — Лагуна, Пхукет | Property Library</title>
@@ -85,22 +27,6 @@ if(v==='dark'||v==='light')document.documentElement.setAttribute('data-theme',v)
 <meta name="twitter:image" content="https://property-library.com/img/PLP-BELLAGUNA.jpg">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"RealEstateListing","@id":"https://property-library.com/object/bellaguna#listing","url":"https://property-library.com/object/bellaguna","name":"Bellaguna Lake Residences","description":"Bellaguna — новый жилой бренд Banyan Group внутри курорта Laguna Phuket, на берегу озера. Пять вытянутых малоэтажных корпусов, резиденции с одной, двумя и тремя спальнями и отдельная коллекция пентхаусов с собственными бассейнами на крыше. Планировки открытые, террасы просторные, корпуса развёрнуты на лагуны и Андаманское море. У жителей — поле для гольфа Laguna, пляжный клуб RAVA, шесть курортных отелей, рестораны и медицинский сервис Laguna Wellness на территории.","about":{"@id":"https://property-library.com/object/bellaguna#residence"}},{"@type":"Residence","@id":"https://property-library.com/object/bellaguna#residence","name":"Bellaguna Lake Residences","description":"Bellaguna — новый жилой бренд Banyan Group внутри курорта Laguna Phuket, на берегу озера. Пять вытянутых малоэтажных корпусов, резиденции с одной, двумя и тремя спальнями и отдельная коллекция пентхаусов с собственными бассейнами на крыше. Планировки открытые, террасы просторные, корпуса развёрнуты на лагуны и Андаманское море. У жителей — поле для гольфа Laguna, пляжный клуб RAVA, шесть курортных отелей, рестораны и медицинский сервис Laguna Wellness на территории.","url":"https://property-library.com/object/bellaguna","image":"https://property-library.com/img/PLP-BELLAGUNA.jpg","address":{"@type":"PostalAddress","addressRegion":"Phuket","addressLocality":"Лагуна","addressCountry":"TH"},"additionalProperty":{"@type":"PropertyValue","name":"Застройщик","value":"Banyan Group"},"numberOfRooms":3,"floorSize":{"@type":"QuantitativeValue","value":355,"unitCode":"MTK"}},{"@type":"Offer","@id":"https://property-library.com/object/bellaguna#offer","itemOffered":{"@id":"https://property-library.com/object/bellaguna#residence"},"priceCurrency":"THB","price":16300000,"availability":"https://schema.org/InStock","url":"https://property-library.com/object/bellaguna","seller":{"@type":"RealEstateAgent","name":"Property Library Phuket","url":"https://property-library.com"}}]}</script>
 <style>
-/* PLP:ANTIFLICKER */
-/* Мигание фона на телефоне — сводная защита. Эльнур 06.09: «фон в мобильной
-   версии везде мигает, ищи по всем страницам». Три источника:
-   1) размытие фона (backdrop-filter) под липкими элементами — браузер
-      перерисовывает весь экран на каждом кадре прокрутки;
-   2) долгое проявление блоков при прокрутке;
-   3) отложенные картинки без фона — на их месте на миг светится подложка. */
-@media(max-width:900px){
-  .header,#toTop,.badge,.pm-tag,.car .tag,.btn-glass,.hero-float,.fbtn,.chipf,
-  .modal-overlay,.mnav,.sheet,.pm-card,.toolbox{
-    backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
-  .reveal{transition-duration:.35s!important}
-}
-.pic-photo,.thumb-photo,.prgs img,.simi-c i,.pm-img img{background-color:var(--warm,#EFEEE7)}
-/* PLP:ANTIFLICKER */
-html{background:var(--bg);overscroll-behavior-y:none}
 /* Эльнур 05.09: сайт — единая система. Страница объекта живёт в тех же
    цветах и с тем же набором блоков, что и карточка на сайте. */
 :root{--green:#D2D5B3;--green-deep:#5F6242;--olive:#5F6242;--ink:#22251C;--paper:#FBFBF7;
@@ -199,10 +125,10 @@ var dark = d==='dark' || (d!=='light' && window.matchMedia && window.matchMedia(
 if(dark) i.src='../img/brand/plp-mark-white.png';})();</script>
 <main class="wrap">
   <div class="hero">
-    <img id="mainShot" src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-BELLAGUNA/cover/fc1bc931cd90eebc-760.webp" alt="Bellaguna Lake Residences" loading="lazy">
+    <img id="mainShot" src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-BELLAGUNA/cover/fc1bc931cd90eebc-1600.webp" alt="Bellaguna Lake Residences" loading="lazy">
     <div class="badge">Кондо · Лагуна</div>
   </div>
-  <div class="shots"><button type="button" class="on" data-src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-BELLAGUNA/cover/fc1bc931cd90eebc-760.webp" aria-label="Фото 1"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-BELLAGUNA/cover/fc1bc931cd90eebc-760.webp" alt="" loading="lazy" decoding="async"></button><button type="button" class="" data-src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-BELLAGUNA/exterior/6dbfa1f73f420cd3-1600.webp" aria-label="Фото 2"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-BELLAGUNA/exterior/6dbfa1f73f420cd3-1600.webp" alt="" loading="lazy" decoding="async"></button><button type="button" class="" data-src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-BELLAGUNA/exterior/d338987004d5405d-1600.webp" aria-label="Фото 3"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-BELLAGUNA/exterior/d338987004d5405d-1600.webp" alt="" loading="lazy" decoding="async"></button><button type="button" class="" data-src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-BELLAGUNA/facilities/579401e9322b76c4-1600.webp" aria-label="Фото 4"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-BELLAGUNA/facilities/579401e9322b76c4-1600.webp" alt="" loading="lazy" decoding="async"></button><button type="button" class="" data-src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-BELLAGUNA/cover/fc1bc931cd90eebc-1600.webp" aria-label="Фото 5"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-BELLAGUNA/cover/fc1bc931cd90eebc-1600.webp" alt="" loading="lazy" decoding="async"></button><button type="button" class="" data-src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-BELLAGUNA/master/49121f614654dc7b-1600.webp" aria-label="Фото 6"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-BELLAGUNA/master/49121f614654dc7b-1600.webp" alt="" loading="lazy" decoding="async"></button><button type="button" class="" data-src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-BELLAGUNA/plans/Bellaguna_Lake_Residences_Lotus_Floor_plan_CN_May2026_01-425dc224-1600.webp" aria-label="Фото 7"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-BELLAGUNA/plans/Bellaguna_Lake_Residences_Lotus_Floor_plan_CN_May2026_01-425dc224-1600.webp" alt="" loading="lazy" decoding="async"></button><button type="button" class="" data-src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-BELLAGUNA/plans/Bellaguna_Lake_Residences_Lotus_Floor_plan_CN_May2026_02-1f4d766c-1600.webp" aria-label="Фото 8"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-BELLAGUNA/plans/Bellaguna_Lake_Residences_Lotus_Floor_plan_CN_May2026_02-1f4d766c-1600.webp" alt="" loading="lazy" decoding="async"></button></div>
+  <div class="shots"><button type="button" class="on" data-src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-BELLAGUNA/cover/fc1bc931cd90eebc-1600.webp" aria-label="Фото 1"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-BELLAGUNA/cover/fc1bc931cd90eebc-1600.webp" alt="" loading="lazy" decoding="async"></button><button type="button" class="" data-src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-BELLAGUNA/exterior/6dbfa1f73f420cd3-1600.webp" aria-label="Фото 2"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-BELLAGUNA/exterior/6dbfa1f73f420cd3-1600.webp" alt="" loading="lazy" decoding="async"></button><button type="button" class="" data-src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-BELLAGUNA/facilities/579401e9322b76c4-1600.webp" aria-label="Фото 3"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-BELLAGUNA/facilities/579401e9322b76c4-1600.webp" alt="" loading="lazy" decoding="async"></button><button type="button" class="" data-src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-BELLAGUNA/master/49121f614654dc7b-1600.webp" aria-label="Фото 4"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-BELLAGUNA/master/49121f614654dc7b-1600.webp" alt="" loading="lazy" decoding="async"></button><button type="button" class="" data-src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-BELLAGUNA/plans/Bellaguna_Lake_Residences_Lotus_Floor_plan_CN_May2026_01-425dc224-1600.webp" aria-label="Фото 5"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-BELLAGUNA/plans/Bellaguna_Lake_Residences_Lotus_Floor_plan_CN_May2026_01-425dc224-1600.webp" alt="" loading="lazy" decoding="async"></button><button type="button" class="" data-src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-BELLAGUNA/exterior/d338987004d5405d-1600.webp" aria-label="Фото 6"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-BELLAGUNA/exterior/d338987004d5405d-1600.webp" alt="" loading="lazy" decoding="async"></button><button type="button" class="" data-src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-BELLAGUNA/plans/Bellaguna_Lake_Residences_Lotus_Floor_plan_CN_May2026_02-1f4d766c-1600.webp" aria-label="Фото 7"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-BELLAGUNA/plans/Bellaguna_Lake_Residences_Lotus_Floor_plan_CN_May2026_02-1f4d766c-1600.webp" alt="" loading="lazy" decoding="async"></button><button type="button" class="" data-src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-BELLAGUNA/plans/Bellaguna_Lake_Residences_Lotus_Floor_plan_CN_May2026_03-3f162939-1600.webp" aria-label="Фото 8"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-BELLAGUNA/plans/Bellaguna_Lake_Residences_Lotus_Floor_plan_CN_May2026_03-3f162939-1600.webp" alt="" loading="lazy" decoding="async"></button></div>
   <h1>Bellaguna Lake Residences</h1>
   <p class="loc">Лагуна, Пхукет</p>
   <div class="price">от 16 300 000 ฿<small>цена по прайсу застройщика на дату сверки</small></div>
@@ -229,7 +155,7 @@ if(dark) i.src='../img/brand/plp-mark-white.png';})();</script>
     <button type="button" class="btn ghost" id="shareBtn">Поделиться</button>
     <a class="btn wa" href="https://wa.me/66955492587?text=Bellaguna%20Lake%20Residences%20%E2%80%94%20%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D0%B5%D1%81%D1%83%D0%B5%D1%82%20%D1%8D%D1%82%D0%BE%D1%82%20%D0%BE%D0%B1%D1%8A%D0%B5%D0%BA%D1%82.%20https%3A%2F%2Fproperty-library.com%2Fobject%2Fbellaguna" rel="noopener" target="_blank">WhatsApp</a>
   </div>
-  <section class="desc"><h2>Похожие объекты</h2><div class="simi"><a class="simi-c" href="garrya"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-GARRYA/exterior/10125_hires-bd5b1214-760.webp" alt="" loading="lazy" decoding="async"><b>Residences at Garrya</b><span>Лагуна · старт продаж · от 16 360 000 ฿</span></a><a class="simi-c" href="bellaguna-golf"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-BELLAGUNA-GOLF/exterior/14166_hires_1_-618aa88b-760.webp" alt="" loading="lazy" decoding="async"><b>Bellaguna Golf Residences</b><span>Лагуна · старт продаж · от 10 010 000 ฿</span></a><a class="simi-c" href="angsana-topaz"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ANGSANA-TOPAZ/exterior/13796_hires-aaf9dbfb-760.webp" alt="" loading="lazy" decoding="async"><b>Angsana Golf Residences Topaz</b><span>Лагуна · старт продаж · от 26 760 000 ฿</span></a></div></section>
+  <section class="desc"><h2>Похожие объекты</h2><div class="simi"><a class="simi-c" href="garrya"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-GARRYA/exterior/10124_hires-09935fff-760.webp" alt="" loading="lazy" decoding="async"><b>Residences at Garrya</b><span>Лагуна · старт продаж · от 16 360 000 ฿</span></a><a class="simi-c" href="bellaguna-golf"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-BELLAGUNA-GOLF/exterior/14166_hires_1_-618aa88b-760.webp" alt="" loading="lazy" decoding="async"><b>Bellaguna Golf Residences</b><span>Лагуна · старт продаж · от 10 010 000 ฿</span></a><a class="simi-c" href="angsana-topaz"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ANGSANA-TOPAZ/exterior/13793_hires-98626977-760.webp" alt="" loading="lazy" decoding="async"><b>Angsana Golf Residences Topaz</b><span>Лагуна · старт продаж · от 26 760 000 ฿</span></a></div></section>
 </main>
 <script>
 /* «Поделиться»: на телефоне системное меню, на компьютере ссылка в буфер */

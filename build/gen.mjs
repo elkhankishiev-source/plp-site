@@ -32,11 +32,6 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const INDEX = path.join(ROOT, 'index.html');
-/* 20.09: код витрины переехал в assets/ (см. build/mkassets.mjs). Каталог
-   живёт в assets/catalog.js, доходность районов — в assets/app.js. Пишем
-   туда, а в index.html остаётся только разметка и блок ссылок на объекты. */
-const CATALOG_JS = path.join(ROOT, 'assets/catalog.js');
-const APP_JS = path.join(ROOT, 'assets/app.js');
 const OBJDIR = path.join(ROOT, 'object');
 
 /* Размеры JPEG без внешних зависимостей: идём по маркерам до SOF.
@@ -164,83 +159,12 @@ function pubOf(o) { return (o && o.public_code) || (o && o.plp_property_id) || '
    там разная информация и фото и подача, это как вообще?». Расходились именно
    кадры: карточка брала первые восемь из общей ленты (восемь фасадов подряд),
    страница — по кругу из каждого раздела. Теперь правило одно и живёт здесь. */
-/* Порядок групп решает, какой кадр станет обложкой карточки. Эльнур 20.09:
-   «на некоторые объекты залиты странные фотки… или вид издалека здание, там даже
-   не понятно, что продаётся». Так и было: первой шла группа, как она легла в базу,
-   и на обложку попадали мастерплан и съёмка с дрона. Сначала показываем то, что
-   человек покупает — фасад и интерьер, потом территорию, и только в конце планы. */
-const ГРУППЫ_ПОРЯДОК = ['exterior', 'interior', 'facilities', 'cover', 'view', 'master', 'plans', 'site'];
-function весГруппы(g) {
-  const n = String((g && g.name) || (g && g.group) || (g && g.key) || '').toLowerCase();
-  const i = ГРУППЫ_ПОРЯДОК.findIndex(x => n.includes(x));
-  return i === -1 ? ГРУППЫ_ПОРЯДОК.indexOf('cover') : i;
-}
-/* Тот же порядок, но по адресу файла: у половины объектов групп нет вовсе, и
-   лента лежит одним списком вперемешку. Именно там и жили «китайские буквы» из
-   жалобы Эльнура — планировки застройщика на китайском
-   (ANG_Topaz_Floor_plan_Condo_CN_…) шли третьим кадром карточки. Планировки не
-   выбрасываем: на странице объекта они нужны. Уводим в конец ленты. */
-/* Порядок кадров ленты — последнее слово. Сортировка устойчивая: внутри одного
-   разряда очередь остаётся той, что задали группы и сдвиг юнита. Без неё сдвиг
-   выводил в обложку планировку — у четырнадцати юнитов так и вышло. */
-function порядокКадров(arr, шаг) {
-  const по = arr.map((u, i) => [u, i])
-    .sort((a, b) => (весКадра(a[0]) - весКадра(b[0])) || (a[1] - b[1]))
-    .map(x => x[0]);
-  /* Сдвиг юнита крутит только фотографии. Если крутить всю ленту, у юнита с
-     короткой галереей обложкой снова становится планировка — так и вышло с
-     четырнадцатью юнитами, пока сдвиг стоял до сортировки. */
-  const предел = ГРУППЫ_ПОРЯДОК.indexOf('master');
-  const фото = по.filter(u => весКадра(u) < предел);
-  const схемы = по.filter(u => весКадра(u) >= предел);
-  if (шаг && фото.length > 1) for (let k = 0; k < шаг % фото.length; k++) фото.push(фото.shift());
-  return фото.concat(схемы);
-}
-
-function весКадра(u) {
-  const п = String(u || '').toLowerCase();
-  for (let i = 0; i < ГРУППЫ_ПОРЯДОК.length; i++) {
-    if (п.includes('/' + ГРУППЫ_ПОРЯДОК[i] + '/')) return i;
-  }
-  return ГРУППЫ_ПОРЯДОК.indexOf('cover');
-}
-/* Юниты одного проекта живут на общих кадрах проекта, и все карточки выходили
-   одинаковыми: пять «Катабелло» с одним фонтаном, шесть «Легендари» с одним
-   двором. Лента у каждого юнита начинается со своего места в общей галерее —
-   кадры те же, честные, но карточки перестают выглядеть копиями. */
-function сдвигЮнита(o) {
-  const m = String((o && o.public_code) || (o && o.plp_property_id) || '').match(/[-_]([A-Z]*)(\d+)$/i);
-  return m ? parseInt(m[2], 10) : 0;   /* U1 сдвигается на 1: иначе совпал бы с проектом */
-}
-
 function heroGallery(o, limit = 8) {
   const all = Array.isArray(o.gallery_urls) ? o.gallery_urls.filter(u => /^https?:/.test(u)) : [];
-  /* 21.09: главный кадр объекта (objects.main_image_url) до сих пор никак не влиял
-     на ленту — карточка брала первое, что лежало в галерее, и на обложку попадали
-     мастерпланы и съёмка с дрона. Теперь выбранный кадр идёт первым, а остальная
-     лента — как была. Это ручка, которой можно поправить любую карточку из базы. */
-  const главный = /^https?:/.test(String(o.main_image_url || '')) ? o.main_image_url : null;
-  /* у юнита главный кадр обычно унаследован от проекта: если поставить его вперёд,
-     все карточки братьев снова станут одинаковыми. Для юнитов со сдвигом ленту
-     не трогаем — там своя очередь кадров. */
-  const впередГлавный = arr => {
-    if (!главный || (o && o.parent_object_id)) return arr;
-    const без = arr.filter(u => u !== главный);
-    return [главный].concat(без);
-  };
   const gs = (Array.isArray(o.photo_groups) ? o.photo_groups : [])
-    .slice()
-    .sort((a, b) => весГруппы(a) - весГруппы(b))
     .map(g => (Array.isArray(g.urls) ? g.urls.filter(u => /^https?:/.test(u)) : []))
     .filter(a => a.length);
-  const шаг = o && o.parent_object_id ? сдвигЮнита(o) : 0;
-  /* у юнита часто нет своих групп — только общая лента проекта; сдвигаем и её */
-  if (gs.length < 2) {
-    const a = all.slice();
-    return впередГлавный(порядокКадров(a, шаг)).slice(0, limit);
-  }
-  /* сдвигать каждую группу по отдельности бесполезно: в «exterior» часто один
-     кадр, и остаток от деления всегда ноль. Прокручиваем собранную ленту целиком. */
+  if (gs.length < 2) return all.slice(0, limit);
   const out = [];
   for (let round = 0; out.length < limit; round++) {
     let added = false;
@@ -250,7 +174,7 @@ function heroGallery(o, limit = 8) {
     }
     if (!added) break;
   }
-  return впередГлавный(порядокКадров(out, шаг)).slice(0, limit);
+  return out;
 }
 
 // диапазон доходности из rental_benchmarks: (district,type) → (district,Кондо) → медиана по Пхукету
@@ -407,12 +331,7 @@ function withFacts(calc, o) {
      Причина была глубже данных: расчёт цены сохранялся из ПРОШЛОЙ версии index.html
      и переживал любую правку базы. Цена на витрине жила своей жизнью месяцами.
      Из старого расчёта бережём настройки (ставки, загрузку), цену берём из базы. */
-  /* 21.09: цена бралась из базы только когда она больше нуля, а иначе в карточке
-     оставалась прошлая — та, что перенеслась из предыдущей сборки. Цену у объекта
-     убрали, а витрина продолжала считать окупаемость по старой цифре (Gardens of
-     Eden: 7 800 000 ฿, которых в базе давно нет). Нет цены в базе — нет цены и в
-     расчёте: пусть блок честно скажет «по запросу», чем соврёт числом. */
-  c.priceTHB = Number(o.price_from_thb) > 0 ? Number(o.price_from_thb) : 0;
+  if (Number(o.price_from_thb) > 0) c.priceTHB = Number(o.price_from_thb);
   let buildYears = 0;
   if (o.handover_date) {
     const months = (new Date(o.handover_date) - new Date()) / (1000 * 60 * 60 * 24 * 30.44);
@@ -900,6 +819,7 @@ function syncListOffers(html, catalog) {
 
 // заменить (или врезать) блок каталога в index.html
 function writeIndex(html, catalog) {
+  html = syncListOffers(html, catalog);
   const block = emitCatalogBlock(catalog);
   const s = html.indexOf(MARK_START);
   const e = html.indexOf(MARK_END);
@@ -944,7 +864,7 @@ function rentTag(o) {
    season_rates собственника; помесячная — из season_rates или rent_price_month_thb.
    Ничего не пересчитываем из ночной в месячную и обратно: это разные рынки,
    умножение на 30 давало бы цену втрое выше настоящей. */
-function rentRates(o, ratesBy, benchmarks) {
+function rentRates(o, ratesBy) {
   const pid = o.plp_property_id;
   const sr = (o.season_rates && typeof o.season_rates === 'object') ? o.season_rates : {};
   const num = v => { const n = Number(v); return Number.isFinite(n) && n > 0 ? n : null; };
@@ -970,41 +890,13 @@ function rentRates(o, ratesBy, benchmarks) {
 
   /* уровень источника виден наружу: факт из договоров, ставка собственника
      или ориентир по рыночным объявлениям — чтобы витрина не выдавала одно за другое */
-  let level = (src === 'uk') ? 'uk' : (sr.level === 'market' ? 'market' : (src ? 'owner' : null));
-
-  /* 21.09 Эльнур: «объекты аренды без ставки — потому что они ещё строятся,
-     поэтому надо ставить примерную цену по характерному объекту, который уже
-     работает в этой же локации».
-     Берём не соседний объект (у него своя планировка и своё состояние), а
-     ставку квадратного метра по району и типу жилья из rental_benchmarks —
-     она собрана по реальному рынку: ADR и загрузка AirDNA, листинги
-     Airbnb/Agoda/Booking, отчёты Knight Frank и C9 Hotelworks. Умножаем на
-     площадь лота и округляем до тысячи: это честный ориентир, а не цена.
-     Уровень пишем отдельным словом — district. Витрина обязана показать его
-     как ориентир района, иначе получится выдуманная цена конкретной квартиры,
-     а такого мы не делаем. */
-  let month2 = month, monthMax2 = monthMax;
-  if (!month && !night && Array.isArray(benchmarks)) {
-    const площадь = Number(o.area_sqm) || Number(o.area_min) || 0;
-    const b = benchmarks.find(x => String(x.district) === String(o.district)
-                                && String(x.unit_type) === String(typeRu(o.type)));
-    if (площадь > 0 && b && b.rate_sqm_low > 0) {
-      const круг = v => Math.round(v / 1000) * 1000;
-      month2 = круг(площадь * Number(b.rate_sqm_low));
-      const верх = Number(b.rate_sqm_high) || 0;
-      monthMax2 = верх > 0 ? круг(площадь * верх) : null;
-      level = 'district';
-      src = 'district';
-    }
-  }
-
-  return { night, nightMax, month: month2, monthMax: monthMax2,
-           rateSrc: (night || month2) ? src : null,
-           rateLevel: (night || month2) ? level : null,
+  const level = (src === 'uk') ? 'uk' : (sr.level === 'market' ? 'market' : (src ? 'owner' : null));
+  return { night, nightMax, month, monthMax, rateSrc: (night || month) ? src : null,
+           rateLevel: (night || month) ? level : null,
            rateAsOf: (night || month) ? (sr.as_of || null) : null, minNights };
 }
 
-function buildRentals(objects, preserve, ratesBy, benchmarks) {
+function buildRentals(objects, preserve, ratesBy) {
   return objects.map((o, i) => {
     const pid = o.plp_property_id;
     const keep = preserve[pid] || {};
@@ -1028,12 +920,6 @@ function buildRentals(objects, preserve, ratesBy, benchmarks) {
       bmax: (o.bedrooms_max === 0 || o.bedrooms_max) ? o.bedrooms_max : null,
       area: areaLabel(o),
       tag: rentTag(o),
-      /* 21.09: карточка аренды выглядела беднее карточки продажи, потому что у
-         неё не было тех же полей. Застройщик у юнита свой не заполнен — берём у
-         проекта; расстояние до моря лежало под именем beach_m и на витрину не
-         попадало вовсе. */
-      developer: shortDev(o.developer) || null,
-      beachM: (o.distance_beach_m === 0 || o.distance_beach_m) ? Number(o.distance_beach_m) : null,
       /* дата старта продаж — справочно: группу она не меняет (см. saleGroup) */
       saleStart: o.sale_started_on || null,
       /* короткая приписка к стадии: «сдан в декабре 2025», «2 октября —
@@ -1070,7 +956,7 @@ function buildRentals(objects, preserve, ratesBy, benchmarks) {
         : null,
       units: unitsOf(o),
       // ставки: что реально известно; чего нет — остаётся null, не выдумываем
-      ...rentRates(o, ratesBy, benchmarks),
+      ...rentRates(o, ratesBy),
     };
   });
 }
@@ -1234,34 +1120,6 @@ function chipRow(items) {
   ).join('');
 }
 
-/* Юнит внутри проекта, у которого нет ничего своего (ни цены, ни площади, ни
-   спален), для поиска почти дословная копия страницы проекта. Такие страницы мы
-   держим для прямых ссылок клиентам, но в индекс не отдаём: одно правило и для
-   canonical на странице, и для карты сайта — иначе они противоречат друг другу. */
-/* Внутренняя пометка о сделке собственника с застройщиком: «Договор подписан,
-   freehold. График платежей привязан к фазам стройки». В базе она нужна, на
-   витрине — нет: клиент выбирает жильё, а не читает чужой график платежей.
-   Правило одно на каталог и на страницы объектов: 21.09 пометка осталась в
-   структурных данных трёх страниц именно потому, что чинилось в одном месте. */
-const ВНУТРЕННЯЯ = /договор подписан|график платежей привязан|платежи привязаны к этап|задаток внесён/i;
-function убратьВнутреннее(o, parent) {
-  if (!o || !ВНУТРЕННЯЯ.test(String(o.usp || ''))) return o;
-  if (parent && parent.usp) o.usp = parent.usp;
-  else o.usp = '';
-  if (parent && parent.usp_en) o.usp_en = parent.usp_en;
-  else o.usp_en = '';
-  return o;
-}
-
-function тонкийЮнит(o, allObjects) {
-  if (!o || !o.parent_object_id || !Array.isArray(allObjects)) return null;
-  const родитель = allObjects.find(x => x.plp_property_id === o.parent_object_id);
-  if (!родитель) return null;
-  const своиДанные = [o.price_from_thb, o.area_sqm, o.bedrooms, o.rent_price_month_thb]
-    .filter(v => v !== null && v !== undefined && v !== '').length >= 2;
-  return своиДанные ? null : родитель;
-}
-
 function objectPage(o, benchmarks, ratesBy, allObjects) {
   const pid = o.plp_property_id;
   const pub = pubOf(o);            /* публичный код: он же в адресе и на странице */
@@ -1269,17 +1127,6 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
   /* 08.09: клиентам мы раздавали чистый адрес, а поисковикам каноническим
      указывали .html — две версии одной страницы. Везде чистый. */
   const url = SITE_BASE + '/object/' + slug;
-  /* 21.09 — юниты внутри проекта. Их 46 из 96, и у большинства нет ничего своего:
-     ни цены, ни площади, ни спален (проверка 20.09: заполнены 8 из 55). Для поиска
-     это почти дословные копии страницы проекта, то есть дубли внутри своего же
-     сайта — за такое Google режет ВЕСЬ раздел, а не только копии.
-     Страницы не удаляем: двойник даёт на них прямые ссылки клиентам. Мы говорим
-     поисковику правду — «главная здесь страница проекта» (canonical на родителя)
-     и «эту в индекс не бери, но по ссылкам с неё иди» (noindex, follow).
-     Юнит, у которого есть чем отличаться, остаётся самостоятельной страницей. */
-  const родитель = тонкийЮнит(o, allObjects);
-  const дубльЮнита = !!родитель;
-  const canonUrl = дубльЮнита ? SITE_BASE + '/object/' + slugOf(pubOf(родитель)) : url;
   /* og-картинка тоже по публичному коду: адрес файла попадает в мессенджеры */
   /* если кадра объекта нет (карточка только заведена) — общая обложка сайта:
      ссылка в мессенджере всё равно должна открываться картинкой, а не строкой */
@@ -1305,7 +1152,7 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
   /* Аренда: вместо стартовой цены застройщика — ставка (ночь или месяц),
      источник тот же, что на витрине: uk_rates → season_rates. */
   const isRent = /аренда|rent/i.test(String(o.purpose || ''));
-  const rr = isRent ? rentRates(o, ratesBy, benchmarks) : null;
+  const rr = isRent ? rentRates(o, ratesBy) : null;
   let rentLine = '';
   if (rr && (rr.night || rr.month)) {
     const part = (lo, hi, unit) => !lo ? '' :
@@ -1779,8 +1626,7 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
 if(v==='dark'||v==='light')document.documentElement.setAttribute('data-theme',v);}catch(e){}})();</script>
 <title>${htmlEsc(title)}</title>
 <meta name="description" content="${htmlEsc(metaDesc)}">
-<link rel="canonical" href="${htmlEsc(canonUrl)}">${дубльЮнита ? `
-<meta name="robots" content="noindex, follow">` : ''}
+<link rel="canonical" href="${htmlEsc(url)}">
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <meta property="og:type" content="product">
 <meta property="og:site_name" content="Property Library Phuket">
@@ -2013,23 +1859,11 @@ function sitemap(objects) {
   for (const [pg, pri] of pages) {
     parts.push(`  <url><loc>${SITE_BASE}/${pg}</loc><lastmod>${lastmodOf(pg)}</lastmod><changefreq>weekly</changefreq><priority>${pri}</priority></url>`);
   }
-  /* 21.09: английские копии основных страниц (build/mken.mjs). Без них Google
-     видит только русскую версию, а на Пхукете англоязычных покупателей примерно
-     половина. Приоритет чуть ниже русских: перевод интерфейса и описаний продажи
-     готов, описания аренды пока русские. */
-  for (const [en, pri] of [['en/', '0.9'], ['en/buy', '0.8'], ['en/rent', '0.8'],
-                           ['en/about', '0.6'], ['en/management', '0.6']]) {
-    parts.push(`  <url><loc>${SITE_BASE}/${en}</loc><changefreq>weekly</changefreq><priority>${pri}</priority></url>`);
-  }
   // 30.08: правовые документы тоже индексируем — они часть сайта
   for (const doc of ['privacy.html', 'rules.html', 'terms.html']) {
     parts.push(`  <url><loc>${SITE_BASE}/${doc}</loc><lastmod>${lastmodOf(doc)}</lastmod><changefreq>yearly</changefreq><priority>0.3</priority></url>`);
   }
-  /* 21.09: в карте были только объекты продажи, и десять страниц аренды со своими
-     ценой и площадью оставались без единой ссылки из карты. Теперь в карту идут все
-     страницы объектов, кроме тонких юнитов — у тех canonical ведёт на проект. */
   for (const o of objects) {
-    if (тонкийЮнит(o, objects)) continue;
     const loc = SITE_BASE + '/object/' + slugOf(pubOf(o));
     parts.push(`  <url><loc>${loc}</loc><lastmod>${lastmodOf('object/' + slugOf(pubOf(o)) + '.html')}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>`);
   }
@@ -2055,19 +1889,16 @@ async function main() {
     'brochure_url,floorplan_url,video_url,website_url,map_url,current_promo,' +
     'season_rates,occupancy_est_pct,maintenance_fee_thb_sqm,lat,lng,coord_source,last_synced_at,availability,' +
     'first_payment,payment_plan,payment_schedule,main_image_url,gallery_urls,unit_types,price_tiers,build_progress,photo_groups,hot_rank,public_code,' +
-    'ownership,amenities,nearby,distance_airport_km,parent_object_id');
+    'ownership,amenities,nearby,distance_airport_km');
   const benchmarks = await sbGet(env,
-    'rental_benchmarks?select=district,unit_type,disp_yield_low_pct,disp_yield_high_pct,'
-    /* 21.09: ставки за квадратный метр нужны для ориентира аренды по району —
-       без них выборка возвращала только доходность, и ориентир не считался. */
-    + 'net_yield_low_pct,net_yield_high_pct,rate_sqm_low,rate_sqm_shoulder,rate_sqm_high');
+    'rental_benchmarks?select=district,unit_type,disp_yield_low_pct,disp_yield_high_pct,net_yield_low_pct,net_yield_high_pct');
 
   // объекты аренды: purpose IN (аренда,rent) И on_site=true.
   // 30.08: убрано исключение для PLP-TEST-RENT — тестовый эталон утекал на публичный сайт.
   const rentals = await sbGet(env,
     'objects?select=plp_property_id,name,district,beach,purpose,type,bedrooms,bedrooms_min,' +
     'bedrooms_max,area_sqm,area_min,area_max,min_stay,deposit,rent_included,rent_excluded,' +
-    'rent_rules,amenities,usp,usp_en,distance_beach_m,on_site,lat,lng,coord_source,last_synced_at,public_code,developer,' +
+    'rent_rules,amenities,usp,usp_en,distance_beach_m,on_site,lat,lng,coord_source,last_synced_at,public_code,' +
     'main_image_url,gallery_urls,photo_groups,unit_types,price_tiers,season_rates,rent_price_month_thb,' +
     'stage,stage_note,sale_started_on,handover_date,parent_object_id' +
     '&and=(or(purpose.eq.' + encodeURIComponent('аренда') + ',purpose.eq.rent),' +
@@ -2107,15 +1938,10 @@ async function main() {
 
   // 1) каталог продажи + аренда в index.html (с сохранением calc/grad/budget)
   let html = fs.readFileSync(INDEX, 'utf8');
-  /* до переезда кода в assets/ каталог лежал в index.html — держим обе дороги,
-     чтобы сборка работала и на старой раскладке */
-  const hasAssets = fs.existsSync(CATALOG_JS);
-  let cat = hasAssets ? fs.readFileSync(CATALOG_JS, 'utf8') : html;
-  const { preserve } = parseExisting(cat);
+  const { preserve } = parseExisting(html);
   const catalog = orderCatalog(buildCatalog(objects, benchmarks, preserve));
-  html = syncListOffers(html, catalog);
-  cat = writeIndex(cat, catalog);
-  const rentPreserve = parseExistingRentals(cat);
+  html = writeIndex(html, catalog);
+  const rentPreserve = parseExistingRentals(html);
   /* Юнит в аренде наследует стадию своего проекта: Modeva сдаётся в 2027,
      и показывать её как «цена по запросу» — обман. Эльнур 06.09. */
   const byId = {};
@@ -2125,34 +1951,8 @@ async function main() {
     if (!parent) continue;
     if (!r.stage) r.stage = parent.stage;
     if (!r.handover_date) r.handover_date = parent.handover_date;
-    if (!r.developer) r.developer = parent.developer;
-    if (r.distance_beach_m == null) r.distance_beach_m = parent.distance_beach_m;
-    /* 21.09: площадь у юнита часто пустая, а без неё не посчитать ориентир по
-       району (ставка за м² × площадь). Берём у проекта его минимальную площадь —
-       это осторожная оценка снизу, и она честнее, чем молчание. */
-    if (!r.area_sqm && !r.area_min) { r.area_min = parent.area_min || parent.area_sqm || null; }
-    /* 21.09: у трёх юнитов в описании стояла внутренняя пометка о сделке
-       собственника с застройщиком — «Договор подписан, freehold. График платежей
-       привязан к фазам стройки». Это видно было на живом сайте и клиенту витрины
-       не нужно: он выбирает жильё, а не читает чужой график платежей.
-       Берём описание проекта, пометка остаётся в базе для внутренней работы. */
-    убратьВнутреннее(r, parent);
-    if (!r.district) r.district = parent.district;
-    if (!r.type) r.type = parent.type;
-    /* 21.09: юнит наследовал от проекта только стадию и срок сдачи, а ставку — нет.
-       Из 45 карточек аренды без своей цены у 26 цена лежала строкой выше, у проекта:
-       «Эстелла 100-180 тыс ฿/мес», «Кабала 120-220», «Легендари 35-65». Человек
-       видел «цена по запросу» там, где цифра была у нас в базе, и уходил.
-       Берём ставку проекта и помечаем её как проектную: это честный диапазон
-       комплекса, а не выдуманная цена конкретной квартиры. */
-    if (!r.rent_price_month_thb && !r.season_rates && !r.nightly_rates) {
-      if (parent.season_rates) { r.season_rates = parent.season_rates; r.rate_from_parent = true; }
-      else if (parent.rent_price_month_thb) {
-        r.rent_price_month_thb = parent.rent_price_month_thb; r.rate_from_parent = true;
-      }
-    }
   }
-  const rentList = buildRentals(rentals, rentPreserve, ratesBy, benchmarks);
+  const rentList = buildRentals(rentals, rentPreserve, ratesBy);
   // 30.08: пока в аренде нет объектов с on_site=true — показываем штатную карточку
   // «Скоро в каталоге» (ветка p.soon в renderRent), а не пустую полосу.
   if (!rentList.length) {
@@ -2163,17 +1963,12 @@ async function main() {
     });
     console.log('[gen] аренда пуста → вставлена карточка «Скоро в каталоге»');
   }
-  cat = writeRentals(cat, rentList);
+  html = writeRentals(html, rentList);
   // доходность района (PL.NETYIELD) из rental_benchmarks — fail-closed: пустой ответ не трогаем
   const netyield = buildNetyield(benchmarks);
   const grossyield = buildGrossyield(benchmarks);
   if (Object.keys(netyield).length && Object.keys(grossyield).length) {
-    if (hasAssets) {
-      const app = fs.readFileSync(APP_JS, 'utf8');
-      fs.writeFileSync(APP_JS, writeNetyield(app, netyield, grossyield));
-    } else {
-      html = writeNetyield(html, netyield, grossyield);
-    }
+    html = writeNetyield(html, netyield, grossyield);
     console.log('[gen] доходность районов обновлена: чистая', Object.keys(netyield).length,
                 '· валовая', Object.keys(grossyield).length);
   } else {
@@ -2181,7 +1976,6 @@ async function main() {
   }
   html = writeObjectIndex(html, objects);
   fs.writeFileSync(INDEX, html);
-  if (hasAssets) fs.writeFileSync(CATALOG_JS, cat);
   console.log('[gen] index.html: каталог продажи', catalog.length, '+ аренда', rentList.length, 'обновлены');
 
   // 2) страницы объектов
@@ -2198,9 +1992,6 @@ async function main() {
   }
   const seenPage = new Set();
   const pageList = [];
-  const поКоду = {};
-  for (const o of objects.concat(rentFull)) поКоду[o.plp_property_id] = o;
-  for (const o of rentFull) убратьВнутреннее(o, поКоду[o.parent_object_id]);
   for (const o of objects.concat(rentFull)) {
     if (!o || !o.plp_property_id || seenPage.has(o.plp_property_id)) continue;
     seenPage.add(o.plp_property_id);
@@ -2227,7 +2018,7 @@ async function main() {
   console.log('[gen] object/*.html:', pages, 'страниц' + (removed ? ', удалено лишних: ' + removed : ''));
 
   // 3) sitemap
-  fs.writeFileSync(SITEMAP, sitemap(pageList));
+  fs.writeFileSync(SITEMAP, sitemap(objects));
   console.log('[gen] sitemap.xml обновлён');
 
   // 4) короткий список для конструктора оффера в кабинете: чтобы сотрудник

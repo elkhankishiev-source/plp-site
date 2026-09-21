@@ -52,19 +52,9 @@ const OI = (() => {
   const s0 = idx.indexOf('PLP:OBJECT-INDEX:START'), s1 = idx.indexOf('PLP:OBJECT-INDEX:END');
   if (s0 === -1 || s1 === -1) return m;
   const blk = idx.slice(s0, s1);
-  /* 21.09: колонок по районам (<div class="oi-col"><h3>Район</h3>) в блоке давно
-     нет — он собирается одним списком, где район стоит рядом с объектом в
-     <span class="oi-d">. Поэтому страницы районов вообще не имели ссылок на свои
-     объекты: ни человеку перейти, ни поисковику обойти. Разбираем нынешний
-     формат: одна строка списка = один объект, ключ — район из oi-d. */
-  const строка = /<li><a href="([^"]+)">([^<]*)<\/a>(?:<span class="oi-d">([^<]*)<\/span>)?([\s\S]*?)<\/li>/g;
+  const re = /<div class="oi-col"><h3>([^<]+)<\/h3>(<ul>[\s\S]*?<\/ul>)<\/div>/g;
   let x;
-  while ((x = строка.exec(blk))) {
-    const район = (x[3] || '').trim();
-    if (!район) continue;
-    (m[район] = m[район] || []).push(x[0]);
-  }
-  for (const k of Object.keys(m)) m[k] = '<ul class="oi-list">' + m[k].join('') + '</ul>';
+  while ((x = re.exec(blk))) m[x[1].trim()] = x[2];
   return m;
 })();
 
