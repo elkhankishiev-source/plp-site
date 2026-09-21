@@ -64,20 +64,20 @@ jobs:
       # с сайта. Пусть о четвёртой скажет проверка, а не клиент.
       - name: Личные данные в публикуемом
         run: |
-          set -e
           fail=0
           test -f _config.yml || { echo "❌ нет _config.yml — tools и build уедут на сайт"; fail=1; }
           grep -q "^  - tools" _config.yml || { echo "❌ tools не исключён из публикации"; fail=1; }
           grep -q "^  - build" _config.yml || { echo "❌ build не исключён из публикации"; fail=1; }
-          if git ls-files 'tools/*.json' | grep -v price_rules | grep -q .; then
-            echo "❌ рабочая выгрузка tools/*.json в репозитории"; fail=1
+          leftovers=$(git ls-files 'tools/*.json' | grep -v price_rules || true)
+          if [ -n "$leftovers" ]; then
+            echo "❌ рабочая выгрузка в репозитории: $leftovers"; fail=1
           fi
-          # номера в том, что реально публикуется: страницы, стили, код витрины
-          НАШИ='66955492587|66640709032|66954143874|66829935173|66960169127'
-          чужие=$(grep -rhoE '\b[0-9]{10,13}\b' --include='*.html' --include='*.js' --include='*.css' \
-                   . 2>/dev/null | sort -u | grep -vE "^($НАШИ)$" | grep -vE '^(66900000|66999000|900999)' | head -5)
-          if [ -n "$чужие" ]; then echo "⚠ похожие на телефоны числа в публикуемом: $чужие"; fi
-          [ "$fail" = "0" ] && echo "✅ личных данных в публикуемом нет"
+          # числа, похожие на телефоны, в том, что реально публикуется
+          ours='66955492587|66640709032|66954143874|66829935173|66960169127'
+          found=$(grep -rhoE '\b[0-9]{10,13}\b' --include='*.html' --include='*.js' --include='*.css' . 2>/dev/null \
+                  | sort -u | grep -vE "^($ours)$" | grep -vE '^(66900000|66999000|900999)' | head -5 || true)
+          if [ -n "$found" ]; then echo "⚠ похожие на телефоны числа в публикуемом: $found"; fi
+          if [ "$fail" = "0" ]; then echo "✅ личных данных в публикуемом нет"; fi
           exit $fail
 
       - name: Сборочные скрипты
