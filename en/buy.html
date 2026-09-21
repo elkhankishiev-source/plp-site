@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
 <script>
 /* Оформление выбирается до отрисовки, чтобы тёмная тема не моргала белым.
@@ -72,11 +72,11 @@
 </script>
 <!-- PLP:HEADTHEME:END -->
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<title>Аренда виллы или апартаментов на Пхукете | Property Library</title>
-<meta name="description" content="Долгосрочная аренда вилл и апартаментов на Пхукете. Свободные объекты по датам, трансфер, уборка, помощь на месте.">
+<title>Buy property in Phuket — villas and apartments</title>
+<meta name="description" content="Villas, apartments and condos in Phuket from developers and owners. Verified projects, yield calculations, full deal support.">
 
 <!-- ===== SEO / SOCIAL ===== -->
-<link rel="canonical" href="https://property-library.com/rent">
+<link rel="canonical" href="https://property-library.com/en/buy">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Property Library Phuket">
 <meta name="robots" content="index,follow">
@@ -89,16 +89,16 @@
 <!-- Open Graph -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Property Library Phuket">
-<meta property="og:title" content="Аренда виллы или апартаментов на Пхукете | Property Library">
-<meta property="og:description" content="Долгосрочная аренда вилл и апартаментов на Пхукете. Свободные объекты по датам, трансфер, уборка, помощь на месте.">
-<meta property="og:url" content="https://property-library.com/rent">
+<meta property="og:title" content="Buy property in Phuket — villas and apartments">
+<meta property="og:description" content="Villas, apartments and condos in Phuket from developers and owners. Verified projects, yield calculations, full deal support.">
+<meta property="og:url" content="https://property-library.com/en/buy">
 <meta property="og:image" content="https://property-library.com/img/PLP-HERITAGE.jpg">
 <meta property="og:image:secure_url" content="https://property-library.com/img/PLP-HERITAGE.jpg">
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1400">
 <meta property="og:image:height" content="674">
 <meta property="og:image:alt" content="Property Library Phuket — недвижимость на Пхукете">
-<meta property="og:locale" content="ru_RU">
+<meta property="og:locale" content="en_US">
 <meta property="og:locale:alternate" content="en_US">
 
 <!-- Twitter -->
@@ -296,10 +296,11 @@ section#rent,section#sale{padding-top:10px}
   #rentDateFilter .df-status{display:none}
 }
 </style>
+<script>try{localStorage.setItem("pl_lang","en")}catch(e){}window.__PL_LANG="en";</script>
 
-<link rel="alternate" hreflang="ru" href="https://property-library.com/rent">
-<link rel="alternate" hreflang="en" href="https://property-library.com/en/rent">
-<link rel="alternate" hreflang="x-default" href="https://property-library.com/rent">
+<link rel="alternate" hreflang="ru" href="https://property-library.com/buy">
+<link rel="alternate" hreflang="en" href="https://property-library.com/en/buy">
+<link rel="alternate" hreflang="x-default" href="https://property-library.com/buy">
 </head>
 <body>
 
@@ -312,13 +313,13 @@ section#rent,section#sale{padding-top:10px}
 <!-- PLP:HEADER:START -->
 <header class="header">
   <div class="container header-inner">
-    <a class="logo" href="/" aria-label="Property Library — на главную"><span class="chip"><img src="img/brand/plp-mark-ink.png" alt="Property Library Phuket" width="24"></span><span class="lname">Property <span>Library</span></span></a>
+    <a class="logo" href="/en/" aria-label="Property Library — на главную"><span class="chip"><img src="img/brand/plp-mark-ink.png" alt="Property Library Phuket" width="24"></span><span class="lname">Property <span>Library</span></span></a>
     <nav class="nav" aria-label="Основное меню">
-      <a href="/buy" data-i18n="nav.sale">Продажа</a>
-      <a href="/rent" data-i18n="nav.rent">Аренда</a>
-      <a href="/#map" data-i18n="nav.map">Районы</a>
-      <a href="/management">Управление</a>
-      <a href="/about" data-i18n="nav.about">О нас</a>
+      <a href="/en/buy" data-i18n="nav.sale">Buy</a>
+      <a href="/en/rent" data-i18n="nav.rent">Rent</a>
+      <a href="/en/index#map" data-i18n="nav.map">Areas</a>
+      <a href="/en/management">Управление</a>
+      <a href="/en/about" data-i18n="nav.about">About</a>
     </nav>
     <div class="htools">
       <div class="lang" role="group" aria-label="Язык">
@@ -329,7 +330,7 @@ section#rent,section#sale{padding-top:10px}
       <button type="button" class="themebtn" id="themeBtn" onclick="cycleTheme()"
               aria-label="Оформление: системное, светлое, тёмное"><span id="themeIco">◐</span></button>
       <span class="swch" role="group" aria-label="Сайт или кабинет">
-        <b>Сайт</b><a href="/owner" data-i18n="nav.cabinet">Кабинет</a>
+        <b>Сайт</b><a href="/en/owner" data-i18n="nav.cabinet">Account</a>
       </span>
       <button type="button" class="burger" aria-label="Меню" onclick="toggleNav(true)"><i></i><i></i><i></i></button>
     </div>
@@ -341,13 +342,13 @@ section#rent,section#sale{padding-top:10px}
 <!-- PLP:MNAV:START -->
 <div class="mnav" id="mnav" onclick="if(event.target===this)toggleNav(false)">
   <div class="sheet">
-    <div class="top"><b data-i18n="nav.menu">Меню</b><button type="button" class="xx" onclick="toggleNav(false)" aria-label="Закрыть">×</button></div>
-    <a href="/buy" data-i18n="nav.sale">Продажа</a>
-    <a href="/rent" data-i18n="nav.rent">Аренда</a>
-    <a href="/#map" onclick="toggleNav(false)" data-i18n="nav.map">Районы</a>
-    <a href="/management">Управление</a>
-    <a href="/add-property">Разместить объект</a>
-    <a href="/about" onclick="toggleNav(false)" data-i18n="nav.about">О нас</a>
+    <div class="top"><b data-i18n="nav.menu">Menu</b><button type="button" class="xx" onclick="toggleNav(false)" aria-label="Закрыть">×</button></div>
+    <a href="/en/buy" data-i18n="nav.sale">Buy</a>
+    <a href="/en/rent" data-i18n="nav.rent">Rent</a>
+    <a href="/en/index#map" onclick="toggleNav(false)" data-i18n="nav.map">Areas</a>
+    <a href="/en/management">Управление</a>
+    <a href="/en/add-property">List your property</a>
+    <a href="/en/about" onclick="toggleNav(false)" data-i18n="nav.about">About</a>
     <!-- Эльнур 06.09: язык и оформление на телефоне живут здесь, одинаково
          на сайте и в кабинете. В шапке их на узком экране нет. -->
     <div class="mtools">
@@ -356,110 +357,62 @@ section#rent,section#sale{padding-top:10px}
         <button type="button" data-l="en" onclick="setLang('en')">EN</button>
       </div>
       <button type="button" class="mtheme" onclick="cycleTheme()" aria-label="Оформление">
-        <span id="mThemeIco">◐</span><span data-i18n="nav.theme">Оформление</span>
+        <span id="mThemeIco">◐</span><span data-i18n="nav.theme">Appearance</span>
       </button>
     </div>
-    <span class="swch mswch" role="group" aria-label="Сайт или кабинет"><b>Сайт</b><a href="/owner" onclick="toggleNav(false)" data-i18n="nav.cabinet">Кабинет</a></span>
-    <button type="button" class="mwa" onclick="toggleNav(false);openChat('hi')" data-i18n="nav.chat">Чат с консультантом</button>
+    <span class="swch mswch" role="group" aria-label="Сайт или кабинет"><b>Сайт</b><a href="/en/owner" onclick="toggleNav(false)" data-i18n="nav.cabinet">Account</a></span>
+    <button type="button" class="mwa" onclick="toggleNav(false);openChat('hi')" data-i18n="nav.chat">Chat with a consultant</button>
   </div>
 </div>
 <!-- PLP:MNAV:END -->
 
 <main id="top">
-<section style="padding:22px 0 0"><div class="container"><h1 style="font-size:clamp(24px,3.2vw,34px);margin:0 0 6px">Аренда жилья на Пхукете</h1><p class="sub" style="max-width:62ch;margin:0;font-size:.95rem">Виллы и апартаменты для жизни и отдыха. Подберём под даты и бюджет, встретим и заселим.</p></div></section>
-<section class="catalog" id="rent" style="padding-top:0">
+<section style="padding:22px 0 0"><div class="container"><h1 style="font-size:clamp(24px,3.2vw,34px);margin:0 0 6px">Buy property in Phuket</h1><p class="sub" style="max-width:62ch;margin:0;font-size:.95rem">Verified villas and apartments from developers and owners. We view every property ourselves before we show it.</p></div></section>
+<section class="catalog" id="sale">
   <div class="container">
     
-    <div class="datefilter reveal" id="rentDateFilter">
-      <div class="df-fields">
-        <div class="df-fld df-range"><span data-i18n="rent.dates.stay">Даты проживания</span>
-          <button type="button" class="rf-btn" id="rentRangeBtn"><span id="rentRangeT" data-i18n="rent.dates.pick">Выберите даты</span><i>▾</i></button>
-          <input type="hidden" id="rentIn"><input type="hidden" id="rentOut">
-          <div class="rf-cal" id="rentRangeCal" hidden></div>
-        </div>
-        <button type="button" class="btn btn-green" id="rentCheck" onclick="checkAvailability()" disabled data-i18n="rent.dates.btn">Показать свободные</button>
-        <button type="button" class="btn btn-glass df-reset" id="rentReset" onclick="resetAvailability()" style="display:none" data-i18n="rent.dates.reset">Сбросить</button>
-      </div>
-      <div class="df-status" id="rentDateStatus" data-i18n="rent.dates.hint">Выберите даты заезда и выезда — покажем только свободные варианты. Без дат показаны все объекты.</div>
+    <div class="filterbar reveal" id="saleFilters">
+      <span class="chipf on" data-facet="budget" data-val="" onclick="toggleFilter(this)" data-i18n="f.budget.all">All budgets</span><span class="chipf" data-facet="budget" data-val="b1" onclick="toggleFilter(this)" data-i18n="f.b1">฿3–5M</span><span class="chipf" data-facet="budget" data-val="b2" onclick="toggleFilter(this)" data-i18n="f.b2">฿5–10M</span><span class="chipf" data-facet="budget" data-val="b3" onclick="toggleFilter(this)" data-i18n="f.b3">฿10–15M</span><span class="chipf" data-facet="budget" data-val="b4" onclick="toggleFilter(this)" data-i18n="f.b4">฿15–20M</span><span class="chipf" data-facet="budget" data-val="b5" onclick="toggleFilter(this)" data-i18n="f.b5">฿20–25M</span><span class="chipf" data-facet="budget" data-val="b6" onclick="toggleFilter(this)" data-i18n="f.b6">฿25–30M</span><span class="chipf" data-facet="budget" data-val="b7" onclick="toggleFilter(this)" data-i18n="f.b7">฿30M+</span><span class="chipf" data-facet="type" data-val="Вилла" onclick="toggleFilter(this)" data-i18n="f.type.villa">Villa</span><span class="chipf" data-facet="type" data-val="Кондо" onclick="toggleFilter(this)" data-i18n="f.type.condo">Condo</span><span class="chipf" data-facet="stage" data-val="presale" onclick="toggleFilter(this)" data-i18n="f.st.presale">Pre-sale</span><span class="chipf" data-facet="stage" data-val="construction" onclick="toggleFilter(this)" data-i18n="f.st.build">Under construction</span><span class="chipf" data-facet="stage" data-val="ready" onclick="toggleFilter(this)" data-i18n="f.st.ready">Ready to move in</span><span class="chipf" data-facet="stage" data-val="resale" onclick="toggleFilter(this)" data-i18n="f.st.resale">Resale</span><span class="chipf" data-facet="stage" data-val="soon" onclick="toggleFilter(this)" data-i18n="f.st.soon">Handover soon</span><span class="chipf" data-facet="stage" data-val="few" onclick="toggleFilter(this)" data-i18n="f.st.few">Last units</span>
     </div>
-    <div class="filterbar reveal" id="rentFilters"></div>
     <div class="toolbar reveal">
-      <label class="search"><input type="search" id="rentSearch" data-i18n-ph="rent.search" placeholder="Поиск: район, название, ID…" oninput="onRentSearch(this.value)"></label>
-      <select id="rentSort" onchange="setRentSort(this.value)" aria-label="Сортировка">
-        <option value="" data-i18n="sort.default">По порядку</option>
-        <option value="beds" data-i18n="sort.beds">Сначала больше спален</option>
-        <option value="area" data-i18n="sort.area">Сначала больше площадь</option>
+      <label class="search"><input type="search" id="saleSearch" data-i18n-ph="sale.search" placeholder="Search: area, name, ID…" oninput="onSaleSearch(this.value)"></label>
+      <select id="saleSort" onchange="setSaleSort(this.value)" aria-label="Сортировка">
+        <option value="" data-i18n="sort.default">Default order</option>
+        <option value="roi" data-i18n="sort.roi">Highest yield first</option>
+        <option value="price" data-i18n="sort.cheap">Lowest price first</option>
+        <option value="price-desc" data-i18n="sort.rich">Highest price first</option>
+        <option value="top7" data-i18n="sort.top7">Top 7 — hot deals</option>
       </select>
-      <span class="chipf" id="rentFavChip" style="display:none" onclick="toggleFavOnly()" data-i18n="f.favs">♥ Избранное</span>
+      <span class="chipf" id="favChip" style="display:none" onclick="toggleFavOnly()" data-i18n="f.favs">♥ Favourites</span>
+      <span class="curswitch" title="Валюта показа">
+        <button type="button" data-cur="thb" class="on" onclick="setCur('thb')">฿</button><button type="button" data-cur="usd" onclick="setCur('usd')">$</button>
+      </span>
     </div>
-    <p class="found" id="rentFound"></p>
+    <p class="found" id="saleFound"></p>
     <div class="carwrap reveal">
-      <div class="arrows carnav"><button type="button" onclick="scrollCar('rentCar',-1)" aria-label="Назад">‹</button><button type="button" onclick="scrollCar('rentCar',1)" aria-label="Вперёд">›</button></div>
-      <div class="catrow"><div><div class="car" id="rentCar"></div></div></div>
-      <div class="noresult" id="rentNoResult" data-i18n="rent.noresult">По выбранным фильтрам ничего не нашлось — измените условия или сбросьте фильтры.</div>
+      <div class="arrows carnav"><button type="button" onclick="scrollCar('saleCar',-1)" aria-label="Назад">‹</button><button type="button" onclick="scrollCar('saleCar',1)" aria-label="Вперёд">›</button></div>
+      <div class="catrow"><div><div class="car" id="saleCar"></div></div></div>
+      <div class="noresult" id="saleNoResult" data-i18n="noresult">Nothing matches these filters — try removing some.</div>
     </div>
-    <!-- PLP:PART:rent-band:START -->
-    <div class="rentband reveal">
-      <div>
-        <h3 data-i18n="rent.b1t">Запрос на аренду — 24/7</h3>
-        <p data-i18n="rent.b1p">Заполните заявку — подберём жильё под ваши даты и бюджет и ответим по условиям.</p>
-      </div>
-      <div class="cta">
-        <button type="button" class="btn btn-green" onclick="openRentRequest()" data-i18n="rent.b1cta">Оставить запрос</button>
-        <a class="btn btn-glass" href="https://t.me/elnurphuket_bot?start=rent_block" target="_blank" rel="noopener" data-i18n="rent.b1tg">Консьерж в Telegram</a>
-      </div>
-    </div>
-    <!-- PLP:PART:rent-band:END -->
-    <!-- PLP:PART:rent-care:START -->
-    <div class="reveal" style="margin-top:28px">
-      <span class="kicker" data-i18n="rent.servlab">Аренда с заботой</span>
-      <h2 data-i18n="rent.servh2">Организуем всё и даже больше</h2>
-      <p class="sub" data-i18n="rent.servsub">Мы не сдаём ключи и не исчезаем. Остаёмся рядом: организуем, подскажем, решим — от встречи в аэропорту до продления визы.</p>
-    </div>
-    <div class="serv-grid reveal">
-      <div class="serv-card"><h4 data-i18n="rs.1t">Бронирование</h4><p data-i18n="rs.1p">Подбираем и бронируем жильё без лишней волокиты</p></div>
-      <div class="serv-card"><h4 data-i18n="rs.2t">Консультации</h4><p data-i18n="rs.2p">Помощь при выборе района, школ, инфраструктуры</p></div>
-      <div class="serv-card"><h4 data-i18n="rs.3t">Трансфер</h4><p data-i18n="rs.3p">Встречаем в аэропорту и организуем комфортный переезд</p></div>
-      <div class="serv-card"><h4 data-i18n="rs.4t">Уборка</h4><p data-i18n="rs.4p">Регулярная уборка — по графику или по запросу</p></div>
-      <div class="serv-card"><h4 data-i18n="rs.5t">Сопровождение</h4><p data-i18n="rs.5p">Поддержка в банках, миграционных службах и не только</p></div>
-      <div class="serv-card"><h4 data-i18n="rs.6t">Юридические услуги</h4><p data-i18n="rs.6p">Продление виз и ВНЖ, налоговые консультации</p></div>
-      <div class="serv-card"><h4 data-i18n="rs.7t">Сервис и услуги</h4><p data-i18n="rs.7p">Подрядчики для ремонта и дизайна, чистка бассейна, уход за территорией</p></div>
-      <div class="serv-card"><h4 data-i18n="rs.8t">Дополнительно</h4><p data-i18n="rs.8p">Аренда яхты, экскурсии и другие активности</p></div>
-      <div class="serv-card"><h4 data-i18n="rs.9t">Консьерж 24/7</h4><p data-i18n="rs.9p">Бот в Telegram отвечает в любое время суток, сложное сразу берёт на себя менеджер</p></div>
-      <div class="serv-card"><h4 data-i18n="rs.10t">Управление жильём</h4><p data-i18n="rs.10p">Если сдаёте своё: заселяем гостей, ведём календарь и показываем доход в личном кабинете</p></div>
-    </div>
-    <!-- PLP:PART:rent-care:END -->
-    <!-- PLP:PART:rent-island:START -->
-    <div class="rentband reveal on-green">
-      <div>
-        <h3 data-i18n="rent.upt">Понравился остров?</h3>
-        <p style="color:#4E3A35" data-i18n="rent.upp">Многие наши гости после аренды решают стать владельцами — подберём объект для покупки под вашу задачу и бюджет.</p>
-      </div>
-      <div class="cta">
-        <a class="btn btn-primary" href="/#sale" data-i18n="rent.upcta">Смотреть объекты в продаже</a>
-        <button type="button" class="btn btn-light btn-2l" onclick="openQuiz()"><b data-i18n="rent.upquiz">Подобрать за 10 минут</b><small data-i18n="cta.free">бесплатная консультация</small></button>
-      </div>
-    </div>
-    <!-- PLP:PART:rent-island:END -->
   </div>
 </section>
 
-<!-- ===== MAP / DISTRICTS ===== -->
+<!-- ===== CATALOG PDF ===== -->
 
 <section id="quiz" style="padding-top:0">
   <div class="container">
     <div class="quizband reveal">
       <div>
-        <span class="kicker" data-i18n="quiz.lab">Подбор за 10 минут</span>
-        <h2 data-i18n="quiz.h2">Пройдите квиз — пришлём подборку под ваши задачи</h2>
-        <p data-i18n="quiz.sub">8 коротких шагов: цель, бюджет, район, тип, спальни и сроки. В конце соберём контакт и сразу покажем подходящий объект.</p>
-        <button type="button" class="btn btn-green" onclick="openQuiz()" data-i18n="quiz.cta">Начать подбор</button>
+        <span class="kicker" data-i18n="quiz.lab">Matched in 10 minutes</span>
+        <h2 data-i18n="quiz.h2">Take the quiz — we will send a personal shortlist</h2>
+        <p data-i18n="quiz.sub">8 short steps: goal, budget, area, type, bedrooms and timing. At the end we take your contact and instantly show a matching property.</p>
+        <button type="button" class="btn btn-green" onclick="openQuiz()" data-i18n="quiz.cta">Start</button>
       </div>
       <div class="qprev" aria-hidden="true">
-        <div class="qcell"><div class="k" data-i18n="quiz.step">Шаг</div><div class="v" data-i18n="q.1">Какая у вас цель?</div></div>
-        <div class="qcell"><div class="k" data-i18n="quiz.step">Шаг</div><div class="v" data-i18n="q.2">На какой бюджет ориентируетесь?</div></div>
-        <div class="qcell"><div class="k" data-i18n="quiz.step">Шаг</div><div class="v" data-i18n="q.3">Какой район интересен?</div></div>
-        <div class="qcell"><div class="k" data-i18n="quiz.step">Шаг</div><div class="v" data-i18n="q.6">Когда планируете сделку?</div></div>
+        <div class="qcell"><div class="k" data-i18n="quiz.step">Step</div><div class="v" data-i18n="q.1">What is your goal?</div></div>
+        <div class="qcell"><div class="k" data-i18n="quiz.step">Step</div><div class="v" data-i18n="q.2">What budget do you have in mind?</div></div>
+        <div class="qcell"><div class="k" data-i18n="quiz.step">Step</div><div class="v" data-i18n="q.3">Which area interests you?</div></div>
+        <div class="qcell"><div class="k" data-i18n="quiz.step">Step</div><div class="v" data-i18n="q.6">When are you planning the deal?</div></div>
       </div>
     </div>
   </div>
@@ -470,23 +423,23 @@ section#rent,section#sale{padding-top:10px}
 <section id="do" style="padding-top:0">
   <div class="container">
     <div class="reveal">
-      <span class="kicker" data-i18n="appr.lab">Наш подход</span>
-      <h2 data-i18n="do.h2">С нами легко выбрать, купить и переехать</h2>
+      <span class="kicker" data-i18n="appr.lab">Our approach</span>
+      <h2 data-i18n="do.h2">Choosing, buying and moving is easy with us</h2>
     </div>
     <div class="adv">
-      <div class="c reveal"><span class="ic">⭐</span><h4 data-i18n="do.1t">Эксклюзивные объекты</h4><p data-i18n="do.1p">Уникальные варианты жилья, которых нет в открытом доступе.</p></div>
-      <div class="c reveal"><span class="ic">🤝</span><h4 data-i18n="do.2t">Партнёрство с застройщиками</h4><p data-i18n="do.2p">Выгодные условия и дополнительные бонусы для наших клиентов.</p></div>
-      <div class="c reveal"><span class="ic">🎯</span><h4 data-i18n="do.3t">Консультация под цели</h4><p data-i18n="do.3p">Поможем понять рынок и подберём недвижимость под ваши задачи.</p></div>
-      <div class="c reveal"><span class="ic">🧭</span><h4 data-i18n="do.4t">Сопровождение на всех этапах</h4><p data-i18n="do.4p">Показы, документы и даже помощь после покупки — на нас.</p></div>
-      <div class="c reveal"><span class="ic">⚖️</span><h4 data-i18n="do.5t">Юридическая поддержка</h4><p data-i18n="do.5p">Сделки сопровождают юристы по тайскому рынку.</p></div>
-      <div class="c reveal"><span class="ic">🌍</span><h4 data-i18n="do.6t">Удалённое оформление</h4><p data-i18n="do.6p">Купить или арендовать можно за тысячи километров.</p></div>
+      <div class="c reveal"><span class="ic">⭐</span><h4 data-i18n="do.1t">Exclusive properties</h4><p data-i18n="do.1p">Unique homes you will not find on the open market.</p></div>
+      <div class="c reveal"><span class="ic">🤝</span><h4 data-i18n="do.2t">Developer partnerships</h4><p data-i18n="do.2p">Better terms and extra bonuses for our clients.</p></div>
+      <div class="c reveal"><span class="ic">🎯</span><h4 data-i18n="do.3t">Goal-based advice</h4><p data-i18n="do.3p">We help you understand the market and match property to your goals.</p></div>
+      <div class="c reveal"><span class="ic">🧭</span><h4 data-i18n="do.4t">Support at every stage</h4><p data-i18n="do.4p">Viewings, paperwork and even after-sale care — on us.</p></div>
+      <div class="c reveal"><span class="ic">⚖️</span><h4 data-i18n="do.5t">Legal support</h4><p data-i18n="do.5p">Deals are handled by lawyers specialising in the Thai market.</p></div>
+      <div class="c reveal"><span class="ic">🌍</span><h4 data-i18n="do.6t">Remote purchase</h4><p data-i18n="do.6p">Buy or rent from thousands of kilometres away.</p></div>
     </div>
   </div>
 </section>
 
 <!-- ===== ABOUT / FOUNDER ===== -->
 
-<section class="obj-index" id="all-objects"><div class="container"><details class="oi-box"><summary><b>Объекты в продаже</b><span class="oi-n">50</span></summary><p class="sub">Все проекты, с которыми мы работаем, — с ценами от застройщика и условиями рассрочки. Объекты в аренду — в разделе «Аренда»; на карте показаны и те, и другие.</p><ul class="oi-list"><li><a href="object/angsana-beach">Angsana Beachfront Residences</a><span class="oi-d">Лагуна</span><span class="oi-p">84 млн ฿</span></li><li><a href="object/angsana-topaz">Angsana Golf Residences Topaz</a><span class="oi-d">Лагуна</span><span class="oi-p">26,8 млн ฿</span></li><li><a href="object/ayana">AYANA Heights Seaview Residences</a><span class="oi-d">Лаян</span><span class="oi-p">8,4 млн ฿</span></li><li><a href="object/bellaguna-golf">Bellaguna Golf Residences</a><span class="oi-d">Лагуна</span><span class="oi-p">10,0 млн ฿</span></li><li><a href="object/bellaguna">Bellaguna Lake Residences</a><span class="oi-d">Лагуна</span><span class="oi-p">16,3 млн ฿</span></li><li><a href="object/clover">Clover Residence</a><span class="oi-d">Банг Тао</span><span class="oi-p">66,3 млн ฿</span></li><li><a href="object/eden-lake">Eden · Lake Residences</a><span class="oi-d">Банг Тао</span></li><li><a href="object/eden-park">Eden · Park Residences</a><span class="oi-d">Банг Тао</span><span class="oi-p">11,9 млн ฿</span></li><li><a href="object/eden-res">Eden Residences</a><span class="oi-d">Банг Тао</span><span class="oi-p">13,9 млн ฿</span></li><li><a href="object/eden-etro">ETRO Residences Phuket</a><span class="oi-d">Банг Тао</span><span class="oi-p">182,6 млн ฿</span></li><li><a href="object/everprime">Ever Prime</a><span class="oi-d">Карон</span><span class="oi-p">6,4 млн ฿</span></li><li><a href="object/fantasy-rawai">Fantasy Plus Rawai</a><span class="oi-d">Равай</span><span class="oi-p">3,6 млн ฿</span></li><li><a href="object/eden">Gardens of Eden</a><span class="oi-d">Банг Тао</span></li><li><a href="object/hythe">HYTHE by Botanica</a><span class="oi-d">Лаян</span><span class="oi-p">10,9 млн ฿</span></li><li><a href="object/bayside">Laguna Beach Residences Bayside</a><span class="oi-d">Банг Тао</span><span class="oi-p">30,3 млн ฿</span></li><li><a href="object/manor">Manor</a><span class="oi-d">Банг Тао</span><span class="oi-p">28,5 млн ฿</span></li><li><a href="object/mono-champaca">Mono Champaca, Таланг</a><span class="oi-d">Таланг</span><span class="oi-p">18,8 млн ฿</span></li><li><a href="object/mori1">MORI 1</a><span class="oi-d">Банг Тао</span><span class="oi-p">16,5 млн ฿</span></li><li><a href="object/mori-valley">MORI The Valley</a><span class="oi-d">Банг Тао</span><span class="oi-p">16,7 млн ฿</span></li><li><a href="object/peylaa">PEYLAA Phuket, Autograph Collection Residences</a><span class="oi-d">Банг Тао</span><span class="oi-p">7,9 млн ฿</span></li><li><a href="object/garrya">Residences at Garrya</a><span class="oi-d">Лагуна</span><span class="oi-p">16,4 млн ฿</span></li><li><a href="object/sudara">Sudara Phuket</a><span class="oi-d">Банг Тао</span><span class="oi-p">10,7 млн ฿</span></li><li><a href="object/sunhills-layan">SUN HILLS Layan</a><span class="oi-d">Лаян</span><span class="oi-p">3,3 млн ฿</span></li><li><a href="object/balcony">The BALCONY Nai Yang</a><span class="oi-d">Най Янг</span><span class="oi-p">5,7 млн ฿</span></li><li><a href="object/gens-botanica">The GENS by Botanica, у Blue Tree</a><span class="oi-d">Банг Тао</span><span class="oi-p">5,5 млн ฿</span></li><li><a href="object/liberty">The Liberty by Wallaya Villas</a><span class="oi-d">Банг Тао</span><span class="oi-p">8,2 млн ฿</span></li><li><a href="object/modeva">The Modeva Bang-Tao</a><span class="oi-d">Банг Тао</span><span class="oi-p">4,8 млн ฿</span></li><li><a href="object/intercontinental">The Residences at InterContinental Phuket Resort</a><span class="oi-d">Камала</span><span class="oi-p">15,7 млн ฿</span></li><li><a href="object/standard">The Standard Residences Phuket Bang Tao</a><span class="oi-d">Банг Тао</span><span class="oi-p">21,9 млн ฿</span></li><li><a href="object/adora">The Title Adora Rawai</a><span class="oi-d">Равай</span><span class="oi-p">5,3 млн ฿</span></li><li><a href="object/biancana">The Title Biancana Surin</a><span class="oi-d">Сурин</span><span class="oi-p">6,1 млн ฿</span></li><li><a href="object/casademonte">The Title Casa De Monte</a><span class="oi-d">Ко Кео</span><span class="oi-p">30,3 млн ฿</span></li><li><a href="object/cielo">The Title Cielo Rawai</a><span class="oi-d">Равай</span><span class="oi-p">6,2 млн ฿</span></li><li><a href="object/coralina">The Title Coralina Kamala</a><span class="oi-d">Камала</span><span class="oi-p">4,7 млн ฿</span></li><li><a href="object/halo1">The Title Halo 1 Naiyang</a><span class="oi-d">Най Янг</span><span class="oi-p">5,1 млн ฿</span></li><li><a href="object/heritage">The Title Heritage Bang-Tao</a><span class="oi-d">Банг Тао</span><span class="oi-p">5,6 млн ฿</span></li><li><a href="object/katabello">The Title Katabello</a><span class="oi-d">Ката</span><span class="oi-p">4,6 млн ฿</span></li><li><a href="object/legendary">The Title Legendary Bang-Tao</a><span class="oi-d">Банг Тао</span><span class="oi-p">6,2 млн ฿</span></li><li><a href="object/serenity">The Title Serenity Naiyang</a><span class="oi-d">Най Янг</span><span class="oi-p">5,2 млн ฿</span></li><li><a href="object/sierra">The Title Sierra</a><span class="oi-d">Банг Тао</span><span class="oi-p">3,1 млн ฿</span></li><li><a href="object/estella">The Title Villa Estella Naiyang</a><span class="oi-d">Най Янг</span><span class="oi-p">22,3 млн ฿</span></li><li><a href="object/kirara">The Title Villa Kirara Bang-Tao</a><span class="oi-d">Банг Тао</span><span class="oi-p">29,0 млн ฿</span></li><li><a href="object/vivana">The Title Vivana Kamala</a><span class="oi-d">Камала</span><span class="oi-p">4,1 млн ฿</span></li><li><a href="object/vivi">The Title VIVI</a><span class="oi-d">Банг Тао</span><span class="oi-p">4,3 млн ฿</span></li><li><a href="object/zero-bangtao">The ZERO Bang Tao</a><span class="oi-d">Банг Тао</span><span class="oi-p">5,1 млн ฿</span></li><li><a href="object/zero-naiyang">The ZERO Nai Yang</a><span class="oi-d">Най Янг</span><span class="oi-p">4,4 млн ฿</span></li><li><a href="object/tonino-ov">Tonino Lamborghini Ocean Valley Villas</a><span class="oi-d">Ao Por</span><span class="oi-p">70,8 млн ฿</span></li><li><a href="object/vibe-karon">Vibe Residence Karon</a><span class="oi-d">Карон</span><span class="oi-p">5,7 млн ฿</span></li><li><a href="object/qabalah">Villa Qabalah</a><span class="oi-d">Таланг</span></li><li><a href="object/zenithy">Zenithy La Ville · Oasis Collection</a><span class="oi-d">Ко Кео</span><span class="oi-p">26,5 млн ฿</span></li></ul></details></div></section>
+<section class="obj-index" id="all-objects"><div class="container"><details class="oi-box"><summary><b>Properties for sale</b><span class="oi-n">50</span></summary><p class="sub">Every project we work with, with developer prices and payment plans. Rentals live in the Rent section; the map shows both.</p><ul class="oi-list"><li><a href="object/angsana-beach">Angsana Beachfront Residences</a><span class="oi-d">Laguna</span><span class="oi-p">84 млн ฿</span></li><li><a href="object/angsana-topaz">Angsana Golf Residences Topaz</a><span class="oi-d">Laguna</span><span class="oi-p">26,8 млн ฿</span></li><li><a href="object/ayana">AYANA Heights Seaview Residences</a><span class="oi-d">Layan</span><span class="oi-p">8,4 млн ฿</span></li><li><a href="object/bellaguna-golf">Bellaguna Golf Residences</a><span class="oi-d">Laguna</span><span class="oi-p">10,0 млн ฿</span></li><li><a href="object/bellaguna">Bellaguna Lake Residences</a><span class="oi-d">Laguna</span><span class="oi-p">16,3 млн ฿</span></li><li><a href="object/clover">Clover Residence</a><span class="oi-d">Bang Tao</span><span class="oi-p">66,3 млн ฿</span></li><li><a href="object/eden-lake">Eden · Lake Residences</a><span class="oi-d">Bang Tao</span></li><li><a href="object/eden-park">Eden · Park Residences</a><span class="oi-d">Bang Tao</span><span class="oi-p">11,9 млн ฿</span></li><li><a href="object/eden-res">Eden Residences</a><span class="oi-d">Bang Tao</span><span class="oi-p">13,9 млн ฿</span></li><li><a href="object/eden-etro">ETRO Residences Phuket</a><span class="oi-d">Bang Tao</span><span class="oi-p">182,6 млн ฿</span></li><li><a href="object/everprime">Ever Prime</a><span class="oi-d">Karon</span><span class="oi-p">6,4 млн ฿</span></li><li><a href="object/fantasy-rawai">Fantasy Plus Rawai</a><span class="oi-d">Равай</span><span class="oi-p">3,6 млн ฿</span></li><li><a href="object/eden">Gardens of Eden</a><span class="oi-d">Bang Tao</span></li><li><a href="object/hythe">HYTHE by Botanica</a><span class="oi-d">Layan</span><span class="oi-p">10,9 млн ฿</span></li><li><a href="object/bayside">Laguna Beach Residences Bayside</a><span class="oi-d">Bang Tao</span><span class="oi-p">30,3 млн ฿</span></li><li><a href="object/manor">Manor</a><span class="oi-d">Bang Tao</span><span class="oi-p">28,5 млн ฿</span></li><li><a href="object/mono-champaca">Mono Champaca, Таланг</a><span class="oi-d">Thalang</span><span class="oi-p">18,8 млн ฿</span></li><li><a href="object/mori1">MORI 1</a><span class="oi-d">Bang Tao</span><span class="oi-p">16,5 млн ฿</span></li><li><a href="object/mori-valley">MORI The Valley</a><span class="oi-d">Bang Tao</span><span class="oi-p">16,7 млн ฿</span></li><li><a href="object/peylaa">PEYLAA Phuket, Autograph Collection Residences</a><span class="oi-d">Bang Tao</span><span class="oi-p">7,9 млн ฿</span></li><li><a href="object/garrya">Residences at Garrya</a><span class="oi-d">Laguna</span><span class="oi-p">16,4 млн ฿</span></li><li><a href="object/sudara">Sudara Phuket</a><span class="oi-d">Bang Tao</span><span class="oi-p">10,7 млн ฿</span></li><li><a href="object/sunhills-layan">SUN HILLS Layan</a><span class="oi-d">Layan</span><span class="oi-p">3,3 млн ฿</span></li><li><a href="object/balcony">The BALCONY Nai Yang</a><span class="oi-d">Nai Yang</span><span class="oi-p">5,7 млн ฿</span></li><li><a href="object/gens-botanica">The GENS by Botanica, у Blue Tree</a><span class="oi-d">Bang Tao</span><span class="oi-p">5,5 млн ฿</span></li><li><a href="object/liberty">The Liberty by Wallaya Villas</a><span class="oi-d">Bang Tao</span><span class="oi-p">8,2 млн ฿</span></li><li><a href="object/modeva">The Modeva Bang-Tao</a><span class="oi-d">Bang Tao</span><span class="oi-p">4,8 млн ฿</span></li><li><a href="object/intercontinental">The Residences at InterContinental Phuket Resort</a><span class="oi-d">Kamala</span><span class="oi-p">15,7 млн ฿</span></li><li><a href="object/standard">The Standard Residences Phuket Bang Tao</a><span class="oi-d">Bang Tao</span><span class="oi-p">21,9 млн ฿</span></li><li><a href="object/adora">The Title Adora Rawai</a><span class="oi-d">Равай</span><span class="oi-p">5,3 млн ฿</span></li><li><a href="object/biancana">The Title Biancana Surin</a><span class="oi-d">Surin</span><span class="oi-p">6,1 млн ฿</span></li><li><a href="object/casademonte">The Title Casa De Monte</a><span class="oi-d">Koh Kaew</span><span class="oi-p">30,3 млн ฿</span></li><li><a href="object/cielo">The Title Cielo Rawai</a><span class="oi-d">Равай</span><span class="oi-p">6,2 млн ฿</span></li><li><a href="object/coralina">The Title Coralina Kamala</a><span class="oi-d">Kamala</span><span class="oi-p">4,7 млн ฿</span></li><li><a href="object/halo1">The Title Halo 1 Naiyang</a><span class="oi-d">Nai Yang</span><span class="oi-p">5,1 млн ฿</span></li><li><a href="object/heritage">The Title Heritage Bang-Tao</a><span class="oi-d">Bang Tao</span><span class="oi-p">5,6 млн ฿</span></li><li><a href="object/katabello">The Title Katabello</a><span class="oi-d">Kata</span><span class="oi-p">4,6 млн ฿</span></li><li><a href="object/legendary">The Title Legendary Bang-Tao</a><span class="oi-d">Bang Tao</span><span class="oi-p">6,2 млн ฿</span></li><li><a href="object/serenity">The Title Serenity Naiyang</a><span class="oi-d">Nai Yang</span><span class="oi-p">5,2 млн ฿</span></li><li><a href="object/sierra">The Title Sierra</a><span class="oi-d">Bang Tao</span><span class="oi-p">3,1 млн ฿</span></li><li><a href="object/estella">The Title Villa Estella Naiyang</a><span class="oi-d">Nai Yang</span><span class="oi-p">22,3 млн ฿</span></li><li><a href="object/kirara">The Title Villa Kirara Bang-Tao</a><span class="oi-d">Bang Tao</span><span class="oi-p">29,0 млн ฿</span></li><li><a href="object/vivana">The Title Vivana Kamala</a><span class="oi-d">Kamala</span><span class="oi-p">4,1 млн ฿</span></li><li><a href="object/vivi">The Title VIVI</a><span class="oi-d">Bang Tao</span><span class="oi-p">4,3 млн ฿</span></li><li><a href="object/zero-bangtao">The ZERO Bang Tao</a><span class="oi-d">Bang Tao</span><span class="oi-p">5,1 млн ฿</span></li><li><a href="object/zero-naiyang">The ZERO Nai Yang</a><span class="oi-d">Nai Yang</span><span class="oi-p">4,4 млн ฿</span></li><li><a href="object/tonino-ov">Tonino Lamborghini Ocean Valley Villas</a><span class="oi-d">Ao Por</span><span class="oi-p">70,8 млн ฿</span></li><li><a href="object/vibe-karon">Vibe Residence Karon</a><span class="oi-d">Karon</span><span class="oi-p">5,7 млн ฿</span></li><li><a href="object/qabalah">Villa Qabalah</a><span class="oi-d">Thalang</span></li><li><a href="object/zenithy">Zenithy La Ville · Oasis Collection</a><span class="oi-d">Koh Kaew</span><span class="oi-p">26,5 млн ฿</span></li></ul></details></div></section>
 <!-- PLP:OBJECT-INDEX:END -->
 
 <!-- ===== FOOTER ===== -->
@@ -495,24 +448,24 @@ section#rent,section#sale{padding-top:10px}
   <div class="container">
     <div class="footer-grid">
       <div>
-        <a class="logo" href="/"><span class="chip"><img src="img/brand/plp-mark-ink.png" alt="Property Library Phuket" width="24"></span><span>Property <span>Library</span></span></a>
-        <p class="sub" style="font-size:.92rem;margin-top:12px" data-i18n="ft.tag">Мы уже выбрали Пхукет, поможем и вам. Все под ключ — от первого звонка до заезда и получения дохода.</p>
+        <a class="logo" href="/en/"><span class="chip"><img src="img/brand/plp-mark-ink.png" alt="Property Library Phuket" width="24"></span><span>Property <span>Library</span></span></a>
+        <p class="sub" style="font-size:.92rem;margin-top:12px" data-i18n="ft.tag">We already chose Phuket — let us help you. Full service, from the first call to move-in and first income.</p>
       </div>
       <div>
-        <h3 data-i18n="ft.menu">Меню</h3>
+        <h3 data-i18n="ft.menu">Menu</h3>
         <ul>
-          <li><a href="/#sale" data-i18n="ft.buy">Покупка</a></li>
-          <li><a href="/rent" data-i18n="nav.rent">Аренда</a></li>
-          <li><a href="/#map" data-i18n="nav.map">Районы</a></li>
-          <li><a href="/about" data-i18n="nav.about">О нас</a></li>
-          <li><a href="/#faq">FAQ</a></li>
+          <li><a href="/en/buy" data-i18n="ft.buy">Buy</a></li>
+          <li><a href="/en/rent" data-i18n="nav.rent">Rent</a></li>
+          <li><a href="/en/index#map" data-i18n="nav.map">Areas</a></li>
+          <li><a href="/en/about" data-i18n="nav.about">About</a></li>
+          <li><a href="/en/index#faq">FAQ</a></li>
           <!-- Эльнур 08.09: «выгрузить объект должно быть на сайте, чтобы можно было
                кинуть эту форму лиду в переписке и он через сайт всё сделал» -->
-          <li><a href="/add-property" data-i18n="ft.addobj">Сдать или продать свой объект</a></li>
+          <li><a href="/en/add-property" data-i18n="ft.addobj">List your property</a></li>
         </ul>
       </div>
       <div>
-        <h3 data-i18n="ft.contacts">Контакты</h3>
+        <h3 data-i18n="ft.contacts">Contacts</h3>
         <ul>
           <li><a href="tel:+66955492587">+(66) 95-549-2587</a></li>
           <li><a href="mailto:info@property-library.com">info@property-library.com</a></li>
@@ -520,19 +473,19 @@ section#rent,section#sale{padding-top:10px}
         </ul>
       </div>
       <div>
-        <h3 data-i18n="ft.connect">Мы на связи</h3>
+        <h3 data-i18n="ft.connect">Stay in touch</h3>
         <ul>
-          <li><a href="https://t.me/elnurphuket_bot?start=site_footer" target="_blank" rel="noopener" data-i18n="ft.bot">Консьерж в Telegram 24/7</a></li>
-          <li><a href="https://t.me/property_library_phuket" target="_blank" rel="noopener" data-i18n="ft.tg">Telegram-канал</a></li>
+          <li><a href="https://t.me/elnurphuket_bot?start=site_footer" target="_blank" rel="noopener" data-i18n="ft.bot">Telegram concierge 24/7</a></li>
+          <li><a href="https://t.me/property_library_phuket" target="_blank" rel="noopener" data-i18n="ft.tg">Telegram channel</a></li>
           <li><a href="https://www.instagram.com/property.library.phuket/" target="_blank" rel="noopener">Instagram</a></li>
         </ul>
       </div>
     </div>
     <div class="footer-bottom">
       <span data-i18n="ft.copy">Property Library Phuket © 2022</span>
-      <a href="/privacy" data-i18n="ft.policy">Политика конфиденциальности</a>
-      <a href="/rules" data-i18n="ft.rules">Правила бронирования и проживания</a>
-      <a href="/terms" data-i18n="ft.terms">Условия использования</a>
+      <a href="/en/privacy" data-i18n="ft.policy">Privacy policy</a>
+      <a href="/en/rules" data-i18n="ft.rules">Booking and stay rules</a>
+      <a href="/en/terms" data-i18n="ft.terms">Terms of use</a>
     </div>
   </div>
 </footer>
@@ -542,11 +495,11 @@ section#rent,section#sale{padding-top:10px}
 </div><!-- /stage -->
 
 <!-- ===== CHAT WIDGET ===== -->
-<div class="fabwrap" id="fabWrap"><button type="button" class="fab" id="fab" onclick="openChat('hi')"><span class="av"><img src="img/brand/plp-mark-ink.png" alt="" width="20"></span><span class="fabtxt" data-i18n="chat.fab">Дарья · на связи</span><span class="dot"></span></button><button type="button" class="fabmin" id="fabMin" onclick="event.stopPropagation();toggleFab()" aria-label="Свернуть" title="Свернуть">×</button></div>
+<div class="fabwrap" id="fabWrap"><button type="button" class="fab" id="fab" onclick="openChat('hi')"><span class="av"><img src="img/brand/plp-mark-ink.png" alt="" width="20"></span><span class="fabtxt" data-i18n="chat.fab">Daria · online</span><span class="dot"></span></button><button type="button" class="fabmin" id="fabMin" onclick="event.stopPropagation();toggleFab()" aria-label="Свернуть" title="Свернуть">×</button></div>
 <div class="chatwin" id="chatwin" role="dialog" aria-label="Чат с менеджером">
   <div class="chathead">
     <span class="av"><img src="img/brand/plp-mark-ink.png" alt="" width="20"></span>
-    <div><b data-i18n="chat.name">Дарья</b><div class="st2"><span class="dot"></span> <span data-i18n="chat.sub">персональный менеджер · отвечает сразу</span></div></div>
+    <div><b data-i18n="chat.name">Daria</b><div class="st2"><span class="dot"></span> <span data-i18n="chat.sub">personal manager · replies right away</span></div></div>
     <button type="button" class="clr" onclick="clearChat()" title="Очистить историю">⟲</button>
     <button type="button" class="x" onclick="closeChat()" aria-label="Закрыть">×</button>
   </div>
@@ -559,7 +512,7 @@ section#rent,section#sale{padding-top:10px}
     <textarea id="chatField" rows="1" name="plp-chat-note" enterkeyhint="send"
            autocomplete="off" autocorrect="on" autocapitalize="sentences" spellcheck="true"
            data-lpignore="true" data-1p-ignore data-form-type="other"
-           data-i18n-ph="chat.placeholder" placeholder="Напишите сообщение…"
+           data-i18n-ph="chat.placeholder" placeholder="Type a message…"
            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendFree();}"></textarea>
     <button type="button" class="s" onclick="sendFree()" aria-label="Отправить">↑</button>
   </div>
@@ -568,16 +521,16 @@ section#rent,section#sale{padding-top:10px}
 <!-- ===== TRAY (favs / compare) ===== -->
 <div class="tray" id="tray">
   <span class="tmsg"></span>
-  <button type="button" class="tb ghost t-fav" style="display:none" onclick="favLead()">♥ <b>0</b> · <span data-i18n="tray.fav">Подборка</span></button>
-  <button type="button" class="tb t-cmp" style="display:none" onclick="openCompare()"><span data-i18n="tray.cmp">Сравнить</span> <b>0</b></button>
+  <button type="button" class="tb ghost t-fav" style="display:none" onclick="favLead()">♥ <b>0</b> · <span data-i18n="tray.fav">Shortlist</span></button>
+  <button type="button" class="tb t-cmp" style="display:none" onclick="openCompare()"><span data-i18n="tray.cmp">Compare</span> <b>0</b></button>
 </div>
 
 <!-- ===== COMPARE MODAL ===== -->
 <div class="modal-overlay" id="cmpModal" onclick="if(event.target===this)closeCompare()">
   <div class="cw">
-    <div class="chd"><h3 data-i18n="cmp.title">Сравнение объектов</h3><button type="button" class="cx" onclick="closeCompare()" aria-label="Закрыть">×</button></div>
+    <div class="chd"><h3 data-i18n="cmp.title">Property comparison</h3><button type="button" class="cx" onclick="closeCompare()" aria-label="Закрыть">×</button></div>
     <div class="cmp-body"></div>
-    <div class="cmp-foot"><button type="button" class="btn btn-primary btn-block" onclick="cmpLead()" data-i18n="cmp.cta">Разобрать различия с менеджером</button></div>
+    <div class="cmp-foot"><button type="button" class="btn btn-primary btn-block" onclick="cmpLead()" data-i18n="cmp.cta">Discuss the differences with a manager</button></div>
   </div>
 </div>
 
@@ -596,7 +549,7 @@ section#rent,section#sale{padding-top:10px}
     <button type="button" class="pm-share" onclick="shareProp()" aria-label="Поделиться" data-i18n-title="u.share" title="Поделиться"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.6" y1="10.5" x2="15.4" y2="6.5"></line><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"></line></svg></button>
     <button type="button" class="pm-close" onclick="closeProp()" aria-label="Закрыть">×</button>
     <div class="pm-media">
-      <div class="pm-img" id="pmImg"><span data-i18n="ph.object">фото объекта</span><div class="pm-badges"><span class="pm-tag" id="pmTag"></span><span class="pm-roi" id="pmRoi"></span></div></div>
+      <div class="pm-img" id="pmImg"><span data-i18n="ph.object">photo soon</span><div class="pm-badges"><span class="pm-tag" id="pmTag"></span><span class="pm-roi" id="pmRoi"></span></div></div>
       <div class="pm-tabs" id="pmTabs"></div>
       <div class="pm-thumbs" id="pmThumbs"></div>
     </div>

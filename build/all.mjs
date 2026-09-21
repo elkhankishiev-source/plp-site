@@ -9,7 +9,7 @@ import { execFileSync } from 'node:child_process';
    адресах отпечаток версии. Всё, что правит стили и каталог, должно отработать
    ДО него, иначе браузер оставит у людей старый файл из кэша. */
 const steps = ['mkog.mjs', 'gen.mjs', 'mkshared.mjs', 'mkpages.mjs', 'mkdistricts.mjs', 'mkextra.mjs',
-               'mkabout.mjs', 'mkoffers.mjs', 'mktheme.mjs', 'mkpreview.mjs', 'mkassets.mjs', 'mklinks.mjs'];
+               'mkabout.mjs', 'mkoffers.mjs', 'mktheme.mjs', 'mkpreview.mjs', 'mkassets.mjs', 'mken.mjs', 'mklinks.mjs'];
 for (const s of steps) {
   process.stdout.write(`— ${s}\n`);
   execFileSync('node', [`build/${s}`], { cwd: '/Users/elnurkhankishiev/plp-site', stdio: 'inherit' });
