@@ -1238,6 +1238,21 @@ function chipRow(items) {
    спален), для поиска почти дословная копия страницы проекта. Такие страницы мы
    держим для прямых ссылок клиентам, но в индекс не отдаём: одно правило и для
    canonical на странице, и для карты сайта — иначе они противоречат друг другу. */
+/* Внутренняя пометка о сделке собственника с застройщиком: «Договор подписан,
+   freehold. График платежей привязан к фазам стройки». В базе она нужна, на
+   витрине — нет: клиент выбирает жильё, а не читает чужой график платежей.
+   Правило одно на каталог и на страницы объектов: 21.09 пометка осталась в
+   структурных данных трёх страниц именно потому, что чинилось в одном месте. */
+const ВНУТРЕННЯЯ = /договор подписан|график платежей привязан|платежи привязаны к этап|задаток внесён/i;
+function убратьВнутреннее(o, parent) {
+  if (!o || !ВНУТРЕННЯЯ.test(String(o.usp || ''))) return o;
+  if (parent && parent.usp) o.usp = parent.usp;
+  else o.usp = '';
+  if (parent && parent.usp_en) o.usp_en = parent.usp_en;
+  else o.usp_en = '';
+  return o;
+}
+
 function тонкийЮнит(o, allObjects) {
   if (!o || !o.parent_object_id || !Array.isArray(allObjects)) return null;
   const родитель = allObjects.find(x => x.plp_property_id === o.parent_object_id);
@@ -2121,11 +2136,7 @@ async function main() {
        привязан к фазам стройки». Это видно было на живом сайте и клиенту витрины
        не нужно: он выбирает жильё, а не читает чужой график платежей.
        Берём описание проекта, пометка остаётся в базе для внутренней работы. */
-    const внутренняя = /договор подписан|график платежей привязан|платежи привязаны к этап/i;
-    if (внутренняя.test(String(r.usp || ''))) {
-      if (parent.usp) r.usp = parent.usp;
-      if (parent.usp_en) r.usp_en = parent.usp_en;
-    }
+    убратьВнутреннее(r, parent);
     if (!r.district) r.district = parent.district;
     if (!r.type) r.type = parent.type;
     /* 21.09: юнит наследовал от проекта только стадию и срок сдачи, а ставку — нет.
@@ -2187,6 +2198,9 @@ async function main() {
   }
   const seenPage = new Set();
   const pageList = [];
+  const поКоду = {};
+  for (const o of objects.concat(rentFull)) поКоду[o.plp_property_id] = o;
+  for (const o of rentFull) убратьВнутреннее(o, поКоду[o.parent_object_id]);
   for (const o of objects.concat(rentFull)) {
     if (!o || !o.plp_property_id || seenPage.has(o.plp_property_id)) continue;
     seenPage.add(o.plp_property_id);
