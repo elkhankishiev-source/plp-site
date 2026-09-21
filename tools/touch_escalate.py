@@ -154,7 +154,10 @@ def main():
             'scheduled_at': when,
             'phone': ph, 'channel': 'telegram', 'agent': t.get('agent') or 'owner_task',
             'occasion': t.get('occasion'), 'body': continuation(name, t.get('body'), ph),
-            'status': 'approved', 'persona': t.get('persona'),
+            # 21.09.2026: кладём ЧЕРНОВИКОМ, а не 'approved'. Иначе в кроне догон начал бы
+            # сам писать живым людям, минуя взгляд Эльнура. Его канон: первая неделя копится,
+            # тексты смотрит он. Одобрение — в кабинете, дальше WF_touch_send отправит.
+            'status': 'draft', 'persona': t.get('persona'),
             'source_persona': t.get('source_persona'),
             'source_channel_id': t.get('source_channel_id'),
             'kind': t.get('kind') or 'cold', 'step': (t.get('step') or 1),
@@ -162,7 +165,7 @@ def main():
             'note': 'догон по канону #111: в WhatsApp тишина с %s' % str(t['sent_at'])[:16]})
         made += 1
     print('\nпоставлено продолжений в Telegram: %d' % made)
-    print('отправит WF_touch_send раз в 10 минут, после привратника')
+    print('лежат ЧЕРНОВИКАМИ: отправит WF_touch_send только после одобрения')
     return 0
 
 
