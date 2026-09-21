@@ -75,6 +75,15 @@ def tg(chat_key, text):
         return False
 
 
+def без_чисел(s):
+    """Ключ дедупа не должен зависеть от счётчика в тексте.
+
+    «ждёт ответа 459 мин» и «479 мин» — это одно и то же событие, а для дедупа были
+    разными, потому что число входило в ключ. Из-за этого одно напоминание уходило
+    в группу каждые двадцать минут без конца."""
+    return ''.join('#' if c.isdigit() else c for c in s)
+
+
 def seen(key):
     try:
         d = json.load(open(SEEN))
@@ -98,6 +107,9 @@ def iso(minutes):
 # свои номера и наши же групповые чаты: это не клиенты, о них не напоминаем
 OWN = {'66954143874', '509498386', '8554364120', '66955492587', '66960169127',
        '66640709032', '8227351774',
+       # демо и тестовые номера: это не люди, напоминать о них в отдел продаж незачем
+       '66900000777', '66900000999', '66900000998', '66999000999', '66999000998',
+       '66900000000', '900000777', '66900000099',
        '5571405041',      # группа «PLP · Тех офис»
        '4664612682'}      # группа «PLP | отдел продаж»
 
@@ -251,6 +263,8 @@ def main():
         if mins > 20:
             waiting.append((ph, int(mins), (rows[-1].get('content') or '')[:70], rows[-1].get('source')))
     for ph, mins, txt, src in waiting[:6]:
+        if ph in OWN or ph.startswith('669000000') or ph.startswith('900'):
+            continue   # свой или тестовый номер, это не клиент
         # застройщика и партнёра не дёргаем и о них не напоминаем: по правилу Эльнура
         # их вообще не мучаем, ответ им не обязателен
         pr = get('/client_profiles?select=name,contact_role&or=(phone_norm.eq.%s,tg_id.eq.%s)&limit=1' % (ph, ph))
@@ -335,6 +349,8 @@ def main():
     past = get('/meetings?status=eq.' + NAZ + '&meet_at=lt.' + urllib.parse.quote(iso(90))
                + '&meet_at=gte.' + urllib.parse.quote(iso(2880)) + '&select=id,meet_at,phone_norm&limit=10')
     for m in past:
+        if str(m.get('phone_norm') or '') in OWN:
+            continue   # встреча на своём номере — это проверка, а не сделка
         pr = get('/client_profiles?select=name&or=(phone_norm.eq.%s,tg_id.eq.%s)&limit=1'
                  % (m['phone_norm'], m['phone_norm']))
         who = (pr[0].get('name') if pr and pr[0].get('name') else m['phone_norm'])
@@ -397,10 +413,10 @@ def main():
     if not SEND:
         return 0
     for line in tech:
-        if not seen('tech:' + line[:60]):
+        if not seen('tech:' + без_чисел(line[:60])):
             tg('TG_TECH_CHAT_ID', line)
     for line in sales:
-        if not seen('sales:' + line[:60]):
+        if not seen('sales:' + без_чисел(line[:60])):
             tg('TG_ALERT_CHAT_ID', line)
     return 0
 

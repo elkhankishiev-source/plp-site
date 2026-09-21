@@ -30,6 +30,14 @@ PORT = 8794
 PAGES = ['index.html', 'about.html', 'buy.html', 'rent.html', 'management.html',
          'districts/bang-tao.html', 'guide/kakaya-dohodnost.html', 'add-property.html',
          'object/heritage.html']
+# 21.09: полный круг — это 9 страниц × 2 темы × 2 ширины = 36 запусков Chrome.
+# На сборке он дважды за сутки сломался: один раз висел 16 минут, второй раз
+# машину выбило по памяти и проверка умерла по таймауту, оборвав сборку.
+# В сборке (--short) идём коротким кругом: три страницы разных шаблонов —
+# главная, раздел каталога и карточка объекта. Они покрывают всю общую вёрстку,
+# потому что остальные страницы собираются из тех же кусков. Полный круг остаётся
+# для ручного прогона: python3 tools/ui_parity.py --full
+БЫСТРЫЕ = ['index.html', 'rent.html', 'object/heritage.html']
 BAD, GOOD = 1.8, 3.0
 
 PROBE = r"""<script>
@@ -168,14 +176,26 @@ def serve():
     return srv
 
 
+def свободная_память():
+    """Свободно мегабайт. None, если измерить не вышло."""
+    try:
+        out = subprocess.run(['vm_stat'], capture_output=True, text=True, timeout=10).stdout
+        размер = int(re.search(r'page size of (\d+)', out).group(1))
+        своб = int(re.search(r'Pages free:\s+(\d+)', out).group(1))
+        неакт = int(re.search(r'Pages inactive:\s+(\d+)', out).group(1))
+        return (своб + неакт) * размер // (1024 * 1024)
+    except Exception:
+        return None
+
+
 def measure(page, width, theme):
     inner = 'http://127.0.0.1:%d/%s?theme=%s' % (PORT, page, theme)
     # headless не делает окно уже 500px — телефон меряем в рамке нужной ширины
     url, win = (inner, width) if width >= 500 else (
         'http://127.0.0.1:%d/__wrap.html?w=%d&src=%s' % (PORT, width, quote(inner, safe='')), 520)
     r = subprocess.run([CHROME, '--headless', '--disable-gpu', '--no-sandbox', '--hide-scrollbars',
-                        '--window-size=%d,900' % win, '--virtual-time-budget=14000', '--dump-dom', url],
-                       capture_output=True, text=True, timeout=240)
+                        '--window-size=%d,900' % win, '--virtual-time-budget=9000', '--dump-dom', url],
+                       capture_output=True, text=True, timeout=90)
     m = re.search(r'<pre id="__parity">(.*?)</pre>', r.stdout, re.S)
     if not m:
         return None
@@ -185,7 +205,15 @@ def measure(page, width, theme):
 
 def main():
     short = '--short' in sys.argv
-    pages = [a for a in sys.argv[1:] if a.endswith('.html')] or PAGES
+    pages = [a for a in sys.argv[1:] if a.endswith('.html')]
+    if not pages:
+        pages = PAGES if '--full' in sys.argv else (БЫСТРЫЕ if short else PAGES)
+    # Проверка поднимает браузер: на забитой памяти он не стартует и роняет прогон.
+    # Лучше честно пропустить, чем оборвать сборку на ровном месте.
+    свободно = свободная_память()
+    if свободно is not None and свободно < 400:
+        print('[вид] пропущено: свободно всего %d МБ памяти — браузер не поднять' % свободно)
+        return 0
     srv = serve()
     invisible, diverge, broken = [], [], []
     try:

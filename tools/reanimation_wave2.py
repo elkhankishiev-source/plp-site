@@ -33,9 +33,18 @@ APPLY = '--apply' in sys.argv
 SEND_N = int(sys.argv[sys.argv.index('--send') + 1]) if '--send' in sys.argv else 0
 STATUS_NOANSWER = 61429858
 CAMPAIGN = 'реанимация-не-отвечают-19.09.2026'
-# канал обязан совпадать с подписью в тексте: 73fa0d4d в channels_config значится как
-# elnur_wa_new (+66955492587). 35d237fd — это Дарья, с него «Это Эльнур» писать нельзя.
-CHANNEL = '73fa0d4d-14f2-4d2f-8d4f-45c760f4e793'   # WhatsApp Эльнура, состояние active
+# Пишет тот, кто ОТВЕТСТВЕННЫЙ за сделку в amoCRM. Иначе сторож справедливо ругается:
+# «переписку вёл Эльнур, а в CRM ответственный Дарья». И это же распределяет нагрузку
+# между каналами — Эльнур 19.09: «можно такой же формат как и мой», продажи ведут оба.
+ВЛАДЕЛЬЦЫ = {
+    10172498: dict(имя='Эльнур', персона='Эльнур',
+                   wa='73fa0d4d-14f2-4d2f-8d4f-45c760f4e793',
+                   tg='db2b55be-11da-4bc2-abcb-c8562f0fbed4'),
+    10882506: dict(имя='Дарья', персона='Дарья',
+                   wa='35d237fd-a3be-4496-886a-418dfa09c529',
+                   tg='f2a15f1d-a252-448c-a7d2-c6ee5edfb7a0'),
+}
+ПО_УМОЛЧАНИЮ = 10172498
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'wave2_final.json')
 
 # первая волна 18.09 — этим людям уже написали, повторно не трогаем
@@ -160,7 +169,13 @@ def first_name(s):
     return s.split()[0]
 
 
-def body_for(name, project, goal, city, phone=''):
+def кто_ведёт(lead):
+    """Ответственный за сделку решает, от чьего лица идёт касание и с какого канала."""
+    uid = lead.get('responsible_user_id')
+    return ВЛАДЕЛЬЦЫ.get(uid, ВЛАДЕЛЬЦЫ[ПО_УМОЛЧАНИЮ])
+
+
+def body_for(name, project, goal, city, phone='', автор='Эльнур'):
     """Первое касание: кто мы, откуда знакомы, повод, и одна вилка на выбор.
 
     Ни цен, ни объектов, ни созвона: это возобновление разговора, а не продажа.
@@ -176,35 +191,37 @@ def body_for(name, project, goal, city, phone=''):
             'За это время там поменялись цены и остатки.' % project,
             'Вы писали нам про %s на Пхукете, а разговор тогда не сложился. '
             'С тех пор по проекту сдвинулись и цены, и наличие.' % project,
-            'Вы интересовались проектом %s на Пхукете. Мы тогда друг друга потеряли, '
-            'а там с того времени многое поменялось.' % project][v]
+            'Вы интересовались проектом %s на Пхукете, но тогда мы не созвонились. '
+            'С того времени там многое поменялось.' % project][v]
     else:
         povod = [
             'Вы оставляли заявку по Пхукету, тогда мы так и не поговорили. '
             'За это время рынок заметно сдвинулся.',
             'Вы писали нам про Пхукет, а разговор тогда не сложился. '
             'С тех пор по острову изменились и цены, и условия рассрочки.',
-            'Вы интересовались Пхукетом. Мы тогда друг друга потеряли, '
-            'а рынок с того времени прилично сдвинулся.'][v]
+            'Вы интересовались Пхукетом, но тогда мы не созвонились. '
+            'Рынок с того времени прилично сдвинулся.'][v]
     low = goal.lower()
+    # Вилка короткая и без спорной интонации. «или всё-таки и для себя» читается как
+    # пререкание с человеком, а мы просто уточняем задачу (замечание Эльнура 19.09).
     if 'инвест' in low or 'аренд' in low or 'доход' in low:
-        vilka = ['Чтобы не гадать: смотрите под доход от аренды или уже и для себя тоже?',
-                 'Уточню, чтобы не гадать: это под доход или всё-таки и для себя?',
-                 'Чтобы говорить по делу: интерес под аренду или и для жизни тоже?'][v]
+        vilka = ['Скажите, сейчас смотрите под доход от аренды или для себя?',
+                 'Уточню одно: под аренду или для себя?',
+                 'Чтобы говорить по делу: под доход или для жизни?'][v]
     elif 'себя' in low or 'жизн' in low or 'прожив' in low:
-        vilka = ['Чтобы не гадать: смотрите для себя или всё же с расчётом на аренду?',
-                 'Уточню, чтобы не гадать: это для себя или с прицелом на доход?',
-                 'Чтобы говорить по делу: для жизни или всё-таки и под аренду?'][v]
+        vilka = ['Скажите, сейчас смотрите для себя или под аренду?',
+                 'Уточню одно: для жизни или под доход?',
+                 'Чтобы говорить по делу: для себя или с расчётом на аренду?'][v]
     else:
-        vilka = ['Чтобы не гадать: смотрите под доход от аренды или для себя?',
-                 'Уточню, чтобы не гадать: интерес под доход или для себя?',
+        vilka = ['Скажите, смотрите под доход от аренды или для себя?',
+                 'Уточню одно: под доход или для себя?',
                  'Чтобы говорить по делу: под аренду или для жизни?'][v]
-    return '%s Это Эльнур, Property Library Phuket. %s %s' % (hi, povod, vilka)
+    return '%s Это %s, Property Library Phuket. %s %s' % (hi, автор, povod, vilka)
 
 
 def main():
     leads = get('/crm_leads?status_id=eq.%d&is_deleted=is.false'
-                '&select=id,name,created_at_crm,updated_at_crm,custom_fields,contacts'
+                '&select=id,name,created_at_crm,updated_at_crm,custom_fields,contacts,responsible_user_id'
                 '&order=created_at_crm.desc&limit=300' % STATUS_NOANSWER)
     print('в «Не отвечают»: %d сделок' % len(leads))
 
@@ -232,7 +249,9 @@ def main():
         if ph in WAVE1:
             drop['первая волна'] = drop.get('первая волна', 0) + 1
             continue
-        rows.append(dict(lead_id=l['id'], phone=ph,
+        вед = кто_ведёт(l)
+        rows.append(dict(lead_id=l['id'], phone=ph, ведёт=вед['имя'],
+                         персона=вед['персона'], канал_wa=вед['wa'], канал_tg=вед['tg'],
                          name=clean_name(nm) or first_name(l.get('name')),
                          project=clean_project(cf(l, 'Проект')) or project_from_utm(l), goal=cf(l, 'Цель покупки'),
                          city=cf(l, 'Локация'), lang=cf(l, 'Язык'),
@@ -308,7 +327,7 @@ def main():
             continue
         r['client_code'] = cl[0].get('code')
         r['thai'] = r['phone'].startswith('66')
-        r['body'] = body_for(r['name'], r['project'], r['goal'], r['city'], r['phone'])
+        r['body'] = body_for(r['name'], r['project'], r['goal'], r['city'], r['phone'], r['персона'])
         ok.append(r)
 
     # сперва свежие: чем ближе заявка, тем теплее разговор
@@ -326,8 +345,9 @@ def main():
     print('отсеяно: %s' % ('; '.join('%s %d' % (k, v) for k, v in sorted(drop.items())) or 'никого'))
     print('к работе: %d\n' % len(ok))
     for i, r in enumerate(ok, 1):
-        print('%2d. %-12s %-14s %-16s %s%s' % (i, r['name'], r['phone'], r['project'],
-                                               r['city'][:24], '  ⚠ тайский номер' if r['thai'] else ''))
+        print('%2d. %-12s %-14s %-16s ведёт %-7s %s%s'
+              % (i, r['name'], r['phone'], r['project'][:16], r['ведёт'],
+                 r['city'][:18], '  ⚠ тайский' if r['thai'] else ''))
         print('    ' + r['body'])
     json.dump(ok, open(OUT, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     print('\nсписок записан: %s' % OUT)
@@ -352,8 +372,9 @@ def main():
             'occasion': 'реанимация: заявка по проекту %s' % (r['project'] or 'Пхукет'),
             'body': r['body'],
             'status': 'approved' if i < SEND_N else 'draft',
+            'persona': r['персона'], 'source_channel_id': r['канал_tg'],
             'scheduled_at': (start + datetime.timedelta(minutes=STEP_MIN * i)).isoformat(),
-            'persona': 'Эльнур', 'source_persona': 'elnur', 'source_channel_id': CHANNEL,
+            'source_persona': r['персона'].lower(),
             'kind': 'cold', 'step': 1, 'campaign': CAMPAIGN,
             'note': 'этап «Не отвечают», повод из заявки: %s / %s' % (r['project'], r['goal'])})
         made += 1

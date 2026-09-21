@@ -21,10 +21,31 @@ QUALITY = 80
 
 
 def creds():
+    """Ключи лежат в двух форматах: JSON и обычный КЛЮЧ=значение.
+
+    20.09.2026: инструмент умел только JSON, а файл ~/.plp_site_supabase.env —
+    это КЛЮЧ=значение. Поэтому он падал на «не нашёл ключи» и не запускался
+    ни разу, хотя сторож исправно про него напоминал.
+    """
     for p in ('/tmp/.sb', os.path.expanduser('~/.plp_site_supabase.env')):
+        if not os.path.exists(p):
+            continue
         try:
             c = json.load(open(p))
             return c['url'], c['key']
+        except Exception:
+            pass
+        try:
+            d = {}
+            for line in open(p, encoding='utf-8'):
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    k, v = line.split('=', 1)
+                    d[k.strip()] = v.strip().strip('"').strip("'")
+            url = d.get('SUPABASE_URL') or d.get('url')
+            key = d.get('SUPABASE_SERVICE_KEY') or d.get('SUPABASE_KEY') or d.get('key')
+            if url and key:
+                return url.rstrip('/'), key
         except Exception:
             continue
     sys.exit('не нашёл ключи Supabase')

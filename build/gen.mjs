@@ -407,7 +407,12 @@ function withFacts(calc, o) {
      Причина была глубже данных: расчёт цены сохранялся из ПРОШЛОЙ версии index.html
      и переживал любую правку базы. Цена на витрине жила своей жизнью месяцами.
      Из старого расчёта бережём настройки (ставки, загрузку), цену берём из базы. */
-  if (Number(o.price_from_thb) > 0) c.priceTHB = Number(o.price_from_thb);
+  /* 21.09: цена бралась из базы только когда она больше нуля, а иначе в карточке
+     оставалась прошлая — та, что перенеслась из предыдущей сборки. Цену у объекта
+     убрали, а витрина продолжала считать окупаемость по старой цифре (Gardens of
+     Eden: 7 800 000 ฿, которых в базе давно нет). Нет цены в базе — нет цены и в
+     расчёте: пусть блок честно скажет «по запросу», чем соврёт числом. */
+  c.priceTHB = Number(o.price_from_thb) > 0 ? Number(o.price_from_thb) : 0;
   let buildYears = 0;
   if (o.handover_date) {
     const months = (new Date(o.handover_date) - new Date()) / (1000 * 60 * 60 * 24 * 30.44);
@@ -2060,6 +2065,18 @@ async function main() {
     if (!parent) continue;
     if (!r.stage) r.stage = parent.stage;
     if (!r.handover_date) r.handover_date = parent.handover_date;
+    /* 21.09: юнит наследовал от проекта только стадию и срок сдачи, а ставку — нет.
+       Из 45 карточек аренды без своей цены у 26 цена лежала строкой выше, у проекта:
+       «Эстелла 100-180 тыс ฿/мес», «Кабала 120-220», «Легендари 35-65». Человек
+       видел «цена по запросу» там, где цифра была у нас в базе, и уходил.
+       Берём ставку проекта и помечаем её как проектную: это честный диапазон
+       комплекса, а не выдуманная цена конкретной квартиры. */
+    if (!r.rent_price_month_thb && !r.season_rates && !r.nightly_rates) {
+      if (parent.season_rates) { r.season_rates = parent.season_rates; r.rate_from_parent = true; }
+      else if (parent.rent_price_month_thb) {
+        r.rent_price_month_thb = parent.rent_price_month_thb; r.rate_from_parent = true;
+      }
+    }
   }
   const rentList = buildRentals(rentals, rentPreserve, ratesBy);
   // 30.08: пока в аренде нет объектов с on_site=true — показываем штатную карточку
