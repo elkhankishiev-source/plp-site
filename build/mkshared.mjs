@@ -84,11 +84,22 @@ console.log('всего вставок:', total);
   if (!fs.existsSync(apPath)) return;
   const idx = fs.readFileSync(idxPath, 'utf8');
   const ap = fs.readFileSync(apPath, 'utf8');
-  const S = '/* PLP:AUTO-CATALOG:START', E = 'PLP:AUTO-CATALOG:END';
-  const i = idx.indexOf(S), e = idx.indexOf(E);
-  const j = ap.indexOf(S), k = ap.indexOf(E);
-  if (i < 0 || e < 0 || j < 0 || k < 0) return;
-  const block = idx.slice(i, idx.indexOf('*/', e) + 2);
-  const out = ap.slice(0, j) + block + ap.slice(ap.indexOf('*/', k) + 2);
-  if (out !== ap) { fs.writeFileSync(apPath, out); console.log('add-property.html: каталог обновлён из общего файла'); }
+  /* 21.09: синхронизировался только каталог ПРОДАЖИ, а блок аренды в анкете
+     застыл с прошлой весны. Там остались внутренние коды с номерами вилл
+     (PLP-MANOR-S14, PLP-ESTELLA-A24) и мёртвые адреса фото на Supabase, хотя
+     анкета открыта для индексации. Обновляем оба блока. */
+  let out = ap, обновлено = [];
+  for (const [S, E, имя] of [['/* PLP:AUTO-CATALOG:START', 'PLP:AUTO-CATALOG:END', 'продажа'],
+                             ['/* PLP:AUTO-RENTALS:START', 'PLP:AUTO-RENTALS:END', 'аренда']]) {
+    const i = idx.indexOf(S), e = idx.indexOf(E);
+    const j = out.indexOf(S), k = out.indexOf(E);
+    if (i < 0 || e < 0 || j < 0 || k < 0) continue;
+    const block = idx.slice(i, idx.indexOf('*/', e) + 2);
+    const стало = out.slice(0, j) + block + out.slice(out.indexOf('*/', k) + 2);
+    if (стало !== out) { out = стало; обновлено.push(имя); }
+  }
+  if (out !== ap) {
+    fs.writeFileSync(apPath, out);
+    console.log('add-property.html: каталог обновлён из общего файла —', обновлено.join(' и '));
+  }
 })();
