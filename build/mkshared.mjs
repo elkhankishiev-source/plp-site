@@ -53,7 +53,7 @@ function apply(file, variant) {
      ведут к разделам, а в кабинете и анкете таких разделов нет — ссылки были мёртвыми.
      Якорь, которого на странице нет, ведём на главную к этому разделу. */
   let fixed = 0;
-  html = html.replace(/href="#([a-zA-Z][\w-]*)"/g, (all, id) => {
+  if (!file.endsWith('.css')) html = html.replace(/href="#([a-zA-Z][\w-]*)"/g, (all, id) => {
     if (html.includes('id="' + id + '"')) return all;
     fixed++;
     return id === 'top' ? 'href="/"' : 'href="/#' + id + '"';
@@ -64,8 +64,10 @@ function apply(file, variant) {
 }
 
 /* у анкеты и страницы управления своя вёрстка без подвала — им отдаём шапку и меню */
+/* 20.09: стили витрины переехали в assets/app.css (build/mkassets.mjs). Общий
+   блок интерфейса живёт по тем же маркерам, только уже не внутри страницы. */
 const targets = [['index.html', 'site'], ['owner.html', 'cabinet'],
-                 ['add-property.html', 'site']];
+                 ['add-property.html', 'site'], ['assets/app.css', 'site']];
 let total = 0;
 for (const [f, v] of targets) {
   if (!fs.existsSync(path.join(ROOT, f))) continue;
@@ -76,7 +78,8 @@ console.log('всего вставок:', total);
 /* 16.09: add-property.html носит копию каталога и раньше застывала — в ней месяцами
    жили старые цены и ссылки на фото с сайта застройщика. Держим копию свежей. */
 (function syncAddPropCatalog(){
-  const idxPath = path.join(ROOT, 'index.html');
+  const catPath = path.join(ROOT, 'assets/catalog.js');
+  const idxPath = fs.existsSync(catPath) ? catPath : path.join(ROOT, 'index.html');
   const apPath = path.join(ROOT, 'add-property.html');
   if (!fs.existsSync(apPath)) return;
   const idx = fs.readFileSync(idxPath, 'utf8');
@@ -87,5 +90,5 @@ console.log('всего вставок:', total);
   if (i < 0 || e < 0 || j < 0 || k < 0) return;
   const block = idx.slice(i, idx.indexOf('*/', e) + 2);
   const out = ap.slice(0, j) + block + ap.slice(ap.indexOf('*/', k) + 2);
-  if (out !== ap) { fs.writeFileSync(apPath, out); console.log('add-property.html: каталог обновлён из index.html'); }
+  if (out !== ap) { fs.writeFileSync(apPath, out); console.log('add-property.html: каталог обновлён из общего файла'); }
 })();

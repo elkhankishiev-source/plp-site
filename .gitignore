@@ -20,3 +20,10 @@ build/prices_last_check.json
 tools/link_units.py
 tools/sql/
 tools/ocr/plpocr
+
+# 21.09.2026: tools/wave2_final.json лежал в репозитории с телефонами, именами и
+# городами десяти клиентов — и отдавался по property-library.com/tools/... Попал
+# туда случайной общей добавкой. Рабочие выгрузки сюда не кладём вообще: имена
+# файлов заранее не угадать, поэтому закрыт весь разряд.
+tools/*.json
+!tools/price_rules.json
