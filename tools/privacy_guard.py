@@ -27,7 +27,17 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PUBLIC_TEXT = ('name', 'usp', 'usp_en', 'availability', 'stage_note', 'ai_pitch_hook',
                'ai_story', 'rent_rules', 'good_for', 'current_promo')
 # номер квартиры: «A11», «F-302», «2205», «S17» — но не год и не площадь
-UNIT = re.compile(r'(?<![\w-])([A-Z]{1,2}[\s-]?\d{2,4}|\d{4})(?![\w%-])')
+# 21.09: было \d{2,4} — минимум две цифры. Из-за этого сторож год молчал про восемь
+# живых страниц /object/qabalah-m1 … -f5: номера вилл Кабалы ОДНОЗНАЧНЫЕ (M-1, F-2)
+# и проходили сквозь фильтр. Теперь ловим и одну цифру.
+# Номер юнита опасен в двух видах: «M-1», «F 2» (буква, разделитель, цифры) и
+# «C408», «I503» (буква и не меньше двух цифр слитно). Слитная буква с ОДНОЙ
+# цифрой — это почти всегда тип планировки или корпус парковки («тип A1»,
+# «P1 7 этажей»), и ловить её нельзя: сторож утонет в своём же шуме.
+UNIT = re.compile(r'(?<![\w-])([A-Z]{1,2}-\d{1,4}|[A-Z]{1,2}\d{2,4}|\d{4})(?![\w%-])')
+# Наши собственные псевдонимы юнитов (U1…U9, R1…R3) — это и есть маска вместо
+# настоящего номера, ругаться на них нельзя, иначе сторож утонет в своём же шуме.
+ПСЕВДОНИМ = re.compile(r'^[UR][\s-]?\d{1,2}$')
 YEAR = re.compile(r'^(19|20)\d\d$')
 PHONE = re.compile(r'(?<!\d)(?:\+?\d[\s()-]?){9,}\d')
 MAIL = re.compile(r'[\w.+-]+@[\w-]+\.[a-z]{2,}', re.I)
@@ -48,12 +58,20 @@ def sb(q):
     return json.loads(urllib.request.urlopen(r, timeout=60).read())
 
 
+# Внутренний код с номером юнита в адресе: …/PLP-VIVI-A507/… или public_code
+# «PLP-QABALAH-M1». Псевдонимы U1/R2 — это маска, они здесь не ловятся.
+ВНУТРЕННИЙ_НОМЕР = re.compile(r'PLP-[A-Z0-9]+-((?![UR]\d{1,2}(?![\dA-Z]))[A-Z]{1,2}-?\d{1,4})(?![\dA-Z])')
+
+
 def unit_no(text):
     """Номер квартиры в тексте, если это действительно номер, а не год и не метраж."""
     for m in UNIT.finditer(text or ''):
         v = m.group(1)
-        if YEAR.match(v.replace('-', '').replace(' ', '')):
+        плоско = v.replace('-', '').replace(' ', '')
+        if YEAR.match(плоско):
             continue
+        if ПСЕВДОНИМ.match(плоско):
+            continue          # U1, R2 — наша маска, а не номер застройщика
         yield v
 
 
@@ -77,12 +95,33 @@ def main():
     try:
         objs = sb('objects?select=plp_property_id,name,public_code,purpose,on_site,parent_object_id,'
                   'owner_ref,usp,usp_en,availability,stage_note,ai_pitch_hook,ai_story,rent_rules,'
-                  'good_for,current_promo&limit=500')
+                  'good_for,current_promo,main_image_url,gallery_urls&limit=500')
     except Exception as ex:
         print('[личные данные] база не ответила:', str(ex)[:110])
         return 0
     names = people()
     bad = []
+
+    # 21.09: сторож смотрел только в тексты карточки и не видел АДРЕСА. А номер
+    # юнита светится ещё в двух местах: в публичном коде (из него строится адрес
+    # страницы) и в пути к фотографии. Пример: страница называется /object/vivi-r5,
+    # то есть замаскирована, а каждая её картинка лежит по адресу
+    # …/objects/PLP-VIVI-A507/interior/… — и номер квартиры уезжает в мессенджер
+    # вместе со ссылкой на превью.
+    for o in objs:
+        if not o.get('on_site'):
+            continue
+        pid = o['plp_property_id']
+        код = str(o.get('public_code') or '')
+        if код and ВНУТРЕННИЙ_НОМЕР.search(код):
+            bad.append((pid, 'public_code', 'номер юнита в адресе страницы «%s»' % код))
+        кадры = list(o.get('gallery_urls') or [])
+        if o.get('main_image_url'):
+            кадры.append(o['main_image_url'])
+        засвет = {m.group(1) for u in кадры for m in [ВНУТРЕННИЙ_НОМЕР.search(str(u))] if m}
+        if засвет:
+            bad.append((pid, 'фото', 'номер юнита в пути к снимкам: %s (кадров %d)'
+                        % (', '.join(sorted(засвет)), len(кадры))))
     for o in objs:
         pid = o['plp_property_id']
         is_unit = bool(o.get('parent_object_id') or o.get('owner_ref')
