@@ -1000,6 +1000,12 @@ function buildRentals(objects, preserve, ratesBy) {
       bmax: (o.bedrooms_max === 0 || o.bedrooms_max) ? o.bedrooms_max : null,
       area: areaLabel(o),
       tag: rentTag(o),
+      /* 21.09: карточка аренды выглядела беднее карточки продажи, потому что у
+         неё не было тех же полей. Застройщик у юнита свой не заполнен — берём у
+         проекта; расстояние до моря лежало под именем beach_m и на витрину не
+         попадало вовсе. */
+      developer: shortDev(o.developer) || null,
+      beachM: (o.distance_beach_m === 0 || o.distance_beach_m) ? Number(o.distance_beach_m) : null,
       /* дата старта продаж — справочно: группу она не меняет (см. saleGroup) */
       saleStart: o.sale_started_on || null,
       /* короткая приписка к стадии: «сдан в декабре 2025», «2 октября —
@@ -2007,7 +2013,7 @@ async function main() {
   const rentals = await sbGet(env,
     'objects?select=plp_property_id,name,district,beach,purpose,type,bedrooms,bedrooms_min,' +
     'bedrooms_max,area_sqm,area_min,area_max,min_stay,deposit,rent_included,rent_excluded,' +
-    'rent_rules,amenities,usp,usp_en,distance_beach_m,on_site,lat,lng,coord_source,last_synced_at,public_code,' +
+    'rent_rules,amenities,usp,usp_en,distance_beach_m,on_site,lat,lng,coord_source,last_synced_at,public_code,developer,' +
     'main_image_url,gallery_urls,photo_groups,unit_types,price_tiers,season_rates,rent_price_month_thb,' +
     'stage,stage_note,sale_started_on,handover_date,parent_object_id' +
     '&and=(or(purpose.eq.' + encodeURIComponent('аренда') + ',purpose.eq.rent),' +
@@ -2065,6 +2071,8 @@ async function main() {
     if (!parent) continue;
     if (!r.stage) r.stage = parent.stage;
     if (!r.handover_date) r.handover_date = parent.handover_date;
+    if (!r.developer) r.developer = parent.developer;
+    if (r.distance_beach_m == null) r.distance_beach_m = parent.distance_beach_m;
     /* 21.09: юнит наследовал от проекта только стадию и срок сдачи, а ставку — нет.
        Из 45 карточек аренды без своей цены у 26 цена лежала строкой выше, у проекта:
        «Эстелла 100-180 тыс ฿/мес», «Кабала 120-220», «Легендари 35-65». Человек
