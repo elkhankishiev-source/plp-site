@@ -70,13 +70,17 @@ def last_question(body):
 
 
 def continuation(name, body, phone):
-    """Продолжение, а не новое знакомство: ни «здравствуйте», ни представления заново."""
+    """Переход в Telegram по формуле Эльнура 19.09.2026: «мол писал вам на ватсап, но
+    там к сожалению не получил ответа, продолжаю в тг».
+
+    Не новое знакомство: ни «здравствуйте», ни представления заново. Говорим прямо, что
+    это продолжение, и повторяем СВОЙ ЖЕ вопрос — человек должен узнать разговор."""
     v = sum(ord(c) for c in (phone or 'x')) % 3
     who = (name + ', ') if name else ''
     lead = [
-        '%sпишу сюда, вдруг в Telegram удобнее.' % who,
-        '%sдублирую в Telegram, чтобы не потерялось.' % who,
-        '%sперехожу сюда, в WhatsApp могло не дойти.' % who,
+        '%sписал вам в WhatsApp, но ответа там, к сожалению, не получил. Продолжу здесь.' % who,
+        '%sнаписал вам в WhatsApp и, похоже, не дошло. Пишу в Telegram, так надёжнее.' % who,
+        '%sв WhatsApp ответа не было, возможно неудобный канал. Тогда здесь.' % who,
     ][v]
     if not name:
         lead = lead[0].upper() + lead[1:]
@@ -126,9 +130,28 @@ def main():
         print('\nЭто отчёт. Поставить в очередь: --apply')
         return 0
 
+    def рабочее_время():
+        """Ближайшее время в окне 11:00–21:00 по Пхукету.
+
+        Без этого догон уходил бы сразу: касание в WhatsApp в 17:00 плюс шесть часов
+        молчания — это 23:00, ночь. Разбудить человека ночью значит получить не ответ,
+        а раздражение и жалобу на спам."""
+        сейчас = datetime.datetime.now(datetime.timezone.utc)
+        пхукет = сейчас + datetime.timedelta(hours=7)
+        if пхукет.hour < 11:
+            цель = пхукет.replace(hour=11, minute=0, second=0, microsecond=0)
+        elif пхукет.hour >= 21:
+            цель = (пхукет + datetime.timedelta(days=1)).replace(hour=11, minute=0,
+                                                                 second=0, microsecond=0)
+        else:
+            return сейчас.isoformat()
+        return (цель - datetime.timedelta(hours=7)).isoformat()
+
+    when = рабочее_время()
     made = 0
     for t, ph, name in plan:
         call('/touch_queue', 'POST', {
+            'scheduled_at': when,
             'phone': ph, 'channel': 'telegram', 'agent': t.get('agent') or 'owner_task',
             'occasion': t.get('occasion'), 'body': continuation(name, t.get('body'), ph),
             'status': 'approved', 'persona': t.get('persona'),

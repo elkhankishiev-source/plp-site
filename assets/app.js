@@ -2325,6 +2325,17 @@ function payPlanHTML(p){
 }
 function calcHTML(p){
   var c=p.calc,S=c.seasons;
+  /* 21.09: калькулятор открывался и тогда, когда цены у объекта нет. У Gardens
+     of Eden цену убрали из базы, а в расчёт тянулась прошлогодняя — 7,8 млн ฿:
+     карточка честно писала «по запросу», а рядом считалась окупаемость по
+     цифре, которой не существует. У Qabalah и Eden Lake в расчёт шёл ноль.
+     Без цены считать нечего — говорим об этом прямо. */
+  if(!(c && c.priceTHB > 0)){
+    return '<div class="calc-none" style="margin-top:14px;padding:14px 16px;border-radius:12px;'+
+      'background:rgba(var(--ink-rgb),.05);color:var(--muted);font-size:.92rem">'+
+      'Расчёт доходности появится, когда застройщик подтвердит цену. '+
+      'Напишите нам — пришлём актуальный прайс и посчитаем под вашу задачу.</div>';
+  }
   function d(v,dflt){return v!=null?v:dflt;}
   function fld(id,label,val,step){return '<div class="fld"><label>'+label+'</label><input id="'+id+'" type="number" '+(step?('step="'+step+'" '):'')+'value="'+val+'"></div>';}
   function grp(title,inner){return '<div class="calc-grp"><div class="gh">'+title+'</div>'+inner+'</div>';}

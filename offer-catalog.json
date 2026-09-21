@@ -282,17 +282,17 @@
    "name": "The BALCONY Nai Yang",
    "district": "Най Янг",
    "type": "Кондо",
-   "price_from": 6082545,
+   "price_from": 5742030,
    "units": [
     {
      "beds": 1,
      "code": null,
-     "free": 10,
+     "free": 1,
      "name": "1 спальня",
      "area_sqm": 33,
-     "price_from_thb": 6082545,
+     "price_from_thb": 5742030,
      "area": 33,
-     "from": 6082545
+     "from": 5742030
     },
     {
      "beds": 1,
@@ -2058,17 +2058,17 @@
    "name": "The Title Sierra",
    "district": "Банг Тао",
    "type": "Кондо",
-   "price_from": 2906700,
+   "price_from": 3145400,
    "units": [
     {
      "beds": 1,
-     "code": "1BS",
-     "free": 71,
+     "code": null,
+     "free": 69,
      "name": "1 спальня",
      "area_sqm": 28.5,
-     "price_from_thb": 2906700,
+     "price_from_thb": 3145400,
      "area": 28.5,
-     "from": 2906700
+     "from": 3145400
     },
     {
      "beds": 1,
@@ -2083,7 +2083,7 @@
     {
      "beds": 1,
      "code": "1BP",
-     "free": 53,
+     "free": 52,
      "name": "1 спальня",
      "area_sqm": 44,
      "price_from_thb": 5350800,
