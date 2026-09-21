@@ -111,7 +111,7 @@ ru: {
   "u.wa":"Написать в WhatsApp","wa.hi":"Здравствуйте! Интересует объект:","wa.hi2":"Здравствуйте! Хочу подобрать объект на Пхукете.","wa.price":"Цена на сайте:","wa.dates":"Даты:","wa.link":"Ссылка:","wa.seen":"Смотрел на сайте:",
   "nav.pick":"Подобрать объект","nav.chat":"Чат с консультантом","f.any":"Любая цена","f.reset":"сбросить","u.upto":"до","map.list":"Объекты на карте","zone.budget":"Ваш бюджет","zone.all":"все районы","u.units":"Что можно купить","u.unitsRent":"Что можно снять","u.plot":"Участок","u.areaHouse":"Площадь дома","u.similar":"Похожие объекты","u.allphotos":"Все","u.progress":"Ход строительства","u.progressAll":"общая готовность по данным застройщика","stay.wait":"Считаем…","stay.nights":"ночей","stay.pernight":" за ночь","stay.off":"скидка за срок","stay.none":"Цена на эти даты — по запросу. Оставьте заявку, ответим точной суммой в течение дня.",
   "assist.lab":"Консультант","assist.h2":"Не уверены, что подходит именно вам?","assist.p":"Спросите Дарью прямо здесь, в чате на сайте. Она знает базу, считает доходность и сравнивает районы — отвечает сразу, в любое время. Что-то сложное передаст менеджеру.","assist.cta":"Задать вопрос в чате","assist.wa":"Подобрать за 10 минут","assist.q1s":"Что купить на 5 млн ฿?","assist.q1":"Что можно купить на 5 млн ฿?","assist.q2s":"Где выше доходность?","assist.q2":"В каком районе выше доходность аренды?","assist.q3s":"Чем Банг Тао лучше Раваи?","assist.q3":"Чем Банг Тао лучше Раваи для инвестиций?","assist.q4s":"Сколько выйдет с налогами?","assist.q4":"Какие расходы при покупке кроме цены объекта?",
-  "u.from":"от","u.onreq":"цена по запросу","u.night":"за ночь","u.month":"в месяц","rent.f.nolimit":"без ограничения","rent.f.budget":"Бюджет","rent.minnights":"от {n} ночей","rent.noprice":"цена по запросу","rent.soon":"сдача {d} · аренда откроется после сдачи","rent.lvl.market":"ориентир по объявлениям","rent.lvl.owner":"ставка по проекту","u.calc":"Рассчитать доходность","u.cmp":"Сравнить","u.cmpOn":"В сравнении",
+  "u.from":"от","u.onreq":"цена по запросу","u.night":"за ночь","u.month":"в месяц","rent.f.nolimit":"без ограничения","rent.f.budget":"Бюджет","rent.minnights":"от {n} ночей","rent.noprice":"цена по запросу","rent.soon":"сдача {d} · аренда откроется после сдачи","rent.lvl.market":"ориентир по объявлениям","rent.lvl.owner":"ставка по проекту","rent.lvl.district":"ориентир по району, не цена объекта","u.calc":"Рассчитать доходность","u.cmp":"Сравнить","u.cmpOn":"В сравнении",
   "u.roinote":"Ориентировочно; потенциал зависит от объекта, стратегии и управления — рассчитаем индивидуально",
   "u.view":"Записаться на показ","u.podborka":"Получить подборку","u.kp":"Получить КП",
   "u.share":"Поделиться","u.copied":"Ссылка скопирована","u.copyfail":"Не удалось скопировать — ссылка в адресной строке",
@@ -288,7 +288,7 @@ en: {
   "u.wa":"Message on WhatsApp","wa.hi":"Hello! I am interested in:","wa.hi2":"Hello! I would like help choosing a property in Phuket.","wa.price":"Price on the site:","wa.dates":"Dates:","wa.link":"Link:","wa.seen":"Viewed on the site:",
   "nav.pick":"Find me a property","nav.chat":"Chat with a consultant","f.any":"Any price","f.reset":"reset","u.upto":"up to","map.list":"Properties on the map","zone.budget":"Your budget","zone.all":"all areas","u.units":"What you can buy","u.unitsRent":"What you can rent","u.plot":"Plot","u.areaHouse":"House area","u.similar":"Similar properties","u.allphotos":"All","u.progress":"Construction progress","u.progressAll":"overall readiness per the developer","stay.wait":"Calculating…","stay.nights":"nights","stay.pernight":" per night","stay.off":"length-of-stay discount","stay.none":"Price for these dates is on request. Leave a request and we will come back with the exact figure the same day.",
   "assist.lab":"Assistant","assist.h2":"Not sure what suits you?","assist.p":"Ask Daria right here, in the chat on this page. She knows the catalogue, works out the yield and compares districts — answers straight away, any time. Anything complex goes to a manager.","assist.cta":"Ask in the chat","assist.wa":"Find me a match in 10 minutes","assist.q1s":"What can I get for ฿5M?","assist.q1":"What can I buy for ฿5 million?","assist.q2s":"Where is the yield higher?","assist.q2":"Which district has the higher rental yield?","assist.q3s":"Bang Tao or Rawai?","assist.q3":"Why is Bang Tao better than Rawai for investment?","assist.q4s":"What about taxes?","assist.q4":"What costs come on top of the price?",
-  "u.from":"from","u.onreq":"price on request","u.night":"per night","u.month":"per month","rent.f.nolimit":"no upper limit","rent.f.budget":"Budget","rent.minnights":"from {n} nights","rent.noprice":"price on request","rent.soon":"handover {d} · rentals open after handover","rent.lvl.market":"market benchmark","rent.lvl.owner":"project rate","u.calc":"Calculate the yield","u.cmp":"Compare","u.cmpOn":"Comparing",
+  "u.from":"from","u.onreq":"price on request","u.night":"per night","u.month":"per month","rent.f.nolimit":"no upper limit","rent.f.budget":"Budget","rent.minnights":"from {n} nights","rent.noprice":"price on request","rent.soon":"handover {d} · rentals open after handover","rent.lvl.market":"market benchmark","rent.lvl.owner":"project rate","rent.lvl.district":"district benchmark, not the unit price","u.calc":"Calculate the yield","u.cmp":"Compare","u.cmpOn":"Comparing",
   "u.roinote":"Indicative; potential depends on the unit, strategy and management — we calculate it individually",
   "u.view":"Book a viewing","u.podborka":"Get a shortlist","u.kp":"Get the offer",
   "u.share":"Share","u.copied":"Link copied","u.copyfail":"Couldn't copy — link is in the address bar",
@@ -1141,8 +1141,21 @@ function rentSoonText(p){
 }
 function rentPriceHTML(p){
   var n=rentRate(p,'night'), m=rentRate(p,'month');
-  /* дом ещё строится — снять нельзя ни за какие деньги, так и пишем */
-  if(p.notReady) return '<span class="pdate">'+rentSoonText(p)+'</span>';
+  /* Дом ещё строится — снять сегодня нельзя, и раньше карточка на этом и
+     заканчивалась: человек видел только «аренда откроется после сдачи» и уходил,
+     не понимая порядка цен. Эльнур 21.09: «надо ставить примерную цену по
+     характерному объекту, который уже работает в этой же локации». Показываем
+     ориентир района и рядом честно пишем, что это ориентир и что заехать можно
+     после сдачи. */
+  if(p.notReady){
+    var mo=rentRate(p,'month');
+    if(!mo) return '<span class="pdate">'+rentSoonText(p)+'</span>';
+    var moTop=rentRateTop(p,'month');
+    return (moTop&&moTop>mo ? fmtBaht(mo)+' — '+fmtBaht(moTop) : t('u.from')+' '+fmtBaht(mo))+
+           ' <small>'+t('u.month')+'</small>'+
+           '<span class="pdate rlvl">'+t('rent.lvl.district')+'</span>'+
+           '<span class="pdate">'+rentSoonText(p)+'</span>';
+  }
   if(!n && !m) return '<span>'+t('u.onreq')+'</span>';
   var nTop=rentRateTop(p,'night'), mTop=rentRateTop(p,'month');
   var main = n
@@ -1157,7 +1170,7 @@ function rentPriceHTML(p){
   if(!extra && p.minNights) extra='<span class="pdate">'+t('rent.minnights').replace('{n}',p.minNights)+'</span>';
   /* честно говорим, откуда цена: факт по нашим договорам подписи не требует,
      а ориентир по чужим объявлениям — обязан её иметь */
-  if(p.rateLevel==='market' || p.rateLevel==='owner'){
+  if(p.rateLevel==='market' || p.rateLevel==='owner' || p.rateLevel==='district'){
     var when=p.rateAsOf?(' · '+String(p.rateAsOf).slice(0,7).split('-').reverse().join('.')):'';
     extra+='<span class="pdate rlvl">'+t('rent.lvl.'+p.rateLevel)+when+'</span>';
   }
