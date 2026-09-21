@@ -53,7 +53,7 @@ function apply(file, variant) {
      ведут к разделам, а в кабинете и анкете таких разделов нет — ссылки были мёртвыми.
      Якорь, которого на странице нет, ведём на главную к этому разделу. */
   let fixed = 0;
-  if (!file.endsWith('.css')) html = html.replace(/href="#([a-zA-Z][\w-]*)"/g, (all, id) => {
+  html = html.replace(/href="#([a-zA-Z][\w-]*)"/g, (all, id) => {
     if (html.includes('id="' + id + '"')) return all;
     fixed++;
     return id === 'top' ? 'href="/"' : 'href="/#' + id + '"';
@@ -64,10 +64,8 @@ function apply(file, variant) {
 }
 
 /* у анкеты и страницы управления своя вёрстка без подвала — им отдаём шапку и меню */
-/* 20.09: стили витрины переехали в assets/app.css (build/mkassets.mjs). Общий
-   блок интерфейса живёт по тем же маркерам, только уже не внутри страницы. */
 const targets = [['index.html', 'site'], ['owner.html', 'cabinet'],
-                 ['add-property.html', 'site'], ['assets/app.css', 'site']];
+                 ['add-property.html', 'site']];
 let total = 0;
 for (const [f, v] of targets) {
   if (!fs.existsSync(path.join(ROOT, f))) continue;
@@ -78,28 +76,16 @@ console.log('всего вставок:', total);
 /* 16.09: add-property.html носит копию каталога и раньше застывала — в ней месяцами
    жили старые цены и ссылки на фото с сайта застройщика. Держим копию свежей. */
 (function syncAddPropCatalog(){
-  const catPath = path.join(ROOT, 'assets/catalog.js');
-  const idxPath = fs.existsSync(catPath) ? catPath : path.join(ROOT, 'index.html');
+  const idxPath = path.join(ROOT, 'index.html');
   const apPath = path.join(ROOT, 'add-property.html');
   if (!fs.existsSync(apPath)) return;
   const idx = fs.readFileSync(idxPath, 'utf8');
   const ap = fs.readFileSync(apPath, 'utf8');
-  /* 21.09: синхронизировался только каталог ПРОДАЖИ, а блок аренды в анкете
-     застыл с прошлой весны. Там остались внутренние коды с номерами вилл
-     (PLP-MANOR-S14, PLP-ESTELLA-A24) и мёртвые адреса фото на Supabase, хотя
-     анкета открыта для индексации. Обновляем оба блока. */
-  let out = ap, обновлено = [];
-  for (const [S, E, имя] of [['/* PLP:AUTO-CATALOG:START', 'PLP:AUTO-CATALOG:END', 'продажа'],
-                             ['/* PLP:AUTO-RENTALS:START', 'PLP:AUTO-RENTALS:END', 'аренда']]) {
-    const i = idx.indexOf(S), e = idx.indexOf(E);
-    const j = out.indexOf(S), k = out.indexOf(E);
-    if (i < 0 || e < 0 || j < 0 || k < 0) continue;
-    const block = idx.slice(i, idx.indexOf('*/', e) + 2);
-    const стало = out.slice(0, j) + block + out.slice(out.indexOf('*/', k) + 2);
-    if (стало !== out) { out = стало; обновлено.push(имя); }
-  }
-  if (out !== ap) {
-    fs.writeFileSync(apPath, out);
-    console.log('add-property.html: каталог обновлён из общего файла —', обновлено.join(' и '));
-  }
+  const S = '/* PLP:AUTO-CATALOG:START', E = 'PLP:AUTO-CATALOG:END';
+  const i = idx.indexOf(S), e = idx.indexOf(E);
+  const j = ap.indexOf(S), k = ap.indexOf(E);
+  if (i < 0 || e < 0 || j < 0 || k < 0) return;
+  const block = idx.slice(i, idx.indexOf('*/', e) + 2);
+  const out = ap.slice(0, j) + block + ap.slice(ap.indexOf('*/', k) + 2);
+  if (out !== ap) { fs.writeFileSync(apPath, out); console.log('add-property.html: каталог обновлён из index.html'); }
 })();
