@@ -420,10 +420,34 @@ PL.DISTRICTS=[
 ];
 
 /* ===== LANG STATE ===== */
-PL.lang=(function(){try{return localStorage.getItem('pl_lang')||'ru';}catch(e){return 'ru';}})();
+/* 21.09: язык страницы теперь может задать сама страница — английские копии в
+   /en/ ставят window.__PL_LANG. Полагаться только на localStorage нельзя:
+   посетитель приходит на английский адрес из поиска с пустым хранилищем, и
+   витрина перерисовывала всё обратно по-русски. Выбор человека (кнопка RU/EN)
+   по-прежнему главнее: он и пишется в localStorage. */
+PL.lang=(function(){
+  try{ var v=localStorage.getItem('pl_lang'); if(v==='ru'||v==='en') return v; }catch(e){}
+  try{ if(window.__PL_LANG==='en'||window.__PL_LANG==='ru') return window.__PL_LANG; }catch(e){}
+  return 'ru';
+})();
 document.addEventListener('DOMContentLoaded',function(){ try{ setCur(PL.cur); }catch(e){} });
 function t(k){var d=PL.I18N[PL.lang]||PL.I18N.ru;return d[k]!=null?d[k]:(PL.I18N.ru[k]!=null?PL.I18N.ru[k]:k);}
 function loc(o){return (o&&(o[PL.lang]||o.ru))||'';}
+
+/* Название объекта приходит из базы по-русски: «AYANA Heights · квартира (U3)»,
+   «Villa Estella · вилла, 3 спальни». Английского имени в данных нет, и заводить
+   второе поле ради двух служебных слов незачем: в CRM и офферах имя должно
+   остаться прежним. На английской версии переводим только эти слова. */
+var СЛУЖЕБНЫЕ=[[/·\s*квартира\s*\(/g,'· apartment ('],[/·\s*вилла,\s*/g,'· villa, '],
+  [/·\s*вилла\s*\(/g,'· villa ('],[/·\s*квартира\b/g,'· apartment'],[/·\s*вилла\b/g,'· villa'],
+  [/(\d+)\s*спальни\b/g,'$1 bedrooms'],[/(\d+)\s*спальня\b/g,'$1 bedroom'],
+  [/(\d+)\s*спален\b/g,'$1 bedrooms'],[/,\s*Таланг\b/g,', Thalang'],[/,\s*Пхукет\b/g,', Phuket']];
+function titleOf(p){
+  var t=(p&&p.title)||'';
+  if(PL.lang!=='en') return t;
+  for(var i=0;i<СЛУЖЕБНЫЕ.length;i++) t=t.replace(СЛУЖЕБНЫЕ[i][0],СЛУЖЕБНЫЕ[i][1]);
+  return t;
+}
 
 function applyI18n(){
   document.querySelectorAll('[data-i18n]').forEach(function(el){el.innerHTML=t(el.getAttribute('data-i18n'));});
@@ -1085,8 +1109,15 @@ function priceLine(p){
 function priceAge(p){
   var out='';
   if(p.avail!=null){
-    var n=p.avail, w=(n%10===1&&n%100!==11)?'вариант':((n%10>=2&&n%10<=4&&(n%100<10||n%100>20))?'варианта':'вариантов');
-    out+='<span class="pdate av'+(n<=5?' few':'')+'">свободно '+n+' '+w+'</span>';
+    /* 21.09: строка была только по-русски и оставалась русской на английской
+       версии — получалось «50 объектов match your filters» вперемешку. */
+    var n=p.avail;
+    if(PL.lang==='en'){
+      out+='<span class="pdate av'+(n<=5?' few':'')+'">'+n+' unit'+(n===1?'':'s')+' available</span>';
+    }else{
+      var w=(n%10===1&&n%100!==11)?'вариант':((n%10>=2&&n%10<=4&&(n%100<10||n%100>20))?'варианта':'вариантов');
+      out+='<span class="pdate av'+(n<=5?' few':'')+'">свободно '+n+' '+w+'</span>';
+    }
   }
   /* Цена, которую давно не сверяли, вводит в заблуждение: честно помечаем.
      Эльнур 07.09 — учёт актуального наличия и цен. */
@@ -1108,7 +1139,7 @@ function renderSale(){
       '<button type="button" class="fav" onclick="event.stopPropagation();toggleFav(\''+p.property_id+'\')" aria-label="В избранное">♡</button>'+
       '<button type="button" class="cmpb" onclick="event.stopPropagation();toggleCmp(\''+p.property_id+'\')">'+t('u.cmp')+'</button></div>'+
       '<div class="body">'+
-      '<div class="trow"><h3>'+p.title+(p.developer?' <small class="dev">('+p.developer+')</small>':'')+'</h3>'+dealBadge(p)+'</div>'+
+      '<div class="trow"><h3>'+titleOf(p)+(p.developer?' <small class="dev">('+p.developer+')</small>':'')+'</h3>'+dealBadge(p)+'</div>'+
       stageLine(p)+
       (p.promo?'<p class="promoline">'+p.promo+'</p>':'')+
       '<p class="desc">'+loc(p.desc)+'</p>'+
@@ -1116,7 +1147,7 @@ function renderSale(){
       '<div class="meta"><span>🛏 '+p.beds+'</span><span>◫ '+areaOf(p)+'</span>'+
         /* срок сдачи известен не у всех: пустая иконка календаря выглядела браком */
         (loc(p.deadline)?'<span>📅 '+loc(p.deadline)+'</span>':'')+
-        (p.beachM!=null?'<span>🌊 '+(p.beachM>=1000?(p.beachM/1000).toFixed(1).replace('.0','')+' км':p.beachM+' м')+' до моря</span>':'')+'</div>'+
+        (p.beachM!=null?'<span>🌊 '+(p.beachM>=1000?(p.beachM/1000).toFixed(1).replace('.0','')+(PL.lang==='en'?' km':' км'):p.beachM+(PL.lang==='en'?' m':' м'))+(PL.lang==='en'?' to the sea':' до моря')+'</span>':'')+'</div>'+
       '<div class="ccalc">📈 '+t('u.calc')+'</div>'+
       '<div class="pid">'+p.property_id+'</div></div></div>';
   }).join('');
@@ -1222,12 +1253,12 @@ function renderRent(){
       '<button type="button" class="fav" onclick="event.stopPropagation();toggleFav(\''+p.property_id+'\')" aria-label="В избранное">♡</button>'+
       '<button type="button" class="cmpb" onclick="event.stopPropagation();toggleCmp(\''+p.property_id+'\')">'+t('u.cmp')+'</button></div>'+
       '<div class="body">'+
-      '<div class="trow"><h3>'+p.title+(p.developer?' <small class="dev">('+p.developer+')</small>':'')+'</h3>'+rentBadge(p)+'</div>'+
+      '<div class="trow"><h3>'+titleOf(p)+(p.developer?' <small class="dev">('+p.developer+')</small>':'')+'</h3>'+rentBadge(p)+'</div>'+
       stageLine(p)+
       '<p class="desc">'+loc(p.desc)+'</p>'+
       '<div class="price">'+rentPriceHTML(p)+'</div>'+
       '<div class="meta"><span>🛏 '+p.beds+'</span><span>◫ '+areaOf(p)+'</span><span>'+loc(p.type)+'</span>'+
-        (p.beachM!=null?'<span>🌊 '+(p.beachM>=1000?(p.beachM/1000).toFixed(1).replace('.0','')+' км':p.beachM+' м')+' до моря</span>':'')+'</div>'+
+        (p.beachM!=null?'<span>🌊 '+(p.beachM>=1000?(p.beachM/1000).toFixed(1).replace('.0','')+(PL.lang==='en'?' km':' км'):p.beachM+(PL.lang==='en'?' m':' м'))+(PL.lang==='en'?' to the sea':' до моря')+'</span>':'')+'</div>'+
       '<span class="amwarn"></span>'+
       '</div></div>';
   }).join('');
@@ -2824,7 +2855,11 @@ function applyRentFilters(){
   var nr=document.getElementById('rentNoResult');if(nr)nr.style.display=visible?'none':'block';
   var rf=document.getElementById('rentFound');
   if(rf){
-    var txt = visible + ' ' + plural(visible,'объект','объекта','объектов') + ' ' + t('f.found');
+    /* 21.09: слово «объект» подставлялось всегда по-русски, и на английской
+       версии выходило «50 объектов match your filters». */
+    var txt = (PL.lang==='en')
+      ? (visible + ' ' + (visible===1?'property':'properties') + ' ' + t('f.found'))
+      : (visible + ' ' + plural(visible,'объект','объекта','объектов') + ' ' + t('f.found'));
     /* при заданном бюджете честно говорим, сколько из них — «цена по запросу»:
        выбрасывать их нельзя (цена может подойти), но и молчать нечестно */
     if(rentPriceRange && noPriceCount) txt += ' · ' + noPriceCount + ' — ' + t('rent.noprice');
@@ -3450,7 +3485,8 @@ function applyFilters(){
   if(top7Only) shown=applyTop7();
   var nr=document.getElementById('saleNoResult');if(nr)nr.style.display=shown?'none':'block';
   var sf=document.getElementById('saleFound');
-  if(sf) sf.textContent = shown + ' ' + plural(shown,'объект','объекта','объектов') + ' ' +
+  if(sf) sf.textContent = shown + ' ' + (PL.lang==='en' ? (shown===1?'property':'properties')
+        : plural(shown,'объект','объекта','объектов')) + ' ' +
     (top7Only ? (hotList().length ? t('f.hotnote') : t('f.top7note')) : t('f.found'));
   /* страницам каталога нужно обновить счётчик и карту после фильтрации */
   if(typeof window.PLP_AFTER_FILTER==='function') window.PLP_AFTER_FILTER(shown);

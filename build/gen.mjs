@@ -1998,6 +1998,14 @@ function sitemap(objects) {
   for (const [pg, pri] of pages) {
     parts.push(`  <url><loc>${SITE_BASE}/${pg}</loc><lastmod>${lastmodOf(pg)}</lastmod><changefreq>weekly</changefreq><priority>${pri}</priority></url>`);
   }
+  /* 21.09: английские копии основных страниц (build/mken.mjs). Без них Google
+     видит только русскую версию, а на Пхукете англоязычных покупателей примерно
+     половина. Приоритет чуть ниже русских: перевод интерфейса и описаний продажи
+     готов, описания аренды пока русские. */
+  for (const [en, pri] of [['en/', '0.9'], ['en/buy', '0.8'], ['en/rent', '0.8'],
+                           ['en/about', '0.6'], ['en/management', '0.6']]) {
+    parts.push(`  <url><loc>${SITE_BASE}/${en}</loc><changefreq>weekly</changefreq><priority>${pri}</priority></url>`);
+  }
   // 30.08: правовые документы тоже индексируем — они часть сайта
   for (const doc of ['privacy.html', 'rules.html', 'terms.html']) {
     parts.push(`  <url><loc>${SITE_BASE}/${doc}</loc><lastmod>${lastmodOf(doc)}</lastmod><changefreq>yearly</changefreq><priority>0.3</priority></url>`);
