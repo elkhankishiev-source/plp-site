@@ -118,7 +118,8 @@ def площадь(o):
     вилла = 'вилл' in str(o.get('type') or '').lower()
     дом, уч = o.get('built_area_sqm'), o.get('plot_area_sqm')
     if вилла and дом and уч:
-        return '%s м² дом · %s м² участок' % (дом, уч)
+        # округляем: «150.15 м² участок» читается как опечатка, а не как точность
+        return '%d м² дом · %d м² участок' % (round(float(дом)), round(float(уч)))
     a = o.get('area_sqm')
     if not a:
         return ''
@@ -130,17 +131,66 @@ def main():
     сегодня = datetime.date.today()
     подпись = '%d %s %d' % (сегодня.day, МЕСЯЦЫ[сегодня.month - 1], сегодня.year)
 
+    # 23.09.2026 Эльнур: «мы перечисляем собственников в одной строке, а не как двух
+    # отдельно, они ведь купили вместе, зачем писать два раза этот же юнит, надо
+    # просто логически объединить причастных».
+    # Собираем домохозяйства: если у двоих есть общий юнит — это одна карточка.
+    # Супруги и совладельцы идут вместе, юнит называется один раз.
+    родня = {}                       # client_id -> номер домохозяйства
+    по_юниту = {}
+    for cid, список in по_людям.items():
+        for u in список:
+            по_юниту.setdefault(u['object_id'], set()).add(cid)
+    номер = 0
+    for совладельцы in по_юниту.values():
+        свои = {родня[c] for c in совладельцы if c in родня}
+        if свои:
+            общий = min(свои)
+            for c, н in list(родня.items()):
+                if н in свои:
+                    родня[c] = общий
+        else:
+            номер += 1
+            общий = номер
+        for c in совладельцы:
+            родня[c] = общий
+    for cid in по_людям:
+        if cid not in родня:
+            номер += 1
+            родня[cid] = номер
+
+    дома = {}
+    for cid, н in родня.items():
+        дома.setdefault(н, []).append(cid)
+
     строки, всего_юнитов = [], 0
-    for cid, список in sorted(по_людям.items(),
-                              key=lambda kv: str(люди.get(kv[0], {}).get('name') or 'я')):
-        ч = люди.get(cid) or {}
+    def _имя(c):
+        return str((люди.get(c) or {}).get('name') or 'я')
+    for н, кто in sorted(дома.items(), key=lambda kv: _имя(sorted(kv[1], key=_имя)[0])):
+        кто = sorted(кто, key=_имя)
+        ч = люди.get(кто[0]) or {}
+        # юниты всего дома, каждый по одному разу
+        список, видели = [], set()
+        for c in кто:
+            for u in по_людям.get(c, []):
+                if u['object_id'] in видели:
+                    continue
+                видели.add(u['object_id'])
+                список.append(u)
         связь = []
-        if ч.get('phone'):
-            связь.append('+' + str(ч['phone']))
-        if ч.get('tg_id'):
-            связь.append('Telegram есть')
-        if ч.get('email'):
-            связь.append(e(ч['email']))
+        for c in кто:
+            л = люди.get(c) or {}
+            куски = []
+            if л.get('phone'):
+                куски.append('+' + str(л['phone']))
+            if л.get('tg_id'):
+                куски.append('Telegram')
+            if л.get('email'):
+                куски.append(str(л['email']))
+            if len(кто) > 1:
+                связь.append('%s: %s' % (л.get('name') or '—', ', '.join(куски) or 'связи нет'))
+            else:
+                связь.extend(куски)
         карточки = []
         for u in sorted(список, key=lambda x: x['object_id'] or ''):
             всего_юнитов += 1
@@ -174,14 +224,15 @@ def main():
             карточки.append(
                 '<li><b>%s</b>%s<div class="f">%s</div>%s%s</li>'
                 % (e(u['object_id']),
-                   ' <span class="sp">супруг(а)</span>' if u.get('rel') == 'spouse' else '',
+                   '',
                    e(' · '.join(факты)) or '<i>данных по объекту нет</i>',
                    ('<div class="h">' + e(' · '.join(хвост)) + '</div>') if хвост else '',
                    ('<div class="n">' + e(заметка) + '</div>') if заметка else ''))
         строки.append(
             '<section><h2>%s <span class="code">%s</span></h2>'
             '<div class="c">%s</div><ul>%s</ul></section>'
-            % (e(ч.get('name') or '—'), e(ч.get('code') or ''),
+            % (e(' и '.join((люди.get(c) or {}).get('name') or '—' for c in кто)),
+               e(' · '.join(str((люди.get(c) or {}).get('code') or '') for c in кто)),
                e(' · '.join(связь)) or '<i>связи в карточке нет</i>', ''.join(карточки)))
 
     html_out = """<!doctype html><html lang="ru"><head><meta charset="utf-8">
@@ -226,7 +277,8 @@ i{color:var(--muted)}
 
     os.makedirs(os.path.dirname(ВЫХОД), exist_ok=True)
     open(ВЫХОД, 'w', encoding='utf-8').write(html_out)
-    print('собрано: %d человек, %d объектов' % (len(по_людям), всего_юнитов))
+    print('собрано: %d человек в %d домохозяйствах, %d объектов'
+          % (len(по_людям), len(дома), всего_юнитов))
     print('файл: %s (%.0f КБ)' % (ВЫХОД, os.path.getsize(ВЫХОД) / 1024))
     if not ПОСЛАТЬ:
         print('\nНаружу не отправлял. Отправить в отдел продаж: --послать --го')

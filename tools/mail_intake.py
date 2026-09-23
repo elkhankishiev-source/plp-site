@@ -36,7 +36,7 @@ MAIL_FILE = os.path.expanduser('~/.plp_titan_mail')
 # На Маке ключи лежат в своём файле, на VPS — в .env сервиса. Берём тот, что есть.
 ENV_FILE = next((p for p in (os.path.expanduser('~/.plp_site_supabase.env'), '/opt/plp-api/.env') if os.path.exists(p)), os.path.expanduser('~/.plp_site_supabase.env'))
 BUCKET = 'client-docs'
-OWNER_TG = '509498386'   # личный Telegram Эльнура: туда уходят протоколы созвонов
+OWNER_TG = (E.get('TG_OWNER_CHAT_ID') if 'E' in dir() else '') or '509498386'   # личный Telegram Эльнура: туда уходят протоколы созвонов
 # Почтовые адреса расшифровщиков: письмо от них — это и есть готовый протокол.
 NOTETAKER = re.compile(r'@(tldv\.io|fathom\.video|otter\.ai|fireflies\.ai|read\.ai|tactiq\.io|grain\.com|sembly\.ai)$', re.I)
 KEEP = re.compile(r'\.(pdf|docx?|xlsx?|pptx?|jpe?g|png|heic|zip)$', re.I)
