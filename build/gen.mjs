@@ -1029,7 +1029,7 @@ function emitNetyieldBlock(netyield, grossyield) {
 const MARK_OI_START = '<!-- PLP:OBJECT-INDEX:START — сгенерировано build/gen.mjs, вручную не править -->';
 const MARK_OI_END = '<!-- PLP:OBJECT-INDEX:END -->';
 
-function writeObjectIndex(html, objects) {
+function writeObjectIndex(html, objects, rentals) {
   const byDistrict = new Map();
   for (const o of objects) {
     if (!o.plp_property_id) continue;
@@ -1055,6 +1055,21 @@ function writeObjectIndex(html, objects) {
       (price ? '<span class="oi-p">' + htmlEsc(price) + '</span>' : '') + '</li>';
   }).join('');
 
+  const rentAll = (rentals || []).slice().sort(
+    (a, b) => String(a.name || '').localeCompare(String(b.name || ''), 'ru'));
+  const rentTotal = rentAll.length;
+  const rentRows = rentAll.map((o) => {
+    const href = 'object/' + slugOf(pubOf(o));
+    const d = DISTRICT_RU[(o.district || '').trim()] || o.district || '';
+    const beds = bedsLabel(o);
+    /* Запасное имя берём из публичного кода, НЕ из plp_property_id: у аренды
+       внутренний код содержит номер юнита (PLP-KATABELLO-F302), и пустое имя
+       выставило бы его наружу обычной ссылкой. */
+    return '<li><a href="' + href + '">' + htmlEsc(o.name || pubOf(o)) + '</a>' +
+      '<span class="oi-d">' + htmlEsc(d) + '</span>' +
+      (beds ? '<span class="oi-p">' + htmlEsc(beds + ' сп.') + '</span>' : '') + '</li>';
+  }).join('');
+
   const block = MARK_OI_START + '\n' +
     '<section class="obj-index" id="all-objects"><div class="container">' +
     /* 17.09 Эльнур: «на карте 64 объекта, а раздел объекты в каталоге 54, странно».
@@ -1065,9 +1080,17 @@ function writeObjectIndex(html, objects) {
     '<p class="sub">Все проекты, с которыми мы работаем, — с ценами от застройщика ' +
     'и условиями рассрочки. Объекты в аренду — в разделе «Аренда»; на карте показаны и те, и другие.</p>' +
     '<ul class="oi-list">' + rows + '</ul></details>' +
+    /* 23.09: 38 страниц объектов аренды были ровно в той же беде, что 28 страниц
+       продажи в сентябре: сгенерированы, а ссылки ни одной. Правку тогда сделали
+       только для продажи — аренда снова осталась за бортом стандарта. */
+    (rentRows ? '<details class="oi-box"><summary><b>Объекты в аренду</b>' +
+      '<span class="oi-n">' + rentTotal + '</span></summary>' +
+      '<p class="sub">Квартиры и виллы наших собственников: ставки, сроки и свободные ' +
+      'даты — на странице объекта. Номер юнита не показываем, у каждого объекта свой публичный код.</p>' +
+      '<ul class="oi-list">' + rentRows + '</ul></details>' : '') +
     '</div></section>\n' + MARK_OI_END;
 
-  console.log('[gen] блок ссылок на объекты:', total, 'ссылок одним списком');
+  console.log('[gen] блок ссылок на объекты:', total, 'в продаже +', rentTotal, 'в аренде');
 
   const s = html.indexOf(MARK_OI_START);
   const e = html.indexOf(MARK_OI_END);
@@ -1830,7 +1853,7 @@ function lastmodOf(rel) {
   return new Date().toISOString().slice(0, 10);
 }
 
-function sitemap(objects) {
+function sitemap(objects, rentals) {
   const today = new Date().toISOString().slice(0, 10);
   /* 🔴 10.09: Search Console прислал «Страница с переадресацией» и не индексировал
      часть адресов. В карту сайта уходили ЯКОРЯ главной — /#quiz, /#about, /#faq,
@@ -1863,9 +1886,12 @@ function sitemap(objects) {
   for (const doc of ['privacy.html', 'rules.html', 'terms.html']) {
     parts.push(`  <url><loc>${SITE_BASE}/${doc}</loc><lastmod>${lastmodOf(doc)}</lastmod><changefreq>yearly</changefreq><priority>0.3</priority></url>`);
   }
-  for (const o of objects) {
+  /* 23.09: в карту шла только продажа, поэтому 38 страниц аренды поиск не видел
+     вовсе. Аренда идёт тем же списком и чуть ниже приоритетом. */
+  for (const o of [...objects, ...(rentals || [])]) {
     const loc = SITE_BASE + '/object/' + slugOf(pubOf(o));
-    parts.push(`  <url><loc>${loc}</loc><lastmod>${lastmodOf('object/' + slugOf(pubOf(o)) + '.html')}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>`);
+    const рент = /аренда|rent/i.test(String(o.purpose || ''));
+    parts.push(`  <url><loc>${loc}</loc><lastmod>${lastmodOf('object/' + slugOf(pubOf(o)) + '.html')}</lastmod><changefreq>weekly</changefreq><priority>${рент ? '0.7' : '0.8'}</priority></url>`);
   }
   parts.push('</urlset>');
   return parts.join('\n') + '\n';
@@ -1946,12 +1972,47 @@ async function main() {
      и показывать её как «цена по запросу» — обман. Эльнур 06.09. */
   const byId = {};
   for (const o of objects) byId[o.plp_property_id] = o;
+  /* Проект-родитель нужен, даже если сам он не на витрине (Capri): иначе юнит
+     остаётся без описания там, где описание есть. Добираем недостающих поимённо. */
+  const нужны = [...new Set(rentals.map(r => r.parent_object_id).filter(Boolean))]
+    .filter(id => !byId[id]);
+  if (нужны.length) {
+    const добор = await sbGet(env, 'objects?plp_property_id=in.(' +
+      encodeURIComponent(нужны.join(',')) + ')&select=plp_property_id,name,stage,handover_date,' +
+      'usp,usp_en,amenities,nearby,distance_beach_m,beach,district,area_min,area_max,' +
+      'main_image_url,gallery_urls,photo_groups,ownership');
+    for (const o of добор || []) byId[o.plp_property_id] = o;
+  }
+  /* 23.09 Эльнур: «почему нет описаний, если инф есть! просто ты не собрал его».
+     И правда: описание пустое у 35 арендных юнитов из 52, а у проекта-родителя
+     оно есть у всех до одного. Юнит — это квартира В проекте: бассейн, парк,
+     расстояние до пляжа у них общие. Берём у проекта то, что про дом, и не
+     берём то, что про конкретную квартиру.
+     Площадь наследуем ТОЛЬКО когда в проекте одна планировка (area_min = area_max,
+     как у вилл Estella). Диапазон «28–168 м²» на карточке одной квартиры — ложь;
+     там площадь приходит из договора или остаётся пустой.
+     Копий не плодим: в базе поле юнита так и остаётся пустым, подстановка живёт
+     в сборке — один экземпляр истины, правка в проекте сразу видна всем юнитам. */
+  const наследие = { стадия: 0, описание: 0, площадь: 0, удобства: 0, пляж: 0, фото: 0 };
   for (const r of rentals) {
     const parent = r.parent_object_id ? byId[r.parent_object_id] : null;
     if (!parent) continue;
-    if (!r.stage) r.stage = parent.stage;
+    const пусто = v => v === undefined || v === null || String(v).trim() === '';
+    if (!r.stage && parent.stage) { r.stage = parent.stage; наследие.стадия++; }
     if (!r.handover_date) r.handover_date = parent.handover_date;
+    if (пусто(r.usp) && !пусто(parent.usp)) { r.usp = parent.usp; наследие.описание++; }
+    if (пусто(r.usp_en) && !пусто(parent.usp_en)) r.usp_en = parent.usp_en;
+    if (пусто(r.amenities) && !пусто(parent.amenities)) { r.amenities = parent.amenities; наследие.удобства++; }
+    if (пусто(r.distance_beach_m) && !пусто(parent.distance_beach_m)) { r.distance_beach_m = parent.distance_beach_m; наследие.пляж++; }
+    if (пусто(r.beach) && !пусто(parent.beach)) r.beach = parent.beach;
+    if (пусто(r.district) && !пусто(parent.district)) r.district = parent.district;
+    if (пусто(r.main_image_url) && !пусто(parent.main_image_url)) { r.main_image_url = parent.main_image_url; наследие.фото++; }
+    const одна = !пусто(parent.area_min) && String(parent.area_min) === String(parent.area_max);
+    if (пусто(r.area_sqm) && одна) { r.area_sqm = parent.area_min; наследие.площадь++; }
   }
+  console.log('[gen] аренда добрала у проектов: описаний', наследие.описание,
+              '· площадей', наследие.площадь, '· удобств', наследие.удобства,
+              '· до пляжа', наследие.пляж, '· фото', наследие.фото, '· стадий', наследие.стадия);
   const rentList = buildRentals(rentals, rentPreserve, ratesBy);
   // 30.08: пока в аренде нет объектов с on_site=true — показываем штатную карточку
   // «Скоро в каталоге» (ветка p.soon в renderRent), а не пустую полосу.
@@ -1974,7 +2035,7 @@ async function main() {
   } else {
     console.error('[gen] rental_benchmarks пуст или без net-колонок — доходность не тронута (fail-closed).');
   }
-  html = writeObjectIndex(html, objects);
+  html = writeObjectIndex(html, objects, rentals);
   fs.writeFileSync(INDEX, html);
   console.log('[gen] index.html: каталог продажи', catalog.length, '+ аренда', rentList.length, 'обновлены');
 
@@ -2018,7 +2079,7 @@ async function main() {
   console.log('[gen] object/*.html:', pages, 'страниц' + (removed ? ', удалено лишних: ' + removed : ''));
 
   // 3) sitemap
-  fs.writeFileSync(SITEMAP, sitemap(objects));
+  fs.writeFileSync(SITEMAP, sitemap(objects, rentals));
   console.log('[gen] sitemap.xml обновлён');
 
   // 4) короткий список для конструктора оффера в кабинете: чтобы сотрудник
