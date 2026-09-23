@@ -52,7 +52,12 @@ def psql(sql):
 
 def diffs():
     out = psql('select w.name, length(w.nodes::text), length(h.nodes::text) ' + DIFF_WHERE + ' order by w.name;')
-    return [ln.split('|') for ln in out.splitlines() if ln.strip()]
+    # 23.09.2026. psql -A разделяет колонки чёрточкой, и она же стоит В ИМЕНИ
+    # сценария: «PLP — 5 @plp_assist_bot v2 | ИИ-Офис команды». split рвал строку
+    # на четыре куска и падал с too many values to unpack — инструмент публикации
+    # не работал вовсе, пока имя с чёрточкой попадало в выборку.
+    # Режем С КОНЦА ровно два раза: имя первое, за ним две длины.
+    return [ln.rsplit('|', 2) for ln in out.splitlines() if ln.strip()]
 
 
 def main():
