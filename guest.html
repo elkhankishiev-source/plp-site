@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<script>
+/* Оформление выбирается до отрисовки — общий выбор с сайтом и кабинетом (pl_theme). */
+(function(){
+  try{
+    var v=localStorage.getItem('pl_theme');
+    if(v==='dark'||v==='light') document.documentElement.setAttribute('data-theme',v);
+  }catch(e){}
+})();
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- PLP:HEADTHEME:START -->
+<meta name="color-scheme" content="light dark">
+<!-- цвет системных полей браузера = фон страницы. Без этого при прокрутке и
+     оттягивании из-под страницы проглядывает чужой цвет — кажется, что фон мигает. -->
+<meta name="theme-color" content="#f7f6f1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0C0D09" media="(prefers-color-scheme: dark)">
+<script>
+(function(){
+  function paintChrome(){
+    try{
+      var bg=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+      if(!bg && document.body) bg=getComputedStyle(document.body).backgroundColor;
+      if(!bg || bg==='rgba(0, 0, 0, 0)') return;
+      var list=document.querySelectorAll('meta[name="theme-color"]');
+      for(var i=0;i<list.length;i++) list[i].parentNode.removeChild(list[i]);
+      var m=document.createElement('meta'); m.setAttribute('name','theme-color');
+      m.setAttribute('content',bg); document.head.appendChild(m);
+    }catch(e){}
+  }
+  /* Кнопка «поделиться»: на телефоне открывает системное меню, на компьютере
+     кладёт ссылку в буфер и говорит об этом. Эльнур 07.09: «сайтом надо
+     пользоваться, он не просто для красоты». */
+  document.addEventListener('click', function(e){
+    var b = e.target && e.target.closest && e.target.closest('[data-share]');
+    if(!b) return;
+    e.preventDefault();
+    var path = b.getAttribute('data-share') || location.pathname;
+    var url = location.origin + path;
+    var title = b.getAttribute('data-share-title') || document.title;
+    var done = function(){
+      var was = b.innerHTML;   /* 15.09: в кнопке живёт svg-иконка, восстанавливаем разметку целиком */
+      b.textContent = '✓ Ссылка скопирована';
+      b.classList.add('ok');
+      setTimeout(function(){ b.innerHTML = was; b.classList.remove('ok'); }, 2200);
+    };
+    if(navigator.share){ navigator.share({title:title, url:url}).catch(function(){}); return; }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(url).then(done).catch(function(){ prompt('Скопируйте ссылку:', url); });
+    } else prompt('Скопируйте ссылку:', url);
+  });
+  window.paintChrome=paintChrome;
+  /* Адрес без .html: страницы и так открываются коротким адресом, но если
+     человек пришёл по старой ссылке, приводим строку браузера к чистому виду.
+     Эльнур 07.09: «мне не нравится html в адресе, я ни у кого её не видел». */
+  try{
+    var pth=location.pathname;
+    if(/\.html$/.test(pth)){
+      var clean=pth.replace(/index\.html$/,'').replace(/\.html$/,'');
+      if(clean==='') clean='/';
+      history.replaceState(null,'',clean+location.search+location.hash);
+    }
+  }catch(e){}
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',paintChrome);
+  else paintChrome();
+  try{ matchMedia('(prefers-color-scheme: dark)').addEventListener('change',paintChrome); }catch(e){}
+})();
+</script>
+
+<!-- PLP:HEADTHEME:END -->
+<title>Гостю · Property Library Phuket</title>
+<!-- Страница личная: в поиске ей делать нечего, а по прямой ссылке без номера
+     брони она пуста. Поэтому noindex и никакого превью для мессенджеров. -->
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<link rel="icon" href="img/brand/plp-mark-ink.png">
+<style>
+/* Палитра и размеры — те же, что в кабинете собственника (owner.html).
+   Гостевая страница не отдельный продукт, а та же система с другой дверью. */
+:root{
+  --ink-rgb:10,10,10;
+  --on-ink:#fff;
+  --on-green:#14150F;
+  --ink-block:#0A0A0A;
+  --paper:#ffffff;
+  --warm:#EFEEE7;
+  --green:#D2D5B3;
+  --green-soft:#E9EBD9;
+  --olive:#5F6242;
+  --ink:#0A0A0A;
+  --muted:#5c5c54;
+  --bg:#f7f6f1;
+  --line:#E6E6DE;
+  --bad:#8f4b3a;
+  --good:#3f6b34;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ink:#ECEFE0; --ink-rgb:236,239,224; --muted:#B9BCA6;
+    --bg:#0C0D09; --paper:#191A12; --warm:#20221A; --line:#2C2E22;
+    --ink-block:#14150F; --green-soft:#2A2D1F; --olive:#C3C79A;
+    --bad:#e2a08f; --good:#9dcb98;
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#ECEFE0; --ink-rgb:236,239,224; --muted:#B9BCA6;
+  --bg:#0C0D09; --paper:#191A12; --warm:#20221A; --line:#2C2E22;
+  --ink-block:#14150F; --green-soft:#2A2D1F; --olive:#C3C79A;
+  --bad:#e2a08f; --good:#9dcb98;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%;background:var(--bg)}
+body{background:var(--bg);color:var(--ink);
+  font:16px/1.6 Manrope,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:720px;margin:0 auto;padding:22px 16px 56px}
+.wrap.narrow{max-width:460px}
+
+/* шапка: логотип, язык, оформление — одинаково на телефоне и на компьютере */
+.top{display:flex;align-items:center;gap:10px;margin-bottom:20px}
+.top .logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:1rem;letter-spacing:-.01em}
+.top .logo .chip{width:34px;height:34px;border-radius:10px;background:var(--green-soft);
+  display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.top .logo .chip img{width:22px}
+.top .logo b span{color:var(--olive)}
+.top .tools{margin-left:auto;display:flex;align-items:center;gap:6px}
+.lang{display:flex;align-items:center;gap:2px;background:var(--paper);
+  border:1px solid var(--line);border-radius:999px;padding:2px;font-size:.68rem;font-weight:700}
+.lang button{padding:4px 8px;border-radius:999px;line-height:1;font:inherit;color:var(--muted);
+  background:none;border:0;cursor:pointer}
+.lang button.on{background:var(--green);color:var(--on-green)}
+.themebtn{width:30px;height:30px;border-radius:9px;background:var(--paper);border:1px solid var(--line);
+  color:var(--muted);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+.card{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:20px;
+  margin-bottom:14px;box-shadow:0 4px 14px rgba(var(--ink-rgb),.06)}
+h1{font-size:24px;font-weight:800;letter-spacing:-.01em;margin-bottom:6px;line-height:1.15}
+h2{font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);
+  margin-bottom:12px;font-weight:700}
+h3{font-size:16px;font-weight:700;margin-bottom:4px}
+.sub{color:var(--muted);font-size:14px}
+.gate-head{text-align:center;margin-bottom:6px}
+
+label{display:block;color:var(--muted);font-size:13px;margin:14px 0 5px}
+input,select,textarea{width:100%;background:var(--bg);border:1px solid var(--line);color:var(--ink);
+  border-radius:14px;padding:11px 13px;font-size:15px;font-family:inherit}
+input::placeholder,textarea::placeholder{color:var(--muted);opacity:.55}
+textarea{min-height:76px;resize:vertical}
+button.go{background:var(--ink-block);color:var(--on-ink);border:0;border-radius:999px;
+  padding:13px 18px;font-size:15px;font-weight:700;cursor:pointer;width:100%;margin-top:16px;font-family:inherit}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) button.go{background:var(--green);color:var(--on-green)}}
+:root[data-theme="dark"] button.go{background:var(--green);color:var(--on-green)}
+button.ghost{background:transparent;border:1px solid var(--line);color:var(--ink);
+  border-radius:999px;padding:10px 16px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{background:transparent;border:1px solid var(--line);color:var(--ink);border-radius:999px;
+  padding:9px 15px;font-size:14px;cursor:pointer;font-family:inherit}
+.opt.on{background:var(--green);border-color:var(--green);color:var(--on-green);font-weight:700}
+.err{color:var(--bad);font-size:14px;margin-top:10px}
+.ok{color:var(--good);font-size:14px;margin-top:10px}
+.hint{color:var(--muted);font-size:12.5px;margin-top:8px;line-height:1.45}
+
+.stay{background:var(--warm);border:1px solid var(--green);border-radius:20px;padding:20px;margin-bottom:14px}
+.stay .who{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--olive);font-weight:700}
+.stay .obj{font-size:24px;font-weight:800;margin-top:6px;line-height:1.15}
+.row{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:0}
+.row span{color:var(--muted);flex:0 0 auto}
+.row b{font-weight:600;text-align:right}
+.empty{background:var(--warm);color:var(--muted);border-radius:12px;padding:14px;font-size:14px}
+
+/* памятки — гармошкой, иначе страница превращается в простыню */
+.fold{border:1px solid var(--line);border-radius:14px;margin-bottom:8px;overflow:hidden;background:var(--bg)}
+.fold h3{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:0;
+  padding:13px 15px;cursor:pointer;font-size:15px}
+.fold .i{color:var(--muted);font-weight:700;flex:0 0 auto}
+.fold .body{padding:0 15px 15px;white-space:pre-wrap;font-size:14px;color:var(--ink);line-height:1.55}
+.task{border-top:1px solid var(--line);padding:11px 0;display:flex;gap:10px;align-items:baseline}
+.task:first-child{border-top:0}
+.task .t{font-weight:600}
+.task .st{margin-left:auto;font-size:12px;color:var(--muted);flex:0 0 auto}
+.task .st.done{color:var(--good)}
+.foot{color:var(--muted);font-size:13px;text-align:center;margin-top:22px;line-height:1.6}
+.foot a{border-bottom:1px dotted var(--muted)}
+@media(max-width:520px){
+  .wrap{padding:16px 14px 44px}
+  .card{padding:17px;border-radius:18px}
+  .stay{padding:17px}
+  h1{font-size:21px}
+  .stay .obj{font-size:20px}
+}
+</style>
+</head>
+<body>
+<div class="wrap narrow" id="wrap">
+
+  <div class="top">
+    <a class="logo" href="/"><span class="chip"><img src="img/brand/plp-mark-ink.png" alt="Property Library Phuket" width="22"></span><b>Property <span>Library</span></b></a>
+    <div class="tools">
+      <div class="lang" role="group" aria-label="Язык">
+        <button type="button" data-l="ru" class="on" onclick="setLang('ru')">RU</button>
+        <button type="button" data-l="en" onclick="setLang('en')">EN</button>
+      </div>
+      <button type="button" class="themebtn" onclick="cycleTheme()" aria-label="Оформление"><span id="themeIco">◐</span></button>
+    </div>
+  </div>
+
+  <!-- вход -->
+  <div class="card" id="gate" style="display:none">
+    <div class="gate-head">
+      <h1 data-t="gate.h">Гостю</h1>
+      <p class="sub" data-t="gate.sub">Памятки по дому, заявки на уборку и трансфер, подтверждение брони.</p>
+    </div>
+    <label for="code" data-t="gate.code">Номер брони</label>
+    <input id="code" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="PLB-000000-0000">
+    <label for="second" data-t="gate.second">Дата заезда или последние 4 цифры вашего телефона</label>
+    <input id="second" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" placeholder="2026-09-24">
+    <button type="button" class="go" id="enter" data-t="gate.enter">Войти</button>
+    <div class="err" id="gate-err"></div>
+    <p class="hint" data-t="gate.hint">Номер брони есть в нашем подтверждении. Не нашли — напишите нам, подскажем.</p>
+  </div>
+
+  <!-- проживание -->
+  <div id="app" style="display:none">
+    <div class="stay">
+      <div class="who" id="who"></div>
+      <div class="obj" id="obj"></div>
+      <div id="stay-rows" style="margin-top:12px"></div>
+    </div>
+
+    <div class="card">
+      <h2 data-t="ask.h">Что нужно</h2>
+      <div class="opts" id="kinds"></div>
+      <div id="ask-form" style="display:none">
+        <label for="details" data-t="ask.details">Коротко, что сделать</label>
+        <textarea id="details" placeholder=""></textarea>
+        <label for="when" data-t="ask.when">На какой день (можно не указывать)</label>
+        <input id="when" type="date">
+        <button type="button" class="go" id="send" data-t="ask.send">Отправить</button>
+        <div class="err" id="ask-err"></div>
+        <div class="ok" id="ask-ok"></div>
+      </div>
+    </div>
+
+    <div class="card" id="tasks-card" style="display:none">
+      <h2 data-t="tasks.h">Ваши заявки</h2>
+      <div id="tasks"></div>
+    </div>
+
+    <div class="card">
+      <h2 data-t="docs.h">Памятки</h2>
+      <div id="docs"></div>
+      <button type="button" class="ghost" id="bdoc" style="margin-top:12px" data-t="docs.booking">Подтверждение брони</button>
+      <div class="err" id="bdoc-err"></div>
+    </div>
+
+    <div class="foot">
+      <span data-t="foot.help">Нужен человек — мы на связи:</span>
+      <a href="https://wa.me/66955492587" target="_blank" rel="noopener">WhatsApp</a> ·
+      <a href="https://t.me/elnurphuket_bot?start=guest" target="_blank" rel="noopener">Telegram</a><br>
+      <a href="#" id="exit" data-t="foot.exit">Выйти</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  var API='https://api.property-library.com/ukowner';
+  var LS='plp_guest';
+  var $=function(id){return document.getElementById(id);};
+
+  /* ── язык и оформление: те же ключи, что у сайта и кабинета ── */
+  var T={
+    ru:{'gate.h':'Гостю','gate.sub':'Памятки по дому, заявки на уборку и трансфер, подтверждение брони.',
+        'gate.code':'Номер брони','gate.second':'Дата заезда или последние 4 цифры вашего телефона',
+        'gate.enter':'Войти','gate.hint':'Номер брони есть в нашем подтверждении. Не нашли — напишите нам, подскажем.',
+        'ask.h':'Что нужно','ask.details':'Коротко, что сделать','ask.when':'На какой день (можно не указывать)',
+        'ask.send':'Отправить','tasks.h':'Ваши заявки','docs.h':'Памятки','docs.booking':'Подтверждение брони',
+        'foot.help':'Нужен человек — мы на связи:','foot.exit':'Выйти',
+        'e.not_found':'Такой брони не нашли. Проверьте номер.',
+        'e.bad_second':'Дата заезда или цифры телефона не сходятся с бронью.',
+        'e.need_second':'Укажите дату заезда или последние 4 цифры телефона.',
+        'e.expired':'Проживание уже закончилось. Будем рады видеть снова.',
+        'e.net':'Связи нет. Попробуйте ещё раз.','e.nodoc':'Подтверждение сейчас не собирается, мы пришлём его сами.',
+        'ok.sent':'Приняли. Управляющий увидит заявку.','ok.dup':'Такая заявка уже принята, дважды не делаем.',
+        'st.open':'в работе','st.done':'сделано','st.cancelled':'отменена',
+        'k.cleaning':'Уборка','k.transfer':'Трансфер','k.repair':'Поломка','k.extend':'Продлить','k.other':'Другое',
+        'l.guest':'Гость','l.dates':'Проживание','l.nights':'Ночей','l.booking':'Бронь','l.district':'Район',
+        'ph.cleaning':'Например: убрать завтра после 12:00','ph.transfer':'Например: в аэропорт 26-го к 10:00, 3 человека',
+        'ph.repair':'Например: не работает кондиционер в спальне','ph.extend':'Например: хотим остаться ещё на 3 ночи',
+        'ph.other':'Напишите своими словами','none':'Пока пусто'},
+    en:{'gate.h':'Guest area','gate.sub':'House guides, cleaning and transfer requests, booking confirmation.',
+        'gate.code':'Booking number','gate.second':'Check-in date or the last 4 digits of your phone',
+        'gate.enter':'Enter','gate.hint':'The booking number is in our confirmation. Cannot find it — just message us.',
+        'ask.h':'What do you need','ask.details':'In short, what to do','ask.when':'For which day (optional)',
+        'ask.send':'Send','tasks.h':'Your requests','docs.h':'Guides','docs.booking':'Booking confirmation',
+        'foot.help':'Need a person — we are here:','foot.exit':'Sign out',
+        'e.not_found':'We did not find this booking. Please check the number.',
+        'e.bad_second':'The date or phone digits do not match the booking.',
+        'e.need_second':'Enter the check-in date or the last 4 digits of your phone.',
+        'e.expired':'This stay is over. We would love to host you again.',
+        'e.net':'No connection. Please try again.','e.nodoc':'The confirmation is not available right now, we will send it ourselves.',
+        'ok.sent':'Got it. The manager sees your request.','ok.dup':'This request is already in, we do not duplicate it.',
+        'st.open':'in progress','st.done':'done','st.cancelled':'cancelled',
+        'k.cleaning':'Cleaning','k.transfer':'Transfer','k.repair':'Something broken','k.extend':'Extend stay','k.other':'Other',
+        'l.guest':'Guest','l.dates':'Stay','l.nights':'Nights','l.booking':'Booking','l.district':'Area',
+        'ph.cleaning':'For example: clean tomorrow after 12:00','ph.transfer':'For example: to the airport on the 26th at 10:00, 3 people',
+        'ph.repair':'For example: the bedroom air conditioner does not work','ph.extend':'For example: we would like 3 more nights',
+        'ph.other':'Write in your own words','none':'Nothing yet'}
+  };
+  var LANG='ru';
+  try{ var sv=localStorage.getItem('pl_lang'); if(sv==='ru'||sv==='en') LANG=sv; }catch(e){}
+  function t(k){ return (T[LANG]&&T[LANG][k])||(T.ru[k])||k; }
+  function paintLang(){
+    document.querySelectorAll('[data-t]').forEach(function(el){ el.textContent=t(el.getAttribute('data-t')); });
+    document.querySelectorAll('.lang button').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-l')===LANG); });
+    document.documentElement.setAttribute('lang', LANG);
+    if(DATA) paintApp();
+    paintKinds();
+  }
+  window.setLang=function(l){ if(l===LANG) return; LANG=l; try{localStorage.setItem('pl_lang',l);}catch(e){} paintLang(); };
+
+  var THEMES=['system','light','dark'];
+  function themeNow(){ try{ return localStorage.getItem('pl_theme')||'system'; }catch(e){ return 'system'; } }
+  function setTheme(v){
+    try{ localStorage.setItem('pl_theme',v); }catch(e){}
+    if(v==='system') document.documentElement.removeAttribute('data-theme');
+    else document.documentElement.setAttribute('data-theme',v);
+    $('themeIco').textContent = v==='light'?'☀':(v==='dark'?'☾':'◐');
+    try{ if(window.paintChrome) window.paintChrome(); }catch(e){}
+  }
+  window.cycleTheme=function(){ var i=THEMES.indexOf(themeNow()); setTheme(THEMES[(i+1)%THEMES.length]); };
+  setTheme(themeNow());
+
+  /* ── разговор с сервером ── */
+  function post(body){
+    return fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})
+      .then(function(r){return r.json();})
+      .catch(function(){ return {ok:false,reason:'net'}; });
+  }
+  function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function dmy(s){ if(!s) return '—'; var p=String(s).slice(0,10).split('-'); return p.length===3?p[2]+'.'+p[1]+'.'+p[0]:String(s); }
+  function nights(a,b){
+    if(!a||!b) return null;
+    var d=(new Date(String(b).slice(0,10))-new Date(String(a).slice(0,10)))/864e5;
+    return (d>0&&d<400)?Math.round(d):null;
+  }
+  function err(id,reason){
+    var m=t('e.'+String(reason||'')); if(m==='e.'+reason) m=t('e.net');
+    $(id).textContent=m;
+  }
+
+  /* ── ключи гостя: номер брони и второй признак.
+       Храним у него же в браузере, на сервер они идут при каждом действии.
+       Сессии нет намеренно — воровать нечего, а вход не протухает посреди
+       проживания, как протух бы код из сообщения. ── */
+  var KEY=null, DATA=null;
+  function keySave(k){ KEY=k; try{ localStorage.setItem(LS, JSON.stringify(k)); }catch(e){} }
+  function keyLoad(){ try{ return JSON.parse(localStorage.getItem(LS)||'null'); }catch(e){ return null; } }
+  function keyDrop(){ KEY=null; DATA=null; try{ localStorage.removeItem(LS); }catch(e){} }
+
+  function show(which){
+    $('gate').style.display = which==='gate'?'':'none';
+    $('app').style.display  = which==='app'?'':'none';
+    $('wrap').className = 'wrap' + (which==='gate'?' narrow':'');
+  }
+
+  /* ── вход ── */
+  function enter(code, second, from){
+    $('gate-err').textContent='';
+    if(!code || !second){ err('gate-err','need_second'); return; }
+    var btn=$('enter'); btn.disabled=true;
+    post({action:'guest_check', code:code, second:second}).then(function(r){
+      btn.disabled=false;
+      if(!r || !r.ok){
+        if(from==='saved'){ keyDrop(); show('gate'); return; }
+        err('gate-err', r&&r.reason); return;
+      }
+      keySave({code:r.booking_id, second:second});
+      DATA=r;
+      if(r.lang==='en'||r.lang==='ru'){ var had=false; try{ had=!!localStorage.getItem('pl_lang'); }catch(e){}
+        if(!had && r.lang!==LANG){ LANG=r.lang; } }
+      paintLang(); show('app');
+    });
+  }
+  $('enter').onclick=function(){
+    enter($('code').value.trim().toUpperCase(), $('second').value.trim(), 'form');
+  };
+  $('code').addEventListener('keydown',function(e){ if(e.key==='Enter') $('second').focus(); });
+  $('second').addEventListener('keydown',function(e){ if(e.key==='Enter') $('enter').click(); });
+  $('exit').onclick=function(e){ e.preventDefault(); keyDrop(); $('code').value=''; $('second').value=''; show('gate'); };
+
+  /* ── проживание ── */
+  function paintApp(){
+    if(!DATA) return;
+    $('who').textContent = t('l.guest') + (DATA.guest ? (' · ' + DATA.guest) : '');
+    $('obj').textContent = DATA.property_name || DATA.property_id || '';
+    var n=nights(DATA.check_in, DATA.check_out), rows='';
+    rows += '<div class="row"><span>'+esc(t('l.dates'))+'</span><b>'+esc(dmy(DATA.check_in))+' — '+esc(dmy(DATA.check_out))+'</b></div>';
+    if(n) rows += '<div class="row"><span>'+esc(t('l.nights'))+'</span><b>'+n+'</b></div>';
+    if(DATA.district) rows += '<div class="row"><span>'+esc(t('l.district'))+'</span><b>'+esc(DATA.district)+'</b></div>';
+    rows += '<div class="row"><span>'+esc(t('l.booking'))+'</span><b>'+esc(DATA.booking_id)+'</b></div>';
+    $('stay-rows').innerHTML = rows;
+    paintDocs();
+    paintTasks();
+  }
+  function paintDocs(){
+    var d=(DATA&&DATA.docs)||[];
+    if(!d.length){ $('docs').innerHTML='<div class="empty">'+esc(t('none'))+'</div>'; return; }
+    $('docs').innerHTML = d.map(function(x,i){
+      return '<div class="fold" data-i="'+i+'">'+
+             '<h3><span>'+esc(x.title)+'</span><span class="i">+</span></h3>'+
+             '<div class="body" hidden>'+esc(x.content)+'</div></div>';
+    }).join('');
+    $('docs').querySelectorAll('.fold h3').forEach(function(h){
+      h.onclick=function(){
+        var b=h.nextElementSibling, open=b.hidden;
+        $('docs').querySelectorAll('.fold .body').forEach(function(o){ o.hidden=true; });
+        $('docs').querySelectorAll('.fold .i').forEach(function(o){ o.textContent='+'; });
+        b.hidden=!open; h.querySelector('.i').textContent=open?'−':'+';
+      };
+    });
+  }
+  function paintTasks(){
+    var r=(DATA&&DATA.requests)||[];
+    $('tasks-card').style.display = r.length?'':'none';
+    if(!r.length) return;
+    $('tasks').innerHTML = r.map(function(x){
+      var st=t('st.'+String(x.status||'open')); if(st.indexOf('st.')===0) st=String(x.status||'');
+      return '<div class="task"><span class="t">'+esc(t('k.'+x.kind)===('k.'+x.kind)?x.kind:t('k.'+x.kind))+'</span>'+
+             '<span class="sub">'+esc(dmy(x.due_date))+'</span>'+
+             '<span class="st'+(x.status==='done'?' done':'')+'">'+esc(st)+'</span></div>';
+    }).join('');
+  }
+
+  /* ── заявка ── */
+  var KINDS=['cleaning','transfer','repair','extend','other'], KIND=null;
+  function paintKinds(){
+    $('kinds').innerHTML = KINDS.map(function(k){
+      return '<button type="button" class="opt'+(k===KIND?' on':'')+'" data-k="'+k+'">'+esc(t('k.'+k))+'</button>';
+    }).join('');
+    $('kinds').querySelectorAll('.opt').forEach(function(b){
+      b.onclick=function(){
+        KIND=b.getAttribute('data-k');
+        $('ask-err').textContent=''; $('ask-ok').textContent='';
+        $('details').placeholder=t('ph.'+KIND);
+        $('ask-form').style.display='';
+        paintKinds();
+        $('details').focus();
+      };
+    });
+  }
+  $('send').onclick=function(){
+    if(!KEY||!KIND) return;
+    $('ask-err').textContent=''; $('ask-ok').textContent='';
+    var btn=$('send'); btn.disabled=true;
+    post({action:'guest_request', code:KEY.code, second:KEY.second, kind:KIND,
+          details:$('details').value.trim().slice(0,400), date:$('when').value||''}).then(function(r){
+      btn.disabled=false;
+      if(!r||!r.ok){ err('ask-err', r&&r.reason); return; }
+      $('ask-ok').textContent = r.duplicate ? t('ok.dup') : t('ok.sent');
+      $('details').value=''; $('when').value=''; KIND=null; paintKinds();
+      $('ask-form').style.display='none';
+      // список заявок пересобираем с сервера, чтобы гость видел то же, что управляющий
+      post({action:'guest_check', code:KEY.code, second:KEY.second}).then(function(f){
+        if(f&&f.ok){ DATA=f; paintTasks(); }
+      });
+    });
+  };
+
+  /* ── подтверждение брони: страницу собирает сервер, ключ остаётся у него ── */
+  $('bdoc').onclick=function(){
+    if(!KEY) return;
+    $('bdoc-err').textContent='';
+    var btn=$('bdoc'); btn.disabled=true;
+    /* окно открываем ДО запроса: открытое после ответа телефон считает всплывающим и блокирует */
+    var w=window.open('', '_blank');
+    post({action:'guest_booking_doc', code:KEY.code, second:KEY.second}).then(function(r){
+      btn.disabled=false;
+      if(!r||!r.ok||!r.html){ if(w) w.close(); err('bdoc-err', r&&r.reason==='no_doc'?'nodoc':(r&&r.reason)); return; }
+      if(w){ w.document.open(); w.document.write(r.html); w.document.close(); }
+    });
+  };
+
+  /* ── старт: ссылка вида /guest?b=PLB-...&d=2026-09-24 заполняет поля,
+       сохранённый вход открывает страницу сразу ── */
+  paintLang();
+  (function start(){
+    var q=new URLSearchParams(location.search);
+    var b=(q.get('b')||'').trim(), d=(q.get('d')||'').trim();
+    if(b) $('code').value=b.toUpperCase();
+    if(d) $('second').value=d;
+    var saved=keyLoad();
+    if(b&&d){ show('gate'); enter(b.toUpperCase(), d, 'form'); return; }
+    if(saved&&saved.code&&saved.second){ show('gate'); enter(saved.code, saved.second, 'saved'); return; }
+    show('gate');
+  })();
+})();
+</script>
+</body>
+</html>
