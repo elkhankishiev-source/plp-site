@@ -195,6 +195,25 @@ p.text{margin:0;font-size:.94rem;line-height:1.6}
   var API='https://api.property-library.com/ukowner';
   var root=document.getElementById('root');
   var token=(location.hash||'').replace(/^#/,'').trim();
+  /* 23.09.2026. Ссылка на предложение рождается в трёх разных местах и в трёх
+     разных видах: где-то после решётки, где-то ?t=, где-то ?token=. Страница
+     умела читать только решётку — по двум другим видам человек при живом
+     предложении видел «Ссылка неполная» и думал, что мы прислали мусор.
+     Принимаем все три. Решётку оставляем главной нарочно: после неё токен не
+     уходит ни в журналы сервера, ни в referer при переходе наружу, — поэтому
+     пришедший в адресе токен сразу переписываем в решётку. */
+  if(!token){
+    try{
+      var qs=new URLSearchParams(location.search);
+      var fromQuery=(qs.get('t')||qs.get('token')||'').trim().replace(/[^A-Za-z0-9_-]/g,'');
+      if(fromQuery){
+        token=fromQuery;
+        qs.delete('t'); qs.delete('token');
+        var rest=qs.toString();
+        history.replaceState(null,'',location.pathname+(rest?'?'+rest:'')+'#'+token);
+      }
+    }catch(e){}
+  }
 
   function esc(x){return String(x==null?'':x).replace(/[&<>"]/g,function(c){
     return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
