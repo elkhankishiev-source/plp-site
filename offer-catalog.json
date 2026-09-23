@@ -1921,6 +1921,16 @@
    ]
   },
   {
+   "id": "PLP-QABALAH-SALE1",
+   "pub": "PLP-QABALAH-RESALE",
+   "url": "https://property-library.com/object/qabalah-resale",
+   "name": "Villa Qabalah · вилла, вторичка",
+   "district": "Банг Тао",
+   "type": "Вилла",
+   "price_from": 20000000,
+   "units": []
+  },
+  {
    "id": "PLP-SERENITY",
    "pub": "PLP-SERENITY",
    "url": "https://property-library.com/object/serenity",

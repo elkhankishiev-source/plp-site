@@ -1228,13 +1228,6 @@ a.lnk,.lnk{color:var(--olive)}
   #app{display:grid;grid-template-columns:230px minmax(0,1fr);gap:26px;align-items:start}
   #cab-ctx{grid-column:1/-1;order:-2}
   #cab-hello{grid-column:1/-1;order:-1}
-  .cab-hints{position:relative;margin:12px 0 0;padding:14px 38px 6px 16px;border:1px solid var(--line);
-             border-radius:14px;background:var(--green-soft);color:var(--on-green);font-size:14px;line-height:1.5}
-  .cab-hints p{margin:0 0 8px}
-  .cab-hints a{color:inherit;text-decoration:underline}
-  .cab-hints-x{position:absolute;top:8px;right:10px;border:0;background:none;color:inherit;
-               font-size:20px;line-height:1;cursor:pointer;opacity:.6}
-  .cab-hints-x:hover{opacity:1}   /* 15.09: сверху фильтр, под ним приветствие, ниже разделы */
   #cab-nav{grid-column:1;position:sticky;top:96px}
   #cab-body{grid-column:2;margin:0}
   .wrap{max-width:1180px}
@@ -2377,7 +2370,7 @@ body{background:var(--bg)}
 
     <div class="card" id="sec-mine" style="display:none">
       <h2 id="mine-hi">Моя недвижимость</h2>
-      <p class="sub hintbox" style="margin:0 0 14px">Здесь ваши объекты, графики платежей и документы.
+      <p class="sub" style="margin:0 0 14px">Здесь ваши объекты, графики платежей и документы.
       Всё, что вы сюда добавите, видите вы и ваш менеджер — больше никто.
       <a href="#" class="lnk" id="my-privacy">Как мы храним ваши данные</a></p>
       <div id="mine-body"></div>
@@ -2871,19 +2864,23 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     try{
       var all=(DATA&&DATA.properties)||[];
       var idx=(CTX.objs&&CTX.objs.length)?CTX.objs:(NO_PICK?[]:[CUR]);
+      /* Пустой выбор — это решение человека, а не «ничего не записано».
+         Пишем его явно, иначе при следующем входе объект воскресает сам. */
       localStorage.setItem(SEL_LS, JSON.stringify(idx.map(function(i){ return all[i]&&all[i].id; }).filter(Boolean)));
     }catch(e){}
   }
   function selRestore(){
-    var all=(DATA&&DATA.properties)||[], pids=[], idx=[];
-    try{ pids=JSON.parse(localStorage.getItem(SEL_LS)||'[]')||[]; }catch(e){}
+    var all=(DATA&&DATA.properties)||[], pids=[], idx=[], было=null;
+    try{ было=localStorage.getItem(SEL_LS); pids=JSON.parse(было||'[]')||[]; }catch(e){}
     pids.forEach(function(pid){
       for(var i=0;i<all.length;i++){ if(String(all[i].id)===String(pid)){ idx.push(i); break; } }
     });
-    if(all.length<=1) idx=all.length?[0]:[];
+    /* Первый вход и объект ровно один — открываем его, это удобно.
+       Но если человек СНЯЛ выбор (записано пустым), уважаем и оставляем пусто. */
+    if(было===null && all.length===1) idx=[0];
     CTX.objs = idx.length>1 ? idx : [];
     CTX.obj  = idx.length===1 ? idx[0] : null;
-    NO_PICK  = all.length>1 && !idx.length;
+    NO_PICK  = !idx.length;
     return idx.length ? idx[0] : 0;
   }
   function selApply(ids){
@@ -2891,7 +2888,11 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     var idx=(ids||[]).map(Number).filter(function(i){ return !isNaN(i)&&i>=0&&i<all.length; });
     CTX.objs = idx.length>1 ? idx : [];
     CTX.obj  = idx.length===1 ? idx[0] : null;
-    NO_PICK  = all.length>1 && !idx.length;
+    /* 23.09.2026 Эльнур: «выбрал объект — он потом не снимается вообще, нелогично».
+       Стояло `all.length>1 && !idx.length`: у кого объект один, снять выбор было
+       математически невозможно, а selPaint тут же возвращал его назад. Теперь
+       пусто — это законное состояние при любом числе объектов. */
+    NO_PICK  = !idx.length;
     if(idx.length) CUR=idx[0];
     selSave(); selPaint();
   }
@@ -4656,35 +4657,17 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     if(!NO_PICK && !_multi) h+=nowBlock(p);
 
     $('portfolio').innerHTML=h;
-    var hb=document.getElementById('cab-hello'); if(hb) hb.innerHTML=hello+подсказкиПервогоВхода();
+    var hb=document.getElementById('cab-hello'); if(hb) hb.innerHTML=hello;
     var rb=document.getElementById('ov-report');
     if(rb) rb.onclick=function(){ buildReport(); };
     bindNowActions(p);
   }
 
-  /* Три лёгкие подсказки при первом входе. Эльнур 23.09.2026: «лучше, чтобы были
-     подсказки какие то лёгкие», и отдельно «не надо надоедать». Поэтому: один раз
-     на устройство, закрываются целиком, в примере кабинета не показываются вовсе.
-     Хранится в браузере человека: у нас на сервере про это знать нечего. */
-  var ПОДСКАЗКИ_КЛЮЧ='plp_cab_hints_v1';
-  function подсказкиПервогоВхода(){
-    try{
-      if(localStorage.getItem(ПОДСКАЗКИ_КЛЮЧ)) return '';
-    }catch(e){ return ''; }      /* приватное окно: молча без подсказок */
-    var demo=document.getElementById('demo-note');
-    if(demo && demo.style.display!=='none') return '';
-    return '<div class="cab-hints" id="cab-hints">'
-      + '<button type="button" class="cab-hints-x" onclick="закрытьПодсказки()" aria-label="Скрыть подсказки">×</button>'
-      + '<p><b>Здесь ваши объекты.</b> Если покупали вдвоём, второй собственник видит то же самое: доступ у каждого свой.</p>'
-      + '<p><b>Документы, платежи и отчёты</b> в разделах сверху. Чего не хватает, напишите в чат, поднимем и приложим.</p>'
-      + '<p><b>Спросить быстрее, чем искать:</b> кнопка чата внизу справа, отвечаем в любое время. '
-      + 'Что нового на рынке и какие старты продаж, пишем в <a href="https://t.me/property_library_phuket" target="_blank" rel="noopener">нашем канале</a>.</p>'
-      + '</div>';
-  }
-  window.закрытьПодсказки=function(){
-    try{ localStorage.setItem(ПОДСКАЗКИ_КЛЮЧ,'1'); }catch(e){}
-    var b=document.getElementById('cab-hints'); if(b) b.remove();
-  };
+  /* 23.09.2026 Эльнур: «эти странные подсказки в кабинете думаю так себе»,
+     «одна подсказка с функцией убрать — лишнее и некрасиво», «никаких плашек
+     без надобности». Зелёная плашка первого входа и её крестик убраны совсем.
+     Если подсказки понадобятся — они должны жить в самом месте, где человек
+     работает, а не плашкой поверх. */
 
   /* Кнопки в блоке «Объект сейчас»: согласование работы уходит менеджеру
      как заявка, чтобы решение владельца не потерялось в переписке. */
@@ -6747,7 +6730,12 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
         b.onclick=function(){
           var id=b.getAttribute('data-id');
           if(opts.multi){ if(chosen[id]) delete chosen[id]; else chosen[id]=1; draw(); }
-          else { chosen={}; chosen[id]=1; toggle(false); }
+          else {
+            /* 23.09.2026: повторный клик по выбранному пункту СНИМАЕТ выбор.
+               Раньше здесь было безусловное chosen[id]=1 — одиночный список
+               умел только назначать, и «поставить пусто» было нельзя нигде. */
+            var был=!!chosen[id]; chosen={}; if(!был) chosen[id]=1; toggle(false);
+          }
           paint(); bulkNum();
           if(opts.onChange) opts.onChange(Object.keys(chosen));
         };
