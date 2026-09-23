@@ -69,7 +69,6 @@
   try{ matchMedia('(prefers-color-scheme: dark)').addEventListener('change',paintChrome); }catch(e){}
 })();
 </script>
-
 <!-- PLP:HEADTHEME:END -->
 <title>Гостю · Property Library Phuket</title>
 <!-- Страница личная: в поиске ей делать нечего, а по прямой ссылке без номера
@@ -78,6 +77,22 @@
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <link rel="icon" href="img/brand/plp-mark-ink.png">
 <style>
+html{background:var(--bg);overscroll-behavior-y:none}
+/* PLP:ANTIFLICKER */
+/* Мигание фона на телефоне — сводная защита. Эльнур 06.09: «фон в мобильной
+   версии везде мигает, ищи по всем страницам». Три источника:
+   1) размытие фона (backdrop-filter) под липкими элементами — браузер
+      перерисовывает весь экран на каждом кадре прокрутки;
+   2) долгое проявление блоков при прокрутке;
+   3) отложенные картинки без фона — на их месте на миг светится подложка. */
+@media(max-width:900px){
+  .header,#toTop,.badge,.pm-tag,.car .tag,.btn-glass,.hero-float,.fbtn,.chipf,
+  .modal-overlay,.mnav,.sheet,.pm-card,.toolbox{
+    backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+  .reveal{transition-duration:.35s!important}
+}
+.pic-photo,.thumb-photo,.prgs img,.simi-c i,.pm-img img{background-color:var(--warm,#EFEEE7)}
+/* PLP:ANTIFLICKER */
 /* Палитра и размеры — те же, что в кабинете собственника (owner.html).
    Гостевая страница не отдельный продукт, а та же система с другой дверью. */
 :root{
