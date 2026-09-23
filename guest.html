@@ -219,7 +219,7 @@ button.ghost{background:transparent;border:1px solid var(--line);color:var(--ink
     <label for="code" data-t="gate.code">Номер брони</label>
     <input id="code" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="PLB-000000-0000">
     <label for="second" data-t="gate.second">Дата заезда или последние 4 цифры вашего телефона</label>
-    <input id="second" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" placeholder="2026-09-24">
+    <input id="second" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" placeholder="24092026 · 1234">
     <button type="button" class="go" id="enter" data-t="gate.enter">Войти</button>
     <div class="err" id="gate-err"></div>
     <p class="hint" data-t="gate.hint">Номер брони есть в нашем подтверждении. Не нашли — напишите нам, подскажем.</p>
@@ -352,7 +352,7 @@ button.ghost{background:transparent;border:1px solid var(--line);color:var(--ink
     return (d>0&&d<400)?Math.round(d):null;
   }
   function err(id,reason){
-    var m=t('e.'+String(reason||'')); if(m==='e.'+reason) m=t('e.net');
+    var m=t('e.'+String(reason||'net')); if(m.indexOf('e.')===0) m=t('e.net');
     $(id).textContent=m;
   }
 
