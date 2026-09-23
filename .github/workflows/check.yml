@@ -25,9 +25,15 @@ jobs:
           set -e
           python3 - <<'PY'
           import re, io, os, sys
-          pages = ['index.html','buy.html','rent.html','management.html','add-property.html','owner.html','admin.html']
+          # 23.09.2026. Список страниц был перечислен руками, и страница
+          # предложения в него не попала: её скрипт правился и уезжал к клиенту
+          # вообще без проверки. Перечислять руками мы всё равно забудем —
+          # берём все страницы в корне разом, чтобы новая была под охраной с
+          # первого дня.
+          pages = sorted(f for f in os.listdir('.') if f.endswith('.html'))
           pages += ['districts/'+f for f in sorted(os.listdir('districts'))] if os.path.isdir('districts') else []
           pages += ['object/'+f for f in sorted(os.listdir('object'))] if os.path.isdir('object') else []
+          pages += ['guide/'+f for f in sorted(os.listdir('guide')) if f.endswith('.html')] if os.path.isdir('guide') else []
           os.makedirs('.check', exist_ok=True)
           n = 0
           for p in pages:
