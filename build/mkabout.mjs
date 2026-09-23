@@ -17,6 +17,15 @@ const P = f => fs.readFileSync(path.join(ROOT, 'build/parts', f), 'utf8');
 const idx = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
 const mStart = idx.indexOf('<main'), mOpen = idx.indexOf('>', mStart) + 1, mEnd = idx.indexOf('</main>');
 const head = idx.slice(0, mOpen), tail = idx.slice(mEnd);
+/* 22.09.2026: подвал в index.html лежит ВНУТРИ <main>, а эти страницы берут только
+   верх и низ главной — середину собирают сами. Поэтому на управлении, «о нас»,
+   двенадцати статьях гайда и восьми районах подвала не было вовсе: человек доходил
+   до низа и упирался в пустоту. Берём подвал из главной по маркерам и ставим перед
+   низом. Источник один — build/parts/footer.html, копии не разойдутся. */
+const _fS = idx.indexOf('<!-- PLP:FOOTER:START -->');
+const _fE = idx.indexOf('<!-- PLP:FOOTER:END -->');
+const ПОДВАЛ = (_fS >= 0 && _fE > _fS) ? idx.slice(_fS, _fE + '<!-- PLP:FOOTER:END -->'.length) : '';
+
 
 function grabPart(name) {
   const a = idx.indexOf(`<!-- PLP:PART:${name}:START -->`);
@@ -44,7 +53,7 @@ const title = 'О нас — Property Library Phuket';
 const desc = 'Кто мы и как работаем: основатель, наш подход, как проходит сделка и истории клиентов. Подбор, сделка и сопровождение на Пхукете под ключ.';
 const url = SITE + '/about';
 
-let html = head + '\n' + body + '\n' + tail;
+let html = head + '\n' + body + '\n' + ПОДВАЛ + '\n' + tail;
 html = html.replace(/<title>[\s\S]*?<\/title>/, '<title>' + esc(title) + '</title>');
 html = html.replace(/(<meta name="description" content=")[^"]*(")/, '$1' + esc(desc) + '$2');
 html = html.replace(/(<link rel="canonical" href=")[^"]*(")/, '$1' + url + '$2');

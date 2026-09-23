@@ -42,7 +42,19 @@ function sectionPage(indexHtml,opts){
     /<div class="head-row reveal"><div>\s*<div class="arrows">[\s\S]*?<\/div>\s*<\/div>/,
     '');
   picked = picked.replace(/<div class="head-row reveal"><div>\s*<\/div>/, '');
-  let out=head+'\n'+intro+'\n'+picked+'\n'+tail;
+  /* 22.09.2026: подвал в index.html лежит ВНУТРИ <main> как одна из секций.
+     Страница покупки выбирает секции 8 и 9 и подвал приезжает с ними, а страница
+     аренды выбирает только свою — и остаётся без подвала. Так же остались без него
+     управление, «о нас», статьи гайда и районы: на двадцати с лишним страницах
+     человек доходит до низа и упирается в пустоту.
+     Берём подвал из главной по маркерам и ставим его на каждую страницу. Источник
+     один — build/parts/footer.html через mkshared, значит копии не разойдутся. */
+  const _fStart = indexHtml.indexOf('<!-- PLP:FOOTER:START -->');
+  const _fEnd   = indexHtml.indexOf('<!-- PLP:FOOTER:END -->');
+  const _footer = (_fStart >= 0 && _fEnd > _fStart)
+    ? indexHtml.slice(_fStart, _fEnd + '<!-- PLP:FOOTER:END -->'.length) : '';
+  const _ужеЕсть = picked.indexOf('<!-- PLP:FOOTER:START -->') >= 0;
+  let out=head+'\n'+intro+'\n'+picked+(_ужеЕсть||!_footer?'':'\n'+_footer)+'\n'+tail;
   const url=SITE_BASE+'/'+opts.file;
   out=out.replace(/<title>[\s\S]*?<\/title>/,'<title>'+htmlEsc(opts.title)+'</title>');
   out=out.replace(/(<meta name="description" content=")[^"]*(")/,'$1'+htmlEsc(opts.desc)+'$2');

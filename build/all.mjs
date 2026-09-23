@@ -14,6 +14,11 @@ for (const s of steps) {
 /* Приёмка карточек идёт на каждой сборке — чтобы противоречия всплывали сами,
    а не когда Эльнур их заметит. Сборку не валит: это отчёт, а не запрет. */
 try {
+  /* 23.09.2026: перед приёмкой каталога проверяем, не уехали ли на страницы
+     настоящие номера юнитов. Маскировка в базе есть, но в сборку включена не
+     была — и в admin.html с add-property.html лежали PLP-MANOR-S14 и имя владельца. */
+  execFileSync('python3', ['tools/privacy_check.py'],
+    { cwd: '/Users/elnurkhankishiev/plp-site', stdio: 'inherit' });
   execFileSync('python3', ['tools/catalog_audit.py', '--short'],
     { cwd: '/Users/elnurkhankishiev/plp-site', stdio: 'inherit' });
 } catch (e) { console.log('[приёмка] проверка не отработала'); }

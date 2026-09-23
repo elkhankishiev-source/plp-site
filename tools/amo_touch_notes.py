@@ -21,7 +21,7 @@
     python3 amo_touch_notes.py            # показать, что будет записано
     python3 amo_touch_notes.py --apply    # записать заметки
 """
-import json, os, sys, urllib.request
+import json, os, sys, urllib.error, urllib.request
 
 APPLY = '--apply' in sys.argv
 HOOK = 'https://hub.property-library.com/webhook/amo-write'
@@ -51,11 +51,25 @@ KEY = os.environ.get('PLP_WEBHOOK_KEY', '')
 
 
 def sb(path, method='GET', body=None):
+    """Ошибку базы печатаем ТЕЛОМ, а не кодом.
+
+    23.09.2026: скрипт 259 прогонов подряд падал с «HTTP Error 409: Conflict»
+    и ни разу не сказал, на что именно жалуется PostgREST. Голый код — это
+    не сообщение об ошибке, это повод гадать. Тот же разбор:
+    [[plp-silent-catch-hides-death]] — только наоборот, тут крик без смысла."""
     r = urllib.request.Request(BASE + path, method=method,
                                data=json.dumps(body).encode() if body is not None else None,
                                headers=dict(H, Prefer='return=representation'))
-    with urllib.request.urlopen(r, timeout=90) as f:
-        raw = f.read().decode()
+    try:
+        with urllib.request.urlopen(r, timeout=90) as f:
+            raw = f.read().decode()
+    except urllib.error.HTTPError as e:
+        тело = ''
+        try:
+            тело = e.read().decode()[:400]
+        except Exception:
+            pass
+        raise RuntimeError('база %s %s → %s %s' % (method, path, e.code, тело)) from None
     return json.loads(raw) if raw.strip() else []
 
 
@@ -100,7 +114,14 @@ def main():
         ph = str(t.get('phone') or '')
         r = роль(ph)
         if r in НЕ_ЛИД:
+            # Отмечаем и их, иначе коллеги и партнёры висят в очереди вечно
+            # и каждый прогон делают вид, что работы больше, чем есть.
             print('   %-14s роль «%s» — заметку не ставлю' % (ph, r))
+            try:
+                sb('/touch_queue?id=eq.%d&source_ref=is.null' % t['id'], 'PATCH',
+                   {'source_ref': 'не_лид:%s:%s' % (r, t['id'])})
+            except RuntimeError as e:
+                print('      (отметку поставить не смог: %s)' % e)
             continue
         сд = сделка_по_номеру(ph)
         if not сд:
@@ -124,19 +145,41 @@ def main():
     if not KEY:
         print('нет ключа PLP_WEBHOOK_KEY в окружении — отменяю')
         return 1
-    ok = 0
+    ok, сбои = 0, 0
     for t, сд, текст in план:
+        # Сначала занимаем строку, потом пишем заметку. Порядок важен: если
+        # заметка ушла, а отметка не встала, следующий прогон через 20 минут
+        # напишет ту же заметку снова — и так 72 раза в сутки. Лучше в редком
+        # случае потерять одну заметку, чем засыпать менеджеру карточку копиями.
+        # Метка обязана быть своя у каждого касания: на source_ref висит
+        # уникальный индекс touch_queue_source_ref_uk. Прежний код писал туда
+        # один номер сделки — и второе касание в ту же сделку падало с 409.
+        # Два человека в одной сделке — не редкость, это норма.
+        метка = 'amo_note:%s:%s' % (сд['id'], t['id'])
+        try:
+            sb('/touch_queue?id=eq.%d&source_ref=is.null' % t['id'], 'PATCH',
+               {'source_ref': метка})
+        except RuntimeError as e:
+            сбои += 1
+            print('   ✗ %s: отметку поставить не смог — %s' % (t['phone'], e))
+            continue          # падать на одной строке и терять остальные шесть незачем
         res = amo('POST', 'leads/%d/notes' % сд['id'],
                   [{'note_type': 'common', 'params': {'text': текст}}])
-        если_ок = '"id"' in res
-        if если_ок:
-            sb('/touch_queue?id=eq.%d' % t['id'], 'PATCH',
-               {'source_ref': 'amo_note:%s' % сд['id']})
+        if '"id"' in res:
+            try:
+                pass          # метка уже стоит, переписывать нечего
+            except RuntimeError:
+                pass
             ok += 1
         else:
-            print('   ✗ %s: %s' % (t['phone'], res[:110]))
-    print('\nзаписано заметок: %d из %d' % (ok, len(план)))
-    return 0
+            сбои += 1
+            print('   ✗ %s: CRM не приняла заметку — %s' % (t['phone'], res[:150]))
+            try:              # заметки нет — отметку снимаем, попробуем в следующий раз
+                sb('/touch_queue?id=eq.%d' % t['id'], 'PATCH', {'source_ref': None})
+            except RuntimeError:
+                pass
+    print('\nзаписано заметок: %d из %d, сбоев: %d' % (ok, len(план), сбои))
+    return 1 if сбои and not ok else 0
 
 
 if __name__ == '__main__':
