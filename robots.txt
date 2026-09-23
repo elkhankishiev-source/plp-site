@@ -10,4 +10,7 @@ Disallow: /admin.html
 # кабинет собственника — только по личному коду, в поиске ему не место
 Disallow: /owner.html
 
+# страница гостя — открывается по номеру брони, в поиске ей не место
+Disallow: /guest.html
+
 Sitemap: https://property-library.com/sitemap.xml
