@@ -123,7 +123,25 @@ function bedsLabel(o) {
   if (min === max) return lo;
   return lo + DASH + String(max);
 }
+/* 23.09 Эльнур: «вилла Эстелла — указываем площадь застройки и участка, обычно
+   так; а если это квартира, то только площадь квартиры».
+   У виллы два числа, и они разные по смыслу: дом и земля под ним. Одно число
+   вместо двух покупателя вводит в заблуждение — у MORI 1 это 229 м² дома
+   на участке 150 м². У квартиры участка нет, там число одно. */
+function площадьВиллы(o) {
+  const дом = Number(o.built_area_sqm), уч = Number(o.plot_area_sqm);
+  const домОк = Number.isFinite(дом) && дом > 0, учОк = Number.isFinite(уч) && уч > 0;
+  /* округляем до целого: «150,15 м² участок» читается как опечатка, а не как точность */
+  const ц = n => fmtNum(Math.round(n));
+  if (домОк && учОк) return ц(дом) + ' м² дом · ' + ц(уч) + ' м² участок';
+  if (учОк) return ц(уч) + ' м² участок';
+  return '';
+}
 function areaLabel(o) {
+  if (/вилл|villa/i.test(String(o.type || ''))) {
+    const в = площадьВиллы(o);
+    if (в) return в;                 // есть оба числа — показываем как положено
+  }
   const min = o.area_min, max = o.area_max;
   if (min === null || min === undefined || max === null || max === undefined) {
     // area_sqm бывает «замусорен» аннотацией — берём только числовую часть
@@ -1915,7 +1933,7 @@ async function main() {
     'brochure_url,floorplan_url,video_url,website_url,map_url,current_promo,' +
     'season_rates,occupancy_est_pct,maintenance_fee_thb_sqm,lat,lng,coord_source,last_synced_at,availability,' +
     'first_payment,payment_plan,payment_schedule,main_image_url,gallery_urls,unit_types,price_tiers,build_progress,photo_groups,hot_rank,public_code,' +
-    'ownership,amenities,nearby,distance_airport_km');
+    'plot_area_sqm,built_area_sqm,ownership,amenities,nearby,distance_airport_km');
   const benchmarks = await sbGet(env,
     'rental_benchmarks?select=district,unit_type,disp_yield_low_pct,disp_yield_high_pct,net_yield_low_pct,net_yield_high_pct');
 
@@ -1926,7 +1944,7 @@ async function main() {
     'bedrooms_max,area_sqm,area_min,area_max,min_stay,deposit,rent_included,rent_excluded,' +
     'rent_rules,amenities,usp,usp_en,distance_beach_m,on_site,lat,lng,coord_source,last_synced_at,public_code,' +
     'main_image_url,gallery_urls,photo_groups,unit_types,price_tiers,season_rates,rent_price_month_thb,' +
-    'stage,stage_note,sale_started_on,handover_date,parent_object_id' +
+    'plot_area_sqm,built_area_sqm,stage,stage_note,sale_started_on,handover_date,parent_object_id' +
     '&and=(or(purpose.eq.' + encodeURIComponent('аренда') + ',purpose.eq.rent),' +
     'on_site.eq.true)&order=plp_property_id');
 
