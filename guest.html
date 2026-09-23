@@ -488,16 +488,19 @@ button.ghost{background:transparent;border:1px solid var(--line);color:var(--ink
     });
   };
 
-  /* ── старт: ссылка вида /guest?b=PLB-...&d=2026-09-24 заполняет поля,
-       сохранённый вход открывает страницу сразу ── */
+  /* ── старт: ссылка вида /guest?b=PLB-... подставляет номер брони,
+       второй признак гость вводит сам, сохранённый вход открывает сразу ──
+
+     23.09.2026. Раньше ссылка понимала и второй параметр d= и входила сама.
+     Такая ссылка это ключ на предъявителя: переслал в семейный чат — вошёл
+     любой, кто его увидел. Второй признак на то и второй, чтобы не ехать
+     рядом с первым. Дату гость набирает сам, это пять секунд. */
   paintLang();
   (function start(){
     var q=new URLSearchParams(location.search);
-    var b=(q.get('b')||'').trim(), d=(q.get('d')||'').trim();
+    var b=(q.get('b')||'').trim();
     if(b) $('code').value=b.toUpperCase();
-    if(d) $('second').value=d;
     var saved=keyLoad();
-    if(b&&d){ show('gate'); enter(b.toUpperCase(), d, 'form'); return; }
     if(saved&&saved.code&&saved.second){ show('gate'); enter(saved.code, saved.second, 'saved'); return; }
     show('gate');
   })();
