@@ -22,7 +22,7 @@
     python3 protect_developers.py            # показать кандидатов
     python3 protect_developers.py --apply    # проставить роль
 """
-import json, os, re, sys, urllib.parse, urllib.request
+import json, os, re, sys, urllib.error, urllib.parse, urllib.request
 
 APPLY = '--apply' in sys.argv
 ENV = os.path.expanduser('~/.plp_site_supabase.env')
@@ -56,6 +56,37 @@ def get(path):
         return json.loads(f.read().decode() or '[]')
 
 
+def get_страницами(path):
+    """Читаем ВСЮ выборку, а не первую тысячу.
+
+    23.09.2026: Supabase отдаёт максимум 1000 строк за раз и МОЛЧА обрезает —
+    `limit=4000` в запросе ничего не меняет, ответ всё равно 1000 строк
+    (проверено: Content-Range 0-999/3393). Реплик клиентов в chat_history 3393,
+    то есть сторож застройщиков видел последнюю тысячу и 2393 реплики не читал:
+    партнёр, писавший раньше, роль не получал. Те же грабли были в
+    census_owners.py и amo_dialog_notes.py. Листаем заголовком Range.
+
+    Только чтение: PATCH по страницам гонять нельзя — запись повторится."""
+    # свой limit в пути перебивает Range: каждая страница вернёт одну и ту же
+    # первую тысячу, и цикл не кончится никогда.
+    path = re.sub(r'[?&]limit=\d+', lambda m: '?' if m.group(0)[0] == '?' else '', path)
+    path = path.replace('?&', '?').rstrip('?&')
+    из, шаг, всё = 0, 1000, []
+    while True:
+        r = urllib.request.Request(BASE + path, headers=dict(H, Range='%d-%d' % (из, из + шаг - 1)))
+        try:
+            with urllib.request.urlopen(r, timeout=120) as f:
+                кусок = json.loads(f.read().decode() or '[]')
+        except urllib.error.HTTPError as ex:
+            if ex.code == 416:      # строк ровно кратно 1000 — страниц больше нет
+                return всё
+            raise
+        всё += кусок
+        if len(кусок) < шаг:
+            return всё
+        из += шаг
+
+
 def patch(path, body):
     r = urllib.request.Request(BASE + path, data=json.dumps(body).encode(),
                                headers=dict(H, **{'Content-Type': 'application/json'}), method='PATCH')
@@ -63,7 +94,9 @@ def patch(path, body):
 
 
 def main():
-    rows = get('/chat_history?role=eq.user&select=phone_norm,content&limit=4000&order=ts.desc')
+    # второй ключ сортировки обязателен: ts не уникален, и без id.desc страницы
+    # Range перемешаются — строки повторятся или потеряются
+    rows = get_страницами('/chat_history?role=eq.user&select=phone_norm,content&order=ts.desc,id.desc')
     byp = {}
     for r in rows:
         ph = r.get('phone_norm')
@@ -79,8 +112,15 @@ def main():
     if not hits:
         print('кандидатов нет')
         return 0
-    profs = get('/client_profiles?phone_norm=in.(%s)&select=phone_norm,name,contact_role'
-                % ','.join(list(hits)[:200]))
+    # Тот же обрез, только не со стороны Supabase, а со своей: раньше сюда
+    # доходило 125 номеров и срез [:200] не мешал, после правки 23.09 доходит 319
+    # и 119 номеров молча выпадали. Идём пачками по 100 — длинный in.() ещё и
+    # упирается в длину URL.
+    ключи = list(hits)
+    profs = []
+    for i in range(0, len(ключи), 100):
+        profs += get('/client_profiles?phone_norm=in.(%s)&select=phone_norm,name,contact_role'
+                     % ','.join(ключи[i:i + 100])) or []
     todo = [p for p in profs if not p.get('contact_role')]
     print('нашлось по переписке: %d, из них без роли: %d' % (len(hits), len(todo)))
     for p in todo:

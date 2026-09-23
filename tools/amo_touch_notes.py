@@ -38,8 +38,6 @@ def env():
             if '=' in ln and not ln.strip().startswith('#'):
                 k, v = ln.strip().split('=', 1)
                 out.setdefault(k, v.strip().strip('"\''))
-        if out.get('SUPABASE_URL'):
-            break
     return out
 
 
@@ -47,7 +45,11 @@ E = env()
 BASE = E['SUPABASE_URL'].rstrip('/') + '/rest/v1'
 H = {'apikey': E['SUPABASE_SERVICE_KEY'], 'Authorization': 'Bearer ' + E['SUPABASE_SERVICE_KEY'],
      'Content-Type': 'application/json'}
-KEY = os.environ.get('PLP_WEBHOOK_KEY', '')
+# Ключ вебхука: сначала окружение, иначе тот же .env, откуда взяты ключи Supabase.
+# 23.09: раньше брался ТОЛЬКО из окружения, и строка крона была вынуждена
+# подставлять его через sed. Руками скрипт при этом не запускался вовсе.
+# В соседнем amo_dialog_notes.py это починено давно — здесь копия отстала.
+KEY = os.environ.get('PLP_WEBHOOK_KEY') or E.get('PLP_WEBHOOK_KEY', '')
 
 
 def sb(path, method='GET', body=None):

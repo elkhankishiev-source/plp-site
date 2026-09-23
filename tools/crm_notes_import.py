@@ -25,7 +25,7 @@
     python3 crm_notes_import.py --restart      # начать с первой страницы
     python3 crm_notes_import.py --status       # сколько уже лежит
 """
-import json, os, sys, time, urllib.parse, urllib.request
+import json, os, re, sys, time, urllib.error, urllib.parse, urllib.request
 
 ENV = next((p for p in (os.path.expanduser('~/.plp_site_supabase.env'), '/opt/plp-api/.env')
             if os.path.exists(p)), None)
@@ -66,6 +66,37 @@ def sb(path, method='GET', body=None, prefer=None):
     return json.loads(t) if t.strip().startswith(('[', '{')) else t
 
 
+def sb_страницами(path):
+    """Читаем ВСЮ таблицу, а не первую тысячу.
+
+    23.09.2026: Supabase отдаёт максимум 1000 строк за раз и МОЛЧА обрезает —
+    `limit=20000` в запросе ничего не меняет, ответ всё равно 1000 строк
+    (проверено: Content-Range 0-999/5387). В crm_notes 5387 строк, то есть
+    отчёт «сколько заметок импортировано» врал в пять раз и показывал 1000.
+    На те же грабли мы наступали в census_owners.py и amo_dialog_notes.py.
+    Листаем заголовком Range, как в census_owners.py.
+
+    Только чтение: гонять PATCH или POST по страницам нельзя — запись повторится."""
+    # свой limit в пути ломает листание: он перебивает Range, и каждая страница
+    # возвращает одну и ту же первую тысячу — цикл не кончится никогда.
+    path = re.sub(r'[?&]limit=\d+', lambda m: m.group(0)[0] if m.group(0)[0] == '?' else '', path)
+    path = path.replace('?&', '?').rstrip('?&')
+    из, шаг, всё = 0, 1000, []
+    while True:
+        r = urllib.request.Request(BASE + path, headers=dict(H, Range='%d-%d' % (из, из + шаг - 1)))
+        try:
+            with urllib.request.urlopen(r, timeout=120) as f:
+                кусок = json.loads(f.read().decode() or '[]')
+        except urllib.error.HTTPError as ex:
+            if ex.code == 416:      # строк ровно кратно 1000 — страниц больше нет
+                return всё
+            raise
+        всё += кусок
+        if len(кусок) < шаг:
+            return всё
+        из += шаг
+
+
 def amo(path):
     r = urllib.request.Request(PROBE, data=json.dumps({'path': path}).encode(),
                                headers={'Content-Type': 'application/json', 'x-plp-key': WKEY},
@@ -87,7 +118,9 @@ def flag(key, value=None):
 
 def main():
     if STATUS:
-        rows = sb('/crm_notes?select=entity_type&limit=20000')
+        # order=id обязателен: без него страницы Range могут перемешаться и
+        # строки повторятся или потеряются
+        rows = sb_страницами('/crm_notes?select=entity_type&order=id')
         import collections
         print('строк в crm_notes: %d %s' % (len(rows), dict(collections.Counter(r['entity_type'] for r in rows))))
         print('страница, на которой остановились: лиды=%s, контакты=%s'

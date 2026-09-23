@@ -40,8 +40,6 @@ def env():
             if '=' in ln and not ln.strip().startswith('#'):
                 k, v = ln.strip().split('=', 1)
                 out.setdefault(k, v.strip().strip('"\''))
-        if out.get('SUPABASE_URL'):
-            break
     return out
 
 
