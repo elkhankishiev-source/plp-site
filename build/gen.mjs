@@ -957,7 +957,6 @@ function buildRentals(objects, preserve, ratesBy) {
       deposit: (o.deposit === 0 || o.deposit) ? o.deposit : null,
       // фильтр удобств: источники — amenities (если есть) + rent_included; distance_beach_m для «у моря»
       amenities: S(o.amenities),
-      beach_m: (o.distance_beach_m === 0 || o.distance_beach_m) ? o.distance_beach_m : null,
       included: S(o.rent_included),
       excluded: S(o.rent_excluded),
       rules: S(o.rent_rules),
