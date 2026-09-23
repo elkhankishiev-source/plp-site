@@ -22,6 +22,11 @@ from datetime import datetime, timedelta, timezone
 SEND = '--send' in sys.argv
 SEEN = '/tmp/plp_watch_seen.json'
 TTL = 6 * 3600
+# 23.09.2026: про одного и того же человека «ждёт ответа» напоминаем РАЗ В СУТКИ,
+# а не каждые 20 минут. Ключ дедупа уже без чисел, но шестичасовой срок давал
+# четыре повтора в день про одно и то же. Эльнур: «глупое уведомление каждые
+# 20 минут». Остальные поводы живут прежние шесть часов.
+TTL_ОЖИДАНИЕ = 24 * 3600
 ENV = next((p for p in (os.path.expanduser('~/.plp_site_supabase.env'), '/opt/plp-api/.env')
             if os.path.exists(p)), None)
 
@@ -78,10 +83,20 @@ def patch(path, body):
 ЧАТ_ID = re.compile(r'(?<![\d])-\d{9,}')
 
 
+# 23.09.2026, Эльнур: «это ненужное уведомление, я буду писать сразу там, где
+# приходит уведомление». Речь про канал userbot_elnur — это ЛИЧНЫЙ телеграм
+# Эльнура через мост. Туда пишут ему лично: реклама курсов, знакомые, холодные
+# предложения. Отвечать за него система не должна и напоминать об этом тоже.
+# Рабочие каналы (wazzup, telegram клиентов, сайт) остаются под присмотром.
+ЛИЧНЫЕ_КАНАЛЫ = ('userbot_elnur', 'tg_userbot', 'userbot')
+
+
 def шум(строка):
     """Не человек или не повод: тест, свой номер, групповая рассылка, id чата."""
     т = str(строка)
     if ТЕСТОВАЯ_ЗАПИСЬ.search(т) or ГРУППОВОЙ_ID.search(т) or ЧАТ_ID.search(т):
+        return True
+    if any(('(' + к + ')') in т for к in ЛИЧНЫЕ_КАНАЛЫ):
         return True
     цифры = re.sub(r'\D', '', т)
     return any(н in цифры for н in СВОИ_НОМЕРА)
@@ -117,8 +132,9 @@ def seen(key):
     except Exception:
         d = {}
     now = time.time()
-    d = {k: v for k, v in d.items() if now - v < TTL}
-    was = key in d
+    срок = TTL_ОЖИДАНИЕ if ':🕑' in key or key.startswith(('sales:🕑', 'tech:🕑')) else TTL
+    d = {k: v for k, v in d.items() if now - v < max(TTL, TTL_ОЖИДАНИЕ)}
+    was = (key in d) and (now - d[key] < срок)
     d[key] = now
     try:
         json.dump(d, open(SEEN, 'w'))
