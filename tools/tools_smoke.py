@@ -43,10 +43,13 @@ SB = E['SUPABASE_URL'].rstrip('/') + '/rest/v1'
 H = {'apikey': E['SUPABASE_SERVICE_KEY'], 'Authorization': 'Bearer ' + E['SUPABASE_SERVICE_KEY']}
 
 
-def гет(путь, тело=None):
+def гет(путь, тело=None, метод=None):
+    """Читать — GET, звать функцию — POST с телом. Метод можно задать прямо
+    (23.09.2026: понадобился PATCH, чтобы сторож убирал за собой свою же строку)."""
+    м = метод or ('POST' if тело is not None else 'GET')
     r = urllib.request.Request(SB + путь,
                                data=json.dumps(тело).encode() if тело is not None else None,
-                               method='POST' if тело is not None else 'GET',
+                               method=м,
                                headers=dict(H, **({'Content-Type': 'application/json'} if тело is not None else {})))
     try:
         with urllib.request.urlopen(r, timeout=30) as f:
@@ -138,6 +141,14 @@ def _():
     if к != 200:
         return False, 'не собрался: %s %s' % (к, д)
     токен = д.get('token') if isinstance(д, dict) else (д[0].get('token') if isinstance(д, list) and д else д)
+    # 23.09.2026. Проверка создаёт НАСТОЯЩУЮ строку оффера, и за сутки их
+    # накопилось семь — все от «сторожа». В пульте список офферов из-за этого
+    # забивался проверками, а живого оффера клиенту в нём было не разглядеть.
+    # Сторож обязан убирать за собой: помечаем свою строку отозванной сразу.
+    # Не удаляем: пусть видно, что проверка была и что она прошла.
+    if токен:
+        гет('/client_offers?token=eq.%s' % токен, метод='PATCH',
+            тело={'revoked': True, 'note': 'строка проверки, клиенту не отправлялась'})
     return (bool(токен), 'токен выдан' if токен else 'токен не выдан')
 
 
