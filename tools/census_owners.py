@@ -89,9 +89,9 @@ def дата(d):
 
 def собрать():
     люди = {c['client_id']: c for c in sb('/clients?select=client_id,code,name,phone,tg_id,email,notes')}
-    юниты = sb('/client_objects?rel=in.(owns,spouse)&select=client_id,plp_property_id,project_name,'
+    юниты = sb('/client_objects?rel=in.(owns,spouse)&select=client_id,object_id,project_name,'
                'unit,rel,stage,uk_status,purchase_price,handover_on,next_payment_on,'
-               'next_payment_amount,note&order=plp_property_id')
+               'next_payment_amount,note&order=object_id')
     # Какие цены подтверждены договором, а какие взяты из переписки и CRM.
     # Это разные вещи, и продавцу важно знать, какую можно называть клиенту.
     с_договором = {d['object_id'] for d in
@@ -142,9 +142,9 @@ def main():
         if ч.get('email'):
             связь.append(e(ч['email']))
         карточки = []
-        for u in sorted(список, key=lambda x: x['plp_property_id'] or ''):
+        for u in sorted(список, key=lambda x: x['object_id'] or ''):
             всего_юнитов += 1
-            o = объекты.get(u['plp_property_id']) or {}
+            o = объекты.get(u['object_id']) or {}
             факты = []
             if o.get('district'):
                 факты.append(РАЙОН.get(o['district'], o['district']))
@@ -163,7 +163,7 @@ def main():
             if u.get('purchase_price'):
                 # ✓ — цифра из договора. Без галочки — из переписки или CRM,
                 # такую клиенту не называем не проверив.
-                подтв = u['plp_property_id'] in с_договором
+                подтв = u['object_id'] in с_договором
                 хвост.append('покупка ' + деньги(u['purchase_price']) + (' ✓' if подтв else ' (не сверено)'))
             if u.get('next_payment_on'):
                 хвост.append('ближайший платёж ' + дата(u['next_payment_on']) +
@@ -173,7 +173,7 @@ def main():
             заметка = str(u.get('note') or '').split('\n')[0][:150]
             карточки.append(
                 '<li><b>%s</b>%s<div class="f">%s</div>%s%s</li>'
-                % (e(u['plp_property_id']),
+                % (e(u['object_id']),
                    ' <span class="sp">супруг(а)</span>' if u.get('rel') == 'spouse' else '',
                    e(' · '.join(факты)) or '<i>данных по объекту нет</i>',
                    ('<div class="h">' + e(' · '.join(хвост)) + '</div>') if хвост else '',
