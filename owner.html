@@ -1227,7 +1227,14 @@ a.lnk,.lnk{color:var(--olive)}
 @media(min-width:1000px){
   #app{display:grid;grid-template-columns:230px minmax(0,1fr);gap:26px;align-items:start}
   #cab-ctx{grid-column:1/-1;order:-2}
-  #cab-hello{grid-column:1/-1;order:-1}   /* 15.09: сверху фильтр, под ним приветствие, ниже разделы */
+  #cab-hello{grid-column:1/-1;order:-1}
+  .cab-hints{position:relative;margin:12px 0 0;padding:14px 38px 6px 16px;border:1px solid var(--line);
+             border-radius:14px;background:var(--green-soft);color:var(--on-green);font-size:14px;line-height:1.5}
+  .cab-hints p{margin:0 0 8px}
+  .cab-hints a{color:inherit;text-decoration:underline}
+  .cab-hints-x{position:absolute;top:8px;right:10px;border:0;background:none;color:inherit;
+               font-size:20px;line-height:1;cursor:pointer;opacity:.6}
+  .cab-hints-x:hover{opacity:1}   /* 15.09: сверху фильтр, под ним приветствие, ниже разделы */
   #cab-nav{grid-column:1;position:sticky;top:96px}
   #cab-body{grid-column:2;margin:0}
   .wrap{max-width:1180px}
@@ -4646,11 +4653,35 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     if(!NO_PICK && !_multi) h+=nowBlock(p);
 
     $('portfolio').innerHTML=h;
-    var hb=document.getElementById('cab-hello'); if(hb) hb.innerHTML=hello;
+    var hb=document.getElementById('cab-hello'); if(hb) hb.innerHTML=hello+подсказкиПервогоВхода();
     var rb=document.getElementById('ov-report');
     if(rb) rb.onclick=function(){ buildReport(); };
     bindNowActions(p);
   }
+
+  /* Три лёгкие подсказки при первом входе. Эльнур 23.09.2026: «лучше, чтобы были
+     подсказки какие то лёгкие», и отдельно «не надо надоедать». Поэтому: один раз
+     на устройство, закрываются целиком, в примере кабинета не показываются вовсе.
+     Хранится в браузере человека: у нас на сервере про это знать нечего. */
+  var ПОДСКАЗКИ_КЛЮЧ='plp_cab_hints_v1';
+  function подсказкиПервогоВхода(){
+    try{
+      if(localStorage.getItem(ПОДСКАЗКИ_КЛЮЧ)) return '';
+    }catch(e){ return ''; }      /* приватное окно: молча без подсказок */
+    var demo=document.getElementById('demo-note');
+    if(demo && demo.style.display!=='none') return '';
+    return '<div class="cab-hints" id="cab-hints">'
+      + '<button type="button" class="cab-hints-x" onclick="закрытьПодсказки()" aria-label="Скрыть подсказки">×</button>'
+      + '<p><b>Здесь ваши объекты.</b> Если покупали вдвоём, второй собственник видит то же самое: доступ у каждого свой.</p>'
+      + '<p><b>Документы, платежи и отчёты</b> в разделах сверху. Чего не хватает, напишите в чат, поднимем и приложим.</p>'
+      + '<p><b>Спросить быстрее, чем искать:</b> кнопка чата внизу справа, отвечаем в любое время. '
+      + 'Что нового на рынке и какие старты продаж, пишем в <a href="https://t.me/property_library_phuket" target="_blank" rel="noopener">нашем канале</a>.</p>'
+      + '</div>';
+  }
+  window.закрытьПодсказки=function(){
+    try{ localStorage.setItem(ПОДСКАЗКИ_КЛЮЧ,'1'); }catch(e){}
+    var b=document.getElementById('cab-hints'); if(b) b.remove();
+  };
 
   /* Кнопки в блоке «Объект сейчас»: согласование работы уходит менеджеру
      как заявка, чтобы решение владельца не потерялось в переписке. */
