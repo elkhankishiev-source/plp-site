@@ -6,6 +6,15 @@ const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').rep
 const idx=fs.readFileSync(path.join(ROOT,'index.html'),'utf8');
 const mStart=idx.indexOf('<main'), mOpen=idx.indexOf('>',mStart)+1, mEnd=idx.indexOf('</main>');
 const head=idx.slice(0,mOpen), tail=idx.slice(mEnd);
+/* 22.09.2026: подвал в index.html лежит ВНУТРИ <main>, а эти страницы берут только
+   верх и низ главной — середину собирают сами. Поэтому на управлении, «о нас»,
+   двенадцати статьях гайда и восьми районах подвала не было вовсе: человек доходил
+   до низа и упирался в пустоту. Берём подвал из главной по маркерам и ставим перед
+   низом. Источник один — build/parts/footer.html, копии не разойдутся. */
+const _fS = idx.indexOf('<!-- PLP:FOOTER:START -->');
+const _fE = idx.indexOf('<!-- PLP:FOOTER:END -->');
+const ПОДВАЛ = (_fS >= 0 && _fE > _fS) ? idx.slice(_fS, _fE + '<!-- PLP:FOOTER:END -->'.length) : '';
+
 
 // секции главной — чтобы переиспользовать каталог на других страницах
 function grabSection(id){
@@ -42,7 +51,7 @@ function rentCatalogOnly(){
 const wrapSection = inner => inner ? `<section style="padding-top:26px"><div class="container">${inner}</div></section>` : '';
 
 function page({file,depth,title,desc,body,jsonld}){
-  let html=head+'\n'+body+'\n'+tail;
+  let html=head+'\n'+body+'\n'+ПОДВАЛ+'\n'+tail;
   const url=SITE+'/'+file;
   html=html.replace(/<title>[\s\S]*?<\/title>/,'<title>'+esc(title)+'</title>');
   html=html.replace(/(<meta name="description" content=")[^"]*(")/,'$1'+esc(desc)+'$2');

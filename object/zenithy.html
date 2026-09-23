@@ -3,6 +3,64 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- PLP:HEADTHEME:START -->
+<meta name="color-scheme" content="light dark">
+<!-- цвет системных полей браузера = фон страницы. Без этого при прокрутке и
+     оттягивании из-под страницы проглядывает чужой цвет — кажется, что фон мигает. -->
+<meta name="theme-color" content="#f7f6f1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0C0D09" media="(prefers-color-scheme: dark)">
+<script>
+(function(){
+  function paintChrome(){
+    try{
+      var bg=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+      if(!bg && document.body) bg=getComputedStyle(document.body).backgroundColor;
+      if(!bg || bg==='rgba(0, 0, 0, 0)') return;
+      var list=document.querySelectorAll('meta[name="theme-color"]');
+      for(var i=0;i<list.length;i++) list[i].parentNode.removeChild(list[i]);
+      var m=document.createElement('meta'); m.setAttribute('name','theme-color');
+      m.setAttribute('content',bg); document.head.appendChild(m);
+    }catch(e){}
+  }
+  /* Кнопка «поделиться»: на телефоне открывает системное меню, на компьютере
+     кладёт ссылку в буфер и говорит об этом. Эльнур 07.09: «сайтом надо
+     пользоваться, он не просто для красоты». */
+  document.addEventListener('click', function(e){
+    var b = e.target && e.target.closest && e.target.closest('[data-share]');
+    if(!b) return;
+    e.preventDefault();
+    var path = b.getAttribute('data-share') || location.pathname;
+    var url = location.origin + path;
+    var title = b.getAttribute('data-share-title') || document.title;
+    var done = function(){
+      var was = b.innerHTML;   /* 15.09: в кнопке живёт svg-иконка, восстанавливаем разметку целиком */
+      b.textContent = '✓ Ссылка скопирована';
+      b.classList.add('ok');
+      setTimeout(function(){ b.innerHTML = was; b.classList.remove('ok'); }, 2200);
+    };
+    if(navigator.share){ navigator.share({title:title, url:url}).catch(function(){}); return; }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(url).then(done).catch(function(){ prompt('Скопируйте ссылку:', url); });
+    } else prompt('Скопируйте ссылку:', url);
+  });
+  window.paintChrome=paintChrome;
+  /* Адрес без .html: страницы и так открываются коротким адресом, но если
+     человек пришёл по старой ссылке, приводим строку браузера к чистому виду.
+     Эльнур 07.09: «мне не нравится html в адресе, я ни у кого её не видел». */
+  try{
+    var pth=location.pathname;
+    if(/\.html$/.test(pth)){
+      var clean=pth.replace(/index\.html$/,'').replace(/\.html$/,'');
+      if(clean==='') clean='/';
+      history.replaceState(null,'',clean+location.search+location.hash);
+    }
+  }catch(e){}
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',paintChrome);
+  else paintChrome();
+  try{ matchMedia('(prefers-color-scheme: dark)').addEventListener('change',paintChrome); }catch(e){}
+})();
+</script>
+<!-- PLP:HEADTHEME:END -->
 <script>(function(){try{var v=localStorage.getItem('pl_theme');
 if(v==='dark'||v==='light')document.documentElement.setAttribute('data-theme',v);}catch(e){}})();</script>
 <title>Zenithy La Ville · Oasis Collection — Ко Кео, Пхукет | Property Library</title>
@@ -27,6 +85,22 @@ if(v==='dark'||v==='light')document.documentElement.setAttribute('data-theme',v)
 <meta name="twitter:image" content="https://property-library.com/img/PLP-ZENITHY.jpg">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"RealEstateListing","@id":"https://property-library.com/object/zenithy#listing","url":"https://property-library.com/object/zenithy","name":"Zenithy La Ville · Oasis Collection","description":"Виллы 3 спальни и 4 санузла в Ко Кэу, две зоны — Tropical и Oasis, два типа планировки. Дом 352–357 м², участок от 259 до 472 м², собственный бассейн 9,5–10 метров. Рядом Британская международная школа и своя коммерческая зона: магазины, рестораны, фитнес, теннисный корт.","about":{"@id":"https://property-library.com/object/zenithy#residence"}},{"@type":"Residence","@id":"https://property-library.com/object/zenithy#residence","name":"Zenithy La Ville · Oasis Collection","description":"Виллы 3 спальни и 4 санузла в Ко Кэу, две зоны — Tropical и Oasis, два типа планировки. Дом 352–357 м², участок от 259 до 472 м², собственный бассейн 9,5–10 метров. Рядом Британская международная школа и своя коммерческая зона: магазины, рестораны, фитнес, теннисный корт.","url":"https://property-library.com/object/zenithy","image":"https://property-library.com/img/PLP-ZENITHY.jpg","address":{"@type":"PostalAddress","addressRegion":"Phuket","addressLocality":"Ко Кео","addressCountry":"TH"},"additionalProperty":{"@type":"PropertyValue","name":"Застройщик","value":"Zenithy Development"},"floorSize":{"@type":"QuantitativeValue","value":357,"unitCode":"MTK"}},{"@type":"Offer","@id":"https://property-library.com/object/zenithy#offer","itemOffered":{"@id":"https://property-library.com/object/zenithy#residence"},"priceCurrency":"THB","price":26530500,"availability":"https://schema.org/InStock","url":"https://property-library.com/object/zenithy","seller":{"@type":"RealEstateAgent","name":"Property Library Phuket","url":"https://property-library.com"}}]}</script>
 <style>
+/* PLP:ANTIFLICKER */
+/* Мигание фона на телефоне — сводная защита. Эльнур 06.09: «фон в мобильной
+   версии везде мигает, ищи по всем страницам». Три источника:
+   1) размытие фона (backdrop-filter) под липкими элементами — браузер
+      перерисовывает весь экран на каждом кадре прокрутки;
+   2) долгое проявление блоков при прокрутке;
+   3) отложенные картинки без фона — на их месте на миг светится подложка. */
+@media(max-width:900px){
+  .header,#toTop,.badge,.pm-tag,.car .tag,.btn-glass,.hero-float,.fbtn,.chipf,
+  .modal-overlay,.mnav,.sheet,.pm-card,.toolbox{
+    backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+  .reveal{transition-duration:.35s!important}
+}
+.pic-photo,.thumb-photo,.prgs img,.simi-c i,.pm-img img{background-color:var(--warm,#EFEEE7)}
+/* PLP:ANTIFLICKER */
+html{background:var(--bg);overscroll-behavior-y:none}
 /* Эльнур 05.09: сайт — единая система. Страница объекта живёт в тех же
    цветах и с тем же набором блоков, что и карточка на сайте. */
 :root{--green:#D2D5B3;--green-deep:#5F6242;--olive:#5F6242;--ink:#22251C;--paper:#FBFBF7;
@@ -125,7 +199,7 @@ var dark = d==='dark' || (d!=='light' && window.matchMedia && window.matchMedia(
 if(dark) i.src='../img/brand/plp-mark-white.png';})();</script>
 <main class="wrap">
   <div class="hero">
-    <img id="mainShot" src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ZENITHY/cover/ff9e2b4fae89ff8b-1600.webp" alt="Zenithy La Ville · Oasis Collection" loading="lazy">
+    <img id="mainShot" src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ZENITHY/cover/ff9e2b4fae89ff8b-760.webp" alt="Zenithy La Ville · Oasis Collection" loading="lazy">
     <div class="badge">Вилла · Ко Кео</div>
   </div>
   <div class="shots"><button type="button" class="on" data-src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ZENITHY/cover/ff9e2b4fae89ff8b-1600.webp" aria-label="Фото 1"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ZENITHY/cover/ff9e2b4fae89ff8b-1600.webp" alt="" loading="lazy" decoding="async"></button><button type="button" class="" data-src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ZENITHY/exterior/83ce68c6e0db366b-1600.webp" aria-label="Фото 2"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ZENITHY/exterior/83ce68c6e0db366b-1600.webp" alt="" loading="lazy" decoding="async"></button><button type="button" class="" data-src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ZENITHY/interior/cb5454c4138dbb2a-1600.webp" aria-label="Фото 3"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ZENITHY/interior/cb5454c4138dbb2a-1600.webp" alt="" loading="lazy" decoding="async"></button><button type="button" class="" data-src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ZENITHY/facilities/ff4fb32507f69e16-1600.webp" aria-label="Фото 4"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ZENITHY/facilities/ff4fb32507f69e16-1600.webp" alt="" loading="lazy" decoding="async"></button><button type="button" class="" data-src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ZENITHY/master/8455ec45345e49e9-1600.webp" aria-label="Фото 5"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ZENITHY/master/8455ec45345e49e9-1600.webp" alt="" loading="lazy" decoding="async"></button><button type="button" class="" data-src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ZENITHY/plans/cf01b50d7cbd023a-1600.webp" aria-label="Фото 6"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ZENITHY/plans/cf01b50d7cbd023a-1600.webp" alt="" loading="lazy" decoding="async"></button><button type="button" class="" data-src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ZENITHY/exterior/890190f48381fc46-1600.webp" aria-label="Фото 7"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ZENITHY/exterior/890190f48381fc46-1600.webp" alt="" loading="lazy" decoding="async"></button><button type="button" class="" data-src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ZENITHY/interior/b4b4c29bdf22492d-1600.webp" aria-label="Фото 8"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ZENITHY/interior/b4b4c29bdf22492d-1600.webp" alt="" loading="lazy" decoding="async"></button></div>
@@ -155,7 +229,7 @@ if(dark) i.src='../img/brand/plp-mark-white.png';})();</script>
     <button type="button" class="btn ghost" id="shareBtn">Поделиться</button>
     <a class="btn wa" href="https://wa.me/66955492587?text=Zenithy%20La%20Ville%20%C2%B7%20Oasis%20Collection%20%E2%80%94%20%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D0%B5%D1%81%D1%83%D0%B5%D1%82%20%D1%8D%D1%82%D0%BE%D1%82%20%D0%BE%D0%B1%D1%8A%D0%B5%D0%BA%D1%82.%20https%3A%2F%2Fproperty-library.com%2Fobject%2Fzenithy" rel="noopener" target="_blank">WhatsApp</a>
   </div>
-  <section class="desc"><h2>Похожие объекты</h2><div class="simi"><a class="simi-c" href="casademonte"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-CASADEMONTE/01-760.webp" alt="" loading="lazy" decoding="async"><b>The Title Casa De Monte</b><span>Ко Кео · старт продаж · от 30 276 000 ฿</span></a><a class="simi-c" href="kirara"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-KIRARA/01-760.webp" alt="" loading="lazy" decoding="async"><b>The Title Villa Kirara Bang-Tao</b><span>Банг Тао · строится · от 29 020 000 ฿</span></a><a class="simi-c" href="manor"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-MANOR/cover/40db998d2b1cc323-760.webp" alt="" loading="lazy" decoding="async"><b>Manor</b><span>Банг Тао · строится · от 28 500 000 ฿</span></a></div></section>
+  <section class="desc"><h2>Похожие объекты</h2><div class="simi"><a class="simi-c" href="casademonte"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-CASADEMONTE/02-760.webp" alt="" loading="lazy" decoding="async"><b>The Title Casa De Monte</b><span>Ко Кео · старт продаж · от 30 276 000 ฿</span></a><a class="simi-c" href="kirara"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-KIRARA/01-760.webp" alt="" loading="lazy" decoding="async"><b>The Title Villa Kirara Bang-Tao</b><span>Банг Тао · строится · от 29 020 000 ฿</span></a><a class="simi-c" href="manor"><img src="https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-MANOR/cover/40db998d2b1cc323-760.webp" alt="" loading="lazy" decoding="async"><b>Manor</b><span>Банг Тао · строится · от 28 500 000 ฿</span></a></div></section>
 </main>
 <script>
 /* «Поделиться»: на телефоне системное меню, на компьютере ссылка в буфер */

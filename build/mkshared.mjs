@@ -64,8 +64,11 @@ function apply(file, variant) {
 }
 
 /* у анкеты и страницы управления своя вёрстка без подвала — им отдаём шапку и меню */
+/* 22.09.2026: политика, правила и условия — публичные страницы, на которые ссылается
+   сам подвал, а подвала на них не было. Теперь получают его из общего источника. */
 const targets = [['index.html', 'site'], ['owner.html', 'cabinet'],
-                 ['add-property.html', 'site']];
+                 ['add-property.html', 'site'],
+                 ['privacy.html', 'site'], ['rules.html', 'site'], ['terms.html', 'site']];
 let total = 0;
 for (const [f, v] of targets) {
   if (!fs.existsSync(path.join(ROOT, f))) continue;

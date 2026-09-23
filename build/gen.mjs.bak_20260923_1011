@@ -1,0 +1,2162 @@
+#!/usr/bin/env node
+/**
+ * PLP site generator — «одна истина» из Supabase.
+ *
+ * Что делает:
+ *   1. Читает objects WHERE on_site=true из Supabase REST (+ rental_benchmarks).
+ *   2. Впечатывает свежий каталог PL.PROPERTIES в index.html между маркерами
+ *      PLP:AUTO-CATALOG:START / END (остальной код index.html не трогает).
+ *   3. Генерит самодостаточные страницы object/<slug>.html (SEO: og + JSON-LD).
+ *   4. Перегенерит sitemap.xml (главная + все страницы объектов).
+ *
+ * Ключ Supabase НЕ хранится в репозитории. Берётся (в порядке приоритета):
+ *   - переменные окружения SUPABASE_URL / SUPABASE_SERVICE_KEY;
+ *   - локальный файл ~/.plp_site_supabase.env (KEY=VALUE построчно),
+ *     либо путь в переменной PLP_SB_ENV.
+ *
+ * Запуск:  node build/gen.mjs
+ *
+ * ВАЖНО про источники полей (см. build/README.md):
+ *   Из Supabase: title, loc, type, price, beds, area, roi, deadline, status,
+ *   desc (из usp), фото, диапазон доходности (rental_benchmarks).
+ *   НЕ из Supabase (сохраняются из текущего index.html по property_id):
+ *   calc (движок калькулятора: сезоны/handoverTHB/buildYears), grad, budget.
+ */
+
+import fs from 'node:fs';
+import { execSync } from 'node:child_process';
+import path from 'node:path';
+import os from 'node:os';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const ROOT = path.resolve(__dirname, '..');
+const INDEX = path.join(ROOT, 'index.html');
+const OBJDIR = path.join(ROOT, 'object');
+
+/* Размеры JPEG без внешних зависимостей: идём по маркерам до SOF.
+   Нужны для og:image:width/height — без них WhatsApp не рисует превью. */
+function jpegSize(file) {
+  try {
+    const b = fs.readFileSync(file);
+    if (b.length < 4 || b[0] !== 0xFF || b[1] !== 0xD8) return null;
+    let i = 2;
+    while (i + 9 < b.length) {
+      if (b[i] !== 0xFF) { i++; continue; }
+      const m = b[i + 1];
+      if (m === 0xD8 || m === 0x01 || (m >= 0xD0 && m <= 0xD7)) { i += 2; continue; }
+      if (m === 0xDA) break;                       // начались данные — SOF уже прошли
+      const len = b.readUInt16BE(i + 2);
+      if (m >= 0xC0 && m <= 0xCF && m !== 0xC4 && m !== 0xC8 && m !== 0xCC) {
+        return { h: b.readUInt16BE(i + 5), w: b.readUInt16BE(i + 7) };
+      }
+      i += 2 + len;
+    }
+  } catch (e) { /* нет файла — просто не выводим размеры */ }
+  return null;
+}
+const R2_BASE = 'https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev';
+const SITEMAP = path.join(ROOT, 'sitemap.xml');
+
+const SITE_BASE = 'https://property-library.com';
+const WA = '66955492587';
+const RATE = 35; // THB→USD для витринного priceUSD (как в текущем каталоге)
+
+const MARK_START = '/* PLP:AUTO-CATALOG:START — сгенерировано build/gen.mjs из Supabase; вручную не править (calc/grad/budget сохраняются между прогонами) */';
+const MARK_END = '/* PLP:AUTO-CATALOG:END */';
+const MARK_RENT_START = '/* PLP:AUTO-RENTALS:START — сгенерировано build/gen.mjs из Supabase (объекты аренды); вручную не править (grad сохраняется между прогонами) */';
+const MARK_RENT_END = '/* PLP:AUTO-RENTALS:END */';
+const MARK_NY_START = '/* PLP:AUTO-NETYIELD:START — сгенерировано build/gen.mjs из Supabase rental_benchmarks: GROSSYIELD из disp_yield_*, NETYIELD из net_yield_*; вручную не править */';
+const MARK_NY_END = '/* PLP:AUTO-NETYIELD:END */';
+
+// EN-район → RU-подпись (loc.ru). loc.en приходит из Supabase objects.district.
+const DISTRICT_RU = {
+  'Rawai': 'Равай', 'Bang Tao': 'Банг Тао', 'Nai Yang': 'Най Янг',
+  'Surin': 'Сурин', 'Koh Kaew': 'Ко Кео', 'Kamala': 'Камала',
+  'Kata': 'Ката', 'Layan': 'Лаян', 'Patong': 'Патонг',
+  'Cherng Talay': 'Чернг Талай', 'Nai Harn': 'Най Харн', 'Laguna': 'Лагуна',
+  'Kamala Beach': 'Камала', 'Nai Thon': 'Най Тон',
+  'Thalang': 'Таланг', 'Mai Khao': 'Май Кхао', 'Karon': 'Карон', 'Naiharn': 'Найхарн',
+};
+
+// -------------------------------------------------------------- env / supabase
+function loadEnv() {
+  const envFile = process.env.PLP_SB_ENV || path.join(os.homedir(), '.plp_site_supabase.env');
+  let url = process.env.SUPABASE_URL, key = process.env.SUPABASE_SERVICE_KEY;
+  if ((!url || !key) && fs.existsSync(envFile)) {
+    for (const line of fs.readFileSync(envFile, 'utf8').split('\n')) {
+      const m = line.match(/^\s*([A-Z_]+)\s*=\s*(.*)$/);
+      if (!m) continue;
+      const v = m[2].trim();
+      if (m[1] === 'SUPABASE_URL' && !url) url = v;
+      if (m[1] === 'SUPABASE_SERVICE_KEY' && !key) key = v;
+    }
+  }
+  if (!url || !key) {
+    console.error('[gen] Нет SUPABASE_URL / SUPABASE_SERVICE_KEY (env или ' + envFile + ').');
+    process.exit(1);
+  }
+  return { url: url.replace(/\/$/, ''), key };
+}
+
+async function sbGet(env, q) {
+  const r = await fetch(env.url + '/rest/v1/' + q, {
+    headers: { apikey: env.key, Authorization: 'Bearer ' + env.key, Accept: 'application/json' },
+  });
+  if (!r.ok) throw new Error('Supabase ' + q + ' → HTTP ' + r.status + ': ' + (await r.text()).slice(0, 300));
+  return r.json();
+}
+
+// ------------------------------------------------------------------- helpers
+const DASH = '–'; // en-dash, как в текущем каталоге
+
+function fmtNum(n) {
+  if (n === null || n === undefined) return '';
+  return String(n);
+}
+function bedsLabel(o) {
+  const min = o.bedrooms_min, max = o.bedrooms_max;
+  if (min === null || min === undefined || max === null || max === undefined) {
+    return (o.bedrooms || '').replace(/-/g, DASH);
+  }
+  const lo = min === 0 ? 'Studio' : String(min);
+  if (min === max) return lo;
+  return lo + DASH + String(max);
+}
+function areaLabel(o) {
+  const min = o.area_min, max = o.area_max;
+  if (min === null || min === undefined || max === null || max === undefined) {
+    // area_sqm бывает «замусорен» аннотацией — берём только числовую часть
+    const raw = String(o.area_sqm || '').match(/[\d.]+\s*[-–]\s*[\d.]+|[\d.]+/);
+    return raw ? raw[0].replace(/-/g, DASH) + ' м²' : '';
+  }
+  if (min === max) return fmtNum(min) + ' м²';
+  return fmtNum(min) + DASH + fmtNum(max) + ' м²';
+}
+function deadline(handover) {
+  if (!handover) return { ru: '', en: '' };
+  const [y, m] = handover.split('-');
+  const q = Math.floor((parseInt(m, 10) - 1) / 3) + 1;
+  return { ru: q + 'Q ' + y, en: 'Q' + q + ' ' + y };
+}
+const STATUS_MAP = { active: 'available', archived: 'reserved', sold: 'sold' };
+function statusLabel(s) { return STATUS_MAP[s] || 'available'; }
+
+function typeLabel(t) {
+  const v = String(t || '').toLowerCase();
+  if (v.startsWith('vill') || v === 'вилла') return { ru: 'Вилла', en: 'Villa' };
+  return { ru: 'Кондо', en: 'Condo' };
+}
+function typeRu(t) { return typeLabel(t).ru; }
+
+/* Адрес страницы объекта строим из публичного кода: номер юнита в URL —
+   это та же внутренняя информация, что и на карточке (Эльнур 07.09). */
+function slugOf(pid) { return String(pid).replace(/^PLP-/, '').toLowerCase(); }
+function pubOf(o) { return (o && o.public_code) || (o && o.plp_property_id) || ''; }
+
+/* ЛЕНТА КАДРОВ — одна на карточку и на страницу (канон 17.09).
+   Эльнур: «когда я на сайте открыл объект, скопировал ссылку и по ней перешёл —
+   там разная информация и фото и подача, это как вообще?». Расходились именно
+   кадры: карточка брала первые восемь из общей ленты (восемь фасадов подряд),
+   страница — по кругу из каждого раздела. Теперь правило одно и живёт здесь. */
+function heroGallery(o, limit = 8) {
+  const all = Array.isArray(o.gallery_urls) ? o.gallery_urls.filter(u => /^https?:/.test(u)) : [];
+  const gs = (Array.isArray(o.photo_groups) ? o.photo_groups : [])
+    .map(g => (Array.isArray(g.urls) ? g.urls.filter(u => /^https?:/.test(u)) : []))
+    .filter(a => a.length);
+  if (gs.length < 2) return all.slice(0, limit);
+  const out = [];
+  for (let round = 0; out.length < limit; round++) {
+    let added = false;
+    for (const arr of gs) {
+      if (arr[round] && !out.includes(arr[round])) { out.push(arr[round]); added = true; }
+      if (out.length >= limit) break;
+    }
+    if (!added) break;
+  }
+  return out;
+}
+
+// диапазон доходности из rental_benchmarks: (district,type) → (district,Кондо) → медиана по Пхукету
+function yieldRange(benchmarks, district, type) {
+  const tr = typeRu(type);
+  const find = (d, u) => benchmarks.find(b => b.district === d && b.unit_type === u);
+  let b = find(district, tr) || find(district, 'Кондо') ||
+          benchmarks.find(x => x.district === district);
+  if (b && b.disp_yield_low_pct != null && b.disp_yield_high_pct != null) {
+    return { low: b.disp_yield_low_pct, high: b.disp_yield_high_pct,
+             netLow: b.net_yield_low_pct, netHigh: b.net_yield_high_pct, scope: 'district' };
+  }
+  /* 08.09: раньше здесь стояло «6–12%» — придуманное число, которое вылезало
+     на карточках без района и без цены. Считаем ориентир по самой таблице
+     ориентиров: медиана по Пхукету, и честно называем его островным. */
+  const med = (key) => {
+    const v = benchmarks.map(x => x[key]).filter(x => x != null).sort((a, b2) => a - b2);
+    return v.length ? v[Math.floor(v.length / 2)] : null;
+  };
+  return { low: med('disp_yield_low_pct') || 6, high: med('disp_yield_high_pct') || 10,
+           netLow: med('net_yield_low_pct'), netHigh: med('net_yield_high_pct'), scope: 'island' };
+}
+
+// сохраняемый из index.html движок калькулятора (fallback для новых объектов)
+function fallbackCalc(o) {
+  const priceTHB = o.price_from_thb || 0;
+  const sr = o.season_rates || {};
+  const high = sr.high_thb_month || 0, low = sr.low_thb_month || 0;
+  const shoulder = high && low ? Math.round((high + low) / 2) : (high || low || 0);
+  const occ = o.occupancy_est_pct || 70;
+  // Сколько осталось строить — из даты сдачи. Раньше стояло 0, и график платежей
+  // ставил все взносы на сегодня. Сдан или дата неизвестна → 0 (рассрочки нет).
+  let buildYears = 0;
+  if (o.handover_date) {
+    const months = (new Date(o.handover_date) - new Date()) / (1000 * 60 * 60 * 24 * 30.44);
+    buildYears = months > 0 ? Math.round((months / 12) * 10) / 10 : 0;
+  }
+  // Первый взнос — как у застройщика, а не выдуманные 30%.
+  const downPct = Number(o.first_payment) > 0 ? Number(o.first_payment) : undefined;
+
+  return {
+    priceTHB, handoverTHB: priceTHB, areaM2: o.area_min || 0, mgmtPct: 20,
+    maintM2Month: o.maintenance_fee_thb_sqm || 80, capexM2: 800, metersTHB: 15000,
+    // Рост цены ПОСЛЕ сдачи. До сдачи он уже заложен в handoverTHB.
+    // Эльнур 04.09: на стройке проект даёт ~30–35% за 2–3 года, после сдачи 1–5% в год.
+    // Потолок 5 — страховка: если в базу опять попадёт рост за всю стройку, он сюда не пролезет.
+    capGrowthPct: Math.min(Number(o.capital_growth_pct) || 3, 5), buildYears,
+    downPct,
+    // План застройщика — дословно из базы. Не разбираем на строки: формулировки у всех
+    // разные, любой разбор — выдумка. Таблица рядом остаётся прикидкой.
+    paymentPlan: noContacts(o.payment_plan || o.payment_schedule || ''),
+    estimated: true,
+    seasons: {
+      high: { rent: high, occ, months: 4 },
+      shoulder: { rent: shoulder, occ, months: 2 },
+      low: { rent: low, occ, months: 6 },
+    },
+  };
+}
+
+// Короткое имя застройщика для карточки. В базе поле развёрнутое, с юридическим
+// названием и регистрационным номером — в карточке это нечитаемая простыня.
+// Ничего не выдумываем: только отрезаем служебные хвосты от того, что уже есть.
+/* Контакты застройщика — наш хлеб, на витрину не идут (Эльнур 06.09:
+   «никаких номеров, сайтов, почт, каналов»). Чистим ВСЁ, что уходит на сайт:
+   описания, заметки по типам, подписи к ходу стройки. Свои каналы не трогаем —
+   их на витрине печатает шаблон, а не данные объекта. */
+const OUR = /(elnurphuket_bot|property_library_phuket|property-library\.com)/i;
+function noContacts(text) {
+  if (!text) return text;
+  let s = String(text);
+  /* 16.09 Эльнур: «мы не размещаем на сайте конфиденциальную информацию — номера,
+     ссылки, почту застройщика» и «странно размещать снимки и источники, откуда снимки».
+     Пометки «[источник: sunhills-layan.com]», «(по сообщению застройщика)», «(estimated)»
+     — наша кухня: они остаются в базе, но на витрину не идут. */
+  s = s.replace(/\s*[\[(](?:источник|source|по сообщению|по данным|estimated)[^\])]*[\])]/gi, '');
+  s = s.replace(/\s*—\s*(?:источник|source)\s*:[^.;]*/gi, '');
+  s = s.replace(/(?:https?:\/\/)?(?:www\.)?t\.me\/[A-Za-z0-9_]+/gi, m => OUR.test(m) ? m : '');
+  s = s.replace(/@[A-Za-z][A-Za-z0-9_]{3,}/g, m => OUR.test(m) ? m : '');
+  s = s.replace(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g, m => OUR.test(m) ? m : '');
+  s = s.replace(/https?:\/\/[^\s<>"']+/gi, m => OUR.test(m) ? m : '');
+  s = s.replace(/(?:^|[\s(])(?:www\.)[^\s<>"')]+/gi, m => OUR.test(m) ? m : ' ');
+  /* 07.09: этот фильтр съедал ЦЕНЫ. Шаблон «много цифр с пробелами» подходит и
+     под телефон, и под «26 900 000 ฿» — цена вырезалась целиком, на сайте
+     оставалось «от ฿». Телефон опознаём по признакам телефона, а не по длине. */
+  s = s.replace(/\+\d[\d\s()-]{7,}\d/g, '');                       // международный, с плюсом
+  s = s.replace(/\b\d{9,15}\b/g, '');                                // подряд, без разделителей
+  s = s.replace(/\b\d{2,4}[-()]\s?\d{2,4}[-()\s]\s?\d{2,4}(?:[-()\s]\s?\d{2,4})?\b/g, ''); // со скобками и дефисами
+  s = s.replace(/\b(?:канал|телеграм|telegram|instagram|инстаграм|whatsapp|ватсап)\s+(?:застройщика|проекта|отдела продаж)\b[:\s-]*/gi, '');
+  return s.replace(/[ \t]{2,}/g, ' ').replace(/\s+([,.;])/g, '$1').trim();
+}
+
+/* Площадь участка у вилл живёт в заметке типа («участок 270–352 м²») или
+   в описании («на участке 187-331 м²»). Эльнур 06.09: «есть площадь дома,
+   и есть еще участка, что не мало важно». Достаём и показываем отдельно. */
+function isVilla(o) { return /villa|вилл/i.test(String(o.type || '')); }
+function plotNums(txt) {
+  const nums = [];
+  const re = /участ(?:ок|ки|ке|ка|кам)?\s*(?:площадью\s*)?([\d\s.,]+)(?:\s*[–—-]\s*([\d\s.,]+))?\s*(?:м²|м2|кв\.?\s*м)/gi;
+  let m;
+  while ((m = re.exec(txt))) {
+    [m[1], m[2]].forEach(v => {
+      if (!v) return;
+      const x = parseFloat(String(v).replace(/\s/g, '').replace(',', '.'));
+      /* участок виллы: меньше сотки — опечатка, больше 3000 м² — это площадь
+         всего проекта, а не покупателя. Такое на витрину не пускаем. */
+      if (x >= 80 && x <= 3000) nums.push(Math.round(x));
+    });
+  }
+  return nums;
+}
+function fmtPlot(nums) {
+  if (!nums.length) return null;
+  const lo = Math.min(...nums), hi = Math.max(...nums);
+  return lo === hi ? (lo + ' м²') : (lo + '–' + hi + ' м²');
+}
+/* Участок показываем ТОЛЬКО у вилл: у кондо «участок» в описании — это земля
+   всего проекта, покупателю она не принадлежит и вводит в заблуждение. */
+function plotOf(o) {
+  if (!isVilla(o)) return null;
+  const nums = [];
+  if (Array.isArray(o.unit_types)) o.unit_types.forEach(u => { if (u && u.note) nums.push(...plotNums(String(u.note))); });
+  if (!nums.length && o.usp) nums.push(...plotNums(String(o.usp)));
+  return fmtPlot(nums);
+}
+
+/* Полное имя застройщика на витрине — без реквизитов и лишних пометок.
+   17.09: на странице PEYLAA в поле «Юридическое лицо» и в разметке для поисковиков
+   печаталось «(рег.0105566213897)», у Mono Champaca — «(на рынке с 1999 г.)».
+   Юридическое имя нужно, регистрационный номер посетителю — нет. */
+function legalDev(dev) {
+  if (!dev) return '';
+  return String(dev).split(' — ')[0].split(' – ')[0]
+    .replace(/\s*\((?=[^)]*(?:рег|reg\.|тин|tax|на рынке|since|\d{6,}))[^)]*\)/gi, '')
+    .replace(/\s{2,}/g, ' ').trim();
+}
+
+function shortDev(dev) {
+  if (!dev) return '';
+  let d = String(dev).split(' — ')[0].split(' – ')[0].trim();
+  // скобки с реквизитами, годами и адресами выбрасываем, короткий бренд оставляем
+  d = d.replace(/\s*\(([^)]*)\)/g, (m, inner) =>
+    (/\d/.test(inner) || inner.length > 12) ? '' : ' (' + inner.trim() + ')');
+  d = d.replace(/\s*\b(Public Company Limited|Co\.,? ?Ltd\.?|Company Limited|PCL|PLC)\b\.?/gi, '');
+  return d.replace(/[\s,;]+$/, '').trim();
+}
+
+// Факты из базы кладём поверх сохранённого calc: срок стройки, первый взнос,
+// план застройщика и потолок роста — это данные, а не ручная настройка витрины.
+// Всё остальное в calc (сезоны, расходы) правится руками и переживает пересборку.
+function withFacts(calc, o) {
+  const c = Object.assign({}, calc);
+  /* 🔴 16.09 Эльнур: «ты пишешь цены „от“, а юниты уже проданы, таких цен уже нет».
+     Причина была глубже данных: расчёт цены сохранялся из ПРОШЛОЙ версии index.html
+     и переживал любую правку базы. Цена на витрине жила своей жизнью месяцами.
+     Из старого расчёта бережём настройки (ставки, загрузку), цену берём из базы. */
+  if (Number(o.price_from_thb) > 0) c.priceTHB = Number(o.price_from_thb);
+  let buildYears = 0;
+  if (o.handover_date) {
+    const months = (new Date(o.handover_date) - new Date()) / (1000 * 60 * 60 * 24 * 30.44);
+    buildYears = months > 0 ? Math.round((months / 12) * 10) / 10 : 0;
+  }
+  c.buildYears = buildYears;
+  if (Number(o.first_payment) > 0) c.downPct = Number(o.first_payment);
+  c.paymentPlan = noContacts(o.payment_plan || o.payment_schedule || '');
+  // Сдан по-настоящему — только stage='Ready' (канон №38). Если стройка идёт,
+  // а дата сдачи в базе уже прошла — это устаревшая дата, а не сданный объект.
+  c.ready = o.stage === 'Ready';
+  // Потолок 5 — канон Эльнура 04.09: после сдачи 1–5% в год.
+  c.capGrowthPct = Math.min(Number(o.capital_growth_pct) || c.capGrowthPct || 3, 5);
+  return c;
+}
+
+// ----------------------------------------------- парсинг текущего PL.PROPERTIES
+// Возвращает { block, arr, hasMarkers, preserve } — preserve по property_id.
+function parseExisting(html) {
+  const s = html.indexOf(MARK_START);
+  const e = html.indexOf(MARK_END);
+  let region, hasMarkers = false;
+  if (s !== -1 && e !== -1 && e > s) {
+    hasMarkers = true;
+    region = html.slice(s + MARK_START.length, e);
+  } else {
+    region = html; // первый прогон: маркеров ещё нет
+  }
+  const ai = region.indexOf('PL.PROPERTIES=');
+  if (ai === -1) return { arr: [], hasMarkers, preserve: {} };
+  const lb = region.indexOf('[', ai);
+  const end = region.indexOf('\n];', lb);
+  const arrText = region.slice(lb, end + 2);
+  let arr = [];
+  try { arr = eval(arrText); } catch (err) {
+    console.error('[gen] Не удалось разобрать текущий PL.PROPERTIES:', err.message);
+  }
+  const preserve = {};
+  for (const p of arr) {
+    preserve[p.property_id] = { calc: p.calc, grad: p.grad, budget: p.budget };
+  }
+  return { arr, hasMarkers, preserve };
+}
+
+// ------------------------------------------------------------- сборка каталога
+function buildCatalog(objects, benchmarks, preserve) {
+  return objects.map((o, i) => {
+    const pid = o.plp_property_id;
+    const keep = preserve[pid] || {};
+    const en = o.district || o.beach || '';
+    const usp = (o.usp || '').trim();
+    const uspEn = (o.usp_en || '').trim() || usp; // EN-описание из usp_en, фолбэк на usp
+    return {
+      /* На витрину идёт публичный код, а не внутренний: у вторички внутренний
+         содержит номер юнита, а его на сайте писать нельзя. Аренда так делала
+         с самого начала — приводим продажу к тому же правилу. */
+      property_id: pubOf(o),
+      title: o.name,
+      funnel: 'sale',
+      grad: keep.grad || ('g' + ((i % 4) + 1)),
+      loc: { ru: DISTRICT_RU[en] || en, en },
+      type: typeLabel(o.type),
+      priceUSD: o.price_from_thb ? Math.round(o.price_from_thb / RATE) : null,
+      roi: (o.roi === 0 || o.roi) ? o.roi : null,
+      budget: keep.budget || 'b1',
+      beds: bedsLabel(o),
+      area: areaLabel(o),
+      deadline: deadline(o.handover_date),
+      status: statusLabel(o.status),
+      // 30.08 канон №38: «готов/сдан» — ТОЛЬКО из stage='Ready', никогда из даты сдачи.
+      ready: o.stage === 'Ready',
+      // 03.09: стадия отдельным полем — по ней фильтр и бейдж на карточке
+      // числовой диапазон спален — по нему работает фильтр «Спальни»
+      bmin: (o.bedrooms_min === 0 || o.bedrooms_min) ? o.bedrooms_min : null,
+      bmax: (o.bedrooms_max === 0 || o.bedrooms_max) ? o.bedrooms_max : null,
+      stage_key: saleGroup(o),
+      /* 🔴 17.09 Эльнур: «вообще временные акции ставить на витрину не рекомендую!!
+         пишем от-от-от, а дальше уже работаем, чтобы привлекать внимание и продавать,
+         а не отпугивать». Акция живёт в базе и доступна менеджеру и двойнику,
+         но на витрину не выходит: скидка со сроком стареет быстрее, чем мы её меняем,
+         и просроченная акция отталкивает сильнее, чем помогает свежая. */
+      promo: null,
+      /* 16.09 Эльнур: «некоторые распроданы, но мы можем ставить его как продан, но по
+         запросу — можно ведь найти там нужный юнит, это шанс». Распроданный проект с
+         витрины не убираем: цену застройщика, которой уже нет, не показываем, зовём в диалог. */
+      soldOut: String(o.stage || '') === 'Sold out',
+      /* дата старта продаж — справочно: группу она не меняет (см. saleGroup) */
+      saleStart: o.sale_started_on || null,
+      /* короткая приписка к стадии: «сдан в декабре 2025», «2 октября —
+         презентация сдачи». Эльнур: «доп отметки это прикольно» */
+      stageNote: o.stage_note || null,
+      desc: { ru: noContacts(usp), en: noContacts(uspEn) },
+      // 02.09: то, что человек ищет глазами в первую очередь — море и застройщик.
+      // Пишем только если данные есть, пустое поле карточка не рисует.
+      // координаты нужны карте объектов — без них метку не поставить
+      lat: (o.lat === 0 || o.lat) ? Number(o.lat) : null,
+      lng: (o.lng === 0 || o.lng) ? Number(o.lng) : null,
+      // 02.09: приблизительные точки помечаем — карта не должна выдавать их за адрес
+      coordOk: o.coord_source === 'exact' || o.coord_source === 'verified',
+      // 02.09: цена в карточке — это минимум из прайса на дату сверки, а не
+      // «сегодня». Отдаём дату, чтобы витрина честно её показывала.
+      priceDate: o.last_synced_at ? String(o.last_synced_at).slice(0, 10) : null,
+      // сколько юнитов свободно по последнему прайсу застройщика
+      avail: (function(){ var m=/(\d+)/.exec(o.availability || ''); return m ? +m[1] : null; })(),
+      beach: o.beach || null,
+      beachM: (o.distance_beach_m === 0 || o.distance_beach_m) ? o.distance_beach_m : null,
+      // Снимки из хранилища: первый идёт обложкой, остальные — лентой в карточке.
+      // Локальные img/<ID>.jpg остаются запасным вариантом для старых объектов.
+      photo: thumbUrl(o.main_image_url, 760, 72),
+      /* «полный» снимок для окна — тоже превью, просто крупнее: оригинал
+         на 19 МБ никому на экране не нужен */
+      photoFull: thumbUrl(o.main_image_url, 1600, 80),
+      photos: heroGallery(o).length ? heroGallery(o).map(u => thumbUrl(u, 1280, 78)) : null,
+      // Планировки: человек выбирает тип и сразу видит его площадь и спальни.
+      // Где застройщик не давал названий планировок, берём тиры из прайса
+      // (минимальная цена на каждый тип спальни) — Эльнур 05.09: «продаётся
+      // проект, а что там можно купить». Цены и площади — из price_tiers,
+      // ничего не досочиняем.
+      units: unitsOf(o),
+      // Витрина «горячие предложения»: порядок задаём вручную в базе (hot_rank).
+      hot: (o.hot_rank === 0 || o.hot_rank) ? Number(o.hot_rank) : null,
+      // Ход стройки и разделы снимков — показываем, если застройщик их дал.
+      // Подпись к снимкам стройки — это имя канала застройщика. На витрину не идёт.
+      progress: (function(){
+        const g = o.build_progress; if (!g) return null;
+        const c = Object.assign({}, g); delete c.source; delete c.channel; delete c.link;
+        if (Array.isArray(c.stages)) c.stages = c.stages.map(x => Object.assign({}, x, { name: noContacts(x.name) }));
+        /* снимки стройки тоже отдаём превью, а не оригиналами */
+        if (Array.isArray(c.photos)) c.photos = c.photos.map(u => thumbUrl(u, 1000, 76));
+        return c;
+      })(),
+      // Площадь участка — отдельная метрика, для вилл важнее площади дома
+      plot: plotOf(o),
+      groups: Array.isArray(o.photo_groups)
+        ? o.photo_groups.map(g => Object.assign({}, g, {
+            urls: Array.isArray(g.urls) ? g.urls.map(u => thumbUrl(u, 1280, 78)) : g.urls }))
+        : null,
+      developer: shortDev(o.developer) || null,
+      developerFull: legalDev(o.developer) || null,
+      calc: withFacts(keep.calc || fallbackCalc(o), o),
+    };
+  });
+}
+
+/* Что можно купить в проекте: сначала именованные планировки застройщика,
+   иначе — тиры прайса (по одной строке на тип спальни, цена «от»). */
+/* Обложки в каталоге весили до 19 МБ каждая — 112 МБ на страницу. Хранилище
+   умеет отдавать уменьшённые копии, поэтому на витрину идут превью, а полный
+   снимок открывается только в просмотрщике. Эльнур 06.09. */
+function thumbUrl(u, w, q) {
+  /* 19.09.2026: фотографии переехали в Cloudflare R2. У Supabase исходящий трафик платный
+     и 18.09 сайт из-за лимита сутки стоял без единой картинки; у R2 трафик бесплатный.
+     Размеры готовим заранее при переносе (760 и 1600 px, webp), поэтому преобразования
+     на лету больше нет вообще: меньше деталей, меньше того, что может отказать. */
+  const s = String(u || '');
+  if (!s) return null;
+  const i = s.indexOf('/storage/v1/object/public/object-media/');
+  if (i < 0) return s;
+  const путь = s.slice(i + '/storage/v1/object/public/object-media/'.length).split('?')[0];
+  const база = путь.replace(/\.(jpg|jpeg|png|webp)$/i, '');
+  const размер = (w && w <= 900) ? '-760' : '-1600';
+  return R2_BASE + '/' + база + размер + '.webp';
+}
+
+function unitsOf(o) {
+  /* Типы приходят из разных источников и называют поля по-разному
+     (area/area_sqm, beds/bedrooms). Приводим к одному виду, а ставки аренды
+     по типу переносим отдельными полями — у аренды цена не «от застройщика». */
+  const named = (Array.isArray(o.unit_types) ? o.unit_types.slice(0, 12) : []).map(u => {
+    const n = Object.assign({}, u);
+    if (n.area == null && n.area_sqm != null) n.area = n.area_sqm;
+    if (n.from == null && n.price_from_thb != null) n.from = n.price_from_thb;
+    if (n.code == null && n.type_code != null) n.code = n.type_code;
+    if (n.beds == null && n.bedrooms != null) n.beds = n.bedrooms;
+    if (n.rentLow == null && n.rent_low_thb_month != null) n.rentLow = n.rent_low_thb_month;
+    if (n.rentHigh == null && n.rent_high_thb_month != null) n.rentHigh = n.rent_high_thb_month;
+    /* участок по типу виллы: в заметке «участок 270–352 м²» — покупателю это
+       такая же важная цифра, как площадь дома */
+    if (isVilla(o) && n.note) { const pl = fmtPlot(plotNums(String(n.note))); if (pl) n.plot = pl; }
+    n.note = noContacts(n.note);
+    return n;
+  });
+  // Тиры приходят от разных застройщиков в двух видах: с числом спален или с
+  // подписью типа «Studio / 1BR / 2BR», цена — price_from_thb либо price_thb.
+  // Приводим к одному виду, иначе половина проектов остаётся без планировок.
+  const tiers = (Array.isArray(o.price_tiers) ? o.price_tiers : []).map(t => {
+    let b = t.bedrooms;
+    if (b == null && t.type) {
+      const s = String(t.type).toLowerCase();
+      const m = /(\d+)\s*(br|bed)/.exec(s);
+      b = /studio/.test(s) ? 0 : (m ? +m[1] : null);
+    }
+    return Object.assign({}, t, { bedrooms: b,
+      price_from_thb: t.price_from_thb || t.price_thb || null });
+  }).filter(t => t.bedrooms != null);
+  const priceByBeds = {};
+  for (const t of tiers) {
+    const b = t.bedrooms;
+    if (b == null || !t.price_from_thb) continue;
+    if (!priceByBeds[b] || t.price_from_thb < priceByBeds[b]) priceByBeds[b] = t.price_from_thb;
+  }
+  /* «1 спальня», «2 спальни» — это не тип, а просто число комнат: такие записи
+     ничего не добавляют к прайсу, зато лишают карточку кода типа и чертежа.
+     Если в прайсе есть тиры, показываем их. */
+  /* 🔴 17.09 Эльнур: «когда мы нажимаем на тип планировки, там нет цены от,
+     в Модева точно нет». У Модевы восемь настоящих типов застройщика со своими
+     ценами (1BMA, 1BL, 2BP, 3BDPAC…), но подписаны они по числу спален — и правило
+     ниже выбрасывало их целиком, оставляя три строки из прайса. Теперь запись
+     считается пустой, только если у неё НЕТ ни кода типа, ни своей площади:
+     код и площадь — это и есть «какая конкретно планировка и в какую стоимость». */
+  const generic = named.length && named.every(u =>
+    /^(студия|\d+\s*(спальн|bedroom))/i.test(String(u.name || '').trim()) &&
+    !u.code && !u.area);
+  if (named.length && !(generic && tiers.length)) {
+    // Цену «от» из прайса подставляем только там, где планировка с таким числом
+    // спален одна. Иначе AURA, SELENE и MYRRHA получали одинаковый ценник —
+    // это цена группы «3 спальни», а не конкретного типа.
+    const perBeds = {};
+    for (const u of named) perBeds[u.beds] = (perBeds[u.beds] || 0) + 1;
+    return named.map(u => {
+      const from = priceByBeds[u.beds];
+      return (from && perBeds[u.beds] === 1) ? Object.assign({}, u, { from }) : u;
+    });
+  }
+  if (!tiers.length) return null;
+  /* пентхаус — отдельная полка, а не «2 спальни»: у Katabello так выходило, что
+     двухспальная стоила дороже трёхспальной, потому что это были пентхаусы */
+  /* 🔴 17.09 Эльнур: «пентхаус две спальни 17,7 дороже, чем три спальни пентхаус
+     13,3 млн бат, как?». Это не ошибка прайса: у Katabello двухспальный пентхаус
+     121 м² с садом стоит 17,67 млн, а трёхспальный 100 м² — 13,3 млн, то есть
+     146 000 против 133 000 ฿ за метр. Одна цифра площади на группу этого не
+     показывала. Собираем вилку площадей: «100–138 м²» рядом с «от 13 300 000»
+     объясняет разницу сразу. */
+  const byBeds = new Map();
+  const spanByKey = new Map();
+  for (const t of tiers) {
+    const b = t.bedrooms;
+    if (b == null) continue;
+    const key = (t.kind === 'penthouse' ? 'ph' : 'flat') + ':' + b;
+    const a = Number(t.area_sqm);
+    if (a > 0) {
+      const sp = spanByKey.get(key) || { min: a, max: a };
+      sp.min = Math.min(sp.min, a); sp.max = Math.max(sp.max, a);
+      spanByKey.set(key, sp);
+    }
+    const cur = byBeds.get(key);
+    if (!cur || (t.price_from_thb && t.price_from_thb < cur.price_from_thb)) byBeds.set(key, t);
+  }
+  const word = b => b === 0 ? 'Студия' : b + (b === 1 ? ' спальня' : b < 5 ? ' спальни' : ' спален');
+  return [...byBeds.values()]
+    .sort((a, c) => (a.kind === 'penthouse') - (c.kind === 'penthouse') || a.bedrooms - c.bedrooms)
+    .map(t => {
+      const key = (t.kind === 'penthouse' ? 'ph' : 'flat') + ':' + t.bedrooms;
+      const sp = spanByKey.get(key);
+      return {
+        name: t.name || word(t.bedrooms),
+        beds: t.bedrooms,
+        code: t.code || null,          // по коду типа встаёт чертёж застройщика
+        area: t.area_sqm || null,
+        /* вилка площадей группы: одно число врало — у Katabello «1 спальня 28 м²»
+           стояла в шапке, а в списке минимальная планировка была 37 м² */
+        areaMin: sp ? sp.min : null,
+        areaMax: sp ? sp.max : null,
+        from: t.price_from_thb || null,
+      };
+    });
+}
+
+/* ===== ЧЕТЫРЕ ГРУППЫ ПРОДАЖИ =====
+   Эльнур 16.09.2026: «есть проекты в стройке, есть старт продаж, пресейл, есть
+   сданные, готовые к заезду, и есть те, что перепродаются… вторичка. Это чёткое
+   разделение, которое должно быть».
+
+   Группа одна на весь сайт: карточка, фильтр, плашка, страница объекта и
+   заголовок раздела берут её отсюда. Внутри группы допустимы уточнения
+   («сдача через 60 дн.», «скоро старт продаж») — но группу они не меняют.
+
+     presale      — старт продаж (пресейл): продажи открыты на раннем этапе
+     construction — строится
+     ready        — готово к заезду
+     resale       — вторичка: объект уже куплен и перепродаётся
+
+   Свежесть старта продаж группу НЕ переключает: у большинства проектов даты
+   старта в базе нет, и объект молча уезжал в «в продаже» — так вся группа
+   «старт продаж» и пропала с витрины. Слово выбираем по стадии из базы,
+   а спор стадии с датой сдачи разбираем ниже и печатаем при сборке. */
+const warned = new Set();
+function warnOnce(id, msg) { if (warned.has(id)) return; warned.add(id); console.error(msg); }
+/* 16.09 Эльнур: «спецофферы тоже классно записывать в проекты… карточка должна быть
+   максимально полезной». Длинный текст акции живёт на странице объекта, а в каталоге
+   нужна одна строка: гарантия дохода, скидка или рассрочка — то, за что цепляется глаз. */
+/* 17.09 Эльнур: «временные акции не пишем на сайт, пока не надо». Условие со сроком
+   («до 30 сентября», «по 11 сентября включительно», «с 12-го новые цены», «осталось 4 юнита»)
+   устаревает молча — у Manor так висело «старые цены до 11.09». На витрину идут только
+   постоянные условия: рассрочка, гарантия дохода, мебельный пакет. */
+function promoIsTimed(t) {
+  return /(^|[^а-яё])(до|по)\s+\d{1,2}(\s*[-–]?\s*(го|е))?\s+(январ|феврал|март|апрел|ма[йя]|июн|июл|август|сентябр|октябр|ноябр|декабр)/i.test(t)
+    || /(^|[^а-яё])(до|по)\s+\d{1,2}\.\d{2}/i.test(t)
+    || /с\s+\d{1,2}\s*-?\s*го/i.test(t)
+    || /(остал|оста[её]т)[а-яё]*\s+(всего\s+)?\d+\s+(юнит|квартир|лот|вилл)/i.test(t)
+    || /(ограниченн[а-яё]*\s+(время|срок)|только\s+(до|в)\s+)/i.test(t);
+}
+function promoShort(o) {
+  /* 🔴 в JS «\w» не видит кириллицу (память: regex-cyrillic-trap) — пишем [а-яё] явно */
+  const t = noContacts(String(o.current_promo || '')).trim();
+  if (!t || /\(estimated\)/i.test(t) || /^\s*(уточнить|нужно|\[)/i.test(t)) return null;
+  if (promoIsTimed(t)) return null;
+  const YEARS = { 'один': 1, 'два': 2, 'две': 2, 'три': 3, 'четыре': 4, 'пять': 5, 'шесть': 6, 'семь': 7, 'десять': 10 };
+  let m = /гарантирован[а-яё]*\s+доход[а-яё]*\s+(\d{1,2})\s*%[^.]{0,60}?(\d+|один|два|две|три|четыре|пять|шесть|семь|десять)\s*(?:года|лет|год)/i.exec(t);
+  if (m) {
+    const n = /^\d+$/.test(m[2]) ? +m[2] : YEARS[m[2].toLowerCase()];
+    const word = n === 1 ? 'год' : (n < 5 ? 'года' : 'лет');
+    return 'Гарантия дохода ' + m[1] + '% на ' + n + ' ' + word;
+  }
+  m = /гарантирован[а-яё]*\s+доход[а-яё]*\s+(\d{1,2})\s*%/i.exec(t);
+  if (m) return 'Гарантия дохода ' + m[1] + '%';
+  m = /скидк[а-яё]*\s+(\d{1,2})\s*%[^.]{0,40}?до\s+(\d{1,2}\s+[а-яё]+|\d{2}\.\d{2})/i.exec(t);
+  if (m) return 'Скидка ' + m[1] + '% до ' + m[2];
+  m = /скидк[а-яё]*\s+(\d{1,2})\s*%/i.exec(t);
+  if (m) return 'Скидка ' + m[1] + '%';
+  m = /скидк[а-яё]*\s+([\d\s]{6,12})\s*(?:฿|бат)/i.exec(t);
+  if (m) return 'Скидка ' + m[1].trim() + ' ฿';
+  if (/рассрочк[а-яё]*/i.test(t)) return 'Рассрочка от застройщика';
+  if (/мебел[а-яё]*\s+(?:в подарок|пакет)/i.test(t)) return 'Мебельный пакет в подарок';
+  if (/спец[а-яё-]*\s*(?:цена|условия|предложение)/i.test(t)) return 'Спецпредложение застройщика';
+  return 'Спецусловия застройщика';
+}
+
+function saleGroup(o) {
+  const st = String(o.stage || '').toLowerCase();
+  const isPre = /pre-?sale|presale|старт|анонс|announced/.test(st);
+  const isBuild = /construction|стро|off-?plan/.test(st);
+  const isResale = st === 'resale' || st === 'sold out' || /распродан|sold\s*out|перепродаж|вторичк|переуступ/.test(st) ||
+    String(o.purpose || '').toLowerCase() === 'resale' || String(o.status || '') === 'sold' ||
+    /перепродаж|вторичк|resale|переуступ/i.test(String(o.name || ''));
+  if (isResale) return 'resale';
+  /* 🔴 08.09: Estella стояла как «старт продаж», а сдача у неё через 84 дня.
+     Эльнур: «ты как вообще придумал такое». Дата сдачи — факт из договора,
+     стадия — слово; когда они спорят, верим дате и говорим об этом вслух. */
+  if (o.handover_date) {
+    const hd = new Date(o.handover_date);
+    if (!isNaN(hd)) {
+      const days = Math.round((hd - new Date()) / 86400000);
+      if (days < 0 && (isPre || isBuild)) {
+        warnOnce(o.plp_property_id, '[gen] ⚠ ' + o.plp_property_id + ': стадия «' + o.stage +
+          '», а сдача была ' + String(o.handover_date).slice(0, 10) + ' — показываю «готово к заезду»');
+        return 'ready';
+      }
+      if (days >= 0 && days <= 365 && isPre) {
+        warnOnce(o.plp_property_id, '[gen] ⚠ ' + o.plp_property_id + ': стадия «' + o.stage +
+          '», а до сдачи ' + days + ' дн. — показываю «строится»');
+        return 'construction';
+      }
+    }
+  }
+  if (st === 'ready' || /готов|ready|заселени/.test(st)) return 'ready';
+  if (isBuild) return 'construction';
+  if (isPre) return 'presale';
+  /* 08.09: стадия не заполнена — «готово» из одной даты не выводим.
+     Пустая стадия честнее догадки. */
+  return '';
+}
+
+const GROUP_RU = { presale:'старт продаж', construction:'строится', ready:'готово к заезду', resale:'перепродажа' };
+const GROUP_EN = { presale:'Pre-sale', construction:'Under construction', ready:'Ready to move in', resale:'Resale' };
+
+/* Анонс — та же группа «старт продаж», но продажи ещё не открыты: это уточнение
+   внутри группы, а не пятая полка. */
+function saleSoon(o) {
+  return /announced|анонс/i.test(String(o.stage || '')) && !o.price_from_thb;
+}
+
+/* ===== ПОРЯДОК ВЫДАЧИ КАТАЛОГА =====
+   Эльнур 08.09: «первые несколько должно быть точно очень красивыми, топовыми
+   эффектными, и рядом с ними те, которые хорошо и быстро продаются, в конец
+   всё остальное», «есть правило продажи: три варианта — дорогой, хороший,
+   дешёвый, чтобы клиент мог сравнить», «вторичку держал бы где-то в конце»,
+   «3 фазы Eden не делал бы друг за другом».
+
+   Порядок никто не набивает руками: он выводится из того, насколько карточка
+   готова показывать себя (снимки, цена, описание, доходность) и продаётся ли
+   объект вообще. Считаем один раз при сборке — на сайте порядок уже готовый. */
+function shelfScore(p) {
+  var n = (p.photos && p.photos.length) || (p.photo ? 1 : 0);
+  var s = 0;
+  s += Math.min(n, 8) * 6;                       // снимки — главное, чем карточка берёт
+  if (p.priceUSD) s += 14;                       // без цены объект не сравнить
+  if (p.roi) s += Math.min(Number(p.roi), 9) * 2;
+  if (p.desc && p.desc.ru && p.desc.ru.length > 220) s += 8;
+  if (p.units && p.units.length) s += 6;         // видно, что именно можно купить
+  if (p.progress) s += 4;                        // ход стройки — доверие
+  if (p.beachM != null) s += 2;
+  return s;
+}
+function priceBand(p) {
+  var v = Number(p.priceUSD) || 0;               // цены в каталоге лежат в долларах
+  if (!v) return 'none';
+  if (v >= 400000) return 'high';                // дорогой
+  if (v >= 160000) return 'mid';                 // хороший
+  return 'low';                                  // доступный
+}
+function familyOf(p) {
+  /* «Gardens of Eden», «Eden Residences», «Eden · Park Residences» — одна семья.
+     Берём заметное слово названия, чтобы фазы одного проекта не шли подряд. */
+  var t = String(p.title || '').toLowerCase()
+    .replace(/^the\s+/, '').replace(/[·,].*$/, '').trim();
+  var w = t.split(/\s+/).filter(function (x) { return x.length > 2; });
+  if (/eden/.test(t)) return 'eden';
+  if (/title/.test(t)) return (w[1] || w[0] || t);   // The Title Adora → adora
+  return w[0] || t;
+}
+function spreadFamilies(list) {
+  var out = [], pool = list.slice();
+  while (pool.length) {
+    var idx = 0;
+    if (out.length) {
+      var prev = familyOf(out[out.length - 1]);
+      for (var j = 0; j < pool.length; j++) {
+        if (familyOf(pool[j]) !== prev) { idx = j; break; }
+      }
+    }
+    out.push(pool.splice(idx, 1)[0]);
+  }
+  return out;
+}
+function orderCatalog(list) {
+  var live = [], weak = [], resale = [];
+  list.forEach(function (p) {
+    if (p.stage_key === 'resale') resale.push(p);
+    else if (shelfScore(p) < 24) weak.push(p);     // пустая карточка вперёд не лезет
+    else live.push(p);
+  });
+  live.sort(function (a, b) { return shelfScore(b) - shelfScore(a); });
+
+  /* Правило трёх: рядом идут дорогой, хороший и доступный — так видна вилка
+     цен, а не десять похожих карточек подряд. Внутри каждой корзины уже
+     отсортировано по готовности карточки. */
+  var bins = { high: [], mid: [], low: [], none: [] };
+  live.forEach(function (p) { bins[priceBand(p)].push(p); });
+  var woven = [], turn = ['high', 'mid', 'low'], i = 0;
+  while (bins.high.length || bins.mid.length || bins.low.length) {
+    var k = turn[i % 3]; i++;
+    if (bins[k].length) woven.push(bins[k].shift());
+  }
+  woven = woven.concat(bins.none);
+
+  weak.sort(function (a, b) { return shelfScore(b) - shelfScore(a); });
+  resale.sort(function (a, b) { return shelfScore(b) - shelfScore(a); });
+  /* Фазы одного проекта разводим в каждой группе: подряд «Eden Residences» и
+     «Eden · Park Residences» читаются как повтор. */
+  return spreadFamilies(woven).concat(spreadFamilies(weak), spreadFamilies(resale));
+}
+
+function emitCatalogBlock(catalog) {
+  const items = catalog.map(p => '  ' + JSON.stringify(p)).join(',\n');
+  return MARK_START + '\n' +
+    'PL.PROPERTIES=[\n' + items + '\n];\n' +
+    MARK_END;
+}
+
+/* 16.09 Эльнур: «ты пишешь цены „от“, а юниты уже проданы». На главной в разметке
+   для поисковиков цены были вписаны руками и устарели (Heritage 5 049 900 против
+   5 588 573 в прайсе). Теперь сборка подставляет туда цену из базы, а у
+   распроданного проекта пишет «распродано» и цену не называет вовсе. */
+function syncListOffers(html, catalog) {
+  const by = {};
+  for (const p of catalog) by[p.property_id] = p;
+  return html.replace(
+    /("url":\s*"[^"]*#object=([A-Z0-9_-]+)"[\s\S]{0,600}?"offers":\s*\{)[^}]*\}/g,
+    (all, head, pid) => {
+      const p = by[pid];
+      if (!p) return all;
+      const thb = p.calc && p.calc.priceTHB ? p.calc.priceTHB : null;
+      if (!thb) {
+        return head + '"@type": "Offer", "priceCurrency": "THB", "availability": "https://schema.org/SoldOut"}';
+      }
+      if (p.soldOut) {
+        return head + '"@type": "Offer", "price": "' + Math.round(thb) +
+          '", "priceCurrency": "THB", "availability": "https://schema.org/LimitedAvailability"}';
+      }
+      return head + '"@type": "Offer", "price": "' + Math.round(thb) +
+        '", "priceCurrency": "THB", "availability": "https://schema.org/InStock"}';
+    });
+}
+
+// заменить (или врезать) блок каталога в index.html
+function writeIndex(html, catalog) {
+  html = syncListOffers(html, catalog);
+  const block = emitCatalogBlock(catalog);
+  const s = html.indexOf(MARK_START);
+  const e = html.indexOf(MARK_END);
+  if (s !== -1 && e !== -1 && e > s) {
+    return html.slice(0, s) + block + html.slice(e + MARK_END.length);
+  }
+  // первый прогон — оборачиваем существующий PL.PROPERTIES=[...];
+  const ai = html.indexOf('PL.PROPERTIES=');
+  const lb = html.indexOf('[', ai);
+  const end = html.indexOf('\n];', lb) + 3; // включая '\n];'
+  return html.slice(0, ai) + block + html.slice(end);
+}
+
+// -------------------------------------------------------------- аренда (RENTALS)
+// Парсит текущий PL.RENTALS для сохранения grad по property_id.
+function parseExistingRentals(html) {
+  const s = html.indexOf(MARK_RENT_START);
+  const e = html.indexOf(MARK_RENT_END);
+  let region = (s !== -1 && e !== -1 && e > s) ? html.slice(s + MARK_RENT_START.length, e) : html;
+  const ai = region.indexOf('PL.RENTALS=');
+  if (ai === -1) return {};
+  const lb = region.indexOf('[', ai);
+  const end = region.indexOf('\n];', lb);
+  if (lb === -1 || end === -1) return {};
+  let arr = [];
+  try { arr = eval(region.slice(lb, end + 2)); } catch (err) { return {}; }
+  const preserve = {};
+  for (const p of arr) if (p && p.property_id) preserve[p.property_id] = { grad: p.grad };
+  return preserve;
+}
+
+// Короткий тег для карточки аренды: до пляжа → мин.срок → «Аренда».
+function rentTag(o) {
+  if (o.distance_beach_m) return { ru: o.distance_beach_m + ' м до моря', en: o.distance_beach_m + ' m to the sea' };
+  if (o.min_stay) return { ru: 'от ' + o.min_stay + ' мес', en: 'from ' + o.min_stay + ' mo' };
+  // 30.08: раньше падало в заглушку «Аренда» — но блок и так называется «Аренда».
+  // Нечего сказать по объекту — не пишем ничего.
+  return { ru: '', en: '' };
+}
+
+/* Цена аренды для витрины. Ночная ставка — из uk_rates (факт), затем из
+   season_rates собственника; помесячная — из season_rates или rent_price_month_thb.
+   Ничего не пересчитываем из ночной в месячную и обратно: это разные рынки,
+   умножение на 30 давало бы цену втрое выше настоящей. */
+function rentRates(o, ratesBy) {
+  const pid = o.plp_property_id;
+  const sr = (o.season_rates && typeof o.season_rates === 'object') ? o.season_rates : {};
+  const num = v => { const n = Number(v); return Number.isFinite(n) && n > 0 ? n : null; };
+
+  let night = null, nightMax = null, src = null, minNights = null;
+  const own = (ratesBy && ratesBy[pid]) || [];
+  if (own.length) {
+    night = Math.min(...own.map(r => r.v));
+    nightMax = Math.max(...own.map(r => r.v));
+    minNights = own.map(r => r.min).filter(Boolean).sort((a, b) => a - b)[0] || null;
+    src = 'uk';
+  } else {
+    const cands = [sr.low_thb_night, sr.night_low_thb, sr.low_night_thb, sr.nightly_low_thb].map(num).filter(Boolean);
+    const tops = [sr.high_thb_night, sr.night_high_thb, sr.high_night_thb, sr.nightly_high_thb].map(num).filter(Boolean);
+    if (cands.length) { night = Math.min(...cands); nightMax = tops.length ? Math.max(...tops) : null; src = 'owner'; }
+  }
+
+  const monthCands = [sr.low_thb_month, sr.month_low_thb, o.rent_price_month_thb].map(num).filter(Boolean);
+  const monthTops = [sr.high_thb_month, sr.month_high_thb].map(num).filter(Boolean);
+  const month = monthCands.length ? Math.min(...monthCands) : null;
+  const monthMax = monthTops.length ? Math.max(...monthTops) : null;
+  if (month && !src) src = 'owner';
+
+  /* уровень источника виден наружу: факт из договоров, ставка собственника
+     или ориентир по рыночным объявлениям — чтобы витрина не выдавала одно за другое */
+  const level = (src === 'uk') ? 'uk' : (sr.level === 'market' ? 'market' : (src ? 'owner' : null));
+  return { night, nightMax, month, monthMax, rateSrc: (night || month) ? src : null,
+           rateLevel: (night || month) ? level : null,
+           rateAsOf: (night || month) ? (sr.as_of || null) : null, minNights };
+}
+
+function buildRentals(objects, preserve, ratesBy) {
+  return objects.map((o, i) => {
+    const pid = o.plp_property_id;
+    const keep = preserve[pid] || {};
+    const en = o.district || o.beach || '';
+    const usp = (o.usp || '').trim();
+    const uspEn = (o.usp_en || '').trim() || usp;
+    const S = (v) => (v === undefined || v === null) ? '' : String(v).trim();
+    return {
+      /* На витрине аренды показываем публичный код проекта, а не номер юнита:
+         «S14», «F302» — внутренняя информация (Эльнур 07.09). Внутренний PLP-ID
+         остаётся в системе, заявка приходит с публичным кодом и разворачивается
+         обратно на сервере. */
+      property_id: o.public_code || pid,
+      title: o.name,
+      funnel: 'rent',
+      grad: keep.grad || ('g' + ((i % 4) + 1)),
+      loc: { ru: DISTRICT_RU[en] || en, en },
+      type: typeLabel(o.type),
+      beds: bedsLabel(o),
+      bmin: (o.bedrooms_min === 0 || o.bedrooms_min) ? o.bedrooms_min : null,
+      bmax: (o.bedrooms_max === 0 || o.bedrooms_max) ? o.bedrooms_max : null,
+      area: areaLabel(o),
+      tag: rentTag(o),
+      /* дата старта продаж — справочно: группу она не меняет (см. saleGroup) */
+      saleStart: o.sale_started_on || null,
+      /* короткая приписка к стадии: «сдан в декабре 2025», «2 октября —
+         презентация сдачи». Эльнур: «доп отметки это прикольно» */
+      stageNote: o.stage_note || null,
+      desc: { ru: noContacts(usp), en: noContacts(uspEn) },
+      // 02.09: аренда тоже встаёт на карту — координаты из той же таблицы
+      lat: (o.lat === 0 || o.lat) ? Number(o.lat) : null,
+      lng: (o.lng === 0 || o.lng) ? Number(o.lng) : null,
+      coordOk: o.coord_source === 'exact' || o.coord_source === 'verified',
+      // стадия проекта: пока дом не сдан, снять нельзя — так и пишем
+      stage: o.stage || null,
+      handover: o.handover_date || null,
+      notReady: !!(o.stage && /construct|стро/i.test(String(o.stage))),
+      min_stay: (o.min_stay === 0 || o.min_stay) ? o.min_stay : null,
+      deposit: (o.deposit === 0 || o.deposit) ? o.deposit : null,
+      // фильтр удобств: источники — amenities (если есть) + rent_included; distance_beach_m для «у моря»
+      amenities: S(o.amenities),
+      beach_m: (o.distance_beach_m === 0 || o.distance_beach_m) ? o.distance_beach_m : null,
+      included: S(o.rent_included),
+      excluded: S(o.rent_excluded),
+      rules: S(o.rent_rules),
+      // 05.09: у аренды на витрине не было ни одного снимка — поля просто не
+      // доезжали из базы. Теперь галерея, разделы и планировки тянутся так же,
+      // как у продажи.
+      photo: thumbUrl(o.main_image_url, 760, 72),
+      /* «полный» снимок для окна — тоже превью, просто крупнее: оригинал
+         на 19 МБ никому на экране не нужен */
+      photoFull: thumbUrl(o.main_image_url, 1600, 80),
+      photos: heroGallery(o).length ? heroGallery(o).map(u => thumbUrl(u, 1280, 78)) : null,
+      groups: Array.isArray(o.photo_groups)
+        ? o.photo_groups.map(g => Object.assign({}, g, {
+            urls: Array.isArray(g.urls) ? g.urls.map(u => thumbUrl(u, 1280, 78)) : g.urls }))
+        : null,
+      units: unitsOf(o),
+      // ставки: что реально известно; чего нет — остаётся null, не выдумываем
+      ...rentRates(o, ratesBy),
+    };
+  });
+}
+
+function emitRentalsBlock(rentals) {
+  // < → <, чтобы свободный текст из БД не мог закрыть <script>
+  const items = rentals.map(p => '  ' + JSON.stringify(p).replace(/</g, '\\u003c')).join(',\n');
+  return MARK_RENT_START + '\n' +
+    'PL.RENTALS=[\n' + items + '\n];\n' +
+    MARK_RENT_END;
+}
+
+function writeRentals(html, rentals) {
+  const block = emitRentalsBlock(rentals);
+  const s = html.indexOf(MARK_RENT_START);
+  const e = html.indexOf(MARK_RENT_END);
+  if (s !== -1 && e !== -1 && e > s) {
+    return html.slice(0, s) + block + html.slice(e + MARK_RENT_END.length);
+  }
+  // первый прогон — оборачиваем существующий PL.RENTALS=[...];
+  const ai = html.indexOf('PL.RENTALS=');
+  if (ai === -1) { console.error('[gen] PL.RENTALS не найден в index.html — аренда не обновлена.'); return html; }
+  const lb = html.indexOf('[', ai);
+  const end = html.indexOf('\n];', lb) + 3;
+  return html.slice(0, ai) + block + html.slice(end);
+}
+
+// ------------------------------------------------- доходность района: две величины
+// 🔴 08.09. Здесь была подмена, из которой росли все расхождения по доходности:
+// карта называлась PL.NETYIELD и комментарий обещал «честный net», а заполнялась
+// она из disp_yield_* — это ВАЛОВЫЕ цифры буклета (Банг Тао 7–11%). Сайт от этого
+// писал «чистыми обычно 5–8%» и считал нормой рынка 6–8%, тогда как исследование
+// 28.08 в той же таблице даёт честный net 4,5–6% («не 7-10% из буклетов»).
+// Теперь две отдельные карты: PL.GROSSYIELD — валовая (до расходов), PL.NETYIELD —
+// чистая (после УК, обслуживания и простоя). Ярлык у цифры обязателен.
+// Если у района несколько unit_type — берём min(low)..max(high), самый широкий ориентир.
+function buildYieldMap(benchmarks, loKey, hiKey) {
+  const acc = {}; // district → { low, high }
+  for (const b of benchmarks) {
+    const d = b.district;
+    if (!d || b[loKey] == null || b[hiKey] == null) continue;
+    const lo = Number(b[loKey]), hi = Number(b[hiKey]);
+    if (!isFinite(lo) || !isFinite(hi)) continue;
+    if (!acc[d]) acc[d] = { low: lo, high: hi };
+    else { acc[d].low = Math.min(acc[d].low, lo); acc[d].high = Math.max(acc[d].high, hi); }
+  }
+  const out = {};
+  for (const d of Object.keys(acc).sort()) out[d] = acc[d].low + DASH + acc[d].high; // «7–11» (en-dash)
+  return out;
+}
+function buildNetyield(benchmarks) { return buildYieldMap(benchmarks, 'net_yield_low_pct', 'net_yield_high_pct'); }
+function buildGrossyield(benchmarks) { return buildYieldMap(benchmarks, 'disp_yield_low_pct', 'disp_yield_high_pct'); }
+
+function emitNetyieldBlock(netyield, grossyield) {
+  const line = (m) => Object.keys(m).map(d => '  ' + JSON.stringify(d) + ':' + JSON.stringify(m[d])).join(',\n');
+  return MARK_NY_START + '\n' +
+    '/* валовая. 10.09: пометки «до расходов»/«чистыми» с витрины сняты по решению\n' +
+    '   Эльнура — показываем один ориентир, точную цифру считает калькулятор. */\n' +
+    'PL.GROSSYIELD={\n' + line(grossyield) + '\n};\n' +
+    '/* чистая — после УК, обслуживания и простоя (исследование 28.08.2026) */\n' +
+    'PL.NETYIELD={\n' + line(netyield) + '\n};\n' +
+    MARK_NY_END;
+}
+
+/* Список всех объектов обычными ссылками.
+   28 страниц object/*.html были сиротами: на них не вело ни одной ссылки ни из
+   HTML, ни из JS — только карта сайта. Для поиска это худшее, что может быть:
+   внутренние ссылки и есть главный сигнал важности страницы. Блок статический,
+   скрипты его не перерисовывают, поэтому ссылки видны и роботу, и человеку. */
+const MARK_OI_START = '<!-- PLP:OBJECT-INDEX:START — сгенерировано build/gen.mjs, вручную не править -->';
+const MARK_OI_END = '<!-- PLP:OBJECT-INDEX:END -->';
+
+function writeObjectIndex(html, objects) {
+  const byDistrict = new Map();
+  for (const o of objects) {
+    if (!o.plp_property_id) continue;
+    const d = (o.district || 'Пхукет').trim();
+    if (!byDistrict.has(d)) byDistrict.set(d, []);
+    byDistrict.get(d).push(o);
+  }
+  if (!byDistrict.size) { console.error('[gen] Список объектов пуст — блок ссылок не тронут.'); return html; }
+
+  // Эльнур 04.09: не «район → внутри объекты», а просто один выезжающий список,
+  // строка = объект. Разбивка по районам читалась как полотно.
+  const all = [];
+  for (const list of byDistrict.values()) all.push(...list);
+  all.sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''), 'ru'));
+  const total = all.length;
+  const rows = all.map((o) => {
+    /* 08.09: адреса без .html — правило Эльнура. Чистый путь на хостинге живой. */
+    const href = 'object/' + slugOf(pubOf(o));
+    const price = o.price_from_thb ? fmtBahtShort(Number(o.price_from_thb)) : '';
+    const d = DISTRICT_RU[(o.district || '').trim()] || o.district || '';
+    return '<li><a href="' + href + '">' + htmlEsc(o.name || o.plp_property_id) + '</a>' +
+      '<span class="oi-d">' + htmlEsc(d) + '</span>' +
+      (price ? '<span class="oi-p">' + htmlEsc(price) + '</span>' : '') + '</li>';
+  }).join('');
+
+  const block = MARK_OI_START + '\n' +
+    '<section class="obj-index" id="all-objects"><div class="container">' +
+    /* 17.09 Эльнур: «на карте 64 объекта, а раздел объекты в каталоге 54, странно».
+       Врало не число, а подпись: здесь только продажа, на карте продажа плюс аренда.
+       Называем вслух, что считаем. */
+    '<details class="oi-box"><summary><b>Объекты в продаже</b>' +
+    '<span class="oi-n">' + total + '</span></summary>' +
+    '<p class="sub">Все проекты, с которыми мы работаем, — с ценами от застройщика ' +
+    'и условиями рассрочки. Объекты в аренду — в разделе «Аренда»; на карте показаны и те, и другие.</p>' +
+    '<ul class="oi-list">' + rows + '</ul></details>' +
+    '</div></section>\n' + MARK_OI_END;
+
+  console.log('[gen] блок ссылок на объекты:', total, 'ссылок одним списком');
+
+  const s = html.indexOf(MARK_OI_START);
+  const e = html.indexOf(MARK_OI_END);
+  if (s === -1 || e === -1 || e < s) {
+    console.error('[gen] Маркеры PLP:OBJECT-INDEX не найдены — блок ссылок не вставлен.');
+    return html;
+  }
+  return html.slice(0, s) + block + html.slice(e + MARK_OI_END.length);
+}
+
+function fmtBahtShort(n) {
+  if (!n || !isFinite(n)) return '';
+  return n >= 1e6 ? (n / 1e6).toFixed(n % 1e6 === 0 ? 0 : 1).replace('.', ',') + ' млн ฿'
+                  : Math.round(n / 1000) + ' тыс. ฿';
+}
+
+function writeNetyield(html, netyield, grossyield) {
+  const block = emitNetyieldBlock(netyield, grossyield);
+  const s = html.indexOf(MARK_NY_START);
+  const e = html.indexOf(MARK_NY_END);
+  if (s !== -1 && e !== -1 && e > s) {
+    return html.slice(0, s) + block + html.slice(e + MARK_NY_END.length);
+  }
+  // первый прогон — оборачиваем существующий PL.NETYIELD={...};
+  const ai = html.indexOf('PL.NETYIELD=');
+  if (ai === -1) { console.error('[gen] PL.NETYIELD не найден в index.html — доходность не обновлена.'); return html; }
+  const lb = html.indexOf('{', ai);
+  const end = html.indexOf('\n};', lb);
+  if (lb === -1 || end === -1) { console.error('[gen] Не разобрал границы PL.NETYIELD — доходность не обновлена.'); return html; }
+  return html.slice(0, ai) + block + html.slice(end + 3); // включая '\n};'
+}
+
+// -------------------------------------------------------------------- SEO/pages
+function htmlEsc(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+function jsonLdSafe(obj) {
+  // < → <, чтобы описание не могло закрыть <script>
+  return JSON.stringify(obj).replace(/</g, '\\u003c');
+}
+function truncate(s, n) {
+  s = String(s || '').replace(/\s+/g, ' ').trim();
+  return s.length > n ? s.slice(0, n - 1).trimEnd() + '…' : s;
+}
+function chipRow(items) {
+  return items.filter(x => x && x.v).map(x =>
+    '<div class="chip"><span class="k">' + htmlEsc(x.k) + '</span><span class="v">' + htmlEsc(x.v) + '</span></div>'
+  ).join('');
+}
+
+function objectPage(o, benchmarks, ratesBy, allObjects) {
+  const pid = o.plp_property_id;
+  const pub = pubOf(o);            /* публичный код: он же в адресе и на странице */
+  const slug = slugOf(pub);
+  /* 08.09: клиентам мы раздавали чистый адрес, а поисковикам каноническим
+     указывали .html — две версии одной страницы. Везде чистый. */
+  const url = SITE_BASE + '/object/' + slug;
+  /* og-картинка тоже по публичному коду: адрес файла попадает в мессенджеры */
+  /* если кадра объекта нет (карточка только заведена) — общая обложка сайта:
+     ссылка в мессенджере всё равно должна открываться картинкой, а не строкой */
+  const hasOwnImg = fs.existsSync(path.join(ROOT, 'img', pub + '.jpg'));
+  const img = SITE_BASE + (hasOwnImg ? '/img/' + pub + '.jpg' : '/img/og-default.jpg');
+  // Реальные размеры картинки: WhatsApp без og:image:width/height часто вообще
+  // не рисует превью, а соврать нельзя — высота у карточек разная (674…1167).
+  const imgDim = jpegSize(path.join(ROOT, 'img', pub + '.jpg'))
+              || jpegSize(path.join(ROOT, 'img', pid + '.jpg'))
+              || jpegSize(path.join(ROOT, 'img', 'og-default.jpg'));
+  const en = o.district || o.beach || '';
+  const ru = DISTRICT_RU[en] || en;
+  const t = typeLabel(o.type);
+  const beds = bedsLabel(o);
+  const area = areaLabel(o);
+  const dl = deadline(o.handover_date);
+  const yr = yieldRange(benchmarks, en, o.type);
+  const usp = (o.usp || '').trim();
+  const uspEn = (o.usp_en || '').trim(); // EN-описание; секция рендерится только если непусто
+  const priceTHB = o.price_from_thb;
+  const money = v => new Intl.NumberFormat('ru-RU').format(Math.round(v)) + ' ฿';
+  const priceFmt = priceTHB ? money(priceTHB) : '';
+  /* Аренда: вместо стартовой цены застройщика — ставка (ночь или месяц),
+     источник тот же, что на витрине: uk_rates → season_rates. */
+  const isRent = /аренда|rent/i.test(String(o.purpose || ''));
+  const rr = isRent ? rentRates(o, ratesBy) : null;
+  let rentLine = '';
+  if (rr && (rr.night || rr.month)) {
+    const part = (lo, hi, unit) => !lo ? '' :
+      ((hi && hi > lo) ? money(lo) + ' — ' + money(hi) : 'от ' + money(lo)) + ' ' + unit;
+    const main = part(rr.night, rr.nightMax, 'за ночь') || part(rr.month, rr.monthMax, 'в месяц');
+    const second = (rr.night && rr.month) ? part(rr.month, rr.monthMax, 'в месяц') : '';
+    /* откуда цена: факт по нашим договорам подписи не требует, ориентир по чужим
+       объявлениям и ставка проекта — обязаны её иметь */
+    const lvl = rr.rateLevel === 'market' ? ('ориентир по объявлениям' + (rr.rateAsOf ? ' · ' + rr.rateAsOf.slice(0, 7).split('-').reverse().join('.') : ''))
+              : rr.rateLevel === 'owner' ? 'ставка по проекту' : '';
+    const note = [second, rr.minNights ? ('от ' + rr.minNights + ' ночей') : '', lvl].filter(Boolean).join(' · ');
+    rentLine = '<div class="price">' + htmlEsc(main) +
+      (note ? '<small>' + htmlEsc(note) + '</small>' : '') + '</div>';
+  }
+  const title = o.name + ' — ' + ru + ', Пхукет | Property Library';
+  const metaDesc = truncate(noContacts(usp) || (o.name + ' — ' + t.ru + ' в районе ' + ru + ', Пхукет.'), 200);
+  const distBeach = o.distance_beach_m ? o.distance_beach_m + ' м до пляжа' : '';
+
+  const waText = encodeURIComponent(o.name + ' — интересует этот объект. ' + url);
+  const waLink = 'https://wa.me/' + WA + '?text=' + waText;
+  const backLink = '../#object=' + encodeURIComponent(pub);   /* в каталоге объект живёт под публичным кодом */
+
+  /* 🔴 10.09.2026. Search Console слал письма: «отсутствует поле aggregateRating»,
+     «отсутствует поле review» — по два на каждый обход. Причина: карточки были
+     объявлены типом Product, и Google применял к ним правила ИНТЕРНЕТ-МАГАЗИНА,
+     где у товара обязаны быть рейтинг и отзывы. У нас их нет, и выдумывать их
+     нельзя — на поддельных отзывах мы уже горели (Михаил и Виолетта, которых
+     не существовало). Поэтому убираем сам повод: объект — не товар на полке.
+     Теперь страница описана как объявление о недвижимости (RealEstateListing),
+     сам объект — как жильё (Residence), а цена — отдельным предложением Offer,
+     которое ссылается на объект. Всё это валидная разметка schema.org, цена и
+     наличие остаются на месте, а требований магазина к ней больше нет.
+     Застройщик переехал из brand (свойство товара) в additionalProperty. */
+  const idRes = url + '#residence';
+  const residence = {
+    '@type': 'Residence',
+    '@id': idRes,
+    name: o.name,
+    description: truncate(noContacts(usp), 500),
+    url,
+    image: img,
+    address: { '@type': 'PostalAddress', addressRegion: 'Phuket', addressLocality: ru, addressCountry: 'TH' },
+  };
+  if (o.developer) residence.additionalProperty = {
+    '@type': 'PropertyValue', name: 'Застройщик', value: legalDev(o.developer),
+  };
+  if (o.bedrooms_max != null) residence.numberOfRooms = o.bedrooms_max;
+  if (o.area_max != null) residence.floorSize = { '@type': 'QuantitativeValue', value: o.area_max, unitCode: 'MTK' };
+
+  const graph = [
+    {
+      '@type': 'RealEstateListing',
+      '@id': url + '#listing',
+      url,
+      name: o.name,
+      description: truncate(noContacts(usp), 500),
+      about: { '@id': idRes },
+      /* datePosted намеренно нет: он подставлялся датой сборки, то есть «сегодня»
+         на каждом прогоне. Это неправда про объявление и вдобавок трогало все
+         47 файлов при любой пересборке. */
+    },
+    residence,
+  ];
+  if (priceTHB) graph.push({
+    '@type': 'Offer',
+    '@id': url + '#offer',
+    itemOffered: { '@id': idRes },
+    priceCurrency: 'THB',
+    price: priceTHB,
+    /* у застройщика распродано, но наш юнит есть — это «ограниченное наличие»,
+       а не «продано»: иначе поисковик прячет живое предложение */
+    availability: String(o.stage || '') === 'Sold out'
+      ? 'https://schema.org/LimitedAvailability'
+      : (o.status === 'sold' ? 'https://schema.org/SoldOut' : 'https://schema.org/InStock'),
+    url,
+    seller: { '@type': 'RealEstateAgent', name: 'Property Library Phuket', url: SITE_BASE },
+  });
+  const ld = { '@context': 'https://schema.org', '@graph': graph };
+
+  /* 16.09 Эльнур: «мы не размещаем на сайте конфиденциальную информацию — номера,
+     ссылки, почту застройщика». Раньше здесь висели кнопки на сайт проекта, тур и
+     презентацию: человек уходил к застройщику с нашей же страницы. Остаётся только
+     карта — она никуда не уводит. Прайсы, папки Диска и каналы застройщика были и
+     остаются кухней агентства (канон showcase_privacy). */
+  const PRIVATE_HOST = /(drive\.google|docs\.google|dropbox|sharepoint|onedrive|supabase\.co\/storage)/i;
+  const linkOk = (u) => typeof u === 'string' && /^https?:\/\//i.test(u.trim()) && !PRIVATE_HOST.test(u);
+  const mapLink = linkOk(o.map_url)
+    ? '<p><a class="lnk" href="' + htmlEsc(String(o.map_url).trim()) + '" rel="noopener nofollow" target="_blank">Показать на карте</a></p>'
+    : '';
+  const materials = '';
+
+  // Галерея, планировки и ход стройки — те же данные, что и в карточке на сайте.
+  /* 07.09: страницы объектов тянули ОРИГИНАЛЫ по 2–19 МБ — за месяц это
+     съело 24 ГБ трафика Supabase при лимите 5,5 ГБ. Отдаём превью того же
+     хранилища: вес падает в десятки раз, качество для экрана то же. */
+  /* 07.09: восемь кадров подряд — это восемь фасадов, а интерьеров клиент
+     не видит вовсе. Берём по кругу из каждого раздела: территория, интерьеры,
+     инфраструктура, мастер-план — тогда в ленте показан весь объект. */
+  const gallery = heroGallery(o).map(u => thumbUrl(u, 1280, 78));
+  const heroSrc = thumbUrl(o.main_image_url, 1600, 80) || (gallery[0] || ('../img/' + pub + '.jpg'));
+  const shots = gallery.length > 1
+    ? '<div class="shots">' + gallery.map((u, i) =>
+        '<button type="button" class="' + (i ? '' : 'on') + '" data-src="' + htmlEsc(u) + '" aria-label="Фото ' + (i + 1) + '">' +
+        '<img src="' + htmlEsc(u) + '" alt="" loading="lazy" decoding="async"></button>').join('') + '</div>'
+    : '';
+  let unitList = unitsOf(o) || [];
+  /* 16.09 Эльнур: «карточка должна нести максимум пользы: чтобы можно было прогреться
+     и выбрать, какая именно планировка нужна и в какую она стоимость». Поэтому тип
+     жилья, его площадь, число спален, цена «от» и сам чертёж стоят рядом, а не в
+     двух разных блоках на разных концах страницы. */
+  const planShots = (Array.isArray(o.photo_groups) ? o.photo_groups : [])
+    .filter(g => g && Array.isArray(g.urls) &&
+      /plan|план|unit|тип/i.test(String(g.key || '') + ' ' + String(g.name || '')) &&
+      !/master|мастер|siteplan|генплан/i.test(String(g.key || '') + ' ' + String(g.name || '')))
+    .flatMap(g => g.urls.filter(u => typeof u === 'string'));
+  /* 16.09 Эльнур: «сохраняй имена чертежей и свяжи их с типами». Имена теперь не
+     обезличиваются при заливке (tools/photos.py), а в прайсе у каждого типа есть код
+     («L2C», «SA», «1BM»). Чертёж встаёт рядом со своей ценой только при точном
+     совпадении кода — угадывать по числу спален больше не пробуем. */
+  /* имя файла чертежа несёт либо код типа («Type_SA»), либо метраж и число спален
+     («1BEDROOM PLUS 50.00 SQ.M»). Сначала пробуем код — он точнее, потом метраж:
+     совпадение по площади ±2 м² при том же числе спален. Ничего не подходит — чертёж
+     остаётся в общей сетке, выдумывать соответствие нельзя. */
+  const planName = p => decodeURIComponent((p.split('/').pop() || ''))
+      .replace(/-[0-9a-f]{8}\.[a-z0-9]+$/i, '').replace(/[_-]+/g, ' ');
+  const planFor = (u) => {
+    const code = String(u.code || '').toUpperCase();
+    if (code) {
+      const rx = new RegExp('(^|[^A-Z0-9])' + code.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '([^A-Z0-9]|$)', 'i');
+      const hit = planShots.find(p => rx.test(planName(p)));
+      if (hit) return hit;
+    }
+    const area = Number(u.area);
+    if (!area) return null;
+    for (const p of planShots) {
+      const nm = planName(p);
+      const m = /(\d{2,4}(?:[.,]\d{1,2})?)\s*(?:sq\.?\s?m|sqm|м²|m2)/i.exec(nm);
+      if (!m) continue;
+      const a = Number(String(m[1]).replace(',', '.'));
+      if (Math.abs(a - area) > 2) continue;
+      if (u.beds != null) {
+        const b = /(\d)\s*(?:bedroom|bed|br\b|спал)/i.exec(nm);
+        if (b && Number(b[1]) !== Number(u.beds)) continue;
+      }
+      return p;
+    }
+    return null;
+  };
+  /* 17.09 Эльнур: «информация в соответствии планировки, на которую ткнул». Чертёж
+     застройщика сам подписан: число спален и метраж вынесены в имя файла при заливке.
+     Если таких подписанных чертежей больше, чем строк прайса, список планировок строим
+     по ним: у каждой свой чертёж и своя площадь, а цена берётся по числу спален. */
+  const fromPlans = (function () {
+    const out = [];
+    for (const p of planShots) {
+      const nm = planName(p);
+      const ma = /(\d{2,4}(?:[.,]\d{1,2})?)\s*(?:sq\.?\s?m|sqm|м²|m2)/i.exec(nm);
+      if (!ma) continue;
+      const area = Number(String(ma[1]).replace(',', '.'));
+      if (!(area > 12 && area < 3000)) continue;
+      const mb = /(\d)\s*(?:br\b|bedroom|bed\b|спал)/i.exec(nm);
+      const beds = mb ? Number(mb[1]) : null;
+      const mt = /type[ _-]?([A-Z0-9][A-Z0-9.\-]{0,6})/i.exec(nm);
+      out.push({ area, beds, code: mt ? mt[1].toUpperCase() : null, shot: p });
+    }
+    const seen = new Set(), uniq = [];
+    for (const x of out.sort((a, b) => (a.beds || 9) - (b.beds || 9) || a.area - b.area)) {
+      const k = (x.beds || '?') + ':' + x.area.toFixed(1);
+      if (seen.has(k)) continue;
+      seen.add(k); uniq.push(x);
+    }
+    return uniq.slice(0, 12);
+  })();
+  const priceForBeds = {};
+  for (const t of (Array.isArray(o.price_tiers) ? o.price_tiers : [])) {
+    const b = t && t.bedrooms, pr = t && (t.price_from_thb || t.price_thb);
+    if (b == null || !pr || t.kind === 'penthouse') continue;
+    if (!priceForBeds[b] || pr < priceForBeds[b]) priceForBeds[b] = pr;
+  }
+  if (fromPlans.length > unitList.length) {
+    unitList = fromPlans.map(x => ({
+      name: (x.beds === 0 ? 'Студия' : x.beds ? (x.beds + (x.beds === 1 ? ' спальня' : x.beds < 5 ? ' спальни' : ' спален')) : 'Планировка')
+            + (x.code ? ' · тип ' + x.code : ''),
+      beds: x.beds, area: x.area, shot: x.shot,
+      from: x.beds != null ? priceForBeds[x.beds] || null : null,
+    }));
+  }
+  const money0 = v => new Intl.NumberFormat('ru-RU').format(Math.round(v)) + ' ฿';
+  const num = v => String(Math.round(Number(v) * 10) / 10).replace('.', ',');
+  const unitsBlock = unitList.length
+    ? '<section class="desc"><h2>Планировки и цены</h2><div class="units">' +
+      unitList.map(u => {
+        const shot = u.shot || planFor(u);
+        /* 17.09: одно число площади врало — у Katabello в шапке «1 спальня 28 м²»,
+           а в списке минимальная планировка 37 м². Показываем вилку группы. */
+        const areaTxt = (u.areaMin && u.areaMax && u.areaMax - u.areaMin > 0.5)
+          ? (num(u.areaMin) + '–' + num(u.areaMax) + ' м²')
+          : (u.area ? (u.area + ' м²') : '');
+        const line = [areaTxt, (u.beds != null ? u.beds + ' сп.' : ''),
+                      u.plot ? ('участок ' + u.plot) : '',
+                      u.free ? ('свободно ' + u.free) : '']
+          .filter(Boolean).join(' · ');
+        return '<div class="unitc">' +
+          (shot ? '<a class="uplan" href="' + htmlEsc(thumbUrl(shot, 1600, 82)) + '" target="_blank" rel="noopener">' +
+                  '<img src="' + htmlEsc(thumbUrl(shot, 520, 74)) + '" alt="Планировка ' + htmlEsc(u.name || '') +
+                  '" loading="lazy" decoding="async"></a>' : '') +
+          '<b>' + htmlEsc(u.name || 'Тип') + '</b>' +
+          (line ? '<span>' + htmlEsc(line) + '</span>' : '') +
+          (u.from ? '<u>от ' + money0(u.from) + '</u>' : '<u class="req">цена по запросу</u>') +
+          (u.note ? '<small>' + htmlEsc(String(u.note).slice(0, 90)) + '</small>' : '') +
+          '</div>';
+      }).join('') +
+      '</div>' +
+      (function () {
+        const used = new Set(unitList.map(u => u.shot || planFor(u)).filter(Boolean));
+        const rest = planShots.filter(p => !used.has(p));
+        return rest.length ? '<h3 class="sub-h">Другие планировки</h3>' +
+          shotGrid(rest).replace('grid-shots', 'grid-shots plans') : '';
+      })() +
+      (priceTHB ? '<p class="fine">Цены по прайсу застройщика на дату сверки, за свободные юниты.</p>' : '') +
+      '</section>'
+    : (planShots.length
+        ? '<section class="desc"><h2>Планировки</h2>' + shotGrid(planShots).replace('grid-shots', 'grid-shots plans') +
+          '<p class="fine">Нажмите на чертёж, чтобы открыть крупно.</p></section>'
+        : '');
+
+  /* Распроданный проект остаётся на витрине: цену из прайса, которого уже нет,
+     не показываем — предлагаем поискать юнит на вторичном рынке. */
+  const soldOut = String(o.stage || '') === 'Sold out';
+  const soldOutLine = soldOut
+    ? (priceFmt
+        ? '<div class="price">от ' + htmlEsc(priceFmt) + '<small>у застройщика распродано — это предложение от владельца, ищем и другие</small></div>'
+        : '<div class="price">Цена по запросу<small>у застройщика распродано — ищем через владельцев</small></div>')
+    : '';
+
+  /* ===== ЧТО ПРЕДЛАГАЕТ ЗАСТРОЙЩИК =====
+     Эльнур 16.09.2026 про заголовок «Что рядом и что нового»: «я бы исправил
+     по соответствию». В поле лежат условия застройщика на сегодня: скидки,
+     рассрочка, мебельный пакет. Иногда — новость про соседнюю площадку:
+     такой текст идёт под своим заголовком.
+     Служебные пометки наружу не выпускаем: «уточнить у застройщика»,
+     «[нужно от Эльнура]» и догадки с меткой (estimated) — это не предложение. */
+  const promoBlock = (function () {
+    let txt = noContacts(String(o.current_promo || '')).trim();
+    if (!txt) return '';
+    if (/\(estimated\)/i.test(txt)) return '';
+    if (promoIsTimed(txt)) return '';
+    if (/^\s*(уточнить|нужно|\[|—|-)\s*/i.test(txt) && txt.length < 60) return '';
+    txt = txt.replace(/\s*\((?:источник|source)\s*:[^)]*\)/ig, '')
+             .replace(/\s*\(сообщение застройщика[^)]*\)/ig, '')
+             .trim().replace(/\s*\.\s*$/, '.');
+    if (txt.length < 12) return '';
+    const aboutArea = /(рядом|поблизости|в соседнем|неподалёку|открыл|открывает|строит)/i.test(txt) &&
+                      !/(скидк|рассрочк|спец|акци|бонус|подар|первоначальн|цены|цена)/i.test(txt);
+    const h = aboutArea ? 'Что нового рядом' : 'Предложение застройщика';
+    return '<section class="promo"><h2>' + h + '</h2><p>' + htmlEsc(txt) + '</p></section>';
+  })();
+
+  /* ===== ХОД СТРОЙКИ =====
+     Эльнур 16.09.2026: «ход строительства должен быть у всех, кому он важен —
+     сроки строительства это важный пункт». Блок собирается для каждого
+     строящегося и предпродажного объекта: срок сдачи есть всегда, отчёт
+     застройщика и снимки — когда они есть.
+     В базе две формы отчёта: {as_of, photos, source} и {'на 2026-09-07':
+     {сделано, в работе, готовность}} — читаем обе. */
+  const grp = saleGroup(o);
+  const bpRaw = o.build_progress && typeof o.build_progress === 'object' ? o.build_progress : null;
+  const bpPhotos = bpRaw && Array.isArray(bpRaw.photos) ? bpRaw.photos : [];
+  const bpReport = (function () {
+    if (!bpRaw) return null;
+    const k = Object.keys(bpRaw).find(x => /^на\s|^as of/i.test(x) && bpRaw[x] && typeof bpRaw[x] === 'object');
+    return k ? { on: k.replace(/^на\s*/i, ''), body: bpRaw[k] } : null;
+  })();
+  const ruDate = v => {
+    const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(v || ''));
+    return m ? m[3] + '.' + m[2] + '.' + m[1] : String(v || '');
+  };
+  const daysLeft = (function () {
+    if (!o.handover_date) return null;
+    const hd = new Date(o.handover_date); if (isNaN(hd)) return null;
+    return Math.round((hd - new Date()) / 86400000);
+  })();
+  const leftWord = (function () {
+    if (daysLeft == null || daysLeft < 0) return '';
+    if (daysLeft <= 90) return 'осталось ' + daysLeft + ' дн.';
+    const mo = Math.round(daysLeft / 30);
+    return 'осталось около ' + mo + ' мес.';
+  })();
+  const progressRows = [
+    { k: 'Срок сдачи', v: dl.ru ? (dl.ru + (leftWord ? ' · ' + leftWord : '')) : '' },
+    { k: 'Стадия', v: GROUP_RU[grp] || '' },
+    { k: 'Отчёт застройщика', v: bpReport ? ('на ' + ruDate(bpReport.on)) : (bpRaw && bpRaw.as_of ? 'на ' + ruDate(bpRaw.as_of) : '') },
+    { k: 'Готовность', v: bpReport && bpReport.body['готовность'] ? String(bpReport.body['готовность']) : '' },
+  ];
+  const listOf = (title, arr) => Array.isArray(arr) && arr.length
+    ? '<h3 class="sub-h">' + title + '</h3><ul class="prg-l">' +
+      arr.map(x => '<li>' + htmlEsc(String(x)) + '</li>').join('') + '</ul>'
+    : '';
+  const progressBody =
+    chipRow(progressRows) +
+    (bpReport ? (listOf('Сделано', bpReport.body['сделано']) + listOf('В работе', bpReport.body['в работе'])) : '') +
+    (o.stage_note && !/^(идут продажи|строится)$/i.test(String(o.stage_note).trim())
+      ? '<p>' + htmlEsc(noContacts(String(o.stage_note))) + '</p>' : '') +
+    (bpPhotos.length
+      ? '<div class="prgs">' + bpPhotos.slice(0, 6).map(u =>
+          '<img src="' + htmlEsc(thumbUrl(u, 760, 74)) + '" alt="" loading="lazy" decoding="async">').join('') + '</div>'
+      : '') +
+    /* откуда снимки — наша кухня: канал застройщика на витрине не называем */
+    '';
+  /* Показываем строящимся и предпродажным, а также любому объекту, по которому
+     застройщик прислал отчёт. Одна строка «стадия» блоком не считается: нужен
+     срок сдачи, отчёт, снимки или приписка — иначе блока нет. */
+  const progressHas = Boolean(dl.ru || bpReport || bpPhotos.length || o.stage_note);
+  /* у сданного проекта блока стройки нет: в канале застройщика лежат уже снимки
+     шоурумов, а не работ — это не «ход строительства» */
+  const progressWorth = (grp === 'construction' || grp === 'presale');
+  const progressBlock = (progressWorth && progressHas)
+    ? '<section class="desc"><h2>' + (grp === 'ready' ? 'Как шло строительство' : 'Ход строительства') +
+      '</h2>' + progressBody + '</section>'
+    : '';
+
+  /* 16.09 Эльнур: «страница объекта должна быть богаче карточки». Всё ниже — из той же
+     базы, что и карточка: планировки, инфраструктура, как платить, форма владения,
+     район и похожие объекты. Ничего не выдумываем: нет данных — блока нет. */
+  const groupsAll = Array.isArray(o.photo_groups) ? o.photo_groups.filter(g => Array.isArray(g.urls) && g.urls.length) : [];
+  const groupBy = re => groupsAll.filter(g => re.test(String(g.key || '') + ' ' + String(g.name || '')));
+  /* объявление функцией, а не стрелкой: сетку кадров зовёт блок планировок,
+     который стоит выше по коду */
+  function shotGrid(urls, w) {
+    return '<div class="grid-shots">' + urls.slice(0, 8).map(u =>
+      '<a href="' + htmlEsc(thumbUrl(u, 1600, 82)) + '" target="_blank" rel="noopener">' +
+      '<img src="' + htmlEsc(thumbUrl(u, w || 620, 74)) + '" alt="" loading="lazy" decoding="async"></a>').join('') + '</div>';
+  }
+
+  /* мастер-план — про весь проект, чертежи квартир — рядом с ценой на них */
+  const masterGroups = groupBy(/master|мастер|siteplan|генплан/i);
+  const plansBlock = masterGroups.length
+    ? '<section class="desc"><h2>Мастер-план</h2>' +
+      masterGroups.map(g => shotGrid(g.urls)).join('') +
+      '<p class="fine">Нажмите на изображение, чтобы открыть крупно.</p></section>'
+    : '';
+
+  const facGroups = groupBy(/facil|инфраструктур|amenit|общие|территор/i);
+  const amenList = String(o.amenities || '').split(/[,;·\n]+/).map(x => x.trim()).filter(x => x.length > 1).slice(0, 18);
+  /* «что рядом» в базе часто описывает саму территорию проекта (бассейны, лобби, парковка),
+     а не окрестности — такой текст читается в инфраструктуре, а не в блоке района */
+  const nearbyRaw = noContacts(String(o.nearby || '')).trim();
+  const nearbyIsFacilities = /facilit|pool|lobby|parking|gym|sauna|onsen|rooftop|бассейн|лобби|паркинг|спортзал|сауна/i.test(nearbyRaw);
+  const facBlock = (facGroups.length || amenList.length || (nearbyRaw && nearbyIsFacilities))
+    ? '<section class="desc"><h2>Инфраструктура проекта</h2>' +
+      (amenList.length ? '<div class="tags">' + amenList.map(a => '<span>' + htmlEsc(a) + '</span>').join('') + '</div>' : '') +
+      (nearbyRaw && nearbyIsFacilities ? '<p>' + htmlEsc(nearbyRaw) + '</p>' : '') +
+      facGroups.map(g => shotGrid(g.urls)).join('') + '</section>'
+    : '';
+
+  const payLines = [
+    o.payment_plan ? ['План застройщика', noContacts(String(o.payment_plan))] : null,
+    (!o.payment_plan && o.payment_schedule) ? ['График', noContacts(String(o.payment_schedule))] : null,
+    o.first_payment ? ['Первый взнос', String(o.first_payment).replace(/%$/, '') + '%'] : null,
+    o.maintenance_fee_thb_sqm ? ['Обслуживание', new Intl.NumberFormat('ru-RU').format(o.maintenance_fee_thb_sqm) + ' ฿ за м² в год'] : null,
+  ].filter(Boolean);
+  const payBlock = payLines.length
+    ? '<section class="desc"><h2>Как платить</h2><dl class="pairs">' +
+      payLines.map(([k, v]) => '<dt>' + htmlEsc(k) + '</dt><dd>' + htmlEsc(v) + '</dd>').join('') +
+      '</dl><p class="fine">Точный график под ваш юнит и сроки считает специалист — цифры застройщика меняются.</p></section>'
+    : '';
+
+  const ownRaw = String(o.ownership || '').trim();
+  const ownRu = !ownRaw ? '' :
+    /both/i.test(ownRaw) ? 'Фрихолд или лизхолд — на выбор' :
+    /^leasehold/i.test(ownRaw) ? 'Лизхолд' :
+    /^freehold/i.test(ownRaw) ? 'Фрихолд' : ownRaw;
+  const ownBlock = ownRu
+    ? '<section class="desc"><h2>Форма владения</h2><p>' + htmlEsc(ownRu) +
+      '</p><p class="fine">Что это значит для иностранца — в <a href="../guide/leasehold-ili-freehold">разборе форм владения</a>.</p></section>'
+    : '';
+
+  const distSlug = String(en || '').toLowerCase().replace(/[^a-z]+/g, '-').replace(/^-|-$/g, '');
+  const hasDistPage = distSlug && fs.existsSync(path.join(ROOT, 'districts', distSlug + '.html'));
+  const areaBits = [
+    o.distance_beach_m ? (o.distance_beach_m + ' м до пляжа') : '',
+    o.distance_airport_km ? (o.distance_airport_km + ' км до аэропорта') : '',
+  ].filter(Boolean);
+  const nearbyTxt = nearbyIsFacilities ? '' : nearbyRaw;
+  const areaBlock = (areaBits.length || nearbyTxt || hasDistPage)
+    ? '<section class="desc"><h2>Район: ' + htmlEsc(ru) + '</h2>' +
+      (areaBits.length ? '<div class="tags">' + areaBits.map(a => '<span>' + htmlEsc(a) + '</span>').join('') + '</div>' : '') +
+      (nearbyTxt ? '<p>' + htmlEsc(nearbyTxt) + '</p>' : '') +
+      (hasDistPage ? '<p><a class="lnk" href="../districts/' + distSlug + '">Весь район: цены, пляжи, что рядом</a></p>' : '') + mapLink +
+      '</section>'
+    : '';
+
+  /* ===== ПОХОЖИЕ ОБЪЕКТЫ =====
+     Эльнур 16.09.2026: «примерно одинаковый концепт, цена-качество, любые схожие
+     критерии: большие виллы, школьные, современные кондо, первая линия, ближе к
+     первой. Это не только цена». Считаем близость по нескольким признакам и
+     показываем три самых близких — а не первые попавшиеся в бюджете ±40%. */
+  const beachClass = m => m == null ? null : (m <= 300 ? 0 : m <= 800 ? 1 : m <= 2000 ? 2 : 3);
+  const areaClass = a => !a ? null : (a < 60 ? 0 : a < 120 ? 1 : a < 250 ? 2 : 3);
+  const myGrp = grp, myBeach = beachClass(o.distance_beach_m), myArea = areaClass(o.area_min || o.area_max);
+  const kinship = x => {
+    let sc = 0;
+    if (String(x.type || '') === String(o.type || '')) sc += 30;          // вилла к вилле, кондо к кондо
+    if ((x.district || x.beach || '') === en && en) sc += 22;             // тот же район
+    const xb = beachClass(x.distance_beach_m);
+    if (myBeach != null && xb != null) sc += xb === myBeach ? 16 : (Math.abs(xb - myBeach) === 1 ? 7 : 0);
+    if (priceTHB && x.price_from_thb) {
+      const d = Math.abs(x.price_from_thb - priceTHB) / priceTHB;
+      sc += d <= 0.2 ? 20 : d <= 0.4 ? 12 : d <= 0.7 ? 4 : 0;
+    }
+    const xa = areaClass(x.area_min || x.area_max);
+    if (myArea != null && xa != null && xa === myArea) sc += 12;          // тот же размер жилья
+    if (saleGroup(x) === myGrp) sc += 10;                                 // та же стадия: сравнивать честно
+    const bo = (o.bedrooms_min != null && x.bedrooms_min != null) &&
+      Math.max(o.bedrooms_min, x.bedrooms_min) <= Math.min(o.bedrooms_max || o.bedrooms_min, x.bedrooms_max || x.bedrooms_min);
+    if (bo) sc += 10;                                                     // спальни пересекаются
+    if (String(x.developer || '') === String(o.developer || '') && o.developer) sc += 6;
+    return sc;
+  };
+  const similar = (Array.isArray(allObjects) ? allObjects : [])
+    .filter(x => x && x.plp_property_id !== pid && !/аренда|rent/i.test(String(x.purpose || '')))
+    .map(x => ({ x, sc: kinship(x) }))
+    .filter(r => r.sc >= 45)                 // ниже — это уже «просто другой объект»
+    .sort((a, b) => b.sc - a.sc)
+    .slice(0, 3).map(r => r.x);
+  const similarBlock = similar.length >= 2
+    ? '<section class="desc"><h2>Похожие объекты</h2><div class="simi">' +
+      similar.map(x => {
+        const xp = pubOf(x), xru = DISTRICT_RU[x.district || x.beach || ''] || (x.district || x.beach || '');
+        const xi = thumbUrl(x.main_image_url, 520, 72) || ('../img/' + xp + '.jpg');
+        const xg = GROUP_RU[saleGroup(x)] || '';
+        return '<a class="simi-c" href="' + htmlEsc(slugOf(xp)) + '">' +
+          '<img src="' + htmlEsc(xi) + '" alt="" loading="lazy" decoding="async">' +
+          '<b>' + htmlEsc(x.name) + '</b><span>' + htmlEsc([xru, xg].filter(Boolean).join(' · ')) +
+          (x.price_from_thb ? ' · от ' + money(x.price_from_thb) : '') + '</span></a>';
+      }).join('') + '</div></section>'
+    : '';
+
+  const chips = chipRow([
+    { k: 'Тип', v: t.ru },
+    { k: 'Спальни', v: beds },
+    { k: 'Площадь', v: area },
+    { k: 'Сдача', v: dl.ru },
+    // 16.09: стадия — одной функцией saleGroup на весь сайт, иначе страница
+    // объекта и карточка спорят между собой («старт продаж» против «в продаже»)
+    { k: 'Стадия', v: soldOut ? 'распродано у застройщика' :
+        (saleGroup(o) === 'resale'
+          ? (String(o.stage || '') === 'Ready' || (o.handover_date && new Date(o.handover_date) < new Date())
+             ? 'вторичка' : 'переуступка')
+          : (GROUP_RU[saleGroup(o)] || '')) },
+    /* 🔴 10.09 Эльнур: «зашёл на карточку, а там доходность 7% до вычета расходов,
+   мы такое не согласовывали». Показывали o.roi — цифру из буклета застройщика,
+   да ещё с пометкой про расходы. Теперь одна цифра на всю карточку: ориентир
+   по району, тот же, что в блоке ниже. Без слов «до расходов» и «чистыми». */
+    /* 16.09 Эльнур: «одинаковые цифры на каждом проекте ничего не говорят, лучше убрать,
+       чтобы не отпугивать — у нас есть калькулятор». Цифра в базе одна на весь остров
+       (6–12%), поэтому в чипах её больше нет: рядом стоит кнопка расчёта по юниту. */
+    { k: 'До пляжа', v: distBeach },
+    { k: 'Застройщик', v: shortDev(o.developer) },
+    // Полное юридическое название — отдельной строкой и только если оно
+    // действительно длиннее короткого: реквизиты нужны, но не вместо имени.
+    { k: 'Юридическое лицо', v: (o.developer && shortDev(o.developer) !== legalDev(o.developer)) ? legalDev(o.developer) : '' },
+  ]);
+
+  return `<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script>(function(){try{var v=localStorage.getItem('pl_theme');
+if(v==='dark'||v==='light')document.documentElement.setAttribute('data-theme',v);}catch(e){}})();</script>
+<title>${htmlEsc(title)}</title>
+<meta name="description" content="${htmlEsc(metaDesc)}">
+<link rel="canonical" href="${htmlEsc(url)}">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="product">
+<meta property="og:site_name" content="Property Library Phuket">
+<meta property="og:title" content="${htmlEsc(o.name + ' — ' + ru)}">
+<meta property="og:description" content="${htmlEsc(metaDesc)}">
+<meta property="og:url" content="${htmlEsc(url)}">
+<meta property="og:image" content="${htmlEsc(img)}">
+<meta property="og:image:secure_url" content="${htmlEsc(img)}">
+<meta property="og:image:type" content="image/jpeg">${imgDim ? `
+<meta property="og:image:width" content="${imgDim.w}">
+<meta property="og:image:height" content="${imgDim.h}">` : ''}
+<meta property="og:image:alt" content="${htmlEsc(o.name)}">
+<meta property="og:locale" content="ru_RU">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${htmlEsc(o.name + ' — ' + ru)}">
+<meta name="twitter:description" content="${htmlEsc(metaDesc)}">
+<meta name="twitter:image" content="${htmlEsc(img)}">
+<script type="application/ld+json">${jsonLdSafe(ld)}</script>
+<style>
+/* Эльнур 05.09: сайт — единая система. Страница объекта живёт в тех же
+   цветах и с тем же набором блоков, что и карточка на сайте. */
+:root{--green:#D2D5B3;--green-deep:#5F6242;--olive:#5F6242;--ink:#22251C;--paper:#FBFBF7;
+  --bg:#F4F4EE;--card:#FBFBF7;--line:#E6E6DE;--muted:#6B6B63;--text:#22251C;--r:20px}
+/* тёмное оформление — тот же канон, что и на сайте; выбор берётся из настройки браузера
+   или из того, что человек выбрал кнопкой на сайте */
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){--ink:#ECEFE0;--text:#ECEFE0;--muted:#B9BCA6;
+    --bg:#0C0D09;--paper:#191A12;--card:#191A12;--line:#2C2E22;--green-deep:#C3C79A}
+}
+:root[data-theme="dark"]{--ink:#ECEFE0;--text:#ECEFE0;--muted:#B9BCA6;
+  --bg:#0C0D09;--paper:#191A12;--card:#191A12;--line:#2C2E22;--green-deep:#C3C79A}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+.wrap{max-width:920px;margin:0 auto;padding:0 20px}
+header.top{padding:18px 0;border-bottom:1px solid var(--line)}
+.brand{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:600;letter-spacing:.02em;color:var(--ink)}
+/* знак бренда не квадратный: жёсткая высота 24px его сплющивала (Эльнур 16.09:
+   «по этой ссылке лого обрезан»). Ширину задаём, высоту считает браузер. */
+.brand img{display:block;width:26px;height:auto;border-radius:6px}
+.brand small{color:var(--muted);font-weight:400}
+.hero{position:relative;border-radius:var(--r);overflow:hidden;margin:24px 0;border:1px solid var(--line);background:var(--card)}
+.hero img{display:block;width:100%;height:auto;max-height:520px;object-fit:cover}
+.hero .badge{position:absolute;top:14px;left:14px;background:rgba(16,15,12,.62);backdrop-filter:blur(6px);color:#fff;padding:7px 13px;border-radius:999px;font-size:13px;border:0}
+/* галерея как в карточке: крупный кадр, под ним миниатюры */
+.shots{display:flex;gap:8px;overflow-x:auto;margin:-8px 0 22px;padding-bottom:6px}
+.shots button{flex:0 0 96px;height:68px;padding:0;border:2px solid transparent;border-radius:10px;overflow:hidden;background:#eceadf;cursor:pointer}
+.shots button.on{border-color:var(--green-deep)}
+.shots img{width:100%;height:100%;object-fit:cover;display:block}
+/* планировка и её цена — одной карточкой: чертёж, тип, метраж, цена «от» */
+.units{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin-top:12px;align-items:start}
+.unitc{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column}
+.unitc .uplan{display:block;margin:-2px -4px 9px;border-radius:10px;overflow:hidden;background:var(--paper)}
+.unitc .uplan img{width:100%;height:150px;object-fit:contain;display:block;background:var(--paper)}
+.unitc b{display:block;font-size:14.5px}
+.unitc span{display:block;font-size:12.5px;color:var(--muted);margin-top:3px}
+.unitc u{display:block;text-decoration:none;font-weight:700;font-size:14px;margin-top:auto;padding-top:7px}
+.unitc u.req{font-weight:600;color:var(--muted)}
+.unitc small{display:block;font-size:11.5px;color:var(--muted);margin-top:4px;line-height:1.35}
+@media(max-width:560px){.units{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:9px}
+  .unitc{padding:10px 11px}.unitc .uplan img{height:120px}}
+.prgs{display:flex;gap:8px;overflow-x:auto;margin-top:10px;padding-bottom:6px}
+.prg-l{margin:0 0 6px;padding-left:18px;color:var(--ink)}
+.prg-l li{margin:3px 0}
+.prgs img{flex:0 0 190px;height:130px;object-fit:cover;border-radius:11px;display:block}
+h1{font-size:clamp(24px,4vw,34px);line-height:1.2;margin:8px 0 4px}
+.loc{color:var(--muted);margin:0 0 14px}
+.price{font-size:clamp(22px,3.5vw,30px);font-weight:700;color:var(--ink)}
+.price small{display:block;font-size:13px;font-weight:400;color:var(--muted);margin-top:2px}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0}
+.stgnote{margin:-8px 0 18px;color:var(--muted);font-size:15px;line-height:1.5}
+.promo{margin:26px 0;padding:18px 20px;border:1px solid var(--line);border-radius:16px}
+.promo h2{font-size:17px;margin:0 0 8px;color:var(--ink)}
+.promo p{margin:0;color:var(--text);opacity:.94;line-height:1.6}
+.chip{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 14px;min-width:120px}
+.chip .k{display:block;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.chip .v{display:block;font-weight:600;margin-top:2px}
+.yield{margin:22px 0;padding:18px 20px;border:1px solid var(--line);border-radius:var(--r);background:linear-gradient(180deg,rgba(210,213,179,.08),rgba(210,213,179,.02))}
+.yield .num{font-size:26px;font-weight:700;color:var(--green-deep)}
+.yield .lbl{color:var(--muted);font-size:14px}
+section.desc{margin:26px 0}
+section.desc h2{font-size:18px;margin:0 0 10px;color:var(--ink)}
+section.desc p{color:var(--text);opacity:.94;white-space:pre-line}
+.sub-h{font-size:14px;color:var(--muted);font-weight:600;margin:16px 0 8px}
+.grid-shots{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.grid-shots.plans img{object-fit:contain;background:var(--paper);height:150px;padding:4px}
+.grid-shots img{width:100%;height:120px;object-fit:cover;border-radius:11px;display:block;background:#eceadf}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+.tags span{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:13px}
+.pairs{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;margin:0}
+.pairs dt{color:var(--muted);font-size:13px}
+.pairs dd{margin:0;font-size:15px}
+.fine{color:var(--muted);font-size:13px;margin:10px 0 0}
+.lnk{color:var(--green-deep);font-weight:600;text-decoration:none;border-bottom:1px solid currentColor}
+.simi{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.simi-c{display:block;text-decoration:none;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.simi-c img{width:100%;height:120px;object-fit:cover;display:block}
+.simi-c b{display:block;padding:10px 12px 0;font-size:14px}
+.simi-c span{display:block;padding:2px 12px 12px;font-size:13px;color:var(--muted)}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin:28px 0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 22px;border-radius:14px;font-weight:600;text-decoration:none;border:1px solid var(--line);cursor:pointer}
+.btn.wa{background:#25D366;color:#0b2b18;border-color:#25D366}
+.btn.primary{background:var(--green);color:var(--on-green,#14150F);border-color:var(--green)}
+.btn.ghost{background:transparent;color:var(--text)}
+footer{border-top:1px solid var(--line);margin-top:40px;padding:22px 0 40px;color:var(--muted);font-size:14px}
+footer a{color:var(--green-deep);text-decoration:none}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap"><a class="brand" href="../" aria-label="Property Library — на главную"><img id="brandMark" src="../img/brand/plp-mark-ink.png" alt="" width="26">Property Library Phuket <small>· недвижимость на Пхукете</small></a></div></header>
+<script>(function(){var i=document.getElementById('brandMark');if(!i)return;
+var d=document.documentElement.getAttribute('data-theme');
+var dark = d==='dark' || (d!=='light' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+if(dark) i.src='../img/brand/plp-mark-white.png';})();</script>
+<main class="wrap">
+  <div class="hero">
+    <img id="mainShot" src="${htmlEsc(heroSrc)}" alt="${htmlEsc(o.name)}" loading="lazy">
+    <div class="badge">${htmlEsc(t.ru)} · ${htmlEsc(ru)}</div>
+  </div>
+  ${shots}
+  <h1>${htmlEsc(o.name)}</h1>
+  <p class="loc">${htmlEsc(ru)}, Пхукет${distBeach ? ' · ' + htmlEsc(distBeach) : ''}</p>
+  ${rentLine || soldOutLine || (priceFmt ? '<div class="price">от ' + htmlEsc(priceFmt) + '<small>цена по прайсу застройщика на дату сверки</small></div>' : '')}
+  <div class="chips">${chips}</div>
+  ${o.stage_note ? '<p class="stgnote">' + htmlEsc(o.stage_note) + '</p>' : ''}
+  ${'' /* акции на витрину не выводим — см. комментарий у promo в каталоге */}
+  ${/* ЕДИНЫЙ ПОРЯДОК БЛОКОВ — канон 17.09. Эльнур: «карточка объекта и страница
+        объекта расходится инфа, мы можем как-то по одному единому концепту,
+        стандарту наполнять эту инф… но должен быть единый концепт, зафиксированный».
+        Порядок один и тот же здесь и в карточке на главной (см. ORDER в index.html):
+        что это → сколько стоит и какие планировки → как это выглядит (чертежи,
+        мастер-план) → как платить и чем владеешь → что вокруг → как идёт стройка →
+        сколько приносит → район → что похожего.
+        Раньше «Об объекте» стояло ПОСЛЕ платежей, района и стройки — человек доходил
+        до описания последним, отсюда «немного в кашу». */''}
+  ${usp ? '<section class="desc"><h2>Об объекте</h2><p>' + htmlEsc(noContacts(usp)) + '</p>' +
+     (uspEn ? '<details class="desc-en"><summary>In English</summary><p lang="en">' + htmlEsc(uspEn) + '</p></details>' : '') +
+     '</section>' : (uspEn ? '<section class="desc" lang="en"><h2>About</h2><p>' + htmlEsc(uspEn) + '</p></section>' : '')}
+  ${unitsBlock}
+  ${plansBlock}
+  ${payBlock}
+  ${ownBlock}
+  ${facBlock}
+  ${progressBlock}
+  <div class="yield">
+    <div class="num">${yr.low}${DASH}${yr.high}%</div>
+    <div class="lbl">${yr.scope === 'district'
+      ? 'Ориентир по району (' + htmlEsc(ru) + ', ' + htmlEsc(t.ru.toLowerCase()) + ')'
+      : 'Ориентир по Пхукету в целом — по этому району отдельной статистики у нас пока нет'}, при активном управлении. Точный расчёт по вашему объекту делает специалист.</div>
+  </div>
+  ${areaBlock}
+  ${materials}
+  <div class="cta">
+    <a class="btn primary" href="${htmlEsc(backLink)}&ask=1">Задать вопрос по объекту</a>
+    <a class="btn ghost" href="${htmlEsc(backLink)}&calc=1">Рассчитать доходность</a>
+    <button type="button" class="btn ghost" id="shareBtn">Поделиться</button>
+    <a class="btn wa" href="${htmlEsc(waLink)}" rel="noopener" target="_blank">WhatsApp</a>
+  </div>
+  ${similarBlock}
+</main>
+<script>
+/* «Поделиться»: на телефоне системное меню, на компьютере ссылка в буфер */
+(function(){
+  var b=document.getElementById('shareBtn'); if(!b) return;
+  b.onclick=function(){
+    var url=location.href, title=document.title;
+    if(navigator.share){ navigator.share({title:title,url:url}).catch(function(){}); return; }
+    var was=b.textContent;
+    function done(){ b.textContent='✓ Ссылка скопирована'; setTimeout(function(){ b.textContent=was; },2200); }
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(url).then(done).catch(function(){ prompt('Скопируйте ссылку:', url); }); }
+    else prompt('Скопируйте ссылку:', url);
+  };
+})();
+/* миниатюры листают главный кадр — как в карточке на сайте */
+(function(){
+  var main=document.getElementById('mainShot');
+  var strip=document.querySelector('.shots');
+  if(!main||!strip) return;
+  strip.addEventListener('click',function(e){
+    var b=e.target.closest('button'); if(!b) return;
+    main.src=b.dataset.src;
+    Array.prototype.forEach.call(strip.children,function(x){ x.classList.toggle('on',x===b); });
+  });
+})();
+</script>
+<footer><div class="wrap">Property Library Phuket · <a href="https://wa.me/${WA}?text=${encodeURIComponent('Здравствуйте! Пишу со страницы «' + String(o.name || '') + '» на property-library.com')}" rel="noopener" target="_blank">WhatsApp +66 95 549 2587</a> · <a href="../">на главную</a><br>Данные носят справочный характер и не являются офертой.</div></footer>
+</body>
+</html>
+`;
+}
+
+// -------------------------------------------------------------------- sitemap
+// 19.09.2026: дата изменения берётся из git, а не из даты сборки.
+// Раньше всем страницам ставилась дата билда, и поисковик переставал верить полю.
+function lastmodOf(rel) {
+  try {
+    const out = execSync('git log -1 --format=%cI -- ' + JSON.stringify(rel), { cwd: ROOT, encoding: 'utf8' }).trim();
+    if (out) return out.slice(0, 10);
+  } catch (e) {}
+  return new Date().toISOString().slice(0, 10);
+}
+
+function sitemap(objects) {
+  const today = new Date().toISOString().slice(0, 10);
+  /* 🔴 10.09: Search Console прислал «Страница с переадресацией» и не индексировал
+     часть адресов. В карту сайта уходили ЯКОРЯ главной — /#quiz, /#about, /#faq,
+     /#contacts. Это не отдельные страницы: Google открывает их, получает ту же
+     главную и считает дублями. Комментарий от 02.09 прямо говорил, что якоря
+     заменены отдельными страницами, но список так и остался в коде.
+     Якорей в карте больше нет; сами разделы на главной никуда не делись. */
+  const anchors = [];
+  const pages = [
+    ['buy.html', '0.9'], ['rent.html', '0.9'], ['management.html', '0.8'],
+    ['add-property.html', '0.8'], ['about.html', '0.7'],
+    ...['bang-tao','layan','surin','kamala','rawai','kata','nai-yang','koh-kaew']
+        .map(d => ['districts/' + d + '.html', '0.8']),
+    ['guide/index.html', '0.7'],
+    ...['garantirovannaya-dohodnost','inostranec-mozhet-kupit','kakaya-dohodnost','kto-upravlyaet-obektom','kupit-udalenno','leasehold-ili-freehold','nalogi-i-rashody','pereprodazha-do-sdachi','risk-nedostroya','skolko-oformlyaetsya-sdelka','stoimost-uslug','viza-i-vnzh']
+        .map(g => ['guide/' + g + '.html', '0.6']),
+  ];
+  const parts = [];
+  parts.push('<?xml version="1.0" encoding="UTF-8"?>');
+  parts.push('<!-- Сгенерировано build/gen.mjs. Главная, разделы и страницы объектов. Якорей нет: это не отдельные страницы. -->');
+  parts.push('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">');
+  parts.push(`  <url><loc>${SITE_BASE}/</loc><lastmod>${lastmodOf('index.html')}</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>`);
+  for (const a of anchors) {
+    parts.push(`  <url><loc>${SITE_BASE}/${a}</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>`);
+  }
+  for (const [pg, pri] of pages) {
+    parts.push(`  <url><loc>${SITE_BASE}/${pg}</loc><lastmod>${lastmodOf(pg)}</lastmod><changefreq>weekly</changefreq><priority>${pri}</priority></url>`);
+  }
+  // 30.08: правовые документы тоже индексируем — они часть сайта
+  for (const doc of ['privacy.html', 'rules.html', 'terms.html']) {
+    parts.push(`  <url><loc>${SITE_BASE}/${doc}</loc><lastmod>${lastmodOf(doc)}</lastmod><changefreq>yearly</changefreq><priority>0.3</priority></url>`);
+  }
+  for (const o of objects) {
+    const loc = SITE_BASE + '/object/' + slugOf(pubOf(o));
+    parts.push(`  <url><loc>${loc}</loc><lastmod>${lastmodOf('object/' + slugOf(pubOf(o)) + '.html')}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>`);
+  }
+  parts.push('</urlset>');
+  return parts.join('\n') + '\n';
+}
+
+// ------------------------------------------------------------------------ main
+async function main() {
+  const env = loadEnv();
+  console.log('[gen] Supabase:', env.url);
+
+  // 30.08: добавлен фильтр по назначению. Раньше в каталог продажи попадало ВСЁ с
+  // on_site=true — пока аренды на витрине не было, баг не проявлялся; как только
+  // появились арендные объекты, они протекли в продажу (21 → 27).
+  const objects = await sbGet(env,
+    'objects?on_site=eq.true&purpose=not.in.(' + encodeURIComponent('аренда') + ',rent)' +
+    '&order=plp_property_id' +
+    '&select=plp_property_id,name,district,beach,purpose,type,price_from_thb,price_to_thb,' +
+    'bedrooms,bedrooms_min,bedrooms_max,area_sqm,area_min,area_max,roi,rental_yield_pct,' +
+    'capital_growth_pct,handover_date,status,stage,stage_note,sale_started_on,developer,distance_beach_m,usp,usp_en,'+
+    'bedrooms_min,bedrooms_max,' +
+    'brochure_url,floorplan_url,video_url,website_url,map_url,current_promo,' +
+    'season_rates,occupancy_est_pct,maintenance_fee_thb_sqm,lat,lng,coord_source,last_synced_at,availability,' +
+    'first_payment,payment_plan,payment_schedule,main_image_url,gallery_urls,unit_types,price_tiers,build_progress,photo_groups,hot_rank,public_code,' +
+    'ownership,amenities,nearby,distance_airport_km');
+  const benchmarks = await sbGet(env,
+    'rental_benchmarks?select=district,unit_type,disp_yield_low_pct,disp_yield_high_pct,net_yield_low_pct,net_yield_high_pct');
+
+  // объекты аренды: purpose IN (аренда,rent) И on_site=true.
+  // 30.08: убрано исключение для PLP-TEST-RENT — тестовый эталон утекал на публичный сайт.
+  const rentals = await sbGet(env,
+    'objects?select=plp_property_id,name,district,beach,purpose,type,bedrooms,bedrooms_min,' +
+    'bedrooms_max,area_sqm,area_min,area_max,min_stay,deposit,rent_included,rent_excluded,' +
+    'rent_rules,amenities,usp,usp_en,distance_beach_m,on_site,lat,lng,coord_source,last_synced_at,public_code,' +
+    'main_image_url,gallery_urls,photo_groups,unit_types,price_tiers,season_rates,rent_price_month_thb,' +
+    'stage,stage_note,sale_started_on,handover_date,parent_object_id' +
+    '&and=(or(purpose.eq.' + encodeURIComponent('аренда') + ',purpose.eq.rent),' +
+    'on_site.eq.true)&order=plp_property_id');
+
+  // Ставки посуточной аренды: истина — uk_rates (договор/реальные брони),
+  // ниже по иерархии — objects.season_rates собственника. Ниже не переписываем.
+  const ukRates = await sbGet(env, 'uk_rates?select=property_id,season,nightly_thb,min_nights');
+  const ratesBy = {};
+  for (const r of ukRates || []) {
+    const v = Number(r.nightly_thb);
+    if (!Number.isFinite(v) || v <= 0) continue;
+    (ratesBy[r.property_id] = ratesBy[r.property_id] || []).push({ v, min: r.min_nights || null });
+  }
+
+  /* 08.09 сторож публичного кода. На витрину идёт только код вида PLP-…; если
+     кода нет — pubOf подставлял внутренний id, и на сайте всплывали INTAKE-…,
+     а у вторички всплыл бы номер юнита. Такую карточку не публикуем вовсе.
+     Аренда маскирует юнит кодом -R1/-R3 — это разрешённая форма. */
+  const badPub = o => {
+    const c = (o && o.public_code || '').trim();
+    if (!c) return 'нет публичного кода';
+    if (!/^PLP-/.test(c)) return 'публичный код не по канону: ' + c;
+    if (/-[A-Z]?\d{2,4}$/.test(c) && !/-R\d+$/.test(c)) return 'в публичном коде номер юнита: ' + c;
+    return '';
+  };
+  for (const arr of [objects, rentals]) {
+    for (let i = arr.length - 1; i >= 0; i--) {
+      const why = badPub(arr[i]);
+      if (why) { console.warn('[gen] ⚠ не публикую', arr[i].plp_property_id, '—', why); arr.splice(i, 1); }
+    }
+  }
+
+  console.log('[gen] Объектов on_site=true:', objects.length, '| benchmarks:', benchmarks.length,
+              '| аренда:', rentals.length, '| со ставками:', Object.keys(ratesBy).length);
+  if (!objects.length) { console.error('[gen] Пусто — прерываю, index.html не трогаю.'); process.exit(1); }
+
+  // 1) каталог продажи + аренда в index.html (с сохранением calc/grad/budget)
+  let html = fs.readFileSync(INDEX, 'utf8');
+  const { preserve } = parseExisting(html);
+  const catalog = orderCatalog(buildCatalog(objects, benchmarks, preserve));
+  html = writeIndex(html, catalog);
+  const rentPreserve = parseExistingRentals(html);
+  /* Юнит в аренде наследует стадию своего проекта: Modeva сдаётся в 2027,
+     и показывать её как «цена по запросу» — обман. Эльнур 06.09. */
+  const byId = {};
+  for (const o of objects) byId[o.plp_property_id] = o;
+  for (const r of rentals) {
+    const parent = r.parent_object_id ? byId[r.parent_object_id] : null;
+    if (!parent) continue;
+    if (!r.stage) r.stage = parent.stage;
+    if (!r.handover_date) r.handover_date = parent.handover_date;
+  }
+  const rentList = buildRentals(rentals, rentPreserve, ratesBy);
+  // 30.08: пока в аренде нет объектов с on_site=true — показываем штатную карточку
+  // «Скоро в каталоге» (ветка p.soon в renderRent), а не пустую полосу.
+  if (!rentList.length) {
+    rentList.push({
+      property_id: 'PLP-RENT-SOON', soon: true, funnel: 'rent', grad: 'g1',
+      loc: { ru: 'Пхукет', en: 'Phuket' },
+      type: { ru: 'Вилла / апартаменты', en: 'Villa / apartment' },
+    });
+    console.log('[gen] аренда пуста → вставлена карточка «Скоро в каталоге»');
+  }
+  html = writeRentals(html, rentList);
+  // доходность района (PL.NETYIELD) из rental_benchmarks — fail-closed: пустой ответ не трогаем
+  const netyield = buildNetyield(benchmarks);
+  const grossyield = buildGrossyield(benchmarks);
+  if (Object.keys(netyield).length && Object.keys(grossyield).length) {
+    html = writeNetyield(html, netyield, grossyield);
+    console.log('[gen] доходность районов обновлена: чистая', Object.keys(netyield).length,
+                '· валовая', Object.keys(grossyield).length);
+  } else {
+    console.error('[gen] rental_benchmarks пуст или без net-колонок — доходность не тронута (fail-closed).');
+  }
+  html = writeObjectIndex(html, objects);
+  fs.writeFileSync(INDEX, html);
+  console.log('[gen] index.html: каталог продажи', catalog.length, '+ аренда', rentList.length, 'обновлены');
+
+  // 2) страницы объектов
+  // Аренде страницы тоже нужны — карта и каталог на них ссылаются. Раньше их не
+  // делали из-за утечки: в 08.26 из-за протечки аренды в продажу на прод уехали
+  // страницы с именем собственника. Сейчас objectPage поля owner_ref/owner_contact_id
+  // не выводит вовсе, поэтому безопасно; выборку для аренды берём полную, чтобы
+  // страница не собиралась из половины данных.
+  const rentIds = rentals.map(r => r.plp_property_id).filter(Boolean);
+  let rentFull = [];
+  if (rentIds.length) {
+    rentFull = await sbGet(env, 'objects?plp_property_id=in.(' +
+      rentIds.map(encodeURIComponent).join(',') + ')&select=*');
+  }
+  const seenPage = new Set();
+  const pageList = [];
+  for (const o of objects.concat(rentFull)) {
+    if (!o || !o.plp_property_id || seenPage.has(o.plp_property_id)) continue;
+    seenPage.add(o.plp_property_id);
+    pageList.push(o);
+  }
+  if (!fs.existsSync(OBJDIR)) fs.mkdirSync(OBJDIR, { recursive: true });
+  let pages = 0;
+  for (const o of pageList) {
+    const slug = slugOf(pubOf(o));
+    fs.writeFileSync(path.join(OBJDIR, slug + '.html'), objectPage(o, benchmarks, ratesBy, pageList));
+    pages++;
+  }
+  // 30.08: удаляем страницы объектов, которых больше нет в каталоге.
+  // Раньше генератор только дописывал — из-за бага с протечкой аренды в продажу
+  // на прод уехали страницы арендных юнитов с ИМЕНЕМ СОБСТВЕННИКА и номером
+  // квартиры, и после исправления каталога они там так и остались.
+  /* адрес страницы строится из публичного кода — по нему же решаем,
+     какие файлы оставить, иначе свежие страницы удалялись как «лишние» */
+  const keep = new Set(pageList.map(o => slugOf(pubOf(o)) + '.html'));
+  let removed = 0;
+  for (const f of fs.readdirSync(OBJDIR)) {
+    if (f.endsWith('.html') && !keep.has(f)) { fs.unlinkSync(path.join(OBJDIR, f)); removed++; }
+  }
+  console.log('[gen] object/*.html:', pages, 'страниц' + (removed ? ', удалено лишних: ' + removed : ''));
+
+  // 3) sitemap
+  fs.writeFileSync(SITEMAP, sitemap(objects));
+  console.log('[gen] sitemap.xml обновлён');
+
+  // 4) короткий список для конструктора оффера в кабинете: чтобы сотрудник
+  //    выбирал объект и тип юнита из списка, а не вбивал ID руками.
+  /* 07.09: тем же файлом пользуются наши боты и ИИ-агенты — иначе им
+     приходится тянуть всю главную (684 КБ) ради названия и цены.
+     Поэтому добавлены публичный код и адрес страницы объекта. */
+  const offerCat = objects.map(o => ({
+    id: o.plp_property_id,
+    pub: pubOf(o),
+    url: 'https://property-library.com/object/' + slugOf(pubOf(o)),
+    name: o.name,
+    district: DISTRICT_RU[o.district || ''] || o.district || '',
+    type: typeLabel(o.type).ru,
+    price_from: o.price_from_thb || null,
+    units: unitsOf(o) || [],
+  })).filter(x => x.id && x.name);
+  fs.writeFileSync(path.join(ROOT, 'offer-catalog.json'),
+    JSON.stringify({ updated: new Date().toISOString().slice(0, 10), items: offerCat }, null, 1));
+  console.log('[gen] offer-catalog.json:', offerCat.length, 'объектов для конструктора оффера');
+
+  /* 5) указатель для машин: наши боты, ИИ-агенты и поисковики читают его
+        первым и сразу знают, где данные, а не разбирают вёрстку. */
+  const llms = [
+    '# Property Library Phuket',
+    '',
+    '> Агентство недвижимости на Пхукете: продажа, аренда, управление объектами.',
+    '> Сайт открыт для чтения целиком, вход и ключи не нужны.',
+    '',
+    '## Данные',
+    '',
+    '- [Каталог объектов](https://property-library.com/offer-catalog.json): название, район, тип,',
+    '  цена от, типы юнитов, адрес страницы. Поле updated — дата сборки.',
+    '- [Карта сайта](https://property-library.com/sitemap.xml): все страницы.',
+    '',
+    '## Разделы',
+    '',
+    '- [Продажа](https://property-library.com/buy)',
+    '- [Аренда](https://property-library.com/rent)',
+    '- [Управление](https://property-library.com/management)',
+    '- [Разместить объект](https://property-library.com/add-property)',
+    '- [Страница объекта](https://property-library.com/object/): адрес берётся из поля url каталога.',
+    '',
+    '## Как читать цифры',
+    '',
+    '- Цены в тайских батах, «от» — минимальный доступный юнит на дату сборки.',
+    '- Доходность на страницах — ориентир по району, а не обещание. Точный расчёт делает специалист.',
+    '- Наличие и цены меняются: перед разговором с клиентом сверяйтесь с датой updated.',
+    '',
+    'Обновлено: ' + new Date().toISOString().slice(0, 10),
+    '',
+  ].join('\n');
+  fs.writeFileSync(path.join(ROOT, 'llms.txt'), llms);
+  console.log('[gen] llms.txt: указатель для ботов и ИИ-агентов');
+
+  console.log('[gen] Готово.');
+}
+
+main().catch(e => { console.error('[gen] ОШИБКА:', e.message); process.exit(1); });
+
+/* ═══════════════════════════════════════════════════════════════
+   СТРАНИЦЫ РАЗДЕЛОВ (01.09)
+   Собираются ИЗ index.html, а не пишутся заново: шапка, подвал,
+   стили и скрипты берутся оттуда же. Правка на главной автоматически
+   расходится по всем разделам — один экземпляр вместо копий.
+   ═══════════════════════════════════════════════════════════════ */
+
+function splitSections(mainHtml) {
+  // режем <main> на секции; для каждой запоминаем id (если есть)
+  const parts = [];
+  const re = /<section\b[^>]*>/g;
+  const starts = [];
+  let m;
+  while ((m = re.exec(mainHtml)) !== null) starts.push({ i: m.index, tag: m[0] });
+  for (let k = 0; k < starts.length; k++) {
+    const from = starts[k].i;
+    const to = k + 1 < starts.length ? starts[k + 1].i : mainHtml.length;
+    const idm = starts[k].tag.match(/id="([^"]+)"/);
+    parts.push({ id: idm ? idm[1] : null, html: mainHtml.slice(from, to), order: k });
+  }
+  return parts;
+}
+
+function sectionPage(indexHtml, opts) {
+  const mStart = indexHtml.indexOf('<main');
+  const mOpenEnd = indexHtml.indexOf('>', mStart) + 1;
+  const mEnd = indexHtml.indexOf('</main>');
+  const head = indexHtml.slice(0, mOpenEnd);
+  const tail = indexHtml.slice(mEnd);
+  const parts = splitSections(indexHtml.slice(mOpenEnd, mEnd));
+
+  // берём только нужные секции: по id или по порядковому номеру
+  const picked = opts.sections.map(sel => {
+    const found = typeof sel === 'number'
+      ? parts.find(p => p.order === sel)
+      : parts.find(p => p.id === sel);
+    return found ? found.html : '';
+  }).join('\n');
+
+  const intro =
+    '<section style="padding-bottom:0"><div class="container">' +
+    '<h1 style="font-size:clamp(28px,4.2vw,42px);margin:0 0 10px">' + htmlEsc(opts.h1) + '</h1>' +
+    '<p class="sub" style="max-width:62ch;margin:0">' + htmlEsc(opts.intro) + '</p>' +
+    '</div></section>';
+
+  let out = head + '\n' + intro + '\n' + picked + '\n' + tail;
+
+  // мета под конкретный раздел
+  const url = SITE_BASE + '/' + opts.file;
+  out = out.replace(/<title>[\s\S]*?<\/title>/, '<title>' + htmlEsc(opts.title) + '</title>');
+  out = out.replace(/(<meta name="description" content=")[^"]*(")/, '$1' + htmlEsc(opts.desc) + '$2');
+  out = out.replace(/(<link rel="canonical" href=")[^"]*(")/, '$1' + url + '$2');
+  out = out.replace(/(<meta property="og:url" content=")[^"]*(")/, '$1' + url + '$2');
+  out = out.replace(/(<meta property="og:title" content=")[^"]*(")/, '$1' + htmlEsc(opts.title) + '$2');
+  out = out.replace(/(<meta property="og:description" content=")[^"]*(")/, '$1' + htmlEsc(opts.desc) + '$2');
+  // пункт меню, соответствующий разделу, подсвечиваем
+  out = out.replace('href="index.html#' + (opts.navId || '') + '"',
+                    'href="index.html#' + (opts.navId || '') + '" class="on"');
+  return out;
+}
+
+export function buildSectionPages(indexHtml) {
+  const pages = [
+    { file: 'buy.html', navId: 'sale', sections: ['sale', 8, 9],
+      h1: 'Купить недвижимость на Пхукете',
+      intro: 'Проверенные виллы и апартаменты от застройщиков и собственников. Каждый объект мы смотрим лично перед тем, как показать.',
+      title: 'Купить недвижимость на Пхукете — виллы и апартаменты | Property Library',
+      desc: 'Виллы, апартаменты и кондо на Пхукете от застройщиков и собственников. Проверенные объекты, расчёт доходности, сопровождение сделки.' },
+    { file: 'rent.html', navId: 'rent', sections: ['rent'],
+      h1: 'Аренда жилья на Пхукете',
+      intro: 'Виллы и апартаменты для жизни и отдыха. Подберём под даты и бюджет, встретим и заселим.',
+      title: 'Аренда виллы или апартаментов на Пхукете | Property Library',
+      desc: 'Долгосрочная аренда вилл и апартаментов на Пхукете. Свободные объекты по датам, трансфер, уборка, помощь на месте.' },
+  ];
+  const written = [];
+  for (const p of pages) {
+    fs.writeFileSync(path.join(ROOT, p.file), sectionPage(indexHtml, p));
+    written.push(p.file);
+  }
+  return written;
+}
