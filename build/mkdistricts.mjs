@@ -110,18 +110,14 @@ for(const d of D){
     <div class="filters">${links}</div>
   </div></section>`;
 
-  // автофильтр каталога по этому району
-  const autoFilter=`<script>
-window.addEventListener('load',function(){
-  try{
-    if(typeof activeFilter!=='undefined'&&typeof applyFilters==='function'){
-      activeFilter.loc=new Set([${JSON.stringify(d.ru)}]);
-      if(typeof buildLocChips==='function') buildLocChips();
-      applyFilters();
-    }
-  }catch(e){}
-});
-</script>`;
+  /* 23.09.2026. Здесь был скрипт, который на window.load делал
+     `if(typeof activeFilter!=='undefined') …` и молча ничего не делал ВСЕГДА:
+     каталог обёрнут в IIFE, activeFilter и applyFilters наружу не видны.
+     Пустой catch это прятал. Итог: на странице «Банг Тао» жили объекты
+     двенадцати районов — 50 карточек вместо 22. Проверено живьём.
+     Теперь район подставляется ВНУТРЬ замыкания, при объявлении фильтра,
+     а если объявление не найдено — сборка кричит, а не молчит. */
+  const ДЕКЛ = "var activeFilter={budget:'',loc:new Set(),type:new Set(),stage:new Set(),beds:new Set()}";
 
   // заголовок секции дублирует H1 страницы и отодвигает объекты за экран
   saleHtml = saleHtml.replace(
@@ -142,7 +138,12 @@ window.addEventListener('load',function(){
   html=html.replace(/href="#top"/g,'href="../index.html"');
   html=html.replace(/href="#(why|sale|rent|map|quiz|about|faq|do|steps|contacts)"/g,'href="../index.html#$1"');
   html=html.replace(/(href|src)="(img\/|object\/|favicon|buy\.html|rent\.html|owner\.html|management\.html|add-property\.html|about\.html|districts\/|guide\/|offer\.html|privacy\.html|rules\.html|terms\.html|index\.html)/g,'$1="../$2');
-  html=html.replace('</body>',autoFilter+'\n</body>');
+  if(html.split(ДЕКЛ).length-1 !== 1){
+    throw new Error('районы: объявление фильтра каталога не найдено (или найдено дважды) на странице '
+      + d.slug + '. Каталог изменился — подстановка района сломана, чинить здесь.');
+  }
+  html = html.replace(ДЕКЛ,
+    "var activeFilter={budget:'',loc:new Set([" + JSON.stringify(d.ru) + "]),type:new Set(),stage:new Set(),beds:new Set()}");
   fs.writeFileSync(path.join(outDir,d.slug+'.html'),html);
   made.push(d.slug);
 }
