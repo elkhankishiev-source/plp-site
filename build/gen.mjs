@@ -125,22 +125,14 @@ function bedsLabel(o) {
 }
 /* 23.09 Эльнур: «вилла Эстелла — указываем площадь застройки и участка, обычно
    так; а если это квартира, то только площадь квартиры».
-   У виллы два числа, и они разные по смыслу: дом и земля под ним. Одно число
-   вместо двух покупателя вводит в заблуждение — у MORI 1 это 229 м² дома
-   на участке 150 м². У квартиры участка нет, там число одно. */
-function площадьВиллы(o) {
-  const дом = Number(o.built_area_sqm), уч = Number(o.plot_area_sqm);
-  const домОк = Number.isFinite(дом) && дом > 0, учОк = Number.isFinite(уч) && уч > 0;
-  /* округляем до целого: «150,15 м² участок» читается как опечатка, а не как точность */
-  const ц = n => fmtNum(Math.round(n));
-  if (домОк && учОк) return ц(дом) + ' м² дом · ' + ц(уч) + ' м² участок';
-  if (учОк) return ц(уч) + ' м² участок';
-  return '';
-}
+   Витрина это уже умеет — но только у продажи: площадь дома подписывается
+   «площадь дома», а участок идёт отдельной плашкой (см. u.areaHouse и u.plot).
+   Поэтому не пишу два числа в одну строку, а достраиваю недостающее:
+   у виллы площадь берём из застройки, участок отдаёт plotOf. */
 function areaLabel(o) {
-  if (/вилл|villa/i.test(String(o.type || ''))) {
-    const в = площадьВиллы(o);
-    if (в) return в;                 // есть оба числа — показываем как положено
+  const дом = Number(o.built_area_sqm);
+  if (/вилл|villa/i.test(String(o.type || '')) && Number.isFinite(дом) && дом > 0) {
+    return fmtNum(Math.round(дом)) + ' м²';
   }
   const min = o.area_min, max = o.area_max;
   if (min === null || min === undefined || max === null || max === undefined) {
@@ -313,6 +305,10 @@ function fmtPlot(nums) {
    всего проекта, покупателю она не принадлежит и вводит в заблуждение. */
 function plotOf(o) {
   if (!isVilla(o)) return null;
+  /* 23.09: в базе есть прямое поле plot_area_sqm, а функция читала только
+     текст описания и примечания к типам. Сперва смотрим на данные, потом на текст. */
+  const прямо = Number(o.plot_area_sqm);
+  if (Number.isFinite(прямо) && прямо > 0) return fmtNum(Math.round(прямо)) + ' м²';
   const nums = [];
   if (Array.isArray(o.unit_types)) o.unit_types.forEach(u => { if (u && u.note) nums.push(...plotNums(String(u.note))); });
   if (!nums.length && o.usp) nums.push(...plotNums(String(o.usp)));
@@ -937,6 +933,11 @@ function buildRentals(objects, preserve, ratesBy) {
       bmin: (o.bedrooms_min === 0 || o.bedrooms_min) ? o.bedrooms_min : null,
       bmax: (o.bedrooms_max === 0 || o.bedrooms_max) ? o.bedrooms_max : null,
       area: areaLabel(o),
+      /* 23.09: участок и застройщик были только у продажи — третий за день случай
+         «починили продажу, аренду забыли». Окно объекта общее, поля те же. */
+      plot: plotOf(o),
+      developer: shortDev(o.developer) || null,
+      beachM: (o.distance_beach_m === 0 || o.distance_beach_m) ? o.distance_beach_m : null,
       tag: rentTag(o),
       /* дата старта продаж — справочно: группу она не меняет (см. saleGroup) */
       saleStart: o.sale_started_on || null,
@@ -1944,7 +1945,7 @@ async function main() {
     'bedrooms_max,area_sqm,area_min,area_max,min_stay,deposit,rent_included,rent_excluded,' +
     'rent_rules,amenities,usp,usp_en,distance_beach_m,on_site,lat,lng,coord_source,last_synced_at,public_code,' +
     'main_image_url,gallery_urls,photo_groups,unit_types,price_tiers,season_rates,rent_price_month_thb,' +
-    'plot_area_sqm,built_area_sqm,stage,stage_note,sale_started_on,handover_date,parent_object_id' +
+    'plot_area_sqm,built_area_sqm,developer,stage,stage_note,sale_started_on,handover_date,parent_object_id' +
     '&and=(or(purpose.eq.' + encodeURIComponent('аренда') + ',purpose.eq.rent),' +
     'on_site.eq.true)&order=plp_property_id');
 
