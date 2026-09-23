@@ -100,7 +100,7 @@ def main():
     for юнит, список in sorted(по_юниту.items()):
         o = sb('/objects?plp_property_id=eq.%s&select=plp_property_id,name,type,area_sqm,'
                'bedrooms,bedrooms_min,bedrooms_max,handover_date' % urllib.parse.quote(юнит))
-        co = sb('/client_objects?plp_property_id=eq.%s&select=id,client_id,purchase_price,'
+        co = sb('/client_objects?object_id=eq.%s&select=id,client_id,purchase_price,'
                 'currency,handover_on,payment_plan,next_payment_on,next_payment_amount,stage'
                 % urllib.parse.quote(юнит))
         if not o:
@@ -163,7 +163,7 @@ def main():
             if правка_o:
                 sb('/objects?plp_property_id=eq.%s' % urllib.parse.quote(юнит), 'PATCH', правка_o)
             if правка_co:
-                sb('/client_objects?plp_property_id=eq.%s' % urllib.parse.quote(юнит),
+                sb('/client_objects?object_id=eq.%s' % urllib.parse.quote(юнит),
                    'PATCH', правка_co)
 
     print('\nюнитов к правке: %d' % правок)
