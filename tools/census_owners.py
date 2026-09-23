@@ -92,13 +92,19 @@ def собрать():
     юниты = sb('/client_objects?rel=in.(owns,spouse)&select=client_id,plp_property_id,project_name,'
                'unit,rel,stage,uk_status,purchase_price,handover_on,next_payment_on,'
                'next_payment_amount,note&order=plp_property_id')
+    # Какие цены подтверждены договором, а какие взяты из переписки и CRM.
+    # Это разные вещи, и продавцу важно знать, какую можно называть клиенту.
+    с_договором = {d['object_id'] for d in
+                   sb('/client_docs?status=eq.parsed&object_id=not.is.null&select=object_id,parsed')
+                   if (d.get('parsed') or {}).get('price')
+                   and (d.get('parsed') or {}).get('confidence') in ('high', 'medium')}
     объекты = {o['plp_property_id']: o for o in
                sb('/objects?select=plp_property_id,type,district,area_sqm,bedrooms,'
                   'plot_area_sqm,built_area_sqm,handover_date,name')}
     по_людям = {}
     for u in юниты:
         по_людям.setdefault(u['client_id'], []).append(u)
-    return люди, по_людям, объекты
+    return люди, по_людям, объекты, с_договором
 
 
 РАЙОН = {'Bang Tao': 'Банг Тао', 'Layan': 'Лаян', 'Kata': 'Ката', 'Surin': 'Сурин',
@@ -120,7 +126,7 @@ def площадь(o):
 
 
 def main():
-    люди, по_людям, объекты = собрать()
+    люди, по_людям, объекты, с_договором = собрать()
     сегодня = datetime.date.today()
     подпись = '%d %s %d' % (сегодня.day, МЕСЯЦЫ[сегодня.month - 1], сегодня.year)
 
@@ -155,7 +161,10 @@ def main():
             if u.get('handover_on'):
                 хвост.append('передача ' + дата(u['handover_on']))
             if u.get('purchase_price'):
-                хвост.append('покупка ' + деньги(u['purchase_price']))
+                # ✓ — цифра из договора. Без галочки — из переписки или CRM,
+                # такую клиенту не называем не проверив.
+                подтв = u['plp_property_id'] in с_договором
+                хвост.append('покупка ' + деньги(u['purchase_price']) + (' ✓' if подтв else ' (не сверено)'))
             if u.get('next_payment_on'):
                 хвост.append('ближайший платёж ' + дата(u['next_payment_on']) +
                              (' — ' + деньги(u['next_payment_amount']) if u.get('next_payment_amount') else ''))
@@ -207,10 +216,11 @@ i{color:var(--muted)}
 </style></head><body><div class="w">
 <h1>Собственники PLP</h1>
 <div class="sub">%d человек · %d объектов · собрано %s</div>
-<div class="note">Юнит зовётся своим кодом <b>PLP-…</b> — по нему он ищется одинаково
-в базе, в кабинете собственника и в CRM. Цена покупки взята из договора, а не из поля
-сделки в CRM: поле там расходится с договором. Личные договорённости собственников
-о продаже в файл не выносим.</div>
+<div class="note">Юнит зовётся своим кодом <b>PLP-…</b> — по нему он ищется одинаково в базе,
+в кабинете собственника и в CRM.<br><b>Цена с галочкой ✓</b> взята из договора —
+её можно называть. <b>«не сверено»</b> значит, что цифра пришла из переписки или
+из поля сделки в CRM, а поле там с договором расходится: перед разговором сверяем.
+Личные договорённости собственников о продаже в файл не выносим.</div>
 %s
 </div></body></html>""" % (len(по_людям), всего_юнитов, подпись, '\n'.join(строки))
 
