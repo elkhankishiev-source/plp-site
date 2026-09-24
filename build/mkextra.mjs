@@ -191,7 +191,8 @@ const mgmt = [M_HERO, M_SERV, wrapSection(grabPart('rent-care')), M_PRICE,
 
 const made=[];
 made.push(page({file:'management.html',depth:0,
-  title:'Управление недвижимостью на Пхукете — сдача, отчёты, выплаты | Property Library',
+  /* 24.09: было 79 знаков. Оставляем район работы и бренд. */
+  title:'Управление недвижимостью на Пхукете | Property Library',
   desc:'Возьмём на себя гостей, уборку, ремонт и отчётность. Комиссия от 15% дохода, подключение бесплатно. Отчёты и выплаты — в личном кабинете.',
   /* Эльнур 06.09: «в блоке управление зачем аренда размещена?» — страница про
      услугу управления, каталог аренды живёт на rent.html. */
@@ -226,7 +227,10 @@ for(const f of faq){
   </div></section>
   ${SALE}`;
   made.push(page({file:'guide/'+slug+'.html',depth:1,
-    title:f.q+' — Property Library Phuket',
+    /* 24.09: вопросы в гайде длинные, и бренд «Property Library Phuket»
+       добивал заголовок до 70+ знаков — поиск обрезал именно бренд.
+       Берём короткую форму, а если и с ней не влезает — оставляем вопрос. */
+    title:(f.q+' | Property Library').length<=65 ? f.q+' | Property Library' : f.q,
     desc:f.a.slice(0,158),
     body,
     jsonld:{'@context':'https://schema.org','@type':'FAQPage','mainEntity':[{'@type':'Question','name':f.q,
@@ -253,7 +257,7 @@ for(const f of faq){
   </div></section>
   ${SALE}`;
   made.push(page({file:'guide/index.html',depth:1,
-    title:'Справочник покупателя недвижимости на Пхукете — Property Library Phuket',
+    title:'Справочник покупателя недвижимости на Пхукете | Property Library',
     desc:'Собственность, налоги, сроки сделки, доходность, риски и управление — ' + faq.length + ' разборов простым языком.',
     body,
     jsonld:{'@context':'https://schema.org','@type':'FAQPage','mainEntity':faq.map(f=>({'@type':'Question',
