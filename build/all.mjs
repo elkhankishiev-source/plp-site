@@ -29,6 +29,13 @@ try {
      и копии тихо расходились. Теперь расхождение видно на сборке, а не глазами. */
   execFileSync('python3', ['tools/parts_check.py'],
     { cwd: '/Users/elnurkhankishiev/plp-site', stdio: 'inherit' });
+  /* 24.09.2026: поиск и тексты. Обе проверки родились из просьбы Эльнура
+     «сверь сразу все страницы… нет ли ошибок в тексте, сео оптимизация».
+     Держим их на сборке, иначе заголовки и описания снова уедут в обрез. */
+  execFileSync('python3', ['tools/site_audit.py'],
+    { cwd: '/Users/elnurkhankishiev/plp-site', stdio: 'inherit' });
+  execFileSync('python3', ['tools/text_check.py'],
+    { cwd: '/Users/elnurkhankishiev/plp-site', stdio: 'inherit' });
   execFileSync('python3', ['tools/catalog_audit.py', '--short'],
     { cwd: '/Users/elnurkhankishiev/plp-site', stdio: 'inherit' });
 } catch (e) { console.log('[приёмка] проверка не отработала'); }
