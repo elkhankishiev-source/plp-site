@@ -34,7 +34,11 @@ def код(url, headers=None, data=None, timeout=45):
     r = urllib.request.Request(url, headers=headers or {}, data=data)
     try:
         resp = urllib.request.urlopen(r, timeout=timeout)
-        return resp.status, resp.read(400).decode('utf-8', 'ignore')
+        # 24.09.2026: было read(400). Ответ обрезался на 400 байтах, и проверка
+        # уроков падала с «Unterminated string» ровно тогда, когда возвращать
+        # было что: одна беда в ответ ещё влезала, три — уже нет. Читатель,
+        # который режет вход и потом разбирает его как JSON, ломается на худшем.
+        return resp.status, resp.read(20000).decode('utf-8', 'ignore')
     except urllib.error.HTTPError as e:
         return e.code, ''
     except Exception:
