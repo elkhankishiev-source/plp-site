@@ -3890,6 +3890,13 @@ function renderRent(){
         (p.beachM!=null?'<span>🌊 '+(p.beachM>=1000?(p.beachM/1000).toFixed(1).replace('.0','')+' км':p.beachM+' м')+' до моря</span>':'')+
         '<span>'+loc(p.type)+'</span></div>'+
       '<span class="amwarn"></span>'+
+      /* Эльнур 24.09: «должны быть указаны спальни, публичный код, и скрыт ещё
+         раз внутренний код — это всё обсуждали уже». У карточки продажи код
+         снизу стоял с самого начала, у арендной его не было, и шесть карточек
+         AYANA выглядели одинаково — человеку не на что сослаться в заявке.
+         Код здесь публичный (public_code): внутренний id с номером юнита на
+         витрину не выходит вовсе, это проверяет tools/privacy_check.py. */
+      '<div class="pid">'+p.property_id+'</div>'+
       '</div></div>';
   }).join('');
   buildRentChips();applyRentFilters();finishRentFilters();
