@@ -28,6 +28,18 @@ for (const [file, [title, desc]] of Object.entries(PAGES)) {
   }
   const url = SITE + '/' + file.replace(/\.html$/, '').replace(/^index$/, '');
   const block = [MARK,
+    /* 24.09.2026. У privacy, rules и terms не было ни описания для поиска, ни
+       canonical, ни разметки — только og. Я добавил их руками в сами файлы,
+       и сборка их стёрла: этот блок между маркерами перезаписывается целиком.
+       Значит и место им здесь, у хозяина головы этих страниц. */
+    `<meta name="description" content="${desc}">`,
+    `<link rel="canonical" href="${url}">`,
+    `<script type="application/ld+json">${JSON.stringify({
+      '@context': 'https://schema.org', '@type': 'WebPage',
+      name: title.split(' · ')[0], url, inLanguage: 'ru',
+      isPartOf: { '@type': 'WebSite', name: 'Property Library Phuket', url: SITE },
+      publisher: { '@type': 'Organization', name: 'Property Library Phuket', url: SITE }
+    })}</script>`,
     `<meta property="og:type" content="website">`,
     `<meta property="og:site_name" content="Property Library Phuket">`,
     `<meta property="og:title" content="${title}">`,
