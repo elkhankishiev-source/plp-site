@@ -2439,7 +2439,19 @@ section#rent,section#sale{padding-top:10px}
    но если человек пришёл по ссылке с якорем — уважаем якорь. */
 try{
   if('scrollRestoration' in history) history.scrollRestoration='manual';
-  if(!location.hash) window.addEventListener('load',function(){ window.scrollTo(0,0); });
+  /* 24.09.2026 Эльнур: «когда открываю раздел на мобильном, он прокручен вниз».
+     Одного load мало. На телефоне браузер возвращает прежнее место ПОСЛЕ load
+     и перебивает наш сброс; а при возврате «назад» страница поднимается из
+     кэша и load не случается вовсе. Поэтому поднимаем наверх в четырёх точках.
+     Всё только когда в адресе НЕТ якоря: переход по якорю трогать нельзя. */
+  if(!location.hash){
+    var _вверх = function(){ window.scrollTo(0,0); };
+    document.addEventListener('DOMContentLoaded', _вверх);
+    window.addEventListener('load', _вверх);
+    window.addEventListener('pageshow', function(e){ if(e.persisted) _вверх(); });
+    if(window.requestAnimationFrame)
+      requestAnimationFrame(function(){ requestAnimationFrame(_вверх); });
+  }
 }catch(e){}
 </script>
 <script>
