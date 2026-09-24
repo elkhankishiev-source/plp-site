@@ -37,7 +37,7 @@ function grabPart(name) {
 const HERO = `<section style="padding-bottom:32px"><div class="container">
   <span class="kicker" data-i18n="nav.about">О нас</span>
   <h1 style="font-size:clamp(30px,4.6vw,48px);margin:6px 0 12px">Property Library Phuket</h1>
-  <p class="sub" style="max-width:62ch;margin:0" data-i18n="ft.tag">Мы уже выбрали Пхукет, поможем и вам. Все под ключ — от первого звонка до заезда и получения дохода.</p>
+  <p class="sub" style="max-width:62ch;margin:0" data-i18n="ft.tag">Мы уже выбрали Пхукет, поможем и вам. Всё под ключ — от первого звонка до заезда и получения дохода.</p>
 </div></section>`;
 
 const body = [
