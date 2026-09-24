@@ -131,8 +131,8 @@ def таблица(строки, РОЛЬ):
     wb = Workbook()
     ws = wb.active
     ws.title = 'Клиенты'
-    шапка = ['Клиент', 'Код', 'Телефон', 'Почта', 'Кабинет',
-             'Проект', 'Юнит', 'Район', 'Спальни', 'Площадь', 'Владение', 'Роль',
+    шапка = ['Собственник', 'Код', 'Телефон', 'Почта', 'Кабинет', 'Совместно с',
+             'Проект', 'Юнит', 'Район', 'Спальни', 'Площадь', 'Владение',
              'Сумма, ฿', 'Куплено', 'Передача', 'Откуда срок', 'Состояние',
              'Откуда стадия', 'Статус УК', 'Чего не хватает', 'Внутренний код объекта']
     ws.append(шапка)
@@ -143,16 +143,17 @@ def таблица(строки, РОЛЬ):
     ws.freeze_panes = 'A2'
 
     for имя, к, юниты in строки:
-        for u in sorted(юниты, key=lambda x: (x.get('project_name') or '', x.get('unit') or '')):
+        for u in юниты:
+            вместе = ', '.join('%s (%s)' % (н, РОЛЬ.get(р, р or '')) for н, р in (u.get('совладельцы') or []))
             ws.append([
                 имя, к.get('code') or '',
                 ('+' + str(к['phone'])) if к.get('phone') else '',
                 к.get('email') or '',
-                'да' if к.get('cabinet_enabled') else '',
+                'да' if к.get('вход') else '',
+                вместе,
                 u.get('project_name') or '', u.get('unit') or '',
                 u.get('район') or '', u.get('спальни') or '', u.get('площадь') or '',
                 u.get('владение') or '',
-                РОЛЬ.get(u.get('rel'), u.get('rel') or ''),
                 int(float(u['purchase_price'])) if u.get('purchase_price') else None,
                 дата(u.get('bought_on')), дата(u.get('handover_on')),
                 ('со слов' if u.get('handover_caveat') else '') or u.get('передача_откуда') or '',
@@ -160,7 +161,7 @@ def таблица(строки, РОЛЬ):
                 u.get('uk_status') or '', u.get('не_хватает') or '',
                 u.get('object_id') or '',
             ])
-    ширины = [26, 12, 16, 28, 9, 26, 10, 13, 8, 10, 11, 22, 14, 12, 12, 13, 34, 13, 11, 34, 24]
+    ширины = [26, 12, 16, 28, 9, 30, 26, 10, 13, 8, 10, 11, 14, 12, 12, 13, 34, 13, 11, 34, 24]
     for i, w in enumerate(ширины, 1):
         ws.column_dimensions[get_column_letter(i)].width = w
     for ряд in ws.iter_rows(min_row=2, min_col=13, max_col=13):
@@ -217,71 +218,129 @@ def главное():
     # оставалась без кода и телефона, хотя в базе они есть. Тот же урок уже был
     # записан («limit больше 1000 Supabase молча обрезает») и всё равно повторился.
     нужны = sorted({с['client_id'] for с in связки if с.get('client_id')})
+    # Вход в кабинет живёт в owner_accounts: человек входит по своему номеру и
+    # коду. Колонка clients.cabinet_enabled к этому отношения не имеет — она
+    # стоит false у 35 человек, у которых вход есть. Смотреть надо туда, где
+    # вход заводится.
+    входы = взять('owner_accounts?select=client_id,phone,status&limit=1000')
     клиенты = {}
     for i in range(0, len(нужны), 40):
         куча = ','.join(нужны[i:i + 40])
         for c in взять('clients?client_id=in.(' + urllib.parse.quote(куча) +
-                       ')&select=client_id,code,name,phone,email,cabinet_enabled,phone_status'):
+                       ')&select=client_id,code,name,phone,email,cabinet_enabled,phone_status,is_internal'):
             клиенты[c['client_id']] = c
+    # 24.09: свои — Эльнур и Дарья — в списке КЛИЕНТОВ быть не должны. Их вилла
+    # Manor S1-20 в базе записана так же, как клиентская, и они приехали вместе
+    # со всеми. Для этого в clients и заведён признак is_internal; я его не
+    # спросил. Фильтруем здесь, а не вычищаем связку: связка верная, это их юнит.
+    свои = {i for i, c in клиенты.items() if c.get('is_internal')}
+    связки = [с for с in связки if с.get('client_id') not in свои]
     объекты = {o['plp_property_id']: o for o in взять(
         'objects?select=plp_property_id,name,parent_object_id,stage,handover_date,bedrooms,bedrooms_min,'
         'area_sqm,area_min,district,type,ownership&limit=3000')}
     дополнить(связки, объекты)
 
-    # у кого что: группируем по человеку
-    по_людям = {}
+    по_id = {a.get('client_id') for a in входы if a.get('client_id')}
+    по_тел = {str(a.get('phone') or '').replace('+', '') for a in входы if a.get('phone')}
+    for c in клиенты.values():
+        c['вход'] = (c['client_id'] in по_id
+                     or str(c.get('phone') or '').replace('+', '') in по_тел)
+
+    # 24.09, Эльнур, две поправки подряд:
+    #   «когда совладельцы и у них общая недвижимость — не надо всех писать,
+    #    дублировать, множить»
+    #   «имя, перечисление, закончили, теперь уже новое имя»
+    # Значит: блок на ЧЕЛОВЕКА, внутри перечень его объектов. Общий объект
+    # стоит ОДИН раз — у того, кто записан владельцем, а совладелец назван прямо
+    # в строке объекта. Отдельного блока на одного только совладельца не заводим:
+    # это и было бы то самое размножение.
+    # 24.09, Эльнур: «там где сделка не состоялась, зачем она». Это список
+    # собственников, а не история попыток: расторгнутые и несостоявшиеся не берём.
+    связки = [с for с in связки
+              if с.get('rel') != 'lost' and (с.get('stage') or '') != 'расторгнут']
+
+    по_юнитам = {}
     for с in связки:
-        по_людям.setdefault(с['client_id'], []).append(с)
+        по_юнитам.setdefault(с['object_id'], []).append(с)
+
+    по_людям = {}
+    for oid, доли in по_юнитам.items():
+        доли.sort(key=lambda x: (0 if x.get('rel') == 'owns' else 1,
+                                 (клиенты.get(x['client_id'], {}).get('name') or '')))
+        главный = доли[0]
+        u = dict(главный)
+        u['совладельцы'] = [(клиенты.get(д['client_id'], {}).get('name') or '—', д.get('rel'))
+                            for д in доли[1:]]
+        u['роли'] = [д.get('rel') for д in доли]
+        по_людям.setdefault(главный['client_id'], []).append(u)
 
     строки = []
     for cid, юниты in по_людям.items():
-        c = клиенты.get(cid) or {}
-        строки.append((c.get('name') or '(без имени)', c, юниты))
+        к = клиенты.get(cid) or {}
+        юниты.sort(key=lambda x: ((x.get('project_name') or '').lower(), x.get('unit') or ''))
+        строки.append((к.get('name') or '(без имени)', к, юниты))
     строки.sort(key=lambda x: x[0].lower())
 
-    всего_юнитов = len(связки)
-    с_ценой = sum(1 for с in связки if с.get('purchase_price'))
-    сумма = sum(float(с['purchase_price']) for с in связки if с.get('purchase_price'))
-    кабинет = sum(1 for _, c, _ in строки if c.get('cabinet_enabled'))
-    бн = sum(1 for _, c, _ in строки if not (c.get('phone') or '').strip())
+    всего_юнитов = sum(len(ю) for _, _, ю in строки)
+    людей = len({с['client_id'] for с in связки})
+    все_ю = [u for _, _, ю in строки for u in ю]
+    с_ценой = sum(1 for u in все_ю if u.get('purchase_price'))
+    сумма = sum(float(u['purchase_price']) for u in все_ю if u.get('purchase_price'))
+    кабинет = sum(1 for _, к, _ in строки if к.get('вход'))
+    бн = sum(1 for _, к, _ in строки if not (к.get('phone') or '').strip())
 
     РОЛЬ = {'owns': 'владелец', 'spouse': 'супруг(а)', 'lost': 'сделка не состоялась'}
 
     куски = []
-    for имя, c, юниты in строки:
-        конт = []
-        if c.get('phone'):
-            конт.append('+' + html.escape(str(c['phone'])))
-        if c.get('email'):
-            конт.append(html.escape(c['email']))
+    for имя, к, юниты in строки:
+        хвост = []
+        if к.get('code'):
+            хвост.append(html.escape(к['code']))
+        if к.get('phone'):
+            хвост.append('+' + html.escape(str(к['phone'])))
+        if к.get('email'):
+            хвост.append(html.escape(к['email']))
         мет = []
-        if c.get('cabinet_enabled'):
+        if к.get('вход'):
             мет.append('<span class="м м-каб">кабинет открыт</span>')
-        if not (c.get('phone') or '').strip():
+        if not (к.get('phone') or '').strip():
             мет.append('<span class="м м-нет">нет телефона</span>')
-        ряды = []
-        for u in sorted(юниты, key=lambda x: (x.get('project_name') or '', x.get('unit') or '')):
-            плохо = ' класс-плохо' if (u.get('rel') == 'lost' or (u.get('stage') or '') == 'расторгнут') else ''
-            ряды.append(
-                '<tr class="%s"><td class="пр">%s</td><td class="юн">%s</td>'
-                '<td>%s</td><td class="ц">%s</td><td>%s</td><td>%s</td><td class="сост">%s</td></tr>' % (
-                    плохо.strip(),
+
+        блоки = []
+        for u in юниты:
+            вместе = ', '.join(html.escape(н) for н, _ in (u.get('совладельцы') or []))
+            поля = [
+                ('Район', u.get('район')),
+                ('Спальни', u.get('спальни')),
+                ('Площадь', u.get('площадь')),
+                ('Владение', u.get('владение')),
+                ('Сумма', деньги(u.get('purchase_price'))),
+                ('Куплено', дата(u.get('bought_on'))),
+                ('Передача', (дата(u.get('handover_on')) or '') +
+                 ('<span class="ог" title="срок со слов, документом не подтверждён">?</span>'
+                  if u.get('handover_caveat')
+                  else (' <i>' + html.escape(u.get('передача_откуда') or '') + '</i>'
+                        if u.get('передача_откуда') else ''))),
+                ('Состояние', html.escape(u.get('stage') or '') +
+                 (' <i>' + html.escape(u.get('стадия_откуда') or '') + '</i>'
+                  if u.get('стадия_откуда') else '')),
+                ('Статус УК', u.get('uk_status')),
+            ]
+            клетки = ''.join('<div class="кл"><span>%s</span><b>%s</b></div>' % (н, з)
+                             for н, з in поля if з)
+            нет = ('<div class="нет">не хватает: %s</div>' % html.escape(u['не_хватает'])) if u.get('не_хватает') else ''
+            блоки.append(
+                '<div class="об"><div class="об-шапка"><b>%s</b> <span class="юн">%s</span>%s</div>'
+                '<div class="сетка">%s</div>%s</div>' % (
                     html.escape(u.get('project_name') or '—'),
-                    html.escape(u.get('unit') or '—'),
-                    html.escape(РОЛЬ.get(u.get('rel'), u.get('rel') or '')),
-                    деньги(u.get('purchase_price')),
-                    дата(u.get('bought_on')),
-                    дата(u.get('handover_on')) + ('<span class="ог" title="срок со слов, не подтверждён документом">?</span>'
-                                                  if u.get('handover_caveat') else ''),
-                    html.escape(u.get('stage') or '')))
+                    html.escape(u.get('unit') or ''),
+                    (' <span class="вместе">совместно с ' + вместе + '</span>') if вместе else '',
+                    клетки, нет))
+
         куски.append(
             '<section class="чел"><header><h2>%s</h2><div class="код">%s</div>'
-            '<div class="конт">%s</div><div class="меты">%s</div></header>'
-            '<table><thead><tr><th>Проект</th><th>Юнит</th><th>Роль</th><th>Сумма</th>'
-            '<th>Куплено</th><th>Передача</th><th>Состояние</th></tr></thead><tbody>%s</tbody></table>'
-            '</section>' % (html.escape(имя), html.escape(c.get('code') or ''),
-                            ' · '.join(конт) or '<i>контактов нет</i>',
-                            ''.join(мет), ''.join(ряды)))
+            '<div class="меты">%s</div></header>%s</section>' % (
+                html.escape(имя), ' · '.join(хвост), ''.join(мет), ''.join(блоки)))
 
     сейчас = datetime.datetime.now(PKT).strftime('%d.%m.%Y, %H:%M по Пхукету')
     док = """<!doctype html><html lang="ru"><head><meta charset="utf-8">
@@ -308,7 +367,7 @@ h1{font-size:clamp(24px,3.4vw,34px);margin:0 0 6px;letter-spacing:-.02em}
 .м{font-size:.72rem;padding:3px 9px;border-radius:999px;border:1px solid var(--рамка)}
 .м-каб{background:var(--олива)}
 .м-нет{color:var(--тревога);border-color:currentColor}
-table{width:100%;border-collapse:collapse;font-size:.88rem}
+.об{border-top:1px solid var(--рамка);padding:12px 0 4px}\n.об:first-of-type{border-top:none;padding-top:4px}\n.об-шапка{font-size:.95rem;margin-bottom:2px}\n.об-шапка .юн{color:var(--тихо);font-variant-numeric:tabular-nums}\n.вместе{font-size:.78rem;color:var(--тихо)}\n.сетка{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-top:12px}\n.кл{background:var(--фон);border-radius:10px;padding:8px 10px}\n.кл span{display:block;font-size:.68rem;color:var(--тихо);text-transform:uppercase;letter-spacing:.04em}\n.кл b{font-size:.9rem;font-weight:600}\n.кл i{font-style:normal;color:var(--тихо);font-weight:400;font-size:.78rem}\n.нет{margin-top:10px;font-size:.8rem;color:var(--тревога)}\n.чел.плохо{opacity:.6}\ntable{width:100%;border-collapse:collapse;font-size:.88rem}
 th{text-align:left;font-weight:600;color:var(--тихо);font-size:.75rem;text-transform:uppercase;
  letter-spacing:.04em;padding:0 10px 6px 0;border-bottom:1px solid var(--рамка)}
 td{padding:8px 10px 8px 0;border-bottom:1px solid var(--фон);vertical-align:top}
@@ -328,8 +387,8 @@ footer{color:var(--тихо);font-size:.8rem;margin-top:28px;line-height:1.7}
 <h1>Клиенты Property Library</h1>
 <p class="под">Собрано из базы @СЕЙЧАС@. Файл пересобирается командой, вручную не правится.</p>
 <div class="итоги">
- <div class="итог"><b>@ЛЮДЕЙ@</b><span>человек с объектом</span></div>
- <div class="итог"><b>@ЮНИТОВ@</b><span>юнитов за ними</span></div>
+ <div class="итог"><b>@ЛЮДЕЙ@</b><span>человек-собственников</span></div>
+ <div class="итог"><b>@ЮНИТОВ@</b><span>объектов, строка = объект</span></div>
  <div class="итог"><b>@СЦЕНОЙ@ из @ЮНИТОВ@</b><span>юнитов с известной суммой</span></div>
  <div class="итог"><b>@СУММА@</b><span>сумма известных сделок</span></div>
  <div class="итог"><b>@КАБИНЕТ@</b><span>с открытым кабинетом</span></div>
@@ -340,7 +399,7 @@ footer{color:var(--тихо);font-size:.8rem;margin-top:28px;line-height:1.7}
 Перечёркнутая строка — сделка не состоялась или договор расторгнут.<br>
 Персональные данные. Наружу этот лист не выкладывается.</footer>
 </div></body></html>"""
-    for метка, значение in (('@СЕЙЧАС@', сейчас), ('@ЛЮДЕЙ@', len(строки)), ('@ЮНИТОВ@', всего_юнитов),
+    for метка, значение in (('@СЕЙЧАС@', сейчас), ('@ЛЮДЕЙ@', людей), ('@ЮНИТОВ@', всего_юнитов),
                             ('@СЦЕНОЙ@', с_ценой), ('@СУММА@', деньги(сумма)),
                             ('@КАБИНЕТ@', кабинет), ('@БЕЗНОМЕРА@', бн),
                             ('@КАРТОЧКИ@', '\n'.join(куски))):
@@ -353,16 +412,16 @@ footer{color:var(--тихо);font-size:.8rem;margin-top:28px;line-height:1.7}
     print('готово: %s' % ТАБЛИЦА)
     нехватка = []
     for к in ('сумма', 'дата покупки', 'срок передачи', 'спальни', 'статус УК'):
-        n = sum(1 for с in связки if к in (с.get('не_хватает') or ''))
+        n = sum(1 for u in все_ю if к in (u.get('не_хватает') or ''))
         if n:
             нехватка.append((к, n))
-    print('человек %d, юнитов %d, с суммой %d, сумма %s' % (len(строки), всего_юнитов, с_ценой, деньги(сумма)))
+    print('человек %d, объектов %d, с суммой %d, сумма %s' % (людей, всего_юнитов, с_ценой, деньги(сумма)))
     print('не хватает: ' + '; '.join('%s у %d' % (к, n) for к, n in нехватка))
     if '--послать' in sys.argv:
         if '--го' not in sys.argv:
             print('наружу не отправлял. Отправить: --послать --го')
         else:
-            отправить(нехватка, len(строки), всего_юнитов, с_ценой)
+            отправить(нехватка, людей, всего_юнитов, с_ценой)
 
 
 if __name__ == '__main__':
