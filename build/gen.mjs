@@ -62,6 +62,12 @@ const SITE_BASE = 'https://property-library.com';
 const WA = '66955492587';
 const RATE = 35; // THB→USD для витринного priceUSD (как в текущем каталоге)
 
+/* Сегодняшняя дата по Пхукету, в виде «ГГГГ-ММ-ДД» — ровно в том формате, в
+   каком handover_date приходит из базы, поэтому сравнивать можно строками.
+   Время держим пхукетское: сборка идёт и из Москвы, и с сервера в UTC, а
+   «сдан или ещё нет» должно читаться так же, как его читает Эльнур. */
+const СЕГОДНЯ = new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Bangkok' });
+
 const MARK_START = '/* PLP:AUTO-CATALOG:START — сгенерировано build/gen.mjs из Supabase; вручную не править (calc/grad/budget сохраняются между прогонами) */';
 const MARK_END = '/* PLP:AUTO-CATALOG:END */';
 const MARK_RENT_START = '/* PLP:AUTO-RENTALS:START — сгенерировано build/gen.mjs из Supabase (объекты аренды); вручную не править (grad сохраняется между прогонами) */';
@@ -952,7 +958,14 @@ function buildRentals(objects, preserve, ratesBy) {
       // стадия проекта: пока дом не сдан, снять нельзя — так и пишем
       stage: o.stage || null,
       handover: o.handover_date || null,
-      notReady: !!(o.stage && /construct|стро/i.test(String(o.stage))),
+      /* 24.09.2026. «Аренда откроется после сдачи · 31.10.2025» — так витрина
+         звала подождать дату, которая прошла год назад: у пяти юнитов Legendary
+         в поле стадии осталось «Construction», хотя сам проект давно Ready.
+         Дата сдачи в прошлом опровергает стадию: строку про ожидание не пишем,
+         карточка встаёт в обычное «по запросу». Сама стадия при этом остаётся
+         как есть — её правит приёмка, а не витрина. */
+      notReady: !!(o.stage && /construct|стро/i.test(String(o.stage))
+                   && !(o.handover_date && String(o.handover_date) < СЕГОДНЯ)),
       min_stay: (o.min_stay === 0 || o.min_stay) ? o.min_stay : null,
       deposit: (o.deposit === 0 || o.deposit) ? o.deposit : null,
       // фильтр удобств: источники — amenities (если есть) + rent_included; distance_beach_m для «у моря»
