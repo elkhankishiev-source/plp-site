@@ -91,6 +91,63 @@ def дополнить(связки, объекты):
                 с['площадь'] = str(пл)
 
 
+def плоский(wb, строки, РОЛЬ):
+    """Второй лист «Поиск»: та же выборка плоской таблицей, с фильтром.
+
+    Эльнур 25.09: «в этом файле даже поисковой строки нет». На первом листе
+    фильтра быть не может: он собран полосами с объединёнными клетками, Excel
+    на такой связке ругается на файл. Поэтому поиск живёт отдельным листом —
+    одна строка на объект, имя владельца повторяется (здесь это не дубль, а
+    условие работы фильтра), сортировка и поиск работают как обычно.
+    """
+    from openpyxl.styles import Alignment, Font, PatternFill
+    from openpyxl.utils import get_column_letter
+
+    ws = wb.create_sheet('Поиск')
+    шапка = ['Собственник', 'Совладельцы', 'Код', 'Телефон', 'Почта', 'Кабинет',
+             'Проект', 'Юнит', 'Спальни', 'Площадь', 'Район', 'Состояние',
+             'Цена, ฿', 'Куплено', 'Передача', 'Откуда срок', 'Статус УК',
+             'Чего не хватает', 'Код объекта']
+    ws.append(шапка)
+    for c in ws[1]:
+        c.font = Font(bold=True, color='FFFFFF')
+        c.fill = PatternFill('solid', fgColor='6E6A4F')
+        c.alignment = Alignment(vertical='center', wrap_text=True, indent=1)
+    for имя, к, юниты in строки:
+        совл = []
+        for u in юниты:
+            for н, р in (u.get('совладельцы') or []):
+                м = '%s — %s' % (н, РОЛЬ.get(р, р or ''))
+                if м not in совл:
+                    совл.append(м)
+        for u in юниты:
+            сп = u.get('спальни')
+            ws.append([
+                имя, ', '.join(совл), к.get('code') or '',
+                ('+' + str(к['phone'])) if к.get('phone') else '',
+                к.get('email') or '', 'да' if к.get('вход') else '',
+                u.get('проект') or u.get('project_name') or '', u.get('unit') or '',
+                сп if сп == 'студия' else ((сп + ' сп.') if сп else ''),
+                u.get('площадь') or '', u.get('район') or '', u.get('stage') or '',
+                int(float(u['purchase_price'])) if u.get('purchase_price') else None,
+                дата(u.get('bought_on')), дата(u.get('handover_on')),
+                ('со слов' if u.get('handover_caveat') else '') or u.get('передача_откуда') or '',
+                u.get('uk_status') or '', u.get('не_хватает') or '', u.get('object_id') or '',
+            ])
+    for i, имя_к in enumerate(шапка, 1):
+        длины = [max((len(x) for x in str(ws.cell(row=r, column=i).value or '').split('\n')), default=0)
+                 for r in range(1, ws.max_row + 1)]
+        ws.column_dimensions[get_column_letter(i)].width = min(max(max(длины) + 2, 9), 30)
+    for r in ws.iter_rows(min_row=2, min_col=13, max_col=13):
+        for c in r:
+            c.number_format = '# ##0'
+    for r in ws.iter_rows(min_row=2):
+        for c in r:
+            c.alignment = Alignment(vertical='center', indent=1)
+    ws.freeze_panes = 'A2'
+    ws.auto_filter.ref = ws.dimensions
+
+
 def таблица(строки, РОЛЬ):
     """Полоса на человека: его клетки объединены и подкрашены, объекты — по строке
     на каждый, цена отдельной колонкой.
@@ -266,6 +323,7 @@ def таблица(строки, РОЛЬ):
     for н, (имя, к, юниты) in enumerate(строки):
         pass
     ws.sheet_view.showGridLines = False
+    плоский(wb, строки, РОЛЬ)
     # Фильтр не ставим: лист собран полосами с объединёнными клетками, фильтровать
     # такой нельзя, а Excel на связке «автофильтр + объединения» ругается на файл.
     wb.save(ТАБЛИЦА)
