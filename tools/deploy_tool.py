@@ -36,9 +36,13 @@ VPS = 'root@' + open(os.path.expanduser('~/.plp_vps_ip')).read().strip()
     'plp_watch.py':         '/opt/plp-api/tools_plp_watch.py',
     'tools_smoke.py':       '/opt/plp-tools/tools_smoke.py',
     'census_owners.py':     '/opt/plp-tools/census_owners.py',
+    # 24.09.2026: главный сторож жил ТОЛЬКО на сервере и под дисциплину
+    # выкладки не попадал — правка шла руками, истины в репозитории не было.
+    'plp_health.py':        '/opt/plp-health.py',
 }
 # Чем проверить, что выложенное живо. Пусто — значит только синтаксис.
 ПРОБА = {
+    'plp_health.py': '',            # сам по себе только проверяет и печатает
     'docs_apply.py': '',            # без --apply только читает
     'docs_parse.py': '',
     'plp_watch.py': '',             # без --send только печатает
