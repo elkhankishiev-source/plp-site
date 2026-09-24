@@ -19,6 +19,11 @@ try {
      была — и в admin.html с add-property.html лежали PLP-MANOR-S14 и имя владельца. */
   execFileSync('python3', ['tools/privacy_check.py'],
     { cwd: '/Users/elnurkhankishiev/plp-site', stdio: 'inherit' });
+  /* 24.09.2026 Эльнур: «в разделе запросить каталог исчезала картинка».
+     Два файла снёс коммит сжатия, разметка осталась звать прежние имена,
+     сборка прошла молча. Теперь ссылка, пережившая файл, видна сразу. */
+  execFileSync('python3', ['tools/images_check.py'],
+    { cwd: '/Users/elnurkhankishiev/plp-site', stdio: 'inherit' });
   execFileSync('python3', ['tools/catalog_audit.py', '--short'],
     { cwd: '/Users/elnurkhankishiev/plp-site', stdio: 'inherit' });
 } catch (e) { console.log('[приёмка] проверка не отработала'); }

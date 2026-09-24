@@ -1993,6 +1993,16 @@ body{background:var(--bg)}
   gap:clamp(18px,3vw,34px);align-items:center}
 @media(max-width:860px){ .lp-grid{grid-template-columns:1fr;gap:16px} }
 
+/* 24.09.2026: снимок в шапке «Управления» — терраса с бассейном, съёмка Эльнура.
+   Широкий кадр на телефоне вырождается в полоску, поэтому там он выше: <picture>
+   отдаёт отдельный файл 4:3, а aspect-ratio держит место до загрузки, чтобы
+   страница не дёргалась. object-fit:cover — на случай, если файл заменят другим.
+   Правим ЗДЕСЬ: в index.html этот блок перезаписывается из build/parts. */
+.mng-hero{display:block;margin:0}
+.mng-hero img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;
+  border-radius:24px;box-shadow:var(--shadow-sm)}
+@media(max-width:640px){ .mng-hero img{aspect-ratio:4/3;border-radius:18px} }
+
 /* Приём документа в кабинете: заметная зона под таблицей документов */
 .upzone{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:12px;
   padding:14px;border:1.5px dashed rgba(var(--ink-rgb),.22);border-radius:14px;background:var(--warm)}
@@ -2195,6 +2205,19 @@ body{background:var(--bg)}
   <h1 style="font-size:clamp(28px,4.4vw,44px);margin:0 0 12px">Управление недвижимостью на Пхукете</h1>
   <p class="sub" style="max-width:64ch;margin:0 0 8px">Вы отдаёте ключи — мы берём на себя гостей, уборку, ремонт и отчётность.
   Каждый месяц вы видите доход, расходы и сумму к выплате в личном кабинете, а не в переписке с менеджером.</p>
+</div></section>
+<!-- 24.09.2026 Эльнур прислал снимок: терраса, бассейн, горы. Настоящая съёмка,
+     не рендер — для страницы про управление это важнее красоты.
+     Две обрезки: 16:9 на компьютере и 4:3 на телефоне. Одна широкая картинка на
+     телефоне превращается в полоску, поэтому кадр там выше. picture выбирает сам,
+     лишнего не качает. -->
+<section style="padding:18px 0 0"><div class="container">
+  <picture class="mng-hero">
+    <source media="(max-width:640px)" srcset="img/management-hero-mob-900.webp" width="900" height="600">
+    <source media="(max-width:1100px)" srcset="img/management-hero-1000.webp" width="1000" height="562">
+    <img src="img/management-hero-1600.webp" width="1600" height="900" loading="eager" decoding="async"
+         alt="Терраса с бассейном на вилле под нашим управлением, Пхукет">
+  </picture>
 </div></section>
 <section style="padding-top:26px"><div class="container">
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px">
