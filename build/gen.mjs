@@ -1293,7 +1293,21 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
      не видит вовсе. Берём по кругу из каждого раздела: территория, интерьеры,
      инфраструктура, мастер-план — тогда в ленте показан весь объект. */
   const gallery = heroGallery(o).map(u => thumbUrl(u, 1280, 78));
-  const heroSrc = thumbUrl(o.main_image_url, 1600, 80) || (gallery[0] || ('../img/' + pub + '.jpg'));
+  /* 24.09.2026. Своего кадра у юнита может не быть — и страница звала
+     ../img/<публичный код>.jpg, файла с таким именем никто никогда не заводил.
+     Объект стоял с пустым местом, а сборка молчала: нашлось только когда
+     Эльнур увидел дыру глазами и появился tools/images_check.py.
+     Спускаемся по родству: свой кадр → кадр проекта-родителя → местный файл,
+     если он всё-таки есть → общая обложка сайта. Пустоты быть не должно. */
+  const _родитель = o.parent_object_id
+    ? (allObjects || []).find(x => x.plp_property_id === o.parent_object_id)
+    : null;
+  const _местный = fs.existsSync(path.join(ROOT, 'img', pub + '.jpg'))
+    ? '../img/' + pub + '.jpg' : '../img/og-default.jpg';
+  const heroSrc = thumbUrl(o.main_image_url, 1600, 80)
+    || gallery[0]
+    || (_родитель && thumbUrl(_родитель.main_image_url, 1600, 80))
+    || _местный;
   const shots = gallery.length > 1
     ? '<div class="shots">' + gallery.map((u, i) =>
         '<button type="button" class="' + (i ? '' : 'on') + '" data-src="' + htmlEsc(u) + '" aria-label="Фото ' + (i + 1) + '">' +
@@ -1623,7 +1637,15 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
     ? '<section class="desc"><h2>Похожие объекты</h2><div class="simi">' +
       similar.map(x => {
         const xp = pubOf(x), xru = DISTRICT_RU[x.district || x.beach || ''] || (x.district || x.beach || '');
-        const xi = thumbUrl(x.main_image_url, 520, 72) || ('../img/' + xp + '.jpg');
+        /* 24.09.2026: та же дыра, что и у обложки — у соседа могло не быть кадра,
+           и лента «Похожие объекты» показывала битую картинку. Родитель, потом
+           местный файл, потом общая обложка. */
+        const xпар = x.parent_object_id
+          ? (allObjects || []).find(y => y.plp_property_id === x.parent_object_id) : null;
+        const xi = thumbUrl(x.main_image_url, 520, 72)
+          || (xпар && thumbUrl(xпар.main_image_url, 520, 72))
+          || (fs.existsSync(path.join(ROOT, 'img', xp + '.jpg'))
+                ? '../img/' + xp + '.jpg' : '../img/og-default.jpg');
         const xg = GROUP_RU[saleGroup(x)] || '';
         return '<a class="simi-c" href="' + htmlEsc(slugOf(xp)) + '">' +
           '<img src="' + htmlEsc(xi) + '" alt="" loading="lazy" decoding="async">' +
