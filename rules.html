@@ -59,6 +59,9 @@
 </script>
 <!-- PLP:HEADTHEME:END -->
 <!-- PLP:PREVIEW -->
+<meta name="description" content="Условия использования сайта Property Library Phuket.">
+<link rel="canonical" href="https://property-library.com/rules">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Правила сайта","url":"https://property-library.com/rules","inLanguage":"ru","isPartOf":{"@type":"WebSite","name":"Property Library Phuket","url":"https://property-library.com"},"publisher":{"@type":"Organization","name":"Property Library Phuket","url":"https://property-library.com"}}</script>
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Property Library Phuket">
 <meta property="og:title" content="Правила сайта · Property Library Phuket">
@@ -112,7 +115,14 @@ ul{padding-left:22px}
 .part{border-top:1px solid var(--line);margin-top:34px;padding-top:8px}
 [data-lang]{display:none}
 
-</style></head><body>
+
+/* 24.09.2026: на странице должен быть один H1. Английский блок — та же
+   страница на другом языке, поэтому его заголовок стал H2, но выглядит
+   как H1: размер и отступы берём у него же. */
+h2.as-h1{font-size:inherit}
+h1,h2.as-h1{font-size:clamp(24px,3.4vw,34px);margin:0 0 10px;line-height:1.2}
+</style><script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Правила бронирования и проживания","url":"https://property-library.com/rules","inLanguage":"ru","isPartOf":{"@type":"WebSite","name":"Property Library Phuket","url":"https://property-library.com"},"publisher":{"@type":"Organization","name":"Property Library Phuket","url":"https://property-library.com"}}</script>
+</head><body>
 <div class="wrap">
 <div class="top">
 <a class="back" href="./" data-i="back">← На главную</a>
@@ -238,7 +248,7 @@ ul{padding-left:22px}
 
 <!-- ===== EN ===== -->
 <div data-lang="en">
-<h1>Booking and stay rules</h1>
+<h2 class="as-h1">Booking and stay rules</h2>
 <p class="upd">Updated: 2 September 2026</p>
 
 <div class="co"><b>Property Library Phuket Co., Ltd.</b><br>Reg. No. 0835566019415 · 134/137 Thepkrasattri, Thalang, Phuket, 83110, Thailand<br>E-mail: elnur@property-library.com</div>
