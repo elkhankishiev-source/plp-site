@@ -88,6 +88,19 @@ const M_HERO = `<section style="padding-bottom:0"><div class="container">
   <h1 style="font-size:clamp(28px,4.4vw,44px);margin:0 0 12px">Управление недвижимостью на Пхукете</h1>
   <p class="sub" style="max-width:64ch;margin:0 0 8px">Вы отдаёте ключи — мы берём на себя гостей, уборку, ремонт и отчётность.
   Каждый месяц вы видите доход, расходы и сумму к выплате в личном кабинете, а не в переписке с менеджером.</p>
+</div></section>
+<!-- 24.09.2026 Эльнур прислал снимок: терраса, бассейн, горы. Настоящая съёмка,
+     не рендер — для страницы про управление это важнее красоты.
+     Две обрезки: 16:9 на компьютере и 4:3 на телефоне. Одна широкая картинка на
+     телефоне превращается в полоску, поэтому кадр там выше. picture выбирает сам,
+     лишнего не качает. -->
+<section style="padding:18px 0 0"><div class="container">
+  <picture class="mng-hero">
+    <source media="(max-width:640px)" srcset="img/management-hero-mob-900.webp" width="900" height="600">
+    <source media="(max-width:1100px)" srcset="img/management-hero-1000.webp" width="1000" height="562">
+    <img src="img/management-hero-1600.webp" width="1600" height="900" loading="eager" decoding="async"
+         alt="Терраса с бассейном на вилле под нашим управлением, Пхукет">
+  </picture>
 </div></section>`;
 const M_LIST = `<section id="list-property" style="padding-top:22px"><div class="container">
   <div style="background:var(--green-soft);border:1px solid var(--line,rgba(var(--ink-rgb),.12));border-radius:24px;padding:clamp(20px,3vw,30px)">
