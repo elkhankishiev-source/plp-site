@@ -97,8 +97,8 @@ const M_HERO = `<section style="padding-bottom:0"><div class="container">
 <section style="padding:18px 0 0"><div class="container">
   <picture class="mng-hero">
     <source media="(max-width:640px)" srcset="img/management-hero-mob-900.webp" width="900" height="600">
-    <source media="(max-width:1100px)" srcset="img/management-hero-1000.webp" width="1000" height="562">
-    <img src="img/management-hero-1600.webp" width="1600" height="900" loading="eager" decoding="async"
+    <source media="(max-width:1100px)" srcset="img/management-hero-1000.webp" width="1000" height="428">
+    <img src="img/management-hero-1600.webp" width="1600" height="685" loading="eager" decoding="async"
          alt="Терраса с бассейном на вилле под нашим управлением, Пхукет">
   </picture>
 </div></section>`;
