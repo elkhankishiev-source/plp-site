@@ -92,19 +92,23 @@ def дополнить(связки, объекты):
 
 
 def таблица(строки, РОЛЬ):
-    """Тот же список таблицей: одна строка = один юнит, чтобы можно было
-    сортировать и фильтровать в Excel или Numbers."""
+    """Строка = СОБСТВЕННИК. Его объекты перечислены в одной клетке.
+
+    Эльнур 25.09: «в одной строке пишешь владелец, перечисление объектов; если
+    совладелец — то тоже в той же строке, не надо делать дубли». До этого имя
+    человека повторялось столько раз, сколько у него объектов, и список
+    приходилось пересчитывать глазами.
+    """
     from openpyxl import Workbook
     from openpyxl.styles import Alignment, Font, PatternFill
     from openpyxl.utils import get_column_letter
 
     wb = Workbook()
     ws = wb.active
-    ws.title = 'Клиенты'
-    шапка = ['Собственник', 'Код', 'Телефон', 'Почта', 'Кабинет', 'Совместно с',
-             'Проект', 'Юнит', 'Район', 'Спальни', 'Площадь', 'Владение',
-             'Сумма, ฿', 'Куплено', 'Передача', 'Откуда срок', 'Состояние',
-             'Откуда стадия', 'Статус УК', 'Чего не хватает', 'Внутренний код объекта']
+    ws.title = 'Собственники'
+    шапка = ['Собственник', 'Код', 'Телефон', 'Почта', 'Кабинет',
+             'Объектов', 'Объекты', 'Совладельцы',
+             'Сумма известная, ฿', 'Ближайшая передача', 'Чего не хватает']
     ws.append(шапка)
     for c in ws[1]:
         c.font = Font(bold=True, color='FFFFFF')
@@ -113,30 +117,58 @@ def таблица(строки, РОЛЬ):
     ws.freeze_panes = 'A2'
 
     for имя, к, юниты in строки:
+        перечень = []
+        совладельцы = []
+        нехватка = []
+        сумма = 0
+        сроки = []
         for u in юниты:
-            вместе = ', '.join('%s (%s)' % (н, РОЛЬ.get(р, р or '')) for н, р in (u.get('совладельцы') or []))
-            ws.append([
-                имя, к.get('code') or '',
-                ('+' + str(к['phone'])) if к.get('phone') else '',
-                к.get('email') or '',
-                'да' if к.get('вход') else '',
-                вместе,
-                u.get('project_name') or '', u.get('unit') or '',
-                u.get('район') or '', u.get('спальни') or '', u.get('площадь') or '',
-                u.get('владение') or '',
-                int(float(u['purchase_price'])) if u.get('purchase_price') else None,
-                дата(u.get('bought_on')), дата(u.get('handover_on')),
-                ('со слов' if u.get('handover_caveat') else '') or u.get('передача_откуда') or '',
-                u.get('stage') or '', u.get('стадия_откуда') or '',
-                u.get('uk_status') or '', u.get('не_хватает') or '',
-                u.get('object_id') or '',
-            ])
-    ширины = [26, 12, 16, 28, 9, 30, 26, 10, 13, 8, 10, 11, 14, 12, 12, 13, 34, 13, 11, 34, 24]
+            сп = u.get('спальни')
+            сп = сп if сп == 'студия' else ((сп + ' сп.') if сп else None)
+            приметы = [x for x in (сп, u.get('площадь'), u.get('район'), u.get('stage')) if x]
+            # 25.09: имя проекта берём чистое, из карточки. В связке один и тот же
+            # Katabello записан тремя способами, а у Clover в имя затесался номер
+            # юнита — выходило «Clover A11 A11».
+            строка = '%s %s' % (u.get('проект') or u.get('project_name') or '—', u.get('unit') or '')
+            if приметы:
+                строка += ' (' + ', '.join(str(x) for x in приметы) + ')'
+            if u.get('purchase_price'):
+                сумма += float(u['purchase_price'])
+                строка += ' — ' + деньги(u['purchase_price'])
+            if u.get('handover_on'):
+                сроки.append(str(u['handover_on'])[:10])
+                строка += ', передача ' + дата(u.get('handover_on'))
+                откуда = ('со слов' if u.get('handover_caveat') else '') or u.get('передача_откуда') or ''
+                if откуда:
+                    строка += ' (' + откуда + ')'
+            перечень.append(строка.strip())
+            for н, р in (u.get('совладельцы') or []):
+                метка = '%s — %s %s' % (н, u.get('проект') or u.get('project_name') or '', u.get('unit') or '')
+                if метка not in совладельцы:
+                    совладельцы.append(метка.strip())
+            if u.get('не_хватает'):
+                нехватка.append('%s: %s' % (u.get('unit') or u.get('project_name') or '', u['не_хватает']))
+
+        ws.append([
+            имя, к.get('code') or '',
+            ('+' + str(к['phone'])) if к.get('phone') else '',
+            к.get('email') or '',
+            'да' if к.get('вход') else '',
+            len(юниты),
+            ';\n'.join(перечень),
+            ';\n'.join(совладельцы),
+            int(сумма) if сумма else None,
+            дата(min(сроки)) if сроки else '',
+            ';\n'.join(нехватка),
+        ])
+
+    ширины = [26, 12, 16, 26, 9, 10, 74, 34, 18, 18, 46]
     for i, w in enumerate(ширины, 1):
         ws.column_dimensions[get_column_letter(i)].width = w
-    for ряд in ws.iter_rows(min_row=2, min_col=13, max_col=13):
+    for ряд in ws.iter_rows(min_row=2):
         for c in ряд:
-            c.number_format = '# ##0'
+            c.alignment = Alignment(vertical='top', wrap_text=True)
+        ряд[8].number_format = '# ##0'
     ws.auto_filter.ref = ws.dimensions
     wb.save(ТАБЛИЦА)
 
@@ -248,6 +280,9 @@ def главное():
         к = клиенты.get(cid) or {}
         юниты.sort(key=lambda x: ((x.get('project_name') or '').lower(), x.get('unit') or ''))
         строки.append((к.get('name') or '(без имени)', к, юниты))
+    for _, _, ю in строки:
+        ю.sort(key=lambda x: ((x.get('проект') or x.get('project_name') or '').lower(),
+                              x.get('unit') or ''))
     строки.sort(key=lambda x: x[0].lower())
 
     всего_юнитов = sum(len(ю) for _, _, ю in строки)
@@ -301,7 +336,7 @@ def главное():
             блоки.append(
                 '<div class="об"><div class="об-шапка"><b>%s</b> <span class="юн">%s</span>%s</div>'
                 '<div class="сетка">%s</div>%s</div>' % (
-                    html.escape(u.get('project_name') or '—'),
+                    html.escape(u.get('проект') or u.get('project_name') or '—'),
                     html.escape(u.get('unit') or ''),
                     (' <span class="вместе">совместно с ' + вместе + '</span>') if вместе else '',
                     клетки, нет))
