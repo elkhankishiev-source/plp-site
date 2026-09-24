@@ -15,6 +15,12 @@ const esc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g,
 
 const OFFERS = [
   {
+    slug: 'aileen', dir: 'offers/aileen',
+    title: 'Aileen Residence Lagoon · Лагуна — предстарт',
+    desc: 'Aileen Residence Lagoon в Лагуне: таунхаусы 159,3 м² с бассейном, цены, график оплаты и что построил застройщик. Предложение для клиентов Property Library Phuket.',
+    pdf: 'Aileen_Lagoon.pdf',
+  },
+  {
     slug: 'vibe2', dir: 'offers/vibe2',
     title: 'Vibe II · Карон — закрытый предстарт',
     desc: 'Vibe II на Кароне: предстартовые цены, бронь, график оплаты и расчёт аренды. Предложение для клиентов Property Library Phuket.',
