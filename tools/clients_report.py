@@ -108,17 +108,23 @@ def таблица(строки, РОЛЬ):
     from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
     from openpyxl.utils import get_column_letter
 
-    ЧЕЛОВЕК = 6          # сколько первых колонок принадлежат человеку
+    # 25.09: совладелец переехал из «полосы человека» в строку ОБЪЕКТА.
+    # У Александра жена записана покупателем только по трём Katabello из девяти —
+    # в объединённой клетке это читалось так, будто она совладелец везде.
+    ЧЕЛОВЕК = 5          # сколько первых колонок принадлежат человеку
     ТОН = ('FFFFFF', 'F4F2EA')   # через одного, чтобы полосы не сливались
-    РАМКА = Side(style='thin', color='D9D3C6')
+    # 25.09, Эльнур: «толстые линии — разделение между людьми». Тонкая линия
+    # терялась на цветной заливке, и полосы сливались. Между людьми — жирная,
+    # внутри полосы линий нет вовсе.
+    РАМКА = Side(style='medium', color='6E6A4F')
 
     wb = Workbook()
     ws = wb.active
     ws.title = 'Собственники'
-    шапка = ['Собственник', 'Код', 'Телефон', 'Почта', 'Кабинет', 'Совладельцы',
-             'Проект', 'Юнит', 'Спальни', 'Площадь', 'Район', 'Состояние',
-             'Цена, ฿', 'Куплено', 'Передача', 'Откуда срок', 'Статус УК',
-             'Чего не хватает', 'Код объекта']
+    шапка = ['Собственник', 'Код', 'Телефон', 'Почта', 'Кабинет',
+             'Проект', 'Юнит', 'Совладелец', 'Спальни', 'Площадь', 'Район',
+             'Состояние', 'Цена, ฿', 'Куплено', 'Передача', 'Откуда срок',
+             'Статус УК', 'Чего не хватает', 'Код объекта']
     ws.append(шапка)
     for c in ws[1]:
         c.font = Font(bold=True, color='FFFFFF')
@@ -130,20 +136,14 @@ def таблица(строки, РОЛЬ):
     for н, (имя, к, юниты) in enumerate(строки):
         первый = ряд
         тон = ТОН[н % 2]
-        совладельцы = []
-        for u in юниты:
-            for имя_св, роль in (u.get('совладельцы') or []):
-                метка = '%s (%s)' % (имя_св, РОЛЬ.get(роль, роль or ''))
-                if метка not in совладельцы:
-                    совладельцы.append(метка)
         for u in юниты:
             сп = u.get('спальни')
             ws.append([
                 имя, к.get('code') or '',
                 ('+' + str(к['phone'])) if к.get('phone') else '',
                 к.get('email') or '', 'да' if к.get('вход') else '',
-                ', '.join(совладельцы),
                 u.get('проект') or u.get('project_name') or '', u.get('unit') or '',
+                ', '.join(н for н, _ in (u.get('совладельцы') or [])),
                 сп if сп == 'студия' else ((сп + ' сп.') if сп else ''),
                 u.get('площадь') or '', u.get('район') or '', u.get('stage') or '',
                 int(float(u['purchase_price'])) if u.get('purchase_price') else None,
@@ -164,19 +164,51 @@ def таблица(строки, РОЛЬ):
             for к_и in range(1, len(шапка) + 1):
                 c = ws.cell(row=r, column=к_и)
                 c.fill = PatternFill('solid', fgColor=тон)
-                c.alignment = Alignment(vertical='top', wrap_text=(к_и <= ЧЕЛОВЕК or к_и >= 18))
-                # полосу отделяем линией сверху, внутри неё линий нет
+                # полосу отделяем жирной линией сверху, внутри неё линий нет
                 if r == первый:
                     c.border = Border(top=РАМКА)
         ws.cell(row=первый, column=1).font = Font(bold=True)
-        ws.cell(row=первый, column=1).alignment = Alignment(vertical='center', wrap_text=True)
 
-    ширины = [24, 12, 15, 24, 9, 30, 26, 10, 9, 9, 12, 26, 14, 11, 11, 13, 11, 34, 22]
-    for i, w in enumerate(ширины, 1):
-        ws.column_dimensions[get_column_letter(i)].width = w
-    for r in ws.iter_rows(min_row=2, min_col=13, max_col=13):
-        for c in r:
-            c.number_format = '# ##0'
+    # Нижний край последней полосы тоже закрываем, иначе лист «обрывается».
+    for к_и in range(1, len(шапка) + 1):
+        c = ws.cell(row=ряд - 1, column=к_и)
+        c.border = Border(top=c.border.top, bottom=РАМКА)
+
+    # Ширины считаем по содержимому, а не на глаз: раньше одни колонки были
+    # вдвое шире нужного, другие резали текст — «то толсто, то тонко».
+    # Потолок держим, чтобы длинная строка не растягивала лист на экран.
+    ПОТОЛОК = {'Чего не хватает': 30, 'Совладелец': 22, 'Почта': 24,
+               'Проект': 24, 'Состояние': 22, 'Собственник': 22}
+    for i, имя_к in enumerate(шапка, 1):
+        длины = [len(str(ws.cell(row=r, column=i).value or ''))
+                 for r in range(1, ряд)]
+        ш = max(длины or [0]) + 2
+        ws.column_dimensions[get_column_letter(i)].width = min(max(ш, 9), ПОТОЛОК.get(имя_к, 26))
+
+    # Выравнивание по смыслу колонки: текст влево, числа вправо, даты и
+    # короткие пометки по центру. Перенос — только там, где он правда нужен.
+    ВПРАВО = {'Цена, ฿'}
+    ЦЕНТР = {'Кабинет', 'Юнит', 'Спальни', 'Площадь', 'Куплено', 'Передача', 'Откуда срок'}
+    ПЕРЕНОС = {'Собственник', 'Совладелец', 'Почта', 'Состояние', 'Чего не хватает'}
+    for i, имя_к in enumerate(шапка, 1):
+        гор = 'right' if имя_к in ВПРАВО else ('center' if имя_к in ЦЕНТР else 'left')
+        for r in range(2, ряд):
+            c = ws.cell(row=r, column=i)
+            c.alignment = Alignment(horizontal=гор,
+                                    vertical='center' if i <= ЧЕЛОВЕК else 'top',
+                                    wrap_text=имя_к in ПЕРЕНОС)
+            if имя_к == 'Цена, ฿':
+                c.number_format = '# ##0'
+            if имя_к in ('Юнит', 'Код объекта'):
+                c.font = Font(color='6B6459')
+
+    # Одна высота на все строки: разнобой и делал лист рваным.
+    ws.row_dimensions[1].height = 30
+    for r in range(2, ряд):
+        ws.row_dimensions[r].height = 17
+    for н, (имя, к, юниты) in enumerate(строки):
+        pass
+    ws.sheet_view.showGridLines = False
     ws.auto_filter.ref = 'A1:%s%d' % (get_column_letter(len(шапка)), ряд - 1)
     wb.save(ТАБЛИЦА)
 
