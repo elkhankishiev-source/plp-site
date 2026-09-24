@@ -91,108 +91,11 @@ def дополнить(связки, объекты):
                 с['площадь'] = str(пл)
 
 
-def заполнить(wb, строки):
-    """Третий лист «Заполнить»: только то, чего не хватает, и пустые клетки под ответ.
-
-    Эльнур 25.09: «как его редактировать, если надо». Первые два листа
-    пересобираются из базы, и правка в них потеряется при следующей сборке.
-    Поэтому правки принимаем здесь: жёлтые клетки заполняет человек, дальше
-    tools/clients_import.py переносит их в базу с пометкой, кто и когда вписал.
-    Строки только те, где чего-то не хватает.
-    """
-    from openpyxl.styles import Alignment, Font, PatternFill
-    from openpyxl.utils import get_column_letter
-
-    ws = wb.create_sheet('Заполнить')
-    шапка = ['Код объекта', 'Собственник', 'Проект', 'Юнит', 'Чего не хватает',
-             'Цена, ฿', 'Куплено', 'Передача', 'Статус УК', 'Комментарий']
-    ws.append(шапка)
-    ЖЁЛТЫЙ = PatternFill('solid', fgColor='FFF3C4')
-    for c in ws[1]:
-        c.font = Font(bold=True, color='FFFFFF')
-        c.fill = PatternFill('solid', fgColor='6E6A4F')
-        c.alignment = Alignment(vertical='center', wrap_text=True, indent=1)
-    n = 0
-    for имя, к, юниты in строки:
-        for u in юниты:
-            if not u.get('не_хватает'):
-                continue
-            ws.append([u.get('object_id') or '', имя,
-                       u.get('проект') or u.get('project_name') or '', u.get('unit') or '',
-                       u['не_хватает'], None, None, None, None, None])
-            n += 1
-            for i in range(6, 11):
-                ws.cell(row=ws.max_row, column=i).fill = ЖЁЛТЫЙ
-    ws.cell(row=ws.max_row + 2, column=1,
-            value='Жёлтое заполняет человек. Цена — числом, без пробелов и знака бата. '
-                  'Даты — как 03.01.2023. Пустое оставляем пустым: пустая клетка означает '
-                  '«не знаю», и она честнее выдуманной. Готовый файл пришлите обратно.')
-    ws.cell(row=ws.max_row, column=1).font = Font(italic=True, color='6B6459')
-    for i, имя_к in enumerate(шапка, 1):
-        длины = [len(str(ws.cell(row=r, column=i).value or '')) for r in range(1, n + 2)]
-        ws.column_dimensions[get_column_letter(i)].width = min(max(max(длины) + 2, 11), 30)
-    for r in ws.iter_rows(min_row=2, max_row=n + 1):
-        for c in r:
-            c.alignment = Alignment(vertical='center', indent=1)
-    ws.freeze_panes = 'A2'
-    ws.auto_filter.ref = 'A1:%s%d' % (get_column_letter(len(шапка)), n + 1)
-
-
-def плоский(wb, строки, РОЛЬ):
-    """Второй лист «Поиск»: та же выборка плоской таблицей, с фильтром.
-
-    Эльнур 25.09: «в этом файле даже поисковой строки нет». На первом листе
-    фильтра быть не может: он собран полосами с объединёнными клетками, Excel
-    на такой связке ругается на файл. Поэтому поиск живёт отдельным листом —
-    одна строка на объект, имя владельца повторяется (здесь это не дубль, а
-    условие работы фильтра), сортировка и поиск работают как обычно.
-    """
-    from openpyxl.styles import Alignment, Font, PatternFill
-    from openpyxl.utils import get_column_letter
-
-    ws = wb.create_sheet('Поиск')
-    шапка = ['Собственник', 'Совладельцы', 'Код', 'Телефон', 'Почта', 'Кабинет',
-             'Проект', 'Юнит', 'Спальни', 'Площадь', 'Район', 'Состояние',
-             'Цена, ฿', 'Куплено', 'Передача', 'Откуда срок', 'Статус УК',
-             'Чего не хватает', 'Код объекта']
-    ws.append(шапка)
-    for c in ws[1]:
-        c.font = Font(bold=True, color='FFFFFF')
-        c.fill = PatternFill('solid', fgColor='6E6A4F')
-        c.alignment = Alignment(vertical='center', wrap_text=True, indent=1)
-    for имя, к, юниты in строки:
-        совл = []
-        for u in юниты:
-            for н, р in (u.get('совладельцы') or []):
-                м = '%s — %s' % (н, РОЛЬ.get(р, р or ''))
-                if м not in совл:
-                    совл.append(м)
-        for u in юниты:
-            сп = u.get('спальни')
-            ws.append([
-                имя, ', '.join(совл), к.get('code') or '',
-                ('+' + str(к['phone'])) if к.get('phone') else '',
-                к.get('email') or '', 'да' if к.get('вход') else '',
-                u.get('проект') or u.get('project_name') or '', u.get('unit') or '',
-                сп if сп == 'студия' else ((сп + ' сп.') if сп else ''),
-                u.get('площадь') or '', u.get('район') or '', u.get('stage') or '',
-                int(float(u['purchase_price'])) if u.get('purchase_price') else None,
-                дата(u.get('bought_on')), дата(u.get('handover_on')),
-                ('со слов' if u.get('handover_caveat') else '') or u.get('передача_откуда') or '',
-                u.get('uk_status') or '', u.get('не_хватает') or '', u.get('object_id') or '',
-            ])
-    for i, имя_к in enumerate(шапка, 1):
-        длины = [max((len(x) for x in str(ws.cell(row=r, column=i).value or '').split('\n')), default=0)
-                 for r in range(1, ws.max_row + 1)]
-        ws.column_dimensions[get_column_letter(i)].width = min(max(max(длины) + 2, 9), 30)
-    for r in ws.iter_rows(min_row=2, min_col=13, max_col=13):
-        for c in r:
-            c.number_format = '# ##0'
-    for r in ws.iter_rows(min_row=2):
-        for c in r:
-            c.alignment = Alignment(vertical='center', indent=1)
-    ws.freeze_panes = 'A2'
-    ws.auto_filter.ref = ws.dimensions
+# 25.09, Эльнур: «стоп, это один лист! Поиск и редактирование прям там же
+# возможно, если это эксель». Листы «Поиск» и «Заполнить» убраны: искать Excel
+# умеет по Ctrl+F на любом листе, а править можно прямо здесь — значение живёт
+# в левой верхней клетке объединения, она и редактируется.
+# Правки возвращаются в базу через tools/clients_import.py.
 
 
 def таблица(строки, РОЛЬ):
@@ -251,9 +154,9 @@ def таблица(строки, РОЛЬ):
         c.border = Border(top=РАМКА, bottom=РАМКА, left=ТОНКАЯ, right=ТОНКАЯ)
     ws.freeze_panes = 'G2'
 
-    ВЫСОТА_СТРОКИ = 16      # строка объекта
-    СТРОКА_ТЕКСТА = 13      # сколько занимает одна строка текста в клетке
-    ОТСТУП = 3              # минимальный воздух сверху и снизу полосы
+    ВЫСОТА_СТРОКИ = 14      # строка объекта
+    СТРОКА_ТЕКСТА = 12      # сколько занимает одна строка текста в клетке
+    ОТСТУП = 2              # минимальный воздух сверху и снизу полосы
     ряд = 2
     пустые = []
     высоты = []
@@ -347,13 +250,13 @@ def таблица(строки, РОЛЬ):
     # Ширины считаем по содержимому, а не на глаз: раньше одни колонки были
     # вдвое шире нужного, другие резали текст — «то толсто, то тонко».
     # Потолок держим, чтобы длинная строка не растягивала лист на экран.
-    ПОТОЛОК = {'Чего не хватает': 30, 'Почта': 24,
-               'Проект': 24, 'Состояние': 22, 'Собственники': 24}
+    ПОТОЛОК = {'Чего не хватает': 26, 'Почта': 22,
+               'Проект': 21, 'Состояние': 18, 'Собственники': 22}
     for i, имя_к in enumerate(шапка, 1):
         длины = [max((len(x) for x in str(ws.cell(row=r, column=i).value or '').split('\n')),
                      default=0) for r in range(1, ряд)]
         ш = max(длины or [0]) + 2   # место под отступ, без лишнего воздуха
-        ws.column_dimensions[get_column_letter(i)].width = min(max(ш, 9), ПОТОЛОК.get(имя_к, 26))
+        ws.column_dimensions[get_column_letter(i)].width = min(max(ш, 8), ПОТОЛОК.get(имя_к, 20))
 
     # Выравнивание по смыслу колонки: текст влево, числа вправо, даты и
     # короткие пометки по центру. Перенос — только там, где он правда нужен.
@@ -377,7 +280,7 @@ def таблица(строки, РОЛЬ):
                 c.font = Font(color='6B6459')
 
     # Одна высота на все строки: разнобой и делал лист рваным.
-    ws.row_dimensions[1].height = 28
+    ws.row_dimensions[1].height = 26
     for r in range(2, ряд):
         ws.row_dimensions[r].height = ВЫСОТА_СТРОКИ
     for отступы_п, добор in высоты:
@@ -386,8 +289,6 @@ def таблица(строки, РОЛЬ):
     for н, (имя, к, юниты) in enumerate(строки):
         pass
     ws.sheet_view.showGridLines = False
-    плоский(wb, строки, РОЛЬ)
-    заполнить(wb, строки)
     # Фильтр не ставим: лист собран полосами с объединёнными клетками, фильтровать
     # такой нельзя, а Excel на связке «автофильтр + объединения» ругается на файл.
     wb.save(ТАБЛИЦА)
