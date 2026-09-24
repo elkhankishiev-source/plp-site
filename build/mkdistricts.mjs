@@ -157,19 +157,6 @@ for(const d of D){
   html=html.replace(/href="#top"/g,'href="../index.html"');
   html=html.replace(/href="#(why|sale|rent|map|quiz|about|faq|do|steps|contacts)"/g,'href="../index.html#$1"');
   html=html.replace(/(href|src)="(img\/|object\/|favicon|buy\.html|rent\.html|owner\.html|management\.html|add-property\.html|about\.html|districts\/|guide\/|offer\.html|privacy\.html|rules\.html|terms\.html|index\.html)/g,'$1="../$2');
-  /* 24.09.2026 Эльнур: «блок районы, почему там так много нерелевантных
-     разделов, разве так должно быть?» Не должно. Страница района тащила ВЕСЬ
-     магазинный фильтр с главной — 25 фишек: семь бюджетов, два типа, шесть
-     стадий, четыре сортировки, топ-7, избранное, валюта. А показывает она от
-     одного объекта (Камала) до двадцати двух (Банг Тао), лентой в один ряд.
-     Фильтровать по бюджету среди трёх объектов незачем: район И ЕСТЬ фильтр.
-     Панель убираем, а полный каталог со всеми фильтрами живёт на «Покупке» —
-     ставим на него ссылку, чтобы путь не потерялся. */
-  html = html.replace('<div class="filters">',
-    '<div class="filters" hidden data-why="район уже выбран, полный фильтр в каталоге">', 1);
-  html = html.replace('</section>',
-    '<p class="sub" style="margin:10px 0 0;font-size:.85rem">Нужны фильтры по бюджету, типу и стадии — они в <a class="lnk" href="../buy">каталоге</a>.</p></section>', 1);
-
   if(html.split(ДЕКЛ).length-1 !== 1){
     throw new Error('районы: объявление фильтра каталога не найдено (или найдено дважды) на странице '
       + d.slug + '. Каталог изменился — подстановка района сломана, чинить здесь.');
