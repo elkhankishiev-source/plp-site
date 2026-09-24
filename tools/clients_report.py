@@ -68,57 +68,27 @@ def дата(x):
 
 
 def дополнить(связки, объекты):
-    """Пустые клетки заполняем тем, что УЖЕ есть в реестре объектов.
+    """Раскладываем колонки представления по именам, которыми пользуется отчёт.
 
-    Эльнур 24.09: «надо чтобы они были заполнены». Половина колонок пустовала не
-    потому, что мы не знаем, а потому что знание лежало в соседней таблице: срок
-    сдачи и стадия есть у юнита или у его проекта, спальни и площадь тоже.
-
-    Данные НЕ копируем в client_objects — закон одного экземпляра. Достаём при
-    сборке и помечаем, что взято по проекту, а не по договору: «сдача 12.2026
-    по проекту» и «сдача 12.2026» — разные утверждения, и путать их нельзя.
+    Считать здесь больше нечего: всё посчитано в client_objects_full, и ровно
+    то же видят двойник и кабинет. Здесь — только перенос имён, чтобы не
+    заводить второй свод правил о том, что такое «срок по проекту».
     """
     for с in связки:
-        o = объекты.get(с.get('object_id')) or {}
-        p = объекты.get(o.get('parent_object_id')) or {}
-        если = lambda *xs: next((x for x in xs if x not in (None, '', [])), None)
-
-        if not с.get('handover_on'):
-            д = если(o.get('handover_date'), p.get('handover_date'))
-            if д:
-                с['handover_on'] = д
-                с['передача_откуда'] = 'по юниту' if o.get('handover_date') else 'по проекту'
-        if not (с.get('stage') or '').strip():
-            ст = если(o.get('stage'), p.get('stage'))
-            if ст:
-                с['stage'] = {'Ready': 'сдан', 'Construction': 'строится',
-                              'Pre-sale': 'старт продаж', 'Sold out': 'распродан',
-                              'Resale': 'вторичка', 'Announced': 'анонсирован'}.get(ст, ст)
-                с['стадия_откуда'] = 'по юниту' if o.get('stage') else 'по проекту'
-        сп = если(o.get('bedrooms'), o.get('bedrooms_min'), p.get('bedrooms_min'))
-        if сп:
-            с['спальни'] = str(сп)
-            с['спальни_откуда'] = 'по юниту' if (o.get('bedrooms') or o.get('bedrooms_min')) else 'по проекту'
-        пл = если(o.get('area_sqm'), o.get('area_min'))
+        с['handover_on'] = с.get('передача')
+        с['передача_откуда'] = (с.get('передача_откуда') or '')
+        if с['передача_откуда'] == 'по договору':
+            с['передача_откуда'] = ''
+        с['stage'] = с.get('стадия') or ''
+        с['стадия_откуда'] = (с.get('стадия_откуда') or '')
+        if с['стадия_откуда'] == 'по договору':
+            с['стадия_откуда'] = ''
+        пл = с.get('площадь_м2')
         if пл:
             try:
                 с['площадь'] = ('%g' % float(пл)) + ' м2'
             except Exception:
                 с['площадь'] = str(пл)
-        с['район'] = если(o.get('district'), p.get('district')) or ''
-        с['владение'] = если(o.get('ownership'), p.get('ownership')) or ''
-        не_хватает = []
-        if not с.get('purchase_price'):
-            не_хватает.append('сумма')
-        if not с.get('bought_on'):
-            не_хватает.append('дата покупки')
-        if not с.get('handover_on'):
-            не_хватает.append('срок передачи')
-        if not с.get('спальни'):
-            не_хватает.append('спальни')
-        if not с.get('uk_status'):
-            не_хватает.append('статус УК')
-        с['не_хватает'] = ', '.join(не_хватает)
 
 
 def таблица(строки, РОЛЬ):
@@ -210,9 +180,11 @@ def отправить(нехватка, людей, юнитов, с_суммо
 
 
 def главное():
-    связки = взять('client_objects?select=client_id,object_id,unit,project_name,rel,stage,uk_status,'
-                   'purchase_price,currency,bought_on,handover_on,next_payment_on,next_payment_amount,'
-                   'handover_caveat&limit=2000')
+    # 24.09: читаем ЗАПОЛНЕННОЕ представление client_objects_full — то же самое,
+    # что видят двойник в Телеграме и кабинет собственника. Раньше дозаполнение
+    # жило только здесь, в отчёте, и у клиента в кабинете клетки оставались
+    # пустыми: починил в одном месте из трёх.
+    связки = взять('client_objects_full?select=*&limit=2000')
     # 24.09: сначала связки, потом ТОЛЬКО нужные люди. Запрос всех клиентов с
     # limit=5000 Supabase молча обрезает на тысяче — в таблице половина строк
     # оставалась без кода и телефона, хотя в базе они есть. Тот же урок уже был
@@ -235,10 +207,7 @@ def главное():
     # спросил. Фильтруем здесь, а не вычищаем связку: связка верная, это их юнит.
     свои = {i for i, c in клиенты.items() if c.get('is_internal')}
     связки = [с for с in связки if с.get('client_id') not in свои]
-    объекты = {o['plp_property_id']: o for o in взять(
-        'objects?select=plp_property_id,name,parent_object_id,stage,handover_date,bedrooms,bedrooms_min,'
-        'area_sqm,area_min,district,type,ownership&limit=3000')}
-    дополнить(связки, объекты)
+    дополнить(связки, None)
 
     по_id = {a.get('client_id') for a in входы if a.get('client_id')}
     по_тел = {str(a.get('phone') or '').replace('+', '') for a in входы if a.get('phone')}
@@ -270,7 +239,7 @@ def главное():
         главный = доли[0]
         u = dict(главный)
         u['совладельцы'] = [(клиенты.get(д['client_id'], {}).get('name') or '—', д.get('rel'))
-                            for д in доли[1:]]
+                            for д in доли[1:]]  # из тех же связок, что и блоки
         u['роли'] = [д.get('rel') for д in доли]
         по_людям.setdefault(главный['client_id'], []).append(u)
 
