@@ -87,8 +87,10 @@ def главное():
                                      'Статус УК', 'Откуда срок')}
 
     есть = {}
-    for с in запрос('client_objects?select=id,object_id,client_id,purchase_price,bought_on,'
-                    'handover_on,uk_status&limit=2000'):
+    # Пишем только в строку ВЛАДЕЛЬЦА: у супругов на одном юните две связки, и
+    # цена должна жить в одной, иначе то же число заведётся дважды.
+    for с in запрос('client_objects?select=id,object_id,client_id,rel,purchase_price,bought_on,'
+                    'handover_on,uk_status&rel=eq.owns&limit=2000'):
         есть.setdefault(с['object_id'], []).append(с)
 
     правки, споры, пусто = [], [], 0
