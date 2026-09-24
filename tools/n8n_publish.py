@@ -30,7 +30,7 @@ workflow_history_bak_<дата>, из неё откат делается одн�
     python3 n8n_publish.py --apply     # опубликовать и перезапустить n8n
     python3 n8n_publish.py --rollback workflow_history_bak_20260919_1500
 """
-import datetime, subprocess, sys
+import datetime, difflib, json, re, subprocess, sys
 
 KEY = '/Users/elnurkhankishiev/.ssh/plp_vps'
 VPS = open('/Users/elnurkhankishiev/.plp_vps_ip').read().strip()
@@ -60,6 +60,54 @@ def diffs():
     return [ln.rsplit('|', 2) for ln in out.splitlines() if ln.strip()]
 
 
+ОПАСНОЕ = [
+    (r'sslip\.io', 'технический адрес sslip.io вместо домена'),
+    (r'https?://\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}', 'голый IP вместо домена'),
+    (r'https?://(127\.0\.0\.1|localhost)', 'локальный адрес — снаружи не отвечает'),
+]
+
+
+def тела(name):
+    """Черновик и живая версия одного сценария, как текст."""
+    sql = ("select w.nodes::text from workflow_entity w where w.name = $n$%s$n$;" % name)
+    черновик = psql(sql)
+    живая = psql("select h.nodes::text from workflow_entity w "
+                 "join workflow_history h on h.\"versionId\"=w.\"activeVersionId\" "
+                 "where w.name = $n$%s$n$;" % name)
+    return черновик, живая
+
+
+def чем_отличается(name):
+    """Что именно разошлось. Инструмент до 24.09 печатал только ДЛИНЫ — и по ним
+    нельзя понять, какая сторона правильная. У WF_offer_page живая версия ходила
+    на домен, а черновик — на технический адрес sslip.io: «опубликовать» означало
+    бы сломать ссылку на оффер клиенту. Поэтому показываем значения."""
+    try:
+        ч, ж = тела(name)
+        а = json.dumps(json.loads(ж), ensure_ascii=False, indent=1, sort_keys=True).split('\n')
+        б = json.dumps(json.loads(ч), ensure_ascii=False, indent=1, sort_keys=True).split('\n')
+    except Exception as e:
+        return ['   не смог разобрать: %s' % str(e)[:90]], ч if 'ч' in dir() else '', ''
+    строки = []
+    for x in difflib.unified_diff(а, б, lineterm='', n=0):
+        if x[:3] in ('+++', '---') or x[:2] == '@@':
+            continue
+        if x[:1] == '-':
+            строки.append('   живая:    ' + x[1:].strip()[:150])
+        elif x[:1] == '+':
+            строки.append('   черновик: ' + x[1:].strip()[:150])
+    return строки, ч, ж
+
+
+def опасное_в_черновике(ч, ж):
+    """Черновик тянет назад то, от чего мы уже ушли?"""
+    беды = []
+    for рег, что in ОПАСНОЕ:
+        if re.search(рег, ч or '') and not re.search(рег, ж or ''):
+            беды.append(что)
+    return беды
+
+
 def main():
     if ROLLBACK:
         if not ROLLBACK.startswith('workflow_history_bak_'):
@@ -77,11 +125,26 @@ def main():
     if not d:
         print('расхождений нет: живые версии совпадают с черновиками')
         return 0
+    опасно = []
     for name, dr, lv in d:
         print('%-70s черновик %s / живая %s' % (name[:70], dr, lv))
+        строки, ч, ж = чем_отличается(name)
+        for x in строки[:12]:
+            print(x)
+        if len(строки) > 12:
+            print('   … ещё %d строк различий' % (len(строки) - 12))
+        for что in опасное_в_черновике(ч, ж):
+            print('   🔴 публиковать НЕЛЬЗЯ: %s' % что)
+            опасно.append((name, что))
     if not APPLY:
         print('\nЭто отчёт. Опубликовать: --apply')
         return 0
+    if опасно:
+        print('\n🔴 не публикую: черновик вернул бы то, от чего мы ушли:')
+        for name, что in опасно:
+            print('   %-50s %s' % (name[:50], что))
+        print('Сначала привести черновик в порядок в самом n8n, потом публиковать.')
+        return 1
 
     bak = 'workflow_history_bak_' + datetime.datetime.now().strftime('%Y%m%d_%H%M')
     psql('create table %s as select h.* %s;' % (bak, DIFF_WHERE))

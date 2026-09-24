@@ -31,6 +31,7 @@
 
 import json
 import os
+import re
 import subprocess
 import sys
 import urllib.parse
@@ -67,7 +68,11 @@ def какая(cmd):
         return 'sql'
     первое = голый.split()[0] if голый.split() else ''
     первое = первое.strip('`"\'()')
-    if первое not in ПРОГРАММЫ:
+    # 24.09: команда вполне может начинаться с присваивания — `N=$(…); test …`.
+    # Классификатор видел «N=$(ssh» и называл это поручением человеку, то есть
+    # честно написанный сторож отправлялся в неисполняемые.
+    присваивание = re.match(r'^[A-Za-z_][A-Za-z0-9_]*=', первое) is not None
+    if первое not in ПРОГРАММЫ and not присваивание:
         return 'человеку'
     if any(м in cmd for м in ПРОЗА):
         return 'проза'
