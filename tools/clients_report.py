@@ -92,84 +92,92 @@ def дополнить(связки, объекты):
 
 
 def таблица(строки, РОЛЬ):
-    """Строка = СОБСТВЕННИК. Его объекты перечислены в одной клетке.
+    """Полоса на человека: его клетки объединены и подкрашены, объекты — по строке
+    на каждый, цена отдельной колонкой.
 
-    Эльнур 25.09: «в одной строке пишешь владелец, перечисление объектов; если
-    совладелец — то тоже в той же строке, не надо делать дубли». До этого имя
-    человека повторялось столько раз, сколько у него объектов, и список
-    приходилось пересчитывать глазами.
+    Эльнур 25.09: «одна колонка на человека одного цвета, в ней не всё в кучу,
+    там могут быть разделения, но чтобы чётко было понятно: вот один человек,
+    его совладелец там же, потом перечисление его проектов, цена отдельно».
+
+    До этого объекты были свалены в одну клетку через точку с запятой — читать
+    приходилось внутри ячейки. Теперь имя стоит один раз на всю свою полосу
+    (объединённые клетки), а каждый объект живёт в своей строке со своими
+    колонками. Дубля имени нет, и ничего не слеплено.
     """
     from openpyxl import Workbook
-    from openpyxl.styles import Alignment, Font, PatternFill
+    from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
     from openpyxl.utils import get_column_letter
+
+    ЧЕЛОВЕК = 6          # сколько первых колонок принадлежат человеку
+    ТОН = ('FFFFFF', 'F4F2EA')   # через одного, чтобы полосы не сливались
+    РАМКА = Side(style='thin', color='D9D3C6')
 
     wb = Workbook()
     ws = wb.active
     ws.title = 'Собственники'
-    шапка = ['Собственник', 'Код', 'Телефон', 'Почта', 'Кабинет',
-             'Объектов', 'Объекты', 'Совладельцы',
-             'Сумма известная, ฿', 'Ближайшая передача', 'Чего не хватает']
+    шапка = ['Собственник', 'Код', 'Телефон', 'Почта', 'Кабинет', 'Совладельцы',
+             'Проект', 'Юнит', 'Спальни', 'Площадь', 'Район', 'Состояние',
+             'Цена, ฿', 'Куплено', 'Передача', 'Откуда срок', 'Статус УК',
+             'Чего не хватает', 'Код объекта']
     ws.append(шапка)
     for c in ws[1]:
         c.font = Font(bold=True, color='FFFFFF')
         c.fill = PatternFill('solid', fgColor='6E6A4F')
-        c.alignment = Alignment(vertical='center')
-    ws.freeze_panes = 'A2'
+        c.alignment = Alignment(vertical='center', wrap_text=True)
+    ws.freeze_panes = 'G2'
 
-    for имя, к, юниты in строки:
-        перечень = []
+    ряд = 2
+    for н, (имя, к, юниты) in enumerate(строки):
+        первый = ряд
+        тон = ТОН[н % 2]
         совладельцы = []
-        нехватка = []
-        сумма = 0
-        сроки = []
+        for u in юниты:
+            for имя_св, роль in (u.get('совладельцы') or []):
+                метка = '%s (%s)' % (имя_св, РОЛЬ.get(роль, роль or ''))
+                if метка not in совладельцы:
+                    совладельцы.append(метка)
         for u in юниты:
             сп = u.get('спальни')
-            сп = сп if сп == 'студия' else ((сп + ' сп.') if сп else None)
-            приметы = [x for x in (сп, u.get('площадь'), u.get('район'), u.get('stage')) if x]
-            # 25.09: имя проекта берём чистое, из карточки. В связке один и тот же
-            # Katabello записан тремя способами, а у Clover в имя затесался номер
-            # юнита — выходило «Clover A11 A11».
-            строка = '%s %s' % (u.get('проект') or u.get('project_name') or '—', u.get('unit') or '')
-            if приметы:
-                строка += ' (' + ', '.join(str(x) for x in приметы) + ')'
-            if u.get('purchase_price'):
-                сумма += float(u['purchase_price'])
-                строка += ' — ' + деньги(u['purchase_price'])
-            if u.get('handover_on'):
-                сроки.append(str(u['handover_on'])[:10])
-                строка += ', передача ' + дата(u.get('handover_on'))
-                откуда = ('со слов' if u.get('handover_caveat') else '') or u.get('передача_откуда') or ''
-                if откуда:
-                    строка += ' (' + откуда + ')'
-            перечень.append(строка.strip())
-            for н, р in (u.get('совладельцы') or []):
-                метка = '%s — %s %s' % (н, u.get('проект') or u.get('project_name') or '', u.get('unit') or '')
-                if метка not in совладельцы:
-                    совладельцы.append(метка.strip())
-            if u.get('не_хватает'):
-                нехватка.append('%s: %s' % (u.get('unit') or u.get('project_name') or '', u['не_хватает']))
+            ws.append([
+                имя, к.get('code') or '',
+                ('+' + str(к['phone'])) if к.get('phone') else '',
+                к.get('email') or '', 'да' if к.get('вход') else '',
+                ', '.join(совладельцы),
+                u.get('проект') or u.get('project_name') or '', u.get('unit') or '',
+                сп if сп == 'студия' else ((сп + ' сп.') if сп else ''),
+                u.get('площадь') or '', u.get('район') or '', u.get('stage') or '',
+                int(float(u['purchase_price'])) if u.get('purchase_price') else None,
+                дата(u.get('bought_on')), дата(u.get('handover_on')),
+                ('со слов' if u.get('handover_caveat') else '') or u.get('передача_откуда') or '',
+                u.get('uk_status') or '', u.get('не_хватает') or '',
+                u.get('object_id') or '',
+            ])
+            ряд += 1
+        последний = ряд - 1
 
-        ws.append([
-            имя, к.get('code') or '',
-            ('+' + str(к['phone'])) if к.get('phone') else '',
-            к.get('email') or '',
-            'да' if к.get('вход') else '',
-            len(юниты),
-            ';\n'.join(перечень),
-            ';\n'.join(совладельцы),
-            int(сумма) if сумма else None,
-            дата(min(сроки)) if сроки else '',
-            ';\n'.join(нехватка),
-        ])
+        # клетки человека — одни на всю полосу
+        if последний > первый:
+            for к_и in range(1, ЧЕЛОВЕК + 1):
+                ws.merge_cells(start_row=первый, start_column=к_и,
+                               end_row=последний, end_column=к_и)
+        for r in range(первый, последний + 1):
+            for к_и in range(1, len(шапка) + 1):
+                c = ws.cell(row=r, column=к_и)
+                c.fill = PatternFill('solid', fgColor=тон)
+                c.alignment = Alignment(vertical='top', wrap_text=(к_и <= ЧЕЛОВЕК or к_и >= 18))
+                # полосу отделяем линией сверху, внутри неё линий нет
+                if r == первый:
+                    c.border = Border(top=РАМКА)
+        ws.cell(row=первый, column=1).font = Font(bold=True)
+        ws.cell(row=первый, column=1).alignment = Alignment(vertical='center', wrap_text=True)
 
-    ширины = [26, 12, 16, 26, 9, 10, 74, 34, 18, 18, 46]
+    ширины = [24, 12, 15, 24, 9, 30, 26, 10, 9, 9, 12, 26, 14, 11, 11, 13, 11, 34, 22]
     for i, w in enumerate(ширины, 1):
         ws.column_dimensions[get_column_letter(i)].width = w
-    for ряд in ws.iter_rows(min_row=2):
-        for c in ряд:
-            c.alignment = Alignment(vertical='top', wrap_text=True)
-        ряд[8].number_format = '# ##0'
-    ws.auto_filter.ref = ws.dimensions
+    for r in ws.iter_rows(min_row=2, min_col=13, max_col=13):
+        for c in r:
+            c.number_format = '# ##0'
+    ws.auto_filter.ref = 'A1:%s%d' % (get_column_letter(len(шапка)), ряд - 1)
     wb.save(ТАБЛИЦА)
 
 
