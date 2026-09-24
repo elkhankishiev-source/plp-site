@@ -366,3 +366,50 @@ body{background:var(--bg)}
 .tray{opacity:0;visibility:hidden;pointer-events:none;
   transition:transform .38s cubic-bezier(.16,1,.3,1),opacity .28s,visibility 0s linear .28s}
 .tray.open{opacity:1;visibility:visible;pointer-events:auto;transition-delay:0s}
+
+
+/* ============================================================
+   ПОДВАЛ — ОДИН НА ВСЕ СТРАНИЦЫ
+   24.09.2026 Эльнур: «почему страница главная в другом стиле подвал?»
+   Разметка подвала общая (build/parts/footer.html), а стили — нет: каждая
+   страница носила свою копию. На add-property копия оказалась старой: не было
+   правил для логотипа, отступы сетки шире, подвал стоял светлой плитой.
+   Чинить по одному правилу бессмысленно — копии разойдутся снова.
+   Поэтому весь подвал собран сюда, а этот файл вставляется по маркеру PLP:UI
+   во ВСЕ страницы, включая две, что правятся руками. Правка одна — вид один.
+   Порядок правил сохранён как на главной: поздние перебивают ранние.
+   ============================================================ */
+.footer{padding:22px 0 16px;border-top:1px solid rgba(var(--ink-rgb),.07);margin-top:40px;background:var(--paper);color:var(--muted)}
+/* На телефоне подвал был простынёй в один столбец: четыре блока подряд. Ставим их в две колонки — высота падает вдвое, читаемость не страдает. */ .footer-grid{display:grid;gap:14px 18px;grid-template-columns:repeat(2,1fr)}
+.footer-grid>:first-child{grid-column:1/-1}
+/* Эльнур 06.09: подвал должен быть мелким и еле заметным — это служебная зона, а не витрина: там документы и реквизиты, которые не надо подсвечивать. */ .footer h3{font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:7px;opacity:.75}
+.footer li{margin-bottom:5px;font-size:.76rem;line-height:1.35}
+.footer a{color:var(--muted)}
+.footer a:hover{color:var(--ink);text-decoration:underline}
+.footer .lname,.footer .logo{font-size:.85rem;color:var(--ink)}
+.footer .logo .chip{width:26px;height:26px;border-radius:8px}
+.footer .logo img{width:16px}
+.footer-bottom{margin-top:14px;padding-top:10px;border-top:1px solid rgba(var(--ink-rgb),.07);display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;font-size:.7rem;color:var(--muted);opacity:.8}
+/* подвал: один вид на обеих страницах и обеих ширинах */ /* 17.09 Эльнур: подвал на фоне страницы, не отдельной белой плитой — отделяет одна тонкая линия. Так же пропадает «пустая полоса» под подвалом на коротких страницах (вход в кабинет). */ .footer{padding:20px 0 14px;color:var(--muted);background:transparent;border-top:1px solid rgba(var(--ink-rgb),.09)}
+.footer h3{font-size:.68rem;opacity:.75;margin-bottom:6px}
+.footer li{margin-bottom:4px;font-size:.74rem;line-height:1.35}
+.footer a{color:var(--muted)}
+.footer a:hover{color:var(--ink)}
+.footer .logo,.footer .lname{font-size:1.05rem;font-weight:700}
+/* 15.09: логотип в подвале заметный */ .footer .logo .chip{width:40px;height:40px;border-radius:11px}
+.footer .logo .chip img{width:26px}
+.footer-grid{display:grid;gap:10px 16px;grid-template-columns:repeat(2,1fr)}
+.footer-grid>:first-child{grid-column:1/-1}
+.footer-bottom{margin-top:12px;padding-top:9px;font-size:.68rem;opacity:.8}
+:root[data-theme="light"] :is(.zwrap:not(.open),.zbud,.footer,.val,.srv-card,.oi-box,.faq-item,.fpan){border-color:rgba(10,10,10,.12)}
+@media(min-width:800px){
+  .footer-grid{grid-template-columns:1.4fr 1fr 1fr 1fr;gap:22px}
+  .footer-grid>:first-child{grid-column:auto}
+}
+@media(min-width:800px){
+  .footer-grid{grid-template-columns:1.4fr 1fr 1fr 1fr}
+  .footer-grid>:first-child{grid-column:auto}
+}
+@media(prefers-color-scheme: light){
+  :root:not([data-theme="dark"]) :is(.zwrap:not(.open),.zbud,.footer,.val,.srv-card,.oi-box,.faq-item,.fpan){border-color:rgba(10,10,10,.12)}
+}

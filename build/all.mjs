@@ -24,6 +24,11 @@ try {
      сборка прошла молча. Теперь ссылка, пережившая файл, видна сразу. */
   execFileSync('python3', ['tools/images_check.py'],
     { cwd: '/Users/elnurkhankishiev/plp-site', stdio: 'inherit' });
+  /* 24.09.2026 Эльнур: «а разве это всё едино? не понимаю». Разметка общих
+     частей вставляется из build/parts, а стили каждая страница носила свои —
+     и копии тихо расходились. Теперь расхождение видно на сборке, а не глазами. */
+  execFileSync('python3', ['tools/parts_check.py'],
+    { cwd: '/Users/elnurkhankishiev/plp-site', stdio: 'inherit' });
   execFileSync('python3', ['tools/catalog_audit.py', '--short'],
     { cwd: '/Users/elnurkhankishiev/plp-site', stdio: 'inherit' });
 } catch (e) { console.log('[приёмка] проверка не отработала'); }
