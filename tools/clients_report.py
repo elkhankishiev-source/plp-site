@@ -129,7 +129,7 @@ def таблица(строки, РОЛЬ):
     for c in ws[1]:
         c.font = Font(bold=True, color='FFFFFF')
         c.fill = PatternFill('solid', fgColor='6E6A4F')
-        c.alignment = Alignment(vertical='center', wrap_text=True)
+        c.alignment = Alignment(vertical='center', wrap_text=True, indent=1)
     ws.freeze_panes = 'G2'
 
     ряд = 2
@@ -182,7 +182,7 @@ def таблица(строки, РОЛЬ):
     for i, имя_к in enumerate(шапка, 1):
         длины = [len(str(ws.cell(row=r, column=i).value or ''))
                  for r in range(1, ряд)]
-        ш = max(длины or [0]) + 2
+        ш = max(длины or [0]) + 4   # +2 на отступ, +2 на воздух
         ws.column_dimensions[get_column_letter(i)].width = min(max(ш, 9), ПОТОЛОК.get(имя_к, 26))
 
     # Выравнивание по смыслу колонки: текст влево, числа вправо, даты и
@@ -194,18 +194,22 @@ def таблица(строки, РОЛЬ):
         гор = 'right' if имя_к in ВПРАВО else ('center' if имя_к in ЦЕНТР else 'left')
         for r in range(2, ряд):
             c = ws.cell(row=r, column=i)
+            # 25.09, Эльнур: «чуть отступы пусть будут не большие». Один шаг
+            # отступа у текста слева и у чисел справа — буквы перестают липнуть
+            # к жирной линии, но колонка не раздувается.
             c.alignment = Alignment(horizontal=гор,
                                     vertical='center' if i <= ЧЕЛОВЕК else 'top',
-                                    wrap_text=имя_к in ПЕРЕНОС)
+                                    wrap_text=имя_к in ПЕРЕНОС,
+                                    indent=1 if гор in ('left', 'right') else 0)
             if имя_к == 'Цена, ฿':
                 c.number_format = '# ##0'
             if имя_к in ('Юнит', 'Код объекта'):
                 c.font = Font(color='6B6459')
 
     # Одна высота на все строки: разнобой и делал лист рваным.
-    ws.row_dimensions[1].height = 30
+    ws.row_dimensions[1].height = 32
     for r in range(2, ряд):
-        ws.row_dimensions[r].height = 17
+        ws.row_dimensions[r].height = 20   # воздух в строке, но без простыни
     for н, (имя, к, юниты) in enumerate(строки):
         pass
     ws.sheet_view.showGridLines = False
