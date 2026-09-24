@@ -38,7 +38,10 @@ import urllib.request
 
 ПРОПУСК_ПАПОК = {'.git', 'node_modules', 'build', 'tools', 'img'}
 # Эти страницы намеренно закрыты от поиска — к ним требования другие.
-ЗАКРЫТЫЕ = {'404.html', 'admin.html', 'guest.html', 'offer.html', 'owner.html', 'vibe2.html'}
+# Закрытые страницы: noindex, в карте сайта их нет, это предложения для своих.
+# Страницы офферов добавляются сюда по мере появления — требования к ним другие.
+ЗАКРЫТЫЕ = {'404.html', 'admin.html', 'guest.html', 'offer.html', 'owner.html',
+            'vibe2.html', 'aileen.html'}
 
 ЧЕРНОВИК = re.compile(r'\b(lorem ipsum|TODO|FIXME|XXX|заглушка|текст текст)\b', re.I)
 
