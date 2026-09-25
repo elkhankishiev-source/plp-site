@@ -1041,20 +1041,6 @@ input.bad{border-color:#d98a84!important;background:var(--paper)6f5}
 .fab .dot{width:8px;height:8px;border-radius:50%;background:#5fce8f;box-shadow:0 0 0 3px rgba(95,206,143,.3);animation:fabdot 2.4s infinite}
 @keyframes fabdot{0%,100%{box-shadow:0 0 0 3px rgba(95,206,143,.3)}50%{box-shadow:0 0 0 6px rgba(95,206,143,.12)}}
 @media(prefers-reduced-motion:reduce){.fab .dot,.msg{animation:none}}
-/* Голосовое сообщение — как в мессенджере: кружок «играть», дорожка, длительность.
-   Эльнур 08.09: «он не выполнил то, что я хотел» — микрофон писал текст под
-   диктовку, а нужен был обмен голосовыми. */
-.vm{display:flex;align-items:center;gap:10px;min-width:190px}
-.vm-play{flex:none;width:34px;height:34px;border-radius:50%;border:0;cursor:pointer;
-  background:var(--green);color:var(--on-green);font-size:.9rem;line-height:1;padding:0;margin:0}
-.msg.me .vm-play{background:rgba(255,255,255,.9);color:#14140f}
-.vm-wave{flex:1;height:3px;border-radius:2px;background:currentColor;opacity:.35;position:relative}
-.vm-wave i{position:absolute;left:0;top:0;bottom:0;width:0;background:currentColor;opacity:1;border-radius:2px;display:block}
-.vm-time{flex:none;font-size:.72rem;opacity:.75;font-variant-numeric:tabular-nums}
-.vm-text{margin-top:8px;font-size:.9rem;opacity:.9}
-.msg.bot .sayb{display:block;margin-top:6px;background:none;border:0;padding:0;
-  font-size:13px;line-height:1;opacity:.55;cursor:pointer}
-.msg.bot .sayb:hover{opacity:1}
 .chatwin{position:fixed;right:20px;bottom:20px;z-index:71;width:372px;max-width:calc(100vw - 32px);background:var(--paper);border-radius:22px;box-shadow:0 30px 70px rgba(20,18,14,.3);overflow:hidden;display:none;flex-direction:column}
 .chatwin.open{display:flex;animation:rise .3s cubic-bezier(.16,1,.3,1)}
 @keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
@@ -1102,34 +1088,7 @@ input.bad{border-color:#d98a84!important;background:var(--paper)6f5}
 .chatinput input:focus,.chatinput textarea:focus{border-color:var(--ink)}
 
 .chatinput .s{width:44px;height:44px;border-radius:50%;background:var(--ink-block);color:var(--on-ink);font-size:1rem;flex:none}
-/* Голосовой ввод: браузер сам распознаёт речь, ничего наружу не уходит.
-   Кнопка появляется только там, где это поддерживается. */
-.chatinput .mic{width:44px;height:44px;border-radius:50%;flex:none;padding:0;
-  display:flex;align-items:center;justify-content:center;
-  background:var(--warm);border:1px solid rgba(var(--ink-rgb),.14);color:var(--ink);cursor:pointer;
-  transition:background .18s,color .18s,border-color .18s}
-.chatinput .mic:hover{border-color:var(--green)}
-/* Идёт запись: кнопка в фирменном оливковом, внутри квадрат «стоп», вокруг мягкая волна.
-   Эльнур 08.09: «на микрофоне не видно, что идёт запись» — теперь видно и на кнопке,
-   и строкой в переписке. Красный не берём: значок должен быть спокойным, в нашем стиле. */
-.chatinput .mic.rec{background:var(--green);color:var(--on-green);border-color:transparent;
-  animation:micpulse 1.6s infinite}
-.chatinput .mic.rec svg{display:none}
-.chatinput .mic.rec::after{content:'';width:13px;height:13px;border-radius:3px;background:currentColor}
-@keyframes micpulse{0%,100%{box-shadow:0 0 0 0 rgba(var(--ink-rgb),.16)}50%{box-shadow:0 0 0 9px rgba(var(--ink-rgb),0)}}
-/* Строка «слушаю»: таймер и то, что уже разобрали — прямо в переписке */
-.vlisten{align-self:flex-start;max-width:88%;display:flex;align-items:center;gap:9px;
-  background:var(--warm);border:1px solid rgba(var(--ink-rgb),.10);border-radius:14px;
-  padding:9px 13px;font-size:.84rem;color:var(--ink)}
-.vlisten .vd{width:8px;height:8px;border-radius:50%;background:var(--green);flex:none;
-  animation:vdot 1s infinite}
-@keyframes vdot{0%,100%{opacity:1}50%{opacity:.25}}
-.vlisten .vt{font-variant-numeric:tabular-nums;opacity:.65;flex:none}
-.vlisten .vx{flex:1;min-width:0;opacity:.85}
-/* Переключатель «Голосом» в шапке чата */
-.chathead .vmode{margin:0 0 0 auto;width:auto;padding:6px 12px;border-radius:999px;font-size:.72rem;
-  font-weight:700;background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.22);cursor:pointer}
-.chathead .vmode.on{background:var(--green);color:var(--on-green);border-color:transparent}
+.chathead .clr{margin-left:auto}
 .chathead .clr,.chathead .x{margin-left:8px}
 @media(max-width:760px){
   .chatwin{right:10px;bottom:10px;width:calc(100vw - 20px)}
@@ -3898,8 +3857,7 @@ function getSource(){var s={};try{s=JSON.parse(sessionStorage.getItem('pl_source
 /* Низкопривилегированный ключ ТОЛЬКО для формы сайта — не мастер, можно в публичном коде. */
 var LEAD_ENDPOINT='https://hub.property-library.com/webhook/site-lead?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7';
 var CTX_ENDPOINT='https://hub.property-library.com/webhook/site-context?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7';
-var VOICE_ENDPOINT='https://hub.property-library.com/webhook/site-voice?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7',
-      CHAT_ENDPOINT='https://hub.property-library.com/webhook/site-chat?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7';
+var CHAT_ENDPOINT='https://hub.property-library.com/webhook/site-chat?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7';
 var AVAIL_ENDPOINT='https://hub.property-library.com/webhook/check-availability?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7';
 function escHtml(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 /* Проверка контакта перед отправкой. Раньше её не было: человек мог ввести
@@ -4074,14 +4032,6 @@ var chatHist=[];try{chatHist=JSON.parse(localStorage.getItem('pl_chat')||'[]');}
 function saveHist(){try{localStorage.setItem('pl_chat',JSON.stringify(chatHist.slice(-40)));}catch(e){}}
 function bot(html,noSave){
   var d=document.createElement('div');d.className='msg bot';d.innerHTML=html;
-  /* кнопка «послушать» — чтобы разговор был живым, а не перепиской */
-  var plain=d.textContent.trim();
-  if(plain.length>12 && (window.speechSynthesis || window.VOICE_ENDPOINT)){
-    var b=document.createElement('button');
-    b.type='button'; b.className='sayb'; b.textContent='🔊'; b.title='Послушать';
-    b.onclick=function(){ speak(b, plain); };
-    d.appendChild(b);
-  }
   cb.appendChild(d);cb.scrollTop=cb.scrollHeight;
   if(!noSave){chatHist.push({r:'bot',h:html});saveHist();}
   return d;
@@ -4449,228 +4399,6 @@ function clearChat(){chatHist=[];leadShown=false;chatStarted=false;userMsgs=0;la
 /* Голосовой ввод в чате (Эльнур 06.09). Распознаёт сам браузер — запись
    никуда не отправляется. Где не поддерживается (Firefox) — кнопки просто нет. */
 var CHAT_REC=null;
-/* ===== ОБМЕН ГОЛОСОВЫМИ =====
-   Эльнур 08.09: «я хотел общение в режиме диалога, чтобы ИИ чат мог отправить
-   голосовое сообщение, и клиент тоже мог отправить голосовое, а не текст под
-   диктовку». Поэтому: нажал — записалось, в переписке появилось ваше голосовое,
-   которое можно переслушать; ответ приходит тоже голосовым, а текст под ним —
-   чтобы можно было прочитать. */
-function vmSecs(n){ n=Math.max(0,Math.round(n||0)); return Math.floor(n/60)+':'+('0'+(n%60)).slice(-2); }
-/* пузырь с голосовым: играет из своего источника, показывает дорожку и время */
-function voiceBubble(kind, play, dur, text){
-  var d=document.createElement('div'); d.className='msg '+kind;
-  var w=document.createElement('div'); w.className='vm';
-  var b=document.createElement('button'); b.type='button'; b.className='vm-play'; b.textContent='▶';
-  var wave=document.createElement('span'); wave.className='vm-wave';
-  var fill=document.createElement('i'); wave.appendChild(fill);
-  var tm=document.createElement('span'); tm.className='vm-time'; tm.textContent=vmSecs(dur);
-  w.appendChild(b); w.appendChild(wave); w.appendChild(tm);
-  d.appendChild(w);
-  if(text){ var tx=document.createElement('div'); tx.className='vm-text'; tx.textContent=text; d.appendChild(tx); }
-  cb.appendChild(d); cb.scrollTop=cb.scrollHeight;
-  var ctl=null;
-  b.onclick=function(){
-    if(ctl && ctl.stop){ ctl.stop(); ctl=null; b.textContent='▶'; fill.style.width='0'; return; }
-    b.textContent='⏸';
-    ctl=play({
-      progress:function(p){ fill.style.width=Math.round(Math.min(1,p)*100)+'%'; },
-      time:function(sec){ tm.textContent=vmSecs(sec); },
-      done:function(){ b.textContent='▶'; fill.style.width='0'; ctl=null; }
-    });
-  };
-  return { el:d, start:function(){ b.onclick(); } };
-}
-/* проигрывание записанного файла */
-function playAudio(url){
-  return function(cbs){
-    var a=new Audio(url);
-    a.ontimeupdate=function(){ if(a.duration) cbs.progress(a.currentTime/a.duration); cbs.time(a.currentTime); };
-    a.onended=function(){ cbs.done(); };
-    a.play();
-    return { stop:function(){ try{ a.pause(); }catch(e){} } };
-  };
-}
-/* проигрывание ответа голосом самого браузера */
-function playSpeech(text){
-  return function(cbs){
-    if(!window.speechSynthesis){ cbs.done(); return null; }
-    try{ speechSynthesis.cancel(); }catch(e){}
-    var u=new SpeechSynthesisUtterance(text);
-    u.lang=(PL.lang==='en')?'en-US':'ru-RU'; u.rate=1.02;
-    var vs=speechSynthesis.getVoices()||[];
-    var v=vs.filter(function(x){ return x.lang && x.lang.indexOf(u.lang.slice(0,2))===0; })[0];
-    if(v) u.voice=v;
-    var t0=Date.now(), total=Math.max(2, text.length/14);
-    var tick=setInterval(function(){
-      var el=(Date.now()-t0)/1000;
-      cbs.progress(el/total); cbs.time(el);
-    }, 200);
-    u.onend=function(){ clearInterval(tick); cbs.done(); };
-    u.onerror=function(){ clearInterval(tick); cbs.done(); };
-    speechSynthesis.speak(u);
-    return { stop:function(){ clearInterval(tick); try{ speechSynthesis.cancel(); }catch(e){} } };
-  };
-}
-/* ответ голосом: пузырь играет сам, текст читаемый под ним */
-function botVoice(text){
-  var v=voiceBubble('bot', playSpeech(text), Math.max(2, text.length/14), text);
-  chatHist.push({r:'bot',h:escHtml(text)}); saveHist();
-  setTimeout(function(){ try{ v.start(); }catch(e){} }, 200);
-  return v;
-}
-/* Режим «Общаемся голосом»: ответы приходят голосовыми. Помним выбор. */
-/* Эльнур 08.09: «функция голосовые так себе, голос корявый, можно оставить
-   как и было — обычный ИИ-чат без голоса». Голос выключен: браузерный голос
-   звучит неживо, а серверный упирается в кредиты. Код оставлен на случай,
-   если решим вернуться, но в интерфейсе его нет. */
-var VOICE_MODE=false;
-function paintVoiceMode(){
-  var b=document.getElementById('chatVmode'); if(!b) return;
-  b.classList.toggle('on', VOICE_MODE);
-  b.textContent = VOICE_MODE ? 'Голосом ✓' : 'Голосом';
-}
-function toggleVoiceMode(){
-  VOICE_MODE=!VOICE_MODE;
-  try{ localStorage.setItem('plp_voice_mode', VOICE_MODE?'1':'0'); }catch(e){}
-  paintVoiceMode();
-  bot(VOICE_MODE
-    ? 'Хорошо, отвечаю голосом. Нажмите микрофон и говорите — я расшифрую и отвечу голосовым. Выключить можно той же кнопкой.'
-    : 'Вернулась к тексту. Голосовое всё равно можно отправить — нажмите микрофон.');
-}
-/* Строка «слушаю»: видно, что запись идёт, сколько секунд и что уже разобрали.
-   Эльнур 08.09: «не видно, что идёт запись, не понятно, что записал голос, что нет». */
-function listenBar(){
-  var d=document.createElement('div'); d.className='vlisten';
-  var dot=document.createElement('span'); dot.className='vd';
-  var tm=document.createElement('span'); tm.className='vt'; tm.textContent='0:00';
-  var tx=document.createElement('span'); tx.className='vx'; tx.textContent='Слушаю — говорите, нажмите ещё раз, когда закончите';
-  d.appendChild(dot); d.appendChild(tm); d.appendChild(tx);
-  cb.appendChild(d); cb.scrollTop=cb.scrollHeight;
-  var t0=Date.now();
-  var iv=setInterval(function(){
-    var n=Math.round((Date.now()-t0)/1000);
-    tm.textContent=Math.floor(n/60)+':'+('0'+(n%60)).slice(-2);
-  },250);
-  return { el:d, secs:function(){ return (Date.now()-t0)/1000; },
-           heard:function(t){ tx.textContent = t ? t : 'Слушаю…'; cb.scrollTop=cb.scrollHeight; },
-           close:function(){ clearInterval(iv); d.remove(); } };
-}
-function chatVoice(){
-  var btn=document.getElementById('chatMic');
-  /* второе нажатие — закончить */
-  if(window.__sr){ try{ window.__sr.stop(); }catch(e){} return; }
-  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){
-    /* Честно и сразу, а не после записи в пустоту: серверная расшифровка сейчас
-       недоступна, поэтому распознаёт только сам браузер. */
-    bot('Этот браузер не распознаёт речь. В Chrome на компьютере и Android голосовые работают, '+
-        'а здесь — напишите, пожалуйста, текстом.');
-    return;
-  }
-  var r=new SR();
-  r.lang=(PL.lang==='en')?'en-US':'ru-RU';
-  r.interimResults=true; r.continuous=true;
-  var heard='', partial='', bar=null, stopped=false;
-  r.onstart=function(){
-    window.__sr=r;
-    if(btn){
-      btn.classList.add('rec'); btn.setAttribute('aria-label','Закончить запись');
-      /* Состояние записи задаём прямо на кнопке: так его не перебьёт ни одно
-         правило стилей. Эльнур 08.09: «не видно, что идёт запись». */
-      btn.style.setProperty('background','var(--green)','important');
-      btn.style.setProperty('color','var(--on-green,#14150F)','important');
-      btn.style.setProperty('border-color','transparent','important');
-    }
-    bar=listenBar();
-  };
-  r.onresult=function(e){
-    partial='';
-    for(var i=e.resultIndex;i<e.results.length;i++){
-      var t=e.results[i][0].transcript;
-      if(e.results[i].isFinal) heard+=t; else partial+=t;
-    }
-    if(bar) bar.heard((heard+partial).trim());
-  };
-  r.onerror=function(ev){
-    stopped=true;
-    if(bar) bar.close();
-    if(btn){ btn.classList.remove('rec');
-      btn.style.removeProperty('background'); btn.style.removeProperty('color');
-      btn.style.removeProperty('border-color'); }
-    window.__sr=null;
-    var why=(ev&&ev.error)||'';
-    bot(why==='not-allowed'
-      ? 'Не дали доступ к микрофону. Разрешите его в браузере и нажмите ещё раз.'
-      : (why==='no-speech'
-         ? 'Ничего не услышала. Нажмите микрофон и говорите — или напишите текстом.'
-         : 'Не получилось записать голос. Напишите, пожалуйста, текстом.'));
-  };
-  r.onend=function(){
-    window.__sr=null;
-    if(btn){
-      btn.classList.remove('rec'); btn.setAttribute('aria-label','Сказать голосом');
-      btn.style.removeProperty('background'); btn.style.removeProperty('color');
-      btn.style.removeProperty('border-color');
-    }
-    if(stopped) return;
-    var secs=bar?bar.secs():0;
-    if(bar) bar.close();
-    var text=(heard+' '+partial).replace(/\s+/g,' ').trim();
-    if(!text){
-      bot('Не разобрала голос. Нажмите микрофон и скажите ещё раз — или напишите текстом.');
-      return;
-    }
-    /* Ваше голосовое в переписке: слышно, что записалось, и написано, что разобрали. */
-    voiceBubble('me', playSpeech(text), Math.max(1, secs), text);
-    chatHist.push({r:'me',h:text}); saveHist();
-    userMsgs++;
-    askAI(text, true);
-  };
-  try{ r.start(); }
-  catch(e){ window.__sr=null; bot('Микрофон занят другой вкладкой. Закройте её и попробуйте снова.'); }
-}
-/* Озвучка ответа. Сначала пробуем голос самого браузера — он есть почти везде
-   и ничего не стоит. Если браузер не умеет, просим сервер собрать аудио. */
-function speak(btn, text){
-  if(!text) return;
-  try{
-    if(window.speechSynthesis){
-      if(speechSynthesis.speaking){ speechSynthesis.cancel(); btn.textContent='🔊'; return; }
-      var u=new SpeechSynthesisUtterance(text);
-      u.lang=(typeof LANG!=='undefined'&&LANG==='en')?'en-US':'ru-RU';
-      u.rate=1.02; u.pitch=1.0;
-      var vs=speechSynthesis.getVoices()||[];
-      var v=vs.filter(function(x){ return x.lang && x.lang.indexOf(u.lang.slice(0,2))===0; })[0];
-      if(v) u.voice=v;
-      btn.textContent='⏸';
-      u.onend=function(){ btn.textContent='🔊'; };
-      u.onerror=function(){ btn.textContent='🔊'; };
-      speechSynthesis.speak(u);
-      return;
-    }
-  }catch(e){}
-  btn.disabled=true; var was=btn.textContent; btn.textContent='…';
-  fetch(VOICE_ENDPOINT,{method:'POST',headers:{'Content-Type':'text/plain'},
-        body:JSON.stringify({action:'tts',text:text})})
-    .then(function(r){return r.json();})
-    .then(function(d){
-      btn.disabled=false; btn.textContent=was;
-      if(d&&d.ok&&d.audio){ new Audio(d.audio).play(); }
-    })
-    .catch(function(){ btn.disabled=false; btn.textContent=was; });
-}
-
-(function(){
-  /* Микрофон показываем только там, где он действительно работает: браузер
-     умеет записывать звук. Мёртвой кнопки быть не должно. */
-  try{
-    if(window.SpeechRecognition||window.webkitSpeechRecognition){
-      var b=document.getElementById('chatMic');
-      if(b){ b.hidden=false; b.title='Сказать голосом'; }
-    }
-    paintVoiceMode();
-  }catch(e){}
-})();
 function closeChat(){var c=document.getElementById('chatwin'); if(c) c.classList.remove('open');
   var w=document.getElementById('fabWrap'); if(w) w.style.display='block';
   var b=document.getElementById('fab'); if(!w && b) b.style.display='flex';}
@@ -7002,7 +6730,7 @@ addEventListener('keydown',function(e){
 /* ===== EXPORT (inline handlers) ===== */
 window.setLang=setLang;window.toggleNav=toggleNav;
 window.openQuiz=openQuiz;window.closeQuiz=closeQuiz;window.quizNext=quizNext;window.quizBack=quizBack;window.pickQuiz=pickQuiz;
-window.chatVoice=chatVoice;window.listenBar=listenBar;window.paintVoiceMode=paintVoiceMode;window.toggleVoiceMode=toggleVoiceMode;window.voiceBubble=voiceBubble;window.playAudio=playAudio;window.playSpeech=playSpeech;window.botVoice=botVoice;window.t=t;window.toggleFab=toggleFab;window.renderMapReal=renderMapReal;window.openChat=openChat;window.closeChat=closeChat;window.clearChat=clearChat;window.sendFree=sendFree;window.closeChatToProp=closeChatToProp;window.askAssistant=askAssistant;window.aiTools=aiTools;window.aiCards=aiCards;window.askBooking=askBooking;
+window.t=t;window.toggleFab=toggleFab;window.renderMapReal=renderMapReal;window.openChat=openChat;window.closeChat=closeChat;window.clearChat=clearChat;window.sendFree=sendFree;window.closeChatToProp=closeChatToProp;window.askAssistant=askAssistant;window.aiTools=aiTools;window.aiCards=aiCards;window.askBooking=askBooking;
 window.openRentRequest=openRentRequest;window.requestService=requestService;
 window.checkAvailability=checkAvailability;window.resetAvailability=resetAvailability;window.resetRentFilters=resetRentFilters;window.pushLead=pushLead;
 window.scrollCar=scrollCar;window.toggleFilter=toggleFilter;window.onSaleSearch=onSaleSearch;window.setSaleSort=setSaleSort;window.setRentSort=setRentSort;window.onRentSearch=onRentSearch;   /* 15.09: поиск и сортировка аренды вызываются из разметки — без экспорта падали */
