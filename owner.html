@@ -796,7 +796,11 @@ td.r,th.r{text-align:right}
 .pos{color:var(--good)}.neg{color:var(--bad)}
 .chip{display:inline-block;background:var(--warm);color:var(--acc);font-size:11px;padding:1px 7px;border-radius:6px;margin-left:6px}
 .chip.grey{background:#1e1e1c;color:var(--dim)}
-.photo{width:100%;border-radius:12px;display:block;margin-bottom:12px}
+/* 25.09.2026 Эльнур: «раздел фото — зачем такое огромное фото, мини карточка
+   пойдёт». Было width:100%% без ограничения высоты: вертикальный снимок
+   растягивался на весь раздел. Делаем аккуратной карточкой 4:3. */
+.photo{width:100%;max-width:300px;aspect-ratio:4/3;object-fit:cover;
+  border-radius:12px;display:block;margin-bottom:12px}
 .links{display:flex;flex-wrap:wrap;gap:8px}
 .links a{display:inline-block;background:var(--warm);color:var(--acc);border:1px solid var(--line);border-radius:10px;
          padding:9px 13px;font-size:14px;text-decoration:none}
@@ -1854,8 +1858,16 @@ body{background:var(--bg)}
    целиком и заголовок уезжает. Делаем полосой 21:9 и ставим потолок высоты:
    снимок остаётся крупным, но под ним сразу виден текст. На телефоне
    по-прежнему 4:3 — там широкая полоса вырождается в ниточку. */
-.mng-hero img{display:block;width:100%;height:auto;aspect-ratio:21/9;object-fit:cover;
-  max-height:min(42vh,420px);border-radius:22px;box-shadow:var(--shadow-sm)}
+/* 25.09.2026 Эльнур: «в текущей рамке просто передвинь саму картинку выше
+   чуть-чуть, тогда бассейн приоткроется больше, ориентир — не закрой вентилятор».
+   Померил по файлу: вентилятор занимает верхние 35 px кадра 1600×685, значит
+   сверху допустимо срезать не больше ~19 px. При ширине 1160 своя высота снимка
+   497 px; ставим потолок 460 — срез 37 px, из них сверху 14 px экранных (19 px
+   исходника, вентилятор цел), остальное снизу. Прежний потолок min(42vh,420px)
+   на ноутбуке давал 353 px и срезал 144 px — вентилятор уходил целиком, бассейн
+   тоже. Рамка почти прежняя, а видно больше. */
+.mng-hero img{display:block;width:100%;height:auto;aspect-ratio:1600/685;object-fit:cover;
+  object-position:50% 38%;max-height:460px;border-radius:22px;box-shadow:var(--shadow-sm)}
 @media(max-width:640px){
   .mng-hero img{aspect-ratio:4/3;max-height:none;border-radius:18px} }
 
@@ -2400,8 +2412,7 @@ body{background:var(--bg)}
     <div class="card" id="sec-objedit" style="display:none">
       <!-- Эльнур 08.09: «лучше, чтобы она тоже открывалась на плюсик» -->
       <details class="fold">
-        <summary><h2 style="display:inline-block;margin:0">Карточка объекта</h2>
-          <span class="sub" style="margin-left:10px">развернуть</span></summary>
+        <summary><h2 style="display:inline-block;margin:0">Карточка объекта</h2></summary>
         <p class="sub" style="margin:10px 0">Уже заполнено тем, что мы собрали по объекту.
         Правьте прямо здесь — что впишете, то и сохранится в объекте и на сайте.
         Пустое поле оставит прежнее значение. Под полями — готовые варианты,
@@ -2412,8 +2423,7 @@ body{background:var(--bg)}
 
     <div class="card" id="sec-edit">
       <details class="fold">
-        <summary><h2 style="display:inline-block;margin:0">Дополнить карточку объекта</h2>
-          <span class="sub" style="margin-left:10px">развернуть</span></summary>
+        <summary><h2 style="display:inline-block;margin:0">Дополнить карточку объекта</h2></summary>
       <p class="sub" style="margin:10px 0 4px">Вы знаете свой объект лучше всех. Что уже есть в
       карточке — подставлено, можно поправить. Под каждым полем готовые варианты:
       нажали — добавилось.</p>
@@ -2601,7 +2611,6 @@ body{background:var(--bg)}
       <details id="req-fold">
         <summary style="cursor:pointer;list-style:none">
           <h2 style="display:inline-block;margin:0">Оставить заявку</h2>
-          <span class="sub" style="margin-left:10px">развернуть</span>
         </summary>
       <p class="sub" style="margin:10px 0 12px">Это внутренняя заявка по конкретному объекту:
       бронь дат, уборка, ремонт, проверка. Она попадает к нам в работу, а по объектам
@@ -5063,13 +5072,19 @@ function toggleNav(v){var m=document.getElementById("mnav");if(m)m.classList.tog
     /* Эльнур 06.09: «перепродажа отдельным пунктом — странно, это то же самое,
        что выгрузить объект». Один раздел: сдать или продать, дальше мы сами. */
     var underBuild = /construct|стро/i.test(String(p.stage||''));
+    /* 25.09.2026 Эльнур: «раздел выгрузить объект — почему только продать,
+       а не аренда тоже?». У объекта в стройке кнопку аренды прятали совсем:
+       «сдавать пока нечего». Но собственник вправе выставить объект в аренду
+       заранее — со сдачи, и заявку мы примем в любом случае (его же правило
+       от 24.09: «не важно, доступен объект или нет»). Кнопка теперь есть всегда,
+       а про срок честно пишем строкой, а не отнимаем действие. */
     var rs='<p class="sub">'+
       (underBuild
-        ? 'Объект ещё строится, поэтому сдавать пока нечего — зато его можно выставить на продажу. Проверим цену, оформим карточку на сайте и пришлём ссылку: её можно отправлять покупателям.'
+        ? 'Объект ещё строится: продать можно уже сейчас, аренду оформим со сдачи — заявку примем заранее и поставим карточку в очередь. Проверим цену, оформим карточку на сайте и пришлём ссылку.'
         : 'Сдать в аренду или продать — оформим карточку на сайте и пришлём ссылку, её можно отправлять клиентам.')+
       '</p><div class="fbtns">'+
-        (underBuild?'':'<button type="button" class="btn" data-resale="'+(p.id||'')+'" data-goal="rent">Сдать в аренду</button>')+
-        '<button type="button" class="btn'+(underBuild?'':' ghost')+'" data-resale="'+(p.id||'')+'" data-goal="sale">Продать</button>'+
+        '<button type="button" class="btn" data-resale="'+(p.id||'')+'" data-goal="rent">Сдать в аренду</button>'+
+        '<button type="button" class="btn ghost" data-resale="'+(p.id||'')+'" data-goal="sale">Продать</button>'+
       '</div>'+
       /* Эльнур 08.09: «логичнее эту карточку поставить в блоке объекты — раздел
          выгрузить объект». Третий путь: объект, которого у нас ещё нет. */
