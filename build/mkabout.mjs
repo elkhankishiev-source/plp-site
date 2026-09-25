@@ -34,7 +34,11 @@ function grabPart(name) {
   return idx.slice(a + `<!-- PLP:PART:${name}:START -->`.length, b);
 }
 
-const HERO = `<section style="padding-bottom:32px"><div class="container">
+/* 25.09.2026 Эльнур: «управление и о нас находятся на разной величине,
+   приподними до уровня первых блоков страницы». У продажи и аренды верх
+   вступления 22 пункта, здесь работал общий отступ секции в 64 — и эти две
+   страницы открывались ниже остальных. */
+const HERO = `<section style="padding:22px 0 32px"><div class="container">
   <span class="kicker" data-i18n="nav.about">О нас</span>
   <h1 style="font-size:clamp(30px,4.6vw,48px);margin:6px 0 12px">Property Library Phuket</h1>
   <p class="sub" style="max-width:62ch;margin:0" data-i18n="ft.tag">Мы уже выбрали Пхукет, поможем и вам. Всё под ключ — от первого звонка до заезда и получения дохода.</p>
