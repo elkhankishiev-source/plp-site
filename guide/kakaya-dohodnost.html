@@ -1090,7 +1090,15 @@ input.bad{border-color:#d98a84!important;background:var(--paper)6f5}
 .faq-list{margin-top:24px;max-width:820px}
 .faq-item{border:1px solid rgba(var(--ink-rgb),.09);border-radius:16px;margin-bottom:10px;background:var(--paper);overflow:hidden}
 .faq-q{width:100%;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:15px 20px;font-weight:700;font-size:.98rem;text-align:left}
-.faq-q .chev{flex:none;width:28px;height:28px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;transition:transform .3s ease;font-weight:800}
+/* 25.09.2026 Эльнур: «на мобильном плюс корявый, на маке норм». Плюс был
+   ОБЫЧНЫМ СИМВОЛОМ в кружке: на компьютере он попадал в центр, а на телефоне
+   метрики шрифта другие, строка 24 пункта в кружке 28 — и знак съезжал.
+   Рисуем его двумя полосками: они по центру при любом шрифте, и поворот на
+   45 градусов даёт ровный крестик. */
+.faq-q .chev{flex:none;width:28px;height:28px;border-radius:50%;background:var(--green);position:relative;font-size:0;line-height:0;transition:transform .3s ease}
+.faq-q .chev::before,.faq-q .chev::after{content:"";position:absolute;left:50%;top:50%;background:currentColor;border-radius:1px}
+.faq-q .chev::before{width:12px;height:2px;transform:translate(-50%,-50%)}
+.faq-q .chev::after{width:2px;height:12px;transform:translate(-50%,-50%)}
 .faq-item.open .chev{transform:rotate(45deg)}
 .faq-a{max-height:0;overflow:hidden;transition:max-height .35s ease}
 .faq-a-inner{padding:0 20px 18px;color:var(--muted);font-size:.92rem}
@@ -2619,7 +2627,7 @@ ru: {
   "u.area":"площадь","u.beds":"спальни","u.deadline":"сдача",
   "st.ready":"Готов","st.available":"Доступен","st.reserved":"Резерв","st.sold":"Продан","st.soon":"Скоро",
   "soon.t":"Скоро в каталоге","soon.p":"Наполняем витрину аренды: новые виллы и апартаменты появятся здесь. Оставьте запрос — подберём вручную уже сейчас.",
-  "book.title":"Запрос на аренду","book.req":"Оставить запрос на аренду","bf.guests":"Гостей","bf.name":"Как к вам обращаться","bf.contact":"Куда ответить","bf.cph":"телефон, WhatsApp или @ник","bf.note":"Что важно","bf.nph":"пожелания, вопросы","bf.send":"Отправить запрос","bf.need":"Оставьте телефон, WhatsApp или почту — иначе не сможем ответить","bf.sending":"Отправляем…","bf.done":"Приняли. Проверим занятость у собственника и ответим — обычно в течение дня.",
+  "book.title":"Запрос на аренду","book.req":"Оставить запрос на аренду","bf.in":"Заезд","bf.out":"Выезд","bf.guests":"Гостей","bf.name":"Как к вам обращаться","bf.contact":"Куда ответить","bf.cph":"телефон, WhatsApp или @ник","bf.note":"Что важно","bf.nph":"пожелания, вопросы","bf.send":"Отправить запрос","bf.need":"Оставьте телефон, WhatsApp или почту — иначе не сможем ответить","bf.sending":"Отправляем…","bf.done":"Приняли. Проверим занятость у собственника и ответим — обычно в течение дня.",
   "u.req2":"Запросить (даты/цену)",
   "rent.dates.in":"Заезд","rent.dates.out":"Выезд","rent.dates.btn":"Показать свободные","rent.dates.reset":"Сбросить дату",
   "ft.addobj":"Сдать или продать свой объект",
@@ -2796,7 +2804,7 @@ en: {
   "u.area":"area","u.beds":"bedrooms","u.deadline":"completion",
   "st.ready":"Ready","st.available":"Available","st.reserved":"Reserved","st.sold":"Sold","st.soon":"Soon",
   "soon.t":"Coming to the catalogue","soon.p":"We are filling the rental showcase: new villas and apartments will appear here. Leave an enquiry — we will match one manually right now.",
-  "book.title":"Rental enquiry","book.req":"Leave a rental enquiry","bf.guests":"Guests","bf.name":"Your name","bf.contact":"Where to reply","bf.cph":"phone, WhatsApp or @handle","bf.note":"Anything important","bf.nph":"wishes, questions","bf.send":"Send request","bf.need":"Leave a phone, WhatsApp or email so we can reply","bf.sending":"Sending…","bf.done":"Got it. We will check availability with the owner and reply, usually within a day.",
+  "book.title":"Rental enquiry","book.req":"Leave a rental enquiry","bf.in":"Check-in","bf.out":"Check-out","bf.guests":"Guests","bf.name":"Your name","bf.contact":"Where to reply","bf.cph":"phone, WhatsApp or @handle","bf.note":"Anything important","bf.nph":"wishes, questions","bf.send":"Send request","bf.need":"Leave a phone, WhatsApp or email so we can reply","bf.sending":"Sending…","bf.done":"Got it. We will check availability with the owner and reply, usually within a day.",
   "u.req2":"Request (dates/price)",
   "rent.dates.in":"Check-in","rent.dates.out":"Check-out","rent.dates.btn":"Show available","rent.dates.reset":"Reset dates",
   "ft.addobj":"List your property",
@@ -4205,7 +4213,46 @@ function requestService(kind){
   bot(label+' — оставьте контакт, согласуем время и условия.');
   showLead();
 }
-function openRentRequest(){openChat('rentreq');}
+function openRentRequest(){
+  /* 🔴 25.09.2026 Эльнур: «блок аренда, запрос на аренду — и не тыкается ничего,
+     как же отправить запрос то? Не важно, доступен объект или нет, надо дать
+     возможность оставлять заявки на нашем сайте».
+     Кнопка открывала ЧАТ, а чат молчит, когда у мозга нет кредитов, — человек
+     упирался в пустоту. Теперь прямо под блоком разворачивается форма и заявка
+     уходит сама, без чата и независимо от занятости объектов. */
+  var band=document.querySelector('.rentband'); if(!band) return openChat('rentreq');
+  var box=document.getElementById('rqForm');
+  if(box){ box.hidden=!box.hidden; if(!box.hidden){var f=box.querySelector('input'); if(f) f.focus();} return; }
+  box=document.createElement('div'); box.id='rqForm'; box.className='bform';
+  box.style.cssText='margin-top:14px;background:var(--paper,#fff);border-radius:14px;padding:14px';
+  box.innerHTML=
+    '<div class="bf-row"><label>'+t('bf.in')+'<input id="rqI" type="date"></label>'+
+    '<label>'+t('bf.out')+'<input id="rqO" type="date"></label></div>'+
+    '<div class="bf-row"><label>'+t('bf.guests')+'<input id="rqG" type="number" min="1" max="12" value="2"></label>'+
+    '<label>'+t('bf.name')+'<input id="rqN" type="text" autocomplete="name"></label></div>'+
+    '<label class="bf-full">'+t('bf.contact')+'<input id="rqC" type="text" inputmode="tel" autocomplete="tel" placeholder="'+t('bf.cph')+'"></label>'+
+    '<label class="bf-full">'+t('bf.note')+'<textarea id="rqT" rows="2" placeholder="'+t('bf.nph')+'"></textarea></label>'+
+    '<button type="button" class="btn btn-primary btn-block" id="rqSend">'+t('bf.send')+'</button>'+
+    '<p class="tnote" id="rqMsg"></p>';
+  band.parentNode.insertBefore(box, band.nextSibling);
+  var f=box.querySelector('input'); if(f) f.focus();
+  document.getElementById('rqSend').onclick=function(){
+    var c=(document.getElementById('rqC').value||'').trim();
+    var msg=document.getElementById('rqMsg');
+    if(c.replace(/\D/g,'').length<7 && c.indexOf('@')<0){ msg.textContent=t('bf.need'); return; }
+    this.disabled=true; msg.textContent=t('bf.sending');
+    var i=(document.getElementById('rqI').value||''), o=(document.getElementById('rqO').value||'');
+    var lead=pushLead({funnel:'rent',goal:'rent_request',
+      name:(document.getElementById('rqN').value||'').trim()||null,
+      contact:c, phone:c, guests:Number(document.getElementById('rqG').value||0)||null,
+      check_in:i||null, check_out:o||null,
+      note:[(i&&o?('Даты: '+i+' → '+o):''),(document.getElementById('rqT').value||'').trim()]
+            .filter(Boolean).join(' · ')||null});
+    var done=function(){ msg.textContent=t('bf.done');
+      box.querySelectorAll('input,textarea,button').forEach(function(x){x.disabled=true;}); };
+    if(lead&&lead.__send&&lead.__send.then) lead.__send.then(done)['catch'](done); else done();
+  };
+}
 function showLead(){
   if(leadShown)return;leadShown=true;
   bot(t('chat.lead'));
@@ -5466,10 +5513,20 @@ function mkRangeField(o){
       else if(A.value&&B.value&&iso>A.value&&iso<B.value) cls=' rf-in';
       cells+='<span class="'+cls.trim()+'" data-d="'+iso+'">'+d+'</span>';
     }
-    cal.innerHTML='<div class="rf-h"><button type="button" class="rf-nav" data-rf="-1">‹</button>'+
-      '<b>'+month.toLocaleDateString(rfLoc(),{month:'long',year:'numeric'})+'</b>'+
-      '<button type="button" class="rf-nav" data-rf="1">›</button></div>'+
-      '<div class="rf-w">'+wd+'</div><div class="rf-g">'+cells+'</div>';
+    /* 25.09.2026 Эльнур: «когда меняю месяц на календаре, он скидывается и не
+       выбирается». Раньше каждое перелистывание переписывало ВЕСЬ календарь
+       вместе со стрелками: на касании палец опускался на одну кнопку, а
+       поднимался уже над новой — и браузер не считал это нажатием. Теперь
+       каркас со стрелками строится один раз, а меняются только подпись месяца
+       и сетка дней. */
+    if(!cal.firstChild){
+      cal.innerHTML='<div class="rf-h"><button type="button" class="rf-nav" data-rf="-1">‹</button>'+
+        '<b></b><button type="button" class="rf-nav" data-rf="1">›</button></div>'+
+        '<div class="rf-w"></div><div class="rf-g"></div>';
+    }
+    cal.querySelector('.rf-h b').textContent=month.toLocaleDateString(rfLoc(),{month:'long',year:'numeric'});
+    cal.querySelector('.rf-w').innerHTML=wd;
+    cal.querySelector('.rf-g').innerHTML=cells;
   }
   function fire(el){
     try{ el.dispatchEvent(new Event('input',{bubbles:true})); }catch(e){}
@@ -5485,9 +5542,15 @@ function mkRangeField(o){
   btn.onclick=function(){ cal.hidden=!cal.hidden; btn.classList.toggle('open',!cal.hidden); if(!cal.hidden) draw(); };
   cal.onclick=function(e){
     var nav=e.target.closest&&e.target.closest('[data-rf]');
-    if(nav){ month=new Date(month.getFullYear(), month.getMonth()+Number(nav.getAttribute('data-rf')),1); draw(); return; }
+    if(nav){
+      e.preventDefault(); e.stopPropagation();
+      var б=month||new Date();
+      month=new Date(б.getFullYear(), б.getMonth()+Number(nav.getAttribute('data-rf')),1);
+      cal.hidden=false; btn.classList.add('open');   /* перелистывание не закрывает календарь */
+      draw(); return;
+    }
     var day=e.target.closest&&e.target.closest('[data-d]');
-    if(day) pick(day.getAttribute('data-d'));
+    if(day){ e.preventDefault(); e.stopPropagation(); pick(day.getAttribute('data-d')); }
   };
   /* если даты сбросили снаружи (кнопка «Сбросить»), надпись обновится сама */
   A.addEventListener('change', label); B.addEventListener('change', label);
