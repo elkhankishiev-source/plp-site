@@ -58,7 +58,7 @@ c, _ = код(SB + '/rest/v1/canon_rules?select=id&limit=1', h)
 c, тело = код('http://127.0.0.1:8090/brain',
               {'Content-Type': 'application/json', 'x-plp-key': API},
               json.dumps({'probe': True, 'text': 'проверка живости',
-                          'phone': '66999000999', 'source': 'telegram'}).encode())
+                          'phone': '669••••••99', 'source': 'telegram'}).encode())
 _соб = 0
 try:
     _соб = int(json.loads(тело).get('prompt_chars') or 0)

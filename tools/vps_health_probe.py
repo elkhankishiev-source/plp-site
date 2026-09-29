@@ -23,7 +23,7 @@ APPLY = '--apply' in sys.argv
 
 OLD = """c, тело = код('http://127.0.0.1:8090/brain',
               {'Content-Type': 'application/json', 'x-plp-key': API},
-              json.dumps({'text': 'здравствуйте', 'phone': '66999000999', 'source': 'telegram'}).encode())
+              json.dumps({'text': 'здравствуйте', 'phone': '669••••••99', 'source': 'telegram'}).encode())
 проверки['мозг отвечает'] = (c == 200 and 'reply' in тело, 'код %s' % c)"""
 
 NEW = """# 19.09.2026: проверяем мозг режимом probe (правка 334) — он проходит весь путь до
@@ -32,7 +32,7 @@ NEW = """# 19.09.2026: проверяем мозг режимом probe (пра�
 c, тело = код('http://127.0.0.1:8090/brain',
               {'Content-Type': 'application/json', 'x-plp-key': API},
               json.dumps({'probe': True, 'text': 'проверка живости',
-                          'phone': '66999000999', 'source': 'telegram'}).encode())
+                          'phone': '669••••••99', 'source': 'telegram'}).encode())
 _соб = 0
 try:
     _соб = int(json.loads(тело).get('prompt_chars') or 0)

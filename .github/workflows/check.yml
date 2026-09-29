@@ -62,8 +62,34 @@ jobs:
           grep -q 'property-library.com/sitemap.xml' robots.txt || { echo "❌ в robots.txt чужая карта сайта"; fail=1; }
           grep -q '<loc>' sitemap.xml || { echo "❌ карта сайта пуста"; fail=1; }
           test -f 404.html || { echo "❌ нет страницы 404"; fail=1; }
-          if grep -rlE 'service_role|SUPABASE_SERVICE_KEY[[:space:]]*=[[:space:]]*ey' --include='*.html' . | grep -q .; then
-            echo "❌ в HTML попал сервисный ключ"; fail=1
+          # 29.09.2026. Было: проверялся только служебный ключ и только в .html.
+          # Проверка расширена на все файлы репозитория и на все виды секретов,
+          # которые у нас реально бывают. Публичный ключ anon — разрешён, его
+          # права режет RLS; служебный обходит права и в репозитории быть не может.
+          sec_fail=0
+          check_secret() {
+            if grep -rlEI "$2" --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=.github . 2>/dev/null | grep -q .; then
+              echo "❌ $1"; sec_fail=1
+            fi
+          }
+          check_secret "служебный ключ Supabase"      'service_role|SUPABASE_SERVICE_KEY[[:space:]]*=[[:space:]]*ey'
+          check_secret "ключ OpenAI"                  'sk-[A-Za-z0-9_-]{32,}'
+          check_secret "ключ Anthropic"               'sk-ant-[A-Za-z0-9_-]{20,}'
+          check_secret "токен GitHub"                 'gh[pso]_[A-Za-z0-9]{30,}'
+          check_secret "токен Meta"                   'EAA[A-Za-z0-9]{80,}'
+          check_secret "токен Telegram-бота"          '[0-9]{8,12}:AA[A-Za-z0-9_-]{30,}'
+          check_secret "ключ AWS"                     'AKIA[0-9A-Z]{16}'
+          check_secret "приватный ключ"               'BEGIN [A-Z ]*PRIVATE KEY'
+          check_secret "пароль в открытую"            'pass(word|wd)?[[:space:]]*[:=][[:space:]]*["'\''][A-Za-z0-9_@#%^&*+=-]{8,}["'\'']'
+          # телефоны клиентов: наш рабочий +66955492587 разрешён, чужие — нет
+          # Наши каналы и тестовые номера разрешены. Цифры внутри имён файлов
+          # (хеши картинок) отсекаем требованием границы слова слева.
+          NASHI='66955492587|66954143874|66960169127|66640709032|66829935173|66800555001|66900000000|66999000998|66999000999'
+          if grep -rhoEI '(^|[^0-9A-Za-z])\+?66[0-9]{9}' --exclude-dir=.git --exclude-dir=.github \
+                  --include='*.html' --include='*.py' --include='*.mjs' . 2>/dev/null \
+             | grep -oE '66[0-9]{9}' | sort -u | grep -vE "$NASHI" | grep -q .; then
+            echo "❌ в репозитории чужой телефонный номер"; sec_fail=1
           fi
+          [ "$sec_fail" = "1" ] && fail=1
           [ "$fail" = "0" ] && echo "✅ структура в порядке"
           exit $fail
