@@ -153,18 +153,35 @@ def unit_map():
     m = {}
     for r in (rows if isinstance(rows, list) else []):
         u = re.sub(r'[^A-Za-z0-9]', '', str(r.get('unit') or '')).upper()
-        if len(u) >= 4:
+        if len(u) >= 5:   # 01.10: K504 Laguna ушёл в Gardens of Eden K-504 — короче 5 знаков только с проектом
             m.setdefault(u, r)
+        elif len(u) >= 2:
+            # 01.10.2026: «Villa A24» (Татьяна, Estella) терялось — короткий номер есть во многих проектах.
+            # Засчитываем его только вместе со словом из названия проекта (проверяет find_unit).
+            m.setdefault('~' + u, []).append(r)
     return m
 
 
 def find_unit(text, umap):
+    low = (text or '').lower()
+    for k, rs in umap.items():
+        if not k.startswith('~'):
+            continue
+        if not re.search(r'(?<![A-Za-z0-9])' + re.escape(k[1:]) + r'(?![A-Za-z0-9])', text or '', re.I):
+            continue
+        for r in rs:
+            words = [w for w in re.findall(r'[A-Za-z]{5,}', str(r.get('project_name') or ''))
+                     if w.lower() not in ('title', 'villa', 'villas', 'residence', 'residences', 'phuket')]
+            if any(w.lower() in low for w in words):
+                return r
     for mt in UNIT_RX.finditer(text or ''):
         key = (mt.group(1) + mt.group(2)).upper()
         if key in umap:
             return umap[key]
         # в письме «PH-MOB-MBD103» встречается и часть кода, и полный номер
         for k in umap:
+            if k.startswith('~'):
+                continue
             if k.endswith(key) or key.endswith(k):
                 return umap[k]
     return None
@@ -231,14 +248,14 @@ def main():
 def one_box(u, p, host):
     m = imaplib.IMAP4_SSL(host, 993, timeout=40)
     m.login(u, p)
-    m.select('INBOX')
+    m.select('INBOX', readonly=True)   # 01.10.2026: не помечать письма прочитанными у Эльнура
     since = (__import__('datetime').date.today() - __import__('datetime').timedelta(days=DAYS)).strftime('%d-%b-%Y')
     st, ids = m.search(None, 'SINCE', since)
     ids = ids[0].split()
     print('писем с %s: %d' % (since, len(ids)))
     seen = 0
     for i in ids:
-        st, d = m.fetch(i, '(RFC822)')
+        st, d = m.fetch(i, '(BODY.PEEK[])')
         if not d or not d[0]:
             continue
         msg = email.message_from_bytes(d[0][1])
@@ -259,6 +276,17 @@ def one_box(u, p, host):
                     text = (part.get_payload(decode=True) or b'').decode('utf-8', 'replace')[:4000]
                 except Exception:
                     pass
+        if not text.strip():
+            # 01.10.2026: письмо Татьяны (A24) пришло только в HTML — тело было пустым, проект не узнать
+            for part in msg.walk():
+                if part.get_content_type() == 'text/html':
+                    try:
+                        h = (part.get_payload(decode=True) or b'').decode('utf-8', 'replace')
+                        h = re.sub(r'(?is)<(script|style).*?</\1>', ' ', h)
+                        text = re.sub(r'\s+', ' ', re.sub(r'<[^>]+>', ' ', h)).strip()[:4000]
+                    except Exception:
+                        pass
+                    break
         links = sorted(set(LINKS.findall(text)))[:8]
         # 18.09.2026, Эльнур: «транскрибатор может мне результаты отправлять сразу в ТГ?
         # Чтобы я их не искал нигде». Любой расшифровщик присылает итог письмом —
@@ -270,7 +298,11 @@ def one_box(u, p, host):
                 notify(head + body[:3200], to_owner=True)
                 print('  протокол с созвона отправлен в Telegram: %s' % subject[:60])
             continue
-        if not files and not links:
+        # 01.10.2026: письма клиентов без вложений терялись (Татьяна про A24, Агамемнон про K504).
+        # Храним всё, кроме рассылок: у рассылки есть List-Unsubscribe / Precedence bulk или адрес noreply.
+        рассылка = bool(msg.get('List-Unsubscribe')) or str(msg.get('Precedence') or '').lower() in ('bulk', 'list') \
+            or bool(re.search(r'(no-?reply|newsletter|marketing|mailer|notifications?|godaddy|facebook-case[0-9]*)@|@(titan\.email|facebookmail\.com|meta\.com)$', addr or ''))
+        if not files and not links and рассылка:
             continue
         seen += 1
         kind = guess(subject, [f['name'] for f in files])
