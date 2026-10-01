@@ -43,6 +43,11 @@ def main():
     changed, waiting, soldout, nolist, nochan = [], [], [], [], []
     args = [PY3, os.path.join(ROOT, 'tools', 'tg_prices.py')] + (['--apply'] if APPLY else [])
     out = run(args)
+    # 01.10.2026: запись Katabello отбилась 409, tg_prices упал, а отчёт написал «обновлено: 6».
+    # Упал — строки до падения не считаем записанными и говорим об этом первой строкой.
+    упал = 'Traceback' in out
+    if упал:
+        out = out.split('Traceback')[0]
     cur = None
     for line in out.splitlines():
         if '≠' in line:
@@ -100,6 +105,8 @@ def main():
 
     today = datetime.date.today().strftime('%d.%m.%Y')
     parts = ['Цены и наличие · %s' % today]
+    if упал:
+        parts.append('⚠️ Запись цен из каналов упала посреди прохода: строки ниже НЕ записаны, нужен разбор.')
     parts.append('Обновлено: %d, ждёт подтверждения: %d' % (len(changed), len(waiting)))
     parts += changed[:15] if changed else ['Изменений нет.']
     if waiting:

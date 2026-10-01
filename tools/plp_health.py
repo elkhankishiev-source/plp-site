@@ -294,6 +294,20 @@ try:
 except Exception as e:
     проверки["все получили ответ"] = (False, "спросить не вышло: %s" % str(e)[:60])
 
+# 4) 01.10.2026. Контролёр канонов: Эльнур — «кто следит, чтобы каноны и чек-лист соблюдались; система сама контролирует».
+#    Последний час живой работы: встала отправка, служебное, второе приветствие, ответ быстрее 10 с, документы, без имени, потолок номера.
+try:
+    _c, _т = код(env("SUPABASE_URL").rstrip("/") + "/rest/v1/rpc/" + urllib.parse.quote("контроль_канонов"),
+                 {"apikey": env("SUPABASE_SERVICE_KEY"), "Authorization": "Bearer " + env("SUPABASE_SERVICE_KEY"),
+                  "Content-Type": "application/json"}, json.dumps({"p_часов": 1}).encode())
+    if _c == 200 and (_т or "").strip().startswith("["):
+        _нар = json.loads(_т)
+        проверки["каноны соблюдаются"] = (not _нар, "; ".join("%s: %s (%s)" % (x.get("проверка"), x.get("сколько"), str(x.get("пример"))[:40]) for x in _нар[:4]) if _нар else "")
+    else:
+        проверки["каноны соблюдаются"] = (False, "база ответила кодом %s" % _c)
+except Exception as e:
+    проверки["каноны соблюдаются"] = (False, "спросить не вышло: %s" % str(e)[:60])
+
 стало = {k: bool(v[0]) for k, v in проверки.items()}
 os.makedirs(os.path.dirname(СОСТОЯНИЕ), exist_ok=True)
 json.dump(стало, open(СОСТОЯНИЕ, 'w'), ensure_ascii=False)
