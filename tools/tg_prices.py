@@ -426,10 +426,10 @@ def main():
     # только если документ в канале НОВЕЕ. Дата прайса на Диске — из выгрузки «материалы_проекта».
     диск = {}
     try:
-        mat, _ = sb(urllib.parse.quote('материалы_проекта') + '?select=project_key,name,modified&' + urllib.parse.quote('ошибка') + '=is.null')
+        mat, _ = sb(urllib.parse.quote('материалы_проекта') + '?select=project_key,name,modified,' + urllib.parse.quote('дата_документа') + '&' + urllib.parse.quote('ошибка') + '=is.null')
         for m in mat:
             if re.search(r'(price|прайс|availab|stock)', m.get('name') or '', re.I) and m.get('modified'):
-                d = m['modified'][:10]
+                d = (m.get('дата_документа') or m['modified'])[:10]   # дата в самом документе главнее даты файла
                 if d > диск.get(m['project_key'], ''):
                     диск[m['project_key']] = d
     except Exception as ex:
