@@ -59,7 +59,7 @@ def main():
             waiting.append(changed.pop().replace('→', 'против'))
         elif 'РАСПРОДАНО' in line:
             soldout.append('• %s — застройщик пишет SOLD OUT' % line.split()[0])
-        elif 'прайса нет' in line:
+        elif 'прайса нет' in line or 'диск главнее' in line:   # 01.10 канон №126: Диск приоритет
             nolist.append(line.split()[0])
         elif 'канала нет' in line:
             nochan.append(line.split()[0])

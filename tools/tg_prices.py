@@ -422,6 +422,18 @@ def main():
     if ONLY:
         rows = [r for r in rows if r['plp_property_id'] in ONLY]
     known = sources(env)
+    # 01.10.2026 канон №126: Google Диск застройщика — официальный приоритет, канал дополняет,
+    # только если документ в канале НОВЕЕ. Дата прайса на Диске — из выгрузки «материалы_проекта».
+    диск = {}
+    try:
+        mat, _ = sb(urllib.parse.quote('материалы_проекта') + '?select=project_key,name,modified&' + urllib.parse.quote('ошибка') + '=is.null')
+        for m in mat:
+            if re.search(r'(price|прайс|availab|stock)', m.get('name') or '', re.I) and m.get('modified'):
+                d = m['modified'][:10]
+                if d > диск.get(m['project_key'], ''):
+                    диск[m['project_key']] = d
+    except Exception as ex:
+        print('[даты прайсов Диска не прочитались: %s — канал пишет как раньше]' % str(ex)[:60])
     data = asyncio.run(collect(rows, known))
     money = lambda v: f'{v:,}'.replace(',', ' ') + ' ฿'
     changed = 0
@@ -438,6 +450,10 @@ def main():
         # в прайсе одна свободная вилла, а через месяц канал написал SOLD OUT)
         if s and e.get('soldout') and e.get('as_of') and e['soldout'] > e['as_of']:
             s = None
+        if s and диск.get(pid) and e.get('as_of') and диск[pid] >= e['as_of']:
+            print('%-20s %-24s диск главнее: прайс на Диске от %s, в канале от %s — канал не пишу'
+                  % (pid, e['channel'][:24], диск[pid], e['as_of']))
+            continue
         if not s:
             note = 'РАСПРОДАНО' if e.get('soldout') else 'прайса нет'
             print('%-20s %-34s %s%s' % (pid, e['channel'][:34], note,
