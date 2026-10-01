@@ -219,7 +219,10 @@ def handle(M, code, ak, apply):
         print('      файл не сохранился:', str(e)[:70])
     rows = req('GET', 'client_objects?select=id,purchase_price,handover_on,payment_plan,note&object_id=eq.' + code) or []
     for row in rows:
-        patch = {'note': ((row.get('note') or '') + '\nДоговор из почты: ' + fn).strip()}
+        # 01.10.2026: каждый повторный запуск дописывал ту же строку — у A24 она стояла 5 раз, всего в 13 карточках
+        _note = row.get('note') or ''
+        _line = 'Договор из почты: ' + fn
+        patch = {'note': _note if _line in _note else (_note + '\n' + _line).strip()}
         if f.get('purchase_price'):
             patch['purchase_price'] = f['purchase_price']
             patch['currency'] = f.get('currency') or 'THB'
