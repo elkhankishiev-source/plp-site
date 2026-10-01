@@ -432,6 +432,10 @@ def main():
         role = (pr[0].get('contact_role') if pr else None) or 'lead'
         if role == 'lead':
             continue
+        # 01.10.2026: правило «не мучить застройщиков» снимало вызов «на связи» живой Дарье (role=internal,
+        # agent=owner_task) как «уже писали за 30 дней». Свои и поручения владельца — не касание, их не трогаем.
+        if role == 'internal' or (t.get('agent') or '') == 'owner_task':
+            continue
         who = (pr[0].get('name') if pr and pr[0].get('name') else t['phone'])
         why = None
         if (t.get('kind') or '') in ('cold', 'silence'):
