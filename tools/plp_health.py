@@ -308,7 +308,42 @@ try:
 except Exception as e:
     проверки["каноны соблюдаются"] = (False, "спросить не вышло: %s" % str(e)[:60])
 
-стало = {k: bool(v[0]) for k, v in проверки.items()}
+# 5) 01.10.2026. Эльнур: «как бы ты организовал?» — каждая труба со сторожем, который кричит сам.
+#    Сторож цен две недели падал молча, у Aileen 32 фото из 35 были битые, вызовы шли не туда — никто не сказал.
+_SB = env("SUPABASE_URL").rstrip("/") + "/rest/v1/"
+_SH = {"apikey": env("SUPABASE_SERVICE_KEY"), "Authorization": "Bearer " + env("SUPABASE_SERVICE_KEY")}
+try:
+    import random, re
+    _c, _т = код(_SB + "objects?select=main_image_url&on_site=eq.true&main_image_url=not.is.null", _SH)
+    _все = [x["main_image_url"] for x in json.loads(_т or "[]")] if _c == 200 else []
+    _плохо = []
+    for _u in random.sample(_все, min(8, len(_все))):
+        _i = _u.find("/storage/v1/object/public/object-media/")
+        if _i >= 0:   # так же, как сборка сайта (build/gen.mjs, thumbUrl): адрес Supabase → R2 760
+            _u = "https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/" + re.sub(r"\.(jpg|jpeg|png|webp)$", "", _u[_i + 39:].split("?")[0], flags=re.I) + "-760.webp"
+        _к, _ = код(_u, {"Range": "bytes=0-50", "User-Agent": "curl/8"}, timeout=20)
+        if _к not in (200, 206):
+            _плохо.append("%s %s" % (_к, _u[-50:]))
+    проверки["фото сайта открываются"] = (bool(_все) and not _плохо, "; ".join(_плохо[:3]) if _плохо else ("" if _все else "карточки не прочитались"))
+except Exception as e:
+    проверки["фото сайта открываются"] = (False, "проверить не вышло: %s" % str(e)[:60])
+try:
+    _c, _т = код(_SB + "objects?select=last_synced_at&on_site=eq.true&order=last_synced_at.desc.nullslast&limit=1", _SH)
+    _посл = (json.loads(_т or "[{}]") or [{}])[0].get("last_synced_at") if _c == 200 else None
+    _дней = (time.time() - __import__("datetime").datetime.fromisoformat(_посл.replace("Z", "+00:00")).timestamp()) / 86400 if _посл else 99
+    проверки["цены сверялись за неделю"] = (_дней < 8.5, "последняя сверка %.1f дн. назад" % _дней)
+except Exception as e:
+    проверки["цены сверялись за неделю"] = (False, "проверить не вышло: %s" % str(e)[:60])
+try:
+    _c, _т = код(_SB + urllib.parse.quote("вызовы_тг") + "?select=id&sent_at=is.null&created_at=lt." +
+                 urllib.parse.quote(time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(time.time() - 300))) +
+                 "&created_at=gt." + urllib.parse.quote(time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(time.time() - 86400))), _SH)
+    _висят = len(json.loads(_т or "[]")) if _c == 200 else -1
+    проверки["вызовы в Telegram уходят"] = (_висят == 0, "" if _висят == 0 else ("висят %d" % _висят if _висят > 0 else "база ответила кодом %s" % _c))
+except Exception as e:
+    проверки["вызовы в Telegram уходят"] = (False, "проверить не вышло: %s" % str(e)[:60])
+
+стало ={k: bool(v[0]) for k, v in проверки.items()}
 os.makedirs(os.path.dirname(СОСТОЯНИЕ), exist_ok=True)
 json.dump(стало, open(СОСТОЯНИЕ, 'w'), ensure_ascii=False)
 
