@@ -1,5 +1,5 @@
 {
- "updated": "2026-09-25",
+ "updated": "2026-10-01",
  "items": [
   {
    "id": "INTAKE-BOTANICA",
@@ -211,7 +211,7 @@
    "name": "AYANA Heights Seaview Residences",
    "district": "Лаян",
    "type": "Кондо",
-   "price_from": 8368435,
+   "price_from": 5426101,
    "units": [
     {
      "beds": 1,
@@ -600,7 +600,7 @@
     {
      "beds": 1,
      "code": "2204",
-     "free": 57,
+     "free": 56,
      "name": "1 спальня",
      "area_sqm": 54,
      "price_from_thb": 10010000,
@@ -706,22 +706,22 @@
    "name": "The Title Biancana Surin",
    "district": "Сурин",
    "type": "Кондо",
-   "price_from": 6115200,
+   "price_from": 6617100,
    "units": [
     {
      "beds": 1,
      "code": "1BM",
-     "free": 1,
+     "free": 3,
      "name": "1 спальня",
      "area_sqm": 31,
-     "price_from_thb": 6115200,
+     "price_from_thb": 6617100,
      "area": 31,
-     "from": 6115200
+     "from": 6617100
     },
     {
      "beds": 1,
      "code": null,
-     "free": 13,
+     "free": 9,
      "name": "1 спальня",
      "area_sqm": 39,
      "price_from_thb": 7379400,
@@ -1135,67 +1135,47 @@
    "name": "Fantasy Plus Rawai",
    "district": "Равай",
    "type": "Кондо",
-   "price_from": 3570000,
+   "price_from": 2996000,
    "units": [
     {
-     "beds": 1,
+     "beds": null,
+     "code": null,
+     "free": 56,
+     "name": "Планировка",
+     "area_sqm": 28,
+     "price_from_thb": 2996000,
+     "area": 28,
+     "from": 2996000
+    },
+    {
+     "beds": null,
      "code": null,
      "free": 1,
-     "name": "1 спальня",
-     "area_sqm": 32,
-     "price_from_thb": 3570000,
-     "area": 32,
-     "from": 3570000
+     "name": "Планировка",
+     "area_sqm": 55,
+     "price_from_thb": 6272000,
+     "area": 55,
+     "from": 6272000
     },
     {
-     "beds": 1,
+     "beds": null,
      "code": null,
-     "free": 1,
-     "name": "1 спальня",
-     "area_sqm": 33,
-     "price_from_thb": 3570000,
-     "area": 33,
-     "from": 3570000
-    },
-    {
-     "beds": 1,
-     "code": null,
-     "free": 60,
-     "name": "1 спальня",
-     "area_sqm": 34,
-     "price_from_thb": 3570000,
-     "area": 34,
-     "from": 3570000
-    },
-    {
-     "beds": 1,
-     "code": null,
-     "free": 1,
-     "name": "1 спальня",
-     "area_sqm": 35,
-     "price_from_thb": 3570000,
-     "area": 35,
-     "from": 3570000
-    },
-    {
-     "beds": 2,
-     "code": null,
-     "free": 59,
-     "name": "2 спальни",
-     "area_sqm": 52,
-     "price_from_thb": 5460000,
-     "area": 52,
-     "from": 5460000
-    },
-    {
-     "beds": 2,
-     "code": null,
-     "free": 1,
-     "name": "2 спальни",
+     "free": 85,
+     "name": "Планировка",
      "area_sqm": 56,
-     "price_from_thb": 5720000,
+     "price_from_thb": 5992000,
      "area": 56,
-     "from": 5720000
+     "from": 5992000
+    },
+    {
+     "beds": null,
+     "code": null,
+     "free": 17,
+     "name": "Планировка",
+     "area_sqm": 92,
+     "price_from_thb": 9844000,
+     "area": 92,
+     "from": 9844000
     }
    ]
   },
@@ -1520,7 +1500,7 @@
    "name": "The Title Katabello",
    "district": "Ката",
    "type": "Кондо",
-   "price_from": 4620000,
+   "price_from": 4851000,
    "units": [
     {
      "beds": 1,
@@ -1528,9 +1508,9 @@
      "free": 15,
      "name": "1 спальня",
      "area_sqm": 37,
-     "price_from_thb": 5550000,
+     "price_from_thb": 5827500,
      "area": 37,
-     "from": 5550000
+     "from": 5827500
     },
     {
      "beds": 1,
@@ -1538,9 +1518,9 @@
      "free": 28,
      "name": "1 спальня",
      "area_sqm": 47,
-     "price_from_thb": 6956000,
+     "price_from_thb": 7303800,
      "area": 47,
-     "from": 6956000
+     "from": 7303800
     },
     {
      "beds": 1,
@@ -1548,9 +1528,9 @@
      "free": 89,
      "name": "1 спальня",
      "area_sqm": 56,
-     "price_from_thb": 8512000,
+     "price_from_thb": 8937600,
      "area": 56,
-     "from": 8512000
+     "from": 8937600
     },
     {
      "beds": 1,
@@ -1558,9 +1538,9 @@
      "free": 13,
      "name": "1 спальня",
      "area_sqm": 61,
-     "price_from_thb": 10126000,
+     "price_from_thb": 10632300,
      "area": 61,
-     "from": 10126000
+     "from": 10632300
     },
     {
      "beds": 2,
@@ -1568,9 +1548,9 @@
      "free": 2,
      "name": "Пентхаус · 2 спальни",
      "area_sqm": 121,
-     "price_from_thb": 17666000,
+     "price_from_thb": 18549300,
      "area": 121,
-     "from": 17666000
+     "from": 18549300
     },
     {
      "beds": 2,
@@ -1578,9 +1558,9 @@
      "free": 1,
      "name": "Пентхаус · 2 спальни",
      "area_sqm": 129,
-     "price_from_thb": 18963000,
+     "price_from_thb": 19911150,
      "area": 129,
-     "from": 18963000
+     "from": 19911150
     },
     {
      "beds": 3,
@@ -1588,9 +1568,9 @@
      "free": 1,
      "name": "Пентхаус · 3 спальни",
      "area_sqm": 100,
-     "price_from_thb": 13300000,
+     "price_from_thb": 13965000,
      "area": 100,
-     "from": 13300000
+     "from": 13965000
     },
     {
      "beds": 3,
@@ -1598,9 +1578,9 @@
      "free": 1,
      "name": "Пентхаус · 3 спальни",
      "area_sqm": 125,
-     "price_from_thb": 18375000,
+     "price_from_thb": 19293750,
      "area": 125,
-     "from": 18375000
+     "from": 19293750
     },
     {
      "beds": 3,
@@ -1608,9 +1588,9 @@
      "free": 1,
      "name": "Пентхаус · 3 спальни",
      "area_sqm": 129,
-     "price_from_thb": 16770000,
+     "price_from_thb": 17608500,
      "area": 129,
-     "from": 16770000
+     "from": 17608500
     },
     {
      "beds": 3,
@@ -1618,9 +1598,9 @@
      "free": 1,
      "name": "Пентхаус · 3 спальни",
      "area_sqm": 138,
-     "price_from_thb": 20286000,
+     "price_from_thb": 21300300,
      "area": 138,
-     "from": 20286000
+     "from": 21300300
     }
    ]
   },
@@ -1861,7 +1841,7 @@
    "name": "MORI The Valley",
    "district": "Банг Тао",
    "type": "Вилла",
-   "price_from": 16670000,
+   "price_from": 16970000,
    "units": []
   },
   {
