@@ -65,7 +65,7 @@ def main():
             nochan.append(line.split()[0])
 
     if APPLY and nolist:
-        d = run([PY3, os.path.join(ROOT, 'tools', 'drive_pull.py'), '--price', '--apply'] + nolist[:12])
+        d = run([PY3, os.path.join(ROOT, 'tools', 'drive_pull.py'), '--price', '--apply'] + (nolist + nochan)[:40])  # 01.10 канон №126: без канала — Диск основной источник
         pid = None
         for line in d.splitlines():
             if line.startswith('PLP') or line.startswith('INTAKE') or line.startswith('RESALE'):
