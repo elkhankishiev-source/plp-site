@@ -43,6 +43,11 @@ VPS = 'root@' + open(os.path.expanduser('~/.plp_vps_ip')).read().strip()
     # команды уроков написаны с его точки зрения (~/plp-site, ssh на VPS).
     # На сервер кладём копию, чтобы истина была в репозитории, а не только тут.
     'uroki_runner.py':      '/opt/plp-tools/uroki_runner.py',
+    # 01.10.2026: серверные помощники дня (досылка, план и итог дня, вызовы в Telegram) жили только на VPS.
+    'dosylka.py':           '/opt/plp-tools/dosylka.py',
+    'plan_day.py':          '/opt/plp-tools/plan_day.py',
+    'itog_day.py':          '/opt/plp-tools/itog_day.py',
+    'zvat_tg.py':           '/opt/plp-tools/zvat_tg.py',
 }
 # Чем проверить, что выложенное живо. Пусто — значит только синтаксис.
 ПРОБА = {
