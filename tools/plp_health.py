@@ -277,6 +277,23 @@ if os.path.exists(СОСТОЯНИЕ):
         было = {}
 было = {k: v for k, v in было.items() if not str(k).startswith('_')} | \
         ({'_когда_сообщали': было.get('_когда_сообщали')} if isinstance(было, dict) and было.get('_когда_сообщали') else {})
+# 3) 30.09.2026. Живой сторож «человек написал — ответа нет». 29.09 мозг отвечал, а ответы терялись
+#    по дороге (заглушка по словам, не тот канал у привратника, правило повтора), и ни один сторож
+#    этого не видел: уроки проверяются раз в сутки и тонут в общей красной строке. Отдельная проверка,
+#    каждые 10 минут, с номерами — чтобы о молчании узнавать от сторожа, а не от клиента.
+try:
+    _c, _т = код(env("SUPABASE_URL").rstrip("/") + "/rest/v1/rpc/" + urllib.parse.quote("без_ответа"),
+                 {"apikey": env("SUPABASE_SERVICE_KEY"), "Authorization": "Bearer " + env("SUPABASE_SERVICE_KEY"),
+                  "Content-Type": "application/json"}, json.dumps({"p_часов": 3}).encode())
+    if _c == 200 and (_т or "").strip().startswith("["):
+        _молчим = json.loads(_т)
+        проверки["все получили ответ"] = (not _молчим, ("без ответа %d: " % len(_молчим)
+            + "; ".join("%s %s" % (x.get("phone"), str(x.get("текст"))[:30]) for x in _молчим[:3])) if _молчим else "")
+    else:
+        проверки["все получили ответ"] = (False, "база ответила кодом %s" % _c)
+except Exception as e:
+    проверки["все получили ответ"] = (False, "спросить не вышло: %s" % str(e)[:60])
+
 стало = {k: bool(v[0]) for k, v in проверки.items()}
 os.makedirs(os.path.dirname(СОСТОЯНИЕ), exist_ok=True)
 json.dump(стало, open(СОСТОЯНИЕ, 'w'), ensure_ascii=False)
