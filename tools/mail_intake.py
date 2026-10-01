@@ -150,6 +150,13 @@ def unit_map():
     Письма от застройщиков почти всегда называют юнит в теме: F-607, C-408, MBD103,
     KKF702. Это надёжнее почты отправителя: адрес может быть чужой, номер юнита — нет."""
     rows = rest('/rest/v1/client_objects?select=client_id,object_id,unit,project_name,rel&limit=500')
+    # 01.10.2026 канон №126: другие имена проекта (фазы) — K504 «Park Residences 2» это Gardens of Eden
+    ал = rest('/rest/v1/' + urllib.parse.quote('псевдонимы_проектов') + '?select=project_name,' + urllib.parse.quote('псевдоним'))
+    псевд = {}
+    for x in (ал if isinstance(ал, list) else []):
+        псевд.setdefault(x['project_name'], []).append(x.get('псевдоним') or '')
+    for r in (rows if isinstance(rows, list) else []):
+        r['_имена'] = [str(r.get('project_name') or '')] + псевд.get(r.get('project_name'), [])
     m = {}
     for r in (rows if isinstance(rows, list) else []):
         u = re.sub(r'[^A-Za-z0-9]', '', str(r.get('unit') or '')).upper()
@@ -172,7 +179,8 @@ def find_unit(text, umap):
         for r in rs:
             words = [w for w in re.findall(r'[A-Za-z]{5,}', str(r.get('project_name') or ''))
                      if w.lower() not in ('title', 'villa', 'villas', 'residence', 'residences', 'phuket')]
-            if any(w.lower() in low for w in words):
+            фразы = [x.lower() for x in r.get('_имена', [])[1:] if x]   # псевдоним целиком: «park residences»
+            if any(w.lower() in low for w in words) or any(x in low for x in фразы):
                 return r
     for mt in UNIT_RX.finditer(text or ''):
         key = (mt.group(1) + mt.group(2)).upper()
