@@ -134,6 +134,36 @@ class Store:
         return self.url + '/storage/v1/object/public/' + BUCKET + '/' + key
 
 
+R2_PUBLIC = 'https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/'
+_r2 = None
+
+
+def to_r2(key, data):
+    """01.10.2026: сайт с 19.09 берёт фото из Cloudflare R2 (build/gen.mjs, thumbUrl: <путь>-760/-1600.webp),
+    а этот инструмент продолжал лить только в Supabase — у Aileen 32 фото из 35 были битые на живом сайте.
+    Кладём в R2 оба размера сразу. Уже лежит — не трогаем. Не вышло — падаем громко, не молча."""
+    global _r2
+    import io
+    from PIL import Image
+    base = key.rsplit('.', 1)[0]
+    try:
+        urllib.request.urlopen(urllib.request.Request(R2_PUBLIC + base + '-760.webp',
+                               headers={'Range': 'bytes=0-50', 'User-Agent': 'curl/8'}), timeout=20)
+        return
+    except Exception:
+        pass
+    if _r2 is None:
+        import boto3
+        c = json.load(open(os.path.expanduser('~/.plp_r2.json')))
+        _r2 = (boto3.client('s3', endpoint_url=c['endpoint'], aws_access_key_id=c['access_key_id'],
+                            aws_secret_access_key=c['secret_access_key'], region_name='auto'), c['bucket'])
+    im = Image.open(io.BytesIO(data)).convert('RGB')
+    for w, suf in ((760, '-760'), (1600, '-1600')):
+        cp = im.copy(); cp.thumbnail((w, w)); buf = io.BytesIO(); cp.save(buf, 'WEBP', quality=80, method=5)
+        _r2[0].put_object(Bucket=_r2[1], Key=base + suf + '.webp', Body=buf.getvalue(), ContentType='image/webp',
+                          CacheControl='public, max-age=31536000, immutable')
+
+
 def kind_of(path: pathlib.Path, forced=None):
     if forced: return forced
     parent = path.parent.name.lower()
@@ -289,6 +319,7 @@ def main():
                 url = st.url + '/storage/v1/object/public/' + BUCKET + '/' + key
             else:
                 url = st.put(key, small, mime)
+            to_r2(key, small)
             added[k].append(url)
         print('  %-16s %d файлов' % (KINDS[k][0], len(added[k])))
 
