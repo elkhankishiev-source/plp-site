@@ -2465,6 +2465,26 @@
    ]
   },
   {
+   "id": "PLP-VIVI-A304",
+   "pub": "PLP-VIVI-R3",
+   "url": "https://property-library.com/object/vivi-r3",
+   "name": "The Title VIVI · квартира",
+   "district": "Банг Тао",
+   "type": "Кондо",
+   "price_from": 4300000,
+   "units": []
+  },
+  {
+   "id": "PLP-VIVI-A507",
+   "pub": "PLP-VIVI-R5",
+   "url": "https://property-library.com/object/vivi-r5",
+   "name": "The Title VIVI · квартира",
+   "district": "Банг Тао",
+   "type": "Кондо",
+   "price_from": 4300000,
+   "units": []
+  },
+  {
    "id": "PLP-ZENITHY",
    "pub": "PLP-ZENITHY",
    "url": "https://property-library.com/object/zenithy",

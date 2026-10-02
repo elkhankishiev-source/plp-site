@@ -709,6 +709,12 @@ function saleGroup(o) {
   }
   if (st === 'ready' || /готов|ready|заселени/.test(st)) return 'ready';
   if (isBuild) return 'construction';
+  /* 02.10.2026 Эльнур: «старт продаж можно убрать спустя наверное полгода; если прошёл год — точно не старт».
+     Bellaguna почти год висела «стартом продаж». Известна дата старта и прошло больше полугода — «строится». */
+  if (isPre && o.sale_started_on) {
+    const sd = new Date(o.sale_started_on);
+    if (!isNaN(sd) && (new Date() - sd) / 86400000 > 183) return 'construction';
+  }
   if (isPre) return 'presale';
   /* 08.09: стадия не заполнена — «готово» из одной даты не выводим.
      Пустая стадия честнее догадки. */
@@ -1232,13 +1238,16 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
   if (rr && (rr.night || rr.month)) {
     const part = (lo, hi, unit) => !lo ? '' :
       ((hi && hi > lo) ? money(lo) + ' — ' + money(hi) : 'от ' + money(lo)) + ' ' + unit;
-    const main = part(rr.night, rr.nightMax, 'за ночь') || part(rr.month, rr.monthMax, 'в месяц');
-    const second = (rr.night && rr.month) ? part(rr.month, rr.monthMax, 'в месяц') : '';
+    /* 02.10.2026 Эльнур (и 25.09): «не пишем сдаём на сутки или не сдаём на сутки, просто даты и цена от;
+       рискованные термины обходим». Ни «за ночь», ни «в месяц», ни «от N ночей»: одна цена «от» и даты. */
+    const lo0 = rr.night || rr.month;
+    const main = lo0 ? 'от ' + money(lo0) : '';
+    const second = 'точная цена на ваши даты';
     /* откуда цена: факт по нашим договорам подписи не требует, ориентир по чужим
        объявлениям и ставка проекта — обязаны её иметь */
     const lvl = rr.rateLevel === 'market' ? ('ориентир по объявлениям' + (rr.rateAsOf ? ' · ' + rr.rateAsOf.slice(0, 7).split('-').reverse().join('.') : ''))
               : rr.rateLevel === 'owner' ? 'ставка по проекту' : '';
-    const note = [second, rr.minNights ? ('от ' + rr.minNights + ' ночей') : '', lvl].filter(Boolean).join(' · ');
+    const note = [second, lvl].filter(Boolean).join(' · ');
     rentLine = '<div class="price">' + htmlEsc(main) +
       (note ? '<small>' + htmlEsc(note) + '</small>' : '') + '</div>';
   }
@@ -2339,7 +2348,7 @@ export function buildSectionPages(indexHtml) {
       h1: 'Аренда жилья на Пхукете',
       intro: 'Виллы и апартаменты для жизни и отдыха. Подберём под даты и бюджет, встретим и заселим.',
       title: 'Аренда виллы или апартаментов на Пхукете | Property Library',
-      desc: 'Долгосрочная аренда вилл и апартаментов на Пхукете. Свободные объекты по датам, трансфер, уборка, помощь на месте.' },
+      desc: 'Аренда вилл и апартаментов на Пхукете. Свободные объекты по датам, трансфер, уборка, помощь на месте.' },
   ];
   const written = [];
   for (const p of pages) {
