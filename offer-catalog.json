@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-01",
+ "updated": "2026-10-02",
  "items": [
   {
    "id": "INTAKE-BOTANICA",
@@ -1056,7 +1056,7 @@
    "name": "Gardens of Eden",
    "district": "Банг Тао",
    "type": "Кондо",
-   "price_from": null,
+   "price_from": 11904800,
    "units": []
   },
   {
@@ -1888,7 +1888,7 @@
    "name": "Villa Qabalah",
    "district": "Таланг",
    "type": "Вилла",
-   "price_from": null,
+   "price_from": 20000000,
    "units": [
     {
      "beds": 2,
