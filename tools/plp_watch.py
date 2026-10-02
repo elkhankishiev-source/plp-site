@@ -191,7 +191,7 @@ def feed():
     text = '💬 Что пишут и как реагируем\n\n' + '\n\n'.join(lines[:8])
     print(text)
     if SEND:
-        tg_owner(text)
+        tg('TG_ALERT_CHAT_ID', text)   # 02.10.2026 Эльнур: «отдел продаж — работа над лидами с командой»; в личке это дублировало вызовы «лид ответил»
     return 0
 
 
