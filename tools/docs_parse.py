@@ -18,12 +18,20 @@
     python3 tools/docs_parse.py --apply         # разобрать
     python3 tools/docs_parse.py --apply --id 46 # один документ
     python3 tools/docs_parse.py --apply --limit 5
+    python3 tools/docs_parse.py --рождение [--id 46] [--apply]   # 02.10: перечитать договоры ради даты рождения
+
+02.10.2026 Эльнур: «дни рождения поздравлять от лица компании… можно из паспортов либо ещё как-то».
+Паспортов в базе нет, а в договорах застройщиков рядом с покупателем часто стоят дата рождения и
+гражданство. Берём только написанное; номер паспорта не берём — для поздравления он не нужен.
+Режим --рождение дописывает в готовый разбор ТОЛЬКО buyer_birth_date и buyer_nationality,
+остальной разбор (уже сверенный) не трогает.
 """
 import base64, json, os, sys, urllib.error, urllib.parse, urllib.request
 
 APPLY = '--apply' in sys.argv
 ОДИН = int(sys.argv[sys.argv.index('--id') + 1]) if '--id' in sys.argv else None
 ПРЕДЕЛ = int(sys.argv[sys.argv.index('--limit') + 1]) if '--limit' in sys.argv else 40
+РОЖДЕНИЕ = '--рождение' in sys.argv
 BUCKET = 'client-docs'
 # 32 МБ — потолок вложения у модели; крупнее пропускаем с честной пометкой
 ПОТОЛОК = 30 * 1024 * 1024
@@ -34,6 +42,7 @@ BUCKET = 'client-docs'
  'Верни СТРОГО JSON, без пояснений вокруг:\n'
  '{"project":"","unit":"","buyer":"","developer":"","price":null,"currency":"THB",'
  '"area_sqm":null,"bedrooms":null,"contract_date":"YYYY-MM-DD","handover_date":"YYYY-MM-DD",'
+ '"buyer_birth_date":"YYYY-MM-DD","buyer_nationality":"",'
  '"stage":"","payments":[{"date":"YYYY-MM-DD","note":"","amount":0,"percent":null,"paid":false}],'
  '"summary":"","confidence":"high|medium|low"}\n\n'
  'Правила:\n'
@@ -42,6 +51,8 @@ BUCKET = 'client-docs'
  '• В котировке (quotation) цена бывает до скидки: если видно и то и другое, бери итоговую.\n'
  '• payments — все этапы графика. paid=true только если в документе прямо отмечено, что оплачено.\n'
  '• Комиссию агентства в payments не переноси.\n'
+ '• buyer_birth_date и buyer_nationality — только если прямо написаны у покупателя (обычно рядом с паспортом). '
+ 'Номер паспорта НЕ выписывай. Нет в документе — null.\n'
  '• summary — одно-два предложения по-русски: что это за документ и о чём он.\n'
  '• confidence low ставь, если текст не читается или документ не про конкретный юнит.'
 )
@@ -93,7 +104,15 @@ def скачать(storage_key):
     r = urllib.request.Request(url, headers={'apikey': E['SUPABASE_SERVICE_KEY'],
                                              'Authorization': 'Bearer ' + E['SUPABASE_SERVICE_KEY']})
     with urllib.request.urlopen(r, timeout=180) as f:
-        return f.read()
+        данные = f.read()
+    # 02.10.2026: часть файлов сценарий n8n сохранил не байтами, а записью {"type":"Buffer","data":[…]}.
+    # Модель отвечала «The PDF specified was not valid». Распаковываем; сам файл в хранилище не трогаем.
+    if данные[:16].startswith(b'{"type":"Buffer"'):
+        try:
+            данные = bytes(json.loads(данные.decode()).get('data') or [])
+        except Exception:
+            pass
+    return данные
 
 
 def спросить(данные, mime, подсказка, ak):
@@ -127,7 +146,36 @@ def спросить(данные, mime, подсказка, ak):
     return json.loads(t[t.find('{'):t.rfind('}') + 1])
 
 
+def рождение():
+    """02.10.2026: перечитать уже разобранные договоры и дописать только дату рождения и гражданство."""
+    усл = ('/client_docs?kind=eq.contract&status=eq.parsed&select=id,client_id,file_name,object_id,mime,size_bytes,storage_key,parsed'
+           + ('&id=eq.%d' % ОДИН if ОДИН else '') + '&order=id')
+    очередь = [д for д in sb(усл) if 'buyer_birth_date' not in (д.get('parsed') or {})][:ПРЕДЕЛ]
+    print('договоров перечитать: %d%s\n' % (len(очередь), '' if APPLY else ' (без записи: --apply)'))
+    ak = ключ_модели()
+    нашлось = 0
+    for д in очередь:
+        if (д.get('size_bytes') or 0) > ПОТОЛОК:
+            print('  ⤬ %s: крупнее 30 МБ' % д['id']); continue
+        try:
+            р = спросить(скачать(д['storage_key']), д.get('mime') or 'application/pdf',
+                         'Нужны только buyer, buyer_birth_date и buyer_nationality. Остальные поля можно null.', ak)
+        except Exception as e:
+            print('  ✗ %s: %s' % (д['id'], str(e)[:150])); continue
+        дата, гр = р.get('buyer_birth_date'), р.get('buyer_nationality')
+        if дата: нашлось += 1
+        print('  %s %-6s %-30s дата рождения: %s · гражданство: %s' % ('✓' if дата else '·', д['id'],
+              str(д.get('file_name'))[:30], 'есть' if дата else 'нет в договоре', гр or '—'))
+        if APPLY:
+            новый = dict(д.get('parsed') or {}); новый['buyer_birth_date'] = дата; новый['buyer_nationality'] = гр
+            sb('/client_docs?id=eq.%d' % д['id'], 'PATCH', {'parsed': новый})
+    print('\nс датой рождения: %d из %d' % (нашлось, len(очередь)))
+    return 0
+
+
 def main():
+    if РОЖДЕНИЕ:
+        return рождение()
     усл = '/client_docs?status=eq.new&select=id,kind,file_name,object_id,mime,size_bytes,storage_key'
     if ОДИН:
         усл = '/client_docs?id=eq.%d&select=id,kind,file_name,object_id,mime,size_bytes,storage_key' % ОДИН
