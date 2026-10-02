@@ -41,6 +41,7 @@ def tg(text):
 
 def main():
     changed, waiting, soldout, nolist, nochan = [], [], [], [], []
+    замок = []   # 02.10.2026: правки, которые не пустил замок цифр (одобрено Эльнуром / документ старше)
     args = [PY3, os.path.join(ROOT, 'tools', 'tg_prices.py')] + (['--apply'] if APPLY else [])
     out = run(args)
     # 01.10.2026: запись Katabello отбилась 409, tg_prices упал, а отчёт написал «обновлено: 6».
@@ -57,6 +58,8 @@ def main():
             changed.append(cur)
         elif 'не записываю' in line and changed:
             waiting.append(changed.pop().replace('→', 'против'))
+        elif '⛔' in line and changed:
+            changed.pop(); замок.append('•' + line.split('⛔', 1)[1][:260])
         elif 'РАСПРОДАНО' in line:
             soldout.append('• %s — застройщик пишет SOLD OUT' % line.split()[0])
         elif 'прайса нет' in line or 'диск главнее' in line:   # 01.10 канон №126: Диск приоритет
@@ -72,6 +75,8 @@ def main():
                 pid = line.split(' ')[0]
             if '✓ записано' in line and pid:
                 changed.append('• %s: цена обновлена с Диска' % pid)
+            if '⛔' in line and 'замок:' in line:
+                замок.append('•' + line.split('⛔', 1)[1][:260])
             if '⚠ не записываю' in line and pid:
                 waiting.append('• %s: прайс с Диска расходится больше чем на четверть' % pid)
 
@@ -81,6 +86,11 @@ def main():
     lag = run([PY3, os.path.join(ROOT, 'tools', 'laguna_prices.py'), '--fetch']
               + (['--apply'] if APPLY else []))
     for line in lag.splitlines():
+        if '⛔' in line and 'замок:' in line:
+            pz = line.split('⛔', 1)[1].strip().split(':')[0]
+            changed = [x for x in changed if not x.startswith('• %s:' % pz)]
+            замок.append('•' + line.split('⛔', 1)[1][:260])
+            continue
         m = re.match(r'(PLP-\S+)\s+(\d{4}-\d\d-\d\d)\s+(.+?฿|—)\s{2,}(.+?฿)\s+(\d+) из (\d+)', line)
         if not m:
             continue
@@ -111,6 +121,8 @@ def main():
     parts += changed[:15] if changed else ['Изменений нет.']
     if waiting:
         parts.append(''); parts.append('Спорное, не трогал:'); parts += waiting[:8]
+    if замок:
+        parts.append(''); parts.append('Замок не пустил (одобрено тобой или документ старше), не записано:'); parts += замок[:8]
     if soldout:
         parts.append(''); parts += soldout
     if nolist:

@@ -108,7 +108,18 @@ def patch(env, pid, body, src=None, date=None, kto=None):
     req = urllib.request.Request(env['SUPABASE_URL'].rstrip('/') + '/rest/v1/objects?plp_property_id=eq.' + pid,
                                  data=json.dumps(body, ensure_ascii=False).encode(), method='PATCH',
                                  headers=h)
-    urllib.request.urlopen(req, timeout=60)
+    try:
+        urllib.request.urlopen(req, timeout=60)
+        return True
+    except urllib.error.HTTPError as ex:
+        txt = ex.read().decode('utf-8', 'ignore')
+        if 'замок' in txt:
+            # 02.10.2026: замок цифр (одобрено Эльнуром или документ старше текущего) — не падаем,
+            # пишем в отчёт и идём к следующему проекту.
+            m = re.search(r'замок:[^"\\]*', txt)
+            print('     ⛔ %s: %s' % (pid, (m.group(0) if m else txt)[:300]))
+            return False
+        raise
 
 
 def parse_units(path):

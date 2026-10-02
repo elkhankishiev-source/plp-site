@@ -405,12 +405,15 @@ def price_from_drive(pid, link, tok, apply=False):
             for line in open(ENVF):
                 if '=' in line and not line.strip().startswith('#'):
                     k, v = line.strip().split('=', 1); e[k] = v.strip().strip('"').strip("'")
-            TP.patch(e, pid, {'price_from_thb': s2['from'], 'price_to_thb': s2['to'],
+            записано = TP.patch(e, pid, {'price_from_thb': s2['from'], 'price_to_thb': s2['to'],
                               'price_tiers': s2['tiers'], 'availability': 'свободно %d' % s2['avail'],
                               'last_synced_at': datetime.datetime.utcnow().isoformat() + 'Z'},
                      src='Диск застройщика: ' + str(f.get('name') or ''), date=str(f.get('modifiedTime') or '')[:10],
                      kto='drive_pull')
-            print('     ✓ записано в карточку (источник: Диск, файл от %s)' % f.get('modifiedTime', '')[:10])
+            if записано:
+                print('     ✓ записано в карточку (источник: Диск, файл от %s)' % f.get('modifiedTime', '')[:10])
+            else:
+                print('     ⛔ не записано: замок цифр (причина строкой выше)')
         return s2
     return None
 
