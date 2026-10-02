@@ -49,10 +49,16 @@ H = {'apikey': E['SUPABASE_SERVICE_KEY'], 'Authorization': 'Bearer ' + E['SUPABA
      'Content-Type': 'application/json'}
 
 
-def sb(path, method='GET', body=None):
+def sb(path, method='GET', body=None, src=None):
+    """02.10.2026: правка карточки подписывается для журнала «история_цифр» (кто и из какого документа)."""
+    import base64
+    hh = dict(H, Prefer='return=representation')
+    if method != 'GET':
+        hh['x-plp-kto'] = 'docs_apply'
+        if src: hh['x-plp-src'] = base64.b64encode(str(src)[:400].encode()).decode()
     r = urllib.request.Request(BASE + path, method=method,
                                data=json.dumps(body).encode() if body is not None else None,
-                               headers=dict(H, Prefer='return=representation'))
+                               headers=hh)
     try:
         with urllib.request.urlopen(r, timeout=90) as f:
             raw = f.read().decode()
@@ -159,7 +165,8 @@ def main():
             print('     %-22s ← %s   [%s]' % (к, зн, ист))
         if APPLY:
             if правка_o:
-                sb('/objects?plp_property_id=eq.%s' % urllib.parse.quote(юнит), 'PATCH', правка_o)
+                sb('/objects?plp_property_id=eq.%s' % urllib.parse.quote(юнит), 'PATCH', правка_o,
+                   src='документ клиента: ' + str(откуда.get('handover_date') or откуда.get('bedrooms') or ''))
             if правка_co:
                 sb('/client_objects?object_id=eq.%s' % urllib.parse.quote(юнит),
                    'PATCH', правка_co)

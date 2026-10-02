@@ -199,7 +199,8 @@ def main():
                     'last_synced_at': datetime.datetime.utcnow().isoformat() + 'Z'}
             if s.get('layouts'):
                 body['unit_types'] = s['layouts']
-            TP.patch(env, pid, body)
+            TP.patch(env, pid, body, src='термшиты Banyan Group: ' + ', '.join(f for f, _, _ in used),
+                     date=as_of, kto='laguna_prices')
             changed += 1
     print('\nПрайс есть, карточки нет:')
     for name, pats in NOCARD.items():

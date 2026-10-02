@@ -407,7 +407,9 @@ def price_from_drive(pid, link, tok, apply=False):
                     k, v = line.strip().split('=', 1); e[k] = v.strip().strip('"').strip("'")
             TP.patch(e, pid, {'price_from_thb': s2['from'], 'price_to_thb': s2['to'],
                               'price_tiers': s2['tiers'], 'availability': 'свободно %d' % s2['avail'],
-                              'last_synced_at': datetime.datetime.utcnow().isoformat() + 'Z'})
+                              'last_synced_at': datetime.datetime.utcnow().isoformat() + 'Z'},
+                     src='Диск застройщика: ' + str(f.get('name') or ''), date=str(f.get('modifiedTime') or '')[:10],
+                     kto='drive_pull')
             print('     ✓ записано в карточку (источник: Диск, файл от %s)' % f.get('modifiedTime', '')[:10])
         return s2
     return None

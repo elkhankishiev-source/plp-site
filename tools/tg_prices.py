@@ -95,12 +95,19 @@ def remember_channel(env, pid, name, username):
             raise
 
 
-def patch(env, pid, body):
+def patch(env, pid, body, src=None, date=None, kto=None):
+    """02.10.2026: правка подписывается для журнала «история_цифр» — кто, откуда, от какой даты документ.
+    Заголовки x-plp-kto, x-plp-date как есть, x-plp-src в base64 (заголовок не несёт кириллицу)."""
+    import base64
     key = env['SUPABASE_SERVICE_KEY']
+    h = {'apikey': key, 'Authorization': 'Bearer ' + key,
+         'Content-Type': 'application/json', 'Prefer': 'return=minimal',
+         'x-plp-kto': ''.join(ch for ch in str(kto or os.path.basename(sys.argv[0]) or 'script') if ord(ch) < 128)[:60] or 'script'}
+    if src: h['x-plp-src'] = base64.b64encode(str(src)[:400].encode()).decode()
+    if date: h['x-plp-date'] = ''.join(ch for ch in str(date) if ord(ch) < 128)[:20]
     req = urllib.request.Request(env['SUPABASE_URL'].rstrip('/') + '/rest/v1/objects?plp_property_id=eq.' + pid,
                                  data=json.dumps(body, ensure_ascii=False).encode(), method='PATCH',
-                                 headers={'apikey': key, 'Authorization': 'Bearer ' + key,
-                                          'Content-Type': 'application/json', 'Prefer': 'return=minimal'})
+                                 headers=h)
     urllib.request.urlopen(req, timeout=60)
 
 
@@ -460,7 +467,8 @@ def main():
                                         (' (' + e['soldout'] + ')') if e.get('soldout') else ''))
             if APPLY and e.get('soldout') and str(o.get('stage')) != 'Resale':
                 patch(env, pid, {'status': 'sold', 'stage': 'Sold out',
-                                 'availability': 'У застройщика распродано. Ищем на вторичном рынке по запросу.'})
+                                 'availability': 'У застройщика распродано. Ищем на вторичном рынке по запросу.'},
+                      src='канал застройщика ' + str(e.get('channel') or ''), date=e.get('soldout'), kto='tg_prices')
                 changed += 1
             continue
         old = o.get('price_from_thb')
@@ -482,7 +490,8 @@ def main():
                     'last_synced_at': datetime.datetime.utcnow().isoformat() + 'Z'}
             if s.get('layouts'):
                 body['unit_types'] = s['layouts']
-            patch(env, pid, body)
+            patch(env, pid, body, src='канал застройщика ' + str(e.get('channel') or ''),
+                  date=e.get('as_of'), kto='tg_prices')
             changed += 1
     if APPLY:
         print('\nзаписано карточек: %d — пересобрать сайт: node build/all.mjs' % changed)
