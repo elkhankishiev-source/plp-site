@@ -35,6 +35,8 @@ MD = '--md' in sys.argv
     'admin.html': 'админка УК — служебная',
     'offer.html': 'конструктор персонального оффера',
     'vibe2.html': 'лендинг Vibe II Карон + PDF',
+    'predstart.html': 'закрытые предложения: Vibe II, KUARTZ, FIZZ (одна карточка на проект)',
+    'aileen.html': 'лендинг Aileen Residence Lagoon (PDF нет)',
     'privacy.html': 'политика конфиденциальности',
     'rules.html': 'правила',
     'terms.html': 'условия',

@@ -41,7 +41,7 @@ import urllib.request
 # Закрытые страницы: noindex, в карте сайта их нет, это предложения для своих.
 # Страницы офферов добавляются сюда по мере появления — требования к ним другие.
 ЗАКРЫТЫЕ = {'404.html', 'admin.html', 'guest.html', 'offer.html', 'owner.html',
-            'vibe2.html', 'aileen.html'}
+            'vibe2.html', 'aileen.html', 'predstart.html'}
 
 ЧЕРНОВИК = re.compile(r'\b(lorem ipsum|TODO|FIXME|XXX|заглушка|текст текст)\b', re.I)
 
