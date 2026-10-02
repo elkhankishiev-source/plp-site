@@ -442,7 +442,7 @@ function buildCatalog(objects, benchmarks, preserve) {
       saleStart: o.sale_started_on || null,
       /* короткая приписка к стадии: «сдан в декабре 2025», «2 октября —
          презентация сдачи». Эльнур: «доп отметки это прикольно» */
-      stageNote: o.stage_note || null,
+      stageNote: publicNote(o.stage_note) || null,
       desc: { ru: noContacts(usp), en: noContacts(uspEn) },
       // 02.09: то, что человек ищет глазами в первую очередь — море и застройщик.
       // Пишем только если данные есть, пустое поле карточка не рисует.
@@ -715,6 +715,14 @@ function saleGroup(o) {
   return '';
 }
 
+/* 02.10.2026. Заметка о стадии (stage_note) печаталась на витрине как есть, а в ней живут
+   рабочие приписки: «Эльнур 02.10.2026», «самого письма в наших сборщиках нет», «по термшиту…
+   подтверждаем актуальность», «перед клиентом сверить». Наружу идут только предложения без них. */
+const _ВНУТР = /Эльнур|слова\s+эльнура|сборщик|письм[а-яё]*\s+(в\s+наших|нет)|термшит|sales\s*kit|перед\s+клиент|публичных\s+карточ|подтвержда[а-яё]*\s+(актуальн|у\s+застройщ)|нашей\s+программ|наших\s+договор|\bCRM\b|amo|комисси|на\s+руки|приложить/i;
+function publicNote(t) {
+  const parts = String(t || '').split(/(?<=[.!?])\s+/).map(x => x.trim()).filter(Boolean);
+  return parts.filter(x => !_ВНУТР.test(x)).join(' ').trim();
+}
 const GROUP_RU = { presale:'старт продаж', construction:'строится', ready:'готово к заезду', resale:'перепродажа' };
 const GROUP_EN = { presale:'Pre-sale', construction:'Under construction', ready:'Ready to move in', resale:'Resale' };
 
@@ -949,7 +957,7 @@ function buildRentals(objects, preserve, ratesBy) {
       saleStart: o.sale_started_on || null,
       /* короткая приписка к стадии: «сдан в декабре 2025», «2 октября —
          презентация сдачи». Эльнур: «доп отметки это прикольно» */
-      stageNote: o.stage_note || null,
+      stageNote: publicNote(o.stage_note) || null,
       desc: { ru: noContacts(usp), en: noContacts(uspEn) },
       // 02.09: аренда тоже встаёт на карту — координаты из той же таблицы
       lat: (o.lat === 0 || o.lat) ? Number(o.lat) : null,
@@ -1199,6 +1207,19 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
   const dl = deadline(o.handover_date);
   const yr = yieldRange(benchmarks, en, o.type);
   const usp = (o.usp || '').trim();
+  /* 02.10.2026 Эльнур: «карточка аренды = описание проекта + описание юнита; карточка проекта = общее
+     описание + возможные юниты». У юнита берём текст проекта отдельным блоком. Для аренды из текста проекта
+     убираем фразы про продажу, цены и рассрочку: снимающему они не нужны. */
+  const _родитель02 = o.parent_object_id && Array.isArray(allObjects)
+    ? allObjects.find(x => x && x.plp_property_id === o.parent_object_id) : null;
+  const _продажное = /продаж|прода[её]т|рассрочк|฿|\$|(^|[^а-яё])цен[аыуе]?([^а-яё]|$)|взнос|доходн|окупа|квот/i;
+  const uspProject = (function () {
+    if (!_родитель02) return '';
+    const t = noContacts(String(_родитель02.usp || '').trim());
+    if (!t || t === usp) return '';
+    if (!/аренда|rent/i.test(String(o.purpose || ''))) return t;
+    return t.split(/(?<=[.!?])\s+/).filter(x => !_продажное.test(x)).join(' ').trim();
+  })();
   const uspEn = (o.usp_en || '').trim(); // EN-описание; секция рендерится только если непусто
   const priceTHB = o.price_from_thb;
   const money = v => new Intl.NumberFormat('ru-RU').format(Math.round(v)) + ' ฿';
@@ -1572,8 +1593,8 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
   const progressBody =
     chipRow(progressRows) +
     (bpReport ? (listOf('Сделано', bpReport.body['сделано']) + listOf('В работе', bpReport.body['в работе'])) : '') +
-    (o.stage_note && !/^(идут продажи|строится)$/i.test(String(o.stage_note).trim())
-      ? '<p>' + htmlEsc(noContacts(String(o.stage_note))) + '</p>' : '') +
+    (publicNote(o.stage_note) && !/^(идут продажи|строится)$/i.test(publicNote(o.stage_note))
+      ? '<p>' + htmlEsc(noContacts(publicNote(o.stage_note))) + '</p>' : '') +
     (bpPhotos.length
       ? '<div class="prgs">' + bpPhotos.slice(0, 6).map(u =>
           '<img src="' + htmlEsc(thumbUrl(u, 760, 74)) + '" alt="" loading="lazy" decoding="async">').join('') + '</div>'
@@ -1721,10 +1742,11 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
     { k: 'Тип', v: t.ru },
     { k: 'Спальни', v: beds },
     { k: 'Площадь', v: area },
-    { k: 'Сдача', v: dl.ru },
+    { k: 'Сдача', v: isRent ? '' : dl.ru },
     // 16.09: стадия — одной функцией saleGroup на весь сайт, иначе страница
     // объекта и карточка спорят между собой («старт продаж» против «в продаже»)
-    { k: 'Стадия', v: soldOut ? 'распродано у застройщика' :
+    /* 02.10 Эльнур: в аренде стадия, застройщик и юрлицо — лишнее, объект и так в разделе аренды */
+    { k: 'Стадия', v: isRent ? '' : soldOut ? 'распродано у застройщика' :
         (saleGroup(o) === 'resale'
           ? (String(o.stage || '') === 'Ready' || (o.handover_date && new Date(o.handover_date) < new Date())
              ? 'вторичка' : 'переуступка')
@@ -1737,10 +1759,10 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
        чтобы не отпугивать — у нас есть калькулятор». Цифра в базе одна на весь остров
        (6–12%), поэтому в чипах её больше нет: рядом стоит кнопка расчёта по юниту. */
     { k: 'До пляжа', v: distBeach },
-    { k: 'Застройщик', v: shortDev(o.developer) },
+    { k: 'Застройщик', v: isRent ? '' : shortDev(o.developer) },
     // Полное юридическое название — отдельной строкой и только если оно
     // действительно длиннее короткого: реквизиты нужны, но не вместо имени.
-    { k: 'Юридическое лицо', v: (o.developer && shortDev(o.developer) !== legalDev(o.developer)) ? legalDev(o.developer) : '' },
+    { k: 'Юридическое лицо', v: !isRent && (o.developer && shortDev(o.developer) !== legalDev(o.developer)) ? legalDev(o.developer) : '' },
   ]);
 
   return `<!doctype html>
@@ -1878,7 +1900,7 @@ if(dark) i.src='../img/brand/plp-mark-white.png';})();</script>
   <p class="loc">${htmlEsc(ru)}, Пхукет${distBeach ? ' · ' + htmlEsc(distBeach) : ''}</p>
   ${rentLine || soldOutLine || (priceFmt ? '<div class="price">от ' + htmlEsc(priceFmt) + '<small>цена по прайсу застройщика на дату сверки</small></div>' : '')}
   <div class="chips">${chips}</div>
-  ${o.stage_note ? '<p class="stgnote">' + htmlEsc(o.stage_note) + '</p>' : ''}
+  ${(!isRent && publicNote(o.stage_note)) ? '<p class="stgnote">' + htmlEsc(publicNote(o.stage_note)) + '</p>' : ''}
   ${'' /* акции на витрину не выводим — см. комментарий у promo в каталоге */}
   ${/* ЕДИНЫЙ ПОРЯДОК БЛОКОВ — канон 17.09. Эльнур: «карточка объекта и страница
         объекта расходится инфа, мы можем как-то по одному единому концепту,
@@ -1889,30 +1911,31 @@ if(dark) i.src='../img/brand/plp-mark-white.png';})();</script>
         сколько приносит → район → что похожего.
         Раньше «Об объекте» стояло ПОСЛЕ платежей, района и стройки — человек доходил
         до описания последним, отсюда «немного в кашу». */''}
-  ${usp ? '<section class="desc"><h2>Об объекте</h2><p>' + htmlEsc(noContacts(usp)) + '</p>' +
+  ${uspProject ? '<section class="desc"><h2>О проекте</h2><p>' + htmlEsc(uspProject) + '</p></section>' : ''}
+  ${usp ? '<section class="desc"><h2>' + (uspProject ? 'Об этом объекте' : 'Об объекте') + '</h2><p>' + htmlEsc(noContacts(usp)) + '</p>' +
      (uspEn ? '<details class="desc-en"><summary>In English</summary><p lang="en">' + htmlEsc(uspEn) + '</p></details>' : '') +
      '</section>' : (uspEn ? '<section class="desc" lang="en"><h2>About</h2><p>' + htmlEsc(uspEn) + '</p></section>' : '')}
   ${unitsBlock}
   ${plansBlock}
-  ${payBlock}
-  ${ownBlock}
+  ${isRent ? '' : payBlock}
+  ${isRent ? '' : ownBlock}
   ${facBlock}
-  ${progressBlock}
-  <div class="yield">
+  ${isRent ? '' : progressBlock}
+  ${isRent ? '' : `<div class="yield">
     <div class="num">${yr.low}${DASH}${yr.high}%</div>
     <div class="lbl">${yr.scope === 'district'
       ? 'Ориентир по району (' + htmlEsc(ru) + ', ' + htmlEsc(t.ru.toLowerCase()) + ')'
       : 'Ориентир по Пхукету в целом — по этому району отдельной статистики у нас пока нет'}, при активном управлении. Точный расчёт по вашему объекту делает специалист.</div>
-  </div>
+  </div>`}
   ${areaBlock}
   ${materials}
   <div class="cta">
     <a class="btn primary" href="${htmlEsc(backLink)}&ask=1">Задать вопрос по объекту</a>
-    <a class="btn ghost" href="${htmlEsc(backLink)}&calc=1">Рассчитать доходность</a>
+    ${isRent ? '' : '<a class="btn ghost" href="' + htmlEsc(backLink) + '&calc=1">Рассчитать доходность</a>'}
     <button type="button" class="btn ghost" id="shareBtn">Поделиться</button>
     <a class="btn wa" href="${htmlEsc(waLink)}" rel="noopener" target="_blank">WhatsApp</a>
   </div>
-  ${similarBlock}
+  ${isRent ? '' : similarBlock}
 </main>
 <script>
 /* «Поделиться»: на телефоне системное меню, на компьютере ссылка в буфер */
