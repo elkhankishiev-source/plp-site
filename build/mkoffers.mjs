@@ -35,9 +35,12 @@ const head = idx.slice(0, mOpen), tail = idx.slice(mEnd);
 for (const o of OFFERS) {
   if (!fs.existsSync(path.join(ROOT, o.dir, 'page.htm'))) { console.log('нет лендинга:', o.dir); continue; }
   const v = fs.statSync(path.join(ROOT, o.dir, 'page.htm')).mtimeMs.toString(36);
+  /* 02.10.2026: кнопка PDF только когда файл правда лежит рядом. У Aileen кнопка стояла,
+     а файла не было, и человек получал «не найдено». Надпись по правилу кнопок «Получить + что». */
+  const hasPdf = o.pdf && fs.existsSync(path.join(ROOT, o.dir, o.pdf));
   const body = `<section class="offer-wrap" style="padding:18px 0 28px"><div class="container">
   <div style="display:flex;justify-content:flex-end;margin:0 0 10px">
-    <a class="btn btn-ghost" href="/${o.dir}/${o.pdf}" download style="font-size:14px">Скачать PDF</a>
+    ${hasPdf ? `<a class="btn btn-ghost" href="/${o.dir}/${o.pdf}" download style="font-size:14px">Получить PDF</a>` : ''}
   </div>
   <div id="offerBox" style="width:100%;max-width:794px;margin:0 auto;overflow:hidden;border-radius:14px;background:#EFECE2;box-shadow:0 2px 18px rgba(23,24,15,.08);height:4531px">
     <iframe id="offerFrame" src="/${o.dir}/page.htm?v=${v}" title="${esc(o.title)}" loading="eager" scrolling="no"
@@ -84,4 +87,105 @@ for (const o of OFFERS) {
 
   fs.writeFileSync(path.join(ROOT, o.slug + '.html'), html);
   console.log(o.slug + '.html собран:', html.length, 'байт');
+}
+
+/* ——— 02.10.2026. Скрытая страница закрытых предложений: /predstart ———
+   Эльнур 02.10: «в секретной странице надо собрать инф по двум новым оферам квартц и физ»,
+   «офер карон вайб 2 ну как то не понятно, их там два, ссылка и пдф». Здесь у каждого
+   предложения одна карточка: открыть страницу и, если есть, получить PDF.
+   Факты KUARTZ и FIZZ только из базы: objects (PLP-KUARTZ, PLP-FIZZ) и материалы_проекта
+   (презентация застройщика «KUARTZ & FIZZ Mini Present», 01.10.2026, страница в скобках).
+   Цен у этих двух пока нет, поэтому кнопка ведёт в WhatsApp за презентацией.
+   Номеров юнитов, комиссий и «на руки» здесь не бывает: репозиторий открытый.
+   Страница в корне, а не в offers/: общая шапка главной ссылается на картинки относительно. */
+const WA = 'https://wa.me/66955492587?text=';
+const CARDS = [
+  {
+    name: 'Vibe II', where: 'Карон', tag: 'закрытый лист',
+    text: ['Второй проект застройщика, у которого первый Vibe за пять дней после старта продал 61% квартир.',
+           'Студии от 3,2 млн бат, это около 91 тыс. долларов за 28 м². Бронь 100–200 тыс. бат, депозит возвратный 30 дней. Сдача в IV квартале 2029.'],
+    open: '/vibe2', pdf: '/offers/vibe2/Vibe2_Karon.pdf',
+  },
+  {
+    name: 'KUARTZ', where: 'Карон', tag: 'старт продаж в октябре',
+    text: ['Новый проект The Title и AssetWise в 400 метрах от пляжа Карон. Два дома по 7 этажей, 189 квартир на участке 4 412,8 м².',
+           'В проекте 23 объекта инфраструктуры, среди них бассейн 25 метров и бассейн на крыше.'],
+    plans: [['1 спальня', '31,7–37,9 м²'], ['1 спальня плюс', '45–47,8 м²'], ['2 спальни', '56,6–62,7 м²'],
+            ['пентхаус, 2 спальни', '69,5 м²'], ['пентхаус, 2 спальни плюс', '89,2–97,2 м²']],
+    note: 'Цен пока нет. Прайс пришлём, как только застройщик его откроет.',
+    ask: 'Здравствуйте! Пришлите, пожалуйста, презентацию KUARTZ на Кароне',
+  },
+  {
+    name: 'FIZZ', where: 'Ката', tag: 'старт продаж в октябре',
+    text: ['Второй новый проект The Title и AssetWise, на Кате. Один жилой дом в 7 этажей на 135 квартир и отдельный трёхэтажный клубный дом, участок 3 801 м².',
+           'Камерный дом, где можно жить с питомцами. 25 объектов инфраструктуры и бассейн 25 на 5 метров. Сдача по плану застройщика в I квартале 2029.'],
+    plans: [['1 спальня', '31–33 м²'], ['1 спальня плюс', '44–52 м²'], ['2 спальни', '58 м²'],
+            ['пентхаус, 2 спальни', '64–77 м²'], ['пентхаус, 3 спальни', '105–110 м²']],
+    note: 'Цен пока нет. Прайс пришлём, как только застройщик его откроет.',
+    ask: 'Здравствуйте! Пришлите, пожалуйста, презентацию FIZZ на Кате',
+  },
+];
+
+function card(c) {
+  const pdfOk = c.pdf && fs.existsSync(path.join(ROOT, c.pdf.replace(/^\//, '')));
+  const btns = [];
+  if (c.open) btns.push(`<a class="btn btn-primary" href="${c.open}">Открыть предложение</a>`);
+  if (pdfOk) btns.push(`<a class="btn btn-ghost" href="${c.pdf}" download>Получить PDF</a>`);
+  if (c.ask) btns.push(`<a class="btn btn-primary" href="${WA}${encodeURIComponent(c.ask)}" target="_blank" rel="noopener">Получить презентацию</a>`);
+  const plans = c.plans ? `<ul class="pc-plans">${c.plans.map(([a, b]) => `<li><span>${esc(a)}</span><b>${esc(b)}</b></li>`).join('')}</ul>` : '';
+  return `<article class="pc-card">
+    <div class="pc-top"><h2>${esc(c.name)}<span>, ${esc(c.where)}</span></h2><em>${esc(c.tag)}</em></div>
+    ${c.text.map(t => `<p>${esc(t)}</p>`).join('\n    ')}
+    ${plans}
+    ${c.note ? `<p class="pc-note">${esc(c.note)}</p>` : ''}
+    <div class="pc-btns">${btns.join('')}</div>
+  </article>`;
+}
+
+{
+  const title = 'Закрытые предложения · Property Library Phuket';
+  const desc = 'Проекты Пхукета до официального старта продаж. Предварительные условия для клиентов Property Library Phuket.';
+  const body = `<style>
+.pc-wrap{padding:28px 0 40px}
+.pc-wrap h1{font-size:clamp(1.6rem,4vw,2.2rem);margin:0 0 8px}
+.pc-lead{color:var(--muted);margin:0 0 22px;max-width:640px}
+.pc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:16px}
+.pc-card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r,14px);padding:20px;display:flex;flex-direction:column;gap:10px}
+.pc-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.pc-top h2{margin:0;font-size:1.35rem}
+.pc-top h2 span{font-weight:500;color:var(--muted)}
+.pc-top em{font-style:normal;font-size:.8rem;padding:3px 10px;border-radius:99px;background:var(--green-soft);color:var(--green-text)}
+.pc-card p{margin:0;line-height:1.5}
+.pc-plans{list-style:none;margin:4px 0 0;padding:0;border-top:1px solid var(--line)}
+.pc-plans li{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);font-size:.92rem}
+.pc-plans b{font-weight:600;white-space:nowrap}
+.pc-note{color:var(--muted);font-size:.9rem}
+.pc-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto;padding-top:6px}
+.pc-btns .btn{font-size:14px}
+.pc-foot{color:var(--muted);font-size:.85rem;margin:20px 0 0;max-width:640px}
+</style>
+<section class="pc-wrap"><div class="container">
+  <h1>Закрытые предложения</h1>
+  <p class="pc-lead">Проекты до официального старта продаж. Условия здесь предварительные, точный прайс и планировки присылаем лично.</p>
+  <div class="pc-grid">
+  ${CARDS.map(card).join('\n  ')}
+  </div>
+  <p class="pc-foot">Площади и состав KUARTZ и FIZZ взяты из презентации застройщика от 01.10.2026, застройщик может их изменить. Условия Vibe II предварительные, до официального прайса.</p>
+</div></section>`;
+
+  const url = SITE + '/predstart';
+  let html = head + '\n' + body + '\n' + tail;
+  html = html.replace(/<title>[\s\S]*?<\/title>/, '<title>' + esc(title) + '</title>');
+  html = html.replace(/(<meta name="description" content=")[^"]*(")/, '$1' + esc(desc) + '$2');
+  html = html.replace(/(<link rel="canonical" href=")[^"]*(")/, '$1' + url + '$2');
+  html = html.replace(/(<meta property="og:url" content=")[^"]*(")/, '$1' + url + '$2');
+  html = html.replace(/(<meta property="og:title" content=")[^"]*(")/, '$1' + esc(title) + '$2');
+  html = html.replace(/(<meta property="og:description" content=")[^"]*(")/, '$1' + esc(desc) + '$2');
+  const headEnd = html.indexOf('</head>');
+  html = html.slice(0, headEnd).replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>\s*/g, '')
+    .replace(/<meta name="robots"[^>]*>\s*/g, '') + '<meta name="robots" content="noindex, nofollow">\n' + html.slice(headEnd);
+  html = html.replace(/href="#top"/g, 'href="index.html"');
+  html = html.replace(/href="#(why|sale|rent|map|quiz|faq|do|contacts|about)"/g, 'href="index.html#$1"');
+  fs.writeFileSync(path.join(ROOT, 'predstart.html'), html);
+  console.log('predstart.html собран:', html.length, 'байт');
 }
