@@ -352,7 +352,7 @@ json.dump(стало, open(СОСТОЯНИЕ, 'w'), ensure_ascii=False)
 # 22.09.2026: проверка может мигать — ломаться и чиниться по кругу. При обходе раз в
 # 10 минут это давало под сотню сообщений в сутки. Про одну и ту же проверку пишем
 # не чаще раза в ПЕРЕРЫВ секунд; остальные переходы копятся молча.
-ПЕРЕРЫВ = 7200
+ПЕРЕРЫВ = 21600   # 02.10.2026 Эльнур (28.09): «не каждый час, хотя бы раз в 6 часов»
 _сейчас = int(time.time())
 _когда = (было.get('_когда_сообщали') or {}) if isinstance(было, dict) else {}
 if not isinstance(_когда, dict):
@@ -377,12 +377,15 @@ if изменилось:
         текст += '\n\nЧинил три раза за час, не помогает — нужны руки: ' + ', '.join(петля)
     if сломано:
         текст += '\n\nСейчас не работает: ' + ', '.join(сломано)
-    tok = env('TG_ELNURPHUKET_TOKEN')
+    # 02.10.2026 Эльнур: «в тех PLP только технические моменты». Тех. сбои — офисным ботом в «PLP · Тех офис»,
+    # не клиентским ботом в личку. Нет настроек группы — по-старому в личку.
+    tok = env('TG_BOT_TOKEN') or env('TG_ELNURPHUKET_TOKEN')
+    _кому = env('TG_TECH_CHAT_ID') or OWNER
     if tok:
         try:
             urllib.request.urlopen(urllib.request.Request(
                 'https://api.telegram.org/bot%s/sendMessage' % tok,
-                data=json.dumps({'chat_id': OWNER, 'text': текст, 'disable_web_page_preview': True}).encode(),
+                data=json.dumps({'chat_id': _кому, 'text': текст, 'disable_web_page_preview': True}).encode(),
                 headers={'Content-Type': 'application/json'}), timeout=30)
             print('сообщение отправлено')
         except Exception as e:

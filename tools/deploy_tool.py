@@ -48,6 +48,7 @@ VPS = 'root@' + open(os.path.expanduser('~/.plp_vps_ip')).read().strip()
     'plan_day.py':          '/opt/plp-tools/plan_day.py',
     'itog_day.py':          '/opt/plp-tools/itog_day.py',
     'zvat_tg.py':           '/opt/plp-tools/zvat_tg.py',
+    'otvety.py':            '/opt/plp-tools/otvety.py',   # 02.10: ответ ведущего → клиенту
 }
 # Чем проверить, что выложенное живо. Пусто — значит только синтаксис.
 ПРОБА = {

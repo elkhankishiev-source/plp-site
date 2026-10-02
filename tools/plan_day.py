@@ -15,7 +15,7 @@ SB, KEY = env('SUPABASE_URL').rstrip('/'), env('SUPABASE_SERVICE_KEY') or env('S
 r = urllib.request.Request(SB + '/rest/v1/rpc/%D0%BF%D0%BB%D0%B0%D0%BD_%D0%B4%D0%BD%D1%8F', data=b'{}', method='POST',
                            headers={'apikey': KEY, 'Authorization': 'Bearer ' + KEY, 'Content-Type': 'application/json'})
 текст = json.load(urllib.request.urlopen(r, timeout=60))
-tok, owner = env('TG_ELNURPHUKET_TOKEN'), int(env('TG_OWNER_CHAT_ID') or 509498386)
+tok, owner = (env('TG_BOT_TOKEN') or env('TG_ELNURPHUKET_TOKEN')), int(env('TG_OWNER_CHAT_ID') or 509498386)
 urllib.request.urlopen(urllib.request.Request('https://api.telegram.org/bot%s/sendMessage' % tok,
     data=json.dumps({'chat_id': owner, 'text': текст[:4000], 'disable_web_page_preview': True}).encode(),
     headers={'Content-Type': 'application/json'}), timeout=30)

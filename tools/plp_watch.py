@@ -471,7 +471,17 @@ def main():
             link = '\n' + mm.group(0)
         txt = '📅 Через 30–45 минут созвон: %s%s' % (who, link)
         if SEND and not seen('meet:' + str(m['id'])):
-            tg_owner(txt)
+            # 02.10.2026 Эльнур: «в личку — тому, кто ответственный». Ведёт Дарья (так пишет заметка встречи) —
+            # напоминание ей, иначе Эльнуру; через «на связи» → Telegram офисным ботом.
+            _кто = 'Дарья' if re.search(r'вед[её]т\s+дарь', m.get('note') or '', re.I) else 'Эльнур'
+            try:
+                _r = urllib.request.Request(E['SUPABASE_URL'].rstrip('/') + '/rest/v1/rpc/' + urllib.parse.quote('позвать'),
+                    data=json.dumps({'p_persona': _кто, 'p_text': txt}).encode(), method='POST',
+                    headers={'apikey': E['SUPABASE_SERVICE_KEY'], 'Authorization': 'Bearer ' + E['SUPABASE_SERVICE_KEY'],
+                             'Content-Type': 'application/json'})
+                urllib.request.urlopen(_r, timeout=20)
+            except Exception:
+                tg_owner(txt)
         print('ЛИЧНО | ' + txt.replace('\n', ' '))
 
     past = get('/meetings?status=eq.' + NAZ + '&meet_at=lt.' + urllib.parse.quote(iso(90))
@@ -506,9 +516,7 @@ def main():
                 if st != 'active':
                     line = ('📵 Канал %s не на связи: состояние «%s». '
                             'qridle значит сессия отпала и нужен новый QR, blocked значит бан.' % (nm, st))
-                    tech.append(line)
-                    if SEND and not seen('chan:' + nm + st):
-                        tg_owner(line)
+                    tech.append(line)   # 02.10.2026: только в «Тех офис» (была ещё копия в личку — дубль)
     except Exception as ex:
         tech.append('📵 Не смог проверить каналы Wazzup: %s' % str(ex)[:70])
 
@@ -529,8 +537,9 @@ def main():
     # 11. сборщик почты не отработал
     if os.path.exists('/var/log/plp_mail_intake.log'):
         age = (time.time() - os.path.getmtime('/var/log/plp_mail_intake.log')) / 60
-        if age > 40:
-            tech.append('📪 Сборщик почты молчит %d минут' % age)
+        # 02.10.2026: сбор почты с 01.10 по пн и чт 09:05 (Эльнур: «2 раза в неделю хватит») — молчание до 4,5 суток норма
+        if age > 4.5 * 24 * 60:
+            tech.append('📪 Сборщик почты молчит %.1f суток (по плану пн и чт)' % (age / 1440))
 
     _было = (len(tech), len(sales))
     tech = [l for l in tech if not шум(l)]
