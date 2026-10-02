@@ -425,8 +425,8 @@ function buildCatalog(objects, benchmarks, preserve) {
       ready: o.stage === 'Ready',
       // 03.09: стадия отдельным полем — по ней фильтр и бейдж на карточке
       // числовой диапазон спален — по нему работает фильтр «Спальни»
-      bmin: (o.bedrooms_min === 0 || o.bedrooms_min) ? o.bedrooms_min : null,
-      bmax: (o.bedrooms_max === 0 || o.bedrooms_max) ? o.bedrooms_max : null,
+      bmin: bedRange(o).min,
+      bmax: bedRange(o).max,
       stage_key: saleGroup(o),
       /* 🔴 17.09 Эльнур: «вообще временные акции ставить на витрину не рекомендую!!
          пишем от-от-от, а дальше уже работаем, чтобы привлекать внимание и продавать,
@@ -494,6 +494,30 @@ function buildCatalog(objects, benchmarks, preserve) {
       calc: withFacts(keep.calc || fallbackCalc(o), o),
     };
   });
+}
+
+/* 02.10.2026 Эльнур: фильтр по спальням должен находить проект, если в нём есть
+   подходящая планировка. Диапазон брался только из bedrooms_min/max, и у Katabello
+   и Coralina (в полях 1–2, а в прайсе есть пентхаусы на 3 спальни) фильтр «3 спальни»
+   их не находил; вторичка Qabalah с полем bedrooms=3 без диапазона не находилась вовсе.
+   Диапазон для фильтра = поля базы, расширенные планировками; нет полей — из bedrooms.
+   Подпись спален на карточке (beds) не трогаем: она по-прежнему из базы. */
+function bedRange(o) {
+  const num = v => (v === 0 || v) && Number.isFinite(Number(v)) ? Number(v) : null;
+  let lo = num(o.bedrooms_min), hi = num(o.bedrooms_max);
+  if (lo == null && hi == null && o.bedrooms != null) {
+    const s = String(o.bedrooms);
+    const m = s.match(/\d+/g);
+    if (m) { lo = Number(m[0]); hi = Number(m[m.length - 1]); }
+    else if (/studio|студи/i.test(s)) { lo = hi = 0; }
+  }
+  for (const u of (unitsOf(o) || [])) {
+    const b = num(u && u.beds);
+    if (b == null) continue;
+    lo = lo == null ? b : Math.min(lo, b);
+    hi = hi == null ? b : Math.max(hi, b);
+  }
+  return { min: lo, max: hi };
 }
 
 /* Что можно купить в проекте: сначала именованные планировки застройщика,
