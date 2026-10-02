@@ -31,6 +31,7 @@ VPS = 'root@' + open(os.path.expanduser('~/.plp_vps_ip')).read().strip()
     'amo_touch_notes.py':   '/opt/plp-api/tools_amo_touch_notes.py',
     'crm_notes_import.py':  '/opt/plp-api/tools_crm_notes_import.py',
     'docs_apply.py':        '/opt/plp-tools/docs_apply.py',
+    'birthdays.py':         '/opt/plp-tools/birthdays.py',   # 02.10: поздравления с днём рождения
     'docs_parse.py':        '/opt/plp-tools/docs_parse.py',
     'mail_intake.py':       '/opt/plp-api/tools_mail_intake.py',
     'plp_watch.py':         '/opt/plp-api/tools_plp_watch.py',
