@@ -533,7 +533,12 @@ function thumbUrl(u, w, q) {
   const s = String(u || '');
   if (!s) return null;
   const i = s.indexOf('/storage/v1/object/public/object-media/');
-  if (i < 0) return s;
+  /* 03.10.2026: ссылки в базе переведены с Supabase на R2. Размер выбираем так же, как для старых
+     ссылок Supabase: миниатюра 760, крупно 1600 — иначе в карточку уходил бы не тот размер. */
+  if (i < 0) {
+    const r = s.match(/^(https:\/\/pub-[0-9a-f]+\.r2\.dev\/.+)-(760|1600)\.webp$/);
+    return r ? r[1] + ((w && w <= 900) ? '-760' : '-1600') + '.webp' : s;
+  }
   const путь = s.slice(i + '/storage/v1/object/public/object-media/'.length).split('?')[0];
   const база = путь.replace(/\.(jpg|jpeg|png|webp)$/i, '');
   const размер = (w && w <= 900) ? '-760' : '-1600';
