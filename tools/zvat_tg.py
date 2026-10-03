@@ -15,7 +15,7 @@ def env(k, f='/opt/plp-api/.env'):
 SB, SK = env('SUPABASE_URL').rstrip('/') + '/rest/v1', env('SUPABASE_SERVICE_KEY')
 H = {'apikey': SK, 'Authorization': 'Bearer ' + SK, 'Content-Type': 'application/json'}
 T = urllib.parse.quote('вызовы_тг')
-TOK = env('TG_BOT_TOKEN')  # 02.10: офисный бот @plp_assist_bot — с ним переписывались и Эльнур, и Дарья (8554364120); клиентский бот ей писать не может
+TOK = env('TG_BOT_TOKEN')  # 02.10: офисный бот @plp_assist_bot — с ним переписывались Эльнур (509498386, второй аккаунт 8554364120) и Дарья (8227351774); клиентский бот ей писать не может
 
 
 def http(m, url, body=None, headers=None):
