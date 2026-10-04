@@ -134,7 +134,7 @@ svg text{font-family:Manrope,Arial,sans-serif}
         <li><b>ноябрь 2025</b> — открыты продажи ZERO Nai Yang</li>
         <li><b>весна 2026</b> — ZERO Bang Tao продан примерно на 75%</li>
         <li><b>сентябрь 2026</b> — первый взнос снижен с 35% до 25%</li>
-        <li><b>07.09.2026</b> — гарантия 10% годовых на 3 года при лизхолде</li>
+        <li><b>07.09.2026</b> — гарантия 10% годовых на 3 года при лизхолде, доход платит застройщик</li>
         <li><b>10 лотов</b> по акции: ≈130 тыс. ฿/м² и мебель в подарок</li>
       </ul>
       <p style="margin-top:5mm;font-size:9pt;color:var(--ink2);border-left:2px solid var(--olive);padding-left:3.5mm">Тот же застройщик и та же модель: тихая локация у пляжа и малая плотность. Акционных лотов десять, дальше цена по прайсу.</p>
@@ -187,19 +187,28 @@ svg text{font-family:Manrope,Arial,sans-serif}
 <section class="pad">
   <svg class="head-ico" id="h3i" viewBox="0 0 20 20"></svg>
   <div class="eyebrow">Доход</div>
-  <h2>Три года гарантированного дохода, дальше арендный пул</h2>
+  <h2>Три года гарантии 10%, дальше арендный пул: 10,7–16,7% по расчёту застройщика</h2>
   <div class="grid g64">
     <div class="card"><h3>Доход студии от 4,45 млн ฿ по годам, тыс. ฿</h3>
       <svg id="rent" viewBox="0 0 110 56" style="width:100%;height:60mm"></svg>
-      <p class="src">Годы 1–3 — гарантия застройщика 10% годовых при лизхолде. С 4-го года — арендный пул 70/30, прогноз застройщика около 11% годовых. Прогноз, не гарантия.</p></div>
+      <p class="src">Годы 1–3 — гарантия: доход платит застройщик, 10% годовых при лизхолде. С 4-го года — арендный пул, столбец по базовому сценарию застройщика 14,3%, линия от 10,7% до 16,7%.</p></div>
     <div class="card">
-      <table>
-        <tr><td style="color:var(--muted)">тыс. ฿</td><td class="r" style="color:var(--muted);font-weight:600">в год</td><td class="r" style="color:var(--muted);font-weight:600">за 3 года</td></tr>
+      <h3>Гарантия 10%, тыс. ฿</h3>
+      <table style="margin-bottom:4mm">
+        <tr><td style="color:var(--muted)"></td><td class="r" style="color:var(--muted);font-weight:600">в год</td><td class="r" style="color:var(--muted);font-weight:600">за 3 года</td></tr>
         <tr><td>Студия от 4,45 млн</td><td class="r num">445</td><td class="r num">1 334</td></tr>
         <tr><td>1 спальня от 5,26 млн</td><td class="r num">526</td><td class="r num">1 579</td></tr>
         <tr><td>2 спальни от 7,68 млн</td><td class="r num">768</td><td class="r num">2 304</td></tr>
       </table>
-      <p class="src">10% от нижней цены типа. Для расчёта по конкретному лоту пришлём лист с его ценой и условиями.</p>
+      <h3>Расчёт застройщика после гарантии</h3>
+      <table>
+        <tr><td style="color:var(--muted)">загрузка</td><td class="r" style="color:var(--muted);font-weight:600">ночей</td><td class="r" style="color:var(--muted);font-weight:600">в год</td></tr>
+        <tr><td>Осторожный 45%</td><td class="r num">164</td><td class="r num hl">10,7%</td></tr>
+        <tr><td>Умеренный 55%</td><td class="r num">201</td><td class="r num hl">13,2%</td></tr>
+        <tr><td>Базовый 60%</td><td class="r num">219</td><td class="r num hl">14,3%</td></tr>
+        <tr><td>Высокий 70%</td><td class="r num">255</td><td class="r num hl">16,7%</td></tr>
+      </table>
+      <p class="src">Презентация застройщика, ноябрь 2025: ночь 6 000 ฿ (на 20–30% ниже Marriott и Pullman рядом), расходы около 25%, владельцу 80% чистого, квартира 5,5 млн ฿. Чистыми, после всех расходов.</p>
     </div>
   </div>
 </section>
@@ -339,13 +348,14 @@ doodle($('planeI'), 'plane', 5, 5, 10, -10, SUN);
 
 (() => {
   const s = $('rent');
-  const q = [['1-й год', 445, 'гарантия'], ['2-й год', 445, 'гарантия'], ['3-й год', 445, 'гарантия'], ['4-й год', 489, 'пул ≈11%']];
-  const Y = v => 46 - v * .07;
-  grid(s, [0, 200, 400], Y);
+  const q = [['1-й год', 445, 'гарантия'], ['2-й год', 445, 'гарантия'], ['3-й год', 445, 'гарантия'], ['4-й год', 636, 'пул, база 14,3%']];
+  const Y = v => 46 - v * .052;
+  grid(s, [0, 200, 400, 600], Y);
   q.forEach(([n, a, note], i) => {
     const x = 16 + i * 23;
     add(s, `<rect x="${x}" y="${Y(a)}" width="15" height="${46 - Y(a)}" fill="${i < 3 ? '#5E6B35' : '#C3C79E'}"${i === 3 ? ' stroke="#5E6B35" stroke-width=".3" stroke-dasharray="1 .8"' : ''}/>`);
-    txt(s, x + 7.5, Y(a) - 1.4, (i === 3 ? '≈' : '') + a, { size: 3.1, w: 800, a: 'middle' });
+    if (i === 3) { add(s, `<line x1="${x + 13}" x2="${x + 13}" y1="${Y(476)}" y2="${Y(743)}" stroke="#17180F" stroke-width=".35"/><line x1="${x + 11}" x2="${x + 15}" y1="${Y(743)}" y2="${Y(743)}" stroke="#17180F" stroke-width=".35"/>`); txt(s, x + 13, Y(743) - 1.4, '476–743', { size: 2.5, c: '#62665A', a: 'middle' }); }
+    txt(s, x + 7.5, Y(a) + (i === 3 ? 5 : -1.4), (i === 3 ? '≈' : '') + a, { size: 3.1, w: 800, a: 'middle', c: i === 3 ? '#17180F' : '#17180F' });
     txt(s, x + 7.5, 50, n, { size: 2.8, w: 700, a: 'middle' });
     txt(s, x + 7.5, 53.4, note, { size: 2.4, c: '#62665A', a: 'middle' });
   });
