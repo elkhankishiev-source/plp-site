@@ -38,12 +38,21 @@
    "name": "Mono Luxury Villas Pasak",
    "district": "Банг Тао",
    "type": "Вилла",
-   "price_from": 14500000,
+   "price_from": 12500000,
    "units": [
     {
      "beds": "3",
+     "code": "PLP-MONO-PASAK-R1",
+     "name": "вилла",
+     "area_sqm": "164",
+     "price_from_thb": 12500000,
+     "area": "164",
+     "from": 12500000
+    },
+    {
+     "beds": "3",
      "code": "PLP-MONO-PASAK-R2",
-     "name": "вилла 3 сп., 150.25 м²",
+     "name": "вилла",
      "area_sqm": "150.25",
      "price_from_thb": 14500000,
      "area": "150.25",
@@ -52,7 +61,7 @@
     {
      "beds": "3",
      "code": "PLP-MONO-PASAK-R3",
-     "name": "вилла 3 сп., 150.25 м²",
+     "name": "вилла",
      "area_sqm": "150.25",
      "price_from_thb": 16000000,
      "area": "150.25",
@@ -61,13 +70,23 @@
     {
      "beds": "3",
      "code": "PLP-MONO-PASAK-R5",
-     "name": "вилла 3 сп., 207.5 м²",
+     "name": "вилла",
      "area_sqm": "207.5",
      "price_from_thb": 16900000,
      "area": "207.5",
      "from": 16900000
     }
    ]
+  },
+  {
+   "id": "PLP-MONO-PASAK-R1",
+   "pub": "PLP-MONO-PASAK-R1",
+   "url": "https://property-library.com/object/mono-pasak-r1",
+   "name": "Mono Luxury Villas Pasak · вилла",
+   "district": "Банг Тао",
+   "type": "Вилла",
+   "price_from": 12500000,
+   "units": []
   },
   {
    "id": "PLP-MONO-PASAK-R2",
@@ -195,6 +214,36 @@
    "district": "Банг Тао",
    "type": "Кондо",
    "price_from": 19700000,
+   "units": []
+  },
+  {
+   "id": "ATT-OXYGEN-SY",
+   "pub": "PLP-OXYGEN-SY",
+   "url": "https://property-library.com/object/oxygen-sy",
+   "name": "Oxygen Sai Yuan",
+   "district": "Равай",
+   "type": "Кондо",
+   "price_from": 11900000,
+   "units": [
+    {
+     "beds": "3",
+     "code": "PLP-OXYGEN-SY-R2",
+     "name": "квартира",
+     "area_sqm": "145.07",
+     "price_from_thb": 11900000,
+     "area": "145.07",
+     "from": 11900000
+    }
+   ]
+  },
+  {
+   "id": "PLP-OXYGEN-SY-R2",
+   "pub": "PLP-OXYGEN-SY-R2",
+   "url": "https://property-library.com/object/oxygen-sy-r2",
+   "name": "Oxygen Sai Yuan · квартира",
+   "district": "Равай",
+   "type": "Кондо",
+   "price_from": 11900000,
    "units": []
   },
   {
@@ -498,7 +547,7 @@
     {
      "beds": "1",
      "code": "PLP-WINGS-R1",
-     "name": "вилла 1 сп., 140 м²",
+     "name": "вилла",
      "area_sqm": "140",
      "price_from_thb": 8500000,
      "area": "140",
@@ -507,11 +556,20 @@
     {
      "beds": "3",
      "code": "PLP-WINGS-R3",
-     "name": "вилла 3 сп., 204 м²",
+     "name": "вилла",
      "area_sqm": "204",
      "price_from_thb": 13500000,
      "area": "204",
      "from": 13500000
+    },
+    {
+     "beds": "4+1",
+     "code": "PLP-WINGS-R5",
+     "name": "вилла",
+     "area_sqm": "295",
+     "price_from_thb": 19700000,
+     "area": "295",
+     "from": 19700000
     }
    ]
   },
@@ -533,6 +591,16 @@
    "district": "Банг Тао",
    "type": "Вилла",
    "price_from": 13500000,
+   "units": []
+  },
+  {
+   "id": "PLP-WINGS-R5",
+   "pub": "PLP-WINGS-R5",
+   "url": "https://property-library.com/object/wings-r5",
+   "name": "Wings Villas · вилла",
+   "district": "Банг Тао",
+   "type": "Вилла",
+   "price_from": 19700000,
    "units": []
   },
   {
