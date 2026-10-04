@@ -90,7 +90,7 @@ for (const o of OFFERS) {
     .replace(/<meta name="robots"[^>]*>\s*/g, '') + '<meta name="robots" content="noindex, nofollow">\n' + html.slice(headEnd);
   /* якоря главной ведут на главную */
   html = html.replace(/href="#top"/g, 'href="index.html"');
-  html = html.replace(/href="#(why|sale|rent|map|quiz|faq|do|contacts|about)"/g, 'href="index.html#$1"');
+  html = html.replace(/href="#(why|sale|rent|map|quiz|faq|do|contacts|about)"/g, 'href="/#$1"');
 
   fs.writeFileSync(path.join(ROOT, o.slug + '.html'), html);
   console.log(o.slug + '.html собран:', html.length, 'байт');
@@ -206,7 +206,7 @@ function card(c) {
   html = html.slice(0, headEnd).replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>\s*/g, '')
     .replace(/<meta name="robots"[^>]*>\s*/g, '') + '<meta name="robots" content="noindex, nofollow">\n' + html.slice(headEnd);
   html = html.replace(/href="#top"/g, 'href="index.html"');
-  html = html.replace(/href="#(why|sale|rent|map|quiz|faq|do|contacts|about)"/g, 'href="index.html#$1"');
+  html = html.replace(/href="#(why|sale|rent|map|quiz|faq|do|contacts|about)"/g, 'href="/#$1"');
   fs.writeFileSync(path.join(ROOT, 'predstart.html'), html);
   console.log('predstart.html собран:', html.length, 'байт');
 }
