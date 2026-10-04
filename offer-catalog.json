@@ -1,6 +1,540 @@
 {
- "updated": "2026-10-02",
+ "updated": "2026-10-04",
  "items": [
+  {
+   "id": "ATT-KYE",
+   "pub": "PLP-KYE",
+   "url": "https://property-library.com/object/kye",
+   "name": "KYE Villas, Раваи · вторичка",
+   "district": "Равай",
+   "type": "Вилла",
+   "price_from": 19800000,
+   "units": [
+    {
+     "beds": "3",
+     "code": "PLP-KYE-R1",
+     "name": "вилла 3 сп., 281.32 м²",
+     "area_sqm": "281.32",
+     "price_from_thb": 19800000,
+     "area": "281.32",
+     "from": 19800000
+    }
+   ]
+  },
+  {
+   "id": "PLP-KYE-R1",
+   "pub": "PLP-KYE-R1",
+   "url": "https://property-library.com/object/kye-r1",
+   "name": "KYE Villas, Раваи · вилла 3 сп., 281.32 м²",
+   "district": "Равай",
+   "type": "Вилла",
+   "price_from": 19800000,
+   "units": []
+  },
+  {
+   "id": "ATT-MONO-PASAK",
+   "pub": "PLP-MONO-PASAK",
+   "url": "https://property-library.com/object/mono-pasak",
+   "name": "Mono Luxury Villas Pasak, Чернгталай · вторичка",
+   "district": "Банг Тао",
+   "type": "Вилла",
+   "price_from": 14500000,
+   "units": [
+    {
+     "beds": "3",
+     "code": "PLP-MONO-PASAK-R2",
+     "name": "вилла 3 сп., 150.25 м²",
+     "area_sqm": "150.25",
+     "price_from_thb": 14500000,
+     "area": "150.25",
+     "from": 14500000
+    },
+    {
+     "beds": "3",
+     "code": "PLP-MONO-PASAK-R3",
+     "name": "вилла 3 сп., 150.25 м²",
+     "area_sqm": "150.25",
+     "price_from_thb": 16000000,
+     "area": "150.25",
+     "from": 16000000
+    },
+    {
+     "beds": "3",
+     "code": "PLP-MONO-PASAK-R5",
+     "name": "вилла 3 сп., 207.5 м²",
+     "area_sqm": "207.5",
+     "price_from_thb": 16900000,
+     "area": "207.5",
+     "from": 16900000
+    }
+   ]
+  },
+  {
+   "id": "PLP-MONO-PASAK-R2",
+   "pub": "PLP-MONO-PASAK-R2",
+   "url": "https://property-library.com/object/mono-pasak-r2",
+   "name": "Mono Luxury Villas Pasak, Чернгталай · вилла 3 сп., 150.25 м²",
+   "district": "Банг Тао",
+   "type": "Вилла",
+   "price_from": 14500000,
+   "units": []
+  },
+  {
+   "id": "PLP-MONO-PASAK-R3",
+   "pub": "PLP-MONO-PASAK-R3",
+   "url": "https://property-library.com/object/mono-pasak-r3",
+   "name": "Mono Luxury Villas Pasak, Чернгталай · вилла 3 сп., 150.25 м²",
+   "district": "Банг Тао",
+   "type": "Вилла",
+   "price_from": 16000000,
+   "units": []
+  },
+  {
+   "id": "PLP-MONO-PASAK-R5",
+   "pub": "PLP-MONO-PASAK-R5",
+   "url": "https://property-library.com/object/mono-pasak-r5",
+   "name": "Mono Luxury Villas Pasak, Чернгталай · вилла 3 сп., 207.5 м²",
+   "district": "Банг Тао",
+   "type": "Вилла",
+   "price_from": 16900000,
+   "units": []
+  },
+  {
+   "id": "ATT-ONYX-SY",
+   "pub": "PLP-ONYX-SY",
+   "url": "https://property-library.com/object/onyx-sy",
+   "name": "Onyx Sai Yuan Estate, Раваи · вторичка",
+   "district": "Равай",
+   "type": "Вилла",
+   "price_from": 10500000,
+   "units": [
+    {
+     "beds": "2",
+     "code": "PLP-ONYX-SY-R1",
+     "name": "вилла 2 сп., 154 м²",
+     "area_sqm": "154",
+     "price_from_thb": 10500000,
+     "area": "154",
+     "from": 10500000
+    },
+    {
+     "beds": "2",
+     "code": "PLP-ONYX-SY-R3",
+     "name": "вилла 2 сп., 178 м²",
+     "area_sqm": "178",
+     "price_from_thb": 14000000,
+     "area": "178",
+     "from": 14000000
+    }
+   ]
+  },
+  {
+   "id": "PLP-ONYX-SY-R1",
+   "pub": "PLP-ONYX-SY-R1",
+   "url": "https://property-library.com/object/onyx-sy-r1",
+   "name": "Onyx Sai Yuan Estate, Раваи · вилла 2 сп., 154 м²",
+   "district": "Равай",
+   "type": "Вилла",
+   "price_from": 10500000,
+   "units": []
+  },
+  {
+   "id": "PLP-ONYX-SY-R3",
+   "pub": "PLP-ONYX-SY-R3",
+   "url": "https://property-library.com/object/onyx-sy-r3",
+   "name": "Onyx Sai Yuan Estate, Раваи · вилла 2 сп., 178 м²",
+   "district": "Равай",
+   "type": "Вилла",
+   "price_from": 14000000,
+   "units": []
+  },
+  {
+   "id": "ATT-OXYGEN-BT",
+   "pub": "PLP-OXYGEN-BT",
+   "url": "https://property-library.com/object/oxygen-bt",
+   "name": "Oxygen Bangtao · вторичка",
+   "district": "Банг Тао",
+   "type": "Кондо",
+   "price_from": 16500000,
+   "units": [
+    {
+     "beds": "3",
+     "code": "PLP-OXYGEN-BT-R2",
+     "name": "квартира 3 сп., 231.03 м²",
+     "area_sqm": "231.03",
+     "price_from_thb": 16500000,
+     "area": "231.03",
+     "from": 16500000
+    },
+    {
+     "beds": "3",
+     "code": "PLP-OXYGEN-BT-R3",
+     "name": "квартира 3 сп., 214.09 м²",
+     "area_sqm": "214.09",
+     "price_from_thb": 19700000,
+     "area": "214.09",
+     "from": 19700000
+    }
+   ]
+  },
+  {
+   "id": "PLP-OXYGEN-BT-R2",
+   "pub": "PLP-OXYGEN-BT-R2",
+   "url": "https://property-library.com/object/oxygen-bt-r2",
+   "name": "Oxygen Bangtao · квартира 3 сп., 231.03 м²",
+   "district": "Банг Тао",
+   "type": "Кондо",
+   "price_from": 16500000,
+   "units": []
+  },
+  {
+   "id": "PLP-OXYGEN-BT-R3",
+   "pub": "PLP-OXYGEN-BT-R3",
+   "url": "https://property-library.com/object/oxygen-bt-r3",
+   "name": "Oxygen Bangtao · квартира 3 сп., 214.09 м²",
+   "district": "Банг Тао",
+   "type": "Кондо",
+   "price_from": 19700000,
+   "units": []
+  },
+  {
+   "id": "ATT-RAWAI-DUPLEX-POOL-HOUSE",
+   "pub": "PLP-RAWAI-DUPLEX-POOL-HOUSE",
+   "url": "https://property-library.com/object/rawai-duplex-pool-house",
+   "name": "Rawai Duplex Pool House, Раваи · вторичка",
+   "district": "Равай",
+   "type": "Вилла",
+   "price_from": 12900000,
+   "units": []
+  },
+  {
+   "id": "ATT-SATURDAYS",
+   "pub": "PLP-SATURDAYS",
+   "url": "https://property-library.com/object/saturdays",
+   "name": "Saturdays Residence, Раваи · вторичка",
+   "district": "Равай",
+   "type": "Кондо",
+   "price_from": 6590000,
+   "units": [
+    {
+     "beds": "1",
+     "code": "PLP-SATURDAYS-R2",
+     "name": "квартира 1 сп., 56.37 м²",
+     "area_sqm": "56.37",
+     "price_from_thb": 6590000,
+     "area": "56.37",
+     "from": 6590000
+    },
+    {
+     "beds": "1",
+     "code": "PLP-SATURDAYS-R1",
+     "name": "квартира 1 сп., 56.37 м²",
+     "area_sqm": "56.37",
+     "price_from_thb": 6590000,
+     "area": "56.37",
+     "from": 6590000
+    },
+    {
+     "beds": "1",
+     "code": "PLP-SATURDAYS-R3",
+     "name": "квартира 1 сп., 56.2 м²",
+     "area_sqm": "56.2",
+     "price_from_thb": 6780000,
+     "area": "56.2",
+     "from": 6780000
+    },
+    {
+     "beds": "1",
+     "code": "PLP-SATURDAYS-R4",
+     "name": "квартира 1 сп., 57.33 м²",
+     "area_sqm": "57.33",
+     "price_from_thb": 6800000,
+     "area": "57.33",
+     "from": 6800000
+    },
+    {
+     "beds": "1",
+     "code": "PLP-SATURDAYS-R7",
+     "name": "квартира 1 сп., 56.37 м²",
+     "area_sqm": "56.37",
+     "price_from_thb": 6900000,
+     "area": "56.37",
+     "from": 6900000
+    },
+    {
+     "beds": "1",
+     "code": "PLP-SATURDAYS-R5",
+     "name": "квартира 1 сп., 56.37 м²",
+     "area_sqm": "56.37",
+     "price_from_thb": 6900000,
+     "area": "56.37",
+     "from": 6900000
+    },
+    {
+     "beds": "1",
+     "code": "PLP-SATURDAYS-R6",
+     "name": "квартира 1 сп., 56.37 м²",
+     "area_sqm": "56.37",
+     "price_from_thb": 6900000,
+     "area": "56.37",
+     "from": 6900000
+    },
+    {
+     "beds": "2",
+     "code": "PLP-SATURDAYS-R9",
+     "name": "квартира 2 сп., 83.08 м²",
+     "area_sqm": "83.08",
+     "price_from_thb": 10500000,
+     "area": "83.08",
+     "from": 10500000
+    },
+    {
+     "beds": "2",
+     "code": "PLP-SATURDAYS-R10",
+     "name": "квартира 2 сп., 83.36 м²",
+     "area_sqm": "83.36",
+     "price_from_thb": 10500000,
+     "area": "83.36",
+     "from": 10500000
+    },
+    {
+     "beds": "2",
+     "code": "PLP-SATURDAYS-R11",
+     "name": "квартира 2 сп., 80.05 м²",
+     "area_sqm": "80.05",
+     "price_from_thb": 10800000,
+     "area": "80.05",
+     "from": 10800000
+    },
+    {
+     "beds": "2",
+     "code": "PLP-SATURDAYS-R12",
+     "name": "квартира 2 сп., 94.6 м²",
+     "area_sqm": "94.6",
+     "price_from_thb": 10900000,
+     "area": "94.6",
+     "from": 10900000
+    },
+    {
+     "beds": "2",
+     "code": "PLP-SATURDAYS-R13",
+     "name": "квартира 2 сп., 82.43 м²",
+     "area_sqm": "82.43",
+     "price_from_thb": 11000000,
+     "area": "82.43",
+     "from": 11000000
+    }
+   ]
+  },
+  {
+   "id": "PLP-SATURDAYS-R1",
+   "pub": "PLP-SATURDAYS-R1",
+   "url": "https://property-library.com/object/saturdays-r1",
+   "name": "Saturdays Residence, Раваи · квартира 1 сп., 56.37 м²",
+   "district": "Равай",
+   "type": "Кондо",
+   "price_from": 6590000,
+   "units": []
+  },
+  {
+   "id": "PLP-SATURDAYS-R10",
+   "pub": "PLP-SATURDAYS-R10",
+   "url": "https://property-library.com/object/saturdays-r10",
+   "name": "Saturdays Residence, Раваи · квартира 2 сп., 83.36 м²",
+   "district": "Равай",
+   "type": "Кондо",
+   "price_from": 10500000,
+   "units": []
+  },
+  {
+   "id": "PLP-SATURDAYS-R11",
+   "pub": "PLP-SATURDAYS-R11",
+   "url": "https://property-library.com/object/saturdays-r11",
+   "name": "Saturdays Residence, Раваи · квартира 2 сп., 80.05 м²",
+   "district": "Равай",
+   "type": "Кондо",
+   "price_from": 10800000,
+   "units": []
+  },
+  {
+   "id": "PLP-SATURDAYS-R12",
+   "pub": "PLP-SATURDAYS-R12",
+   "url": "https://property-library.com/object/saturdays-r12",
+   "name": "Saturdays Residence, Раваи · квартира 2 сп., 94.6 м²",
+   "district": "Равай",
+   "type": "Кондо",
+   "price_from": 10900000,
+   "units": []
+  },
+  {
+   "id": "PLP-SATURDAYS-R13",
+   "pub": "PLP-SATURDAYS-R13",
+   "url": "https://property-library.com/object/saturdays-r13",
+   "name": "Saturdays Residence, Раваи · квартира 2 сп., 82.43 м²",
+   "district": "Равай",
+   "type": "Кондо",
+   "price_from": 11000000,
+   "units": []
+  },
+  {
+   "id": "PLP-SATURDAYS-R14",
+   "pub": "PLP-SATURDAYS-R14",
+   "url": "https://property-library.com/object/saturdays-r14",
+   "name": "Saturdays Residence, Раваи · квартира 2 сп., 83.36 м²",
+   "district": "Равай",
+   "type": "Кондо",
+   "price_from": 11500000,
+   "units": []
+  },
+  {
+   "id": "PLP-SATURDAYS-R15",
+   "pub": "PLP-SATURDAYS-R15",
+   "url": "https://property-library.com/object/saturdays-r15",
+   "name": "Saturdays Residence, Раваи · квартира 2 сп., 86.84 м²",
+   "district": "Равай",
+   "type": "Кондо",
+   "price_from": 11800000,
+   "units": []
+  },
+  {
+   "id": "PLP-SATURDAYS-R16",
+   "pub": "PLP-SATURDAYS-R16",
+   "url": "https://property-library.com/object/saturdays-r16",
+   "name": "Saturdays Residence, Раваи · квартира 2 сп., 142.94 м²",
+   "district": "Равай",
+   "type": "Кондо",
+   "price_from": 12900000,
+   "units": []
+  },
+  {
+   "id": "PLP-SATURDAYS-R2",
+   "pub": "PLP-SATURDAYS-R2",
+   "url": "https://property-library.com/object/saturdays-r2",
+   "name": "Saturdays Residence, Раваи · квартира 1 сп., 56.37 м²",
+   "district": "Равай",
+   "type": "Кондо",
+   "price_from": 6590000,
+   "units": []
+  },
+  {
+   "id": "PLP-SATURDAYS-R3",
+   "pub": "PLP-SATURDAYS-R3",
+   "url": "https://property-library.com/object/saturdays-r3",
+   "name": "Saturdays Residence, Раваи · квартира 1 сп., 56.2 м²",
+   "district": "Равай",
+   "type": "Кондо",
+   "price_from": 6780000,
+   "units": []
+  },
+  {
+   "id": "PLP-SATURDAYS-R4",
+   "pub": "PLP-SATURDAYS-R4",
+   "url": "https://property-library.com/object/saturdays-r4",
+   "name": "Saturdays Residence, Раваи · квартира 1 сп., 57.33 м²",
+   "district": "Равай",
+   "type": "Кондо",
+   "price_from": 6800000,
+   "units": []
+  },
+  {
+   "id": "PLP-SATURDAYS-R5",
+   "pub": "PLP-SATURDAYS-R5",
+   "url": "https://property-library.com/object/saturdays-r5",
+   "name": "Saturdays Residence, Раваи · квартира 1 сп., 56.37 м²",
+   "district": "Равай",
+   "type": "Кондо",
+   "price_from": 6900000,
+   "units": []
+  },
+  {
+   "id": "PLP-SATURDAYS-R6",
+   "pub": "PLP-SATURDAYS-R6",
+   "url": "https://property-library.com/object/saturdays-r6",
+   "name": "Saturdays Residence, Раваи · квартира 1 сп., 56.37 м²",
+   "district": "Равай",
+   "type": "Кондо",
+   "price_from": 6900000,
+   "units": []
+  },
+  {
+   "id": "PLP-SATURDAYS-R7",
+   "pub": "PLP-SATURDAYS-R7",
+   "url": "https://property-library.com/object/saturdays-r7",
+   "name": "Saturdays Residence, Раваи · квартира 1 сп., 56.37 м²",
+   "district": "Равай",
+   "type": "Кондо",
+   "price_from": 6900000,
+   "units": []
+  },
+  {
+   "id": "PLP-SATURDAYS-R9",
+   "pub": "PLP-SATURDAYS-R9",
+   "url": "https://property-library.com/object/saturdays-r9",
+   "name": "Saturdays Residence, Раваи · квартира 2 сп., 83.08 м²",
+   "district": "Равай",
+   "type": "Кондо",
+   "price_from": 10500000,
+   "units": []
+  },
+  {
+   "id": "ATT-TARA",
+   "pub": "PLP-TARA",
+   "url": "https://property-library.com/object/tara",
+   "name": "Two Villas Tara, Лаян · вторичка",
+   "district": "Лаян",
+   "type": "Вилла",
+   "price_from": 18000000,
+   "units": []
+  },
+  {
+   "id": "ATT-WINGS",
+   "pub": "PLP-WINGS",
+   "url": "https://property-library.com/object/wings",
+   "name": "Wings Villas, Чернгталай · вторичка",
+   "district": "Банг Тао",
+   "type": "Вилла",
+   "price_from": 8500000,
+   "units": [
+    {
+     "beds": "1",
+     "code": "PLP-WINGS-R1",
+     "name": "вилла 1 сп., 140 м²",
+     "area_sqm": "140",
+     "price_from_thb": 8500000,
+     "area": "140",
+     "from": 8500000
+    },
+    {
+     "beds": "3",
+     "code": "PLP-WINGS-R3",
+     "name": "вилла 3 сп., 204 м²",
+     "area_sqm": "204",
+     "price_from_thb": 13500000,
+     "area": "204",
+     "from": 13500000
+    }
+   ]
+  },
+  {
+   "id": "PLP-WINGS-R1",
+   "pub": "PLP-WINGS-R1",
+   "url": "https://property-library.com/object/wings-r1",
+   "name": "Wings Villas, Чернгталай · вилла 1 сп., 140 м²",
+   "district": "Банг Тао",
+   "type": "Вилла",
+   "price_from": 8500000,
+   "units": []
+  },
+  {
+   "id": "PLP-WINGS-R3",
+   "pub": "PLP-WINGS-R3",
+   "url": "https://property-library.com/object/wings-r3",
+   "name": "Wings Villas, Чернгталай · вилла 3 сп., 204 м²",
+   "district": "Банг Тао",
+   "type": "Вилла",
+   "price_from": 13500000,
+   "units": []
+  },
   {
    "id": "INTAKE-BOTANICA",
    "pub": "PLP-GENS-BOTANICA",
