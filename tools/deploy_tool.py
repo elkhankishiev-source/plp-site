@@ -50,6 +50,7 @@ VPS = 'root@' + open(os.path.expanduser('~/.plp_vps_ip')).read().strip()
     'itog_day.py':          '/opt/plp-tools/itog_day.py',
     'zvat_tg.py':           '/opt/plp-tools/zvat_tg.py',
     'otvety.py':            '/opt/plp-tools/otvety.py',   # 02.10: ответ ведущего → клиенту
+    'svodka_trevog.py':     '/opt/plp-tools/svodka_trevog.py',   # 04.10: сводка тревог с Мака на сервер
 }
 # Чем проверить, что выложенное живо. Пусто — значит только синтаксис.
 ПРОБА = {
@@ -58,6 +59,7 @@ VPS = 'root@' + open(os.path.expanduser('~/.plp_vps_ip')).read().strip()
     'docs_parse.py': '',
     'plp_watch.py': '',             # без --send только печатает
     'tools_smoke.py': '',
+    'svodka_trevog.py': '--покажи',
     'amo_touch_notes.py': '',
     'crm_notes_import.py': '--status',
     'census_owners.py': '',
