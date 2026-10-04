@@ -126,7 +126,11 @@ def без_чисел(s):
     return ''.join('#' if c.isdigit() else c for c in s)
 
 
-def seen(key):
+def seen(key, mark=True):
+    """04.10.2026 Эльнур: «уведомления должен кто-то читать, не должно ничего проходить само собой».
+    Раньше отметка «уже сообщил» ставилась ДО отправки: Telegram не ответил — сообщение пропадало,
+    а сторож молчал до конца срока. Теперь вызывающий сначала спрашивает (mark=False), шлёт,
+    и только после ok от Telegram ставит отметку (seen(key))."""
     try:
         d = json.load(open(SEEN))
     except Exception:
@@ -135,7 +139,8 @@ def seen(key):
     срок = TTL_ОЖИДАНИЕ if ':🕑' in key or key.startswith(('sales:🕑', 'tech:🕑')) else TTL
     d = {k: v for k, v in d.items() if now - v < max(TTL, TTL_ОЖИДАНИЕ)}
     was = (key in d) and (now - d[key] < срок)
-    d[key] = now
+    if mark:
+        d[key] = now
     try:
         json.dump(d, open(SEEN, 'w'))
     except Exception:
@@ -207,8 +212,9 @@ def tg_owner(text):
                                                       'disable_web_page_preview': True}).encode(),
                                      headers={'Content-Type': 'application/json'}, method='POST')
         urllib.request.urlopen(req, timeout=20)
+        return True
     except Exception:
-        pass
+        return False
 
 
 def digest():
@@ -472,7 +478,7 @@ def main():
         if mm:
             link = '\n' + mm.group(0)
         txt = '📅 Через 30–45 минут созвон: %s%s' % (who, link)
-        if SEND and not seen('meet:' + str(m['id'])):
+        if SEND and not seen('meet:' + str(m['id']), mark=False):
             # 02.10.2026 Эльнур: «в личку — тому, кто ответственный». Ведёт Дарья (так пишет заметка встречи) —
             # напоминание ей, иначе Эльнуру; через «на связи» → Telegram офисным ботом.
             _кто = 'Дарья' if re.search(r'вед[её]т\s+дарь', m.get('note') or '', re.I) else 'Эльнур'
@@ -482,8 +488,10 @@ def main():
                     headers={'apikey': E['SUPABASE_SERVICE_KEY'], 'Authorization': 'Bearer ' + E['SUPABASE_SERVICE_KEY'],
                              'Content-Type': 'application/json'})
                 urllib.request.urlopen(_r, timeout=20)
+                seen('meet:' + str(m['id']))
             except Exception:
-                tg_owner(txt)
+                if tg_owner(txt):
+                    seen('meet:' + str(m['id']))
         print('ЛИЧНО | ' + txt.replace('\n', ' '))
 
     past = get('/meetings?status=eq.' + NAZ + '&meet_at=lt.' + urllib.parse.quote(iso(90))
@@ -558,11 +566,13 @@ def main():
     if not SEND:
         return 0
     for line in tech:
-        if not seen('tech:' + без_чисел(line[:60])):
-            tg('TG_TECH_CHAT_ID', line)
+        k = 'tech:' + без_чисел(line[:60])
+        if not seen(k, mark=False) and tg('TG_TECH_CHAT_ID', line):
+            seen(k)
     for line in sales:
-        if not seen('sales:' + без_чисел(line[:60])):
-            tg('TG_ALERT_CHAT_ID', line)
+        k = 'sales:' + без_чисел(line[:60])
+        if not seen(k, mark=False) and tg('TG_ALERT_CHAT_ID', line):
+            seen(k)
     return 0
 
 
