@@ -537,6 +537,10 @@ def main():
                + '&select=ts,phone_norm,role,source&order=ts.asc&limit=600')
     byph = {}
     for r in last:
+        # 04.10.2026: ручные сообщения Эльнура из личного Telegram (мост пишет их в историю как наши)
+        # и служебные чаты — не «двойник». Было ложное «два подряд» на Романа (…7412), которому писал сам Эльнур.
+        if str(r.get('source') or '') in ('userbot_elnur', 'office_bot', 'wazzup_group', 'tg_backfill'):
+            continue
         if r.get('phone_norm') and r['phone_norm'] not in OWN:
             byph.setdefault(r['phone_norm'], []).append(r)
     for ph, rr in byph.items():
