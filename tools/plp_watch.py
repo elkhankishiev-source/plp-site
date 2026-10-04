@@ -562,6 +562,23 @@ def main():
         if age > 4.5 * 24 * 60:
             tech.append('📪 Сборщик почты молчит %.1f суток (по плану пн и чт)' % (age / 1440))
 
+    # 12. 04.10.2026: мост личного Telegram пролежал 17:11–18:10 по Пхукету (AuthKeyDuplicated, 157 перезапусков) —
+    #     ни один сторож не заметил. Мост раз в 5 минут пишет «heartbeat» в свой журнал; нет свежей отметки 15 минут — тревога.
+    _мост = '/home/claw/plp_tg_userbot.log'
+    if os.path.exists(_мост):
+        try:
+            with open(_мост, 'rb') as fh:
+                fh.seek(max(0, os.path.getsize(_мост) - 20000))
+                хвост = fh.read().decode('utf-8', 'ignore').splitlines()
+            пульс = [l for l in хвост if 'heartbeat: connected=True' in l or 'bridge up as' in l]
+            if пульс:
+                t0 = datetime.strptime(пульс[-1][:19], '%Y-%m-%d %H:%M:%S').replace(tzinfo=timezone.utc)
+                мин = (datetime.now(timezone.utc) - t0).total_seconds() / 60
+                if мин > 15:
+                    tech.append('🔌 Мост личного Telegram молчит %d мин: нет отметки «на связи». Сообщения из личного TG не попадают в систему, поиск по номеру в TG стоит' % мин)
+        except Exception as ex:
+            tech.append('🔌 Не смог проверить мост личного Telegram: %s' % str(ex)[:60])
+
     _было = (len(tech), len(sales))
     tech = [l for l in tech if not шум(l)]
     sales = [l for l in sales if not шум(l)]
