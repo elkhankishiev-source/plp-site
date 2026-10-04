@@ -54,6 +54,18 @@ def главное():
                 части.append('\n' + текущий)
             части.append('• ' + с['строка'])
         текст = 'Сводка за сутки, %s\n%s' % (пхукет.strftime('%d.%m %H:%M'), '\n'.join(части))
+    # 04.10.2026: ежедневная сверка (sverka_dnya.py, 07:30): нарушения правил в сообщениях лидам и решения, утверждённые, но не внедрённые.
+    try:
+        r = urllib.request.Request(SB + '/' + urllib.parse.quote('сверка_дня') + '?select=*&order=' + urllib.parse.quote('день') + '.desc&limit=1',
+                                   headers={'apikey': SK, 'Authorization': 'Bearer ' + SK})
+        св = (json.loads(urllib.request.urlopen(r, timeout=60).read().decode() or '[]') or [None])[0]
+        if св:
+            пр = св.get('по_правилам') or {}
+            текст += '\n\n📋 Сверка за сутки: сообщений лидам %s, нарушений %s%s' % (св.get('сообщений'), св.get('нарушений'),
+                     (': ' + ', '.join('%s ×%s' % (k, v) for k, v in sorted(пр.items(), key=lambda z: -z[1])[:4])) if пр else '')
+            текст += '\n📌 Утверждено, но не внедрено: %d' % len(св.get('не_внедрено') or [])
+    except Exception as ex:
+        текст += '\n\n📋 Сверка не прочиталась: ' + str(ex)[:80]
     # 04.10.2026: обычные отказы привратника за сутки — одной строкой (раньше каждые 20 минут в Тех офис).
     try:
         с = (datetime.now(timezone.utc) - timedelta(hours=24)).strftime('%Y-%m-%dT%H:%M:%SZ')
