@@ -40,6 +40,12 @@ def tg(text):
 
 
 def main():
+    # 04.10.2026: репозиторий общий (вторая сессия Claude, Codex). Раньше выкладка делала git add -A
+    # и забрала бы чужие незаписанные правки. Выкладываем, только если до прогона копия была чистой,
+    # и сначала подтягиваем свежий main, чтобы не затереть чужие коммиты.
+    чисто_до = not run(['git', 'status', '--porcelain']).strip()
+    if чисто_до and PUBLISH:
+        run(['git', 'pull', '--ff-only', 'origin', 'main'])
     changed, waiting, soldout, nolist, nochan = [], [], [], [], []
     замок = []   # 02.10.2026: правки, которые не пустил замок цифр (одобрено Эльнуром / документ старше)
     args = [PY3, os.path.join(ROOT, 'tools', 'tg_prices.py')] + (['--apply'] if APPLY else [])
@@ -103,7 +109,9 @@ def main():
         b = run(['node', os.path.join(ROOT, 'build', 'all.mjs')], timeout=3000)
         ok = all(s in b for s in ('[вид] ок', '[кабинет] ок')) and 'сборка завершена' in b
         built = 'сборка: ок' if ok else 'сборка: ПРОВЕРКИ НЕ ПРОШЛИ — не публикую'
-        if ok and PUBLISH:
+        if ok and PUBLISH and not чисто_до:
+            published = 'не выкладываю: в репозитории до прогона были чужие незаписанные правки'
+        elif ok and PUBLISH:
             st = run(['git', 'status', '--porcelain'])
             if st.strip():
                 run(['git', 'add', '-A'])
