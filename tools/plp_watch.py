@@ -341,13 +341,20 @@ def main():
     den = get('/funnel_events?event_type=eq.gate_decision&ts=gte.' + urllib.parse.quote(iso(60))
               + '&select=metadata&limit=200')
     bad = [d for d in den if (d.get('metadata') or {}).get('decision') == 'DENY']
+    # 04.10.2026 Эльнур: «уведомления без внимания — шум». За 3 суток 2360 отказов, из них 3 настоящие поломки,
+    # остальное — обычная работа (лимит номера, выключенный канал, тихие часы, чёрный список).
+    # Обычные отказы — одной строкой в утренней сводке (svodka_trevog.py), сюда только поломки.
+    _ОБЫЧНО = ('плотность:', 'quiet_hours', 'blacklist', 'purchase_status_won', 'роль «internal»')
     if bad:
         why = {}
         for d in bad:
             for r in ((d.get('metadata') or {}).get('denies') or ['без причины']):
+                if str(r).startswith(_ОБЫЧНО):
+                    continue
                 why[r] = why.get(r, 0) + 1
-        tech.append('🚫 Привратник отказал %d раз за час: %s'
-                    % (len(bad), ', '.join('%s ×%d' % (k, v) for k, v in sorted(why.items(), key=lambda x: -x[1])[:4])))
+        if why:
+            tech.append('🚫 Привратник не пустил по поломке %d раз за час: %s'
+                        % (sum(why.values()), ', '.join('%s ×%d' % (k, v) for k, v in sorted(why.items(), key=lambda x: -x[1])[:4])))
 
     # 3. очередь amoCRM встала
     # Массовая заливка (например перевод сделок) сама по себе не авария: очередь держит

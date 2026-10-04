@@ -54,6 +54,26 @@ def главное():
                 части.append('\n' + текущий)
             части.append('• ' + с['строка'])
         текст = 'Сводка за сутки, %s\n%s' % (пхукет.strftime('%d.%m %H:%M'), '\n'.join(части))
+    # 04.10.2026: обычные отказы привратника за сутки — одной строкой (раньше каждые 20 минут в Тех офис).
+    try:
+        с = (datetime.now(timezone.utc) - timedelta(hours=24)).strftime('%Y-%m-%dT%H:%M:%SZ')
+        r = urllib.request.Request(SB + '/funnel_events?event_type=eq.gate_decision&ts=gte.' + с
+                                   + '&select=metadata&limit=5000', headers={'apikey': SK, 'Authorization': 'Bearer ' + SK})
+        ев = json.loads(urllib.request.urlopen(r, timeout=60).read().decode() or '[]')
+        пр = {}
+        for e in ев:
+            m = e.get('metadata') or {}
+            if m.get('decision') != 'DENY':
+                continue
+            for x in (m.get('denies') or []):
+                x = str(x)
+                x = 'лимит номера в сутки' if 'потолок в сутки' in x else ('канал выключен' if 'канал выключен' in x else
+                    ('тихие часы' if x == 'quiet_hours' else ('ждём часы человека или разброс' if x.startswith('плотность') else x[:50])))
+                пр[x] = пр.get(x, 0) + 1
+        if пр:
+            текст += '\n\n🚦 Привратник за сутки не пустил: ' + ', '.join('%s ×%d' % (k, v) for k, v in sorted(пр.items(), key=lambda z: -z[1])[:5])
+    except Exception as ex:
+        текст += '\n\n🚦 Отказы привратника не прочитались: ' + str(ex)[:80]
     if '--покажи' in sys.argv:
         print(текст)
         return 0
