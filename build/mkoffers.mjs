@@ -161,7 +161,9 @@ function card(c) {
   const plans = c.plans ? `<ul class="pc-plans">${c.plans.map(([a, b]) => `<li><span>${esc(a)}</span><b>${esc(b)}</b></li>`).join('')}</ul>` : '';
   /* 05.10.2026 Эльнур: «карточки гигантские, некрасивые». Компактно: название, метка, одна ключевая строка, кнопки;
      полный текст и планировки — по «Подробнее». */
-  const ключ = String(c.text[1] || c.text[0] || '').split(/(?<=\.)\s/)[0];
+  const фразы = c.text.join(' ').split(/(?<=[.!?])\s+(?=[А-ЯЁA-Z])/);
+  let ключ = фразы.find(f => /(млн|тыс\.|бат|\$|%)/.test(f) && /(от |ориентир|вход|гаранти|студи)/i.test(f)) || фразы[0] || '';
+  if (ключ.length > 120) ключ = ключ.slice(0, 117).replace(/\s+\S*$/, '') + '…';
   const ещё = c.text.map(t => `<p>${esc(t)}</p>`).join('') + plans + (c.note ? `<p class="pc-note">${esc(c.note)}</p>` : '');
   return `<article class="pc-card">
     <div class="pc-top"><h2>${esc(c.name)}<span>, ${esc(c.where)}</span></h2><em>${esc(c.tag)}</em></div>
