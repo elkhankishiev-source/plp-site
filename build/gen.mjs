@@ -867,7 +867,12 @@ function orderCatalog(list) {
   return spreadFamilies(woven).concat(spreadFamilies(weak), spreadFamilies(resale));
 }
 
+/* 05.10.2026 Эльнур: «карточки есть без фото, чини!». Первой в аренде стояла The Capri Resident с заглушкой «фото скоро».
+   Как на любой витрине: объект без фото не идёт вперёд, он встаёт в конец, пока фото не появятся. Порядок остальных не меняется. */
+function сФотоВперёд(list) { return list.filter(p => p.photo).concat(list.filter(p => !p.photo)); }
+
 function emitCatalogBlock(catalog) {
+  catalog = сФотоВперёд(catalog);
   const items = catalog.map(p => '  ' + JSON.stringify(p)).join(',\n');
   return MARK_START + '\n' +
     'PL.PROPERTIES=[\n' + items + '\n];\n' +
@@ -1055,6 +1060,7 @@ function buildRentals(objects, preserve, ratesBy) {
 }
 
 function emitRentalsBlock(rentals) {
+  rentals = сФотоВперёд(rentals);
   // < → <, чтобы свободный текст из БД не мог закрыть <script>
   const items = rentals.map(p => '  ' + JSON.stringify(p).replace(/</g, '\\u003c')).join(',\n');
   return MARK_RENT_START + '\n' +
