@@ -594,7 +594,16 @@ def main():
     for ph, rr in byph.items():
         tail = [x['role'] for x in rr][-3:]
         if len(tail) >= 2 and tail[-1] == 'assistant' and tail[-2] == 'assistant':
-            tech.append('✋ Двойник отправил два сообщения подряд без ответа человека: %s' % ph)
+            # 05.10.2026: канон 114 — в день 0 до пяти наших сообщений без ответа с шагом 3 часа, это лестница, а не ошибка.
+            # Тревога была шумом каждые 20 минут. Нарушение — два подряд чаще, чем раз в 2,5 часа (шквал).
+            try:
+                t1 = datetime.fromisoformat(str(rr[-2]['ts']).replace('Z', '+00:00'))
+                t2 = datetime.fromisoformat(str(rr[-1]['ts']).replace('Z', '+00:00'))
+                шквал = (t2 - t1).total_seconds() < 2.5 * 3600
+            except Exception:
+                шквал = True
+            if шквал:
+                tech.append('✋ Двойник отправил два сообщения подряд чаще раза в 2,5 ч без ответа человека: %s' % ph)
 
     # 11. сборщик почты не отработал
     if os.path.exists('/var/log/plp_mail_intake.log'):
