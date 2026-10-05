@@ -36,6 +36,9 @@ YT = {
     'Tumanov Group': 'UCqeV4QXM0-j12-dXeDB10GQ',
     'Royal Property Thailand': 'UCU2ZUkn_67i3uOywh4Sc_XA',
     'Mango Family Phuket': 'UCJy5vvB3cVSmvrK5gsdO8cg',
+    # 05.10 Эльнур: «под контролем» — Малина, Mango, Валера Phuket 4 Life, Жанна GetYourPhuket
+    'Малина (Malina Thailand)': 'UCpRvID9iOe3RAIBe75JOoLA',
+    'Mango Family (mngfamily)': 'UCK8VARJqMJjrn7VHDDyFxZw',
 }
 
 # О ком ищем новости раз в неделю: наши застройщики и рынок острова.
