@@ -25,7 +25,8 @@ def env(k, f='/opt/plp-api/.env'):
 
 SB = env('SUPABASE_URL').rstrip('/') + '/rest/v1'
 SK = env('SUPABASE_SERVICE_KEY')
-ТОКЕН, КОМУ = env('TG_BOT_TOKEN'), env('TG_TECH_CHAT_ID')   # офисный бот, «PLP · Тех офис»
+ТОКЕН, КОМУ = env('TG_BOT_TOKEN'), env('TG_TECH_CHAT_ID')
+ПРОДАЖИ = ''   # офисный бот, «PLP · Тех офис»
 
 
 def rpc(имя, тело=None):
@@ -61,8 +62,11 @@ def главное():
         св = (json.loads(urllib.request.urlopen(r, timeout=60).read().decode() or '[]') or [None])[0]
         if св:
             пр = св.get('по_правилам') or {}
-            текст += '\n\n📋 Сверка за сутки: сообщений лидам %s, нарушений %s%s' % (св.get('сообщений'), св.get('нарушений'),
-                     (': ' + ', '.join('%s ×%s' % (k, v) for k, v in sorted(пр.items(), key=lambda z: -z[1])[:4])) if пр else '')
+            # 05.10.2026 Эльнур: «продажи это продажи, тех это тех» — работа с лидами уходит в «Отдел продаж», в «Тех офис» только техника
+            global ПРОДАЖИ
+            ПРОДАЖИ = ('📋 Работа с лидами за сутки (%s): сообщений %s, нарушений %s' % (пхукет.strftime('%d.%m'), св.get('сообщений'), св.get('нарушений'))
+                       + ''.join('\n• %s: %s' % (k.split(' (')[0], v) for k, v in sorted(пр.items(), key=lambda z: -z[1])[:6])
+                       + ''.join('\n  пример %s — %s' % (x.get('номер'), str(x.get('кусок'))[:90]) for x in (св.get('примеры') or [])[:4]))
             текст += '\n📌 Утверждено, но не внедрено: %d' % len(св.get('не_внедрено') or [])
     except Exception as ex:
         текст += '\n\n📋 Сверка не прочиталась: ' + str(ex)[:80]
@@ -87,8 +91,16 @@ def главное():
     except Exception as ex:
         текст += '\n\n🚦 Отказы привратника не прочитались: ' + str(ex)[:80]
     if '--покажи' in sys.argv:
-        print(текст)
+        print(текст); print('--- в Отдел продаж ---'); print(ПРОДАЖИ)
         return 0
+    if ПРОДАЖИ and env('TG_ALERT_CHAT_ID'):
+        try:
+            urllib.request.urlopen(urllib.request.Request('https://api.telegram.org/bot%s/sendMessage' % ТОКЕН,
+                data=json.dumps({'chat_id': env('TG_ALERT_CHAT_ID'), 'text': ПРОДАЖИ[:3900], 'disable_web_page_preview': True}).encode(),
+                headers={'Content-Type': 'application/json'}), timeout=60)
+            print('итог по лидам ушёл в Отдел продаж')
+        except Exception as e:
+            print('в Отдел продаж не ушло:', e)
     r = urllib.request.Request('https://api.telegram.org/bot%s/sendMessage' % ТОКЕН,
                                data=json.dumps({'chat_id': КОМУ, 'text': текст[:3900],
                                                 'disable_web_page_preview': True}).encode(),
