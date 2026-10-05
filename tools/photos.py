@@ -58,9 +58,9 @@ def looks_like_image(data: bytes) -> bool:
 def shrink(data: bytes):
     """Уменьшаем до разумного размера прямо перед заливкой: оригинал не храним."""
     try:
-        from PIL import Image
+        from PIL import Image, ImageOps
         import io
-        im = Image.open(io.BytesIO(data))
+        im = ImageOps.exif_transpose(Image.open(io.BytesIO(data)))   # 05.10: поворот по отметке камеры
         im = im.convert('RGB')
         if im.width > MAX_W:
             im = im.resize((MAX_W, round(im.height * MAX_W / im.width)), Image.LANCZOS)
@@ -157,7 +157,8 @@ def to_r2(key, data):
         c = json.load(open(os.path.expanduser('~/.plp_r2.json')))
         _r2 = (boto3.client('s3', endpoint_url=c['endpoint'], aws_access_key_id=c['access_key_id'],
                             aws_secret_access_key=c['secret_access_key'], region_name='auto'), c['bucket'])
-    im = Image.open(io.BytesIO(data)).convert('RGB')
+    from PIL import ImageOps
+    im = ImageOps.exif_transpose(Image.open(io.BytesIO(data))).convert('RGB')   # 05.10: без этого кадр «боком» уходил на сайт повёрнутым
     for w, suf in ((760, '-760'), (1600, '-1600')):
         cp = im.copy(); cp.thumbnail((w, w)); buf = io.BytesIO(); cp.save(buf, 'WEBP', quality=80, method=5)
         _r2[0].put_object(Bucket=_r2[1], Key=base + suf + '.webp', Body=buf.getvalue(), ContentType='image/webp',
