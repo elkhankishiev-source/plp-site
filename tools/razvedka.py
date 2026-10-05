@@ -38,7 +38,11 @@ YT = {
     'Mango Family Phuket': 'UCJy5vvB3cVSmvrK5gsdO8cg',
     # 05.10 Эльнур: «под контролем» — Малина, Mango, Валера Phuket 4 Life, Жанна GetYourPhuket
     'Малина (Malina Thailand)': 'UCpRvID9iOe3RAIBe75JOoLA',
-    'Mango Family (mngfamily)': 'UCK8VARJqMJjrn7VHDDyFxZw',
+    # 05.10: новые сильные игроки (разбор помощника): Лосев, VillaCarte, Hayat Estate, My Land Phuket
+    'Losev.Thai (Алексей Лосев)': 'UC94iv6CO0wMu66sAaN8fh3g',
+    'VillaCarte': 'UCt5bJSvlrU8q7IGuO1LHjkg',
+    'Hayat Estate': 'UC8EKQx1pP2hbO0n0_RZF3YQ',
+    'My Land Phuket (Ольга и Сергей)': 'UCfVWbTzM3mbiEdmLm2EzYjw',
 }
 
 # О ком ищем новости раз в неделю: наши застройщики и рынок острова.
