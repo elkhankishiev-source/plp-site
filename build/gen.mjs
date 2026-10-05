@@ -175,10 +175,29 @@ function pubOf(o) { return (o && o.public_code) || (o && o.plp_property_id) || '
    там разная информация и фото и подача, это как вообще?». Расходились именно
    кадры: карточка брала первые восемь из общей ленты (восемь фасадов подряд),
    страница — по кругу из каждого раздела. Теперь правило одно и живёт здесь. */
+/* 05.10.2026 (ночь) Эльнур: «я не разрешаю выгружать на первые страницы схемы, номера дверей, туалеты, всякий бред
+   и запрещённое». Правило (память plp-object-media-pipeline): на витрину — только рендеры и парадные кадры.
+   Галерея брала снимки по кругу из ВСЕХ групп, поэтому планировки (410), мастер-планы (147) и сканы разрешений
+   (Mono Champaca) вставали в первые кадры и в каталог. Вид снимка записан в адресе инструментом заливки
+   (objects/<ID>/<вид>/…): в витрину идут только обложка, территория, интерьеры, инфраструктура и старые снимки
+   без вида. Планировки остаются в своём блоке рядом с ценами, мастер-план и ход стройки — в своих разделах. */
+const НЕ_ВИТРИНА = /\/objects\/[^/]+\/(plans?|master|progress|docs?|documents?|permits?|floorplans?)\//i;
+const НЕ_ВИТРИНА_ГРУППА = /plan|план|unit|тип|master|мастер|генплан|siteplan|progress|стройк|doc|документ|permit|разреш/i;
+/* 05.10.2026: вид каждого фото витрины размечен (таблица фото_витрина, /opt/plp-tools/photo_classify.py):
+   санузлы, техника, слайды с текстом, коридоры с номерами дверей, стройка и брак в первые кадры не идут. */
+const НЕ_ПАРАДНЫЕ = new Set();
+function ключФото(u) { return String(u || '').replace(/-(760|1600)\.webp$/, ''); }
+function витрина(u) { return /^https?:/.test(String(u || '')) && !НЕ_ВИТРИНА.test(String(u)) && !НЕ_ПАРАДНЫЕ.has(ключФото(u)); }
+function главноеФото(o) {
+  if (!o) return null;
+  if (витрина(o.main_image_url)) return o.main_image_url;
+  return heroGallery(o, 1)[0] || null;
+}
 function heroGallery(o, limit = 8) {
-  const all = Array.isArray(o.gallery_urls) ? o.gallery_urls.filter(u => /^https?:/.test(u)) : [];
+  const all = Array.isArray(o.gallery_urls) ? o.gallery_urls.filter(витрина) : [];
   const gs = (Array.isArray(o.photo_groups) ? o.photo_groups : [])
-    .map(g => (Array.isArray(g.urls) ? g.urls.filter(u => /^https?:/.test(u)) : []))
+    .filter(g => !НЕ_ВИТРИНА_ГРУППА.test(String(g.key || '') + ' ' + String(g.name || '')))
+    .map(g => (Array.isArray(g.urls) ? g.urls.filter(витрина) : []))
     .filter(a => a.length);
   if (gs.length < 2) return all.slice(0, limit);
   const out = [];
@@ -460,10 +479,10 @@ function buildCatalog(objects, benchmarks, preserve) {
       beachM: (o.distance_beach_m === 0 || o.distance_beach_m) ? o.distance_beach_m : null,
       // Снимки из хранилища: первый идёт обложкой, остальные — лентой в карточке.
       // Локальные img/<ID>.jpg остаются запасным вариантом для старых объектов.
-      photo: thumbUrl(o.main_image_url, 760, 72),
+      photo: thumbUrl(главноеФото(o), 760, 72),
       /* «полный» снимок для окна — тоже превью, просто крупнее: оригинал
          на 19 МБ никому на экране не нужен */
-      photoFull: thumbUrl(o.main_image_url, 1600, 80),
+      photoFull: thumbUrl(главноеФото(o), 1600, 80),
       photos: heroGallery(o).length ? heroGallery(o).map(u => thumbUrl(u, 1280, 78)) : null,
       // Планировки: человек выбирает тип и сразу видит его площадь и спальни.
       // Где застройщик не давал названий планировок, берём тиры из прайса
@@ -1019,10 +1038,10 @@ function buildRentals(objects, preserve, ratesBy) {
       // 05.09: у аренды на витрине не было ни одного снимка — поля просто не
       // доезжали из базы. Теперь галерея, разделы и планировки тянутся так же,
       // как у продажи.
-      photo: thumbUrl(o.main_image_url, 760, 72),
+      photo: thumbUrl(главноеФото(o), 760, 72),
       /* «полный» снимок для окна — тоже превью, просто крупнее: оригинал
          на 19 МБ никому на экране не нужен */
-      photoFull: thumbUrl(o.main_image_url, 1600, 80),
+      photoFull: thumbUrl(главноеФото(o), 1600, 80),
       photos: heroGallery(o).length ? heroGallery(o).map(u => thumbUrl(u, 1280, 78)) : null,
       groups: Array.isArray(o.photo_groups)
         ? o.photo_groups.map(g => Object.assign({}, g, {
@@ -1426,9 +1445,9 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
     : null;
   const _местный = fs.existsSync(path.join(ROOT, 'img', pub + '.jpg'))
     ? '../img/' + pub + '.jpg' : '../img/og-default.jpg';
-  const heroSrc = thumbUrl(o.main_image_url, 1600, 80)
+  const heroSrc = thumbUrl(главноеФото(o), 1600, 80)
     || gallery[0]
-    || (_родитель && thumbUrl(_родитель.main_image_url, 1600, 80))
+    || (_родитель && thumbUrl(главноеФото(_родитель), 1600, 80))
     || _местный;
   const shots = gallery.length > 1
     ? '<div class="shots">' + gallery.map((u, i) =>
@@ -1764,8 +1783,8 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
            местный файл, потом общая обложка. */
         const xпар = x.parent_object_id
           ? (allObjects || []).find(y => y.plp_property_id === x.parent_object_id) : null;
-        const xi = thumbUrl(x.main_image_url, 520, 72)
-          || (xпар && thumbUrl(xпар.main_image_url, 520, 72))
+        const xi = thumbUrl(главноеФото(x), 520, 72)
+          || (xпар && thumbUrl(главноеФото(xпар), 520, 72))
           || (fs.existsSync(path.join(ROOT, 'img', xp + '.jpg'))
                 ? '../img/' + xp + '.jpg' : '../img/og-default.jpg');
         const xg = GROUP_RU[saleGroup(x)] || '';
@@ -2069,6 +2088,11 @@ async function main() {
   // 30.08: добавлен фильтр по назначению. Раньше в каталог продажи попадало ВСЁ с
   // on_site=true — пока аренды на витрине не было, баг не проявлялся; как только
   // появились арендные объекты, они протекли в продажу (21 → 27).
+  try {
+    for (const x of (await sbGet(env, encodeURIComponent('фото_витрина') + '?select=url&' + encodeURIComponent('вид') + '=neq.' + encodeURIComponent('парадный') + '&limit=20000')) || [])
+      НЕ_ПАРАДНЫЕ.add(x.url);
+    console.log('[витрина] не парадных фото: ' + НЕ_ПАРАДНЫЕ.size);
+  } catch (e) { console.log('[витрина] разметка фото не прочиталась: ' + String(e.message || e).slice(0, 80)); }
   const objects = await sbGet(env,
     'objects?on_site=eq.true&purpose=not.in.(' + encodeURIComponent('аренда') + ',rent)' +
     '&order=plp_property_id' +
