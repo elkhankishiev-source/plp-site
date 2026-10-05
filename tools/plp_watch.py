@@ -337,6 +337,24 @@ def main():
         tech.append('⏳ Касания одобрены, но не ушли (%d): %s'
                     % (len(stuck), ', '.join(str(s['id']) for s in stuck[:10])))
 
+    # 1б. 05.10.2026 Эльнур: «последнее сообщение лидам в 14:50, почему никто не следит?» С 13:17 до 21:00 касания
+    # застревали в черновиках (проверка смысла не видела офферов) и в плане (ложный потолок), а пункт 1 смотрит
+    # только approved — 6 часов тишины прошли без тревоги. Теперь: в рабочее окно 08:00–20:30 по Пхукету
+    # есть просроченные больше 2 ч касания и за 2 ч ни одно не ушло — тревога с главными причинами.
+    _час = datetime.now(timezone.utc) + timedelta(hours=7)
+    if 8 * 60 + 120 <= _час.hour * 60 + _час.minute <= 20 * 60 + 30:
+        висят = get('/touch_queue?status=in.(planned,draft)&kind=in.(cold,silence)&scheduled_at=lt.'
+                    + urllib.parse.quote(iso(120)) + '&select=id,status,note&limit=300')
+        ушло = get('/touch_queue?status=eq.sent&sent_at=gte.' + urllib.parse.quote(iso(120)) + '&select=id&limit=1')
+        if висят and not ушло:
+            причины = {}
+            for x in висят:
+                к = re.sub(r'[0-9.,:]+', '#', str(x.get('note') or 'без заметки'))[:60]
+                причины[к] = причины.get(к, 0) + 1
+            tech.append('🛑 Касания стоят: за 2 ч не ушло ни одного, просрочено %d (черновиков %d). Причины: %s'
+                        % (len(висят), sum(1 for x in висят if x.get('status') == 'draft'),
+                           '; '.join('%s ×%d' % (k, v) for k, v in sorted(причины.items(), key=lambda x: -x[1])[:4])))
+
     # 2. привратник отказал за последний час — причины важнее самого факта
     den = get('/funnel_events?event_type=eq.gate_decision&ts=gte.' + urllib.parse.quote(iso(60))
               + '&select=metadata&limit=200')
