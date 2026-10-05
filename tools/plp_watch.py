@@ -326,6 +326,21 @@ def main():
         tech.append('☎️ Непригодные номера в новых карточках (%d): %s. %s'
                     % (len(битые), примеры, битые[0][1]))
 
+    # 0б. 05.10.2026: двойник карточки. Валерии в 22:55 завелись две лишние карточки — номер стоял в поле Telegram id,
+    # а id пришёл с приставкой «tg». Ловим в тот же час: tg_id из 11+ цифр (это номер) или телефон, который уже есть у другой карточки.
+    новые = get('/clients?created_at=gte.' + urllib.parse.quote(iso(180)) + '&слит_в=is.null&select=code,phone,tg_id&limit=200')
+    дв = []
+    for c in новые or []:
+        if c.get('tg_id') and len(str(c['tg_id'])) >= 11:
+            дв.append('%s (номер в поле Telegram id)' % c.get('code'))
+        elif c.get('phone'):
+            те = get('/clients?phone=eq.%s&code=neq.%s&слит_в=is.null&select=code&limit=1'
+                     % (urllib.parse.quote(str(c['phone'])), urllib.parse.quote(str(c.get('code')))))
+            if те:
+                дв.append('%s = %s (один телефон)' % (c.get('code'), те[0].get('code')))
+    if дв:
+        tech.append('👥 Похоже на двойника карточки (%d): %s. Склейка — client_link, только после проверки.' % (len(дв), ', '.join(дв[:6])))
+
     # 1. касание одобрено, но не ушло больше часа — отправщик или привратник встал.
     # 23.09: сторож смотрел на created_at — когда строку ЗАВЕЛИ, а не когда ей пора.
     # Касание, заведённое 21-го и назначенное на 25-е, он объявлял застрявшим и
