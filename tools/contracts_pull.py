@@ -13,8 +13,12 @@
 import argparse, email, imaplib, json, os, pathlib, re, sys, urllib.request
 from email.header import decode_header
 
-c = json.load(open('/tmp/.sb'))
-URL, KEY = c['url'], c['key']
+# 05.10.2026: доступ к базе берём из постоянного файла настроек (~/.plp_site_supabase.env), временная копия ключа в /tmp не нужна
+if os.path.exists('/tmp/.sb'):
+    c = json.load(open('/tmp/.sb')); URL, KEY = c['url'], c['key']
+else:
+    _e = dict(l.strip().split('=', 1) for l in open(os.path.expanduser('~/.plp_site_supabase.env'), encoding='utf-8') if '=' in l and not l.startswith('#'))
+    URL, KEY = _e['SUPABASE_URL'].strip('"'), _e['SUPABASE_SERVICE_KEY'].strip('"')
 H = {'apikey': KEY, 'Authorization': 'Bearer ' + KEY, 'Content-Type': 'application/json'}
 BUCKET = 'client-docs'
 # Ищем во всех рабочих папках, а не только во «Входящих»: договоры Эльнур
@@ -30,6 +34,9 @@ AGENCY = re.compile(r'agency\s*agreement|агентск', re.I)
 PROJ_CODE = {'LEGENDARY': 'LEB', 'KATABELLO': 'KAT', 'ESTELLA': 'EST',
              'HERITAGE': 'HEB', 'SERENITY': 'SEN', 'CIELO': 'CIR',
              'MODEVA': 'MOB', 'ADORA': 'ADR'}
+
+
+UNIT_PREFIX = {'KATABELLO': ['KK']}   # код юнита у застройщика: KKA206, KKF302
 
 
 def req(method, path, body=None):
@@ -145,6 +152,10 @@ def handle(M, code, ak, apply):
         queries.append('(TEXT "%s" TEXT "%s")' % (w, flat))
     if len(flat) >= 4:
         queries.append('TEXT "%s"' % flat)          # номер юнита сам по себе достаточно редкий
+    # 05.10.2026: застройщик пишет юнит своим кодом (Katabello A-606 → KKA606), а почтовый поиск ищет слово целиком:
+    # по «A606» письма про KKA606 не находились, и в папку Katabello лёг чужой договор Legendary A606.
+    for pref in UNIT_PREFIX.get(proj.upper(), []):
+        queries.append('TEXT "%s%s"' % (pref, flat))
 
     found = []
     for box in FOLDERS:
