@@ -59,32 +59,42 @@ def запиши(таблица, строки, конфликт=None):
     urllib.request.urlopen(r, timeout=60)
 
 
+def _yt_токен():
+    """05.10: открытые ленты YouTube с серверного адреса отдают 404 — берём официальный API по нашему входу Google."""
+    t = json.load(open('/root/.plp_google_youtube.json'))
+    o = json.load(open('/root/.plp_google_oauth.json'))
+    r = urllib.request.Request('https://oauth2.googleapis.com/token', data=urllib.parse.urlencode({
+        'refresh_token': t['refresh_token'], 'client_id': o['client_id'], 'client_secret': o['client_secret'],
+        'grant_type': 'refresh_token'}).encode())
+    return json.loads(urllib.request.urlopen(r, timeout=30).read())['access_token']
+
+
 def yt():
-    ns = {'a': 'http://www.w3.org/2005/Atom', 'yt': 'http://www.youtube.com/xml/schemas/2015',
-          'media': 'http://search.yahoo.com/mrss/'}
     гр = datetime.now(timezone.utc) - timedelta(days=14)
+    ток = _yt_токен()
+    def api(path):
+        q = urllib.request.Request('https://www.googleapis.com/youtube/v3/' + path, headers={'Authorization': 'Bearer ' + ток})
+        return json.loads(urllib.request.urlopen(q, timeout=30).read())
     строки = []
     for имя, cid in YT.items():
         try:
-            x = ET.fromstring(urllib.request.urlopen('https://www.youtube.com/feeds/videos.xml?channel_id=' + cid, timeout=30).read())
+            items = api('playlistItems?part=snippet,contentDetails&maxResults=15&playlistId=UU' + cid[2:]).get('items', [])
         except Exception as e:
-            print('лента не открылась:', имя, e)
+            print('канал не открылся:', имя, e)
             continue
-        for e in x.findall('a:entry', ns):
-            vid = e.findtext('yt:videoId', '', ns)
-            когда = e.findtext('a:published', '', ns)
-            if not vid or datetime.fromisoformat(когда.replace('Z', '+00:00')) < гр:
-                continue
-            g = e.find('media:group', ns)
-            стат = g.find('media:community/media:statistics', ns) if g is not None else None
-            оц = g.find('media:community/media:starRating', ns) if g is not None else None
+        свежие = [x for x in items if datetime.fromisoformat(x['contentDetails']['videoPublishedAt'].replace('Z', '+00:00')) >= гр]
+        стат = {}
+        if свежие:
+            for v in api('videos?part=statistics&id=' + ','.join(x['contentDetails']['videoId'] for x in свежие)).get('items', []):
+                стат[v['id']] = v.get('statistics', {})
+        for x in свежие:
+            vid = x['contentDetails']['videoId']; st = стат.get(vid, {})
             строки.append({'сборщик': 'yt_competitors', 'канал': 'youtube', 'источник': имя, 'тема': 'конкурент',
-                           'заголовок': e.findtext('a:title', '', ns),
-                           'текст': (g.findtext('media:description', '', ns) if g is not None else '')[:1500],
+                           'заголовок': x['snippet'].get('title', ''), 'текст': x['snippet'].get('description', '')[:1500],
                            'ссылка': 'https://www.youtube.com/watch?v=' + vid,
-                           'метрики': {'просмотры': int(стат.get('views')) if стат is not None else None,
-                                       'оценки': int(оц.get('count')) if оц is not None else None},
-                           'опубликовано': когда, 'ключ': 'yt:' + vid, 'для_кого': 'smm'})
+                           'метрики': {'просмотры': int(st.get('viewCount', 0) or 0), 'лайки': int(st.get('likeCount', 0) or 0),
+                                       'комментарии': int(st.get('commentCount', 0) or 0)},
+                           'опубликовано': x['contentDetails']['videoPublishedAt'], 'ключ': 'yt:' + vid, 'для_кого': 'smm'})
     запиши('разведка', строки, 'ключ')
     print('YouTube: роликов за 14 дней', len(строки))
 
