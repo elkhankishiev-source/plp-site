@@ -159,11 +159,14 @@ function card(c) {
   if (pdfOk) btns.push(`<a class="btn btn-ghost" href="${c.pdf}" download>Получить PDF</a>`);
   if (c.ask) btns.push(`<a class="btn btn-primary" href="${WA}${encodeURIComponent(c.ask)}" target="_blank" rel="noopener">Получить презентацию</a>`);
   const plans = c.plans ? `<ul class="pc-plans">${c.plans.map(([a, b]) => `<li><span>${esc(a)}</span><b>${esc(b)}</b></li>`).join('')}</ul>` : '';
+  /* 05.10.2026 Эльнур: «карточки гигантские, некрасивые». Компактно: название, метка, одна ключевая строка, кнопки;
+     полный текст и планировки — по «Подробнее». */
+  const ключ = String(c.text[1] || c.text[0] || '').split(/(?<=\.)\s/)[0];
+  const ещё = c.text.map(t => `<p>${esc(t)}</p>`).join('') + plans + (c.note ? `<p class="pc-note">${esc(c.note)}</p>` : '');
   return `<article class="pc-card">
     <div class="pc-top"><h2>${esc(c.name)}<span>, ${esc(c.where)}</span></h2><em>${esc(c.tag)}</em></div>
-    ${c.text.map(t => `<p>${esc(t)}</p>`).join('\n    ')}
-    ${plans}
-    ${c.note ? `<p class="pc-note">${esc(c.note)}</p>` : ''}
+    <p class="pc-key">${esc(ключ)}</p>
+    <details class="pc-more"><summary>Подробнее</summary>${ещё}</details>
     <div class="pc-btns">${btns.join('')}</div>
   </article>`;
 }
@@ -175,10 +178,14 @@ function card(c) {
 .pc-wrap{padding:28px 0 40px}
 .pc-wrap h1{font-size:clamp(1.6rem,4vw,2.2rem);margin:0 0 8px}
 .pc-lead{color:var(--muted);margin:0 0 22px;max-width:640px}
-.pc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:16px}
-.pc-card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r,14px);padding:20px;display:flex;flex-direction:column;gap:10px}
+.pc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,280px),1fr));gap:12px;align-items:start}
+.pc-card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r,14px);padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.pc-key{font-size:.95rem}
+.pc-more summary{cursor:pointer;color:var(--muted);font-size:.88rem}
+.pc-more[open]{display:flex;flex-direction:column;gap:8px}
+.pc-more p{font-size:.92rem}
 .pc-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
-.pc-top h2{margin:0;font-size:1.35rem}
+.pc-top h2{margin:0;font-size:1.12rem}
 .pc-top h2 span{font-weight:500;color:var(--muted)}
 .pc-top em{font-style:normal;font-size:.8rem;padding:3px 10px;border-radius:99px;background:var(--green-soft);color:var(--green-text)}
 .pc-card p{margin:0;line-height:1.5}
@@ -187,7 +194,7 @@ function card(c) {
 .pc-plans b{font-weight:600;white-space:nowrap}
 .pc-note{color:var(--muted);font-size:.9rem}
 .pc-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto;padding-top:6px}
-.pc-btns .btn{font-size:14px}
+.pc-btns .btn{font-size:13px;padding:7px 12px}
 .pc-foot{color:var(--muted);font-size:.85rem;margin:20px 0 0;max-width:640px}
 </style>
 <section class="pc-wrap"><div class="container">
