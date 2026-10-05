@@ -37,7 +37,7 @@ YT = {
     'Royal Property Thailand': 'UCU2ZUkn_67i3uOywh4Sc_XA',
     'Mango Family Phuket': 'UCJy5vvB3cVSmvrK5gsdO8cg',
     # 05.10 Эльнур: «под контролем» — Малина, Mango, Валера Phuket 4 Life, Жанна GetYourPhuket
-    'Малина (Malina Thailand)': 'UCpRvID9iOe3RAIBe75JOoLA',
+    'Малина (Дмитрий Тюменцев, @malina.thailand)': 'UCZ_ThWnR8Kx0l0hc6Oct4vg',  # 05.10: прежний UCpRv… был пустой однофамилец
     # 05.10: новые сильные игроки (разбор помощника): Лосев, VillaCarte, Hayat Estate, My Land Phuket
     'Losev.Thai (Алексей Лосев)': 'UC94iv6CO0wMu66sAaN8fh3g',
     'VillaCarte': 'UCt5bJSvlrU8q7IGuO1LHjkg',
