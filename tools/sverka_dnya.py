@@ -44,6 +44,7 @@ H = {'apikey': SK, 'Authorization': 'Bearer ' + SK, 'Content-Type': 'application
     'служебная метка или текст для своих',
     'признаётся, что это бот или ИИ',
     'касание без нового повода, повтор прошлого текста',
+    'пустое касание: «как дела / когда на Пхукет / какие планы» без проекта, цены или факта (05.10 Эльнур: «выводить клиента дальше, предлагать то, что нам надо продать»)',
     'ответ режет квалификацию: нет заботы, экспертизы или следующего шага',
 ]
 
@@ -65,8 +66,19 @@ def opus(system, user):
 def главное():
     с = (datetime.now(timezone.utc) - timedelta(hours=24)).strftime('%Y-%m-%dT%H:%M:%SZ')
     исход = get('/chat_history?select=phone_norm,role,content,ts,source&ts=gte.' + с
-                + '&role=eq.assistant&source=in.(touch_queue,wazzup,telegram)&order=ts.asc&limit=600')
+                + '&role=eq.assistant&source=in.(touch_queue,wazzup,telegram,telegram_direct)&order=ts.asc&limit=600')
     исход = [x for x in исход if str(x.get('phone_norm') or '') not in СВОИ and len(str(x.get('phone_norm') or '')) <= 15]
+    # 05.10: партнёры, застройщики и коллеги — не лиды, им по канону отвечаем коротко; тестовые id 9009990xx не считаем
+    исход = [x for x in исход if not str(x.get('phone_norm') or '').startswith('9009990')]
+    try:
+        номера = sorted({str(x['phone_norm']) for x in исход})
+        роли = {}
+        for k in range(0, len(номера), 100):
+            for r in get('/client_profiles?select=phone_norm,contact_role&phone_norm=in.(' + ','.join(номера[k:k + 100]) + ')'):
+                роли[str(r.get('phone_norm'))] = r.get('contact_role')
+        исход = [x for x in исход if роли.get(str(x['phone_norm'])) not in ('partner', 'developer', 'colleague', 'team', 'supplier')]
+    except Exception as e:
+        print('роли не прочитаны:', e)
     итог = {п: 0 for п in ПРАВИЛА}
     примеры = []
     for i in range(0, len(исход), 40):
