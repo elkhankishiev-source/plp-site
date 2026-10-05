@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-04",
+ "updated": "2026-10-05",
  "items": [
   {
    "id": "ATT-KYE",
@@ -1308,17 +1308,17 @@
    "name": "The Title Biancana Surin",
    "district": "Сурин",
    "type": "Кондо",
-   "price_from": 6617100,
+   "price_from": 6130950,
    "units": [
     {
      "beds": 1,
-     "code": "1BM",
-     "free": 3,
+     "code": null,
+     "free": 2,
      "name": "1 спальня",
      "area_sqm": 31,
-     "price_from_thb": 6617100,
+     "price_from_thb": 6130950,
      "area": 31,
-     "from": 6617100
+     "from": 6130950
     },
     {
      "beds": 1,
@@ -1930,22 +1930,12 @@
    "name": "The Title Heritage Bang-Tao",
    "district": "Банг Тао",
    "type": "Кондо",
-   "price_from": 5588573,
+   "price_from": 5385744,
    "units": [
     {
      "beds": 1,
      "code": "SC",
-     "free": 9,
-     "name": "1 спальня",
-     "area_sqm": 35.5,
-     "price_from_thb": 5623769,
-     "area": 35.5,
-     "from": 5623769
-    },
-    {
-     "beds": 1,
-     "code": "SC",
-     "free": 19,
+     "free": 18,
      "name": "1 спальня",
      "area_sqm": 36,
      "price_from_thb": 5616555,
@@ -1961,6 +1951,16 @@
      "price_from_thb": 5955390,
      "area": 41.5,
      "from": 5955390
+    },
+    {
+     "beds": 1,
+     "code": "MB",
+     "free": 5,
+     "name": "1 спальня",
+     "area_sqm": 47.5,
+     "price_from_thb": 6845822,
+     "area": 47.5,
+     "from": 6845822
     },
     {
      "beds": 1,
@@ -2027,16 +2027,6 @@
      "code": null,
      "free": 1,
      "name": "3 спальни",
-     "area_sqm": 122,
-     "price_from_thb": 20887146,
-     "area": 122,
-     "from": 20887146
-    },
-    {
-     "beds": 3,
-     "code": null,
-     "free": 1,
-     "name": "3 спальни",
      "area_sqm": 130,
      "price_from_thb": 22259769,
      "area": 130,
@@ -2051,6 +2041,16 @@
      "price_from_thb": 27115790,
      "area": 162.5,
      "from": 27115790
+    },
+    {
+     "beds": 3,
+     "code": null,
+     "free": 1,
+     "name": "3 спальни",
+     "area_sqm": 166,
+     "price_from_thb": 29548000,
+     "area": 166,
+     "from": 29548000
     }
    ]
   },
@@ -2660,12 +2660,12 @@
    "name": "The Title Sierra",
    "district": "Банг Тао",
    "type": "Кондо",
-   "price_from": 3145400,
+   "price_from": 3097000,
    "units": [
     {
      "beds": 1,
      "code": null,
-     "free": 69,
+     "free": 68,
      "name": "1 спальня",
      "area_sqm": 28.5,
      "price_from_thb": 3145400,
@@ -2674,13 +2674,13 @@
     },
     {
      "beds": 1,
-     "code": "1BM",
-     "free": 81,
+     "code": "1BMC",
+     "free": 14,
      "name": "1 спальня",
-     "area_sqm": 30.5,
-     "price_from_thb": 3343200,
-     "area": 30.5,
-     "from": 3343200
+     "area_sqm": 31,
+     "price_from_thb": 3781400,
+     "area": 31,
+     "from": 3781400
     },
     {
      "beds": 1,
