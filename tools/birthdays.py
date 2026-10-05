@@ -88,6 +88,17 @@ def main():
                        'body': ТЕКСТ.format(имя=ч['name'].split(' ')[0]), 'status': 'approved',
                        'scheduled_at': когда, 'persona': 'Эльнур', 'source_channel_id': WA_ЭЛЬНУР,
                        'decided_by': 'Эльнур 02.10: текст поздравления одобрен'})
+    # 05.10.2026 Эльнур: «каждому имениннику 1 кг манго лично в руки на Пхукете от нашей компании» — задача Дарье в «Отдел продаж»
+    манго = [т for т in ставим if (rpc('tz_for_phone', {'p_phone': т['phone']}) or '') == 'Asia/Bangkok']
+    if APPLY and not ДАТА and манго and env('TG_ALERT_CHAT_ID'):
+        текст = '🎂 Сегодня день рождения, клиент на Пхукете — Дарья, 1 кг манго лично в руки от компании:\n' + '\n'.join(
+            '• %s, номер …%s' % (т['body'].split(',')[0], т['phone'][-4:]) for т in манго)
+        try:
+            urllib.request.urlopen(urllib.request.Request('https://api.telegram.org/bot%s/sendMessage' % env('TG_BOT_TOKEN'),
+                data=json.dumps({'chat_id': env('TG_ALERT_CHAT_ID'), 'text': текст}).encode(),
+                headers={'Content-Type': 'application/json'}), timeout=30)
+        except Exception as e:
+            print('задача на манго не ушла:', e)
     print('дней рождения в карточках: %d; поздравить сегодня: %d%s' % (
         len(люди), len(ставим), '' if APPLY and not ДАТА else ' (без записи)'))
     for т in ставим:
@@ -102,5 +113,56 @@ def main():
     return 0
 
 
+# 05.10.2026 Эльнур «ок» на тексты: Новый год (с наступающим, 29–31.12) и Сонгкран (13.04). Только лидам и клиентам,
+# с кем говорили за полгода; партнёров, застройщиков, своих и «на паузе» отсекает touch_blocked. Потолки номера действуют (agent nurture).
+# номера команды и семьи — только в настройках сервера (PLP_OWN_NUMBERS), репозиторий публичный
+СВОИ_НОМЕРА = {x.strip() for x in env('PLP_OWN_NUMBERS').split(',') if x.strip()}
+СВОИ_НОМЕРА |= {x.strip() for x in env('PLP_DEMO_NUMBERS').split(',') if x.strip()}
+ПРАЗДНИКИ = {(12, 29): 'ny', (12, 30): 'ny', (12, 31): 'ny', (4, 13): 'songkran'}
+ПРАЗДНИК_ТЕКСТ = {
+    'ny': '{имя}, с наступающим Новым годом! Пусть {год}-й будет спокойным, а все планы сбудутся. Команда Property Library Phuket',
+    'songkran': '{имя}, сегодня на Пхукете Сонгкран, тайский Новый год. Здесь в этот день обливают друг друга водой на удачу. Желаем вам свежего начала и хороших новостей. Команда Property Library Phuket'}
+
+
+def праздники():
+    сегодня = datetime.date.fromisoformat(ДАТА) if ДАТА else datetime.datetime.now(ZoneInfo('Asia/Bangkok')).date()
+    вид = ПРАЗДНИКИ.get((сегодня.month, сегодня.day))
+    if not вид:
+        print('праздника сегодня нет'); return
+    гр = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=180)).strftime('%Y-%m-%dT%H:%M:%SZ')
+    номера = {r['phone_norm'] for r in get('/chat_history?select=phone_norm&role=eq.user&ts=gte.' + гр + '&limit=20000') if r.get('phone_norm')}
+    ставим = []
+    for ph in sorted(номера):
+        if len(ph) > 15 or rpc('touch_blocked', {'p_phone': ph}):
+            continue
+        # 05.10: touch_blocked пропустил жену Эльнура и его собственный номер — свои и семья по номеру, фамилии и имени владельца
+        if ph in СВОИ_НОМЕРА:
+            continue
+        if get('/touch_queue?select=id&kind=eq.holiday&phone=eq.%s&created_at=gte.%s-%02d-01' % (ph, сегодня.year, сегодня.month)):
+            continue
+        пр = get('/client_profiles?select=name&phone_norm=eq.%s&limit=1' % ph)
+        имя = ((пр[0].get('name') if пр else '') or '').strip()
+        if not имя_годится(имя):
+            continue
+        if re.search(r'ханкишиев|khankishiev|эльнур|property library', имя, re.I):
+            continue
+        канал = get('/chat_history?select=channel&phone_norm=eq.%s&order=ts.desc&limit=1' % ph)
+        канал = 'telegram' if (канал and канал[0].get('channel') == 'telegram') else 'whatsapp'
+        tz = rpc('tz_for_phone', {'p_phone': ph}) or 'Asia/Bangkok'
+        утро = datetime.datetime.combine(сегодня, datetime.time(10, 0), tzinfo=ZoneInfo(tz))
+        ставим.append({'phone': ph, 'channel': канал, 'agent': 'nurture', 'kind': 'holiday', 'step': 1, 'status': 'approved',
+                       'occasion': 'праздник: ' + ('Новый год' if вид == 'ny' else 'Сонгкран'),
+                       'body': ПРАЗДНИК_ТЕКСТ[вид].format(имя=имя.split(' ')[0], год=сегодня.year + 1),
+                       'scheduled_at': rpc('touch_slot', {'p_at': утро.astimezone(datetime.timezone.utc).isoformat(), 'p_phone': ph}),
+                       'persona': 'Эльнур', 'source_channel_id': WA_ЭЛЬНУР, 'decided_by': 'Эльнур 05.10: «ок» на тексты праздников'})
+    print('праздник %s: поздравить %d%s' % (вид, len(ставим), '' if APPLY and not ДАТА else ' (без записи)'))
+    for т in ставим[:5]:
+        print('  ✓ …%s · %s' % (т['phone'][-4:], т['body'][:70]))
+    if APPLY and not ДАТА and ставим:
+        urllib.request.urlopen(urllib.request.Request(SB + '/touch_queue', method='POST', data=json.dumps(ставим, ensure_ascii=False).encode(),
+                                                      headers=dict(H, Prefer='return=minimal')), timeout=60)
+
+
 if __name__ == '__main__':
-    sys.exit(main())
+    main()
+    праздники()
