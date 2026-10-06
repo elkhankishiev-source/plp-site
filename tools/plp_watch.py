@@ -379,6 +379,21 @@ def main():
         if post('/ops_orders', {'text': текст, 'status': 'новое'}):
             sales.append('🤝 Двойник пообещал …%s: «%s» — дело в пульте' % (тел[-4:], кусок[:100]))
 
+    # 0д. 06.10.2026: очередь «Клоду». Двойник 06.10 пять раз сказал Эльнуру «ставлю Клоду задачу», а такой очереди не было —
+    # поручения пропадали (Sansiri, Nakara, Naturale, Mouana, Arise). Теперь каждое такое обещание — дело в пульте с текстом поручения.
+    for м in get('/chat_history?role=eq.assistant&ts=gte.' + urllib.parse.quote(iso(60))
+                 + '&phone_norm=in.(509498386,66954143874,8554364120,66960169127,8227351774)&select=id,phone_norm,ts,content&limit=100') or []:
+        т = str(м.get('content') or '')
+        if not re.search(r'(клод|claude)', т, re.I) or not re.search(r'(задач|переда|поруч|в работу|заведу|завести)', т, re.I):
+            continue
+        метка = '#ch%s' % м.get('id')
+        if get('/ops_orders?text=like.*' + метка + '*&select=id&limit=1'):
+            continue
+        пред = get('/chat_history?phone_norm=eq.%s&role=eq.user&ts=lte.%s&order=ts.desc&limit=1&select=content' % (м['phone_norm'], urllib.parse.quote(str(м['ts'])))) or []
+        поручение = re.sub(r'\s+', ' ', str((пред[0] if пред else {}).get('content') or ''))[:200]
+        if post('/ops_orders', {'text': 'Клоду от Эльнура %s: %s | двойник: %s' % (метка, поручение, re.sub(r'\s+', ' ', т)[:300]), 'status': 'новое'}):
+            tech.append('📥 Поручение Клоду из чата: «%s» — в «Дела»' % поручение[:100])
+
     # 0г. 06.10.2026: петля тестировщика. Валерия (SMM) пишет боту «ошибка: …» — заносим в кандидаты эталонного набора
     # вместе с ответом бота, на который она указала, и ставим дело. Набор растёт от каждой найденной ошибки.
     for з in get('/chat_history?role=eq.user&ts=gte.' + urllib.parse.quote(iso(60))
