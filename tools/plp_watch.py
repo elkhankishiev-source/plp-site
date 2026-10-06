@@ -57,6 +57,17 @@ def get(path):
         return []
 
 
+def post(path, body):
+    r = urllib.request.Request(BASE + urllib.parse.quote(path, safe="/?&=.,()*:!'~%+-_"), data=json.dumps(body).encode(),
+                               headers=dict(H, **{'Content-Type': 'application/json', 'Prefer': 'return=minimal'}),
+                               method='POST')
+    try:
+        urllib.request.urlopen(r, timeout=30)
+        return True
+    except Exception:
+        return False
+
+
 def patch(path, body):
     r = urllib.request.Request(BASE + path, data=json.dumps(body).encode(),
                                headers=dict(H, **{'Content-Type': 'application/json'}),
@@ -348,6 +359,25 @@ def main():
                 дв.append('%s = %s (один телефон)' % (c.get('code'), те[0].get('code')))
     if дв:
         tech.append('👥 Похоже на двойника карточки (%d): %s. Склейка — client_link, только после проверки.' % (len(дв), ', '.join(дв[:6])))
+
+    # 0в. 06.10.2026: учёт обещаний. Симоне 01.10 двойник пообещал «подборку с фото и видео» — за 5 дней ничего:
+    # обещание нигде не становилось задачей. Каждое «пришлю / соберу / подготовлю / отправлю» клиенту — дело в пульте.
+    _обещ = re.compile(r'(пришлю|вышлю|отправлю|скину|соберу|подготовлю|подберу и пришлю|сделаю расч|посчитаю и пришлю|пришлём|соберём|подготовим|отправим)', re.I)
+    for м in get('/chat_history?role=eq.assistant&ts=gte.' + urllib.parse.quote(iso(60))
+                 + '&source=in.(wazzup,telegram_direct,touch_queue)&select=id,phone_norm,ts,content&limit=200') or []:
+        тел = str(м.get('phone_norm') or '')
+        if not тел or тел in OWN or тел.startswith('9009990'):
+            continue
+        т = str(м.get('content') or '')
+        if not _обещ.search(т):
+            continue
+        метка = '#ch%s' % м.get('id')
+        if get('/ops_orders?text=like.*' + метка + '*&select=id&limit=1'):
+            continue
+        кусок = re.sub(r'\s+', ' ', т)[:160]
+        текст = 'Обещание клиенту …%s: «%s» — исполнить или снять с объяснением %s' % (тел[-4:], кусок, метка)
+        if post('/ops_orders', {'text': текст, 'status': 'новое'}):
+            sales.append('🤝 Двойник пообещал …%s: «%s» — дело в пульте' % (тел[-4:], кусок[:100]))
 
     # 1. касание одобрено, но не ушло больше часа — отправщик или привратник встал.
     # 23.09: сторож смотрел на created_at — когда строку ЗАВЕЛИ, а не когда ей пора.
