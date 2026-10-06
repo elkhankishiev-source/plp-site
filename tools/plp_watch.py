@@ -379,6 +379,18 @@ def main():
         if post('/ops_orders', {'text': текст, 'status': 'новое'}):
             sales.append('🤝 Двойник пообещал …%s: «%s» — дело в пульте' % (тел[-4:], кусок[:100]))
 
+    # 0е. 06.10.2026: OpenClaw с ~02.10 не отвечал Эльнуру — его WhatsApp «personal» отключился (terminal disconnect),
+    # а сторожа на это не было четыре дня. Есть такие строки за последний час — тревога: нужен QR с телефона Эльнура.
+    try:
+        _лог = '/tmp/openclaw/openclaw-%s.log' % datetime.now(timezone.utc).strftime('%Y-%m-%d')
+        if os.path.exists(_лог):
+            _хв = open(_лог, encoding='utf-8', errors='ignore').read()[-200000:]
+            _час = (datetime.now(timezone.utc) - timedelta(hours=1)).strftime('%Y-%m-%dT%H')
+            if 'terminal disconnect' in _хв and _час in _хв[_хв.rfind('terminal disconnect') - 2000:]:
+                tech.append('📵 OpenClaw: WhatsApp «personal» отключён (terminal disconnect) — Эльнуру нужно заново привязать по QR, бот ему не отвечает')
+    except Exception:
+        pass
+
     # 0д. 06.10.2026: очередь «Клоду». Двойник 06.10 пять раз сказал Эльнуру «ставлю Клоду задачу», а такой очереди не было —
     # поручения пропадали (Sansiri, Nakara, Naturale, Mouana, Arise). Теперь каждое такое обещание — дело в пульте с текстом поручения.
     for м in get('/chat_history?role=eq.assistant&ts=gte.' + urllib.parse.quote(iso(60))
