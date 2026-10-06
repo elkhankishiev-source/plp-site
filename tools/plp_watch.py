@@ -379,6 +379,23 @@ def main():
         if post('/ops_orders', {'text': текст, 'status': 'новое'}):
             sales.append('🤝 Двойник пообещал …%s: «%s» — дело в пульте' % (тел[-4:], кусок[:100]))
 
+    # 0г. 06.10.2026: петля тестировщика. Валерия (SMM) пишет боту «ошибка: …» — заносим в кандидаты эталонного набора
+    # вместе с ответом бота, на который она указала, и ставим дело. Набор растёт от каждой найденной ошибки.
+    for з in get('/chat_history?role=eq.user&ts=gte.' + urllib.parse.quote(iso(60))
+                 + '&phone_norm=in.(412711606,375333942426)&select=id,phone_norm,ts,content&limit=50') or []:
+        т = str(з.get('content') or '')
+        if not re.match(r'^\s*(ошибк|error|неверно|не так)', т, re.I):
+            continue
+        ключ = 'ch%s' % з.get('id')
+        if get('/эталон_кандидаты?ключ=eq.' + ключ + '&select=id&limit=1'):
+            continue
+        пред = get('/chat_history?phone_norm=eq.%s&ts=lt.%s&order=ts.desc&limit=4&select=role,content' % (з['phone_norm'], urllib.parse.quote(str(з['ts'])))) or []
+        бот = next((str(x.get('content') or '') for x in пред if x.get('role') == 'assistant'), '')
+        вопрос = next((str(x.get('content') or '') for x in пред if x.get('role') == 'user'), '')
+        if post('/эталон_кандидаты', {'кто': 'Валерия', 'замечание': т[:1000], 'ответ_бота': бот[:1500], 'вопрос': вопрос[:600], 'ключ': ключ}):
+            post('/ops_orders', {'text': 'Случай для эталонного набора от Валерии: «%s» — разобрать и добавить в evals/набор.json' % т[:150], 'status': 'новое'})
+            tech.append('🧪 Валерия отметила ошибку бота: «%s» — в кандидаты набора' % т[:120])
+
     # 1. касание одобрено, но не ушло больше часа — отправщик или привратник встал.
     # 23.09: сторож смотрел на created_at — когда строку ЗАВЕЛИ, а не когда ей пора.
     # Касание, заведённое 21-го и назначенное на 25-е, он объявлял застрявшим и
