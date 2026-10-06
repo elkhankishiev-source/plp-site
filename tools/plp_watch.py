@@ -385,8 +385,11 @@ def main():
         _лог = '/tmp/openclaw/openclaw-%s.log' % datetime.now(timezone.utc).strftime('%Y-%m-%d')
         if os.path.exists(_лог):
             _хв = open(_лог, encoding='utf-8', errors='ignore').read()[-200000:]
-            _час = (datetime.now(timezone.utc) - timedelta(hours=1)).strftime('%Y-%m-%dT%H')
-            if 'terminal disconnect' in _хв and _час in _хв[_хв.rfind('terminal disconnect') - 2000:]:
+            _i = _хв.rfind('terminal disconnect')
+            _стр = _хв[_хв.rfind('\n', 0, _i) + 1:(_хв.find('\n', _i) if _хв.find('\n', _i) > 0 else len(_хв))] if _i >= 0 else ''
+            _м = re.search(r'"time":"([0-9T:\-]{19})', _стр)
+            _св = _м and (datetime.now(timezone.utc) - datetime.strptime(_м.group(1), '%Y-%m-%dT%H:%M:%S').replace(tzinfo=timezone.utc)) < timedelta(minutes=90)
+            if _св:
                 tech.append('📵 OpenClaw: WhatsApp «personal» отключён (terminal disconnect) — Эльнуру нужно заново привязать по QR, бот ему не отвечает')
     except Exception:
         pass
