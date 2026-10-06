@@ -384,7 +384,7 @@ def main():
     for м in get('/chat_history?role=eq.assistant&ts=gte.' + urllib.parse.quote(iso(60))
                  + '&phone_norm=in.(509498386,66954143874,8554364120,66960169127,8227351774)&select=id,phone_norm,ts,content&limit=100') or []:
         т = str(м.get('content') or '')
-        if not re.search(r'(клод|claude)', т, re.I) or not re.search(r'(задач|переда|поруч|в работу|заведу|завести)', т, re.I):
+        if not re.search(r'((ставлю|передам|передаю|оставляю|записал|заведу)[^.!?]{0,40}(клод|claude)|(клод|claude)[^.!?]{0,15}задач)', т, re.I):
             continue
         метка = '#ch%s' % м.get('id')
         if get('/ops_orders?text=like.*' + метка + '*&select=id&limit=1'):
