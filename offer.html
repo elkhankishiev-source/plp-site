@@ -278,8 +278,10 @@ p.text{margin:0;font-size:.94rem;line-height:1.6}
         ? 'ваша цена, прайс '+baht(o.list_price) : 'цена от застройщика']);
     if(uArea||area)  cells.push([uArea||area,'площадь']);
     if(uBeds||beds)  cells.push([uBeds||beds,'спальни']);
+    if(o.plot) cells.push([String(Math.round(o.plot))+' м²','участок']);
     if(hand)  cells.push([hand,'срок сдачи']);
-    else if(o.stage) cells.push([esc(o.stage).slice(0,28),'стадия']);
+    else if(o.stage){ var _st={'ready':'Готов','completed':'Сдан','under construction':'Строится','off-plan':'Старт продаж','offplan':'Старт продаж'}[String(o.stage).toLowerCase()]||o.stage;
+      cells.push([esc(_st).slice(0,28),'стадия']); }
     if(o.beach_m!=null) cells.push([(o.beach_m>=1000?(o.beach_m/1000).toFixed(1).replace('.0','')+' км':o.beach_m+' м'),'до пляжа']);
     if(o.roi!=null && on('yield')) cells.push(['~'+o.roi+'%','ориентир доходности']);
 
