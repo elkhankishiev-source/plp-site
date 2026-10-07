@@ -230,3 +230,7 @@ function card(c) {
   fs.writeFileSync(path.join(ROOT, 'predstart.html'), html);
   console.log('predstart.html собран:', html.length, 'байт');
 }
+
+/* 07.10: mkoffers, запущенный отдельно, возвращал офферам превью Heritage (шапка главной), а mkogfix стоит только в all.mjs.
+   Поэтому превью по теме ставим и здесь, сразу после сборки офферов. */
+await import('./mkogfix.mjs');
