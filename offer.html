@@ -255,8 +255,9 @@ p.text{margin:0;font-size:.94rem;line-height:1.6}
     var B=Array.isArray(d.blocks)&&d.blocks.length?d.blocks:null;
     function on(k){ return !B || B.indexOf(k)>=0; }
     var price=baht(o.price_from);
-    var area=(o.area_min&&o.area_max&&o.area_min!==o.area_max)?(o.area_min+'–'+o.area_max+' м²')
-             :(o.area_min?o.area_min+' м²':null);
+    function _m2(x){ return String(Math.round(Number(x)*10)/10).replace('.',','); }
+    var area=(o.area_min&&o.area_max&&o.area_min!==o.area_max)?(_m2(o.area_min)+'–'+_m2(o.area_max)+' м²')
+             :(o.area_min?_m2(o.area_min)+' м²':null);
     var beds=(o.beds_min&&o.beds_max&&o.beds_min!==o.beds_max)?(o.beds_min+'–'+o.beds_max)
              :(o.beds_min?String(o.beds_min):null);
     var hand=dt(o.handover);
