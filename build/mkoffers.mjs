@@ -27,6 +27,12 @@ const OFFERS = [
     pdf: 'Vibe2_Karon.pdf',
   },
   {
+    /* 07.10.2026 Эльнур: «собрать презентацию по формату Vibe II и скинуть ссылку». Факты: слайды CG Capital (фото Эльнура 07.10) и его голосовые. */
+    slug: 'cg-capital', dir: 'offers/cg-capital',
+    title: 'Central Group на Пхукете · PURITA и Andaz — первые лоты',
+    desc: 'CG Capital, девелоперская часть Central Group: PURITA на Банг Тао и Andaz Residences на Лаяне. Сроки, первые цены, как попасть в первую очередь.',
+  },
+  {
     /* 04.10.2026 Эльнур: «на секретной странице… зеро наянг гарантия 10% годовых». Факты: objects PLP-ZERO-NAIYANG
        (current_promo, unit_types, payment_plan; прайс и сообщение застройщика 07.09.2026) и презентация застройщика 11.2025. */
     slug: 'zero-naiyang', dir: 'offers/zero-naiyang',
