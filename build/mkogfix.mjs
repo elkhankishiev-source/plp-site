@@ -24,7 +24,9 @@ function jpegSize(p) {
   return null;
 }
 
-const ОФФЕРЫ = { 'vibe2.html': 'offers/vibe2/img/preview.jpg', 'zero-naiyang.html': 'offers/zero-naiyang/img/preview.jpg' };
+const ОФФЕРЫ = { 'vibe2.html': 'offers/vibe2/img/preview.jpg', 'zero-naiyang.html': 'offers/zero-naiyang/img/preview.jpg',
+  // 07.10 Эльнур: «превью ссылки соответствующее фото, не везде одно и то же» — /cg-capital и /aileen показывали Heritage
+  'cg-capital.html': 'offers/cg-capital/img/preview.jpg', 'aileen.html': 'offers/aileen/img/hero.jpg' };
 const РАЙОНЫ = { 'bang-tao': 'PLP-SIERRA', kamala: 'PLP-VIVANA', kata: 'PLP-KATABELLO', 'koh-kaew': 'PLP-ZENITHY', layan: 'PLP-SUNHILLS-LAYAN',
   'nai-yang': 'PLP-ZERO-NAIYANG', rawai: 'PLP-FANTASY-RAWAI', surin: 'PLP-BIANCANA', karon: 'PLP-VIBE-KARON' };
 const ФИРМЕННАЯ = 'img/og-default.jpg';
