@@ -1735,7 +1735,7 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
     /^freehold/i.test(ownRaw) ? 'Фрихолд' : ownRaw;
   const ownBlock = ownRu
     ? '<section class="desc"><h2>Форма владения</h2><p>' + htmlEsc(ownRu) +
-      '</p><p class="fine">Что это значит для иностранца — в <a href="../guide/leasehold-ili-freehold">разборе форм владения</a>.</p></section>'
+      '</p><p class="fine">Что это значит для иностранца — в <a href="../#faq-leasehold-ili-freehold">ответе про формы владения</a>.</p></section>'
     : '';
 
   const distSlug = String(en || '').toLowerCase().replace(/[^a-z]+/g, '-').replace(/^-|-$/g, '');
@@ -2063,9 +2063,7 @@ function sitemap(objects, rentals) {
     ['add-property.html', '0.8'], ['about.html', '0.7'],
     ...['bang-tao','layan','surin','kamala','rawai','kata','nai-yang','koh-kaew']
         .map(d => ['districts/' + d + '.html', '0.8']),
-    ['guide/index.html', '0.7'],
-    ...['garantirovannaya-dohodnost','inostranec-mozhet-kupit','kakaya-dohodnost','kto-upravlyaet-obektom','kupit-udalenno','leasehold-ili-freehold','nalogi-i-rashody','pereprodazha-do-sdachi','risk-nedostroya','skolko-oformlyaetsya-sdelka','stoimost-uslug','viza-i-vnzh']
-        .map(g => ['guide/' + g + '.html', '0.6']),
+    /* 09.10.2026: справочник встроен в FAQ главной, /guide/* — переадресации, в сайтмап не идут */
   ];
   const parts = [];
   parts.push('<?xml version="1.0" encoding="UTF-8"?>');
