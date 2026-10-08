@@ -253,7 +253,7 @@ try{var s=localStorage.getItem('plp_lang'); if(s==='en')setL('en');}catch(e){}
         <ul>
           <li><a href="/#sale" data-i18n="ft.buy">Покупка</a></li>
           <li><a href="/rent" data-i18n="nav.rent">Аренда</a></li>
-          <li><a href="/#map" data-i18n="nav.map">Районы</a></li>
+          <!-- скрыто 09.10 по го Эльнура: блок «Районы» на главной скрыт, общей страницы районов нет; вернуть — снять hidden --><li hidden><a href="/#map" data-i18n="nav.map">Районы</a></li>
           <li><a href="/about" data-i18n="nav.about">О нас</a></li>
           <li><a href="/#faq">FAQ</a></li>
           <!-- Эльнур 08.09: «выгрузить объект должно быть на сайте, чтобы можно было

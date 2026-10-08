@@ -1810,6 +1810,16 @@
    ]
   },
   {
+   "id": "PLP-FIZZ",
+   "pub": "PLP-FIZZ",
+   "url": "https://property-library.com/object/fizz",
+   "name": "FIZZ, Ката",
+   "district": "Ката",
+   "type": "Кондо",
+   "price_from": 3700000,
+   "units": []
+  },
+  {
    "id": "PLP-GARRYA",
    "pub": "PLP-GARRYA",
    "url": "https://property-library.com/object/garrya",
@@ -2282,6 +2292,37 @@
      "price_from_thb": 96720000,
      "area": 660,
      "from": 96720000
+    }
+   ]
+  },
+  {
+   "id": "PLP-KUARTZ",
+   "pub": "PLP-KUARTZ",
+   "url": "https://property-library.com/object/kuartz",
+   "name": "KUARTZ, Карон",
+   "district": "Карон",
+   "type": "Кондо",
+   "price_from": 4100000,
+   "units": [
+    {
+     "area": "31,7–37,9 м²",
+     "name": "1 спальня"
+    },
+    {
+     "area": "45,0–47,8 м²",
+     "name": "1 спальня плюс"
+    },
+    {
+     "area": "56,6–62,7 м²",
+     "name": "2 спальни"
+    },
+    {
+     "area": "69,5 м²",
+     "name": "пентхаус 2 спальни"
+    },
+    {
+     "area": "89,2–97,2 м²",
+     "name": "пентхаус 2 спальни плюс"
     }
    ]
   },
