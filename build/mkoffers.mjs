@@ -67,6 +67,7 @@ const OFFERS = [
     slug: 'zero-naiyang', dir: 'offers/zero-naiyang',
     title: 'The ZERO Nai Yang · Най Янг — гарантия 10% на три года',
     desc: 'The ZERO Nai Yang в 350 метрах от пляжа Най Янг: гарантия 10% годовых на три года, цены, график оплаты. Предложение для клиентов Property Library Phuket.',
+    pdf: 'ZERO_NaiYang.pdf',
   },
 ];
 
