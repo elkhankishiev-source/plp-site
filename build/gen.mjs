@@ -1606,9 +1606,15 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
     txt = txt.replace(/\s*\((?:источник|source)\s*:[^)]*\)/ig, '')
              .replace(/\s*\(сообщение застройщика[^)]*\)/ig, '')
              .trim().replace(/\s*\.\s*$/, '.');
+    /* 08.10.2026 решение №273: без источников, дат и ограниченных акций — лист не должен «стареть» и уводить лида */
+    if (/ограниченн/i.test(txt)) return '';
+    txt = txt.replace(/\s*Источник[а-яё]*\s*:[^]*$/i, '')
+             .replace(/\s*\((?:[^)]*\d{1,2}\.\d{2}\.\d{2,4}[^)]*|акция на сайте|рассылка[^)]*)\)/ig, '')
+             .trim().replace(/\s*\.\s*$/, '.');
     if (txt.length < 12) return '';
     const aboutArea = /(рядом|поблизости|в соседнем|неподалёку|открыл|открывает|строит)/i.test(txt) &&
                       !/(скидк|рассрочк|спец|акци|бонус|подар|первоначальн|цены|цена)/i.test(txt);
+    if (aboutArea) return '';  /* 08.10.2026: новости района на странице объекта расходились с листом (POP Phuket) — не выводим */
     const h = aboutArea ? 'Что нового рядом' : 'Предложение застройщика';
     return '<section class="promo"><h2>' + h + '</h2><p>' + htmlEsc(txt) + '</p></section>';
   })();
@@ -1980,6 +1986,7 @@ if(dark) i.src='../img/brand/plp-mark-white.png';})();</script>
      '</section>' : (uspEn ? '<section class="desc" lang="en"><h2>About</h2><p>' + htmlEsc(uspEn) + '</p></section>' : '')}
   ${unitsBlock}
   ${plansBlock}
+  ${isRent ? '' : promoBlock}  <!-- 08.10.2026 Эльнур: «интересно на сайте нет этого графика?» — блок акции был написан, но не вставлен -->
   ${isRent ? '' : payBlock}
   ${isRent ? '' : ownBlock}
   ${facBlock}

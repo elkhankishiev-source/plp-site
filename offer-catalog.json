@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-06",
+ "updated": "2026-10-08",
  "items": [
   {
    "id": "ATT-KYE",
@@ -1678,8 +1678,36 @@
    "name": "Eden · Lake Residences",
    "district": "Банг Тао",
    "type": "Кондо",
-   "price_from": null,
-   "units": []
+   "price_from": 11904800,
+   "units": [
+    {
+     "name": "1 спальня",
+     "beds": 1,
+     "code": "1BR A Plus",
+     "area": 52,
+     "areaMin": 52,
+     "areaMax": 52,
+     "from": 11904800
+    },
+    {
+     "name": "2 спальни",
+     "beds": 2,
+     "code": "2BR A Plus",
+     "area": 80.53,
+     "areaMin": 80.53,
+     "areaMax": 80.53,
+     "from": 16911300
+    },
+    {
+     "name": "3 спальни",
+     "beds": 3,
+     "code": "3BR A Plus",
+     "area": 123.71,
+     "areaMin": 123.71,
+     "areaMax": 123.71,
+     "from": 25979100
+    }
+   ]
   },
   {
    "id": "PLP-EDEN-PARK",
