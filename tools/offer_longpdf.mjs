@@ -19,7 +19,8 @@ const port = 8700 + Math.floor(Math.random() * 200);
 const srv = spawn('python3', ['-m', 'http.server', String(port), '--bind', '127.0.0.1'], { cwd: ROOT, stdio: 'ignore' });
 try {
   await new Promise((r) => setTimeout(r, 1000));
-  execFileSync('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', ['--headless=new', '--disable-gpu',
+  execFileSync('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', ['--headless=new', '--disable-gpu', '--user-data-dir=' + fs.mkdtempSync(path.join(os.tmpdir(), 'pdfprof-')),   // свой профиль: зависший Chrome от снимков не мешает (08.10)
+   
     '--no-pdf-header-footer', '--virtual-time-budget=15000', '--print-to-pdf=' + raw,
     `http://127.0.0.1:${port}/offers/${slug}/page.htm?pdf=1`], { stdio: 'ignore', timeout: 120000 });
   execFileSync(path.join(os.homedir(), '.local/bin/uv'), ['run', '-q', '--python', '3.12', '--with', 'pymupdf', 'python', '-c',
