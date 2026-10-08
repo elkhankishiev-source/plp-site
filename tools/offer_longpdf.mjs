@@ -19,10 +19,18 @@ const port = 8700 + Math.floor(Math.random() * 200);
 const srv = spawn('python3', ['-m', 'http.server', String(port), '--bind', '127.0.0.1'], { cwd: ROOT, stdio: 'ignore' });
 try {
   await new Promise((r) => setTimeout(r, 1000));
-  execFileSync('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', ['--headless=new', '--disable-gpu', '--user-data-dir=' + fs.mkdtempSync(path.join(os.tmpdir(), 'pdfprof-')),   // свой профиль: зависший Chrome от снимков не мешает (08.10)
-   
-    '--no-pdf-header-footer', '--virtual-time-budget=15000', '--print-to-pdf=' + raw,
-    `http://127.0.0.1:${port}/offers/${slug}/page.htm?pdf=1`], { stdio: 'ignore', timeout: 120000 });
+  // 08.10.2026: Chrome печатает за ~30 с, но потом не выходит (висит его обновлятор) — ждём, пока файл допишется, и закрываем сами.
+  const ch = spawn('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', ['--headless=new', '--disable-gpu',
+    '--user-data-dir=' + fs.mkdtempSync(path.join(os.tmpdir(), 'pdfprof-')), '--no-pdf-header-footer', '--virtual-time-budget=15000',
+    '--print-to-pdf=' + raw, `http://127.0.0.1:${port}/offers/${slug}/page.htm?pdf=1`], { stdio: 'ignore' });
+  let прошлый = -1, ровно = 0;
+  for (let i = 0; i < 90 && ровно < 3; i++) {
+    await new Promise((r) => setTimeout(r, 2000));
+    const n = fs.existsSync(raw) ? fs.statSync(raw).size : 0;
+    ровно = (n > 0 && n === прошлый) ? ровно + 1 : 0; прошлый = n;
+  }
+  try { ch.kill('SIGKILL'); } catch (e) {}
+  if (!fs.existsSync(raw)) throw new Error('Chrome не напечатал PDF за 3 минуты');
   execFileSync(path.join(os.homedir(), '.local/bin/uv'), ['run', '-q', '--python', '3.12', '--with', 'pymupdf', 'python', '-c',
     `import pymupdf,sys
 d=pymupdf.open(sys.argv[1]); p=d[0]
