@@ -22,7 +22,7 @@ const OFFERS = [
   },
   {
     slug: 'vibe2', dir: 'offers/vibe2',
-    title: 'Vibe II · Карон — закрытый предстарт',
+    title: 'Vibe II Downtown · Карон — закрытый предстарт',
     desc: 'Vibe II на Кароне: предстартовые цены, бронь, график оплаты и расчёт аренды. Предложение для клиентов Property Library Phuket.',
     pdf: 'Vibe2_Karon.pdf',
   },
@@ -143,7 +143,7 @@ for (const o of OFFERS) {
 const WA = 'https://wa.me/66955492587?text=';
 const CARDS = [
   {
-    name: 'Vibe II', where: 'Карон', tag: 'закрытый лист',
+    name: 'Vibe II Downtown', where: 'Карон', tag: 'закрытый лист',
     text: ['Второй проект застройщика, у которого первый Vibe за пять дней после старта продал 61% квартир.',
            'Студии от 3,2 млн бат, это около 91 тыс. долларов за 28 м². Бронь 100–200 тыс. бат, депозит возвратный 30 дней. Сдача в IV квартале 2029.'],
     open: '/vibe2', pdf: '/offers/vibe2/Vibe2_Karon.pdf',
