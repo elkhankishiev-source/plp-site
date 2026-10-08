@@ -120,6 +120,7 @@ svg text{font-family:Manrope,Arial,sans-serif}
   <div class="block" style="left:96mm;top:4mm;width:104mm;height:94mm;transform:rotate(-2.5deg)"></div>
   <div class="photo" style="left:90mm;top:24mm;width:112mm;height:76mm;transform:rotate(-1.5deg)"><img src="img/std-court.webp" alt="The Standard Residences, Банг Тао, рендер застройщика"></div>
   <div class="label" style="left:158mm;top:9mm;transform:rotate(6deg)">с 1947 года</div>
+  <div class="dd" style="left:66mm;top:88mm;width:20mm;transform:rotate(-6deg)"><img src="../../img/doodles/palm.webp" alt=""></div>
 </div>
 
 <div class="stats">
@@ -173,6 +174,14 @@ svg text{font-family:Manrope,Arial,sans-serif}
     <div><b>6 × 7</b><span>корпусов × этажей</span></div>
     <div><b>12,5 рай</b><span>участок резиденций</span></div>
     <div><b>IV кв. 2026</b><span>сдача</span></div>
+  </div>
+  <div class="grid g2" style="margin:0 0 7mm;align-items:start">
+    <div class="card"><h3>Продано до сдачи</h3>
+      <svg id="sold" viewBox="0 0 110 58" style="width:100%;height:62mm"></svg>
+      <p class="src">166 из 188: Bangkok Post, 2026. В продаже 18: прайс застройщика 05.10.2026.</p></div>
+    <div class="card"><h3>Что осталось: цена за м², тыс. ฿</h3>
+      <svg id="ppm" viewBox="0 0 110 58" style="width:100%;height:62mm"></svg>
+      <p class="src">Расчёт по прайсу застройщика 05.10.2026: цена квартиры, делённая на площадь.</p></div>
   </div>
   <div class="pgrid">
     <div class="pol" style="transform:rotate(-.6deg)"><img style="object-position:center top" src="img/std-pool.webp" alt="The Standard Residences, бассейн"><i>бассейн 25 метров</i></div>
@@ -263,6 +272,7 @@ svg text{font-family:Manrope,Arial,sans-serif}
 <section class="pad">
   <div class="eyebrow">Лаян</div>
   <h2>Andaz Resort &amp; Residences: последний участок у пляжа Лаян</h2>
+  <div class="dd" style="right:15mm;top:6mm;width:17mm;transform:rotate(-5deg)"><img src="../../img/doodles/umbrella.webp" alt=""></div>
   <p class="lead">Брендированные резиденции под маркой Andaz. Не больше 100 квартир и около 9 вилл, поэтому первые лоты разойдутся по своим. Старт продаж по графику застройщика в I квартале 2027.</p>
   <div class="photo" style="position:relative;left:0;top:0;width:100%;height:100mm;margin-top:4mm"><img src="img/andaz.webp" alt="Andaz Resort and Residences Phuket at Layan, слайд застройщика"></div>
   <div class="card" style="margin-top:5mm"><h3>Наш взгляд</h3>
@@ -284,4 +294,23 @@ svg text{font-family:Manrope,Arial,sans-serif}
   <div class="foot"><span>Property Library Phuket. Сопровождаем от выбора до ключей</span><span>По презентации застройщика 07.10.2026, условия могут меняться.</span></div>
 </footer>
 </div>
+<script>
+(()=>{const $=id=>document.getElementById(id);let seed=7;const rnd=()=>(seed=(seed*9301+49297)%233280)/233280;const J=(v,a)=>v+(rnd()-.5)*a;
+const add=(s,h)=>s.insertAdjacentHTML('beforeend',h);
+const txt=(s,x,y,t,o={})=>add(s,`<text x="${x}" y="${y}" font-size="${o.size||3}" font-weight="${o.w||500}" fill="${o.c||'#17180F'}" text-anchor="${o.a||'start'}"${o.f?` style="font-family:'${o.f}',cursive"`:''}>${t}</text>`);
+const pen=(s,d,c='#B4533A',w=.45)=>add(s,`<path d="${d}" fill="none" stroke="${c}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`);
+const ring=(cx,cy,rx,ry)=>{let d='';for(let i=0;i<=30;i++){const t=i/28*Math.PI*2+.5;d+=(i?' L':'M')+J(cx+rx*Math.cos(t),.35)+' '+J(cy+ry*Math.sin(t),.35);}return d;};
+const hand='Marck Script';
+/* продано: 188 квартир клетками, 166 закрашены */
+(()=>{const s=$('sold');let k=0;for(let r=0;r<8;r++)for(let c=0;c<24;c++){if(k>=188)break;const x=4+c*3.4,y=6+r*4.6;add(s,`<rect x="${x}" y="${y}" width="2.6" height="3.6" rx=".5" fill="${k<166?'#5E6B35':'#F2D96B'}" stroke="${k<166?'none':'#17180F'}" stroke-width=".25"/>`);k++;}
+txt(s,4,50,'88%',{size:9,w:800});txt(s,26,46.5,'166 продано',{size:3.2,w:700,c:'#5E6B35'});txt(s,26,51,'из 188 квартир',{size:3,c:'#62665A'});
+const lx=4+(166%24)*3.4+4,ly=6+Math.floor(166/24)*4.6+1.8;pen(s,ring(lx+12,ly+2,15,4.2));pen(s,`M${lx+20} ${ly+6.5} Q 86 47 90 50`);txt(s,92,52.5,'не продано 22',{size:5,c:'#B4533A',f:hand,a:'middle'});})();
+/* цена за м² по типам */
+(()=>{const s=$('ppm');const Y=v=>48-v*.13;[0,100,200].forEach(v=>{add(s,`<line x1="10" x2="106" y1="${Y(v)}" y2="${Y(v)}" stroke="#ECECE0" stroke-width=".3"/>`);txt(s,8.5,Y(v)+1,v,{size:2.6,c:'#8E917F',a:'end'});});
+const rows=[['2 спальни M','100 м²',219,219],['2 спальни L','120 м²',191,193],['3 спальни L','167–173 м²',191,215],['дуплекс','289–299 м²',228,247]];
+rows.forEach(([n,m,lo,hi],i)=>{const x=16+i*23;add(s,`<rect x="${x}" y="${Y(hi)}" width="15" height="${48-Y(hi)}" fill="${i==3?'#5E6B35':'#C3C79E'}"/>`);if(lo!==hi)add(s,`<rect x="${x}" y="${Y(hi)}" width="15" height="${Y(lo)-Y(hi)}" fill="#F2D96B" opacity=".8"/>`);
+txt(s,x+7.5,Y(hi)-1.6,lo===hi?lo:lo+'–'+hi,{size:3.2,w:800,a:'middle'});txt(s,x+7.5,51.6,n,{size:2.5,w:700,a:'middle'});txt(s,x+7.5,54.8,m,{size:2.3,c:'#62665A',a:'middle'});});
+txt(s,12,7,'около 190–250 тыс. за метр',{size:4.6,c:'#B4533A',f:hand});})();
+})();
+</script>
 </body></html>
