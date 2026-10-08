@@ -34,6 +34,14 @@ const OFFERS = [
     pdf: 'CentralGroup_Phuket.pdf',   // node tools/offer_longpdf.mjs cg-capital CentralGroup_Phuket.pdf
   },
   {
+    /* 08.10.2026 Эльнур: «KUARTZ и FIZZ по эталону» (решение №263). Факты: презентация застройщика KUARTZ & FIZZ 01.10.2026,
+       факты_рынка 49–54 (The Title), 32 (AirROI Карон); цена — ориентир 120 тыс. ฿/м² (решение №232). */
+    slug: 'kuartz-fizz', dir: 'offers/kuartz-fizz',
+    title: 'KUARTZ и FIZZ · Карон и Ката — закрытый старт',
+    desc: 'KUARTZ у пляжа Карон и FIZZ на Кате от The Title × AssetWise: планировки, аренда по прогнозу застройщика, сроки и ориентир цены.',
+    pdf: 'KUARTZ_FIZZ_Karon_Kata.pdf',   // node tools/offer_longpdf.mjs kuartz-fizz KUARTZ_FIZZ_Karon_Kata.pdf
+  },
+  {
     /* 04.10.2026 Эльнур: «на секретной странице… зеро наянг гарантия 10% годовых». Факты: objects PLP-ZERO-NAIYANG
        (current_promo, unit_types, payment_plan; прайс и сообщение застройщика 07.09.2026) и презентация застройщика 11.2025. */
     slug: 'zero-naiyang', dir: 'offers/zero-naiyang',
@@ -136,6 +144,7 @@ const CARDS = [
     note: 'Формируем список инвесторов закрытого старта: участники первыми выбирают планировку и получают условия старта.',
     ask: 'Здравствуйте! Пришлите, пожалуйста, презентацию KUARTZ на Кароне',
     // pdf: '/offers/kuartz/KUARTZ_Karon.pdf',  05.10 Эльнур: эталон PDF — Vibe II, этот лист хуже, не выдаём
+    open: '/kuartz-fizz', pdf: '/offers/kuartz-fizz/KUARTZ_FIZZ_Karon_Kata.pdf',   // 08.10: новый лист по эталону №263
   },
   {
     name: 'FIZZ', where: 'Ката', tag: 'старт продаж в октябре',
@@ -146,6 +155,7 @@ const CARDS = [
     note: 'Формируем список инвесторов закрытого старта: участники первыми выбирают планировку и получают условия старта.',
     ask: 'Здравствуйте! Пришлите, пожалуйста, презентацию FIZZ на Кате',
     // pdf: '/offers/fizz/FIZZ_Kata.pdf',  05.10 Эльнур: эталон PDF — Vibe II, этот лист хуже, не выдаём
+    open: '/kuartz-fizz', pdf: '/offers/kuartz-fizz/KUARTZ_FIZZ_Karon_Kata.pdf',   // 08.10: новый лист по эталону №263
   },
   {
     /* 08.10.2026 Эльнур: «увидел эту презу в чате, почему нет этого в пульте офер?». Была карточка «Новый проект Central Group»
