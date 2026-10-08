@@ -54,7 +54,7 @@ function render(J) {
   const out = [];
   // 1. шапка
   let hero = J.hero;
-  hero = hero.replace(/\n<\/div>$/, '\n  ' + DD('palm', 'left:68mm;top:90mm;width:18mm;transform:rotate(-6deg)') + '\n</div>');
+  hero = hero.replace(/\n<\/div>$/, '\n  ' + DD('palm', 'left:186mm;top:88mm;width:18mm;transform:rotate(-6deg)') + '\n</div>');
   out.push(J.top, hero, J.stats);
 
   // 2. квартиры и цены
