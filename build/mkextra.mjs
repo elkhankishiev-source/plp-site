@@ -220,7 +220,7 @@ for(const f of faq){
     <h1 style="font-size:clamp(26px,3.8vw,38px);margin:0 0 16px">${esc(f.q)}</h1>
     <p style="font-size:18px;line-height:1.7;margin:0 0 20px">${esc(f.a)}</p>
     <div style="background:var(--green-soft);border-radius:18px;padding:18px 20px;margin:24px 0">
-      <p style="margin:0 0 12px;font-size:15px">Разберём вашу ситуацию бесплатно — ответим за пять минут в рабочее время.</p>
+      <p style="margin:0 0 12px;font-size:15px">Разберём вашу задачу и пришлём расчёт, ответим за пять минут в рабочее время.</p>
       <div class="hero-cta" style="margin:0">
         <a class="btn btn-primary" href="https://t.me/elnurphuket_bot?start=faq" target="_blank" rel="noopener">Спросить в Telegram</a>
         <a class="btn btn-ghost" href="../buy.html">Смотреть объекты</a>
