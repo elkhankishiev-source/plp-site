@@ -110,6 +110,7 @@ svg text{font-family:Manrope,Arial,sans-serif}
 </div>
 
 <div class="hero" style="height:118mm">
+  <svg class="layer" id="heroDraw" viewBox="0 0 210 118"></svg>
   <div class="txt">
     <div class="eyebrow">Банг Тао · Лаян</div>
     <h1 style="font-size:46pt;white-space:normal;line-height:.95">Central<br><span>Group</span></h1>
@@ -121,13 +122,14 @@ svg text{font-family:Manrope,Arial,sans-serif}
 </div>
 
 <div class="stats">
-  <div class="stat"><b>1947</b><span>основана Central Group</span></div>
-  <div class="stat"><b>&gt;20 млрд ฿</b><span>проекты CG Capital</span></div>
-  <div class="stat"><b>88%</b><span>The Standard продан</span></div>
-  <div class="stat"><b>от 7,xx млн ฿</b><span>PURITA, 1 спальня 56 м²</span></div>
+  <div class="stat"><svg id="i1" viewBox="0 0 12 12"></svg><b>1947</b><span>основана Central Group</span></div>
+  <div class="stat"><svg id="i2" viewBox="0 0 12 12"></svg><b>&gt;20 млрд ฿</b><span>проекты CG Capital</span></div>
+  <div class="stat"><svg id="i3" viewBox="0 0 12 12"></svg><b>88%</b><span>The Standard продан</span></div>
+  <div class="stat"><svg id="i4" viewBox="0 0 12 12"></svg><b>от 7,xx млн ฿</b><span>PURITA, 1 спальня 56 м²</span></div>
 </div>
 
 <section class="pad">
+  <svg class="head-ico" id="h1i" viewBox="0 0 20 20"></svg>
   <div class="eyebrow">Кто строит</div>
   <h2>Central Group: от лавки в Бангкоке до Selfridges в Лондоне</h2>
   <div class="grid g64" style="align-items:start">
@@ -151,6 +153,7 @@ svg text{font-family:Manrope,Arial,sans-serif}
 </section>
 
 <section class="pad">
+  <svg class="head-ico" id="h2i" viewBox="0 0 20 20"></svg>
   <div class="eyebrow">Рынок</div>
   <h2>Почему Банг Тао</h2>
   <div class="facts" style="grid-template-columns:repeat(3,1fr);margin-top:3mm">
@@ -162,6 +165,7 @@ svg text{font-family:Manrope,Arial,sans-serif}
 </section>
 
 <section class="pad">
+  <svg class="head-ico" id="h3i" viewBox="0 0 20 20"></svg>
   <div class="eyebrow">Первый проект на Пхукете · Банг Тао</div>
   <h2>The Standard Residences: продано 88% до сдачи</h2>
   <p class="lead">Резиденции под гостиничной маркой The Standard: 15 квартир на рай, у каждой балкон глубиной 2 метра, полностью с мебелью. Продано 166 квартир из 188, покупатели наполовину тайцы, наполовину иностранцы. Сдача в конце 2026 года.</p>
@@ -226,7 +230,7 @@ svg text{font-family:Manrope,Arial,sans-serif}
 </section>
 
 <section class="pad">
-  <div class="plans-band">
+  <div class="plans-band" style="position:relative"><svg id="h4i" viewBox="0 0 20 20" style="position:absolute;right:8mm;top:7mm;width:18mm;height:18mm;overflow:visible"></svg>
     <div class="eyebrow" style="color:var(--sun)">Планы</div>
     <h2 style="color:#fff">Что дальше на Пхукете и когда вам действовать</h2>
     <ol class="tl2">
@@ -241,6 +245,7 @@ svg text{font-family:Manrope,Arial,sans-serif}
 </section>
 
 <section class="pad">
+  <svg class="head-ico" id="h5i" viewBox="0 0 20 20"></svg>
   <div class="eyebrow">Банг Тао</div>
   <h2>PURITA: квартиры с мебелью и потолками 3 метра</h2>
   <div class="photo" style="position:relative;left:0;top:0;width:100%;height:101mm;margin-bottom:5mm"><img src="img/purita.webp" alt="PURITA Phuket Bangtao, рендер застройщика"></div>
@@ -256,6 +261,7 @@ svg text{font-family:Manrope,Arial,sans-serif}
 </section>
 
 <section class="pad">
+  <svg class="head-ico" id="h6i" viewBox="0 0 20 20"></svg>
   <div class="eyebrow">Лаян</div>
   <h2>Andaz Resort &amp; Residences: последний участок у пляжа Лаян</h2>
   <p class="lead">Брендированные резиденции под маркой Andaz. Не больше 100 квартир и около 9 вилл, поэтому первые лоты разойдутся по своим. Старт продаж по графику застройщика в I квартале 2027.</p>
@@ -279,4 +285,29 @@ svg text{font-family:Manrope,Arial,sans-serif}
   <div class="foot"><span>Property Library Phuket. Сопровождаем от выбора до ключей</span><span>По презентации застройщика 07.10.2026, условия могут меняться.</span></div>
 </footer>
 </div>
+<script src="doodles.js"></script>
+<script>
+/* 08.10.2026 Эльнур: «набор рисованных иконок в стиле дудлов… аккуратно, не сломай стиль, концепт и разметку». Техника Vibe II (doodles.js), цвета бренда. */
+(function(){
+  var $=function(id){return document.getElementById(id);}, SAGE='#D2D5B3', SUN='#F2D96B', CREAM='#EFECE2';
+  try{
+    var s=$('heroDraw');
+    doodle(s,'coins',24,106,16,-4,SUN);
+    doodle(s,'key',48,110,12,-18,SAGE);
+    doodle(s,'palm',200,110,18,0,SAGE);
+    doodle(s,'spark',86,16,8,0);
+    doodle(s,'arrow',172,108,13,0);
+    doodle($('i1'),'calendar',6,6,11,0,SUN);
+    doodle($('i2'),'coins',6,6,12,0,SUN);
+    doodle($('i3'),'percent',6,6,11,0,SAGE);
+    doodle($('i4'),'key',6,6,11,-10,SAGE);
+    doodle($('h1i'),'house',10,10,19,0,SUN);
+    doodle($('h2i'),'chart',10,10,19,0,SUN);
+    doodle($('h3i'),'key',10,10,19,-12,SAGE);
+    doodle($('h4i'),'plane',10,10,19,-8,SUN,CREAM);
+    doodle($('h5i'),'palm',10,10,19,0,SAGE);
+    doodle($('h6i'),'wave',10,10,19,0,SUN);
+  }catch(e){}
+})();
+</script>
 </body></html>
