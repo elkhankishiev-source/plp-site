@@ -774,6 +774,8 @@ function saleGroup(o) {
    подтверждаем актуальность», «перед клиентом сверить». Наружу идут только предложения без них. */
 const _ВНУТР = /Эльнур|слова\s+эльнура|сборщик|письм[а-яё]*\s+(в\s+наших|нет)|термшит|sales\s*kit|перед\s+клиент|публичных\s+карточ|подтвержда[а-яё]*\s+(актуальн|у\s+застройщ)|нашей\s+программ|наших\s+договор|\bCRM\b|amo|комисси|на\s+руки|приложить/i;
 function publicNote(t) {
+  /* 09.10.2026: служебные пометки в скобках «(решение №274)», «(Эльнур 09.10)», «(канон №80)» вырезаем, а предложение с ценой оставляем. */
+  t = String(t || '').replace(/\s*\((?:[^()]*?(?:решени[ея]\s*№|канон\s*№|Эльнур|\.pdf|источник))[^()]*\)/gi, '');
   const parts = String(t || '').split(/(?<=[.!?])\s+/).map(x => x.trim()).filter(Boolean);
   return parts.filter(x => !_ВНУТР.test(x)).join(' ').trim();
 }
@@ -1339,11 +1341,11 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
   const title = (function(){
     const основа = o.name + (_различитель && !o.name.includes(_различитель)
                              ? ' · ' + _различитель : '');
-    const полный = основа + ' — ' + ru + ', Пхукет | Property Library';
+    const полный = (String(основа).includes(ru) ? основа : основа + ' · ' + ru) + ', Пхукет | Property Library';
     if (полный.length <= 65) return полный;
-    const безБренда = основа + ' — ' + ru + ', Пхукет';
+    const безБренда = (String(основа).includes(ru) ? основа : основа + ' · ' + ru) + ', Пхукет';
     if (безБренда.length <= 65) return безБренда;
-    const безПхукета = основа + ' — ' + ru;
+    const безПхукета = (String(основа).includes(ru) ? основа : основа + ' · ' + ru);
     if (безПхукета.length <= 65) return безПхукета;
     return truncate(безПхукета, 65);
   })();
@@ -1667,7 +1669,8 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
   const progressBody =
     chipRow(progressRows) +
     (bpReport ? (listOf('Сделано', bpReport.body['сделано']) + listOf('В работе', bpReport.body['в работе'])) : '') +
-    (publicNote(o.stage_note) && !/^(идут продажи|строится)$/i.test(publicNote(o.stage_note))
+    /* 09.10.2026: у продажи заметка уже стоит вверху страницы (stgnote) — здесь не повторяем. */
+    (isRent && publicNote(o.stage_note) && !/^(идут продажи|строится)$/i.test(publicNote(o.stage_note))
       ? '<p>' + htmlEsc(noContacts(publicNote(o.stage_note))) + '</p>' : '') +
     (bpPhotos.length
       ? '<div class="prgs">' + bpPhotos.slice(0, 6).map(u =>
@@ -1852,7 +1855,7 @@ if(v==='dark'||v==='light')document.documentElement.setAttribute('data-theme',v)
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <meta property="og:type" content="product">
 <meta property="og:site_name" content="Property Library Phuket">
-<meta property="og:title" content="${htmlEsc(o.name + ' — ' + ru)}">
+<meta property="og:title" content="${htmlEsc(String(o.name).includes(ru) ? o.name : o.name + ' · ' + ru)}">
 <meta property="og:description" content="${htmlEsc(metaDesc)}">
 <meta property="og:url" content="${htmlEsc(url)}">
 <meta property="og:image" content="${htmlEsc(img)}">
@@ -1863,7 +1866,7 @@ if(v==='dark'||v==='light')document.documentElement.setAttribute('data-theme',v)
 <meta property="og:image:alt" content="${htmlEsc(o.name)}">
 <meta property="og:locale" content="ru_RU">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="${htmlEsc(o.name + ' — ' + ru)}">
+<meta name="twitter:title" content="${htmlEsc(String(o.name).includes(ru) ? o.name : o.name + ' · ' + ru)}">
 <meta name="twitter:description" content="${htmlEsc(metaDesc)}">
 <meta name="twitter:image" content="${htmlEsc(img)}">
 <script type="application/ld+json">${jsonLdSafe(ld)}</script>
