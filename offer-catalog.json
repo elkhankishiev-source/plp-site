@@ -1816,7 +1816,7 @@
    "name": "FIZZ, Ката",
    "district": "Ката",
    "type": "Кондо",
-   "price_from": 3700000,
+   "price_from": 4000000,
    "units": []
   },
   {
@@ -2302,7 +2302,7 @@
    "name": "KUARTZ, Карон",
    "district": "Карон",
    "type": "Кондо",
-   "price_from": 4100000,
+   "price_from": 4400000,
    "units": [
     {
      "area": "31,7–37,9 м²",
