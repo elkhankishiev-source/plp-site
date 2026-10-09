@@ -1260,9 +1260,7 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
   /* 10.10.2026 Эльнур: «убери вообще всякие оттуда картинки» — превью ссылки = голый кадр объекта, без надписей. */
   const hasCard = false;
   const hasOwnImg = fs.existsSync(path.join(ROOT, 'img', pub + '.jpg'));
-  /* 10.10.2026: чистое фото 1200×630 настоящим JPEG из tools/og_plain.py (часть img/<код>.jpg внутри WebP) */
-  const hasPhoto = fs.existsSync(path.join(ROOT, 'img', 'og', 'photo-' + pub + '.jpg'));
-  const imgRel = hasPhoto ? '/img/og/photo-' + pub + '.jpg' : hasCard ? '/img/og/' + pub + '.jpg' : (hasOwnImg ? '/img/' + pub + '.jpg' : '/img/og-default.jpg');
+  const imgRel = hasCard ? '/img/og/' + pub + '.jpg' : (hasOwnImg ? '/img/' + pub + '.jpg' : '/img/og-default.jpg');
   const img = SITE_BASE + imgRel;
   // Реальные размеры картинки: WhatsApp без og:image:width/height часто вообще
   // не рисует превью, а соврать нельзя — высота у карточек разная (674…1167).
