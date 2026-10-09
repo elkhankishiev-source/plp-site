@@ -56,7 +56,7 @@ d.rewrite_images(dpi_threshold=160, dpi_target=150, quality=78); d.save(sys.argv
 // Сверяем число картинок в PDF с листом; меньше — пересобираем ещё раз (до двух повторов).
 {
   const html = fs.readFileSync(path.join(ROOT, 'offers', slug, 'page.htm'), 'utf8');
-  const нужно = (html.match(/<img[^>]+src="(?!data:)/g) || []).length;
+  const нужно = new Set((html.match(/<img[^>]+src="(?!data:)[^"]+"/g) || []).map((m) => m.replace(/^.*src="/, ''))).size;  // одинаковая картинка в PDF хранится один раз
   const сколько = () => +execFileSync(path.join(os.homedir(), '.local/bin/uv'), ['run', '-q', '--python', '3.12', '--with', 'pymupdf', 'python', '-c',
     'import pymupdf,sys;print(len(pymupdf.open(sys.argv[1])[0].get_images()))', out]).toString().trim();
   let есть = сколько();
