@@ -1252,11 +1252,16 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
   /* og-картинка тоже по публичному коду: адрес файла попадает в мессенджеры */
   /* если кадра объекта нет (карточка только заведена) — общая обложка сайта:
      ссылка в мессенджере всё равно должна открываться картинкой, а не строкой */
+  /* 09.10.2026 Эльнур: «превью некрасивое… чтобы все превью ссылок были всегда красивыми».
+     Первой идёт фирменная карточка 1200×630 из tools/og_objects.py (фото, район, название, цена, знак PLP);
+     нет карточки — голый кадр объекта, нет кадра — общая обложка, как раньше. */
+  const hasCard = fs.existsSync(path.join(ROOT, 'img', 'og', pub + '.jpg'));
   const hasOwnImg = fs.existsSync(path.join(ROOT, 'img', pub + '.jpg'));
-  const img = SITE_BASE + (hasOwnImg ? '/img/' + pub + '.jpg' : '/img/og-default.jpg');
+  const imgRel = hasCard ? '/img/og/' + pub + '.jpg' : (hasOwnImg ? '/img/' + pub + '.jpg' : '/img/og-default.jpg');
+  const img = SITE_BASE + imgRel;
   // Реальные размеры картинки: WhatsApp без og:image:width/height часто вообще
   // не рисует превью, а соврать нельзя — высота у карточек разная (674…1167).
-  const imgDim = jpegSize(path.join(ROOT, 'img', pub + '.jpg'))
+  const imgDim = jpegSize(path.join(ROOT, imgRel))
               || jpegSize(path.join(ROOT, 'img', pid + '.jpg'))
               || jpegSize(path.join(ROOT, 'img', 'og-default.jpg'));
   const en = o.district || o.beach || '';

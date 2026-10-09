@@ -30,11 +30,19 @@ const ОФФЕРЫ = { 'vibe2.html': 'offers/vibe2/img/preview.jpg', 'zero-naiya
   'kuartz.html': 'offers/kuartz/img/preview.jpg', 'fizz.html': 'offers/fizz/img/preview.jpg', 'eden.html': 'offers/eden/img/preview.jpg' };
 const РАЙОНЫ = { 'bang-tao': 'PLP-SIERRA', kamala: 'PLP-VIVANA', kata: 'PLP-KATABELLO', 'koh-kaew': 'PLP-ZENITHY', layan: 'PLP-SUNHILLS-LAYAN',
   'nai-yang': 'PLP-ZERO-NAIYANG', rawai: 'PLP-FANTASY-RAWAI', surin: 'PLP-BIANCANA', karon: 'PLP-VIBE-KARON' };
-const ФИРМЕННАЯ = 'img/og-default.jpg';
+/* 09.10.2026 Эльнур: «превью некрасивое… чтобы все превью ссылок были всегда красивыми, а не мертво-глухо».
+   Главная, «Купить», «Аренда», «Управление», «О нас», «Добавить объект» наследовали шапку главной с фото Heritage,
+   а /predstart и гайды — серую обложку. Теперь у каждой своя фирменная карточка 1200×630 (tools/og_objects.py --pages). */
+const ФИРМЕННАЯ = fs.existsSync(path.join(ROOT, 'img/og/page-default.jpg')) ? 'img/og/page-default.jpg' : 'img/og-default.jpg';
+const ГЛАВНЫЕ = { 'index.html': 'index', 'buy.html': 'buy', 'rent.html': 'rent', 'management.html': 'management',
+  'about.html': 'about', 'predstart.html': 'predstart', 'add-property.html': 'add-property' };
 
 const задания = [];
 for (const [f, img] of Object.entries(ОФФЕРЫ)) задания.push([f, img]);
-задания.push(['predstart.html', ФИРМЕННАЯ]);
+for (const [f, имя] of Object.entries(ГЛАВНЫЕ)) {
+  const карточка = 'img/og/page-' + имя + '.jpg';
+  задания.push([f, fs.existsSync(path.join(ROOT, карточка)) ? карточка : ФИРМЕННАЯ]);
+}
 for (const f of fs.readdirSync(path.join(ROOT, 'guide'))) if (f.endsWith('.html')) задания.push(['guide/' + f, ФИРМЕННАЯ]);
 for (const f of fs.readdirSync(path.join(ROOT, 'districts'))) if (f.endsWith('.html')) {
   const код = РАЙОНЫ[f.replace(/\.html$/, '')];
