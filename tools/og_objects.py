@@ -82,6 +82,9 @@ def short_name(n):
     return n.strip()
 
 
+PRESTART_SQM = {'PLP-KUARTZ', 'PLP-FIZZ'}  # закрытый старт: застройщик объявит прайс на старте
+
+
 def price_mln(v):
     if not v:
         return ''
@@ -193,7 +196,7 @@ def render(jobs):
 
 def object_jobs(only, force):
     pages = {f[:-5] for f in os.listdir(os.path.join(SITE, 'object')) if f.endswith('.html')}
-    rows = sb("select plp_property_id, public_code, name, district, beach, type, purpose, price_from_thb, parent_object_id "
+    rows = sb("select plp_property_id, public_code, name, district, beach, type, purpose, price_from_thb, price_per_sqm_thb, stage, parent_object_id "
               "from objects where on_site or purpose in ('аренда','rent')")
     jobs, skipped, nophoto, noey = [], 0, [], []
     seen = set()
@@ -218,6 +221,9 @@ def object_jobs(only, force):
         unit = bool(o.get('parent_object_id'))
         rent = str(o.get('purpose') or '').lower() in ('аренда', 'rent')
         price = '' if rent else price_mln(o.get('price_from_thb'))
+        # 09.10.2026: до официального прайса (закрытый старт) — ориентир за м², как на листах KUARTZ/FIZZ, без общей цены «от».
+        if not rent and o.get('price_per_sqm_thb') and str(o.get('plp_property_id')) in PRESTART_SQM:
+            price = '≈%d тыс. ฿ за м²' % round(float(o['price_per_sqm_thb']) / 1000)
         jobs.append((pub + '.jpg', card_html(photo, ey, short_name(o.get('name')), price, fmt_word(o, unit),
                                              'Property Library Phuket · для наших клиентов')))
     print('объектов со страницей: %d, к рендеру: %d, уже есть: %d' % (len(pages), len(jobs), skipped))
