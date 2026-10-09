@@ -12,7 +12,7 @@
   "lead": "150 квартир в двух корпусах: Sky Residences и Earth Residences, во втором можно жить с питомцами. Бассейн и бар на крыше, кинотеатр под открытым небом, своя управляющая компания. Экспертиза EIA одобрена.",
   "facts": "<div class=\"facts\" style=\"grid-template-columns:repeat(4,1fr);margin:5mm 0 6mm\">\n    <div><b>150</b><span>квартир</span></div>\n    <div><b>2 × 5</b><span>корпусов × этажей</span></div>\n    <div><b>35–105 м²</b><span>от студии до сьюта, текущий прайс</span></div>\n    <div><b>EIA</b><span>одобрена</span></div>\n  </div>",
   "cards": [
-   "<div class=\"card\"><h3>Что в продаже</h3>\n      <table>\n        <tr><td>Студия · 35,2–36,3 м²</td><td class=\"r num\">4,94–5,52 млн ฿</td></tr>\n        <tr><td>1 спальня · 37,5–46 м²</td><td class=\"r num\">5,23–6,76 млн ฿</td></tr>\n        <tr><td>1 спальня плюс · 44,4–52,4 м²</td><td class=\"r num\">6,23–7,34 млн ฿</td></tr>\n        <tr><td>2 спальни · 52,8–66,7 м²</td><td class=\"r num\">6,62–10,15 млн ฿</td></tr>\n        <tr><td>Сьют · 81,2–105 м²</td><td class=\"r num\">11,77–15,22 млн ฿</td></tr>\n      </table>\n      <p style=\"margin:3mm 0 0;color:var(--ink2);font-size:9pt\">105 квартир в продаже по прайсу, 125–154 тыс. ฿ за м². Мебельный пакет 350–700 тыс. ฿ по планировке.</p>\n      <p class=\"src\">Прайс застройщика; цены могут меняться.</p></div>"
+   "<div class=\"card\"><h3>Что в продаже</h3>\n      <table>\n        <tr><td>Студия · 35,2–36,3 м²</td><td class=\"r num\">4,94–5,52 млн ฿</td></tr>\n        <tr><td>1-спальная · 37,5–46 м²</td><td class=\"r num\">5,23–6,76 млн ฿</td></tr>\n        <tr><td>1-спальная плюс · 44,4–52,4 м²</td><td class=\"r num\">6,23–7,34 млн ฿</td></tr>\n        <tr><td>2 спальни · 52,8–66,7 м²</td><td class=\"r num\">6,62–10,15 млн ฿</td></tr>\n        <tr><td>Сьют · 81,2–105 м²</td><td class=\"r num\">11,77–15,22 млн ฿</td></tr>\n      </table>\n      <p style=\"margin:3mm 0 0;color:var(--ink2);font-size:9pt\">105 квартир в продаже по прайсу, 125–154 тыс. ฿ за м². Мебельный пакет 350–700 тыс. ฿ по планировке.</p>\n      <p class=\"src\">Прайс застройщика; цены могут меняться.</p></div>"
   ],
   "photos": [
    {
@@ -22,8 +22,8 @@
    },
    {
     "src": "img/z-1bed.webp",
-    "alt": "ZERO Nai Yang, 1 спальня, интерьер застройщика",
-    "cap": "1 спальня"
+    "alt": "ZERO Nai Yang, 1-спальная квартира, интерьер застройщика",
+    "cap": "1-спальная квартира"
    },
    {
     "src": "img/z-2bed.webp",
@@ -44,13 +44,13 @@
    },
    {
     "src": "img/z-p_1b.webp",
-    "alt": "Планировка 1 спальни",
-    "cap": "1 спальня · от 37,5 м²"
+    "alt": "Планировка 1-спальной квартиры",
+    "cap": "1-спальная · от 37,5 м²"
    },
    {
     "src": "img/z-p_1bp.webp",
-    "alt": "Планировка 1 спальни плюс",
-    "cap": "1 спальня плюс · от 44,4 м²"
+    "alt": "Планировка 1-спальной плюс",
+    "cap": "1-спальная плюс · от 44,4 м²"
    },
    {
     "src": "img/z-p_2b.webp",
@@ -153,7 +153,7 @@
  },
  "income": {
   "h2": "Гарантия 10% в год на три года",
-  "html": "<div class=\"grid g64\" style=\"align-items:start\">\n    <div class=\"card\" style=\"background:var(--sage);border-color:var(--sage)\"><h3>Сколько платит застройщик</h3>\n      <p style=\"margin:1mm 0 3mm;color:var(--ink2)\">При покупке в лизхолд застройщик платит владельцу 10% от цены квартиры в год, три года. С другими акциями не суммируется.</p>\n      <table>\n        <tr><td style=\"color:var(--muted)\"></td><td class=\"r\" style=\"color:var(--muted);font-weight:600\">в год</td><td class=\"r\" style=\"color:var(--muted);font-weight:600\">за 3 года</td></tr>\n        <tr><td>Студия 4,94 млн</td><td class=\"r num\">494 тыс.</td><td class=\"r num\">1,48 млн</td></tr>\n        <tr><td>1 спальня 5,23 млн</td><td class=\"r num\">523 тыс.</td><td class=\"r num\">1,57 млн</td></tr>\n        <tr><td>2 спальни 6,62 млн</td><td class=\"r num\">662 тыс.</td><td class=\"r num\">1,99 млн</td></tr>\n      </table>\n      <p style=\"margin:3mm 0 0;color:var(--ink2);font-size:9pt\">После гарантии квартира идёт в арендную программу застройщика. Его прогноз доходности около 11% в год.</p>\n      <p class=\"src\">Сообщение застройщика (гарантия); фактшит (прогноз застройщика). Наш расчёт по нижним ценам прайса.</p></div>\n    <div class=\"pol\" style=\"transform:rotate(-.5deg)\"><img style=\"height:78mm\" src=\"img/c89b25feead6ed06.webp\" alt=\"ZERO Nai Yang, въезд, рендер застройщика\"><i>въезд и лобби</i></div>\n  </div>"
+  "html": "<div class=\"grid g64\" style=\"align-items:start\">\n    <div class=\"card\" style=\"background:var(--sage);border-color:var(--sage)\"><h3>Сколько платит застройщик</h3>\n      <p style=\"margin:1mm 0 3mm;color:var(--ink2)\">При покупке в лизхолд застройщик платит владельцу 10% от цены квартиры в год, три года. С другими акциями не суммируется.</p>\n      <table>\n        <tr><td style=\"color:var(--muted)\"></td><td class=\"r\" style=\"color:var(--muted);font-weight:600\">в год</td><td class=\"r\" style=\"color:var(--muted);font-weight:600\">за 3 года</td></tr>\n        <tr><td>Студия 4,94 млн</td><td class=\"r num\">494 тыс.</td><td class=\"r num\">1,48 млн</td></tr>\n        <tr><td>1-спальная 5,23 млн</td><td class=\"r num\">523 тыс.</td><td class=\"r num\">1,57 млн</td></tr>\n        <tr><td>2 спальни 6,62 млн</td><td class=\"r num\">662 тыс.</td><td class=\"r num\">1,99 млн</td></tr>\n      </table>\n      <p style=\"margin:3mm 0 0;color:var(--ink2);font-size:9pt\">После гарантии квартира идёт в арендную программу застройщика. Его прогноз доходности около 11% в год.</p>\n      <p class=\"src\">Сообщение застройщика (гарантия); фактшит (прогноз застройщика). Наш расчёт по нижним ценам прайса.</p></div>\n    <div class=\"pol\" style=\"transform:rotate(-.5deg)\"><img style=\"height:78mm\" src=\"img/c89b25feead6ed06.webp\" alt=\"ZERO Nai Yang, въезд, рендер застройщика\"><i>въезд и лобби</i></div>\n  </div>"
  },
  "place": {
   "h2": "Най Янг: нацпарк, тихий пляж и аэропорт рядом",
