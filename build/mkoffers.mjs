@@ -30,7 +30,7 @@ const OFFERS = [
     /* 07.10.2026 Эльнур: «собрать презентацию по формату Vibe II и скинуть ссылку». Факты: слайды CG Capital (фото Эльнура 07.10) и его голосовые. */
     slug: 'cg-capital', dir: 'offers/cg-capital',
     title: 'Central Group на Пхукете · Andaz и PURITA: старт продаж',
-    desc: 'Andaz у пляжа Лаян от 16 млн ฿ и PURITA на Банг Тао от 7 млн ฿ от Central Group. Сроки, первые цены, как попасть в первую очередь.',
+    desc: 'Andaz у пляжа Лаян от 16,xx млн ฿ и PURITA на Банг Тао от 7,xx млн ฿ от Central Group. Сроки, первые цены, как попасть в первую очередь.',
     pdf: 'CentralGroup_Phuket.pdf',   // node tools/offer_longpdf.mjs cg-capital CentralGroup_Phuket.pdf
   },
   {
