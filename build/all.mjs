@@ -10,6 +10,12 @@ const steps = ['mkog.mjs', 'gen.mjs', 'mkshared.mjs', 'mkpages.mjs', 'mkdistrict
 for (const s of steps) {
   process.stdout.write(`— ${s}\n`);
   execFileSync('node', [`build/${s}`], { cwd: '/Users/elnurkhankishiev/plp-site', stdio: 'inherit' });
+  /* 09.10.2026 Эльнур: «превью ссылок всегда красивые». После mkog (фото объектов) и до gen (страницы берут
+     img/og/<код>.jpg, если он есть) — фирменные карточки для НОВЫХ объектов. Упал генератор — сборку не валим. */
+  if (s === 'mkog.mjs') {
+    try { execFileSync('python3', ['tools/og_objects.py'], { cwd: '/Users/elnurkhankishiev/plp-site', stdio: 'inherit', timeout: 600000 }); }
+    catch (e) { process.stdout.write('⚠️ превью новых объектов не сделаны: ' + String(e.message).slice(0, 120) + '\n'); }
+  }
 }
 /* Приёмка карточек идёт на каждой сборке — чтобы противоречия всплывали сами,
    а не когда Эльнур их заметит. Сборку не валит: это отчёт, а не запрет. */
