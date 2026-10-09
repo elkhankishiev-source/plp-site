@@ -9,7 +9,6 @@ D=[ # slug, фото (1 или 2), надзаголовок, название, �
  ('eden',['lake-cover.webp'],'Банг Тао · третья фаза','Gardens of Eden Lake','от 11,9 млн ฿','рассрочка на 5 лет'),
  ('kuartz',['k-pool2.webp'],'Карон · 400 м до пляжа','KUARTZ','≈130 тыс. ฿ за м²','закрытый старт'),
  ('fizz',['f-pool.webp'],'Ката · камерный дом','FIZZ','≈120 тыс. ฿ за м²','закрытый старт'),
- ('kuartz-fizz',['k-pool2.webp','../../fizz/img/f-pool.webp'],'Карон и Ката','KUARTZ и FIZZ','≈120–130 тыс. ฿ за м²','закрытый старт'),
  ('aileen',['hero.jpg'],'Лагуна · таунхаусы 159 м²','Aileen Residence Lagoon','от 11,85 млн ฿','предстарт'),
 ]
 T='''<!doctype html><html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">

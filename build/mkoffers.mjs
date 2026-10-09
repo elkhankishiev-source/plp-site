@@ -53,14 +53,7 @@ const OFFERS = [
     desc: 'FIZZ на Кате от The Title × AssetWise: камерный дом на 135 квартир, можно с питомцами. Планировки, аренда, сроки и ориентир цены.',
     pdf: 'FIZZ_Kata.pdf',
   },
-  {
-    /* 08.10.2026 Эльнур: «KUARTZ и FIZZ по эталону» (решение №263). Факты: презентация застройщика KUARTZ & FIZZ 01.10.2026,
-       факты_рынка 49–54 (The Title), 32 (AirROI Карон); цена — ориентир 130 тыс. ฿/м² KUARTZ (№276), 120 FIZZ (№232). */
-    slug: 'kuartz-fizz', dir: 'offers/kuartz-fizz',
-    title: 'KUARTZ и FIZZ · Карон и Ката: закрытый старт',
-    desc: 'KUARTZ у пляжа Карон и FIZZ на Кате от The Title × AssetWise: планировки, аренда по прогнозу застройщика, сроки и ориентир цены.',
-    pdf: 'KUARTZ_FIZZ_Karon_Kata.pdf',   // node tools/offer_longpdf.mjs kuartz-fizz KUARTZ_FIZZ_Karon_Kata.pdf
-  },
+  /* 09.10.2026 Эльнур: общий лист KUARTZ+FIZZ «лишний, удали» — убран; /kuartz-fizz пересылает на /kuartz. */
   {
     /* 04.10.2026 Эльнур: «на секретной странице… зеро наянг гарантия 10% годовых». Факты: objects PLP-ZERO-NAIYANG
        (current_promo, unit_types, payment_plan; прайс и сообщение застройщика 07.09.2026) и презентация застройщика 11.2025. */
@@ -82,8 +75,9 @@ for (const o of OFFERS) {
      а файла не было, и человек получал «не найдено». Надпись по правилу кнопок «Получить + что». */
   const hasPdf = o.pdf && fs.existsSync(path.join(ROOT, o.dir, o.pdf));
   const body = `<section class="offer-wrap" style="padding:18px 0 28px"><div class="container">
-  <div style="display:flex;justify-content:flex-end;margin:0 0 10px">
-    ${hasPdf ? `<a class="btn btn-ghost" href="/${o.dir}/${o.pdf}" target="_blank" rel="noopener" style="font-size:14px">Получить PDF</a>` : ''}
+  <!-- 09.10.2026 Эльнур: «открыл ссылку, а там на пол-экрана скачать PDF, стрёмно». Маленькая строка справа, лист сразу виден. -->
+  <div style="display:flex;justify-content:flex-end;margin:0 0 8px">
+    ${hasPdf ? `<a href="/${o.dir}/${o.pdf}" target="_blank" rel="noopener" style="font-size:13px;line-height:1;padding:7px 12px;border:1px solid rgba(255,255,255,.28);border-radius:999px;color:#EFECE2;text-decoration:none;opacity:.85">PDF ↓</a>` : ''}
   </div>
   <div id="offerBox" style="width:100%;max-width:794px;margin:0 auto;overflow:hidden;border-radius:14px;background:#EFECE2;box-shadow:0 2px 18px rgba(23,24,15,.08);height:4531px">
     <iframe id="offerFrame" src="/${o.dir}/page.htm?v=${v}" title="${esc(o.title)}" loading="eager" scrolling="no"
