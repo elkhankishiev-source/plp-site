@@ -1,171 +1,171 @@
 {
- "slug": "zero-naiyang",
- "pdf": "ZERO_NaiYang.pdf",
- "head": "<!doctype html>\n<html lang=\"ru\"><head><script>/* 02.10.2026: прямую ссылку на лист А4 открыли на телефоне — правую часть обрезало. На узком экране вне рамки ведём на /vibe2, где лист уменьшается целиком. Печать и PDF не трогаем. */if(window.top===window&&window.innerWidth<800&&!/[?&]pdf/.test(location.search)&&!window.matchMedia('print').matches){location.replace('/zero-naiyang'+location.hash);}</script>\n<base target=\"_top\"><meta charset=\"utf-8\">\n<meta name=\"robots\" content=\"noindex, nofollow\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>The ZERO Nai Yang · Най Янг · Property Library Phuket</title>\n<meta property=\"og:type\" content=\"website\">\n<meta property=\"og:site_name\" content=\"Property Library Phuket\">\n<meta property=\"og:title\" content=\"The ZERO Nai Yang · Най Янг\">\n<meta property=\"og:description\" content=\"Предложение Property Library Phuket: гарантия 10% на три года, цены, график платежей\">\n<meta property=\"og:url\" content=\"https://property-library.com/offers/zero-naiyang/page.htm\">\n<meta property=\"og:image\" content=\"https://property-library.com/offers/zero-naiyang/img/preview.jpg\">\n<meta property=\"og:image:width\" content=\"1200\">\n<meta property=\"og:image:height\" content=\"630\">\n<meta name=\"twitter:card\" content=\"summary_large_image\">\n<link rel=\"stylesheet\" href=\"https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Marck+Script&display=swap\">\n<style>\n@page{size:210mm 2800mm;margin:0}\n.photo{position:absolute;z-index:2;border-radius:3mm;overflow:hidden;box-shadow:0 1.5mm 4mm rgba(23,24,15,.18)}\n.photo img{width:100%;height:100%;object-fit:cover;display:block}\n:root{--ink:#17180F;--ink2:#2B2D22;--sage:#D2D5B3;--olive:#5E6B35;--cream:#EFECE2;--line:#DAD8C8;--muted:#62665A;--rust:#B4533A;--teal:#4E7F80;--sun:#F2D96B}\n*{box-sizing:border-box}\nhtml,body{margin:0;background:var(--cream)}\nbody{color:var(--ink);font:10pt/1.55 Manrope,-apple-system,\"Segoe UI\",Arial,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}\n.w{width:210mm;margin:0 auto;background:var(--cream);position:relative;overflow:hidden}\n.pad{padding-left:15mm;padding-right:15mm}\na{color:inherit}\n.pen{font-family:\"Marck Script\",cursive;color:var(--rust)}\n.eyebrow{font-weight:700;font-size:7.6pt;letter-spacing:.18em;text-transform:uppercase;color:var(--olive)}\nh1{font-weight:800;font-size:58pt;line-height:.95;letter-spacing:-.04em;margin:3mm 0 4mm;white-space:nowrap}\nh1 span{color:var(--olive)}\nh2{font-weight:800;font-size:21pt;line-height:1.08;letter-spacing:-.015em;margin:1.5mm 0 3mm;max-width:140mm}\nh3{font-weight:700;font-size:7.6pt;letter-spacing:.14em;text-transform:uppercase;color:var(--olive);margin:0 0 2.5mm}\np{margin:0 0 2mm}\n.lead{font-size:11pt;color:var(--ink2);max-width:150mm}\n.src{font-size:7pt;color:var(--muted);margin-top:2.5mm}\n.num{font-variant-numeric:tabular-nums}\nsection{padding-top:14mm;position:relative}\n.layer{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:5}\n.top{display:flex;justify-content:space-between;align-items:flex-start;padding:10mm 15mm 0}\n.top img{height:19mm;display:block}\n.top .tag{font-size:7.4pt;letter-spacing:.16em;text-transform:uppercase;color:var(--olive);text-align:right;line-height:1.7;font-weight:700}\n.hero{position:relative;height:150mm}\n.hero .txt{position:absolute;left:15mm;top:12mm;width:76mm;z-index:3}\n.hero .sub{font-size:11pt;color:var(--ink2);max-width:66mm}\n.block{position:absolute;background:var(--sage);background-image:repeating-linear-gradient(135deg,rgba(23,24,15,.07) 0 .6mm,transparent .6mm 2.4mm)}\n.sticker{position:absolute;z-index:2}\n.sticker img{width:100%;display:block}\n.label{position:absolute;z-index:4;background:var(--ink);color:var(--sun);font-weight:800;font-size:9pt;letter-spacing:.14em;text-transform:uppercase;padding:2mm 3.5mm;border-radius:1mm;box-shadow:.8mm .8mm 0 rgba(23,24,15,.25)}\n.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:3.5mm;padding:0 15mm;position:relative;z-index:3}\n.stat{background:#FFFFFF;border:1px solid var(--line);border-radius:2.5mm;padding:4mm 4mm 4.5mm;position:relative}\n.stat svg{position:absolute;right:2.5mm;top:2.5mm;width:11mm;height:11mm;overflow:visible}\n.stat b{display:block;font-weight:800;font-size:15.5pt;letter-spacing:-.01em;white-space:nowrap;margin-top:7mm}\n.stat span{font-size:7.1pt;color:var(--muted);white-space:nowrap}\n.grid{display:grid;gap:6mm}\n.g2{grid-template-columns:1fr 1fr}\n.g64{grid-template-columns:1.5fr 1fr}\n.card{background:#FFFFFF;border:1px solid var(--line);border-radius:2.5mm;padding:5.5mm 6mm;position:relative}\ntable{border-collapse:collapse;width:100%}\ntd{padding:1.9mm 0;border-bottom:1px solid #ECECE0;font-size:9pt;vertical-align:top}\ntr:last-child td{border-bottom:0}\ntd.r{text-align:right;font-weight:700;white-space:nowrap;padding-left:4mm}\n.hl{color:var(--olive)}\n.big{font-weight:800;font-size:26pt;letter-spacing:-.02em;line-height:1}\nul.l{margin:0;padding:0;list-style:none}\nul.l li{position:relative;padding:1.6mm 0 1.6mm 5mm;border-bottom:1px solid #E1DFD0;font-size:9pt}\nul.l li:last-child{border-bottom:0}\nul.l li:before{content:\"\";position:absolute;left:0;top:3.6mm;width:2mm;height:2mm;border-radius:50%;background:var(--olive)}\n.head-ico{position:absolute;right:15mm;top:11mm;width:20mm;height:20mm;overflow:visible}\n.polaroid{position:absolute;background:#fff;padding:2mm 2mm 8mm;box-shadow:0 1.2mm 3mm rgba(23,24,15,.18)}\n.polaroid img{display:block;width:100%;height:100%;object-fit:cover}\n.polaroid i{position:absolute;left:0;right:0;bottom:1.6mm;text-align:center;font-family:\"Marck Script\",cursive;font-style:normal;font-size:11pt;color:var(--ink2)}\n.tape{position:absolute;width:18mm;height:5.5mm;background:rgba(242,217,107,.78);z-index:3}\n.dev{position:relative;height:112mm;margin-top:4mm}\n.facts{display:grid;grid-template-columns:1fr 1fr;gap:3mm 5mm}\n.facts b{display:block;font-weight:800;font-size:15pt}\n.facts span{font-size:8pt;color:var(--muted)}\n.cta{margin:12mm 15mm 0;padding:7mm 0 7mm;border-top:1px solid var(--line)}\n.ctahead{display:grid;grid-template-columns:1.3fr 1fr;gap:8mm;align-items:end}\n.cta h2{font-size:17pt;margin:1mm 0 0}\n.cta .ctahead p{font-size:9pt;color:var(--ink2);margin:0}\n.links{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;gap:2.5mm;margin-top:5mm}\n.links a{display:block;text-decoration:none;border:1px solid var(--line);border-radius:2mm;padding:2.8mm 3.2mm;color:var(--ink);background:#FFFFFF}\n.links a b{display:block;font-weight:700;font-size:8.6pt;white-space:nowrap}\n.links a span{font-size:7.2pt;color:var(--muted);white-space:nowrap}\n.links a.main{background:var(--sage);border-color:var(--sage)}\n.foot{display:flex;justify-content:space-between;gap:8mm;font-size:6.8pt;color:var(--muted);margin-top:4mm}\n.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:10mm 7mm;margin-top:3mm}\n.pol{background:#fff;padding:2mm 2mm 8mm;box-shadow:0 .6mm 1.6mm rgba(23,24,15,.14);position:relative}\n.pol img{display:block;width:100%;height:52mm;object-fit:cover}\n.pol i{position:absolute;left:0;right:0;bottom:1.4mm;text-align:center;font-family:\"Marck Script\",cursive;font-style:normal;font-size:11pt;color:var(--ink2)}\n.tl{display:grid;grid-template-columns:repeat(4,1fr);gap:3.5mm;margin-top:3mm;position:relative}\n.tl div{background:#fff;border:1px solid var(--line);border-radius:2.5mm;padding:4mm;border-top:1.2mm solid var(--olive)}\n.tl b{display:block;font-weight:800;font-size:11pt;margin-bottom:1mm}\n.tl span{font-size:8.4pt;color:var(--ink2)}\n.plans-band{position:relative;background:var(--olive);border-radius:3mm;padding:8mm 9mm 6mm;color:#fff}\n.tl2{list-style:none;margin:4mm 0 0;padding:0}\n.tl2 li{display:grid;grid-template-columns:42mm 1fr;grid-template-rows:auto auto;column-gap:5mm;padding:3.2mm 0;border-top:1px solid rgba(255,255,255,.22)}\n.tl2 li b{grid-row:1/3;font-weight:800;font-size:12pt;color:var(--sun)}\n.tl2 li span{font-weight:700;font-size:10pt}\n.tl2 li em{font-style:normal;font-size:8.6pt;color:rgba(255,255,255,.78)}\n.dd{position:absolute;z-index:6;pointer-events:none}\n.dd img{width:100%;display:block;filter:drop-shadow(0 .6mm .8mm rgba(23,24,15,.18))}\nsvg text{font-family:Manrope,Arial,sans-serif}\n\n</style><!-- PLP:GA --><script async src=\"https://www.googletagmanager.com/gtag/js?id=G-HQNDG3B8MW\"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-HQNDG3B8MW');</script></head>\n",
- "top": "<div class=\"top\">\n  <a href=\"https://property-library.com\"><img src=\"img/plp-logo-ink.webp\" alt=\"Property Library Phuket\"></a>\n  <div class=\"tag\">Предложение<br>для клиентов Property Library<br><span style=\"color:var(--muted)\">по прайсу застройщика</span></div>\n</div>",
- "hero": "<div class=\"hero\" style=\"height:118mm\">\n  <div class=\"txt\">\n    <div class=\"eyebrow\">Най Янг · север Пхукета</div>\n    <h1 style=\"font-size:50pt;white-space:normal;line-height:.95\">ZERO<br><span>Nai Yang</span></h1>\n    <p class=\"sub\">Дом на 150 квартир в 350 метрах от пляжа Най Янг, рядом нацпарк и аэропорт. При покупке в лизхолд застройщик платит 10% годовых три года.</p>\n  </div>\n  <div class=\"block\" style=\"left:96mm;top:4mm;width:104mm;height:94mm;transform:rotate(-2.5deg)\"></div>\n  <div class=\"photo\" style=\"left:90mm;top:24mm;width:112mm;height:76mm;transform:rotate(-1.5deg)\"><img src=\"img/z-ext.webp\" alt=\"Silhouette by The Zero, Най Янг, рендер застройщика\"></div>\n  <div class=\"label\" style=\"left:156mm;top:9mm;transform:rotate(6deg)\">10% × 3 года</div>\n</div>",
- "stats": "<div class=\"stats\">\n  <div class=\"stat\"><b>от 4,94 млн ฿</b><span>студия 35,2 м²</span></div>\n  <div class=\"stat\"><b>10% в год</b><span>гарантия 3 года, лизхолд</span></div>\n  <div class=\"stat\"><b>350 м</b><span>до пляжа Най Янг</span></div>\n  <div class=\"stat\"><b>III кв. 2028</b><span>сдача по графику</span></div>\n</div>",
- "cta": "<footer class=\"cta\">\n  <div class=\"ctahead\">\n    <div><div class=\"eyebrow\">Следующий шаг</div><h2>Расчёт по вашему лоту</h2></div>\n    <p>Пришлём свободные квартиры, цену и расчёт гарантии под ваш бюджет.</p>\n  </div>\n  <div class=\"links\">\n    <a class=\"main\" href=\"https://wa.me/66955492587?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%98%D0%BD%D1%82%D0%B5%D1%80%D0%B5%D1%81%D0%B5%D0%BD%20The%20ZERO%20Nai%20Yang\"><b>Написать Эльнуру →</b><span>WhatsApp</span></a>\n    <a href=\"https://t.me/elnurphuket_bot?start=zero_offer\"><b>Telegram</b><span>@elnurphuket_bot</span></a>\n    <a href=\"https://property-library.com/object/zero-naiyang\"><b>Сайт</b><span>карточка проекта</span></a>\n    <a href=\"https://t.me/property_library_phuket\"><b>Канал</b><span>новости рынка</span></a>\n  </div>\n  <div class=\"foot\"><span>Property Library Phuket. Сопровождаем от выбора до ключей</span><span>По прайсу застройщика, условия могут меняться.</span></div>\n</footer>",
- "tail": "\n</div>\n</body></html>\n",
- "units": {
-  "h2": "Silhouette by The Zero: два корпуса по 5 этажей",
-  "lead": "150 квартир в двух корпусах: Sky Residences и Earth Residences, во втором можно жить с питомцами. Бассейн и бар на крыше, кинотеатр под открытым небом, своя управляющая компания. Экспертиза EIA одобрена.",
-  "facts": "<div class=\"facts\" style=\"grid-template-columns:repeat(4,1fr);margin:5mm 0 6mm\">\n    <div><b>150</b><span>квартир</span></div>\n    <div><b>2 × 5</b><span>корпусов × этажей</span></div>\n    <div><b>35–105 м²</b><span>от студии до сьюта, текущий прайс</span></div>\n    <div><b>EIA</b><span>одобрена</span></div>\n  </div>",
-  "cards": [
-   "<div class=\"card\"><h3>Что в продаже</h3>\n      <table>\n        <tr><td>Студия · 35,2–36,3 м²</td><td class=\"r num\">4,94–5,52 млн ฿</td></tr>\n        <tr><td>1-спальная · 37,5–46 м²</td><td class=\"r num\">5,23–6,76 млн ฿</td></tr>\n        <tr><td>1-спальная плюс · 44,4–52,4 м²</td><td class=\"r num\">6,23–7,34 млн ฿</td></tr>\n        <tr><td>2 спальни · 52,8–66,7 м²</td><td class=\"r num\">6,62–10,15 млн ฿</td></tr>\n        <tr><td>Сьют · 81,2–105 м²</td><td class=\"r num\">11,77–15,22 млн ฿</td></tr>\n      </table>\n      <p style=\"margin:3mm 0 0;color:var(--ink2);font-size:9pt\">105 квартир в продаже по прайсу, 125–154 тыс. ฿ за м². Мебельный пакет 350–700 тыс. ฿ по планировке.</p>\n      <p class=\"src\">Прайс застройщика; цены могут меняться.</p></div>"
-  ],
-  "photos": [
-   {
-    "src": "img/z-studio.webp",
-    "alt": "ZERO Nai Yang, студия, интерьер застройщика",
-    "cap": "студия"
-   },
-   {
-    "src": "img/z-1bed.webp",
-    "alt": "ZERO Nai Yang, 1-спальная квартира, интерьер застройщика",
-    "cap": "1-спальная квартира"
-   },
-   {
-    "src": "img/z-2bed.webp",
-    "alt": "ZERO Nai Yang, 2 спальни, интерьер застройщика",
-    "cap": "2 спальни"
-   },
-   {
-    "src": "img/z-suite.webp",
-    "alt": "ZERO Nai Yang, сьют, интерьер застройщика",
-    "cap": "сьют на 5 этаже"
-   }
-  ],
-  "plans_pol": [
-   {
-    "src": "img/z-p_st.webp",
-    "alt": "Планировка студии",
-    "cap": "студия · 35–36 м²"
-   },
-   {
-    "src": "img/z-p_1b.webp",
-    "alt": "Планировка 1-спальной квартиры",
-    "cap": "1-спальная · от 37,5 м²"
-   },
-   {
-    "src": "img/z-p_1bp.webp",
-    "alt": "Планировка 1-спальной плюс",
-    "cap": "1-спальная плюс · от 44,4 м²"
-   },
-   {
-    "src": "img/z-p_2b.webp",
-    "alt": "Планировка 2 спален",
-    "cap": "2 спальни · от 52,8 м²"
-   },
-   {
-    "src": "img/z-p_su.webp",
-    "alt": "Планировка сьюта",
-    "cap": "сьют · от 81,2 м²"
-   }
-  ],
-  "plans_title": "Планировки",
-  "plans_src": "Планировки застройщика."
- },
- "project": {
-  "h2": "Что внутри Silhouette",
-  "lead": "",
-  "big": {
-   "src": "img/z-rest.webp",
-   "alt": "ZERO Nai Yang, ресторан и бар",
-   "contain": false,
-   "cap": ""
+  "slug": "zero-naiyang",
+  "pdf": "ZERO_NaiYang.pdf",
+  "head": "<!doctype html>\n<html lang=\"ru\"><head><script>/* 02.10.2026: прямую ссылку на лист А4 открыли на телефоне — правую часть обрезало. На узком экране вне рамки ведём на /vibe2, где лист уменьшается целиком. Печать и PDF не трогаем. */if(window.top===window&&window.innerWidth<800&&!/[?&]pdf/.test(location.search)&&!window.matchMedia('print').matches){location.replace('/zero-naiyang'+location.hash);}</script>\n<base target=\"_top\"><meta charset=\"utf-8\">\n<meta name=\"robots\" content=\"noindex, nofollow\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>The ZERO Nai Yang · Най Янг · Property Library Phuket</title>\n<meta property=\"og:type\" content=\"website\">\n<meta property=\"og:site_name\" content=\"Property Library Phuket\">\n<meta property=\"og:title\" content=\"The ZERO Nai Yang · Най Янг\">\n<meta property=\"og:description\" content=\"Предложение Property Library Phuket: гарантия 10% на три года, цены, график платежей\">\n<meta property=\"og:url\" content=\"https://property-library.com/offers/zero-naiyang/page.htm\">\n<meta property=\"og:image\" content=\"https://property-library.com/offers/zero-naiyang/img/preview.jpg\">\n<meta property=\"og:image:width\" content=\"1200\">\n<meta property=\"og:image:height\" content=\"630\">\n<meta name=\"twitter:card\" content=\"summary_large_image\">\n<link rel=\"stylesheet\" href=\"https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Marck+Script&display=swap\">\n<style>\n@page{size:210mm 2800mm;margin:0}\n.photo{position:absolute;z-index:2;border-radius:3mm;overflow:hidden;box-shadow:0 1.5mm 4mm rgba(23,24,15,.18)}\n.photo img{width:100%;height:100%;object-fit:cover;display:block}\n:root{--ink:#17180F;--ink2:#2B2D22;--sage:#D2D5B3;--olive:#5E6B35;--cream:#EFECE2;--line:#DAD8C8;--muted:#62665A;--rust:#B4533A;--teal:#4E7F80;--sun:#F2D96B}\n*{box-sizing:border-box}\nhtml,body{margin:0;background:var(--cream)}\nbody{color:var(--ink);font:10pt/1.55 Manrope,-apple-system,\"Segoe UI\",Arial,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}\n.w{width:210mm;margin:0 auto;background:var(--cream);position:relative;overflow:hidden}\n.pad{padding-left:15mm;padding-right:15mm}\na{color:inherit}\n.pen{font-family:\"Marck Script\",cursive;color:var(--rust)}\n.eyebrow{font-weight:700;font-size:7.6pt;letter-spacing:.18em;text-transform:uppercase;color:var(--olive)}\nh1{font-weight:800;font-size:58pt;line-height:.95;letter-spacing:-.04em;margin:3mm 0 4mm;white-space:nowrap}\nh1 span{color:var(--olive)}\nh2{font-weight:800;font-size:21pt;line-height:1.08;letter-spacing:-.015em;margin:1.5mm 0 3mm;max-width:140mm}\nh3{font-weight:700;font-size:7.6pt;letter-spacing:.14em;text-transform:uppercase;color:var(--olive);margin:0 0 2.5mm}\np{margin:0 0 2mm}\n.lead{font-size:11pt;color:var(--ink2);max-width:150mm}\n.src{font-size:7pt;color:var(--muted);margin-top:2.5mm}\n.num{font-variant-numeric:tabular-nums}\nsection{padding-top:14mm;position:relative}\n.layer{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:5}\n.top{display:flex;justify-content:space-between;align-items:flex-start;padding:10mm 15mm 0}\n.top img{height:19mm;display:block}\n.top .tag{font-size:7.4pt;letter-spacing:.16em;text-transform:uppercase;color:var(--olive);text-align:right;line-height:1.7;font-weight:700}\n.hero{position:relative;height:150mm}\n.hero .txt{position:absolute;left:15mm;top:12mm;width:76mm;z-index:3}\n.hero .sub{font-size:11pt;color:var(--ink2);max-width:66mm}\n.block{position:absolute;background:var(--sage);background-image:repeating-linear-gradient(135deg,rgba(23,24,15,.07) 0 .6mm,transparent .6mm 2.4mm)}\n.sticker{position:absolute;z-index:2}\n.sticker img{width:100%;display:block}\n.label{position:absolute;z-index:4;background:var(--ink);color:var(--sun);font-weight:800;font-size:9pt;letter-spacing:.14em;text-transform:uppercase;padding:2mm 3.5mm;border-radius:1mm;box-shadow:.8mm .8mm 0 rgba(23,24,15,.25)}\n.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:3.5mm;padding:0 15mm;position:relative;z-index:3}\n.stat{background:#FFFFFF;border:1px solid var(--line);border-radius:2.5mm;padding:4mm 4mm 4.5mm;position:relative}\n.stat svg{position:absolute;right:2.5mm;top:2.5mm;width:11mm;height:11mm;overflow:visible}\n.stat b{display:block;font-weight:800;font-size:15.5pt;letter-spacing:-.01em;white-space:nowrap;margin-top:7mm}\n.stat span{font-size:7.1pt;color:var(--muted);white-space:nowrap}\n.grid{display:grid;gap:6mm}\n.g2{grid-template-columns:1fr 1fr}\n.g64{grid-template-columns:1.5fr 1fr}\n.card{background:#FFFFFF;border:1px solid var(--line);border-radius:2.5mm;padding:5.5mm 6mm;position:relative}\ntable{border-collapse:collapse;width:100%}\ntd{padding:1.9mm 0;border-bottom:1px solid #ECECE0;font-size:9pt;vertical-align:top}\ntr:last-child td{border-bottom:0}\ntd.r{text-align:right;font-weight:700;white-space:nowrap;padding-left:4mm}\n.hl{color:var(--olive)}\n.big{font-weight:800;font-size:26pt;letter-spacing:-.02em;line-height:1}\nul.l{margin:0;padding:0;list-style:none}\nul.l li{position:relative;padding:1.6mm 0 1.6mm 5mm;border-bottom:1px solid #E1DFD0;font-size:9pt}\nul.l li:last-child{border-bottom:0}\nul.l li:before{content:\"\";position:absolute;left:0;top:3.6mm;width:2mm;height:2mm;border-radius:50%;background:var(--olive)}\n.head-ico{position:absolute;right:15mm;top:11mm;width:20mm;height:20mm;overflow:visible}\n.polaroid{position:absolute;background:#fff;padding:2mm 2mm 8mm;box-shadow:0 1.2mm 3mm rgba(23,24,15,.18)}\n.polaroid img{display:block;width:100%;height:100%;object-fit:cover}\n.polaroid i{position:absolute;left:0;right:0;bottom:1.6mm;text-align:center;font-family:\"Marck Script\",cursive;font-style:normal;font-size:11pt;color:var(--ink2)}\n.tape{position:absolute;width:18mm;height:5.5mm;background:rgba(242,217,107,.78);z-index:3}\n.dev{position:relative;height:112mm;margin-top:4mm}\n.facts{display:grid;grid-template-columns:1fr 1fr;gap:3mm 5mm}\n.facts b{display:block;font-weight:800;font-size:15pt}\n.facts span{font-size:8pt;color:var(--muted)}\n.cta{margin:12mm 15mm 0;padding:7mm 0 7mm;border-top:1px solid var(--line)}\n.ctahead{display:grid;grid-template-columns:1.3fr 1fr;gap:8mm;align-items:end}\n.cta h2{font-size:17pt;margin:1mm 0 0}\n.cta .ctahead p{font-size:9pt;color:var(--ink2);margin:0}\n.links{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;gap:2.5mm;margin-top:5mm}\n.links a{display:block;text-decoration:none;border:1px solid var(--line);border-radius:2mm;padding:2.8mm 3.2mm;color:var(--ink);background:#FFFFFF}\n.links a b{display:block;font-weight:700;font-size:8.6pt;white-space:nowrap}\n.links a span{font-size:7.2pt;color:var(--muted);white-space:nowrap}\n.links a.main{background:var(--sage);border-color:var(--sage)}\n.foot{display:flex;justify-content:space-between;gap:8mm;font-size:6.8pt;color:var(--muted);margin-top:4mm}\n.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:10mm 7mm;margin-top:3mm}\n.pol{background:#fff;padding:2mm 2mm 8mm;box-shadow:0 .6mm 1.6mm rgba(23,24,15,.14);position:relative}\n.pol img{display:block;width:100%;height:52mm;object-fit:cover}\n.pol i{position:absolute;left:0;right:0;bottom:1.4mm;text-align:center;font-family:\"Marck Script\",cursive;font-style:normal;font-size:11pt;color:var(--ink2)}\n.tl{display:grid;grid-template-columns:repeat(4,1fr);gap:3.5mm;margin-top:3mm;position:relative}\n.tl div{background:#fff;border:1px solid var(--line);border-radius:2.5mm;padding:4mm;border-top:1.2mm solid var(--olive)}\n.tl b{display:block;font-weight:800;font-size:11pt;margin-bottom:1mm}\n.tl span{font-size:8.4pt;color:var(--ink2)}\n.plans-band{position:relative;background:var(--olive);border-radius:3mm;padding:8mm 9mm 6mm;color:#fff}\n.tl2{list-style:none;margin:4mm 0 0;padding:0}\n.tl2 li{display:grid;grid-template-columns:42mm 1fr;grid-template-rows:auto auto;column-gap:5mm;padding:3.2mm 0;border-top:1px solid rgba(255,255,255,.22)}\n.tl2 li b{grid-row:1/3;font-weight:800;font-size:12pt;color:var(--sun)}\n.tl2 li span{font-weight:700;font-size:10pt}\n.tl2 li em{font-style:normal;font-size:8.6pt;color:rgba(255,255,255,.78)}\n.dd{position:absolute;z-index:6;pointer-events:none}\n.dd img{width:100%;display:block;filter:drop-shadow(0 .6mm .8mm rgba(23,24,15,.18))}\nsvg text{font-family:Manrope,Arial,sans-serif}\n\n</style><!-- PLP:GA --><script async src=\"https://www.googletagmanager.com/gtag/js?id=G-HQNDG3B8MW\"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-HQNDG3B8MW');</script></head>\n",
+  "top": "<div class=\"top\">\n  <a href=\"https://property-library.com\"><img src=\"img/plp-logo-ink.webp\" alt=\"Property Library Phuket\"></a>\n  <div class=\"tag\">Предложение<br>для клиентов Property Library<br><span style=\"color:var(--muted)\">по прайсу застройщика</span></div>\n</div>",
+  "hero": "<div class=\"hero\" style=\"height:118mm\">\n  <div class=\"txt\">\n    <div class=\"eyebrow\">Най Янг · север Пхукета</div>\n    <h1 style=\"font-size:50pt;white-space:normal;line-height:.95\">ZERO<br><span>Nai Yang</span></h1>\n    <p class=\"sub\">Дом на 150 квартир в 350 метрах от пляжа Най Янг, рядом нацпарк и аэропорт. При покупке в лизхолд застройщик платит 10% годовых три года.</p>\n  </div>\n  <div class=\"photo\" style=\"left:90mm;top:24mm;width:112mm;height:76mm;transform:rotate(-1.5deg)\"><img src=\"img/z-ext.webp\" alt=\"Silhouette by The Zero, Най Янг, рендер застройщика\"></div>\n  <div class=\"label\" style=\"left:156mm;top:9mm;transform:rotate(6deg)\">10% × 3 года</div>\n</div>",
+  "stats": "<div class=\"stats\">\n  <div class=\"stat\"><b>150 квартир</b><span>два корпуса по 5 этажей</span></div>\n  <div class=\"stat\"><b>10% в год</b><span>гарантия 3 года, лизхолд</span></div>\n  <div class=\"stat\"><b>350 м</b><span>до пляжа Най Янг</span></div>\n  <div class=\"stat\"><b>III кв. 2028</b><span>сдача по графику</span></div>\n</div>",
+  "cta": "<footer class=\"cta\">\n  <div class=\"ctahead\">\n    <div><div class=\"eyebrow\">Следующий шаг</div><h2>Расчёт по вашему лоту</h2></div>\n    <p>Пришлём свободные квартиры, цену и расчёт гарантии под ваш бюджет.</p>\n  </div>\n  <div class=\"links\">\n    <a class=\"main\" href=\"https://wa.me/66955492587?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%98%D0%BD%D1%82%D0%B5%D1%80%D0%B5%D1%81%D0%B5%D0%BD%20The%20ZERO%20Nai%20Yang\"><b>Написать Эльнуру →</b><span>WhatsApp</span></a>\n    <a href=\"https://t.me/elnurphuket_bot?start=zero_offer\"><b>Telegram</b><span>@elnurphuket_bot</span></a>\n    <a href=\"https://property-library.com/object/zero-naiyang\"><b>Сайт</b><span>карточка проекта</span></a>\n    <a href=\"https://t.me/property_library_phuket\"><b>Канал</b><span>новости рынка</span></a>\n  </div>\n  <div class=\"foot\"><span>Property Library Phuket. Сопровождаем от выбора до ключей</span><span>По прайсу застройщика, условия могут меняться.</span></div>\n</footer>",
+  "tail": "\n</div>\n</body></html>\n",
+  "units": {
+    "h2": "Silhouette by The Zero: два корпуса по 5 этажей",
+    "lead": "150 квартир в двух корпусах: Sky Residences и Earth Residences, во втором можно жить с питомцами. Бассейн и бар на крыше, кинотеатр под открытым небом, своя управляющая компания. Экспертиза EIA одобрена.",
+    "facts": "<div class=\"facts\" style=\"grid-template-columns:repeat(4,1fr);margin:5mm 0 6mm\">\n    <div><b>150</b><span>квартир</span></div>\n    <div><b>2 × 5</b><span>корпусов × этажей</span></div>\n    <div><b>35–105 м²</b><span>от студии до сьюта, текущий прайс</span></div>\n    <div><b>EIA</b><span>одобрена</span></div>\n  </div>",
+    "cards": [
+      "<div class=\"card\"><h3>Что в продаже</h3>\n      <table>\n        <tr><td>Студия · 35,2–36,3 м²</td><td class=\"r num\">4,94–5,52 млн ฿</td></tr>\n        <tr><td>1-спальная · 37,5–46 м²</td><td class=\"r num\">5,23–6,76 млн ฿</td></tr>\n        <tr><td>1-спальная плюс · 44,4–52,4 м²</td><td class=\"r num\">6,23–7,34 млн ฿</td></tr>\n        <tr><td>2 спальни · 52,8–66,7 м²</td><td class=\"r num\">6,62–10,15 млн ฿</td></tr>\n        <tr><td>Сьют · 81,2–105 м²</td><td class=\"r num\">11,77–15,22 млн ฿</td></tr>\n      </table>\n      <p style=\"margin:3mm 0 0;color:var(--ink2);font-size:9pt\">105 квартир в продаже по прайсу, 125–154 тыс. ฿ за м². Мебельный пакет 350–700 тыс. ฿ по планировке.</p>\n      <p class=\"src\">Прайс застройщика; цены могут меняться.</p></div>"
+    ],
+    "photos": [
+      {
+        "src": "img/z-studio.webp",
+        "alt": "ZERO Nai Yang, студия, интерьер застройщика",
+        "cap": "студия"
+      },
+      {
+        "src": "img/z-1bed.webp",
+        "alt": "ZERO Nai Yang, 1-спальная квартира, интерьер застройщика",
+        "cap": "1-спальная квартира"
+      },
+      {
+        "src": "img/z-2bed.webp",
+        "alt": "ZERO Nai Yang, 2 спальни, интерьер застройщика",
+        "cap": "2 спальни"
+      },
+      {
+        "src": "img/z-suite.webp",
+        "alt": "ZERO Nai Yang, сьют, интерьер застройщика",
+        "cap": "сьют на 5 этаже"
+      }
+    ],
+    "plans_pol": [
+      {
+        "src": "img/z-p_st.webp",
+        "alt": "Планировка студии",
+        "cap": "студия · 35–36 м²"
+      },
+      {
+        "src": "img/z-p_1b.webp",
+        "alt": "Планировка 1-спальной квартиры",
+        "cap": "1-спальная · от 37,5 м²"
+      },
+      {
+        "src": "img/z-p_1bp.webp",
+        "alt": "Планировка 1-спальной плюс",
+        "cap": "1-спальная плюс · от 44,4 м²"
+      },
+      {
+        "src": "img/z-p_2b.webp",
+        "alt": "Планировка 2 спален",
+        "cap": "2 спальни · от 52,8 м²"
+      },
+      {
+        "src": "img/z-p_su.webp",
+        "alt": "Планировка сьюта",
+        "cap": "сьют · от 81,2 м²"
+      }
+    ],
+    "plans_title": "Планировки",
+    "plans_src": "Планировки застройщика."
   },
-  "photos": [
-   {
-    "src": "img/z-cow.webp",
-    "alt": "Коворкинг",
-    "cap": "коворкинг"
-   },
-   {
-    "src": "img/z-gym.webp",
-    "alt": "Зал",
-    "cap": "зал"
-   },
-   {
-    "src": "img/f8ebd3fde608ffdc.webp",
-    "alt": "Спа",
-    "cap": "спа"
-   }
-  ],
-  "cards": [
-   "<div class=\"card\"><h3>Инфраструктура</h3>\n      <ul class=\"l\">\n        <li>Бассейн и бар на крыше</li>\n        <li>Кинотеатр под открытым небом</li>\n        <li>Велнес-центр, спа, зал</li>\n        <li>Ресторан, коворкинг, переговорные</li>\n        <li>Подземная парковка, зарядки для электромобилей</li>\n        <li>Консьерж и охрана 24/7</li>\n      </ul>\n      <p class=\"src\">Фактшит застройщика; карточка проекта.</p></div>"
-  ],
-  "plans": [
-   {
-    "src": "img/z-mp_1.webp",
-    "alt": "Мастер-план, 1 этаж",
-    "contain": true,
-    "cap": "Мастер-план 1 этажа: лобби, бассейн, сад, два корпуса."
-   },
-   {
-    "src": "img/z-mp_24.webp",
-    "alt": "Мастер-план, 2–4 этажи",
-    "contain": true,
-    "cap": "Этажи 2–4."
-   },
-   {
-    "src": "img/z-mp_roof.webp",
-    "alt": "Крыша",
-    "contain": true,
-    "cap": "Крыша: бассейн, бар, кинотеатр под открытым небом."
-   }
-  ]
- },
- "buy": {
-  "h2": "Бронь 100 000 ฿ и оплата по этапам стройки",
-  "html": "<div class=\"grid g64\" style=\"align-items:start\">\n    <div class=\"card\"><h3>Как купить</h3>\n      <table>\n        <tr><td>Бронь</td><td class=\"r num\">100 000 ฿</td></tr>\n        <tr><td>Первый взнос через 15 дней</td><td class=\"r num\">25%</td></tr>\n        <tr><td>Остальное по этапам стройки</td><td class=\"r num\">2026–2028</td></tr>\n        <tr><td>При передаче ключей</td><td class=\"r num\">10%</td></tr>\n        <tr><td>Содержание, за м² в месяц</td><td class=\"r num\">80 ฿</td></tr>\n        <tr><td>Фонд дома, за м² разово</td><td class=\"r num\">800 ฿</td></tr>\n        <tr><td>Сбор за фрихолд</td><td class=\"r num\">350–700 тыс. ฿</td></tr>\n      </table>\n      <div style=\"margin:3.5mm 0 0;background:var(--sun);border-radius:2mm;padding:3mm 3.5mm;font-size:9.4pt;font-weight:700;color:var(--ink)\">Бронь 100 000 ฿, первый взнос через 15 дней, остальное по этапам стройки.</div>\n      <p class=\"src\">Сбор за переоформление пополам с застройщиком. Подключение света и воды до 20 000 ฿. Прайс, фактшит; первый взнос 25% по условиям застройщика.</p></div>\n    <div class=\"pol\" style=\"transform:rotate(.5deg)\"><img style=\"height:70mm\" src=\"img/49e5626c9f5a889a.webp\" alt=\"ZERO Nai Yang у пляжа Най Янг, рендер застройщика\"><i>350 метров до пляжа</i></div>\n  </div>"
- },
- "step": {
-  "eyebrow": "Ваш шаг",
-  "h2": "Как войти и получить гарантию 10%",
-  "items": [
-   [
-    "сейчас",
-    "Бронь 100 000 ฿, первый взнос через 15 дней",
-    "фиксируем цену по текущему прайсу, пока она не выросла"
-   ],
-   [
-    "октябрь 2026",
-    "Действующий прайс: 125–154 тыс. ฿ за м²",
-    "цена растёт по мере продаж: корпус Earth уже подорожал со 110 до 125 тыс. ฿"
-   ],
-   [
-    "I квартал 2027",
-    "Сдача первого проекта, The Zero Bang Tao",
-    "можно посмотреть качество застройщика вживую"
-   ],
-   [
-    "III квартал 2028",
-    "Сдача ZERO Nai Yang",
-    "ключи, затем гарантия 10% и аренда"
-   ]
-  ],
-  "src": "Источники: прайс и условия застройщика; сдача по материалы застройщика; Estatyx; прайс; письмо застройщика."
- },
- "who": {
-  "h2": "Для дохода без хлопот и для жизни у моря",
-  "html": "<div class=\"grid g2\" style=\"align-items:start\">\n    <div class=\"card\"><ul class=\"l\">\n      <li><b>Инвесторам</b>: три года фиксированного дохода от застройщика, дальше арендная программа</li>\n      <li><b>Тем, кто часто летает</b>: аэропорт в 2,5 км</li>\n    </ul></div>\n    <div class=\"card\"><ul class=\"l\">\n      <li><b>Для жизни в тишине</b>: нацпарк, сосны, спокойный пляж</li>\n      <li><b>С питомцами</b>: корпус Earth Residences</li>\n    </ul></div>\n  </div>\n  <div class=\"card\" style=\"margin-top:6mm\"><h3>Наш взгляд</h3>\n    <p style=\"margin:1.5mm 0 0;color:var(--ink2)\">Гарантия 10% закрывает первые три года после сдачи, а дальше доход зависит от сдачи в аренду. Место сильное: нацпарк, пляж в 350 метрах и аэропорт рядом. Подберём квартиру под вашу задачу и посчитаем гарантию и график платежей по конкретному лоту.</p>\n    <p class=\"src\">Цены по прайсу застройщика, условия могут меняться.</p></div>"
- },
- "income": {
-  "h2": "Гарантия 10% в год на три года",
-  "html": "<div class=\"grid g64\" style=\"align-items:start\">\n    <div class=\"card\" style=\"background:var(--sage);border-color:var(--sage)\"><h3>Сколько платит застройщик</h3>\n      <p style=\"margin:1mm 0 3mm;color:var(--ink2)\">При покупке в лизхолд застройщик платит владельцу 10% от цены квартиры в год, три года. С другими акциями не суммируется.</p>\n      <table>\n        <tr><td style=\"color:var(--muted)\"></td><td class=\"r\" style=\"color:var(--muted);font-weight:600\">в год</td><td class=\"r\" style=\"color:var(--muted);font-weight:600\">за 3 года</td></tr>\n        <tr><td>Студия 4,94 млн</td><td class=\"r num\">494 тыс.</td><td class=\"r num\">1,48 млн</td></tr>\n        <tr><td>1-спальная 5,23 млн</td><td class=\"r num\">523 тыс.</td><td class=\"r num\">1,57 млн</td></tr>\n        <tr><td>2 спальни 6,62 млн</td><td class=\"r num\">662 тыс.</td><td class=\"r num\">1,99 млн</td></tr>\n      </table>\n      <p style=\"margin:3mm 0 0;color:var(--ink2);font-size:9pt\">После гарантии квартира идёт в арендную программу застройщика. Его прогноз доходности около 11% в год.</p>\n      <p class=\"src\">Сообщение застройщика (гарантия); фактшит (прогноз застройщика). Наш расчёт по нижним ценам прайса.</p></div>\n    <div class=\"pol\" style=\"transform:rotate(-.5deg)\"><img style=\"height:78mm\" src=\"img/c89b25feead6ed06.webp\" alt=\"ZERO Nai Yang, въезд, рендер застройщика\"><i>въезд и лобби</i></div>\n  </div>"
- },
- "place": {
-  "h2": "Най Янг: нацпарк, тихий пляж и аэропорт рядом",
-  "html": "<div class=\"photo\" style=\"position:relative;left:0;top:0;width:100%;height:110mm;margin:2mm 0 5mm\"><img src=\"img/z-top.webp\" alt=\"Silhouette by The Zero у пляжа Най Янг, вид сверху, рендер застройщика\"></div>\n  <div>\n    <div class=\"card\"><ul class=\"l\">\n      <li>350 метров до пляжа Най Янг</li>\n      <li>Пляж внутри национального парка Сиринат, вдоль берега сосны и коралловый риф</li>\n      <li>Аэропорт в 2,5 км</li>\n      <li>Рядом Phuket Marriott Resort &amp; Spa Nai Yang Beach, 180 номеров</li>\n      <li>Bumrungrad строит больницу у Blue Canyon, в 3 км от аэропорта</li>\n    </ul>\n    <p class=\"src\">Карта и фактшит застройщика; eHotelier (Marriott).</p></div>\n  </div>"
- },
- "market": {
-  "eyebrow": "Рынок",
-  "h2": "Аэропорт работает сверх расчёта",
-  "html": "<div class=\"facts\" style=\"grid-template-columns:repeat(3,1fr);margin-top:3mm\">\n    <div><b>17,5 млн</b><span>пассажиров за 2025 финансовый год</span></div>\n    <div><b>12,5 млн</b><span>на столько рассчитан аэропорт</span></div>\n    <div><b>18 млн</b><span>после второй очереди расширения</span></div>\n  </div>\n  <p style=\"margin-top:4mm;color:var(--ink2);max-width:160mm\">Аэропорт перегружен с 2019 года. Вторая очередь ещё в проектировании: одобрение ждут в 2027 году.</p>\n  <p class=\"src\">Источники: годовой отчёт AOT по сводке, C9 Hotelworks; Thaiger; Thansettakij.</p>"
- },
- "developer": {
-  "h2": "The Zero Phuket: британская команда и эко-подход",
-  "html": "<div class=\"grid g64\" style=\"align-items:start\">\n    <div class=\"card\"><h3>История</h3>\n      <ul class=\"l\">\n        <li><b>2002–2017</b>: команда построила около 185 квартир в Великобритании.</li>\n        <li><b>2019</b>: компания основана в Лондоне. Основатель Robert Hodge, гендиректор Tony Bygraves.</li>\n        <li><b>2018–2023</b>: дом Zero London на 35 квартир, премия 2022 Large Scale Project Award.</li>\n        <li><b>Пхукет</b>: первый проект The Zero Bang Tao. Награда Dot Property Thailand Awards 2025 за лучший устойчивый жилой проект, первое кондо на острове без одноразового пластика.</li>\n        <li><b>Своя управляющая компания</b>: сдача и обслуживание квартир внутри застройщика.</li>\n      </ul>\n      <p class=\"src\">Источники: фактшит застройщика; Thaiger.</p></div>\n    <div>\n      <div class=\"card\" style=\"background:var(--sage);border-color:var(--sage)\"><h3>The Zero Bang Tao</h3>\n        <div class=\"big hl\" style=\"margin:1mm 0 2mm\">75%</div>\n        <p style=\"margin:0;color:var(--ink2)\">квартир продано, сдача в I квартале 2027. Тот же застройщик, та же модель: тихое место у пляжа и невысокая плотность.</p>\n        <p class=\"src\">Письмо застройщика партнёрам.</p></div>\n      <div class=\"photo\" style=\"position:relative;left:0;top:0;width:100%;height:46mm;margin-top:4mm\"><img src=\"img/z-det.webp\" alt=\"Silhouette by The Zero, въезд, рендер застройщика\"></div>\n    </div>\n  </div>"
- }
+  "project": {
+    "h2": "Что внутри Silhouette",
+    "lead": "",
+    "big": {
+      "src": "img/z-rest.webp",
+      "alt": "ZERO Nai Yang, ресторан и бар",
+      "contain": false,
+      "cap": ""
+    },
+    "photos": [
+      {
+        "src": "img/z-cow.webp",
+        "alt": "Коворкинг",
+        "cap": "коворкинг"
+      },
+      {
+        "src": "img/z-gym.webp",
+        "alt": "Зал",
+        "cap": "зал"
+      },
+      {
+        "src": "img/f8ebd3fde608ffdc.webp",
+        "alt": "Спа",
+        "cap": "спа"
+      }
+    ],
+    "cards": [
+      "<div class=\"card\"><h3>Инфраструктура</h3>\n      <ul class=\"l\">\n        <li>Бассейн и бар на крыше</li>\n        <li>Кинотеатр под открытым небом</li>\n        <li>Велнес-центр, спа, зал</li>\n        <li>Ресторан, коворкинг, переговорные</li>\n        <li>Подземная парковка, зарядки для электромобилей</li>\n        <li>Консьерж и охрана 24/7</li>\n      </ul>\n      <p class=\"src\">Фактшит застройщика; карточка проекта.</p></div>"
+    ],
+    "plans": [
+      {
+        "src": "img/z-mp_1.webp",
+        "alt": "Мастер-план, 1 этаж",
+        "contain": true,
+        "cap": "Мастер-план 1 этажа: лобби, бассейн, сад, два корпуса."
+      },
+      {
+        "src": "img/z-mp_24.webp",
+        "alt": "Мастер-план, 2–4 этажи",
+        "contain": true,
+        "cap": "Этажи 2–4."
+      },
+      {
+        "src": "img/z-mp_roof.webp",
+        "alt": "Крыша",
+        "contain": true,
+        "cap": "Крыша: бассейн, бар, кинотеатр под открытым небом."
+      }
+    ]
+  },
+  "buy": {
+    "h2": "Бронь 100 000 ฿ и оплата по этапам стройки",
+    "html": "<div class=\"grid g64\" style=\"align-items:start\">\n    <div class=\"card\"><h3>Как купить</h3>\n      <table>\n        <tr><td>Бронь</td><td class=\"r num\">100 000 ฿</td></tr>\n        <tr><td>Первый взнос через 15 дней</td><td class=\"r num\">25%</td></tr>\n        <tr><td>Остальное по этапам стройки</td><td class=\"r num\">2026–2028</td></tr>\n        <tr><td>При передаче ключей</td><td class=\"r num\">10%</td></tr>\n        <tr><td>Содержание, за м² в месяц</td><td class=\"r num\">80 ฿</td></tr>\n        <tr><td>Фонд дома, за м² разово</td><td class=\"r num\">800 ฿</td></tr>\n        <tr><td>Сбор за фрихолд</td><td class=\"r num\">350–700 тыс. ฿</td></tr>\n      </table>\n      <div style=\"margin:3.5mm 0 0;background:var(--sun);border-radius:2mm;padding:3mm 3.5mm;font-size:9.4pt;font-weight:700;color:var(--ink)\">Бронь 100 000 ฿, первый взнос через 15 дней, остальное по этапам стройки.</div>\n      <p class=\"src\">Сбор за переоформление пополам с застройщиком. Подключение света и воды до 20 000 ฿. Прайс, фактшит; первый взнос 25% по условиям застройщика.</p></div>\n    <div class=\"pol\" style=\"transform:rotate(.5deg)\"><img style=\"height:70mm\" src=\"img/49e5626c9f5a889a.webp\" alt=\"ZERO Nai Yang у пляжа Най Янг, рендер застройщика\"><i>350 метров до пляжа</i></div>\n  </div>"
+  },
+  "step": {
+    "eyebrow": "Ваш шаг",
+    "h2": "Как войти и получить гарантию 10%",
+    "items": [
+      [
+        "сейчас",
+        "Бронь 100 000 ฿, первый взнос через 15 дней",
+        "фиксируем цену по текущему прайсу, пока она не выросла"
+      ],
+      [
+        "октябрь 2026",
+        "Действующий прайс: 125–154 тыс. ฿ за м²",
+        "цена растёт по мере продаж: корпус Earth уже подорожал со 110 до 125 тыс. ฿"
+      ],
+      [
+        "I квартал 2027",
+        "Сдача первого проекта, The Zero Bang Tao",
+        "можно посмотреть качество застройщика вживую"
+      ],
+      [
+        "III квартал 2028",
+        "Сдача ZERO Nai Yang",
+        "ключи, затем гарантия 10% и аренда"
+      ]
+    ],
+    "src": "Источники: прайс и условия застройщика; сдача по материалы застройщика; Estatyx; прайс; письмо застройщика."
+  },
+  "who": {
+    "h2": "Для дохода без хлопот и для жизни у моря",
+    "html": "<div class=\"grid g2\" style=\"align-items:start\">\n    <div class=\"card\"><ul class=\"l\">\n      <li><b>Инвесторам</b>: три года фиксированного дохода от застройщика, дальше арендная программа</li>\n      <li><b>Тем, кто часто летает</b>: аэропорт в 2,5 км</li>\n    </ul></div>\n    <div class=\"card\"><ul class=\"l\">\n      <li><b>Для жизни в тишине</b>: нацпарк, сосны, спокойный пляж</li>\n      <li><b>С питомцами</b>: корпус Earth Residences</li>\n    </ul></div>\n  </div>\n  <div class=\"card\" style=\"margin-top:6mm\"><h3>Наш взгляд</h3>\n    <p style=\"margin:1.5mm 0 0;color:var(--ink2)\">Гарантия 10% закрывает первые три года после сдачи, а дальше доход зависит от сдачи в аренду. Место сильное: нацпарк, пляж в 350 метрах и аэропорт рядом. Подберём квартиру под вашу задачу и посчитаем гарантию и график платежей по конкретному лоту.</p>\n    <p class=\"src\">Цены по прайсу застройщика, условия могут меняться.</p></div>"
+  },
+  "income": {
+    "h2": "Гарантия 10% в год на три года",
+    "html": "<div class=\"grid g64\" style=\"align-items:start\">\n    <div class=\"card\" style=\"background:var(--sage);border-color:var(--sage)\"><h3>Сколько платит застройщик</h3>\n      <p style=\"margin:1mm 0 3mm;color:var(--ink2)\">При покупке в лизхолд застройщик платит владельцу 10% от цены квартиры в год, три года. С другими акциями не суммируется.</p>\n      <table>\n        <tr><td style=\"color:var(--muted)\"></td><td class=\"r\" style=\"color:var(--muted);font-weight:600\">в год</td><td class=\"r\" style=\"color:var(--muted);font-weight:600\">за 3 года</td></tr>\n        <tr><td>Студия 4,94 млн</td><td class=\"r num\">494 тыс.</td><td class=\"r num\">1,48 млн</td></tr>\n        <tr><td>1-спальная 5,23 млн</td><td class=\"r num\">523 тыс.</td><td class=\"r num\">1,57 млн</td></tr>\n        <tr><td>2 спальни 6,62 млн</td><td class=\"r num\">662 тыс.</td><td class=\"r num\">1,99 млн</td></tr>\n      </table>\n      <p style=\"margin:3mm 0 0;color:var(--ink2);font-size:9pt\">После гарантии квартира идёт в арендную программу застройщика. Его прогноз доходности около 11% в год.</p>\n      <p class=\"src\">Сообщение застройщика (гарантия); фактшит (прогноз застройщика). Наш расчёт по нижним ценам прайса.</p></div>\n    <div class=\"pol\" style=\"transform:rotate(-.5deg)\"><img style=\"height:78mm\" src=\"img/c89b25feead6ed06.webp\" alt=\"ZERO Nai Yang, въезд, рендер застройщика\"><i>въезд и лобби</i></div>\n  </div>"
+  },
+  "place": {
+    "h2": "Най Янг: нацпарк, тихий пляж и аэропорт рядом",
+    "html": "<div class=\"photo\" style=\"position:relative;left:0;top:0;width:100%;height:110mm;margin:2mm 0 5mm\"><img src=\"img/z-top.webp\" alt=\"Silhouette by The Zero у пляжа Най Янг, вид сверху, рендер застройщика\"></div>\n  <div>\n    <div class=\"card\"><ul class=\"l\">\n      <li>350 метров до пляжа Най Янг</li>\n      <li>Пляж внутри национального парка Сиринат, вдоль берега сосны и коралловый риф</li>\n      <li>Аэропорт в 2,5 км</li>\n      <li>Рядом Phuket Marriott Resort &amp; Spa Nai Yang Beach, 180 номеров</li>\n      <li>Bumrungrad строит больницу у Blue Canyon, в 3 км от аэропорта</li>\n    </ul>\n    <p class=\"src\">Карта и фактшит застройщика; eHotelier (Marriott).</p></div>\n  </div>"
+  },
+  "market": {
+    "eyebrow": "Рынок",
+    "h2": "Аэропорт работает сверх расчёта",
+    "html": "<div class=\"facts\" style=\"grid-template-columns:repeat(3,1fr);margin-top:3mm\">\n    <div><b>17,5 млн</b><span>пассажиров за 2025 финансовый год</span></div>\n    <div><b>12,5 млн</b><span>на столько рассчитан аэропорт</span></div>\n    <div><b>18 млн</b><span>после второй очереди расширения</span></div>\n  </div>\n  <p style=\"margin-top:4mm;color:var(--ink2);max-width:160mm\">Аэропорт перегружен с 2019 года. Вторая очередь ещё в проектировании: одобрение ждут в 2027 году.</p>\n  <p class=\"src\">Источники: годовой отчёт AOT по сводке, C9 Hotelworks; Thaiger; Thansettakij.</p>"
+  },
+  "developer": {
+    "h2": "The Zero Phuket: британская команда и эко-подход",
+    "html": "<div class=\"grid g64\" style=\"align-items:start\">\n    <div class=\"card\"><h3>История</h3>\n      <ul class=\"l\">\n        <li><b>2002–2017</b>: команда построила около 185 квартир в Великобритании.</li>\n        <li><b>2019</b>: компания основана в Лондоне. Основатель Robert Hodge, гендиректор Tony Bygraves.</li>\n        <li><b>2018–2023</b>: дом Zero London на 35 квартир, премия 2022 Large Scale Project Award.</li>\n        <li><b>Пхукет</b>: первый проект The Zero Bang Tao. Награда Dot Property Thailand Awards 2025 за лучший устойчивый жилой проект, первое кондо на острове без одноразового пластика.</li>\n        <li><b>Своя управляющая компания</b>: сдача и обслуживание квартир внутри застройщика.</li>\n      </ul>\n      <p class=\"src\">Источники: фактшит застройщика; Thaiger.</p></div>\n    <div>\n      <div class=\"card\" style=\"background:var(--sage);border-color:var(--sage)\"><h3>The Zero Bang Tao</h3>\n        <div class=\"big hl\" style=\"margin:1mm 0 2mm\">75%</div>\n        <p style=\"margin:0;color:var(--ink2)\">квартир продано, сдача в I квартале 2027. Тот же застройщик, та же модель: тихое место у пляжа и невысокая плотность.</p>\n        <p class=\"src\">Письмо застройщика партнёрам.</p></div>\n      <div class=\"photo\" style=\"position:relative;left:0;top:0;width:100%;height:46mm;margin-top:4mm\"><img src=\"img/z-det.webp\" alt=\"Silhouette by The Zero, въезд, рендер застройщика\"></div>\n    </div>\n  </div>"
+  }
 }

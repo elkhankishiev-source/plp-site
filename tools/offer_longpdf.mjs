@@ -51,3 +51,21 @@ d.rewrite_images(dpi_threshold=160, dpi_target=150, quality=78); d.save(sys.argv
     raw, out], { stdio: 'inherit', timeout: 180000 });
   console.log(out, (fs.statSync(out).size / 1e6).toFixed(1) + ' МБ');
 } finally { srv.kill('SIGKILL'); fs.rmSync(raw, { force: true }); if (prof) fs.rmSync(prof, { recursive: true, force: true }); }
+
+// 09.10.2026: Chrome иногда печатает до того, как догрузились картинки (Vibe II: 22 из 24, Aileen: половина).
+// Сверяем число картинок в PDF с листом; меньше — пересобираем ещё раз (до двух повторов).
+{
+  const html = fs.readFileSync(path.join(ROOT, 'offers', slug, 'page.htm'), 'utf8');
+  const нужно = (html.match(/<img[^>]+src="(?!data:)/g) || []).length;
+  const сколько = () => +execFileSync(path.join(os.homedir(), '.local/bin/uv'), ['run', '-q', '--python', '3.12', '--with', 'pymupdf', 'python', '-c',
+    'import pymupdf,sys;print(len(pymupdf.open(sys.argv[1])[0].get_images()))', out]).toString().trim();
+  let есть = сколько();
+  if (есть < нужно && !process.env.PDF_RETRY) {
+    for (let i = 0; i < 2 && есть < нужно; i++) {
+      console.log('картинок в PDF', есть, 'из', нужно, '— пересобираю');
+      execFileSync(process.execPath, [process.argv[1], slug, name], { stdio: 'inherit', env: { ...process.env, PDF_RETRY: '1' } });
+      есть = сколько();
+    }
+  }
+  console.log('картинок в PDF', есть, 'из', нужно, есть < нужно ? '⚠️ НЕ ВСЕ' : '✓');
+}

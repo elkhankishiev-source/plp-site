@@ -77,7 +77,7 @@ function render(J) {
   if (U.accent) {
     out.push(`<section class="pad">\n  <div class="accent">\n    <div class="ph" style="background:var(--rust);color:#fff">${U.accent}</div>\n    <div class="eyebrow" style="margin-top:2mm">Квартиры и цены</div>\n    <h2 style="max-width:none">${U.h2}</h2>\n    ${ub}\n  </div>\n</section>`);
   } else {
-    out.push(section('Квартиры и цены', U.h2, ub));
+    out.push(section(U.eyebrow || 'Квартиры и цены', U.h2, ub));
   }
 
   // 3. как купить
