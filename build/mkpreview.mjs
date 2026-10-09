@@ -7,7 +7,8 @@ import path from 'node:path';
 
 const ROOT = '/Users/elnurkhankishiev/plp-site';
 const SITE = 'https://property-library.com';
-const IMG = SITE + '/img/og-default.jpg';
+/* 09.10.2026: фирменная карточка 1200×630 со знаком PLP вместо серой обложки (tools/og_objects.py --pages) */
+const IMG = SITE + (fs.existsSync(path.join(ROOT, 'img/og/page-default.jpg')) ? '/img/og/page-default.jpg' : '/img/og-default.jpg');
 const MARK = '<!-- PLP:PREVIEW -->';
 
 const PAGES = {
