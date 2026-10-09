@@ -7,8 +7,8 @@ D=[ # slug, фото (1 или 2), надзаголовок, название, �
  ('vibe2',['v1-cover-hd.webp'],'Карон · застройщик ESM','Vibe II Downtown','от 3,2 млн ฿','старт 28 октября'),
  ('zero-naiyang',['z-ext.webp'],'Най Янг · 350 м до пляжа','The ZERO Nai Yang','от 4,94 млн ฿','гарантия 10% на 3 года'),
  ('eden',['lake-cover.webp'],'Банг Тао · третья фаза','Gardens of Eden Lake','от 11,9 млн ฿','рассрочка на 5 лет'),
- ('kuartz',['k-pool2.webp'],'Карон · 400 м до пляжа','KUARTZ','≈130 тыс. ฿ за м²','закрытый старт'),
- ('fizz',['f-pool.webp'],'Ката · камерный дом','FIZZ','≈120 тыс. ฿ за м²','закрытый старт'),
+ ('kuartz',['k-pool2.webp'],'Карон · 400 м до пляжа','KUARTZ','≈140 тыс. ฿ за м²','закрытый старт'),
+ ('fizz',['f-pool.webp'],'Ката · камерный дом','FIZZ','≈130 тыс. ฿ за м²','закрытый старт'),
  ('aileen',['hero.jpg'],'Лагуна · таунхаусы 159 м²','Aileen Residence Lagoon','от 11,85 млн ฿','предстарт'),
 ]
 T='''<!doctype html><html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
