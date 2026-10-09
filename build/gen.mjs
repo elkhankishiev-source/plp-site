@@ -1357,11 +1357,12 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
   const metaDesc = (function(){
     let д = truncate(noContacts(usp) || '', 155);
     if (д.length < 70) {
-      const допы = [t.ru, 'район ' + ru, areaLabel(o) ? ('площадь ' + areaLabel(o)) : '',
+      const допы = [t.ru, String(o.name).includes(ru) ? '' : 'район ' + ru, areaLabel(o) ? ('площадь ' + areaLabel(o)) : '',
                     o.bedrooms ? (o.bedrooms + ' спальни') : ''].filter(Boolean);
-      const хвост = o.name + ' — ' + допы.join(', ') + '. Пхукет, Property Library.';
+      const хвост = o.name + ': ' + допы.join(', ').toLowerCase() + '. Пхукет, Property Library.';
       д = truncate((д ? д + ' ' : '') + хвост, 155);
     }
+    д = д.replace(/\s+—\s+/g, ', ');  /* 09.10.2026: длинное тире в превью — примета ИИ */
     return д;
   })();
   const distBeach = o.distance_beach_m ? o.distance_beach_m + ' м до пляжа' : '';
