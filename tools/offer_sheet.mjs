@@ -118,7 +118,7 @@ function render(J) {
   let cta = J.cta;
   if (!/\.pdf"/.test(cta) && J.pdf) {
     cta = cta.replace(/(<a href="https:\/\/t\.me\/property_library_phuket">.*?<\/a>)/s,
-      `$1\n    <a href="${esc(J.pdf)}" download><b>PDF</b><span>скачать лист</span></a>`);
+      `$1\n    <a href="https://property-library.com/offers/${J.slug}/${esc(J.pdf)}" target="_blank" rel="noopener"><b>PDF</b><span>скачать лист</span></a>`);
   }
   { /* кнопки в одну строку при любом их числе */
     const n = (cta.match(/<a /g) || []).length;
