@@ -1257,7 +1257,8 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
   /* 09.10.2026 Эльнур: «превью некрасивое… чтобы все превью ссылок были всегда красивыми».
      Первой идёт фирменная карточка 1200×630 из tools/og_objects.py (фото, район, название, цена, знак PLP);
      нет карточки — голый кадр объекта, нет кадра — общая обложка, как раньше. */
-  const hasCard = fs.existsSync(path.join(ROOT, 'img', 'og', pub + '.jpg'));
+  /* 10.10.2026 Эльнур: «убери вообще всякие оттуда картинки» — превью ссылки = голый кадр объекта, без надписей. */
+  const hasCard = false;
   const hasOwnImg = fs.existsSync(path.join(ROOT, 'img', pub + '.jpg'));
   const imgRel = hasCard ? '/img/og/' + pub + '.jpg' : (hasOwnImg ? '/img/' + pub + '.jpg' : '/img/og-default.jpg');
   const img = SITE_BASE + imgRel;
