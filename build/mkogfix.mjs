@@ -24,24 +24,23 @@ function jpegSize(p) {
   return null;
 }
 
-const ОФФЕРЫ = { 'vibe2.html': 'offers/vibe2/img/og-photo.jpg', 'zero-naiyang.html': 'offers/zero-naiyang/img/og-photo.jpg',
+const ОФФЕРЫ = { 'vibe2.html': 'offers/vibe2/img/preview.jpg', 'zero-naiyang.html': 'offers/zero-naiyang/img/preview.jpg',
   // 07.10 Эльнур: «превью ссылки соответствующее фото, не везде одно и то же» — /cg-capital и /aileen показывали Heritage
-  'cg-capital.html': 'offers/cg-capital/img/og-photo.jpg', 'aileen.html': 'offers/aileen/img/og-photo.jpg',
-  'kuartz.html': 'offers/kuartz/img/og-photo.jpg', 'fizz.html': 'offers/fizz/img/og-photo.jpg', 'eden.html': 'offers/eden/img/og-photo.jpg' };
+  'cg-capital.html': 'offers/cg-capital/img/preview-v2.jpg', 'aileen.html': 'offers/aileen/img/preview.jpg',
+  'kuartz.html': 'offers/kuartz/img/preview-v2.jpg', 'fizz.html': 'offers/fizz/img/preview-v2.jpg', 'eden.html': 'offers/eden/img/preview.jpg' };
 const РАЙОНЫ = { 'bang-tao': 'PLP-SIERRA', kamala: 'PLP-VIVANA', kata: 'PLP-KATABELLO', 'koh-kaew': 'PLP-ZENITHY', layan: 'PLP-SUNHILLS-LAYAN',
   'nai-yang': 'PLP-ZERO-NAIYANG', rawai: 'PLP-FANTASY-RAWAI', surin: 'PLP-BIANCANA', karon: 'PLP-VIBE-KARON' };
 /* 09.10.2026 Эльнур: «превью некрасивое… чтобы все превью ссылок были всегда красивыми, а не мертво-глухо».
    Главная, «Купить», «Аренда», «Управление», «О нас», «Добавить объект» наследовали шапку главной с фото Heritage,
    а /predstart и гайды — серую обложку. Теперь у каждой своя фирменная карточка 1200×630 (tools/og_objects.py --pages). */
-/* 10.10.2026 Эльнур: «убери вообще всякие оттуда картинки» — превью главных страниц = чистое фото без надписей (img/og/plain-*). */
-const ФИРМЕННАЯ = fs.existsSync(path.join(ROOT, 'img/og/plain-default.jpg')) ? 'img/og/plain-default.jpg' : 'img/og-default.jpg';
+const ФИРМЕННАЯ = fs.existsSync(path.join(ROOT, 'img/og/page-default.jpg')) ? 'img/og/page-default.jpg' : 'img/og-default.jpg';
 const ГЛАВНЫЕ = { 'index.html': 'index', 'buy.html': 'buy', 'rent.html': 'rent', 'management.html': 'management',
   'about.html': 'about', 'predstart.html': 'predstart', 'add-property.html': 'add-property' };
 
 const задания = [];
 for (const [f, img] of Object.entries(ОФФЕРЫ)) задания.push([f, img]);
 for (const [f, имя] of Object.entries(ГЛАВНЫЕ)) {
-  const карточка = 'img/og/plain-' + имя + '.jpg';
+  const карточка = 'img/og/page-' + имя + '.jpg';
   задания.push([f, fs.existsSync(path.join(ROOT, карточка)) ? карточка : ФИРМЕННАЯ]);
 }
 for (const f of fs.readdirSync(path.join(ROOT, 'guide'))) if (f.endsWith('.html')) задания.push(['guide/' + f, ФИРМЕННАЯ]);
