@@ -13,10 +13,6 @@ for (const s of steps) {
   /* 09.10.2026 Эльнур: «превью ссылок всегда красивые». После mkog (фото объектов) и до gen (страницы берут
      img/og/<код>.jpg, если он есть) — фирменные карточки для НОВЫХ объектов. Упал генератор — сборку не валим. */
   /* 10.10.2026 Эльнур: превью без надписей — карточки tools/og_objects.py больше не делаем. */
-  if (s === 'mkog.mjs') {
-    try { execFileSync('python3', ['tools/og_plain.py'], { cwd: '/Users/elnurkhankishiev/plp-site', stdio: 'inherit', timeout: 600000 }); }
-    catch (e) { process.stdout.write('⚠️ превью объектов: ' + String(e.message).slice(0, 120) + '\n'); }
-  }
   if (false && s === 'mkog.mjs') {
     try { execFileSync('python3', ['tools/og_objects.py'], { cwd: '/Users/elnurkhankishiev/plp-site', stdio: 'inherit', timeout: 600000 }); }
     catch (e) { process.stdout.write('⚠️ превью новых объектов не сделаны: ' + String(e.message).slice(0, 120) + '\n'); }
