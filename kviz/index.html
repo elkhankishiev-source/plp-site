@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="/favicon.svg">
+<script>!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','1387930368853540');fbq('track','PageView');</script>
+<title>Подбор квартиры на Пхукете · Property Library Phuket</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light;
+  --bg:#F4F3EC;--paper:#FFFFFF;--ink:#16170F;--muted:#62635A;--line:rgba(22,23,15,.12);
+  --olive:#5F6242;--sage-soft:#ECEEDD;--red:#D7262B;
+  --f:Manrope,-apple-system,"Segoe UI",Roboto,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--f);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--olive);outline-offset:2px}
+.wrap{max-width:520px;margin:0 auto;padding-inline:16px;padding-block:8px 40px}
+.draft{font-size:.72rem;color:var(--muted);text-align:center;padding:6px 0}
+.switch{display:flex;gap:8px;justify-content:center;margin-bottom:8px}
+.switch a{font-size:.75rem;font-weight:800;color:var(--olive);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:5px 10px}
+.switch a.on{background:var(--ink);color:#fff}
+h1,.q{text-wrap:balance;letter-spacing:-.025em}
+
+/* Старт: фото на весь экран, заголовок, строка, кнопка */
+.start{position:relative;border-radius:22px;overflow:hidden;min-height:min(88vh,720px);display:flex;flex-direction:column;justify-content:space-between;color:#fff;background:#3b3d2c}
+.start .ph0{position:absolute;inset:0;overflow:hidden;z-index:0}
+.start img.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;transform:scale(1.08);transform-origin:40% 40%}
+.start:after{content:"";position:absolute;inset:0;z-index:0;background:linear-gradient(180deg,rgba(0,0,0,.35) 0,rgba(0,0,0,0) 22%,rgba(0,0,0,0) 38%,rgba(8,10,5,.7) 58%,rgba(8,10,5,.92))}
+.start h1,.start p{text-shadow:0 1px 12px rgba(0,0,0,.45)}
+.start>*{position:relative;z-index:1}
+.start .logo{padding:16px 18px}.start .logo img{height:34px;filter:brightness(0) invert(1)}
+.start .t{padding:0 18px 20px}
+.start h1{font-size:1.85rem;line-height:1.08;font-weight:800}
+.start p{font-size:.95rem;line-height:1.4;opacity:.92;margin-top:8px}
+.cta{display:flex;align-items:center;justify-content:center;width:100%;height:58px;border-radius:16px;background:var(--red);color:#fff;font-weight:800;font-size:1.02rem;margin-top:16px;box-shadow:0 10px 24px rgba(215,38,43,.3)}
+.start small{display:block;font-size:.72rem;opacity:.75;margin-top:10px;line-height:1.35}
+
+/* Вопросы */
+.card{background:var(--paper);border-radius:22px;padding:20px 18px}
+.prog{font-size:.75rem;font-weight:700;color:var(--muted)}
+.bar{height:6px;background:var(--sage-soft);border-radius:999px;overflow:hidden;margin:8px 0 18px}
+.bar i{display:block;height:100%;width:0;background:var(--olive);transition:width .4s}
+.q{font-size:1.3rem;font-weight:800;line-height:1.2}
+.gift{display:grid;gap:4px;font-size:.82rem;font-weight:700;color:var(--ink);background:var(--sage-soft);border-radius:12px;padding:10px 12px;margin:-6px 0 16px}
+.gift b{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--olive)}
+.opts{display:grid;gap:10px;margin-top:16px}
+.opts.pics{grid-template-columns:1fr 1fr}
+.opt{display:flex;gap:12px;align-items:center;text-align:left;border:1.5px solid var(--line);border-radius:14px;padding:15px 14px;font-weight:700;font-size:.95rem;background:var(--paper);transition:border-color .15s,background .15s}
+.opts.pics .opt{flex-direction:column;align-items:stretch;padding:8px;gap:8px}
+.opts.pics .opt:last-child:nth-child(odd){grid-column:1/-1}
+.opts.pics .opt:last-child:nth-child(odd) .ph{aspect-ratio:16/7}
+.opts.pics .opt span{padding:0 4px 4px;font-size:.88rem;line-height:1.25}
+.opt:hover{border-color:var(--olive)}.opt.on{border-color:var(--olive);background:var(--sage-soft)}
+.opt .ph{display:block;overflow:hidden;border-radius:10px;aspect-ratio:4/3;background:#fff}
+.opt img{width:100%;height:100%;object-fit:cover;transform:scale(1.1);transform-origin:40% 40%}
+.opt img.fit{object-fit:contain;transform:none}
+.back{color:var(--muted);font-weight:700;font-size:.88rem;padding:14px 0 0}
+.who{display:flex;gap:10px;align-items:center;margin-top:14px;font-size:.84rem;color:var(--muted);line-height:1.35}
+.who img{width:44px;height:44px;border-radius:50%;object-fit:cover;object-position:50% 18%;flex:none}
+.who b{color:var(--ink)}
+form{display:grid;gap:10px;margin-top:16px}
+input{height:54px;border:1.5px solid var(--line);border-radius:12px;padding:0 14px;font:inherit;font-size:1rem;background:#fff;color:var(--ink)}
+.chan{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.chan button{height:46px;border-radius:12px;border:1.5px solid var(--line);font-weight:700}.chan button.on{border-color:var(--olive);background:var(--sage-soft)}
+.err{color:var(--red);font-size:.82rem;min-height:1em}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+.note{font-size:.72rem;color:var(--muted);text-align:center;margin-top:10px;line-height:1.4}
+
+/* Телефон (как Marquiz): во всю ширину, фото сверху, текст на белом */
+@media (max-width:640px){
+  .wrap{padding-inline:0;padding-block:0 24px}
+  .draft,.switch{display:none}
+  .start{border-radius:0;min-height:0;background:var(--paper);color:var(--ink);justify-content:flex-start}
+  .start:after{display:none}
+  .start .ph0{position:relative;aspect-ratio:4/3;height:auto}
+  .start img.bg{transform:scale(1.08);transform-origin:50% 75%}
+  .start .logo{position:absolute;top:0;left:0;z-index:2}
+  .start .logo img{filter:brightness(0) invert(1) drop-shadow(0 1px 6px rgba(0,0,0,.5))}
+  .start .t{padding:20px 16px 8px}
+  .start h1{font-size:1.6rem;text-shadow:none}
+  .start p{text-shadow:none;color:var(--muted);opacity:1}
+  .start small{color:var(--muted);opacity:1}
+  .card{border-radius:0;padding:20px 16px}
+
+}
+.foot-sw{display:none;flex-wrap:wrap;justify-content:center;gap:6px 10px;padding:16px;font-size:.75rem}
+@media (max-width:640px){.foot-sw{display:flex}}
+.foot-sw a{font-size:.72rem;color:var(--muted)}
+
+.done{text-align:left;padding:0;overflow:hidden}
+.pj{position:relative}.pj .ph0{position:relative;aspect-ratio:16/10;overflow:hidden}
+.pj img.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.08);transform-origin:40% 30%}
+.pt{padding:18px 18px 4px}.pt h2{font-size:1.5rem;font-weight:800;letter-spacing:-.02em;margin-top:8px}
+.pt p{color:var(--muted);font-size:.92rem;margin-top:6px;line-height:1.4}
+.ok{display:inline-block;background:var(--sage-soft);color:var(--olive);font-weight:800;font-size:.75rem;padding:5px 10px;border-radius:999px}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:14px 18px 0}
+.facts div{background:var(--bg);border-radius:12px;padding:10px 12px;font-size:.8rem;color:var(--muted);font-weight:600}
+.facts b{display:block;font-size:1.02rem;color:var(--ink)}
+.gal{display:grid;grid-auto-flow:column;grid-auto-columns:78%;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:14px 18px 4px}
+.gal img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:14px;scroll-snap-align:start;transform:scale(1.1);transform-origin:40% 30%}
+.gal .gi{display:block;overflow:hidden;border-radius:14px;scroll-snap-align:start}
+.done .cta{margin:14px 18px 0;width:auto;text-decoration:none}
+.cta2{display:flex;align-items:center;justify-content:center;height:52px;margin:10px 18px 0;border-radius:16px;border:1.5px solid var(--ink);color:var(--ink);font-weight:800;text-decoration:none}
+.lnk{display:block;text-align:center;padding:16px 0 22px;color:var(--olive);font-weight:700;font-size:.9rem}
+#qwrap{animation:fade .3s ease}@keyframes fade{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:none}}
+body{min-height:101vh;overscroll-behavior-y:contain}
+
+/* 09.10.2026 Эльнур: «уменьшить само фото, а не растянуть и в зуме показать не то». Фото в родных пропорциях, без приближений. */
+.draft,.switch{display:none}
+.wrap{padding-inline:0;padding-block:0 24px}
+.start{border-radius:0;min-height:0;background:var(--paper);color:var(--ink);justify-content:flex-start}
+.start:after{display:none}
+.start .ph0{position:relative;aspect-ratio:16/9;height:auto;overflow:hidden}
+.start img.bg,.start img.bg[style]{transform:none!important}
+.start .logo{position:absolute;top:0;left:0;z-index:2}
+.start .logo img{filter:brightness(0) invert(1) drop-shadow(0 1px 6px rgba(0,0,0,.5))}
+.start .t{padding:20px 16px 8px}
+.start h1{font-size:1.6rem;text-shadow:none}
+.start p{text-shadow:none;color:var(--muted);opacity:1}
+.start small{color:var(--muted);opacity:1}
+.card{border-radius:0;padding:20px 16px}
+.foot-sw{display:flex}
+.opt .ph{aspect-ratio:16/10}
+.opt img{transform:none!important}
+.opts.pics .opt:last-child:nth-child(odd) .ph{aspect-ratio:16/9}
+.gal .gi{aspect-ratio:16/10}.gal img{transform:none!important;height:100%}
+.pj .ph0{aspect-ratio:16/9}.pj img.bg{transform:none!important}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <section id="s0"></section>
+  <section id="quiz" class="card" hidden>
+    <div class="prog" id="stepn"></div>
+    <div class="bar"><i id="bar"></i></div>
+    <p class="gift" id="gift"></p>
+    <div id="qwrap"></div>
+    <button class="back" id="back">← Назад</button>
+  </section>
+  <section id="done" class="card done" hidden></section>
+</div>
+
+<script>
+/* Заявка уходит в sitelead: сделка в воронке «PLP Реклама | Квиз», этап New Leads, с метками рекламы; двойник пишет за 3 минуты. */
+const P = {
+  kuartz: {
+    id:'PLP-KUARTZ', name:'KUARTZ', hero:'k-pool-c',
+    h1:'KUARTZ на Кароне: квартиры от 4,1 млн ฿*',
+    sub:'400 м до пляжа, бассейн на крыше с видом на море. Подберём лот под вашу цель за 4 вопроса.',
+    foot:'*Стартовые условия для клиентов Property Library до открытых продаж',
+    gifts:['Прайс KUARTZ до старта продаж','Персональная финмодель под ваш бюджет'],
+    facts:[['400 м','до пляжа Карон'],['от 4,1 млн ฿','1-спальная, 32–38 м²'],['≈130 тыс. ฿','за м², ориентир'],['I кв. 2029','сдача']],
+    gal:['k-roof-c','k-pool2-c','k-1brplus-c'], sheet:'https://property-library.com/offers/kuartz/page.htm', bot:'kviz_kuartz',
+    Q:[
+      {k:'plan', q:'Какая квартира вам интересна?',
+        o:[['1-спальная, 32–38 м²','k-1br-c'],['1-спальная плюс, 45–48 м²','k-1brplus-c'],['2-спальная, 57–63 м²','k-roof-c'],['Пентхаус с видом на море','k-pool2-c']]},
+      {k:'goal', q:'Для чего рассматриваете?', o:[['Сдавать в аренду'],['Жить у моря'],['И жить, и сдавать'],['Пока изучаю рынок']]},
+      {k:'when', q:'Когда планируете покупку?', o:[['На старте в октябре'],['В течение 3 месяцев'],['До конца года'],['Пока без срока']]},
+      {k:'who', q:'Вы покупаете для себя?', o:[['Да, для себя'],['Для семьи или партнёров'],['Я агент, ищу для клиента']]}]
+  },
+  vibe2: {
+    id:'PLP-VIBE2-KARON', name:'Vibe II', hero:'vibe-roof',
+    h1:'Vibe II на Кароне: квартиры от 3,2 млн ฿*',
+    sub:'Мебель и техника в подарок, первый Vibe продан на 85%. Подберём квартиру под вашу цель за 4 вопроса.',
+    foot:'*Стартовая цена для клиентов Property Library до 28 октября. Визуализации первого Vibe той же команды',
+    gifts:['Стартовые цены Vibe II до 28 октября','Мебель и техника в подарок','Персональная финмодель под ваш бюджет'],
+    facts:[['от 3,2 млн ฿','студия 28 м²'],['мебель и техника','в подарок'],['28 октября','закрытый старт'],['IV кв. 2029','сдача']],
+    gal:['vibe-roof2','vibe-pool-units','vibe-interior-ef4a6857d82c754f'], sheet:'https://property-library.com/offers/vibe2/page.htm', bot:'kviz_vibe2',
+    Q:[
+      {k:'plan', q:'Какой формат вам интересен?',
+        o:[['Студия, 28 м²','vibe-interior-ef4a6857d82c754f'],['1-спальная, 33–35 м²','vibe-interior-6957235e53d576c6'],['2-спальная, ≈55 м²','vibe-interior-8b89ead9d0ae695a'],['Помогите выбрать','vibe-pool-units']]},
+      {k:'goal', q:'Для чего рассматриваете?', o:[['Сдавать в аренду'],['Для себя на сезон'],['И жить, и сдавать'],['Пока изучаю рынок']]},
+      {k:'pay', q:'Как удобнее платить?', o:[['Бронь сейчас, дальше по этапам стройки'],['Большую часть сразу'],['Нужна консультация по оплате']]},
+      {k:'who', q:'Вы покупаете для себя?', o:[['Да, для себя'],['Для семьи или партнёров'],['Я агент, ищу для клиента']]}]
+  },
+  fizz: {
+    id:'PLP-FIZZ', name:'FIZZ', place:'Ката', hero:'f-building-c',
+    h1:'FIZZ на Кате: квартиры от 3,7 млн ฿*',
+    sub:'Камерный дом на 135 квартир у пляжа Ката, можно с питомцами. Подберём квартиру под вашу цель за 4 вопроса.',
+    foot:'*Ориентир до прайса. Стартовые условия для клиентов Property Library до открытых продаж',
+    gifts:['Прайс FIZZ до старта продаж','Персональная финмодель под ваш бюджет'],
+    facts:[['от 3,7 млн ฿','1-спальная 31–33 м², ориентир'],['135','квартир, камерный дом'],['можно','с питомцами'],['I кв. 2029','сдача']],
+    gal:['f-pool-c','f-lobby-c','c-club-c'], sheet:'https://property-library.com/offers/fizz/page.htm', bot:'kviz_fizz',
+    Q:[
+      {k:'plan', q:'Какая квартира вам интересна?',
+        o:[['1-спальная, 31–33 м²','u-1br-c'],['1-спальная плюс, 44–52 м²','u-1brplus-c'],['2-спальная, 58 м²','f-lobby-c'],['Пентхаус с 2–3 спальнями','f-pool-c']]},
+      {k:'goal', q:'Для чего рассматриваете?', o:[['Сдавать в аренду'],['Жить у моря'],['И жить, и сдавать'],['Пока изучаю рынок']]},
+      {k:'when', q:'Когда планируете покупку?', o:[['На старте в октябре'],['В течение 3 месяцев'],['До конца года'],['Пока без срока']]},
+      {k:'who', q:'Вы покупаете для себя?', o:[['Да, для себя'],['Для семьи или партнёров'],['Я агент, ищу для клиента']]}]
+  },
+  standard: {
+    id:'PLP-STANDARD', name:'The Standard', place:'Банг Тао', hero:'std-pool-c',
+    h1:'The Standard на Банг Тао: квартиры от 21,9 млн ฿*',
+    sub:'Продано 88% до сдачи, квартиры с мебелью, сдача в конце 2026. Подберём квартиру под вашу цель за 4 вопроса.',
+    foot:'*Прайс застройщика. В продаже осталось 18 квартир',
+    gifts:['Свободные квартиры The Standard по этажу и виду','Расчёт аренды под вашу квартиру'],
+    facts:[['88%','продано до сдачи'],['от 21,9 млн ฿','2-спальная, 100 м²'],['с мебелью','и сервисом отеля'],['конец 2026','сдача']],
+    gal:['std-living-c','std-pool-c','std-terrace-c'], sheet:'https://property-library.com/offers/cg-capital/page.htm', bot:'kviz_standard',
+    Q:[
+      {k:'plan', q:'Какая квартира вам интересна?',
+        o:[['2-спальная, 100 м²','std-living-c'],['2-спальная, 117–120 м²','std-terrace-c'],['3-спальная, 167–173 м²','std-lobby-c'],['Дуплекс с бассейном, 289–299 м²','std-pool-c']]},
+      {k:'goal', q:'Для чего рассматриваете?', o:[['Сдавать в аренду'],['Жить у моря'],['И жить, и сдавать'],['Сохранить капитал']]},
+      {k:'when', q:'Когда планируете покупку?', o:[['В ближайший месяц'],['В течение 3 месяцев'],['До конца года'],['Пока без срока']]},
+      {k:'who', q:'Вы покупаете для себя?', o:[['Да, для себя'],['Для семьи или партнёров'],['Я агент, ищу для клиента']]}]
+  },
+  eden: {
+    id:'PLP-EDEN-LAKE', name:'Eden Lake', place:'Банг Тао', hero:'lake-cover',
+    h1:'Eden Lake на Банг Тао: резиденции от 11,9 млн ฿*',
+    sub:'Третья фаза Gardens of Eden у озера, 500 м до пляжа. Первый взнос 20% и рассрочка на 5 лет.',
+    foot:'*Каталог застройщика',
+    gifts:['Первый взнос 20% и рассрочка на 5 лет','Свободные резиденции по виду и этажу','Персональный расчёт рассрочки под ваш бюджет'],
+    facts:[['от 11,9 млн ฿','1-спальная, 52 м²'],['500 м','до пляжа Банг Тао'],['20%','первый взнос, рассрочка 5 лет'],['698','резиденций, 9 корпусов']],
+    gal:['lake-pool','lake-club','lake-int1'], sheet:'https://property-library.com/offers/eden/page.htm', bot:'kviz_eden',
+    Q:[
+      {k:'plan', q:'Какая резиденция вам интересна?',
+        o:[['1-спальная, 52 м²','lake-int1'],['2-спальная, 80 м²','lake-int2'],['3-спальная, до 124 м²','lake-club'],['Помогите выбрать','lake-pool']]},
+      {k:'goal', q:'Для чего рассматриваете?', o:[['Сдавать в аренду'],['Жить у моря'],['И жить, и сдавать'],['Сохранить капитал']]},
+      {k:'pay', q:'Как удобнее платить?', o:[['20% сейчас, рассрочка на 5 лет'],['60% за стройку, 40% после сдачи'],['Полная оплата'],['Нужна консультация']]},
+      {k:'who', q:'Вы покупаете для себя?', o:[['Да, для себя'],['Для семьи или партнёров'],['Я агент, ищу для клиента']]}]
+  },
+  zero: {
+    id:'PLP-ZERO-NAIYANG', name:'ZERO', place:'Най Янг', hero:'z-front',
+    h1:'ZERO на Най Янге: гарантия застройщика 10% годовых*',
+    sub:'Студии от 4,94 млн ฿, 350 м до пляжа. На студии гарантия даёт 1,48 млн ฿ за три года.',
+    foot:'*При покупке в лизхолд, три года после сдачи. Условия и прайс застройщика',
+    gifts:['Расчёт гарантии на конкретной квартире','Персональная финмодель под ваш бюджет'],
+    facts:[['от 4,94 млн ฿','студия 35,2 м²'],['10% годовых','гарантия застройщика, 3 года'],['350 м','до пляжа Най Янг'],['III кв. 2028','сдача']],
+    gal:['z-dusk','z-rest','z-suite'], sheet:'https://property-library.com/offers/zero-naiyang/page.htm', bot:'kviz_zero',
+    Q:[
+      {k:'plan', q:'Какая квартира вам интересна?',
+        o:[['Студия, 35–36 м²','z-studio'],['1-спальная, 37,5–46 м²','z-1bed'],['2-спальная, 52,8–66,7 м²','z-2bed'],['Сьют, 81–105 м²','z-suite']]},
+      {k:'goal', q:'Что для вас главное?', o:[['Гарантированный доход'],['Сдавать самому'],['Жить у моря'],['Пока изучаю рынок']]},
+      {k:'pay', q:'Как удобнее платить?', o:[['Бронь и взнос 25%, дальше по стройке'],['Полная оплата'],['Нужна консультация']]},
+      {k:'who', q:'Вы покупаете для себя?', o:[['Да, для себя'],['Для семьи или партнёров'],['Я агент, ищу для клиента']]}]
+  }
+};
+const POST = { kuartz:'https://t.me/property_library_phuket', vibe2:'https://t.me/property_library_phuket', fizz:'https://t.me/property_library_phuket', standard:'https://t.me/property_library_phuket', eden:'https://t.me/property_library_phuket', zero:'https://t.me/property_library_phuket' }; /* ссылки на посты-разборы: подставить, когда выйдут */
+const $ = id => document.getElementById(id);
+let C, A, i, T0, tStep, timing, pasted;
+
+function boot(){
+  const key = (new URLSearchParams(location.search).get('p') || location.hash.slice(1) || 'kuartz').toLowerCase(); C = P[key] || P.kuartz;
+  Object.keys(P).forEach(k => { const e = $('sw-' + k); if (e) e.classList.toggle('on', P[k] === C); });
+  A = {}; i = 0; timing = []; pasted = false; T0 = Date.now();
+  $('quiz').hidden = true; $('done').hidden = true; $('s0').hidden = false;
+  $('s0').innerHTML = '<div class="start"><div class="ph0"><img class="bg" src="img/' + C.hero + '.webp" alt=""' + (C.heroPos || C.heroSt ? ' style="' + (C.heroPos ? 'object-position:' + C.heroPos + ';' : '') + (C.heroSt || '') + '"' : '') + '></div>' +
+    '<div class="logo"><img src="img/plp-logo-ink.webp" alt="Property Library Phuket"></div>' +
+    '<div class="t"><h1>' + C.h1 + '</h1><p>' + C.sub + '</p>' +
+    '<button class="cta" id="start">Получить подборку</button><small>' + C.foot + '</small></div></div>';
+  $('start').onclick = () => { $('s0').hidden = true; $('quiz').hidden = false; tStep = Date.now(); render(); scrollTo(0, 0); };
+}
+
+function render(){
+  const Q = C.Q, total = Q.length + 1;
+  const left = Q.length - i;
+  $('stepn').textContent = i < Q.length ? 'Вопрос ' + (i + 1) + ' из ' + Q.length + (left > 1 ? ' · ещё ' + (left - 1) + ' и подборка готова' : ' · последний вопрос') : 'Подборка готова на 100%';
+  $('gift').innerHTML = '<b>' + (i < Q.length ? 'Бонусы после опроса' : 'Пришлю вам') + '</b>' + C.gifts.map(g => '<span>🎁 ' + g + '</span>').join('');
+  $('bar').style.width = Math.round((i + 1) / total * 100) + '%'; $('back').hidden = !i;
+  if (i < Q.length) {
+    const s = Q[i], pics = !!s.o[0][1];
+    $('qwrap').style.animation='none'; void $('qwrap').offsetWidth; $('qwrap').style.animation='';
+    $('qwrap').innerHTML = '<div class="q">' + s.q + '</div><div class="opts' + (pics ? ' pics' : '') + '">' +
+      s.o.map((o, n) => '<button class="opt' + (A[s.k] === o[0] ? ' on' : '') + '" data-n="' + n + '">' +
+        (o[1] ? '<i class="ph"><img' + (s.fit ? ' class="fit"' : '') + ' src="img/' + o[1] + '.webp" alt=""' + (o[2] ? ' style="' + o[2] + '"' : '') + '></i>' : '') + '<span>' + o[0] + '</span></button>').join('') + '</div>';
+    document.querySelectorAll('.opt').forEach(b => b.onclick = () => {
+      A[s.k] = s.o[+b.dataset.n][0];
+      document.querySelectorAll('.opt').forEach(x => x.classList.remove('on')); b.classList.add('on');
+      timing.push(Math.round((Date.now() - tStep) / 1000)); tStep = Date.now();
+      setTimeout(() => { i++; render(); }, 260);
+    });
+  } else {
+    $('qwrap').innerHTML = '<div class="q">Куда прислать подборку?</div>' +
+      '<div class="who"><img src="img/elnur.jpg" alt=""><span><b>Эльнур Ханкишиев</b>, основатель Property Library. Пришлю лично цены и расчёт доходности.</span></div>' +
+      '<form id="f" novalidate><input id="nm" placeholder="Ваше имя" autocomplete="name">' +
+      '<input id="ph" type="tel" inputmode="tel" placeholder="Телефон с кодом страны, +7…" autocomplete="tel">' +
+      '<div class="chan"><button type="button" class="on" data-c="whatsapp">WhatsApp</button><button type="button" data-c="telegram">Telegram</button></div>' +
+      '<input class="hp" id="co" tabindex="-1" autocomplete="off" aria-hidden="true">' +
+      '<div class="err" id="err"></div><button class="cta" type="submit">Получить подборку</button></form>' +
+      '<p class="note">Оставляя номер, вы соглашаетесь, что Property Library Phuket свяжется с вами по этому запросу.</p>';
+    A.channel = 'whatsapp';
+    $('ph').addEventListener('paste', () => pasted = true);
+    document.querySelectorAll('.chan button').forEach(b => b.onclick = () => {
+      document.querySelectorAll('.chan button').forEach(x => x.classList.remove('on')); b.classList.add('on'); A.channel = b.dataset.c; });
+    $('f').addEventListener('submit', e => { e.preventDefault(); if (send()) finish(); });
+  }
+}
+
+function send(){
+  const phone = $('ph').value.replace(/[^\d+]/g, ''), d = phone.replace(/\D/g, '');
+  if ($('co').value) return true;   // робот заполнил скрытое поле: показываем успех, заявку не шлём
+  if (d.length < 10 || d.length > 15) { $('err').textContent = 'Проверьте номер: нужен код страны, например +7 или +66'; return false; }
+  const p = new URLSearchParams(location.search), utm = {};
+  ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','fbclid','gclid'].forEach(k => { if (p.get(k)) utm[k] = p.get(k); });
+  const lead = { source:'website', funnel:'ads_quiz', object_id:C.id, object_name:C.name, name:$('nm').value.trim(), phone,
+    contact_pref:A.channel, goal:A.goal, budget:A.plan, message:'Квиз ' + C.name + ': ' + Object.values(A).filter(x => x !== A.channel).join(' · '),
+    page:location.href, utm, quiz:A,
+    quality:{ secs_total:Math.round((Date.now() - T0) / 1000), secs_per_step:timing, pasted_phone:pasted,
+      all_first_answers:C.Q.every(s => A[s.k] === s.o[0][0]), agent:/агент/i.test(A.who || '') } };
+  lead.channel_pref = A.channel === 'telegram' ? 'telegram' : 'whatsapp';
+  try { fetch('https://hub.property-library.com/webhook/site-lead?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(lead), keepalive:true }).catch(() => {}); } catch (e) {}
+  try { if (window.fbq) fbq('track', 'Lead', { content_name: C.name, content_category: 'kviz' }); } catch (e) {}
+  return true;
+}
+
+function finish(){
+  $('quiz').hidden = true;
+  const ch = A.channel === 'telegram' ? 'Telegram' : 'WhatsApp', key = Object.keys(P).find(k => P[k] === C);
+  $('done').innerHTML =
+    '<div class="pj"><div class="ph0"><img class="bg" src="img/' + C.hero + '.webp" alt=""' + (C.heroPos || C.heroSt ? ' style="' + (C.heroPos ? 'object-position:' + C.heroPos + ';' : '') + (C.heroSt || '') + '"' : '') + '></div>' +
+    '<div class="pt"><span class="ok">Заявка принята</span><h2>' + C.name + ', ' + (C.place || 'Карон') + '</h2>' +
+    '<p>Напишу вам в ' + ch + ' в ближайшие минуты' + (A.plan ? ', подборка: ' + A.plan.toLowerCase() : '') + '.</p></div></div>' +
+    '<div class="facts">' + C.facts.map(f => '<div><b>' + f[0] + '</b>' + f[1] + '</div>').join('') + '</div>' +
+    '<div class="gal">' + C.gal.map(g => { const [n, st] = g.split('|'); return '<i class="gi"><img src="img/' + n + '.webp" alt=""' + (st ? ' style="' + st + '"' : '') + '></i>'; }).join('') + '</div>' +
+    '<a class="cta" href="' + POST[key] + '" target="_blank" rel="noopener">Читать разбор ' + C.name + ' в Telegram</a>' +
+    '<a class="cta2" href="https://t.me/elnurphuket_bot?start=' + C.bot + '" target="_blank" rel="noopener">Получить расчёт в Telegram</a>' +
+    '<a class="lnk" href="' + C.sheet + '" target="_blank" rel="noopener">Открыть лист проекта</a>';
+  $('done').hidden = false; scrollTo(0, 0);
+}
+
+/* Пружина при оттягивании вниз (как в приложениях): тянется с сопротивлением и возвращается */
+(function(){
+  const w = document.querySelector('.wrap'); let y0 = null, dy = 0, x0 = 0;
+  addEventListener('touchstart', e => { if (scrollY <= 0) { y0 = e.touches[0].clientY; w.style.transition = 'none'; } }, { passive:true });
+  addEventListener('touchstart', e => { x0 = e.touches[0].clientX; }, { passive:true });
+  addEventListener('touchmove', e => { if (y0 === null) return; if (Math.abs(e.touches[0].clientX - x0) > Math.abs(e.touches[0].clientY - y0)) return; dy = Math.max(0, e.touches[0].clientY - y0);
+    w.style.transform = dy ? 'translateY(' + Math.round(60 * (1 - Math.exp(-dy / 120))) + 'px)' : ''; }, { passive:true });
+  addEventListener('touchend', () => { if (y0 === null) return; y0 = null; dy = 0;
+    w.style.transition = 'transform .45s cubic-bezier(.2,1.4,.4,1)'; w.style.transform = ''; });
+})();
+
+$('back').onclick = () => { if (i) { i--; render(); } };
+window.addEventListener('hashchange', boot);
+boot();
+</script>
+
+</body>
+</html>
