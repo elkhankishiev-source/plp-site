@@ -247,7 +247,7 @@ svg text{font-family:Manrope,Arial,sans-serif}
     </ul></div>
   </div>
   <div class="card" style="margin-top:6mm"><h3>Наш взгляд</h3>
-    <p style="margin:1.5mm 0 0;color:var(--ink2)">Мы ведём покупателей в Gardens of Eden с первой фазы и видели, как метр вырос с 160–170 тыс. ฿ на старте до 202–352 тыс. сейчас. Третья фаза дальше от пляжа, зато стартует ниже нынешних цен первой и даёт рассрочку на 5 лет. Рост первой фазы не гарантирует такой же рост третьей, поэтому подбираем лот по виду и этажу и считаем сдачу до брони.</p>
+    <p style="margin:1.5mm 0 0;color:var(--ink2)">Мы ведём покупателей в Gardens of Eden с первой фазы и видели, как метр вырос со 180 тыс. ฿ на старте до 202–352 тыс. сейчас. Третья фаза дальше от пляжа, зато стартует ниже нынешних цен первой и даёт рассрочку на 5 лет. Рост первой фазы не гарантирует такой же рост третьей, поэтому подбираем лот по виду и этажу и считаем сдачу до брони.</p>
     <p class="src">Доходность: наша сравнительная таблица по проекту.</p></div>
 </section>
 
@@ -261,7 +261,7 @@ svg text{font-family:Manrope,Arial,sans-serif}
       <p class="src">Старт фазы 1: наша переписка с покупателями. Сейчас: сейл-кит застройщика. Lake: каталог, расчёт цены «от» на площадь.</p></div>
     <div class="card" style="background:var(--sage);border-color:var(--sage)"><h3>Как выросла цена</h3>
       <table>
-        <tr><td>Старт продаж, осень 2023</td><td class="r num">от 160–170 тыс. ฿/м²</td></tr>
+        <tr><td>Старт продаж, осень 2023</td><td class="r num">от 180 тыс. ฿/м²</td></tr>
         <tr><td>Сейчас, та же фаза</td><td class="r num">202–352 тыс. ฿/м²</td></tr>
       </table>
       <p style="margin:3mm 0 0;color:var(--ink2);font-size:9pt">Наши клиенты заходили в Gardens of Eden в конце 2023 года, на старте продаж. С тех пор метр в первой фазе стоит заметно дороже.</p>
@@ -416,7 +416,7 @@ svg text{font-family:Manrope,Arial,sans-serif}
 (()=>{const s=document.getElementById('grow');if(!s)return;const add=h=>s.insertAdjacentHTML('beforeend',h);
 const txt=(x,y,t,o={})=>add(`<text x="${x}" y="${y}" font-size="${o.size||3}" font-weight="${o.w||500}" fill="${o.c||'#17180F'}" text-anchor="${o.a||'middle'}"${o.f?` style="font-family:'${o.f}',cursive"`:''}>${t}</text>`);
 const Y=v=>50-v*.12;[0,100,200,300].forEach(v=>{add(`<line x1="10" x2="106" y1="${Y(v)}" y2="${Y(v)}" stroke="#ECECE0" stroke-width=".3"/>`);txt(8.5,Y(v)+1,v,{size:2.6,c:'#8E917F',a:'end'});});
-const rows=[['Фаза 1 · старт','осень 2023',160,170,'#C9CCA9'],['Фаза 1 · сейчас','сейл-кит',202,352,'#7E8756'],['Фаза 3 · старт','Lake, 2025',210,229,'#5E6B35']];
+const rows=[['Фаза 1 · старт','осень 2023',180,180,'#C9CCA9'],['Фаза 1 · сейчас','сейл-кит',202,352,'#7E8756'],['Фаза 3 · старт','Lake, 2025',210,229,'#5E6B35']];
 rows.forEach(([n,sub,lo,hi,c],i)=>{const x=20+i*30;add(`<rect x="${x}" y="${Y(hi)}" width="18" height="${50-Y(hi)}" fill="${c}"/>`);if(lo!==hi)add(`<rect x="${x}" y="${Y(hi)}" width="18" height="${Y(lo)-Y(hi)}" fill="#F2D96B" opacity=".75"/>`);
 txt(x+9,Y(hi)-1.6,lo+'–'+hi,{size:3.2,w:800});txt(x+9,53.6,n,{size:2.5,w:700});txt(x+9,56.8,sub,{size:2.3,c:'#62665A'});});
 add(`<path d="M30 ${Y(175)} C 40 ${Y(300)}, 45 ${Y(360)}, 53 ${Y(358)}" fill="none" stroke="#B4533A" stroke-width=".45"/>`);
