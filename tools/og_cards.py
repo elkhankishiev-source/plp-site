@@ -3,7 +3,7 @@
 import os, subprocess, tempfile, sys
 SITE=os.path.expanduser('~/plp-site'); CH='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 D=[ # slug, фото (1 или 2), надзаголовок, название, цена, плашка
- ('cg-capital',['andaz-clean.webp','purita-clean.webp'],'Central Group · Лаян и Банг Тао','Andaz и PURITA','от 7,xx млн ฿','старт продаж'),
+ ('cg-capital',['andaz-og.jpg','purita-og.jpg'],'Central Group · Лаян и Банг Тао','Andaz и PURITA','от 7,xx млн ฿','старт продаж'),
  ('vibe2',['v1-cover-hd.webp'],'Карон · застройщик ESM','Vibe II Downtown','от 3,2 млн ฿','старт 28 октября'),
  ('zero-naiyang',['z-ext.webp'],'Най Янг · 350 м до пляжа','The ZERO Nai Yang','от 4,94 млн ฿','гарантия 10% на 3 года'),
  ('eden',['lake-cover.webp'],'Банг Тао · третья фаза','Gardens of Eden Lake','от 11,9 млн ฿','рассрочка на 5 лет'),
@@ -27,6 +27,9 @@ for slug,ph,ey,t,p,tag in D:
     fs=72 if len(t)<=10 else (60 if len(t)<=18 else 50)
     html=T
     for k,v in {'fs':str(fs),'imgs':''.join('<img src="%s">'%x for x in ph),'ey':ey,'t':t,'p':p,'tag':tag}.items(): html=html.replace('{{'+k+'}}',v)
+    # 10.10.2026 Эльнур: «пурита тоже фотка обрезана, сделай нормальный вид». Кадры Andaz и PURITA — широкие полосы
+    # (~3:1); в колонке 690 их резало по бокам. Для двух кадров колонка фото шире, чтобы оба были видны целиком.
+    if len(ph)==2: html=html.replace('</style>','.ph{width:880px}.tx{padding:38px 26px 32px}.logo{height:38px}.ey{font-size:13px;white-space:nowrap}h1{font-size:40px;margin:10px 0 16px}.pr{font-size:28px}.tag{font-size:16px;padding:7px 12px}.ft{font-size:12px;margin-top:18px}</style>')
     f=os.path.join(d,'_og.htm'); open(f,'w',encoding='utf-8').write(html)
     png=os.path.join(tempfile.gettempdir(),'og_%s.png'%slug)
     import time
