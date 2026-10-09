@@ -16,40 +16,40 @@ const esc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g,
 const OFFERS = [
   {
     slug: 'aileen', dir: 'offers/aileen',
-    title: 'Aileen Residence Lagoon · Лагуна — предстарт',
+    title: 'Aileen Residence Lagoon · Лагуна: предстарт',
     desc: 'Aileen Residence Lagoon в Лагуне: таунхаусы 159,3 м² с бассейном, цены, график оплаты и что построил застройщик. Предложение для клиентов Property Library Phuket.',
     pdf: 'Aileen_Lagoon.pdf',
   },
   {
     slug: 'vibe2', dir: 'offers/vibe2',
-    title: 'Vibe II Downtown · Карон — закрытый предстарт',
+    title: 'Vibe II Downtown · Карон: закрытый предстарт',
     desc: 'Vibe II на Кароне: предстартовые цены, бронь, график оплаты и расчёт аренды. Предложение для клиентов Property Library Phuket.',
     pdf: 'Vibe2_Karon.pdf',
   },
   {
     /* 07.10.2026 Эльнур: «собрать презентацию по формату Vibe II и скинуть ссылку». Факты: слайды CG Capital (фото Эльнура 07.10) и его голосовые. */
     slug: 'cg-capital', dir: 'offers/cg-capital',
-    title: 'Central Group на Пхукете · PURITA и Andaz — первые лоты',
-    desc: 'CG Capital, девелоперская часть Central Group: PURITA на Банг Тао и Andaz Residences на Лаяне. Сроки, первые цены, как попасть в первую очередь.',
+    title: 'Central Group на Пхукете · Andaz и PURITA: старт продаж',
+    desc: 'Andaz у пляжа Лаян от 16 млн ฿ и PURITA на Банг Тао от 7 млн ฿ от Central Group. Сроки, первые цены, как попасть в первую очередь.',
     pdf: 'CentralGroup_Phuket.pdf',   // node tools/offer_longpdf.mjs cg-capital CentralGroup_Phuket.pdf
   },
   {
     /* 08.10.2026 Эльнур: «сделай эден 1 2 и акцент на 3 фазу новая возможность». Факты: брошюры и сейл-киты застройщика (Диск), карточки PLP-EDEN*, каталог LAKE 24.11.2025, канал застройщика 09.09.2026. */
     slug: 'eden', dir: 'offers/eden',
-    title: 'Gardens of Eden · третья фаза Lake — новая возможность',
+    title: 'Gardens of Eden · третья фаза Lake: новая возможность',
     desc: 'Gardens of Eden на Банг Тао: три фазы, рост цены метра с 2023 года, третья фаза Lake от 11,9 млн ฿ и рассрочка после ключей.',
     pdf: 'Eden_Layan.pdf',
   },
   {
     /* 08.10.2026 Эльнур: «сделай кварц, сделай физз» — отдельные листы по эталону /cg-capital. */
     slug: 'kuartz', dir: 'offers/kuartz',
-    title: 'KUARTZ · Карон — закрытый старт',
+    title: 'KUARTZ · Карон: закрытый старт',
     desc: 'KUARTZ в 400 м от пляжа Карон от The Title × AssetWise: планировки, аренда по прогнозу застройщика, сроки и ориентир цены.',
     pdf: 'KUARTZ_Karon.pdf',
   },
   {
     slug: 'fizz', dir: 'offers/fizz',
-    title: 'FIZZ · Ката — закрытый старт',
+    title: 'FIZZ · Ката: закрытый старт',
     desc: 'FIZZ на Кате от The Title × AssetWise: камерный дом на 135 квартир, можно с питомцами. Планировки, аренда, сроки и ориентир цены.',
     pdf: 'FIZZ_Kata.pdf',
   },
@@ -57,7 +57,7 @@ const OFFERS = [
     /* 08.10.2026 Эльнур: «KUARTZ и FIZZ по эталону» (решение №263). Факты: презентация застройщика KUARTZ & FIZZ 01.10.2026,
        факты_рынка 49–54 (The Title), 32 (AirROI Карон); цена — ориентир 130 тыс. ฿/м² KUARTZ (№276), 120 FIZZ (№232). */
     slug: 'kuartz-fizz', dir: 'offers/kuartz-fizz',
-    title: 'KUARTZ и FIZZ · Карон и Ката — закрытый старт',
+    title: 'KUARTZ и FIZZ · Карон и Ката: закрытый старт',
     desc: 'KUARTZ у пляжа Карон и FIZZ на Кате от The Title × AssetWise: планировки, аренда по прогнозу застройщика, сроки и ориентир цены.',
     pdf: 'KUARTZ_FIZZ_Karon_Kata.pdf',   // node tools/offer_longpdf.mjs kuartz-fizz KUARTZ_FIZZ_Karon_Kata.pdf
   },
@@ -65,7 +65,7 @@ const OFFERS = [
     /* 04.10.2026 Эльнур: «на секретной странице… зеро наянг гарантия 10% годовых». Факты: objects PLP-ZERO-NAIYANG
        (current_promo, unit_types, payment_plan; прайс и сообщение застройщика 07.09.2026) и презентация застройщика 11.2025. */
     slug: 'zero-naiyang', dir: 'offers/zero-naiyang',
-    title: 'The ZERO Nai Yang · Най Янг — гарантия 10% на три года',
+    title: 'The ZERO Nai Yang · Най Янг: гарантия 10% на три года',
     desc: 'The ZERO Nai Yang в 350 метрах от пляжа Най Янг: гарантия 10% годовых на три года, цены, график оплаты. Предложение для клиентов Property Library Phuket.',
     pdf: 'ZERO_NaiYang.pdf',
   },
@@ -83,7 +83,7 @@ for (const o of OFFERS) {
   const hasPdf = o.pdf && fs.existsSync(path.join(ROOT, o.dir, o.pdf));
   const body = `<section class="offer-wrap" style="padding:18px 0 28px"><div class="container">
   <div style="display:flex;justify-content:flex-end;margin:0 0 10px">
-    ${hasPdf ? `<a class="btn btn-ghost" href="/${o.dir}/${o.pdf}" download style="font-size:14px">Получить PDF</a>` : ''}
+    ${hasPdf ? `<a class="btn btn-ghost" href="/${o.dir}/${o.pdf}" target="_blank" rel="noopener" style="font-size:14px">Получить PDF</a>` : ''}
   </div>
   <div id="offerBox" style="width:100%;max-width:794px;margin:0 auto;overflow:hidden;border-radius:14px;background:#EFECE2;box-shadow:0 2px 18px rgba(23,24,15,.08);height:4531px">
     <iframe id="offerFrame" src="/${o.dir}/page.htm?v=${v}" title="${esc(o.title)}" loading="eager" scrolling="no"
@@ -200,7 +200,7 @@ function card(c) {
   const pdfOk = c.pdf && fs.existsSync(path.join(ROOT, c.pdf.replace(/^\//, '')));
   const btns = [];
   if (c.open) btns.push(`<a class="btn btn-primary" href="${c.open}">Открыть предложение</a>`);
-  if (pdfOk) btns.push(`<a class="btn btn-ghost" href="${c.pdf}" download>Получить PDF</a>`);
+  if (pdfOk) btns.push(`<a class="btn btn-ghost" href="${c.pdf}" target="_blank" rel="noopener">Получить PDF</a>`);
   if (c.ask) btns.push(`<a class="btn btn-primary" href="${WA}${encodeURIComponent(c.ask)}" target="_blank" rel="noopener">Получить презентацию</a>`);
   const plans = c.plans ? `<ul class="pc-plans">${c.plans.map(([a, b]) => `<li><span>${esc(a)}</span><b>${esc(b)}</b></li>`).join('')}</ul>` : '';
   /* 05.10.2026 Эльнур: «карточки гигантские, некрасивые». Компактно: название, метка, одна ключевая строка, кнопки;
