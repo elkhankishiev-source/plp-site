@@ -26,7 +26,7 @@ function jpegSize(p) {
 
 const ОФФЕРЫ = { 'vibe2.html': 'offers/vibe2/img/preview.jpg', 'zero-naiyang.html': 'offers/zero-naiyang/img/preview.jpg',
   // 07.10 Эльнур: «превью ссылки соответствующее фото, не везде одно и то же» — /cg-capital и /aileen показывали Heritage
-  'cg-capital.html': 'offers/cg-capital/img/preview-v8.jpg', 'aileen.html': 'offers/aileen/img/preview.jpg',
+  'cg-capital.html': 'offers/cg-capital/img/preview-v9.jpg', 'aileen.html': 'offers/aileen/img/preview.jpg',
   'kuartz.html': 'offers/kuartz/img/preview-v2.jpg', 'fizz.html': 'offers/fizz/img/preview-v2.jpg', 'eden.html': 'offers/eden/img/preview.jpg' };
 const РАЙОНЫ = { 'bang-tao': 'PLP-SIERRA', kamala: 'PLP-VIVANA', kata: 'PLP-KATABELLO', 'koh-kaew': 'PLP-ZENITHY', layan: 'PLP-SUNHILLS-LAYAN',
   'nai-yang': 'PLP-ZERO-NAIYANG', rawai: 'PLP-FANTASY-RAWAI', surin: 'PLP-BIANCANA', karon: 'PLP-VIBE-KARON' };
@@ -62,6 +62,12 @@ for (const [file, img] of задания) {
              .replace(/(<meta name="twitter:image" content=")[^"]*(")/, '$1' + url + '$2');
   if (sz) html = html.replace(/(<meta property="og:image:width" content=")[^"]*(")/, '$1' + sz.w + '$2')
                      .replace(/(<meta property="og:image:height" content=")[^"]*(")/, '$1' + sz.h + '$2');
+  /* 10.10.2026: Telegram в превью ссылки /eden показал общий заголовок «Агентство недвижимости на Пхукете» —
+     он взял twitter:title/description, а там стоял текст главной. Метки twitter повторяют og этой страницы. */
+  const огЗаг = (html.match(/<meta property="og:title" content="([^"]*)"/) || [])[1];
+  const огОп = (html.match(/<meta property="og:description" content="([^"]*)"/) || [])[1];
+  if (огЗаг) html = html.replace(/(<meta name="twitter:title" content=")[^"]*(")/, (m, a, b) => a + огЗаг + b);
+  if (огОп) html = html.replace(/(<meta name="twitter:description" content=")[^"]*(")/, (m, a, b) => a + огОп + b);
   if (html !== до) { fs.writeFileSync(p, html); n++; }
 }
 console.log('превью по теме: обновлено страниц', n, 'из', задания.length);
