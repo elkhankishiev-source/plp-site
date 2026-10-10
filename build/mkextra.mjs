@@ -219,6 +219,24 @@ const redirectPage=(to,title)=>`<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(title)}</title>
 <link rel="canonical" href="https://property-library.com/${to}">
+<!-- 10.10.2026 Эльнур: превью ссылок /guide/… — у переадресаций не было og-меток, мессенджер показывал голую ссылку.
+     Картинку подставляет mkogfix.mjs (фирменная карточка), здесь заготовка меток. -->
+<meta name="description" content="${esc(title)}: ответ в разделе вопросов Property Library Phuket.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Property Library Phuket">
+<meta property="og:title" content="${esc(title)}">
+<meta property="og:description" content="Ответ в разделе вопросов Property Library Phuket: покупка, аренда и управление недвижимостью на Пхукете.">
+<meta property="og:url" content="https://property-library.com/${to}">
+<meta property="og:image" content="https://property-library.com/img/og/page-default.jpg">
+<meta property="og:image:secure_url" content="https://property-library.com/img/og/page-default.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="ru_RU">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${esc(title)}">
+<meta name="twitter:description" content="Ответ в разделе вопросов Property Library Phuket: покупка, аренда и управление недвижимостью на Пхукете.">
+<meta name="twitter:image" content="https://property-library.com/img/og/page-default.jpg">
 <meta name="robots" content="noindex, follow">
 <meta http-equiv="refresh" content="0; url=../${to}">
 <script>location.replace('../${to}');</script>

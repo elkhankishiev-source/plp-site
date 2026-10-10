@@ -599,6 +599,25 @@ h3{font-size:1.12rem;font-weight:700}
   .chatwin{right:10px;bottom:10px;width:calc(100vw - 20px)}
   .chatbody{height:50vh}
 }
+/* 10.10.2026 решение №120, Эльнур 02.10: «ИИ-чат на телефоне: окно крутится, не зафиксирован размер;
+   карточки не подогнаны; стабильно как у сайтов „Малина“ и IBG; не видно работу ИИ».
+   Причины по замеру (phone_shot.mjs, PLP_MERA=1): окно висело над страницей с высотой от 100vh
+   (на iPhone это высота БЕЗ клавиатуры и адресной строки), страница под чатом не была закреплена
+   и уезжала, когда ленту чата докручивали до конца, а поле ввода было 14 px — iPhone увеличивает
+   страницу при касании поля мельче 16 px, и всё окно начинает «плавать».
+   Как у сайтов с живым чатом: на телефоне окно занимает весь видимый экран (по visualViewport,
+   с клавиатурой — над клавиатурой), страница под ним закреплена, лента чата не тянет страницу. */
+@media(max-width:760px){
+  .chatwin{top:0;left:0;right:0;bottom:auto;width:100%;max-width:none;height:100vh;height:100dvh;border-radius:0}
+  .chatwin.open{animation:none}
+  .chathead{padding-top:calc(12px + env(safe-area-inset-top,0px))}
+  .chatbody{flex:1 1 auto;height:auto;min-height:0;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+  .chatinput{padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))}
+  .chatwin .chatinput textarea,.chatwin .chatinput input,.chatwin .leadform input,.chatwin .leadform select{font-size:16px}
+  .msg.chat-tools,.msg.bot:has(.leadform){max-width:100%;align-self:stretch}
+}
+html.chatlock,html.chatlock body{overflow:hidden;overscroll-behavior:none}
+.msg.typing .tyt{font-size:.78rem;color:var(--muted);margin-left:6px;white-space:nowrap}
 .tray.open{transform:translate(-50%,0)}
 .tray .tb{font-size:.8rem;font-weight:700;border-radius:999px;padding:9px 15px;background:var(--green);color:var(--ink);transition:transform .2s}
 .tray .tb:hover{transform:translateY(-1px)}
@@ -8301,9 +8320,33 @@ function chatChips(items){
   });
   w.appendChild(c); cb.appendChild(w); cb.scrollTop=cb.scrollHeight;
 }
+/* 10.10.2026 №120: на телефоне окно чата = видимый экран. Страницу под ним закрепляем (как в меню),
+   высоту и верх окна берём у visualViewport — с клавиатурой окно встаёт над ней, а не уезжает. */
+var chatLockY=null;
+function chatFit(){
+  var c=document.getElementById('chatwin'); if(!c) return;
+  var vv=window.visualViewport;
+  if(innerWidth>760||!c.classList.contains('open')||!vv){c.style.height='';c.style.top='';return;}
+  c.style.height=Math.round(vv.height)+'px'; c.style.top=Math.round(vv.offsetTop)+'px';
+  var b=document.getElementById('chatbody'); if(b) b.scrollTop=b.scrollHeight;
+}
+function chatLock(on){
+  var de=document.documentElement, bs=document.body.style;
+  if(on){
+    if(innerWidth>760||chatLockY!==null) return;
+    chatLockY=window.scrollY||de.scrollTop||0;
+    de.classList.add('chatlock'); bs.position='fixed'; bs.top=(-chatLockY)+'px'; bs.left='0'; bs.right='0'; bs.width='100%';
+  }else{
+    if(chatLockY===null) return;
+    de.classList.remove('chatlock'); bs.position=''; bs.top=''; bs.left=''; bs.right=''; bs.width='';
+    var y=chatLockY; chatLockY=null; window.scrollTo({top:y,left:0,behavior:'instant'});
+  }
+}
+if(window.visualViewport){visualViewport.addEventListener('resize',chatFit);visualViewport.addEventListener('scroll',chatFit);}
 function openChat(){
   var w=document.getElementById('chatwin'); if(!w) return;
   w.classList.add('open');
+  chatLock(true); chatFit();
   var fw=document.getElementById('fabWrap'); if(fw) fw.style.display='none';
   if(!chatStarted){
     chatStarted=true;
@@ -8315,7 +8358,8 @@ function openChat(){
   var f=document.getElementById('chatField'); if(f && innerWidth>760) f.focus();
 }
 function closeChat(){
-  var w=document.getElementById('chatwin'); if(w) w.classList.remove('open');
+  var w=document.getElementById('chatwin'); if(w){ w.classList.remove('open'); w.style.height=''; w.style.top=''; }
+  chatLock(false);
   var fw=document.getElementById('fabWrap'); if(fw) fw.style.display='';
 }
 function clearChat(){
@@ -8340,6 +8384,9 @@ function askDaria(txt, byVoice){
   if(!byVoice) chatMsg('me',txt);
   chatHist.push({role:'user',content:txt});
   var wait=chatMsg('bot','…'); if(wait) wait.classList.add('typing');
+  /* 10.10.2026 №120 «не видно работу ИИ»: как на сайте — пока готовится ответ, этапы работы под точками */
+  if(wait){ var st=['читаю вопрос','смотрю ваш объект и данные','собираю ответ'], tm=[0,3500,9000], k=0;
+    (function next(){ if(!wait.isConnected||k>=st.length) return; wait.textContent='… '+st[k]; k++; if(k<st.length) setTimeout(next,tm[k]-tm[k-1]); })(); }
   fetch(CHAT_ENDPOINT,{method:'POST',headers:{'Content-Type':'text/plain'},
     body:JSON.stringify({message:txt,history:chatHist.slice(-8),lang:'ru',context:cabChatContext()})})
     .then(function(r){ return r.json().catch(function(){return {ok:false};}); })

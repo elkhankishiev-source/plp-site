@@ -1574,7 +1574,7 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
            а в списке минимальная планировка 37 м². Показываем вилку группы. */
         const areaTxt = (u.areaMin && u.areaMax && u.areaMax - u.areaMin > 0.5)
           ? (num(u.areaMin) + '–' + num(u.areaMax) + ' м²')
-          : (u.area ? (u.area + ' м²') : '');
+          : (u.area ? (/м²|м2/.test(String(u.area)) ? String(u.area) : (u.area + ' м²')) : '');   /* 10.10: площадь уже со «м²» не удваиваем */
         const line = [areaTxt, (u.beds != null ? u.beds + ' сп.' : ''),
                       u.plot ? ('участок ' + u.plot) : '',
                       u.free ? ('свободно ' + u.free) : '']
