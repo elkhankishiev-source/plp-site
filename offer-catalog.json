@@ -621,7 +621,20 @@
    "district": "Таланг",
    "type": "Вилла",
    "price_from": 17900000,
-   "units": []
+   "units": [
+    {
+     "area": "140,50–175,00 м²",
+     "name": "3 спальни",
+     "price_from_thb": 17900000,
+     "from": 17900000
+    },
+    {
+     "area": "199,40–213,80 м²",
+     "name": "4 спальни",
+     "price_from_thb": 28000000,
+     "from": 28000000
+    }
+   ]
   },
   {
    "id": "PLP-ADORA",
@@ -1681,30 +1694,21 @@
    "price_from": 11904800,
    "units": [
     {
-     "name": "1 спальня",
-     "beds": 1,
-     "code": "1BR A Plus",
-     "area": 52,
-     "areaMin": 52,
-     "areaMax": 52,
+     "area": "52 м²",
+     "name": "1 спальня (A Plus)",
+     "price_from_thb": 11904800,
      "from": 11904800
     },
     {
-     "name": "2 спальни",
-     "beds": 2,
-     "code": "2BR A Plus",
-     "area": 80.53,
-     "areaMin": 80.53,
-     "areaMax": 80.53,
+     "area": "80,53 м²",
+     "name": "2 спальни (A Plus)",
+     "price_from_thb": 16911300,
      "from": 16911300
     },
     {
-     "name": "3 спальни",
-     "beds": 3,
-     "code": "3BR A Plus",
-     "area": 123.71,
-     "areaMin": 123.71,
-     "areaMax": 123.71,
+     "area": "123,71 м²",
+     "name": "3 спальни (A Plus)",
+     "price_from_thb": 25979100,
      "from": 25979100
     }
    ]
@@ -1756,7 +1760,20 @@
    "district": "Карон",
    "type": "Кондо",
    "price_from": 6420000,
-   "units": []
+   "units": [
+    {
+     "area": "46,53–60,09 м²",
+     "name": "2 спальни",
+     "price_from_thb": 6141960,
+     "from": 6141960
+    },
+    {
+     "area": "176,35 м²",
+     "name": "4 спальни",
+     "price_from_thb": 22220100,
+     "from": 22220100
+    }
+   ]
   },
   {
    "id": "PLP-FANTASY-RAWAI",
