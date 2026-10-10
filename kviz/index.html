@@ -379,7 +379,11 @@ function send(){
       all_first_answers:C.Q.every(s => A[s.k] === s.o[0][0]), agent:/агент/i.test(A.who || '') } };
   lead.channel_pref = A.channel === 'telegram' ? 'telegram' : 'whatsapp';
   try { fetch('https://hub.property-library.com/webhook/site-lead?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(lead), keepalive:true }).catch(() => {}); } catch (e) {}
-  try { if (window.fbq) fbq('track', 'Lead', { content_name: C.name, content_category: 'kviz' }); } catch (e) {}
+  // тестовые номера (то же правило, что ТЕСТ в реклама_сводка.py) не считаем лидом в рекламе
+  if (!/^(66)?9009990|^669000000|^900999/.test(d)) {
+    try { if (window.fbq) fbq('track', 'Lead', { content_name: C.name, content_category: 'kviz' }); } catch (e) {}
+    try { if (window.gtag) gtag('event', 'generate_lead', { lead_source: 'kviz', item_name: C.name }); } catch (e) {}
+  }
   return true;
 }
 
