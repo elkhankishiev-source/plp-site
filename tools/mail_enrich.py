@@ -179,7 +179,7 @@ def main():
             print('      • ' + str(x)[:96])
         if a.dry:
             continue
-        rows = req('GET', 'client_objects?select=id,purchase_price,handover_on,next_payment_on,next_payment_amount,stage,payment_plan,note&object_id=eq.' + code)
+        rows = req('GET', 'client_objects?select=id,purchase_price,handover_on,next_payment_on,next_payment_amount,stage,payment_plan,note,досье&object_id=eq.' + code)
         for row in (rows or []):
             patch = {}
             if not row.get('purchase_price') and f.get('purchase_price'):
@@ -192,7 +192,20 @@ def main():
                     patch[k] = f[k]
             facts = ' · '.join(str(x) for x in (f.get('facts') or [])[:4])
             if facts:
-                patch['note'] = ((row.get('note') or '') + '\nИз переписки: ' + facts).strip()
+                old_note = row.get('note') or ''
+                # Урок 56/65, 10.10: то же самое из переписки дописывалось в note
+                # по второму кругу (разные прогоны, близкие даты), и note целиком
+                # едет в промпт — двойник цитировал устаревшую историю клиенту.
+                # Не пишем, если первые 50 знаков этих же фактов уже есть в note.
+                if facts[:50] not in old_note:
+                    new_note = (old_note + '\nИз переписки: ' + facts).strip()
+                    # note едет в промпт целиком — длинную историю туда не растим.
+                    # Старое уходит в досье (ничего не стираем), в note остаётся
+                    # только свежая строка.
+                    if len(new_note) > 1200:
+                        patch['досье'] = ((row.get('досье') or '') + '\n' + old_note).strip()
+                        new_note = 'Из переписки: ' + facts
+                    patch['note'] = new_note
             if patch:
                 req('PATCH', 'client_objects?id=eq.%d' % row['id'], patch)
         print('      → записано в карточку')
