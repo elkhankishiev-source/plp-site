@@ -461,7 +461,7 @@ function buildCatalog(objects, benchmarks, preserve) {
       saleStart: o.sale_started_on || null,
       /* короткая приписка к стадии: «сдан в декабре 2025», «2 октября —
          презентация сдачи». Эльнур: «доп отметки это прикольно» */
-      stageNote: publicNote(o.stage_note) || null,
+      stageNote: stageNoteOf(o) || null,
       desc: { ru: noContacts(usp), en: noContacts(uspEn) },
       // 02.09: то, что человек ищет глазами в первую очередь — море и застройщик.
       // Пишем только если данные есть, пустое поле карточка не рисует.
@@ -773,6 +773,20 @@ function saleGroup(o) {
    рабочие приписки: «Эльнур 02.10.2026», «самого письма в наших сборщиках нет», «по термшиту…
    подтверждаем актуальность», «перед клиентом сверить». Наружу идут только предложения без них. */
 const _ВНУТР = /Эльнур|слова\s+эльнура|сборщик|письм[а-яё]*\s+(в\s+наших|нет)|термшит|sales\s*kit|перед\s+клиент|публичных\s+карточ|подтвержда[а-яё]*\s+(актуальн|у\s+застройщ)|нашей\s+программ|наших\s+договор|\bCRM\b|amo|комисси|на\s+руки|приложить/i;
+/* 10.10.2026 решение №113 (Эльнур 02.10: «Manor: „сдача после сдачи“, а часть уже сдана — показывать по фазам»).
+   У проекта бывает несколько очередей (память plp-project-phases): одна сдана, другая строится.
+   Пока по очередям нет своей приписки в stage_note, витрина берёт факт из базы: если у строящегося
+   проекта есть дочерние объекты на сайте со стадией Ready (parent_object_id), карточка и страница
+   говорят «часть проекта уже сдана», а не только «строится». Номера юнитов сюда не попадают.
+   Своя приписка в stage_note (с очередями и датами по источнику) всегда главнее этой. */
+const ЧАСТЬ_СДАНА = new Set();
+const ЧАСТЬ_СДАНА_ТЕКСТ = 'часть проекта уже сдана';
+function stageNoteOf(o) {
+  const own = publicNote(o && o.stage_note);
+  if (own) return own;
+  if (o && ЧАСТЬ_СДАНА.has(o.plp_property_id) && String(o.stage || '') !== 'Ready') return ЧАСТЬ_СДАНА_ТЕКСТ;
+  return '';
+}
 function publicNote(t) {
   /* 09.10.2026: служебные пометки в скобках «(решение №274)», «(Эльнур 09.10)», «(канон №80)» вырезаем, а предложение с ценой оставляем. */
   t = String(t || '').replace(/\s*\((?:[^()]*?(?:решени[ея]\s*№|канон\s*№|Эльнур|\.pdf|источник))[^()]*\)/gi, '');
@@ -1978,7 +1992,7 @@ if(dark) i.src='../img/brand/plp-mark-white.png';})();</script>
   <p class="loc">${htmlEsc(ru)}, Пхукет${distBeach ? ' · ' + htmlEsc(distBeach) : ''}</p>
   ${rentLine || soldOutLine || (priceFmt ? '<div class="price">от ' + htmlEsc(priceFmt) + '<small>цена по прайсу застройщика на дату сверки</small></div>' : '')}
   <div class="chips">${chips}</div>
-  ${(!isRent && publicNote(o.stage_note)) ? '<p class="stgnote">' + htmlEsc(publicNote(o.stage_note)) + '</p>' : ''}
+  ${(!isRent && stageNoteOf(o)) ? '<p class="stgnote">' + htmlEsc(stageNoteOf(o)) + '</p>' : ''}
   ${'' /* акции на витрину не выводим — см. комментарий у promo в каталоге */}
   ${/* ЕДИНЫЙ ПОРЯДОК БЛОКОВ — канон 17.09. Эльнур: «карточка объекта и страница
         объекта расходится инфа, мы можем как-то по одному единому концепту,
@@ -2166,6 +2180,11 @@ async function main() {
     }
   }
 
+  /* №113: строящиеся проекты, у которых часть уже сдана (дочерние объекты на сайте со стадией Ready) */
+  for (const r of rentals || []) {
+    if (r && r.parent_object_id && String(r.stage || '') === 'Ready') ЧАСТЬ_СДАНА.add(r.parent_object_id);
+  }
+  console.log('[gen] Часть проекта сдана:', [...ЧАСТЬ_СДАНА].filter(id => objects.some(o => o.plp_property_id === id && String(o.stage || '') !== 'Ready')).join(', ') || 'нет');
   console.log('[gen] Объектов on_site=true:', objects.length, '| benchmarks:', benchmarks.length,
               '| аренда:', rentals.length, '| со ставками:', Object.keys(ratesBy).length);
   if (!objects.length) { console.error('[gen] Пусто — прерываю, index.html не трогаю.'); process.exit(1); }

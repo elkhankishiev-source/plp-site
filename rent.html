@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+<meta name="facebook-domain-verification" content="zg4n2qqbfghng2luigwhxeosn8gqgy" />
 <script>
 /* Оформление выбирается до отрисовки, чтобы тёмная тема не моргала белым.
    Три состояния: system (атрибута нет) / light / dark. */
@@ -1215,6 +1216,25 @@ input.bad{border-color:#d98a84!important;background:var(--paper)6f5}
   .chatbody{height:50vh}
   .fab{right:14px;bottom:14px;padding:7px 13px 7px 7px;font-size:.78rem}
 }
+/* 10.10.2026 решение №120, Эльнур 02.10: «ИИ-чат на телефоне: окно крутится, не зафиксирован размер;
+   карточки не подогнаны; стабильно как у сайтов „Малина“ и IBG; не видно работу ИИ».
+   Причины по замеру (phone_shot.mjs, PLP_MERA=1): окно висело над страницей с высотой от 100vh
+   (на iPhone это высота БЕЗ клавиатуры и адресной строки), страница под чатом не была закреплена
+   и уезжала, когда ленту чата докручивали до конца, а поле ввода было 14 px — iPhone увеличивает
+   страницу при касании поля мельче 16 px, и всё окно начинает «плавать».
+   Как у сайтов с живым чатом: на телефоне окно занимает весь видимый экран (по visualViewport,
+   с клавиатурой — над клавиатурой), страница под ним закреплена, лента чата не тянет страницу. */
+@media(max-width:760px){
+  .chatwin{top:0;left:0;right:0;bottom:auto;width:100%;max-width:none;height:100vh;height:100dvh;border-radius:0}
+  .chatwin.open{animation:none}
+  .chathead{padding-top:calc(12px + env(safe-area-inset-top,0px))}
+  .chatbody{flex:1 1 auto;height:auto;min-height:0;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+  .chatinput{padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))}
+  .chatwin .chatinput textarea,.chatwin .chatinput input,.chatwin .leadform input,.chatwin .leadform select{font-size:16px}
+  .msg.chat-tools,.msg.bot:has(.leadform){max-width:100%;align-self:stretch}
+}
+html.chatlock,html.chatlock body{overflow:hidden;overscroll-behavior:none}
+.msg.typing .tyt{font-size:.78rem;color:var(--muted);margin-left:6px;white-space:nowrap}
 
 /* ===== tray (favs / compare) ===== */
 /* 17.09: пустая полоса пряталась сдвигом на 140% СВОЕЙ высоты. Когда избранного нет,
@@ -2718,7 +2738,7 @@ ru: {
   "v.t.lo":"при таких вводных считать объект инвестицией стоит осторожно — обсудите с менеджером, за счёт чего можно улучшить экономику",
   "v.note":"Разбор по вашим цифрам — не инвестиционная рекомендация.",
   "ft.copy":"Property Library Phuket © 2022",
-  "chat.av":"Д","chat.fab":"Дарья · на связи","chat.name":"Дарья","chat.sub":"персональный менеджер · отвечает сразу","chat.placeholder":"Напишите сообщение…",
+  "chat.av":"Д","chat.fab":"Дарья · на связи","chat.name":"Дарья","chat.sub":"персональный менеджер · отвечает сразу","chat.w1":"читаю вопрос","chat.w2":"смотрю каталог и цены","chat.w3":"подбираю варианты","chat.w4":"собираю ответ","chat.placeholder":"Напишите сообщение…",
   "chat.botline":"Личный диалог. Отвечаем в течение 5 минут в рабочее время",
   "chat.hello":"Здравствуйте! Я Дарья, менеджер Property Library из команды Эльнура. Помогу с покупкой, арендой и любым вопросом по Пхукету. Что вам интересно?",
   "chat.menu1":"Купить / инвестировать","chat.menu2":"Аренда","chat.menu3":"Услуги и сопровождение","chat.menu4":"Оставить контакт для подборки",
@@ -2895,7 +2915,7 @@ en: {
   "v.t.lo":"with these inputs treat it as an investment with caution — discuss with a manager how the economics could be improved",
   "v.note":"A take based on your numbers — not investment advice.",
   "ft.copy":"Property Library Phuket © 2022",
-  "chat.av":"D","chat.fab":"Daria · online","chat.name":"Daria","chat.sub":"personal manager · replies right away","chat.placeholder":"Type a message…",
+  "chat.av":"D","chat.fab":"Daria · online","chat.name":"Daria","chat.sub":"personal manager · replies right away","chat.w1":"reading your question","chat.w2":"checking catalog and prices","chat.w3":"picking options","chat.w4":"putting the answer together","chat.placeholder":"Type a message…",
   "chat.botline":"Personal dialogue. We reply within 5 minutes during working hours",
   "chat.hello":"Hello! I am Daria, a Property Library manager from Elnur's team. I will help with buying, renting and any question about Phuket. What are you interested in?",
   "chat.menu1":"Buy / invest","chat.menu2":"Rent from a month","chat.menu3":"Services and support","chat.menu4":"Leave contact for a shortlist",
@@ -3146,10 +3166,26 @@ try{
     }
     raf=requestAnimationFrame(draw);
   };
-  addEventListener('resize',function(){resize();makeBlobs();if(reduceMotion)drawStatic();});
+  /* на телефоне resize идёт при каждом показе/скрытии адресной строки во время прокрутки:
+     холст пересоздавался и размывался заново посреди жеста. Неподвижный фон перерисовываем, только если сменилась ширина. */
+  var lastW=0;
+  addEventListener('resize',function(){if(still&&Math.abs(innerWidth*1.2-lastW)<2)return;resize();lastW=W;makeBlobs();if(reduceMotion||still)drawStatic();});
   addEventListener('scroll',function(){scY=window.scrollY||document.documentElement.scrollTop;},{passive:true});
-  resize();makeBlobs();
-  if(reduceMotion){drawStatic();}else{raf=requestAnimationFrame(draw);}
+  /* 10.10.2026 решение №111 («карточки на телефоне листаются неуверенно, залипают, тормозят»).
+     Фон — холст во весь экран под размытием blur(70px), и он перерисовывался КАЖДЫЙ кадр, всегда.
+     Замер (phone_shot.mjs PLP_MERA=1, процессор ×4): страница в покое занимала ~0,5 с из каждых 3 с,
+     а телефон на каждом кадре заново размывал целый экран — эта работа шла и во время смаха ленты.
+     На сенсорных экранах фон рисуем один раз (вид тот же, без медленного дрейфа пятен),
+     и на любом экране не крутим анимацию, пока вкладка скрыта. */
+  var still=reduceMotion;
+  try{still=still||matchMedia('(hover: none), (pointer: coarse)').matches;}catch(e){}
+  resize();lastW=W;makeBlobs();
+  if(still){drawStatic();}else{raf=requestAnimationFrame(draw);}
+  document.addEventListener('visibilitychange',function(){
+    if(still) return;
+    if(document.hidden){ if(raf){cancelAnimationFrame(raf);raf=null;} }
+    else if(!raf){ raf=requestAnimationFrame(draw); }
+  });
 }catch(e){/* фон не критичен: без canvas страница живёт */}
 
 /* ===== REVEAL ON SCROLL ===== */
@@ -4191,7 +4227,14 @@ function bot(html,noSave){
   if(!noSave){chatHist.push({r:'bot',h:html});saveHist();}
   return d;
 }
-function typingEl(){var d=document.createElement('div');d.className='msg bot typing';d.innerHTML='<i></i><i></i><i></i>';cb.appendChild(d);cb.scrollTop=cb.scrollHeight;return d;}
+function typingEl(steps){var d=document.createElement('div');d.className='msg bot typing';d.innerHTML='<i></i><i></i><i></i>';cb.appendChild(d);cb.scrollTop=cb.scrollHeight;
+  /* 10.10.2026 №120 «не видно работу ИИ»: ответ готовится 15–28 с, три точки столько не держат внимание.
+     Пока ждём ответ, под точками сменяются этапы работы. */
+  if(steps){var s=document.createElement('span');s.className='tyt';d.appendChild(s);var k=0,tm=[0,3500,9000,18000];
+    var next=function(){if(!d.isConnected||k>=steps.length)return;s.textContent=steps[k];cb.scrollTop=cb.scrollHeight;k++;if(k<steps.length)setTimeout(next,tm[k]-tm[k-1]);};next();}
+  return d;}
+/* лента чата сама едет вниз, только если человек и так внизу — иначе не выдёргиваем его из чтения */
+function cbNear(){return cb.scrollHeight-cb.scrollTop-cb.clientHeight<80;}
 function botT(html,delay){
   var ty=typingEl();
   setTimeout(function(){
@@ -4199,7 +4242,7 @@ function botT(html,delay){
     if(/[<>]/.test(html)){bot(html);return;}
     var d=bot('',true);chatHist.push({r:'bot',h:html});saveHist();
     if(reduceMotion){d.textContent=html;cb.scrollTop=cb.scrollHeight;return;}
-    var i=0;(function tick(){d.textContent=html.slice(0,++i);cb.scrollTop=cb.scrollHeight;if(i<html.length)setTimeout(tick,14);})();
+    var i=0;(function tick(){var nb=cbNear();d.textContent=html.slice(0,++i);if(nb)cb.scrollTop=cb.scrollHeight;if(i<html.length)setTimeout(tick,14);})();
   },delay||650);
 }
 function me(txt,noSave){var d=document.createElement('div');d.className='msg me';d.textContent=txt;cb.appendChild(d);cb.scrollTop=cb.scrollHeight;if(!noSave){chatHist.push({r:'me',h:txt});saveHist();}}
@@ -4245,8 +4288,32 @@ function askAssistant(q){
   };
   if(inp) requestAnimationFrame(go); else setTimeout(go,260);
 }
+/* 10.10.2026 №120: на телефоне окно чата = видимый экран. Страницу под ним закрепляем (как в меню),
+   высоту и верх окна берём у visualViewport — с клавиатурой окно встаёт над ней, а не уезжает. */
+var chatLockY=null;
+function chatFit(){
+  var c=document.getElementById('chatwin'); if(!c) return;
+  var vv=window.visualViewport;
+  if(innerWidth>760||!c.classList.contains('open')||!vv){c.style.height='';c.style.top='';return;}
+  c.style.height=Math.round(vv.height)+'px'; c.style.top=Math.round(vv.offsetTop)+'px';
+  var b=document.getElementById('chatbody'); if(b&&chatBusy) b.scrollTop=b.scrollHeight;
+}
+function chatLock(on){
+  var de=document.documentElement, bs=document.body.style;
+  if(on){
+    if(innerWidth>760||chatLockY!==null) return;
+    chatLockY=window.scrollY||de.scrollTop||0;
+    de.classList.add('chatlock'); bs.position='fixed'; bs.top=(-chatLockY)+'px'; bs.left='0'; bs.right='0'; bs.width='100%';
+  }else{
+    if(chatLockY===null) return;
+    de.classList.remove('chatlock'); bs.position=''; bs.top=''; bs.left=''; bs.right=''; bs.width='';
+    var y=chatLockY; chatLockY=null; window.scrollTo({top:y,left:0,behavior:'instant'});
+  }
+}
+if(window.visualViewport){visualViewport.addEventListener('resize',chatFit);visualViewport.addEventListener('scroll',chatFit);}
 function openChat(ctx){
   document.getElementById('chatwin').classList.add('open');
+  chatLock(true); chatFit();
   var _fw=document.getElementById('fabWrap')||document.getElementById('fab');
   if(_fw) _fw.style.display='none';
   var fld=document.getElementById('chatField');if(fld&&innerWidth>760)fld.focus();
@@ -4457,14 +4524,14 @@ function renderBotText(txt){
   txt=cleanBotText(txt);
   var d=bot('',true);chatHist.push({r:'bot',h:escHtml(txt)});saveHist();
   if(reduceMotion){d.textContent=txt;cb.scrollTop=cb.scrollHeight;return;}
-  var i=0;(function tick(){d.textContent=txt.slice(0,++i);cb.scrollTop=cb.scrollHeight;if(i<txt.length)setTimeout(tick,14);})();
+  var i=0;(function tick(){var nb=cbNear();d.textContent=txt.slice(0,++i);if(nb)cb.scrollTop=cb.scrollHeight;if(i<txt.length)setTimeout(tick,14);})();
 }
 /* фолбэк при сбое ИИ: реплика-подсказка + прямой контакт WhatsApp */
 function aiFail(reply){if(reply)renderBotText(reply);bot(t('chat.aifail'));}
 /* основной путь свободного вопроса — живой ИИ-бэкенд (brain_core, персона Дарья) */
 function askAI(txt, byVoice){
   setChatBusy(true);
-  var ty=typingEl();
+  var ty=typingEl([t('chat.w1'),t('chat.w2'),t('chat.w3'),t('chat.w4')]);
   var body=JSON.stringify({message:txt,history:buildAIHistory(),lang:PL.lang,context:{object_id:chatObjCtx()}});
   var ctrl=(typeof AbortController!=='undefined')?new AbortController():null;
   /* 30.08: было 25000 — бэкенд отвечает 15–28с (замеры), содержательные ответы обрывались
@@ -4565,7 +4632,8 @@ function clearChat(){chatHist=[];leadShown=false;chatStarted=false;userMsgs=0;la
 /* Голосовой ввод в чате (Эльнур 06.09). Распознаёт сам браузер — запись
    никуда не отправляется. Где не поддерживается (Firefox) — кнопки просто нет. */
 var CHAT_REC=null;
-function closeChat(){var c=document.getElementById('chatwin'); if(c) c.classList.remove('open');
+function closeChat(){var c=document.getElementById('chatwin'); if(c){ c.classList.remove('open'); c.style.height=''; c.style.top=''; }
+  chatLock(false);
   var w=document.getElementById('fabWrap'); if(w) w.style.display='block';
   var b=document.getElementById('fab'); if(!w && b) b.style.display='flex';}
 
