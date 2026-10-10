@@ -136,6 +136,11 @@ if (!slugs.length) { console.log('node tools/offer_sheet.mjs <slug> …'); proce
 for (const slug of slugs) {
   const J = JSON.parse(fs.readFileSync(path.join(ROOT, 'offers', slug, 'sheet.json'), 'utf8'));
   const html = render(J);
+  /* 10.10.2026 Эльнур: «Какой ещё портал Estatyx, мы не пишем этого… ориентир — файл застройщика». Решение №273:
+     в подписях источников (<p class="src">) не называть порталы и брокеров. Сборка листа с таким источником не проходит. */
+  const ПОРТАЛЫ = /estatyx|fazwaz|ddproperty|hipflat|dot\s?property(?!\s+thailand\s+awards)|propertyguru(?!\s+thailand\s+property\s+awards)|thailand-property|realting|prian|tranio|bayut|facebook\.com|t\.me\//i;
+  for (const m of html.matchAll(/<p class="src"[^>]*>([\s\S]*?)<\/p>/g))
+    if (ПОРТАЛЫ.test(m[1])) throw new Error(slug + ': в источниках портал или брокер (решение №273): «' + m[1].slice(0, 120) + '»');
   fs.writeFileSync(path.join(ROOT, 'offers', slug, 'page.htm'), html);
   console.log(slug, 'собран:', html.length, 'знаков');
 }
