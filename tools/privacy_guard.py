@@ -95,7 +95,7 @@ def main():
     try:
         objs = sb('objects?select=plp_property_id,name,public_code,purpose,on_site,parent_object_id,'
                   'owner_ref,usp,usp_en,availability,stage_note,ai_pitch_hook,ai_story,rent_rules,'
-                  'good_for,current_promo,main_image_url,gallery_urls&limit=500')
+                  'good_for,current_promo,main_image_url,gallery_urls,photo_groups,floorplan_url,price_tiers&limit=500')
     except Exception as ex:
         print('[личные данные] база не ответила:', str(ex)[:110])
         return 0
@@ -122,6 +122,31 @@ def main():
         if засвет:
             bad.append((pid, 'фото', 'номер юнита в пути к снимкам: %s (кадров %d)'
                         % (', '.join(sorted(засвет)), len(кадры))))
+        # 11.10.2026: на Champaca чертежи лежали как Floor_plan_F3, MCC_PLOT_A2…_Sold — номер юнита и «продано»
+        # в ИМЕНИ файла, а сторож смотрел только папку и не читал photo_groups. Теперь: все адреса карточки,
+        # в имени файла — код из её же прайса (не после «type») или метки PLOT/UNIT/VILLA с номером, SOLD.
+        гр = o.get('photo_groups') or []
+        for g in (гр.values() if isinstance(гр, dict) else гр):
+            if isinstance(g, dict):
+                кадры += list(g.get('urls') or [])
+            elif isinstance(g, list):
+                кадры += g
+            elif isinstance(g, str):
+                кадры.append(g)
+        if o.get('floorplan_url'):
+            кадры.append(o['floorplan_url'])
+        коды = {str(t.get('code') or '').strip() for t in (o.get('price_tiers') or []) if isinstance(t, dict)}
+        коды = {к for к in коды if re.fullmatch(r'[A-Za-z]{1,3}-?\d{1,4}', к)}
+        имена = set()
+        for u in кадры:
+            имя = re.sub(r'-[0-9a-f]{8}-\d+\.webp$', '', str(u).rsplit('/', 1)[-1])
+            if re.search(r'(?i)(plot|unit|villa)[_ -]?[a-z]?\d|(?<![a-z])sold(?![a-z])', имя):
+                имена.add(имя)
+            for к in коды:
+                if re.search(r'(?i)(?<![a-z0-9])(?<!type[_ -])' + re.escape(к) + r'(?![0-9])', имя):
+                    имена.add(имя)
+        if имена:
+            bad.append((pid, 'фото', 'номер юнита или «продано» в имени файла: %s' % ', '.join(sorted(имена))[:200]))
     for o in objs:
         pid = o['plp_property_id']
         is_unit = bool(o.get('parent_object_id') or o.get('owner_ref')
