@@ -221,6 +221,7 @@ body{min-height:101vh;overscroll-behavior-y:contain}
   <section id="done" class="card done" hidden></section>
 </div>
 
+<script src="/js/phone.js"></script>
 <script>
 /* Заявка уходит в sitelead: сделка в воронке «PLP Реклама | Квиз», этап New Leads, с метками рекламы; двойник пишет за 3 минуты. */
 const P = {
@@ -317,12 +318,14 @@ const P = {
 };
 const POST = { kuartz:'https://t.me/property_library_phuket', vibe2:'https://t.me/property_library_phuket', fizz:'https://t.me/property_library_phuket', standard:'https://t.me/property_library_phuket', eden:'https://t.me/property_library_phuket', zero:'https://t.me/property_library_phuket' }; /* ссылки на посты-разборы: подставить, когда выйдут */
 const $ = id => document.getElementById(id);
-let C, A, i, T0, tStep, timing, pasted;
+let C, A, i, T0, tStep, timing, pasted, LID, busy = false;
+/* 12.10.2026: id прохождения квиза — приёмник по нему не напишет человеку дважды, если форма отправит повторно */
+const newLid = () => { try { return crypto.randomUUID(); } catch (e) { return 'k' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10); } };
 
 function boot(){
   const key = (new URLSearchParams(location.search).get('p') || location.hash.slice(1) || 'kuartz').toLowerCase(); C = P[key] || P.kuartz;
   Object.keys(P).forEach(k => { const e = $('sw-' + k); if (e) e.classList.toggle('on', P[k] === C); });
-  A = {}; i = 0; timing = []; pasted = false; T0 = Date.now();
+  A = {}; i = 0; timing = []; pasted = false; T0 = Date.now(); LID = newLid();
   $('quiz').hidden = true; $('done').hidden = true; $('s0').hidden = false;
   $('s0').innerHTML = '<div class="start"><div class="ph0"><img class="bg" src="img/' + C.hero + '.webp" alt=""' + (C.heroPos || C.heroSt ? ' style="' + (C.heroPos ? 'object-position:' + C.heroPos + ';' : '') + (C.heroSt || '') + '"' : '') + '></div>' +
     '<div class="logo"><img src="img/plp-logo-ink.webp" alt="Property Library Phuket"></div>' +
@@ -362,38 +365,65 @@ function render(){
     $('ph').addEventListener('paste', () => pasted = true);
     document.querySelectorAll('.chan button').forEach(b => b.onclick = () => {
       document.querySelectorAll('.chan button').forEach(x => x.classList.remove('on')); b.classList.add('on'); A.channel = b.dataset.c; });
-    $('f').addEventListener('submit', e => { e.preventDefault(); if (send()) finish(); });
+    $('f').addEventListener('submit', e => { e.preventDefault(); send(); });
+    $('ph').addEventListener('input', () => { $('err').textContent = ''; });
   }
 }
 
 function send(){
-  const phone = $('ph').value.replace(/[^\d+]/g, ''), d = phone.replace(/\D/g, '');
-  if ($('co').value) return true;   // робот заполнил скрытое поле: показываем успех, заявку не шлём
-  if (d.length < 10 || d.length > 15) { $('err').textContent = 'Проверьте номер: нужен код страны, например +7 или +66'; return false; }
+  /* 12.10.2026 Эльнур: «как у него вообще получилось ввести неверный номер?» (7011888018, Казахстан без +7: форма
+     пропустила 10 цифр, приёмник тоже, Wazzup отбил, а человек увидел «Заявка принята»). Теперь: (1) номер проверяет
+     общий phone.js (тот же, что у приёмника); (2) форма ЖДЁТ ответ приёмника, а он сначала пишет человеку в WhatsApp;
+     (3) «Заявка принята» и событие Lead в Meta — только после ok от приёмника. */
+  if (busy) return;
+  if ($('co').value) { finish({ ok: true, sent: false }); return; }   // робот заполнил скрытое поле: показываем успех, заявку не шлём
+  const raw = $('ph').value;
+  const chk = window.PLPPhone ? PLPPhone.check(raw) : { ok: raw.replace(/\D/g, '').length >= 10, digits: raw.replace(/\D/g, ''), hint: 'Проверьте номер: нужен код страны, например +7 или +66' };
+  if (!chk.ok) { $('err').textContent = chk.hint; return; }
+  const d = chk.digits;
   const p = new URLSearchParams(location.search), utm = {};
-  ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','fbclid','gclid'].forEach(k => { if (p.get(k)) utm[k] = p.get(k); });
-  const lead = { source:'website', funnel:'ads_quiz', object_id:C.id, object_name:C.name, name:$('nm').value.trim(), phone,
+  ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','utm_id','fbclid','gclid'].forEach(k => { if (p.get(k)) utm[k] = p.get(k); });
+  const lead = { source:'website', funnel:'ads_quiz', object_id:C.id, object_name:C.name, name:$('nm').value.trim(), phone:'+' + d, lid:LID,
     contact_pref:A.channel, goal:A.goal, budget:A.plan, message:'Квиз ' + C.name + ': ' + Object.values(A).filter(x => x !== A.channel).join(' · '),
     page:location.href, utm, quiz:A,
-    quality:{ secs_total:Math.round((Date.now() - T0) / 1000), secs_per_step:timing, pasted_phone:pasted,
+    quality:{ secs_total:Math.round((Date.now() - T0) / 1000), secs_per_step:timing, pasted_phone:pasted, phone_fixed:chk.fixed || '',
       all_first_answers:C.Q.every(s => A[s.k] === s.o[0][0]), agent:/агент/i.test(A.who || '') } };
   lead.channel_pref = A.channel === 'telegram' ? 'telegram' : 'whatsapp';
-  try { fetch('https://hub.property-library.com/webhook/site-lead?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(lead), keepalive:true }).catch(() => {}); } catch (e) {}
-  // тестовые номера (то же правило, что ТЕСТ в реклама_сводка.py) не считаем лидом в рекламе
-  if (!/^(66)?9009990|^669000000|^900999/.test(d)) {
-    try { if (window.fbq) fbq('track', 'Lead', { content_name: C.name, content_category: 'kviz' }); } catch (e) {}
-    try { if (window.gtag) gtag('event', 'generate_lead', { lead_source: 'kviz', item_name: C.name }); } catch (e) {}
-  }
-  return true;
+  const btn = document.querySelector('#f .cta'), label = btn ? btn.textContent : '';
+  busy = true; if (btn) { btn.disabled = true; btn.textContent = 'Отправляем…'; } $('err').textContent = '';
+  const unlock = () => { busy = false; if (btn) { btn.disabled = false; btn.textContent = label; } };
+  /* ждём не дольше 15 с (обычно 6–10: приёмник сам пишет человеку). Не дождались — заявка почти наверняка дошла,
+     показываем «напишем в ближайшее время»; повтор с тем же LID приёмник не задвоит. */
+  const ctl = window.AbortController ? new AbortController() : null;
+  const timer = setTimeout(() => { if (ctl) ctl.abort(); }, 15000);
+  const isTest = /^(66)?9009990|^669000000|^900999/.test(d);
+  /* text/plain — как у главной (index.html, sendLead): без предзапроса CORS, приёмник разбирает строку сам (sitelead.mjs стр. 24);
+     keepalive — закрыл вкладку, пока ждёт, заявка всё равно дойдёт */
+  fetch('https://hub.property-library.com/webhook/site-lead?key=ee8efec5c8c30f8a3f9d1c7b7c00739381a674b7', { method:'POST', headers:{'Content-Type':'text/plain'},
+        body:JSON.stringify(lead), keepalive:true, signal: ctl ? ctl.signal : undefined })
+    .then(r => r.json())
+    .then(r => {
+      clearTimeout(timer);
+      if (r && r.ok === false && r.field === 'phone') { unlock(); $('err').textContent = r.hint || 'Проверьте номер: код страны и все цифры.'; return; }
+      if (!isTest) {   // тестовые номера (то же правило, что ТЕСТ в реклама_сводка.py) не считаем лидом в рекламе
+        const ev = r && r.event_id ? { eventID: r.event_id } : undefined;
+        try { if (window.fbq) fbq('track', 'Lead', { content_name: C.name, content_category: 'kviz' }, ev); } catch (e) {}
+        try { if (window.gtag) gtag('event', 'generate_lead', { lead_source: 'kviz', item_name: C.name }); } catch (e) {}
+      }
+      finish(r || { ok: true, sent: false });
+    })
+    .catch(() => { clearTimeout(timer); finish({ ok: true, sent: false, late: true }); });
 }
 
-function finish(){
+function finish(r){
+  r = r || {}; busy = false;
   $('quiz').hidden = true;
   const ch = A.channel === 'telegram' ? 'Telegram' : 'WhatsApp', key = Object.keys(P).find(k => P[k] === C);
   $('done').innerHTML =
     '<div class="pj"><div class="ph0"><img class="bg" src="img/' + C.hero + '.webp" alt=""' + (C.heroPos || C.heroSt ? ' style="' + (C.heroPos ? 'object-position:' + C.heroPos + ';' : '') + (C.heroSt || '') + '"' : '') + '></div>' +
     '<div class="pt"><span class="ok">Заявка принята</span><h2>' + C.name + ', ' + (C.place || 'Карон') + '</h2>' +
-    '<p>Напишу вам в ' + ch + ' в ближайшие минуты' + (A.plan ? ', подборка: ' + A.plan.toLowerCase() : '') + '.</p></div></div>' +
+    (r.sent ? '<p>Написал вам в ' + ch + (r.phone ? ' на ' + r.phone : '') + '. Проверьте сообщения' + (A.plan ? ', подборка: ' + A.plan.toLowerCase() : '') + '.</p>'
+            : '<p>Напишу вам в ' + ch + ' в ближайшее время' + (A.plan ? ', подборка: ' + A.plan.toLowerCase() : '') + '.</p>') + '</div></div>' +
     '<div class="facts">' + C.facts.map(f => '<div><b>' + f[0] + '</b>' + f[1] + '</div>').join('') + '</div>' +
     '<div class="gal">' + C.gal.map(g => { const [n, st] = g.split('|'); return '<i class="gi"><img src="img/' + n + '.webp" alt=""' + (st ? ' style="' + st + '"' : '') + '></i>'; }).join('') + '</div>' +
     '<a class="cta" href="' + POST[key] + '" target="_blank" rel="noopener">Читать разбор ' + C.name + ' в Telegram</a>' +
