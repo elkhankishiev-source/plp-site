@@ -418,7 +418,7 @@ function send(){
 function finish(r){
   r = r || {}; busy = false;
   $('quiz').hidden = true;
-  const ch = A.channel === 'telegram' ? 'Telegram' : 'WhatsApp', key = Object.keys(P).find(k => P[k] === C);
+  const ch = (r.channel || A.channel) === 'telegram' ? 'Telegram' : 'WhatsApp', key = Object.keys(P).find(k => P[k] === C);
   $('done').innerHTML =
     '<div class="pj"><div class="ph0"><img class="bg" src="img/' + C.hero + '.webp" alt=""' + (C.heroPos || C.heroSt ? ' style="' + (C.heroPos ? 'object-position:' + C.heroPos + ';' : '') + (C.heroSt || '') + '"' : '') + '></div>' +
     '<div class="pt"><span class="ok">Заявка принята</span><h2>' + C.name + ', ' + (C.place || 'Карон') + '</h2>' +
