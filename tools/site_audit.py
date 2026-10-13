@@ -31,7 +31,7 @@ import re
 import sys
 import urllib.request
 
-КОРЕНЬ = os.path.expanduser('~/plp-site')
+КОРЕНЬ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # 13.10: корень = папка над tools/, не ~/plp-site
 САЙТ = 'https://property-library.com'
 ЖИВЬЁМ = '--живьём' in sys.argv
 ТОЛЬКО_СЕО = '--сео' in sys.argv

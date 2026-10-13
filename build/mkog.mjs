@@ -6,9 +6,10 @@
    Здесь кадр объекта из хранилища сохраняется в /img/<КОД>.jpg перед сборкой страниц. */
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import https from 'node:https';
 
-const ROOT = '/Users/elnurkhankishiev/plp-site';
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'); // 13.10: корень = папка над build/, а не ~/plp-site — прогон в другой копии не трогает рабочую
 const ENV = path.join(process.env.HOME, '.plp_site_supabase.env');
 
 function env() {

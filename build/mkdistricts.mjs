@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
-const ROOT='/Users/elnurkhankishiev/plp-site';
+import { fileURLToPath } from 'node:url';
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'); // 13.10: корень = папка над build/, а не ~/plp-site — прогон в другой копии не трогает рабочую
 const SITE='https://property-library.com';
 const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 

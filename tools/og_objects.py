@@ -13,7 +13,7 @@
 # Рендер: один Chrome на пачку из 10 карточек, никогда два одновременно (Мак 8 ГБ).
 import os, re, sys, json, time, shutil, subprocess, tempfile, urllib.request, html as H
 
-SITE = os.path.expanduser('~/plp-site')
+SITE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # 13.10: корень = папка над tools/, не ~/plp-site
 OUT = os.path.join(SITE, 'img', 'og')
 CH = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 LOGO = os.path.join(SITE, 'offers/vibe2/img/plp-logo-ink.webp')

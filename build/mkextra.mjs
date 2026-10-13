@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
-const ROOT='/Users/elnurkhankishiev/plp-site';
+import { fileURLToPath } from 'node:url';
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'); // 13.10: корень = папка над build/, а не ~/plp-site — прогон в другой копии не трогает рабочую
 const SITE='https://property-library.com';
 const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const idx=fs.readFileSync(path.join(ROOT,'index.html'),'utf8');
@@ -203,7 +204,7 @@ made.push(page({file:'management.html',depth:0,
   body:mgmt}));
 
 /* ── ГАЙДЫ ──────────────────────────────────────────────── */
-const faq=JSON.parse(fs.readFileSync('/Users/elnurkhankishiev/plp-site/build/faq.json','utf8'));
+const faq=JSON.parse(fs.readFileSync(path.join(ROOT,'build/faq.json'),'utf8'));
 const slugs={'1':'inostranec-mozhet-kupit','2':'leasehold-ili-freehold','3':'nalogi-i-rashody',
              '4':'skolko-oformlyaetsya-sdelka','5':'kupit-udalenno','6':'stoimost-uslug',
              '7':'kakaya-dohodnost','8':'garantirovannaya-dohodnost','9':'kto-upravlyaet-obektom',

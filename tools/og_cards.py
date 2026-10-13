@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Фирменные превью ссылок 1200×630 (09.10.2026, Эльнур: «превью ссылок страшное»). Фото проекта + название, район, цена, знак PLP.
 import os, subprocess, tempfile, sys
-SITE=os.path.expanduser('~/plp-site'); CH='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+SITE=os.path.dirname(os.path.dirname(os.path.abspath(__file__))); CH='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 D=[ # slug, фото (1 или 2), надзаголовок, название, цена, плашка
  ('cg-capital',['andaz-hd.webp'],'Central Group · Лаян и Банг Тао','Andaz и PURITA','от 7,xx млн ฿','старт продаж'),
  ('vibe2',['v2-hero.webp'],'Карон · застройщик ESM','Vibe II Downtown','от 3,2 млн ฿','старт 28 октября'),

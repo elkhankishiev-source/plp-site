@@ -6,8 +6,9 @@
    одинаково работали и с главной, и из object/, и из districts/. */
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const ROOT = '/Users/elnurkhankishiev/plp-site';
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'); // 13.10: корень = папка над build/, а не ~/plp-site — прогон в другой копии не трогает рабочую
 const skip = new Set(['node_modules', '.git', 'build']);
 function walk(dir, out = []) {
   for (const e of fs.readdirSync(dir, { withFileTypes: true })) {

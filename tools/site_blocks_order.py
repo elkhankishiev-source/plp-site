@@ -47,10 +47,10 @@
     python3 site_blocks_order.py            # показать новый порядок
     python3 site_blocks_order.py --apply    # переставить
 """
-import re, sys
+import os, re, sys
 
 APPLY = '--apply' in sys.argv
-FILE = '/Users/elnurkhankishiev/plp-site/index.html'
+FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'index.html')  # 13.10: от расположения скрипта
 
 # имена для блоков, которые их не имели
 ИМЕНА = {'PDF · 23 страницы': 'pdf', 'Сделки': 'deals', 'Организуем всё': 'services'}

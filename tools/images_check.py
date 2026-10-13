@@ -20,7 +20,7 @@ import os
 import re
 import sys
 
-КОРЕНЬ = os.path.expanduser('~/plp-site')
+КОРЕНЬ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # 13.10: корень = папка над tools/, не ~/plp-site
 ТИХО = '--тихо' in sys.argv
 
 # Где искать ссылки. Каталоги сборки и выгрузок не трогаем.
