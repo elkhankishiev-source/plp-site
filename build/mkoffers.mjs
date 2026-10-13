@@ -25,6 +25,7 @@ const OFFERS = [
     title: 'Vibe II Downtown · Карон: закрытый предстарт',
     desc: 'Vibe II на Кароне: предстартовые цены, бронь, график оплаты и расчёт аренды. Предложение для клиентов Property Library Phuket.',
     pdf: 'Vibe2_Karon.pdf',
+    h: 8950,   // 13.10.2026: лист по киту Vibe Downtown, PDF 2367 мм = 8950 px при ширине 794; рамка сразу нужной высоты, без прыжка
   },
   {
     /* 07.10.2026 Эльнур: «собрать презентацию по формату Vibe II и скинуть ссылку». Факты: слайды CG Capital (фото Эльнура 07.10) и его голосовые. */
@@ -79,16 +80,16 @@ for (const o of OFFERS) {
   <div style="display:flex;justify-content:flex-end;margin:0 0 8px">
     ${hasPdf ? `<a href="/${o.dir}/${o.pdf}" target="_blank" rel="noopener" style="font-size:13px;line-height:1;padding:7px 12px;border:1px solid rgba(255,255,255,.28);border-radius:999px;color:#EFECE2;text-decoration:none;opacity:.85">PDF ↓</a>` : ''}
   </div>
-  <div id="offerBox" style="width:100%;max-width:794px;margin:0 auto;overflow:hidden;border-radius:14px;background:#EFECE2;box-shadow:0 2px 18px rgba(23,24,15,.08);height:4531px">
+  <div id="offerBox" style="width:100%;max-width:794px;margin:0 auto;overflow:hidden;border-radius:14px;background:#EFECE2;box-shadow:0 2px 18px rgba(23,24,15,.08);height:${o.h || 4531}px">
     <iframe id="offerFrame" src="/${o.dir}/page.htm?v=${v}" title="${esc(o.title)}" loading="eager" scrolling="no"
-      style="display:block;width:794px;height:4531px;border:0;transform-origin:0 0"></iframe>
+      style="display:block;width:794px;height:${o.h || 4531}px;border:0;transform-origin:0 0"></iframe>
   </div>
 </div></section>
 <script>
 /* Лист оффера показываем ровно как в PDF: ширина листа 794px (210 мм), на узком экране
    уменьшаем его целиком, а не перестраиваем в колонку. Эльнур 18.09: «как в PDF, рядом». */
 (function () {
-  var box = document.getElementById('offerBox'), f = document.getElementById('offerFrame'), H = 4531;
+  var box = document.getElementById('offerBox'), f = document.getElementById('offerFrame'), H = ${o.h || 4531};
   function layout() {
     var k = Math.min(1, box.clientWidth / 794);
     f.style.transform = k < 1 ? 'scale(' + k + ')' : '';
