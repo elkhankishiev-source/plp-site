@@ -426,8 +426,13 @@ function finish(r){
             : '<p>Напишу вам в ' + ch + ' в ближайшее время' + (A.plan ? ', подборка: ' + A.plan.toLowerCase() : '') + '.</p>') + '</div></div>' +
     '<div class="facts">' + C.facts.map(f => '<div><b>' + f[0] + '</b>' + f[1] + '</div>').join('') + '</div>' +
     '<div class="gal">' + C.gal.map(g => { const [n, st] = g.split('|'); return '<i class="gi"><img src="img/' + n + '.webp" alt=""' + (st ? ' style="' + st + '"' : '') + '></i>'; }).join('') + '</div>' +
-    '<a class="cta" href="' + POST[key] + '" target="_blank" rel="noopener">Читать разбор ' + C.name + ' в Telegram</a>' +
-    '<a class="cta2" href="https://t.me/elnurphuket_bot?start=' + C.bot + '" target="_blank" rel="noopener">Получить расчёт в Telegram</a>' +
+    /* 13.10.2026 Эльнур («лид нажал — и автоматом в Telegram»): ссылка в бот несёт метку заявки (r.tg_start от приёмника),
+       бот по ней узнаёт Telegram человека, даже если номер в Telegram скрыт. Выбрал Telegram — эта кнопка главная. */
+    (r.tg_start && A.channel === 'telegram'
+      ? '<a class="cta" href="' + r.tg_start + '" target="_blank" rel="noopener">Получить ответ в Telegram</a>' +
+        '<a class="cta2" href="' + POST[key] + '" target="_blank" rel="noopener">Читать разбор ' + C.name + ' в Telegram</a>'
+      : '<a class="cta" href="' + POST[key] + '" target="_blank" rel="noopener">Читать разбор ' + C.name + ' в Telegram</a>' +
+        '<a class="cta2" href="' + (r.tg_start || ('https://t.me/elnurphuket_bot?start=' + C.bot)) + '" target="_blank" rel="noopener">Получить расчёт в Telegram</a>') +
     '<a class="lnk" href="' + C.sheet + '" target="_blank" rel="noopener">Открыть лист проекта</a>';
   $('done').hidden = false; scrollTo(0, 0);
 }
