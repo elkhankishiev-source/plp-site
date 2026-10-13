@@ -2453,6 +2453,44 @@
    "units": []
   },
   {
+   "id": "PLP-MILLENNIUM",
+   "pub": "PLP-MILLENNIUM",
+   "url": "https://property-library.com/object/millennium",
+   "name": "Millennium Condominium, Банг Тао",
+   "district": "Банг Тао",
+   "type": "Кондо",
+   "price_from": 3420200,
+   "units": [
+    {
+     "area": "24,4–30,0 м²",
+     "beds": 0,
+     "free": 145,
+     "name": "Студия",
+     "area_sqm": 24.4,
+     "price_from_thb": 3420200,
+     "from": 3420200
+    },
+    {
+     "area": "35,0–46,2 м²",
+     "beds": 1,
+     "free": 30,
+     "name": "1 спальня",
+     "area_sqm": 35,
+     "price_from_thb": 4893000,
+     "from": 4893000
+    },
+    {
+     "area": "60,0–74,2 м²",
+     "beds": 2,
+     "free": 25,
+     "name": "2 спальни",
+     "area_sqm": 60,
+     "price_from_thb": 8393000,
+     "from": 8393000
+    }
+   ]
+  },
+  {
    "id": "PLP-MODEVA",
    "pub": "PLP-MODEVA",
    "url": "https://property-library.com/object/modeva",
