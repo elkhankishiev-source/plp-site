@@ -4,8 +4,9 @@
    маркерами. Правишь один файл — меняется везде, расхождения больше не копятся. */
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const ROOT = '/Users/elnurkhankishiev/plp-site';
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'); // 13.10: корень = папка над build/, а не ~/plp-site — прогон в другой копии не трогает рабочую
 const P = f => fs.readFileSync(path.join(ROOT, 'build/parts', f), 'utf8');
 
 const HEADER = P('header.html');

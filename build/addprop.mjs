@@ -5,7 +5,8 @@
    Если понадобится вернуть сборку — сначала перенести сюда живой файл. */
 import fs from 'node:fs';
 import path from 'node:path';
-const ROOT='/Users/elnurkhankishiev/plp-site';
+import { fileURLToPath } from 'node:url';
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'); // 13.10: корень = папка над build/, а не ~/plp-site — прогон в другой копии не трогает рабочую
 /* 15.09: предохранитель. README звал этот скрипт по привычке, а он затирает
    живой add-property.html (сверка 15.09: 1778 строк расхождения). Без явного
    ADDPROP_FORCE=1 выходим, ничего не записав. */

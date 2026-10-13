@@ -6,8 +6,9 @@
    плюс каждой гарантируется фон на <html>, иначе при оттягивании светит белое. */
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const ROOT = '/Users/elnurkhankishiev/plp-site';
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'); // 13.10: корень = папка над build/, а не ~/plp-site — прогон в другой копии не трогает рабочую
 const PART = fs.readFileSync(path.join(ROOT, 'build/parts/head-theme.html'), 'utf8').trim();
 const OPEN = '<!-- PLP:HEADTHEME:START -->', CLOSE = '<!-- PLP:HEADTHEME:END -->';
 const HTMLBG = 'html{background:var(--bg);overscroll-behavior-y:none}';

@@ -4,8 +4,9 @@
    Служебные страницы (оффер, правила, 404) раньше уходили голой строкой. */
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const ROOT = '/Users/elnurkhankishiev/plp-site';
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'); // 13.10: корень = папка над build/, а не ~/plp-site — прогон в другой копии не трогает рабочую
 const SITE = 'https://property-library.com';
 /* 09.10.2026: фирменная карточка 1200×630 со знаком PLP вместо серой обложки (tools/og_objects.py --pages) */
 const IMG = SITE + (fs.existsSync(path.join(ROOT, 'img/og/page-default.jpg')) ? '/img/og/page-default.jpg' : '/img/og-default.jpg');
