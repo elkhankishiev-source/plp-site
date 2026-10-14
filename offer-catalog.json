@@ -2340,27 +2340,77 @@
    "name": "KUARTZ, Карон",
    "district": "Карон",
    "type": "Кондо",
-   "price_from": 5183000,
+   "price_from": 5767967,
    "units": [
     {
-     "area": "31,7–37,9 м²",
-     "name": "1 спальня"
+     "code": "1 Bedroom",
+     "name": "1 спальня",
+     "units": 70,
+     "price_to_thb": 7699260,
+     "price_from_thb": 5767967,
+     "from": 5767967
     },
     {
-     "area": "45,0–47,8 м²",
-     "name": "1 спальня плюс"
+     "code": "1 Bedroom Mirror",
+     "name": "1 спальня Mirror",
+     "units": 25,
+     "price_to_thb": 7093864,
+     "price_from_thb": 5806306,
+     "from": 5806306
     },
     {
-     "area": "56,6–62,7 м²",
-     "name": "2 спальни"
+     "code": "1 Bedroom Corner",
+     "name": "1 спальня угловая",
+     "units": 9,
+     "price_to_thb": 7227873,
+     "price_from_thb": 6079499,
+     "from": 6079499
     },
     {
-     "area": "69,5 м²",
-     "name": "пентхаус 2 спальни"
+     "code": "1 Bedroom Plus",
+     "name": "1 спальня плюс",
+     "units": 38,
+     "price_to_thb": 11175447,
+     "price_from_thb": 8289744,
+     "from": 8289744
     },
     {
-     "area": "89,2–97,2 м²",
-     "name": "пентхаус 2 спальни плюс"
+     "code": "1 Bedroom Plus Corner",
+     "name": "1 спальня плюс угловая",
+     "units": 29,
+     "price_to_thb": 11217874,
+     "price_from_thb": 8233489,
+     "from": 8233489
+    },
+    {
+     "code": "2 Bedrooms Corner",
+     "name": "2 спальни угловая",
+     "units": 11,
+     "price_to_thb": 12906880,
+     "price_from_thb": 10697129,
+     "from": 10697129
+    },
+    {
+     "code": "2 Bedrooms Penthouse",
+     "name": "пентхаус 2 спальни",
+     "units": 3,
+     "price_from_thb": 13984978,
+     "from": 13984978
+    },
+    {
+     "code": "2 Bedrooms Plus Penthouse",
+     "name": "пентхаус 2 спальни плюс",
+     "units": 1,
+     "price_from_thb": 19184618,
+     "from": 19184618
+    },
+    {
+     "code": "2 Bedrooms Plus Corner Penthouse",
+     "name": "пентхаус 2 спальни плюс угловой",
+     "units": 3,
+     "price_to_thb": 21184053,
+     "price_from_thb": 17948663,
+     "from": 17948663
     }
    ]
   },
