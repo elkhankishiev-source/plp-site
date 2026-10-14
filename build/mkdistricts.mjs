@@ -5,17 +5,17 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'); /
 const SITE='https://property-library.com';
 const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
-// районы: русское имя (как в каталоге) → адрес, падеж, рыночная справка
+// районы: русское имя (как в каталоге) → адрес, падеж, описание (рыночных цифр нет, 14.10)
 const D=[
- {ru:'Банг Тао', slug:'bang-tao', in:'Банг Тао', m2:135000, yoy:15.2, yld:7.1, src:'CBRE, I квартал 2025',
+ {ru:'Банг Тао', slug:'bang-tao', in:'Банг Тао',
   about:'Западное побережье, пляж Банг Тао и район Лагуны. Здесь больше всего новых проектов и самый устойчивый спрос на аренду: рядом международные школы, рестораны и гольф.'},
- {ru:'Лаян', slug:'layan', in:'Лаяне', m2:128000, yoy:13.0, yld:6.9, src:'Knight Frank, 2025',
+ {ru:'Лаян', slug:'layan', in:'Лаяне',
   about:'Тихая бухта к северу от Банг Тао. Спокойнее и зеленее соседей, при этом до инфраструктуры Лагуны десять минут на машине.'},
- {ru:'Сурин', slug:'surin', in:'Сурине', m2:125000, yoy:11.3, yld:7.0, src:'Knight Frank, 2025',
+ {ru:'Сурин', slug:'surin', in:'Сурине',
   about:'Один из самых престижных пляжей острова. Виллы на склонах с видом на море, закрытые резиденции, высокая цена входа и стабильный премиальный спрос.'},
- {ru:'Камала', slug:'kamala', in:'Камале', m2:115000, yoy:10.8, yld:6.5, src:'FazWaz, 2025',
+ {ru:'Камала', slug:'kamala', in:'Камале',
   about:'Семейный район между Сурином и Патонгом. Длинный спокойный пляж, набережная, школы рядом — сюда чаще переезжают жить, а не только инвестировать.'},
- {ru:'Равай', slug:'rawai', in:'Равае', m2:85000, yoy:8.5, yld:5.9, src:'FazWaz, 2025',
+ {ru:'Равай', slug:'rawai', in:'Равае',
   about:'Юг острова: рыбацкая гавань, рынки, лодки на Ко Ланта и Пхи-Пхи. Самый доступный вход в рынок и большая русскоязычная община.'},
  {ru:'Ката', slug:'kata', in:'Кате', about:
   'Курортный юго-запад с двумя пляжами — Ката и Ката Ной. Живой туристический поток круглый год, устойчивый спрос на аренду.'},
@@ -96,19 +96,8 @@ for(const d of D){
   })();
   const url=`${SITE}/districts/${d.slug}.html`;
 
-  const market = d.m2 ? `
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-top:24px">
-      <div style="background:var(--paper);border:1px solid var(--line,rgba(var(--ink-rgb),.1));border-radius:18px;padding:16px 18px">
-        <div style="font-size:26px;font-weight:800;letter-spacing:-.01em">฿${fmt(d.m2)}</div>
-        <div style="color:var(--muted);font-size:13px;margin-top:2px">за м² · медиана</div></div>
-      <div style="background:var(--paper);border:1px solid var(--line,rgba(var(--ink-rgb),.1));border-radius:18px;padding:16px 18px">
-        <div style="font-size:26px;font-weight:800;letter-spacing:-.01em">+${d.yoy}%</div>
-        <div style="color:var(--muted);font-size:13px;margin-top:2px">рост цены за год</div></div>
-      <div style="background:var(--paper);border:1px solid var(--line,rgba(var(--ink-rgb),.1));border-radius:18px;padding:16px 18px">
-        <div style="font-size:26px;font-weight:800;letter-spacing:-.01em">${d.yld}%</div>
-        <div style="color:var(--muted);font-size:13px;margin-top:2px">доходность аренды</div></div>
-    </div>
-    <p class="sub" style="font-size:14px;margin-top:10px">Источник: ${esc(d.src)}. Цифры по рынку района — ориентир, не гарантия по конкретному объекту.</p>` : '';
+  /* 14.10.2026 Эльнур: блок «рынок района» (₽/м², рост, доходность, подпись Knight Frank/CBRE/FazWaz) убран — цифры не из достоверных источников (district_facts_cache очищена). Не возвращать без документа-источника. */
+  const market = '';
 
   const intro=`<section style="padding-bottom:0"><div class="container">
     <p class="kicker">Пхукет · ${esc(d.ru)}</p>
