@@ -34,7 +34,8 @@ ALIAS = {
     'PLP-VIVI': 'Vivi Bangtao', 'PLP-HALO1': 'Halo 1 Naiyang', 'PLP-EDEN': 'Gardens of Eden',
     'PLP-EDEN-RES': 'Gardens of Eden', 'PLP-EDEN-PARK': 'Gardens of Eden', 'PLP-EDEN-ETRO': 'Gardens of Eden',
     'PLP-ZERO-BANGTAO': 'The Zero Bang Tao', 'PLP-ZERO-NAIYANG': 'The Zero Bang Tao',
-    'PLP-SUNHILLS-LAYAN': 'Sun Hills Lakeside', 'PLP-VIBE-KARON': 'VIBE', 'PLP-FANTASY-RAWAI': 'Fantasea',
+    'PLP-SUNHILLS-LAYAN': 'Sun Hills Lakeside', 'PLP-VIBE-KARON': 'VIBE', 'PLP-FANTASY-RAWAI': None,  # 13.10: это Dominion Rawai; канал Fantasea Plus — другой проект (PLP-FANTASEA-RAWAI), прайс туда ошибочно уехал 12.10
+    'PLP-FANTASEA-RAWAI': 'Fantasea',
     'PLP-AYANA': 'AYANA Phuket', 'PLP-MANOR': None, 'PLP-STANDARD': None,
     'PLP-VIBE-KARON': 'VIBE_RESIDENCE',
 }
@@ -255,7 +256,9 @@ def parse_columns(path):
             persq = next((v for v in nums if 20_000 <= v < 1_000_000), None)
             area = None
             if persq:
-                area = next((v for v in nums if 10 <= v <= 3000 and abs(price / v - persq) <= persq * 0.08), None)
+                # 13.10: допуск 8% брал номер строки («No» 32, 33, 35) вместо площади 34 — берём ближайшее к price/persq, допуск 2%
+                cand = [v for v in nums if 10 <= v <= 3000 and abs(price / v - persq) <= persq * 0.02]
+                area = min(cand, key=lambda v: abs(price / v - persq)) if cand else None
             if area is None:
                 area = next((v for v in nums if 20 <= v <= 3000), None)
             # спальни: сначала раскладка «2B+2B», потом «2 bed», и только потом «2BR».
@@ -263,6 +266,10 @@ def parse_columns(path):
             m = (re.search(r'\b(\d)\s*B\s*\+\s*\d\s*B\b', line)
                  or re.search(r'(\d)\s*bed', line, re.I)
                  or re.search(r'\b(\d)\s*BR\b', line))
+            # 13.10.2026: у Cielo тип словами («one bedroom», «two bedroom plus») — без цифры спальни были None,
+            # unit_types получили «Планировка», а price_tiers обнулились.
+            WORDN = {'studio': 0, 'one': 1, 'two': 2, 'three': 3, 'four': 4}
+            wm = None if m else re.search(r'\b(studio|one|two|three|four)\s+bedrooms?\b', line, re.I)
             # 🔴 17.09 Эльнур: «Аяна Хайтс от 15 млн бат, откуда это вообще». В корпусе D
             # у Аяны ПРОДАНЫ все шестнадцать юнитов, но у части строк слово SOLD стоит
             # отдельной строкой PDF — координатная сетка относила его к соседней строке,
@@ -276,7 +283,7 @@ def parse_columns(path):
                     # только если у соседа нет своей цены — иначе это чужая строка
                     if not re.search(r'\d[\d,]{6,}', txt):
                         near += ' ' + txt
-            st = 'sold' if re.search(r'\bsold|reserved\b', near, re.I) else 'available'
+            st = 'sold' if re.search(r'\bsold|reserved\b|show\s*unit', near, re.I) else 'available'   # 13.10: SHOW UNIT — демо-юнит, не в продаже
             # 🔴 16.09 Эльнур: «у Katabello 2 спальни 121 м² за 17 млн, а 3 спальни за 12 —
             # таких квартир там нет». Это были пентхаусы: они попадали в обычные полки
             # по числу спален и ломали и площадь, и цену. Помечаем их отдельно.
@@ -292,7 +299,7 @@ def parse_columns(path):
                         code = nxt
                     break
             out.append({'status': st, 'price': int(price), 'area': area, 'ph': ph, 'code': code,
-                        'beds': int(m.group(1)) if m else None})
+                        'beds': int(m.group(1)) if m else (WORDN[wm.group(1).lower()] if wm else None)})
     return out
 
 
