@@ -14,7 +14,7 @@ const i = src.indexOf('const CARDS = ['); const j = src.indexOf('\n];', i);
 const CARDS = new Function('return ' + src.slice(i + 'const CARDS = '.length, j + 2))();
 const ФОТО = {   // главное фото предложения: каталог (R2) или папка предложения на сайте
   'The ZERO Nai Yang': 'https://pub-8e4357d7dd6c4c018600cb6d37990142.r2.dev/objects/PLP-ZERO-NAIYANG/exterior/c89b25feead6ed06-1600.webp',
-  'Vibe II': 'file://' + path.join(ROOT, 'offers/vibe2/img/preview.jpg'),
+  'Vibe II': 'file://' + path.join(ROOT, 'offers/vibe2/img/preview-v10.jpg'),
 };
 const WA = 'https://wa.me/66955492587?text=';   // рабочий WhatsApp Эльнура, как у кнопок на странице предложений
 const esc = (s) => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/(\d) (?=\d)/g, '$1\u00a0').replace(/ (м²|млн|тыс\.)/g, '\u00a0$1');   // число не рвём по строкам
