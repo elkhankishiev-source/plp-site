@@ -1743,7 +1743,7 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
     o.payment_plan ? ['План застройщика', noContacts(String(o.payment_plan))] : null,
     (!o.payment_plan && o.payment_schedule) ? ['График', noContacts(String(o.payment_schedule))] : null,
     o.first_payment ? ['Первый взнос', String(o.first_payment).replace(/%$/, '') + '%'] : null,
-    o.maintenance_fee_thb_sqm ? ['Обслуживание', new Intl.NumberFormat('ru-RU').format(o.maintenance_fee_thb_sqm) + ' ฿ за м² в год'] : null,
+    o.maintenance_fee_thb_sqm ? ['Обслуживание', new Intl.NumberFormat('ru-RU').format(o.maintenance_fee_thb_sqm) + ' ฿ за м² в месяц'] : null,   // 14.10: было «в год» — у застройщиков взнос за м² в месяц (прайс KUARTZ/FIZZ 14.10)
   ].filter(Boolean);
   const payBlock = payLines.length
     ? '<section class="desc"><h2>Как платить</h2><dl class="pairs">' +
