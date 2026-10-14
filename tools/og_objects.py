@@ -223,7 +223,8 @@ def object_jobs(only, force):
         price = '' if rent else price_mln(o.get('price_from_thb'))
         # 09.10.2026: до официального прайса (закрытый старт) — ориентир за м², как на листах KUARTZ/FIZZ, без общей цены «от».
         if not rent and o.get('price_per_sqm_thb') and str(o.get('plp_property_id')) in PRESTART_SQM:
-            price = '≈%d тыс. ฿ за м²' % round(float(o['price_per_sqm_thb']) / 1000)
+            # 14.10.2026: прайс застройщика вышел (KUARTZ, FIZZ сверено) — «от» по нижней цене за м², отсекаем, не округляем вверх
+            price = 'от %d тыс. ฿ за м²' % (int(float(o['price_per_sqm_thb'])) // 1000)
         jobs.append((pub + '.jpg', card_html(photo, ey, short_name(o.get('name')), price, fmt_word(o, unit),
                                              'Property Library Phuket · для наших клиентов')))
     print('объектов со страницей: %d, к рендеру: %d, уже есть: %d' % (len(pages), len(jobs), skipped))
