@@ -705,6 +705,8 @@ function promoIsTimed(t) {
 function promoShort(o) {
   /* 🔴 в JS «\w» не видит кириллицу (память: regex-cyrillic-trap) — пишем [а-яё] явно */
   const t = noContacts(String(o.current_promo || '')).trim();
+  /* 14.10.2026 Эльнур: скидки для клиентов PL (200/300/400/500 тыс. и ещё 5%) «закреплять в файл не надо, это доп текст УТП»: на витрину не выводим */
+  if (/для\s+клиентов\s+Property\s+Library/i.test(t)) return null;
   if (!t || /\(estimated\)/i.test(t) || /^\s*(уточнить|нужно|\[)/i.test(t)) return null;
   if (promoIsTimed(t)) return null;
   const YEARS = { 'один': 1, 'два': 2, 'две': 2, 'три': 3, 'четыре': 4, 'пять': 5, 'шесть': 6, 'семь': 7, 'десять': 10 };
@@ -1622,6 +1624,8 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
   const promoBlock = (function () {
     let txt = noContacts(String(o.current_promo || '')).trim();
     if (!txt) return '';
+    /* 14.10.2026 Эльнур: скидки для клиентов PL (200/300/400/500 тыс. и ещё 5%) «закреплять в файл не надо, это доп текст УТП»: на витрину не выводим */
+  if (/для\s+клиентов\s+Property\s+Library/i.test(txt)) return '';
     if (/\(estimated\)/i.test(txt)) return '';
     if (promoIsTimed(txt)) return '';
     if (/^\s*(уточнить|нужно|\[|—|-)\s*/i.test(txt) && txt.length < 60) return '';

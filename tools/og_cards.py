@@ -10,6 +10,7 @@ D=[ # slug, фото (1 или 2), надзаголовок, название, �
  ('kuartz',['k-pool2.webp'],'Карон · 400 м до пляжа','KUARTZ','от 163 тыс. ฿ за м²','закрытый старт'),
  ('fizz',['f-pool.webp'],'Ката · камерный дом','FIZZ','от 146 тыс. ฿ за м²','закрытый старт'),
  ('aileen',['hero.jpg'],'Лагуна · таунхаусы 159 м²','Aileen Residence Lagoon','от 11,85 млн ฿','предстарт'),
+ ('millennium',['hero.webp'],'Банг Тао · 750 м до пляжа','Millennium','от 3,42 млн ฿','старт 14 октября'),  # 14.10.2026: цена и дата с листа offers/millennium (прайс застройщика 13.10)
 ]
 T='''<!doctype html><html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
 <style>*{margin:0;box-sizing:border-box}body{width:1200px;height:630px;background:#EFECE2;font-family:Manrope,Arial,sans-serif;display:flex;overflow:hidden}

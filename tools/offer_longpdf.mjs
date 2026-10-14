@@ -14,6 +14,32 @@ const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..')
 const [slug, name] = process.argv.slice(2);
 if (!slug || !name) { console.error('node tools/offer_longpdf.mjs <slug> <файл.pdf>'); process.exit(1); }
 const out = path.join(ROOT, 'offers', slug, name);
+
+// 14.10.2026 Эльнур: «как выглядит превью ссылки мне нравится, а как выглядит обложка пдф, так себе. пусть они будут в одном стиле все!»
+// Обложка PDF = та самая картинка превью ссылки (og:image страницы /<slug>, её рисует tools/og_cards.py), на всех листах одинаково.
+// Печатаем временную копию page.htm (_pdf.htm): шапка и «hero» заменены превью, абзац hero остаётся текстом под обложкой, пальма — в углу.
+// Сам лист на сайте не меняется. Новому листу достаточно строки в tools/og_cards.py: обложка PDF подхватится сама.
+const SHEET = path.join(ROOT, 'offers', slug, 'page.htm');
+const TMP = path.join(ROOT, 'offers', slug, '_pdf.htm');
+process.on('exit', () => { try { fs.rmSync(TMP, { force: true }); } catch (e) {} });
+function coverPdf(html) {
+  let og = '';
+  const wrap = path.join(ROOT, slug + '.html');
+  if (fs.existsSync(wrap)) og = (fs.readFileSync(wrap, 'utf8').match(/<meta property="og:image" content="[^"]*\/(offers\/[^"\/]+\/img\/[^"\/]+)"/) || [])[1] || '';
+  if (!og) og = (html.match(/<meta property="og:image" content="[^"]*\/(offers\/[^"\/]+\/img\/[^"\/]+)"/) || [])[1] || '';
+  if (!og || !fs.existsSync(path.join(ROOT, og))) { console.log('⚠️ превью для обложки не найдено — печатаю лист как есть'); return html; }
+  const sub = (html.match(/<p class="sub"[^>]*>([\s\S]*?)<\/p>/) || [])[1] || '';
+  const cover = `<div class="pdfcover" style="position:relative"><img src="/${og}" alt="" style="width:210mm;display:block">` +
+    `<div class="dd" style="right:5mm;bottom:-10mm;width:17mm;transform:rotate(-6deg)"><img src="../../img/doodles/palm.webp" alt=""></div></div>` +
+    (sub ? `<p class="sub" style="font-size:11pt;color:var(--ink2);max-width:150mm;margin:7mm 15mm 7mm">${sub}</p>` : '');
+  const css = '<style>.top,.hero{display:none!important}.pdfcover .dd{position:absolute;z-index:6}</style>';
+  let h = html.replace('</head>', css + '</head>');
+  const i = h.indexOf('<div class="top">');
+  const j = h.indexOf('<div class="stats">');
+  if (i < 0 || j < 0 || j < i) { console.log('⚠️ нет шапки/hero в листе — печатаю как есть'); return html; }
+  return h.slice(0, i) + cover + h.slice(j);   // от шапки до строки цифр (включая hero) заменено обложкой
+}
+fs.writeFileSync(TMP, coverPdf(fs.readFileSync(SHEET, 'utf8')));
 const raw = path.join(os.tmpdir(), 'offer_raw_' + slug + '.pdf');
 const port = 8700 + Math.floor(Math.random() * 200);
 let prof = ''; // 09.10.2026: профиль Chrome удаляем за собой (накопилось 137 штук, 1,8 ГБ)
@@ -23,7 +49,7 @@ try {
   // 08.10.2026: Chrome печатает за ~30 с, но потом не выходит (висит его обновлятор) — ждём, пока файл допишется, и закрываем сами.
   const ch = spawn('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', ['--headless=new', '--disable-gpu',
     '--user-data-dir=' + (prof = fs.mkdtempSync(path.join(os.tmpdir(), 'pdfprof-'))), '--no-pdf-header-footer', '--virtual-time-budget=15000',
-    '--print-to-pdf=' + raw, `http://127.0.0.1:${port}/offers/${slug}/page.htm?pdf=1`], { stdio: 'ignore' });
+    '--print-to-pdf=' + raw, `http://127.0.0.1:${port}/offers/${slug}/_pdf.htm?pdf=1`], { stdio: 'ignore' });
   let прошлый = -1, ровно = 0;
   for (let i = 0; i < 90 && ровно < 3; i++) {
     await new Promise((r) => setTimeout(r, 2000));
@@ -55,7 +81,7 @@ d.rewrite_images(dpi_threshold=160, dpi_target=150, quality=78); d.save(sys.argv
 // 09.10.2026: Chrome иногда печатает до того, как догрузились картинки (Vibe II: 22 из 24, Aileen: половина).
 // Сверяем число картинок в PDF с листом; меньше — пересобираем ещё раз (до двух повторов).
 {
-  const html = fs.readFileSync(path.join(ROOT, 'offers', slug, 'page.htm'), 'utf8');
+  const html = fs.readFileSync(TMP, 'utf8');
   const нужно = new Set((html.match(/<img[^>]+src="(?!data:)[^"]+"/g) || []).map((m) => m.replace(/^.*src="/, ''))).size;  // одинаковая картинка в PDF хранится один раз
   const сколько = () => +execFileSync(path.join(os.homedir(), '.local/bin/uv'), ['run', '-q', '--python', '3.12', '--with', 'pymupdf', 'python', '-c',
     'import pymupdf,sys;print(len(pymupdf.open(sys.argv[1])[0].get_images()))', out]).toString().trim();

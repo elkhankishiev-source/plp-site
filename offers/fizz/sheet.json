@@ -101,7 +101,7 @@
   },
   "buy": {
     "h2": "Бронь и график оплаты",
-    "html": "<div style=\"background:var(--sun);border-radius:2mm;padding:3mm 3.5mm;font-weight:700;max-width:160mm\">Бронь и график платежей застройщик объявит на старте закрытых продаж в октябре 2026. Пришлём вам первыми.</div>\n  <div class=\"card\" style=\"margin-top:4mm\"><h3>Эксклюзивные условия для клиентов Property Library</h3>\n      <table>\n        <tr><td colspan=\"2\" style=\"color:var(--muted);font-size:7.6pt\">Этап 1. Фиксированная скидка</td></tr>\n        <tr><td>1-спальная</td><td class=\"r num\">200 000 ฿</td></tr>\n        <tr><td>1-спальная плюс</td><td class=\"r num\">300 000 ฿</td></tr>\n        <tr><td>2 спальни</td><td class=\"r num\">400 000 ฿</td></tr>\n        <tr><td>Пентхаус, 2–3 спальни</td><td class=\"r num\">500 000 ฿</td></tr>\n        <tr><td colspan=\"2\" style=\"color:var(--muted);font-size:7.6pt;padding-top:3mm\">Этап 2. Дополнительная скидка</td></tr>\n        <tr><td>После первого этапа, на все типы квартир</td><td class=\"r num\">стандартная 5%</td></tr>\n      </table>\n      <p class=\"src\">Условия застройщика на 14.10.2026, действуют для клиентов Property Library.</p></div>"
+    "html": "<div style=\"background:var(--sun);border-radius:2mm;padding:3mm 3.5mm;font-weight:700;max-width:160mm\">Бронь и график платежей застройщик объявит на старте закрытых продаж в октябре 2026. Пришлём вам первыми.</div>"
   },
   "step": {
     "eyebrow": "Закрытый старт",
