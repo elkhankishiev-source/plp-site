@@ -8,6 +8,7 @@
    Данные: offers/<slug>/sheet.json (тексты и цифры перенесены из проверенных листов).
      node tools/offer_sheet.mjs kuartz fizz vibe2 zero-naiyang eden   → offers/<slug>/page.htm */
 import fs from 'node:fs';
+import { applyWatermark } from './offer_watermark.mjs';  // 15.10.2026 водяной знак PL
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -135,7 +136,7 @@ const slugs = process.argv.slice(2);
 if (!slugs.length) { console.log('node tools/offer_sheet.mjs <slug> …'); process.exit(1); }
 for (const slug of slugs) {
   const J = JSON.parse(fs.readFileSync(path.join(ROOT, 'offers', slug, 'sheet.json'), 'utf8'));
-  const html = render(J);
+  const html = applyWatermark(render(J));
   /* 10.10.2026 Эльнур: «Какой ещё портал Estatyx, мы не пишем этого… ориентир — файл застройщика». Решение №273:
      в подписях источников (<p class="src">) не называть порталы и брокеров. Сборка листа с таким источником не проходит. */
   const ПОРТАЛЫ = /estatyx|fazwaz|ddproperty|hipflat|dot\s?property(?!\s+thailand\s+awards)|propertyguru(?!\s+thailand\s+property\s+awards)|thailand-property|realting|prian|tranio|bayut|facebook\.com|t\.me\//i;
