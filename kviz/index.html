@@ -141,6 +141,15 @@ input{height:54px;border:1.5px solid var(--line);border-radius:12px;padding:0 14
 .chan{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .chan button{height:46px;border-radius:12px;border:1.5px solid var(--line);font-weight:700}.chan button.on{border-color:var(--olive);background:var(--sage-soft)}
 .err{color:var(--red);font-size:.82rem;min-height:1em}
+.err:not(:empty){font-weight:700;background:#FDECEC;border-radius:10px;padding:8px 10px}
+/* 15.10.2026: телефон = выбор страны + номер. Без кода страны заявку не принимаем. */
+.phrow{display:grid;grid-template-columns:auto 1fr;gap:8px}
+.phrow select{height:54px;border:1.5px solid var(--line);border-radius:12px;padding:0 8px;font:inherit;font-size:1rem;font-weight:700;background:#fff;color:var(--ink);max-width:132px}
+.phrow input{min-width:0;width:100%}
+input[aria-invalid="true"]{border-color:var(--red);background:#FFF7F7}
+.fh{font-size:.75rem;color:var(--muted);margin-top:-4px;line-height:1.35}
+.tgf{display:grid;gap:4px}.tgf[hidden]{display:none}
+.tgf input{border-color:var(--olive)}
 .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
 .note{font-size:.72rem;color:var(--muted);text-align:center;margin-top:10px;line-height:1.4}
 
@@ -318,6 +327,39 @@ const P = {
   }
 };
 const POST = { kuartz:'https://t.me/property_library_phuket', vibe2:'https://t.me/property_library_phuket', fizz:'https://t.me/property_library_phuket', standard:'https://t.me/property_library_phuket', eden:'https://t.me/property_library_phuket', zero:'https://t.me/property_library_phuket' }; /* ссылки на посты-разборы: подставить, когда выйдут */
+/* 15.10.2026: код страны выбирается списком, номер вводится без кода. [id, флаг, код, пример, приставка внутри страны].
+   Пустой код = «Другая»: тогда номер целиком с +. Проверку делает тот же phone.js, что у приёмника. */
+const CC = [
+  ['ru','🇷🇺','7','900 123-45-67',/^8(?=\d{10}$)/], ['kz','🇰🇿','7','701 123 45 67',/^8(?=\d{10}$)/],
+  ['th','🇹🇭','66','81 234 5678',/^0/], ['ua','🇺🇦','380','50 123 4567',/^0/], ['by','🇧🇾','375','29 123-45-67',/^80?(?=\d{9}$)/],
+  ['uz','🇺🇿','998','90 123 45 67',/^8(?=\d{9}$)/], ['kg','🇰🇬','996','700 123 456',/^0/], ['ge','🇬🇪','995','555 12 34 56',/^0/],
+  ['am','🇦🇲','374','77 123456',/^0/], ['az','🇦🇿','994','50 123 45 67',/^0/], ['ae','🇦🇪','971','50 123 4567',/^0/],
+  ['il','🇮🇱','972','50 123 4567',/^0/], ['tr','🇹🇷','90','532 123 45 67',/^0/], ['de','🇩🇪','49','151 23456789',/^0/],
+  ['gb','🇬🇧','44','7400 123456',/^0/], ['us','🇺🇸','1','201 555 0123',/^1(?=\d{10}$)/], ['xx','🌍','','',null]];
+/* страна по языку браузера: сначала регион (ru-KZ → Казахстан), потом язык; английский без Британии и всё прочее → +7 */
+const ccDef = (() => { try {
+  const L = (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || '']).map(x => String(x).toLowerCase());
+  const has = id => CC.some(c => c[0] === id);
+  const byLang = { ru:'ru', kk:'kz', th:'th', uk:'ua', be:'by', uz:'uz', ky:'kg', ka:'ge', hy:'am', az:'az', ar:'ae', he:'il', tr:'tr', de:'de' };
+  for (const t of L) { const [lg, rg] = t.split(/[-_]/);
+    if (lg === 'en') { if (rg === 'gb') return 'gb'; continue; }
+    if (rg && has(rg) && rg !== 'xx' && rg !== 'us') return rg;
+    if (byLang[lg]) return byLang[lg]; }
+} catch (e) {} return 'ru'; })();
+const ccGet = () => { const v = document.getElementById('cc') ? document.getElementById('cc').value : ccDef; return CC.find(c => c[0] === v) || CC[0]; };
+/* номер = код из списка + цифры без приставки страны. Набрал с + или 00 — берём как набрал (код в списке не важен). */
+function phoneCheck(raw){
+  const s = String(raw || '').trim(), c = ccGet();
+  const chk = x => window.PLPPhone ? PLPPhone.check(x) : { ok: x.replace(/\D/g, '').length >= 10, digits: x.replace(/\D/g, ''), hint: 'Проверьте номер: нужен код страны, например +7 или +66' };
+  if (!s) return { ok: false, hint: 'Укажите номер телефона.' };
+  if (/^(\+|00)/.test(s)) return chk(s);
+  if (!c[2]) return { ok: false, hint: 'Выбрана «Другая» страна: введите номер целиком, с + и кодом страны, например +971 50 123 4567.' };
+  if (/[A-Za-zА-Яа-яЁё]/.test(s)) return chk(s);
+  const d = s.replace(/\D/g, ''), first = chk('+' + c[2] + d.replace(c[4], ''));
+  if (first.ok) return first;
+  if (d.indexOf(c[2]) === 0) { const again = chk('+' + d); if (again.ok) return again; }   // ввёл код без +
+  return first;
+}
 const $ = id => document.getElementById(id);
 let C, A, i, T0, tStep, timing, pasted, LID, busy = false;
 /* 12.10.2026: id прохождения квиза — приёмник по нему не напишет человеку дважды, если форма отправит повторно */
@@ -362,17 +404,24 @@ function render(){
     $('qwrap').innerHTML = '<div class="q">Куда прислать подборку?</div>' +
       '<div class="who"><img src="img/elnur.jpg" alt=""><span><b>Эльнур Ханкишиев</b>, основатель Property Library. Пришлю лично цены и расчёт доходности.</span></div>' +
       '<form id="f" novalidate><input id="nm" placeholder="Ваше имя" autocomplete="name">' +
-      '<input id="ph" type="tel" inputmode="tel" placeholder="Телефон с кодом страны, +7…" autocomplete="tel">' +
+      '<div class="phrow"><select id="cc" aria-label="Код страны">' + CC.map(c => '<option value="' + c[0] + '"' + (c[0] === ccDef ? ' selected' : '') + '>' + c[1] + ' ' + (c[2] ? '+' + c[2] : 'Другая') + '</option>').join('') + '</select>' +
+      '<input id="ph" type="tel" inputmode="tel" placeholder="" autocomplete="tel-national" aria-describedby="phh err"></div>' +
+      '<div class="fh" id="phh"></div>' +
       '<div class="chan"><button type="button" class="on" data-c="whatsapp">WhatsApp</button><button type="button" data-c="telegram">Telegram</button></div>' +
+      '<label class="tgf" id="tgf" hidden><input id="tg" placeholder="Ник в Telegram, например @name" autocomplete="off" autocapitalize="off" spellcheck="false"><span class="fh">Необязательно. Поможет найти вас, если номер в Telegram скрыт.</span></label>' +
       '<input class="hp" id="co" tabindex="-1" autocomplete="off" aria-hidden="true">' +
       '<div class="err" id="err"></div><button class="cta" type="submit">Получить подборку</button></form>' +
       '<p class="note">Оставляя номер, вы соглашаетесь, что Property Library Phuket свяжется с вами по этому запросу.</p>';
     A.channel = 'whatsapp'; TR('form_view');
     $('ph').addEventListener('paste', () => pasted = true);
     document.querySelectorAll('.chan button').forEach(b => b.onclick = () => {
-      document.querySelectorAll('.chan button').forEach(x => x.classList.remove('on')); b.classList.add('on'); A.channel = b.dataset.c; TR('channel', A.channel); });
+      document.querySelectorAll('.chan button').forEach(x => x.classList.remove('on')); b.classList.add('on'); A.channel = b.dataset.c; TR('channel', A.channel);
+      $('tgf').hidden = A.channel !== 'telegram'; });
     $('f').addEventListener('submit', e => { e.preventDefault(); send(); });
-    $('ph').addEventListener('input', () => { $('err').textContent = ''; });
+    const ccHint = () => { const c = ccGet(); $('ph').placeholder = c[3]; $('phh').textContent = c[2] ? 'Номер без кода страны, например ' + c[3] : 'Номер целиком с + и кодом страны, например +971 50 123 4567'; };
+    $('cc').addEventListener('change', () => { ccHint(); $('err').textContent = ''; $('ph').removeAttribute('aria-invalid'); });
+    ccHint();
+    $('ph').addEventListener('input', () => { $('err').textContent = ''; $('ph').removeAttribute('aria-invalid'); });
   }
 }
 
@@ -384,8 +433,8 @@ function send(){
   if (busy) return;
   if ($('co').value) { finish({ ok: true, sent: false }); return; }   // робот заполнил скрытое поле: показываем успех, заявку не шлём
   const raw = $('ph').value;
-  const chk = window.PLPPhone ? PLPPhone.check(raw) : { ok: raw.replace(/\D/g, '').length >= 10, digits: raw.replace(/\D/g, ''), hint: 'Проверьте номер: нужен код страны, например +7 или +66' };
-  if (!chk.ok) { $('err').textContent = chk.hint; TR('phone_err'); return; }
+  const chk = phoneCheck(raw);
+  if (!chk.ok) { $('err').textContent = chk.hint || 'Проверьте номер: код страны и все цифры.'; $('ph').setAttribute('aria-invalid', 'true'); try { $('ph').focus(); } catch (e) {} TR('phone_err'); return; }
   const d = chk.digits;
   const p = new URLSearchParams(location.search), utm = {};
   ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','utm_id','fbclid','gclid'].forEach(k => { if (p.get(k)) utm[k] = p.get(k); });
@@ -395,6 +444,9 @@ function send(){
     quality:{ secs_total:Math.round((Date.now() - T0) / 1000), secs_per_step:timing, pasted_phone:pasted, phone_fixed:chk.fixed || '',
       all_first_answers:C.Q.every(s => A[s.k] === s.o[0][0]), agent:/агент/i.test(A.who || '') } };
   lead.channel_pref = A.channel === 'telegram' ? 'telegram' : 'whatsapp';
+  /* ник в Telegram (необязательно): приёмник sitelead.mjs читает tg_username и сам убирает @ и t.me/ */
+  const tgNick = A.channel === 'telegram' && $('tg') ? $('tg').value.trim().slice(0, 64) : '';
+  if (tgNick) lead.tg_username = tgNick;
   try { if (window.PLPTrack) lead.track = PLPTrack.lead(); } catch (e) {}
   TR('submit');
   const btn = document.querySelector('#f .cta'), label = btn ? btn.textContent : '';
@@ -412,7 +464,7 @@ function send(){
     .then(r => r.json())
     .then(r => {
       clearTimeout(timer);
-      if (r && r.ok === false && r.field === 'phone') { unlock(); $('err').textContent = r.hint || 'Проверьте номер: код страны и все цифры.'; return; }
+      if (r && r.ok === false && r.field === 'phone') { unlock(); $('err').textContent = r.hint || 'Проверьте номер: код страны и все цифры.'; $('ph').setAttribute('aria-invalid', 'true'); return; }
       if (!isTest) {   // тестовые номера (то же правило, что ТЕСТ в реклама_сводка.py) не считаем лидом в рекламе
         const ev = r && r.event_id ? { eventID: r.event_id } : undefined;
         try { if (window.fbq) fbq('track', 'Lead', { content_name: C.name, content_category: 'kviz' }, ev); } catch (e) {}
@@ -430,17 +482,17 @@ function finish(r){
   $('done').innerHTML =
     '<div class="pj"><div class="ph0"><img class="bg" src="img/' + C.hero + '.webp" alt=""' + (C.heroPos || C.heroSt ? ' style="' + (C.heroPos ? 'object-position:' + C.heroPos + ';' : '') + (C.heroSt || '') + '"' : '') + '></div>' +
     '<div class="pt"><span class="ok">Заявка принята</span><h2>' + C.name + ', ' + (C.place || 'Карон') + '</h2>' +
-    (r.sent ? '<p>Написал вам в ' + ch + (r.phone ? ' на ' + r.phone : '') + '. Проверьте сообщения' + (A.plan ? ', подборка: ' + A.plan.toLowerCase() : '') + '.</p>'
-            : '<p>Напишу вам в ' + ch + ' в ближайшее время' + (A.plan ? ', подборка: ' + A.plan.toLowerCase() : '') + '.</p>') + '</div></div>' +
+    /* 15.10.2026: без обещания «напишу в ближайшее время»; главный путь к расчёту — бот в Telegram.
+       «Написал вам» остаётся только когда приёмник подтвердил отправку (r.sent). */
+    (r.sent ? '<p>Написал вам в ' + ch + (r.phone ? ' на ' + r.phone : '') + ', проверьте сообщения. Быстрее всего получить расчёт в Telegram: кнопка ниже.</p>'
+            : '<p>Я напишу вам в выбранный мессенджер. Быстрее всего получить расчёт в Telegram: кнопка ниже.</p>') + '</div></div>' +
     '<div class="facts">' + C.facts.map(f => '<div><b>' + f[0] + '</b>' + f[1] + '</div>').join('') + '</div>' +
     '<div class="gal">' + C.gal.map(g => { const [n, st] = g.split('|'); return '<i class="gi"><img src="img/' + n + '.webp" alt=""' + (st ? ' style="' + st + '"' : '') + '></i>'; }).join('') + '</div>' +
     /* 13.10.2026 Эльнур («лид нажал — и автоматом в Telegram»): ссылка в бот несёт метку заявки (r.tg_start от приёмника),
-       бот по ней узнаёт Telegram человека, даже если номер в Telegram скрыт. Выбрал Telegram — эта кнопка главная. */
-    (r.tg_start && A.channel === 'telegram'
-      ? '<a class="cta" href="' + r.tg_start + '" target="_blank" rel="noopener">Получить ответ в Telegram</a>' +
-        '<a class="cta2" href="' + POST[key] + '" target="_blank" rel="noopener">Читать разбор ' + C.name + ' в Telegram</a>'
-      : '<a class="cta" href="' + POST[key] + '" target="_blank" rel="noopener">Читать разбор ' + C.name + ' в Telegram</a>' +
-        '<a class="cta2" href="' + (r.tg_start || ('https://t.me/elnurphuket_bot?start=' + C.bot)) + '" target="_blank" rel="noopener">Получить расчёт в Telegram</a>') +
+       бот по ней узнаёт Telegram человека, даже если номер в Telegram скрыт.
+       15.10.2026: бот — всегда главная кнопка, канал — вторая. Метка та же: r.tg_start, без неё kviz_<проект>. */
+    '<a class="cta" href="' + (r.tg_start || ('https://t.me/elnurphuket_bot?start=' + C.bot)) + '" target="_blank" rel="noopener">Получить расчёт в Telegram</a>' +
+    '<a class="cta2" href="' + POST[key] + '" target="_blank" rel="noopener">Читать разбор ' + C.name + ' в Telegram</a>' +
     '<a class="lnk" href="' + C.sheet + '" target="_blank" rel="noopener">Открыть лист проекта</a>';
   $('done').hidden = false; scrollTo(0, 0);
   $('done').onclick = e => { const a = e.target.closest && e.target.closest('a'); if (!a) return; const h = a.getAttribute('href') || '';
