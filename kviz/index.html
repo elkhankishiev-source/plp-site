@@ -192,8 +192,8 @@ input[aria-invalid="true"]{border-color:var(--red);background:#FFF7F7}
 /* 15.10.2026: лид пишет первым. WhatsApp и Telegram режут наши первые сообщения незнакомцам,
    поэтому на экране «спасибо» главная кнопка ведёт человека написать Эльнуру самому, с готовым текстом. */
 .mot{margin:16px 18px 0;padding:12px 14px;border-radius:14px;background:var(--sage-soft);font-weight:800;font-size:.95rem;line-height:1.35}
-.wr{display:grid;gap:10px;margin:12px 18px 0}
-.wr a{display:flex;align-items:center;justify-content:center;gap:10px;height:58px;border-radius:16px;color:#fff;font-weight:800;font-size:1.02rem;text-decoration:none}
+.wr{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;margin:12px 18px 0}
+.wr a{display:flex;align-items:center;justify-content:center;gap:9px;height:58px;padding:0 12px;border-radius:16px;color:#fff;font-weight:800;font-size:min(.93rem,3.6vw);min-width:0;letter-spacing:-.01em;white-space:nowrap;text-decoration:none}
 .wr a svg{width:22px;height:22px;flex:none;fill:currentColor}
 .wr .wa{background:#1FA855;box-shadow:0 10px 24px rgba(31,168,85,.28)}
 .wr .tg{background:#229ED9;box-shadow:0 10px 24px rgba(34,158,217,.28)}
@@ -373,7 +373,12 @@ function phoneCheck(raw){
   return first;
 }
 const $ = id => document.getElementById(id);
-let C, A, i, T0, tStep, timing, pasted, LID, PH = '', busy = false;
+let C, A, i, T0, tStep, timing, pasted, LID, PH = '', AS = '', busy = false;
+/* 15.10.2026 Эльнур: лиды делим между двумя рабочими номерами, чтобы грелись оба. Правило — чётность последней цифры
+   номера лида: чётная — Эльнур, нечётная — Дарья. Детерминированно: повторная заявка с того же номера идёт к тому же.
+   Рабочие Telegram — канон 141 (t.me/elnur_kh, t.me/plpdaria); WhatsApp Дарьи — новый рабочий 66917172890 с 15.10. */
+const WRK = { elnur:{ who:'Эльнура', wa:'66955492587', tg:'elnur_kh' }, daria:{ who:'Дарьи', wa:'66917172890', tg:'plpdaria' } };
+const assignee = digits => { const c = String(digits || '').replace(/\D/g, '').slice(-1); return c === '' ? 'elnur' : (+c % 2 ? 'daria' : 'elnur'); };
 /* 12.10.2026: id прохождения квиза — приёмник по нему не напишет человеку дважды, если форма отправит повторно */
 /* 14.10 трекинг посетителя (js/track.js): ключ тот же, что у приёмника заявок, он и так виден в исходнике */
 const TR = (n, v) => { try { if (window.PLPTrack) PLPTrack.ev(n, v); } catch (e) {} };
@@ -447,10 +452,10 @@ function send(){
   const raw = $('ph').value;
   const chk = phoneCheck(raw);
   if (!chk.ok) { $('err').textContent = chk.hint || 'Проверьте номер: код страны и все цифры.'; $('ph').setAttribute('aria-invalid', 'true'); try { $('ph').focus(); } catch (e) {} TR('phone_err'); return; }
-  const d = chk.digits; PH = '+' + d;
+  const d = chk.digits; PH = '+' + d; AS = assignee(d);
   const p = new URLSearchParams(location.search), utm = {};
   ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','utm_id','fbclid','gclid'].forEach(k => { if (p.get(k)) utm[k] = p.get(k); });
-  const lead = { source:'website', funnel:'ads_quiz', object_id:C.id, object_name:C.name, name:$('nm').value.trim(), phone:'+' + d, lid:LID,
+  const lead = { source:'website', funnel:'ads_quiz', object_id:C.id, object_name:C.name, name:$('nm').value.trim(), phone:'+' + d, lid:LID, assigned_to:AS,
     contact_pref:A.channel, goal:A.goal, budget:A.plan, message:'Квиз ' + C.name + ': ' + Object.values(A).filter(x => x !== A.channel).join(' · '),
     page:location.href, utm, quiz:A,
     quality:{ secs_total:Math.round((Date.now() - T0) / 1000), secs_per_step:timing, pasted_phone:pasted, phone_fixed:chk.fixed || '',
@@ -501,12 +506,14 @@ function finish(r){
     eden:'Напишите, и пришлём планировки и расчёт рассрочки на 5 лет.',
     zero:'Напишите, и пришлём расчёт гарантированного дохода 10%.',
     standard:'Напишите, и пришлём свободные квартиры The Standard по этажу и виду и расчёт аренды.' };
+  /* 15.10.2026 Эльнур: кнопка называется как бонус (бонус = мотивация выше), ведёт к тому, за кем закреплён лид (AS). */
   const wkey = Object.keys(P).find(k => P[k] === C), ref = r.client_code || r.phone || PH || '';
-  const msg = encodeURIComponent('Здравствуйте! Хочу закрепить условия по ' + C.name + '.' + (ref ? ' Заявка ' + ref : ''));
+  const who = AS || assignee(r.phone || PH), W = WRK[who];
+  const msg = encodeURIComponent('Здравствуйте! Хочу забрать бонус по ' + C.name + '.' + (ref ? ' Заявка ' + ref : ''));
   const icWA = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.2s.9 2.5 1 2.7c.1.2 1.8 2.8 4.4 3.9 1.6.7 2.3.8 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></svg>';
   const icTG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.9 4.3 18.7 19.4c-.2 1-.9 1.3-1.7.8l-4.8-3.6-2.3 2.2c-.3.3-.5.5-1 .5l.3-4.9 8.9-8c.4-.3-.1-.5-.6-.2l-11 6.9-4.7-1.5c-1-.3-1-1 .2-1.5l18.5-7.1c.9-.3 1.6.2 1.4 1.3z"/></svg>';
-  const bWA = '<a class="wa" data-ev="click_wa_write" href="https://wa.me/66955492587?text=' + msg + '" target="_blank" rel="noopener">' + icWA + 'Написать Эльнуру в WhatsApp</a>';
-  const bTG = '<a class="tg" data-ev="click_tg_write" href="https://t.me/elnur_kh?text=' + msg + '" target="_blank" rel="noopener">' + icTG + 'Написать в Telegram</a>';
+  const bWA = '<a class="wa" data-ev="click_wa_write" href="https://wa.me/' + W.wa + '?text=' + msg + '" target="_blank" rel="noopener">' + icWA + 'Забрать бонус у ' + W.who + ' в WhatsApp</a>';
+  const bTG = '<a class="tg" data-ev="click_tg_write" href="https://t.me/' + W.tg + '?text=' + msg + '" target="_blank" rel="noopener">' + icTG + 'Забрать бонус у ' + W.who + ' в Telegram</a>';
   const write = '<p class="mot">' + (MOT[wkey] || 'Напишите, и пришлём расчёт под ваш бюджет.') + '</p>' +
     '<div class="wr">' + ((r.channel || A.channel) === 'telegram' ? bTG + bWA : bWA + bTG) + '</div>';
   $('quiz').hidden = true;
@@ -516,8 +523,8 @@ function finish(r){
     '<div class="pt"><span class="ok">Заявка принята</span><h2>' + C.name + ', ' + (C.place || 'Карон') + '</h2>' +
     /* 15.10.2026: без обещания «напишу в ближайшее время»; главный путь к расчёту — бот в Telegram.
        «Написал вам» остаётся только когда приёмник подтвердил отправку (r.sent). */
-    (r.sent ? '<p>Написал вам в ' + ch + (r.phone ? ' на ' + r.phone : '') + ', проверьте сообщения. Быстрее всего напишите мне сами: кнопка ниже.</p>'
-            : '<p>Я напишу вам в выбранный мессенджер. Быстрее всего напишите мне сами: кнопка ниже.</p>') + '</div></div>' + write +
+    (r.sent ? '<p>Написал вам в ' + ch + (r.phone ? ' на ' + r.phone : '') + ', проверьте сообщения. Быстрее всего заберите бонус сами: кнопка ниже.</p>'
+            : '<p>Я напишу вам в выбранный мессенджер. Быстрее всего заберите бонус сами: кнопка ниже.</p>') + '</div></div>' + write +
     '<div class="facts">' + C.facts.map(f => '<div><b>' + f[0] + '</b>' + f[1] + '</div>').join('') + '</div>' +
     '<div class="gal">' + C.gal.map(g => { const [n, st] = g.split('|'); return '<i class="gi"><img src="img/' + n + '.webp" alt=""' + (st ? ' style="' + st + '"' : '') + '></i>'; }).join('') + '</div>' +
     /* 13.10.2026 Эльнур («лид нажал — и автоматом в Telegram»): ссылка в бот несёт метку заявки (r.tg_start от приёмника),
@@ -528,7 +535,8 @@ function finish(r){
     '<a class="lnk" href="' + C.sheet + '" target="_blank" rel="noopener">Открыть лист проекта</a></div>';
   $('done').hidden = false; scrollTo(0, 0);
   $('done').onclick = e => { const a = e.target.closest && e.target.closest('a'); if (!a) return; const h = a.getAttribute('href') || '';
-    TR(a.dataset.ev ? a.dataset.ev : /elnurphuket_bot/.test(h) ? 'cta_bot' : /t\.me/.test(h) ? 'cta_channel' : 'cta_sheet', h.replace(/^https?:\/\//, '').slice(0, 60)); if (window.PLPTrack) PLPTrack.flush(false); };
+    if (a.dataset.ev) { TR(a.dataset.ev, who); if (window.PLPTrack) PLPTrack.flush(false); return; }
+    TR(/elnurphuket_bot/.test(h) ? 'cta_bot' : /t\.me/.test(h) ? 'cta_channel' : 'cta_sheet', h.replace(/^https?:\/\//, '').slice(0, 60)); if (window.PLPTrack) PLPTrack.flush(false); };
 }
 
 /* Пружина при оттягивании вниз (как в приложениях): тянется с сопротивлением и возвращается */
