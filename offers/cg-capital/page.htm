@@ -103,6 +103,11 @@ ul.l li:before{content:"";position:absolute;left:0;top:3.6mm;width:2mm;height:2m
 .dd img{width:100%;display:block;filter:drop-shadow(0 .6mm .8mm rgba(23,24,15,.18))}
 svg text{font-family:Manrope,Arial,sans-serif}
 
+/* WM-PLP: водяной знак PL (15.10.2026) */
+.photo::after,.pol::after,.pdfcover::after{content:"";position:absolute;inset:0;z-index:4;pointer-events:none;background:url(../../img/brand/plp-wm.svg) center/46mm auto;opacity:.16}
+.pol::after{inset:2mm 2mm 8mm}
+.w::after{content:"";position:absolute;inset:0;z-index:9;pointer-events:none;background:url(../../img/brand/plp-wm.svg) 0 0/90mm auto;opacity:.07}
+.wmfoot{text-align:center;font-size:8pt;letter-spacing:.04em;color:var(--muted);padding:5mm 0 6mm}
 </style><!-- PLP:GA --><script async src="https://www.googletagmanager.com/gtag/js?id=G-HQNDG3B8MW"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-HQNDG3B8MW');</script></head>
 <body><div class="w">
 
@@ -321,6 +326,7 @@ svg text{font-family:Manrope,Arial,sans-serif}
   </div>
   <div class="foot"><span>Property Library Phuket. Сопровождаем от выбора до ключей</span><span>По презентации застройщика, условия могут меняться.</span></div>
 </footer>
+<div class="wmfoot">Property Library Phuket · property-library.com</div>
 </div>
 <script>
 (()=>{const $=id=>document.getElementById(id);let seed=7;const rnd=()=>(seed=(seed*9301+49297)%233280)/233280;const J=(v,a)=>v+(rnd()-.5)*a;
