@@ -189,6 +189,18 @@ input[aria-invalid="true"]{border-color:var(--red);background:#FFF7F7}
 .done .cta{margin:14px 18px 0;width:auto;text-decoration:none}
 .cta2{display:flex;align-items:center;justify-content:center;height:52px;margin:10px 18px 0;border-radius:16px;border:1.5px solid var(--ink);color:var(--ink);font-weight:800;text-decoration:none}
 .lnk{display:block;text-align:center;padding:16px 0 22px;color:var(--olive);font-weight:700;font-size:.9rem}
+/* 15.10.2026: лид пишет первым. WhatsApp и Telegram режут наши первые сообщения незнакомцам,
+   поэтому на экране «спасибо» главная кнопка ведёт человека написать Эльнуру самому, с готовым текстом. */
+.mot{margin:16px 18px 0;padding:12px 14px;border-radius:14px;background:var(--sage-soft);font-weight:800;font-size:.95rem;line-height:1.35}
+.wr{display:grid;gap:10px;margin:12px 18px 0}
+.wr a{display:flex;align-items:center;justify-content:center;gap:10px;height:58px;border-radius:16px;color:#fff;font-weight:800;font-size:1.02rem;text-decoration:none}
+.wr a svg{width:22px;height:22px;flex:none;fill:currentColor}
+.wr .wa{background:#1FA855;box-shadow:0 10px 24px rgba(31,168,85,.28)}
+.wr .tg{background:#229ED9;box-shadow:0 10px 24px rgba(34,158,217,.28)}
+.wr a+a{height:52px;box-shadow:none}
+.done .cta2.bot{margin-top:18px}
+.lnks{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 18px;padding:14px 18px 22px}
+.lnks .lnk{padding:4px 0}
 #qwrap{animation:fade .3s ease}@keyframes fade{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:none}}
 body{min-height:101vh;overscroll-behavior-y:contain}
 
@@ -361,7 +373,7 @@ function phoneCheck(raw){
   return first;
 }
 const $ = id => document.getElementById(id);
-let C, A, i, T0, tStep, timing, pasted, LID, busy = false;
+let C, A, i, T0, tStep, timing, pasted, LID, PH = '', busy = false;
 /* 12.10.2026: id прохождения квиза — приёмник по нему не напишет человеку дважды, если форма отправит повторно */
 /* 14.10 трекинг посетителя (js/track.js): ключ тот же, что у приёмника заявок, он и так виден в исходнике */
 const TR = (n, v) => { try { if (window.PLPTrack) PLPTrack.ev(n, v); } catch (e) {} };
@@ -435,7 +447,7 @@ function send(){
   const raw = $('ph').value;
   const chk = phoneCheck(raw);
   if (!chk.ok) { $('err').textContent = chk.hint || 'Проверьте номер: код страны и все цифры.'; $('ph').setAttribute('aria-invalid', 'true'); try { $('ph').focus(); } catch (e) {} TR('phone_err'); return; }
-  const d = chk.digits;
+  const d = chk.digits; PH = '+' + d;
   const p = new URLSearchParams(location.search), utm = {};
   ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','utm_id','fbclid','gclid'].forEach(k => { if (p.get(k)) utm[k] = p.get(k); });
   const lead = { source:'website', funnel:'ads_quiz', object_id:C.id, object_name:C.name, name:$('nm').value.trim(), phone:'+' + d, lid:LID,
@@ -479,6 +491,24 @@ function send(){
 
 function finish(r){
   r = r || {}; busy = false; TR(r.sent ? 'lead_sent' : 'lead_ok', r.channel || A.channel);
+  /* 15.10.2026 Эльнур: «поставим в квизе кнопку, чтобы они сами нам написали, так быстрее, и нужна обязательно мотивация».
+     Мотивация — из горячих офферов и objects.current_promo (15.10). Кнопка той же сети, что выбрал человек, стоит первой.
+     Рабочий Telegram Эльнура — t.me/elnur_kh (канон 141 tg_link_is_work_account), WhatsApp — рабочий 66955492587. */
+  const MOT = {
+    vibe2:'Напишите, и закрепим за вами квартиру до старта 28 октября и мебель с техникой в подарок.',
+    kuartz:'Напишите, и закрепим скидку клиента Property Library: от 200 до 500 тыс. бат по типу квартиры и ещё 5%.',
+    fizz:'Напишите, и закрепим скидку клиента Property Library: от 200 до 500 тыс. бат по типу квартиры и ещё 5%.',
+    eden:'Напишите, и пришлём планировки и расчёт рассрочки на 5 лет.',
+    zero:'Напишите, и пришлём расчёт гарантированного дохода 10%.',
+    standard:'Напишите, и пришлём свободные квартиры The Standard по этажу и виду и расчёт аренды.' };
+  const wkey = Object.keys(P).find(k => P[k] === C), ref = r.client_code || r.phone || PH || '';
+  const msg = encodeURIComponent('Здравствуйте! Хочу закрепить условия по ' + C.name + '.' + (ref ? ' Заявка ' + ref : ''));
+  const icWA = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.2s.9 2.5 1 2.7c.1.2 1.8 2.8 4.4 3.9 1.6.7 2.3.8 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></svg>';
+  const icTG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.9 4.3 18.7 19.4c-.2 1-.9 1.3-1.7.8l-4.8-3.6-2.3 2.2c-.3.3-.5.5-1 .5l.3-4.9 8.9-8c.4-.3-.1-.5-.6-.2l-11 6.9-4.7-1.5c-1-.3-1-1 .2-1.5l18.5-7.1c.9-.3 1.6.2 1.4 1.3z"/></svg>';
+  const bWA = '<a class="wa" data-ev="click_wa_write" href="https://wa.me/66955492587?text=' + msg + '" target="_blank" rel="noopener">' + icWA + 'Написать Эльнуру в WhatsApp</a>';
+  const bTG = '<a class="tg" data-ev="click_tg_write" href="https://t.me/elnur_kh?text=' + msg + '" target="_blank" rel="noopener">' + icTG + 'Написать в Telegram</a>';
+  const write = '<p class="mot">' + (MOT[wkey] || 'Напишите, и пришлём расчёт под ваш бюджет.') + '</p>' +
+    '<div class="wr">' + ((r.channel || A.channel) === 'telegram' ? bTG + bWA : bWA + bTG) + '</div>';
   $('quiz').hidden = true;
   const ch = (r.channel || A.channel) === 'telegram' ? 'Telegram' : 'WhatsApp', key = Object.keys(P).find(k => P[k] === C);
   $('done').innerHTML =
@@ -486,19 +516,19 @@ function finish(r){
     '<div class="pt"><span class="ok">Заявка принята</span><h2>' + C.name + ', ' + (C.place || 'Карон') + '</h2>' +
     /* 15.10.2026: без обещания «напишу в ближайшее время»; главный путь к расчёту — бот в Telegram.
        «Написал вам» остаётся только когда приёмник подтвердил отправку (r.sent). */
-    (r.sent ? '<p>Написал вам в ' + ch + (r.phone ? ' на ' + r.phone : '') + ', проверьте сообщения. Быстрее всего получить расчёт в Telegram: кнопка ниже.</p>'
-            : '<p>Я напишу вам в выбранный мессенджер. Быстрее всего получить расчёт в Telegram: кнопка ниже.</p>') + '</div></div>' +
+    (r.sent ? '<p>Написал вам в ' + ch + (r.phone ? ' на ' + r.phone : '') + ', проверьте сообщения. Быстрее всего напишите мне сами: кнопка ниже.</p>'
+            : '<p>Я напишу вам в выбранный мессенджер. Быстрее всего напишите мне сами: кнопка ниже.</p>') + '</div></div>' + write +
     '<div class="facts">' + C.facts.map(f => '<div><b>' + f[0] + '</b>' + f[1] + '</div>').join('') + '</div>' +
     '<div class="gal">' + C.gal.map(g => { const [n, st] = g.split('|'); return '<i class="gi"><img src="img/' + n + '.webp" alt=""' + (st ? ' style="' + st + '"' : '') + '></i>'; }).join('') + '</div>' +
     /* 13.10.2026 Эльнур («лид нажал — и автоматом в Telegram»): ссылка в бот несёт метку заявки (r.tg_start от приёмника),
        бот по ней узнаёт Telegram человека, даже если номер в Telegram скрыт.
-       15.10.2026: бот — всегда главная кнопка, канал — вторая. Метка та же: r.tg_start, без неё kviz_<проект>. */
-    '<a class="cta" href="' + (r.tg_start || ('https://t.me/elnurphuket_bot?start=' + C.bot)) + '" target="_blank" rel="noopener">Получить расчёт в Telegram</a>' +
-    '<a class="cta2" href="' + POST[key] + '" target="_blank" rel="noopener">Читать разбор ' + C.name + ' в Telegram</a>' +
-    '<a class="lnk" href="' + C.sheet + '" target="_blank" rel="noopener">Открыть лист проекта</a>';
+       15.10.2026 (вечер): бот ниже кнопок «Написать Эльнуру», канал и лист ссылками. Метка та же: r.tg_start, без неё kviz_<проект>. */
+    '<a class="cta2 bot" href="' + (r.tg_start || ('https://t.me/elnurphuket_bot?start=' + C.bot)) + '" target="_blank" rel="noopener">Получить расчёт в Telegram</a>' +
+    '<div class="lnks"><a class="lnk" href="' + POST[key] + '" target="_blank" rel="noopener">Читать разбор ' + C.name + ' в Telegram</a>' +
+    '<a class="lnk" href="' + C.sheet + '" target="_blank" rel="noopener">Открыть лист проекта</a></div>';
   $('done').hidden = false; scrollTo(0, 0);
   $('done').onclick = e => { const a = e.target.closest && e.target.closest('a'); if (!a) return; const h = a.getAttribute('href') || '';
-    TR(/elnurphuket_bot/.test(h) ? 'cta_bot' : /t\.me/.test(h) ? 'cta_channel' : 'cta_sheet', h.replace(/^https?:\/\//, '').slice(0, 60)); if (window.PLPTrack) PLPTrack.flush(false); };
+    TR(a.dataset.ev ? a.dataset.ev : /elnurphuket_bot/.test(h) ? 'cta_bot' : /t\.me/.test(h) ? 'cta_channel' : 'cta_sheet', h.replace(/^https?:\/\//, '').slice(0, 60)); if (window.PLPTrack) PLPTrack.flush(false); };
 }
 
 /* Пружина при оттягивании вниз (как в приложениях): тянется с сопротивлением и возвращается */
