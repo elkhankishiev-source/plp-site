@@ -374,10 +374,12 @@ function phoneCheck(raw){
 }
 const $ = id => document.getElementById(id);
 let C, A, i, T0, tStep, timing, pasted, LID, PH = '', AS = '', busy = false;
-/* 15.10.2026 Эльнур: лиды делим между двумя рабочими номерами, чтобы грелись оба. Правило — чётность последней цифры
-   номера лида: чётная — Эльнур, нечётная — Дарья. Детерминированно: повторная заявка с того же номера идёт к тому же.
+/* 15.10.2026 Эльнур: лиды делим между двумя рабочими номерами, чтобы грелись оба.
+   16.10.2026 Эльнур («по чётности — бред, если все чётные? Живая очередь: по очереди мне и Дарье»): кому лид, решает приёмник заявок
+   по очереди по кругу (функция базы очередь_ведущего: повторная заявка — тому, кто уже ведёт) и отдаёт в ответе assigned_to.
+   Форма сама не выбирает; чётность последней цифры — только запасной вариант, если ответа приёмника нет (сеть, 15 с).
    Рабочие Telegram — канон 141 (t.me/elnur_kh, t.me/plpdaria); WhatsApp Дарьи — новый рабочий 66917172890 с 15.10. */
-const WRK = { elnur:{ who:'Эльнура', wa:'66955492587', tg:'elnur_kh' }, daria:{ who:'Дарьи', wa:'66917172890', tg:'plpdaria' } };
+const WRK = { elnur:{ wa:'66955492587', tg:'elnur_kh' }, daria:{ wa:'66917172890', tg:'plpdaria' } };
 const assignee = digits => { const c = String(digits || '').replace(/\D/g, '').slice(-1); return c === '' ? 'elnur' : (+c % 2 ? 'daria' : 'elnur'); };
 /* 12.10.2026: id прохождения квиза — приёмник по нему не напишет человеку дважды, если форма отправит повторно */
 /* 14.10 трекинг посетителя (js/track.js): ключ тот же, что у приёмника заявок, он и так виден в исходнике */
@@ -452,10 +454,10 @@ function send(){
   const raw = $('ph').value;
   const chk = phoneCheck(raw);
   if (!chk.ok) { $('err').textContent = chk.hint || 'Проверьте номер: код страны и все цифры.'; $('ph').setAttribute('aria-invalid', 'true'); try { $('ph').focus(); } catch (e) {} TR('phone_err'); return; }
-  const d = chk.digits; PH = '+' + d; AS = assignee(d);
+  const d = chk.digits; PH = '+' + d; AS = '';
   const p = new URLSearchParams(location.search), utm = {};
   ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','utm_id','fbclid','gclid'].forEach(k => { if (p.get(k)) utm[k] = p.get(k); });
-  const lead = { source:'website', funnel:'ads_quiz', object_id:C.id, object_name:C.name, name:$('nm').value.trim(), phone:'+' + d, lid:LID, assigned_to:AS,
+  const lead = { source:'website', funnel:'ads_quiz', object_id:C.id, object_name:C.name, name:$('nm').value.trim(), phone:'+' + d, lid:LID,
     contact_pref:A.channel, goal:A.goal, budget:A.plan, message:'Квиз ' + C.name + ': ' + Object.values(A).filter(x => x !== A.channel).join(' · '),
     page:location.href, utm, quiz:A,
     quality:{ secs_total:Math.round((Date.now() - T0) / 1000), secs_per_step:timing, pasted_phone:pasted, phone_fixed:chk.fixed || '',
@@ -506,14 +508,17 @@ function finish(r){
     eden:'Напишите, и пришлём планировки и расчёт рассрочки на 5 лет.',
     zero:'Напишите, и пришлём расчёт гарантированного дохода 10%.',
     standard:'Напишите, и пришлём свободные квартиры The Standard по этажу и виду и расчёт аренды.' };
-  /* 15.10.2026 Эльнур: кнопка называется как бонус (бонус = мотивация выше), ведёт к тому, за кем закреплён лид (AS). */
+  /* 15.10.2026 Эльнур: кнопка называется как бонус (бонус = мотивация выше), ведёт к тому, за кем закреплён лид.
+     16.10.2026: кто — из ответа приёмника (r.assigned_to); нет ответа — запасной вариант по чётности. Подпись без имени
+     (Эльнур: «одни карточки на меня, другие на Дарью, и всё»). */
+  if (r.assigned_to === 'elnur' || r.assigned_to === 'daria') AS = r.assigned_to;
   const wkey = Object.keys(P).find(k => P[k] === C), ref = r.client_code || r.phone || PH || '';
   const who = AS || assignee(r.phone || PH), W = WRK[who];
   const msg = encodeURIComponent('Здравствуйте! Хочу забрать бонус по ' + C.name + '.' + (ref ? ' Заявка ' + ref : ''));
   const icWA = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.2s.9 2.5 1 2.7c.1.2 1.8 2.8 4.4 3.9 1.6.7 2.3.8 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></svg>';
   const icTG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.9 4.3 18.7 19.4c-.2 1-.9 1.3-1.7.8l-4.8-3.6-2.3 2.2c-.3.3-.5.5-1 .5l.3-4.9 8.9-8c.4-.3-.1-.5-.6-.2l-11 6.9-4.7-1.5c-1-.3-1-1 .2-1.5l18.5-7.1c.9-.3 1.6.2 1.4 1.3z"/></svg>';
-  const bWA = '<a class="wa" data-ev="click_wa_write" href="https://wa.me/' + W.wa + '?text=' + msg + '" target="_blank" rel="noopener">' + icWA + 'Забрать бонус у ' + W.who + ' в WhatsApp</a>';
-  const bTG = '<a class="tg" data-ev="click_tg_write" href="https://t.me/' + W.tg + '?text=' + msg + '" target="_blank" rel="noopener">' + icTG + 'Забрать бонус у ' + W.who + ' в Telegram</a>';
+  const bWA = '<a class="wa" data-ev="click_wa_write" href="https://wa.me/' + W.wa + '?text=' + msg + '" target="_blank" rel="noopener">' + icWA + 'Забрать бонус в WhatsApp</a>';
+  const bTG = '<a class="tg" data-ev="click_tg_write" href="https://t.me/' + W.tg + '?text=' + msg + '" target="_blank" rel="noopener">' + icTG + 'Забрать бонус в Telegram</a>';
   const write = '<p class="mot">' + (MOT[wkey] || 'Напишите, и пришлём расчёт под ваш бюджет.') + '</p>' +
     '<div class="wr">' + ((r.channel || A.channel) === 'telegram' ? bTG + bWA : bWA + bTG) + '</div>';
   $('quiz').hidden = true;
