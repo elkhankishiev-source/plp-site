@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-11",
+ "updated": "2026-10-15",
  "items": [
   {
    "id": "ATT-KYE",
@@ -1449,87 +1449,67 @@
    "name": "The Title Cielo Rawai",
    "district": "Равай",
    "type": "Кондо",
-   "price_from": 6191000,
+   "price_from": 7558583,
    "units": [
     {
      "beds": 1,
      "code": "1BLAC",
      "free": 1,
      "name": "1 спальня",
-     "area_sqm": 41,
-     "price_from_thb": 6191000,
-     "area": 41,
-     "from": 6191000
-    },
-    {
-     "beds": 1,
-     "code": "1BMAC",
-     "free": 1,
-     "name": "1 спальня",
-     "area_sqm": 42,
-     "price_from_thb": 6426000,
-     "area": 42,
-     "from": 6426000
+     "area_sqm": 47,
+     "price_from_thb": 7558583,
+     "area": 47,
+     "from": 7558583
     },
     {
      "beds": 1,
      "code": "1BLA",
      "free": 1,
      "name": "1 спальня",
-     "area_sqm": 51,
-     "price_from_thb": 8058000,
-     "area": 51,
-     "from": 8058000
+     "area_sqm": 48,
+     "price_from_thb": 7930020,
+     "area": 48,
+     "from": 7930020
     },
     {
      "beds": 1,
      "code": "1BPMC",
-     "free": 3,
+     "free": 1,
      "name": "1 спальня",
-     "area_sqm": 56,
-     "price_from_thb": 7728000,
-     "area": 56,
-     "from": 7728000
+     "area_sqm": 55.5,
+     "price_from_thb": 8056440,
+     "area": 55.5,
+     "from": 8056440
     },
     {
      "beds": 2,
      "code": "2BMC",
-     "free": 4,
+     "free": 3,
      "name": "2 спальни",
-     "area_sqm": 72,
-     "price_from_thb": 11304000,
-     "area": 72,
-     "from": 11304000
+     "area_sqm": 72.5,
+     "price_from_thb": 11984595,
+     "area": 72.5,
+     "from": 11984595
     },
     {
      "beds": 2,
      "code": "2BSAC",
      "free": 1,
      "name": "2 спальни",
-     "area_sqm": 76,
-     "price_from_thb": 12008000,
-     "area": 76,
-     "from": 12008000
-    },
-    {
-     "beds": 2,
-     "code": "2BLC",
-     "free": 1,
-     "name": "2 спальни",
-     "area_sqm": 81,
-     "price_from_thb": 11988000,
-     "area": 81,
-     "from": 11988000
+     "area_sqm": 77,
+     "price_from_thb": 12732825,
+     "area": 77,
+     "from": 12732825
     },
     {
      "beds": 2,
      "code": "2BLAC",
      "free": 2,
      "name": "2 спальни",
-     "area_sqm": 87,
-     "price_from_thb": 13485000,
-     "area": 87,
-     "from": 13485000
+     "area_sqm": 85.5,
+     "price_from_thb": 13882575,
+     "area": 85.5,
+     "from": 13882575
     }
    ]
   },
@@ -1785,44 +1765,34 @@
    "price_from": 2996000,
    "units": [
     {
-     "beds": null,
-     "code": null,
-     "free": 56,
-     "name": "Планировка",
-     "area_sqm": 28,
-     "price_from_thb": 2996000,
-     "area": 28,
-     "from": 2996000
+     "beds": 1,
+     "name": "1 спальня",
+     "area_sqm": 43.5,
+     "area": 43.5
     },
     {
-     "beds": null,
-     "code": null,
-     "free": 1,
-     "name": "Планировка",
-     "area_sqm": 55,
-     "price_from_thb": 6272000,
-     "area": 55,
-     "from": 6272000
+     "beds": 1,
+     "name": "1 спальня",
+     "area_sqm": 49.5,
+     "area": 49.5
     },
     {
-     "beds": null,
-     "code": null,
-     "free": 85,
-     "name": "Планировка",
+     "beds": 2,
+     "name": "2 спальни",
      "area_sqm": 56,
-     "price_from_thb": 5992000,
-     "area": 56,
-     "from": 5992000
+     "area": 56
+    },
+    {
+     "beds": 2,
+     "name": "2 спальни",
+     "area_sqm": 64,
+     "area": 64
     },
     {
      "beds": null,
-     "code": null,
-     "free": 17,
      "name": "Планировка",
-     "area_sqm": 92,
-     "price_from_thb": 9844000,
-     "area": 92,
-     "from": 9844000
+     "area_sqm": 31,
+     "area": 31
     }
    ]
   },
@@ -2855,7 +2825,7 @@
    "name": "The Title Sierra",
    "district": "Банг Тао",
    "type": "Кондо",
-   "price_from": 3097000,
+   "price_from": 3145400,
    "units": [
     {
      "beds": 1,
@@ -2880,7 +2850,7 @@
     {
      "beds": 1,
      "code": "1BP",
-     "free": 52,
+     "free": 51,
      "name": "1 спальня",
      "area_sqm": 44,
      "price_from_thb": 5350800,
@@ -2890,7 +2860,7 @@
     {
      "beds": 1,
      "code": "1BPC",
-     "free": 23,
+     "free": 22,
      "name": "1 спальня",
      "area_sqm": 46.5,
      "price_from_thb": 5607400,
