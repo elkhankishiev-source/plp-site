@@ -405,7 +405,7 @@ function render(){
   } else {
     $('qwrap').innerHTML = '<div class="q">Куда прислать подборку?</div>' +
       '<div class="who"><img src="img/elnur.jpg" alt=""><span><b>Эльнур Ханкишиев</b>, основатель Property Library. Пришлю лично цены и расчёт доходности.</span></div>' +
-      '<form id="f" novalidate><input id="nm" placeholder="Ваше имя" autocomplete="name">' +
+      '<form id="f" novalidate><input id="nm" placeholder="Ваше имя" autocomplete="name" required aria-required="true">' +
       '<input id="ph" type="tel" inputmode="tel" placeholder="+7 900 123 45 67" value="+" autocomplete="tel" aria-describedby="phh err">' +
       '<div class="fh" id="phh">Номер с кодом страны, например +7 900 123 45 67 или +66 81 234 5678</div>' +
       '<div class="chan"><button type="button" class="on" data-c="whatsapp">WhatsApp</button><button type="button" data-c="telegram">Telegram</button></div>' +
@@ -432,6 +432,9 @@ function send(){
      (3) «Заявка принята» и событие Lead в Meta — только после ok от приёмника. */
   if (busy) return;
   if ($('co').value) { finish({ ok: true, sent: false }); return; }   // робот заполнил скрытое поле: показываем успех, заявку не шлём
+  /* 16.10.2026: имя обязательно — без имени первое касание не уходит (решение №299 «без имени не шлём»), лид повисал без ответа */
+  const nm = $('nm').value.trim();
+  if (nm.replace(/[^A-Za-zА-Яа-яЁё]/g, '').length < 2) { $('err').textContent = 'Как к вам обращаться? Укажите имя.'; $('nm').setAttribute('aria-invalid', 'true'); try { $('nm').focus(); } catch (e) {} TR('name_err'); return; }
   const raw = $('ph').value;
   const chk = phoneCheck(raw);
   if (!chk.ok) { $('err').textContent = chk.hint || 'Проверьте номер: код страны и все цифры.'; $('ph').setAttribute('aria-invalid', 'true'); try { $('ph').focus(); } catch (e) {} TR('phone_err'); return; }
