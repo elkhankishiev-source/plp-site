@@ -143,6 +143,10 @@ for(const d of D){
   html=html.replace(/(<meta property="og:url" content=")[^"]*(")/,'$1'+url+'$2');
   html=html.replace(/(<meta property="og:title" content=")[^"]*(")/,'$1'+esc(title)+'$2');
   html=html.replace(/(<meta property="og:description" content=")[^"]*(")/,'$1'+esc(desc)+'$2');
+  /* 16.10.2026 (SEO): «хлебные крошки» Главная › район — поиск показывает их вместо голого адреса. */
+  html=html.replace('</head>','<script type="application/ld+json">'+JSON.stringify({'@context':'https://schema.org','@type':'BreadcrumbList',
+    itemListElement:[{'@type':'ListItem',position:1,name:'Главная',item:'https://property-library.com/'},
+                     {'@type':'ListItem',position:2,name:d.ru,item:url.replace(/\.html$/,'')}]}).replace(/</g,'\\u003c')+'</script>\n</head>');
   // страница лежит в подпапке — ресурсы и ссылки на уровень выше
   html=html.replace(/href="#top"/g,'href="../index.html"');
   html=html.replace(/href="#(why|sale|rent|map|quiz|about|faq|do|steps|contacts)"/g,'href="../index.html#$1"');
