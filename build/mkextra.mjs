@@ -53,7 +53,7 @@ const wrapSection = inner => inner ? `<section style="padding-top:26px"><div cla
 
 function page({file,depth,title,desc,body,jsonld}){
   let html=head+'\n'+body+'\n'+ПОДВАЛ+'\n'+tail;
-  const url=SITE+'/'+file;
+  const url=SITE+'/'+file.replace(/(^|\/)index\.html$/,'$1'); // 16.10: /guide/ вместо /guide/index
   html=html.replace(/<title>[\s\S]*?<\/title>/,'<title>'+esc(title)+'</title>');
   html=html.replace(/(<meta name="description" content=")[^"]*(")/,'$1'+esc(desc)+'$2');
   html=html.replace(/(<link rel="canonical" href=")[^"]*(")/,'$1'+url+'$2');
@@ -212,43 +212,72 @@ const slugs={'1':'inostranec-mozhet-kupit','2':'leasehold-ili-freehold','3':'nal
 const gdir=path.join(ROOT,'guide');
 if(!fs.existsSync(gdir)) fs.mkdirSync(gdir,{recursive:true});
 
-/* 09.10.2026 Эльнур: «справочник покупателя просто вмести его как продолжение FAQ». Отдельного раздела больше нет:
-   все вопросы с полными ответами живут в FAQ на главной (index.html, якоря #faq-<slug>). Старые адреса /guide/…
-   оставляем рабочими — ссылки из бота, постов и поиска ведут на нужный вопрос FAQ. */
-const redirectPage=(to,title)=>`<!doctype html>
-<html lang="ru"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>${esc(title)}</title>
-<link rel="canonical" href="https://property-library.com/${to}">
-<!-- 10.10.2026 Эльнур: превью ссылок /guide/… — у переадресаций не было og-меток, мессенджер показывал голую ссылку.
-     Картинку подставляет mkogfix.mjs (фирменная карточка), здесь заготовка меток. -->
-<meta name="description" content="${esc(title)}: ответ в разделе вопросов Property Library Phuket.">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="Property Library Phuket">
-<meta property="og:title" content="${esc(title)}">
-<meta property="og:description" content="Ответ в разделе вопросов Property Library Phuket: покупка, аренда и управление недвижимостью на Пхукете.">
-<meta property="og:url" content="https://property-library.com/${to}">
-<meta property="og:image" content="https://property-library.com/img/og/page-default.jpg">
-<meta property="og:image:secure_url" content="https://property-library.com/img/og/page-default.jpg">
-<meta property="og:image:type" content="image/jpeg">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:locale" content="ru_RU">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="${esc(title)}">
-<meta name="twitter:description" content="Ответ в разделе вопросов Property Library Phuket: покупка, аренда и управление недвижимостью на Пхукете.">
-<meta name="twitter:image" content="https://property-library.com/img/og/page-default.jpg">
-<meta name="robots" content="noindex, follow">
-<meta http-equiv="refresh" content="0; url=../${to}">
-<script>location.replace('../${to}');</script>
-</head><body><p><a href="../${to}">${esc(title)}</a></p></body></html>
-`;
+/* 09.10.2026 Эльнур: «справочник покупателя просто вмести его как продолжение FAQ» — тогда /guide/* стали
+   переадресациями на вопрос главной (noindex, вне карты сайта).
+   16.10.2026 (SEO, «го» Эльнура «чини сразу», разбор ~/plp-ops/разборы/seo_1610/решения.md п.2): статьи снова
+   отдельные страницы в поиске. Команды «закрыть от поиска» не было, закрытие было побочным эффектом слияния;
+   засветы (комиссии, «бесплатно», проценты) вычищены ещё 09.10. FAQ на главной остаётся, ведёт сюда ссылкой.
+   Текст один: build/faq.json обязан совпадать с FAQ главной (index.html, data-i18n faq.Nq/faq.Na) —
+   разошлись, сборка падает, чтобы статья не вернула в поиск уже исправленное слово. */
+{
+  const strip = x => x.replace(/<[^>]+>/g, '').replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+  for (const f of faq) {
+    const q = idx.match(new RegExp('data-i18n="faq\\.' + f.n + 'q">([\\s\\S]*?)</span>'));
+    const a = idx.match(new RegExp('data-i18n="faq\\.' + f.n + 'a">([\\s\\S]*?)</p>'));
+    if (!q || !a || strip(q[1]) !== f.q || strip(a[1]) !== f.a)
+      throw new Error('справочник: вопрос ' + f.n + ' в build/faq.json не совпадает с FAQ главной — свести к одному тексту');
+  }
+}
 for(const f of faq){
   const slug=slugs[f.n]; if(!slug) continue;
-  fs.writeFileSync(path.join(gdir,slug+'.html'),redirectPage('#faq-'+slug,f.q));
-  made.push('guide/'+slug+'.html → /#faq-'+slug);
+  const others=faq.filter(x=>x.n!==f.n&&slugs[x.n]).map(x=>
+    `<li style="margin:8px 0"><a href="${slugs[x.n]}">${esc(x.q)}</a></li>`).join('');
+  const body=`<section style="padding-bottom:0"><div class="container" style="max-width:760px">
+    <p class="kicker"><a href="./" style="color:inherit">Справочник покупателя</a></p>
+    <h1 style="font-size:clamp(26px,3.8vw,38px);margin:0 0 16px">${esc(f.q)}</h1>
+    <p style="font-size:18px;line-height:1.7;margin:0 0 20px">${esc(f.a)}</p>
+    <div style="background:var(--green-soft);border-radius:18px;padding:18px 20px;margin:24px 0">
+      <p style="margin:0 0 12px;font-size:15px">Разберём вашу задачу и пришлём расчёт по конкретным объектам.</p>
+      <div class="hero-cta" style="margin:0">
+        <a class="btn btn-primary" href="https://t.me/elnurphuket_bot?start=faq" target="_blank" rel="noopener">Получить расчёт</a>
+        <a class="btn btn-ghost" href="../buy.html">Смотреть объекты</a>
+      </div>
+    </div>
+    <h2 style="font-size:20px;margin:28px 0 8px">Другие вопросы</h2>
+    <ul style="padding-left:18px;margin:0">${others}</ul>
+  </div></section>
+  ${SALE}`;
+  made.push(page({file:'guide/'+slug+'.html',depth:1,
+    /* 24.09: вопросы длинные, бренд добивал заголовок до 70+ знаков — поиск обрезал именно бренд. */
+    title:(f.q+' | Property Library').length<=65 ? f.q+' | Property Library' : f.q,
+    desc:(function(){ if(f.a.length<=158) return f.a; let k=f.a.slice(0,157); const p=k.lastIndexOf(' '); if(p>100) k=k.slice(0,p); return k.replace(/[\s,;:—-]+$/,'')+'…'; })(),
+    body,
+    jsonld:{'@context':'https://schema.org','@type':'FAQPage','mainEntity':[{'@type':'Question','name':f.q,
+      'acceptedAnswer':{'@type':'Answer','text':f.a}}]}}));
 }
-fs.writeFileSync(path.join(gdir,'index.html'),redirectPage('#faq','Вопросы о покупке недвижимости на Пхукете'));
-made.push('guide/index.html → /#faq');
+/* Оглавление справочника. */
+{
+  const items = faq.filter(f => slugs[f.n]).map(f =>
+    `<li style="margin:0"><a href="${slugs[f.n]}" style="display:block;padding:14px 16px;` +
+    `background:var(--card,#fff);border:1px solid var(--line,#e7e7e2);border-radius:14px;` +
+    `text-decoration:none;color:inherit"><b style="display:block;font-size:17px;line-height:1.35">` +
+    `${esc(f.q)}</b><span style="display:block;margin-top:6px;font-size:14px;opacity:.75;` +
+    `line-height:1.5">${esc(f.a.slice(0, 150))}…</span></a></li>`).join('');
+  const body = `<section style="padding-bottom:0"><div class="container" style="max-width:760px">
+    <p class="kicker">Справочник покупателя</p>
+    <h1 style="font-size:clamp(26px,3.8vw,38px);margin:0 0 10px">Что нужно знать до покупки на Пхукете</h1>
+    <p style="font-size:18px;line-height:1.7;margin:0 0 22px">${faq.length} ответов: собственность,
+      налоги, сроки, доходность, риски и управление. Коротко о том же в блоке
+      «Нас часто спрашивают» на главной.</p>
+    <ul style="list-style:none;padding:0;margin:0;display:grid;gap:10px">${items}</ul>
+  </div></section>
+  ${SALE}`;
+  made.push(page({file:'guide/index.html',depth:1,
+    title:'Справочник покупателя недвижимости на Пхукете | Property Library',
+    desc:'Собственность, налоги, сроки сделки, доходность, риски и управление: ' + faq.length + ' ответов простым языком.',
+    body,
+    jsonld:{'@context':'https://schema.org','@type':'FAQPage','mainEntity':faq.map(f=>({'@type':'Question',
+      'name':f.q,'acceptedAnswer':{'@type':'Answer','text':f.a}}))}}));
+}
 console.log('создано страниц:',made.length);
 console.log(made.join('\n'));

@@ -60,7 +60,7 @@ if (fs.existsSync(sm)) {
   let x = fs.readFileSync(sm, 'utf8');
   const b = x;
   x = x.replace(/(https:\/\/property-library\.com\/[^<\s]*?)\.html/g, '$1')
-       .replace(/https:\/\/property-library\.com\/index</g, 'https://property-library.com/<');
+       .replace(/(https:\/\/property-library\.com\/(?:[^<\s]*\/)?)index</g, '$1<'); /* 16.10: и /guide/index → /guide/ */
   if (x !== b) fs.writeFileSync(sm, x);
 }
 console.log(`чистые адреса: страниц ${files}, ссылок ${links}`);
