@@ -74,7 +74,8 @@ def fonts_css():
 
 def short_name(n):
     # «… · квартира», «… · вилла, вторичка» — приписка юнита, её отрезаем; «Eden · Lake Residences» — часть имени
-    n = re.sub(r'\s+·\s+(квартира|вилла|таунхаус)\b.*$', '', n or '')
+    n = re.sub(r'\s*\((?=[^()]*,)[^()]*\)\s*$', '', n or '')   # 16.10: хвост-список написаний для поиска, «Vibe II Karon (Вайб 2, …)» (как build/gen.mjs)
+    n = re.sub(r'\s+·\s+(квартира|вилла|таунхаус)\b.*$', '', n)
     n = re.sub(r'\s+·\s+', ' ', n)
     n = re.sub(r',\s*[А-ЯЁа-яё][^,]*$', '', n)          # «KUARTZ, Карон» → «KUARTZ»
     n = re.sub(r',\s*у\s+.*$', '', n)                    # «The GENS by Botanica, у Blue Tree»
