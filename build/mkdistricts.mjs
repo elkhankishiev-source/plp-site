@@ -55,18 +55,33 @@ let saleHtml=(parts.find(p=>p.id==='sale')||{}).html||'';
 const outDir=path.join(ROOT,'districts');
 if(!fs.existsSync(outDir)) fs.mkdirSync(outDir,{recursive:true});
 
-/* Объекты района — берём уже собранный блок PLP:OBJECT-INDEX с главной,
-   чтобы не заводить второй источник правды. Ключ — русское имя района. */
-const OI = (() => {
-  const m = {};
-  const s0 = idx.indexOf('PLP:OBJECT-INDEX:START'), s1 = idx.indexOf('PLP:OBJECT-INDEX:END');
-  if (s0 === -1 || s1 === -1) return m;
-  const blk = idx.slice(s0, s1);
-  const re = /<div class="oi-col"><h3>([^<]+)<\/h3>(<ul>[\s\S]*?<\/ul>)<\/div>/g;
-  let x;
-  while ((x = re.exec(blk))) m[x[1].trim()] = x[2];
-  return m;
+/* Объекты района.
+   16.10.2026 (SEO, «го» Эльнура «чини сразу»): раньше блок разбирал HTML главной по старой разбивке
+   <div class="oi-col"><h3>Район</h3>, а главная с 04.09 собирает один общий список — шаблон не совпадал,
+   и блок «Объекты в районе» молча пропадал на всех 8 страницах (ссылок на объекты 0).
+   Теперь берём те же данные, из которых gen.mjs собирает каталог: offer-catalog.json (пишется gen.mjs
+   из objects на каждой сборке, раньше этого шага). Юниты-дети (Saturdays · квартира и т.п.) не показываем:
+   у них своя страница, а ссылка на неё есть на странице проекта. */
+const CAT = (() => {
+  const items = JSON.parse(fs.readFileSync(path.join(ROOT, 'offer-catalog.json'), 'utf8')).items || [];
+  const slugOf = x => String(x.url || '').split('/').pop();
+  const unitCodes = new Set(items.flatMap(x => (x.units || []).map(u => u.code)));
+  const slugs = new Set(items.map(slugOf));
+  const isChild = x => unitCodes.has(x.pub) || (/^(.+)-[ru]\d+$/.test(slugOf(x)) && slugs.has(slugOf(x).replace(/-[ru]\d+$/, '')));
+  const by = {};
+  for (const x of items) {
+    if (!x.name || !slugOf(x) || isChild(x)) continue;
+    (by[x.district] = by[x.district] || []).push({ slug: slugOf(x), name: x.name, type: x.type || '', price: x.price_from || null });
+  }
+  for (const k in by) by[k].sort((a, b) => (a.price || 9e15) - (b.price || 9e15));
+  return by;
 })();
+/* Цена «от» — тот же вид, что в блоке объектов главной (копия fmtBahtShort из gen.mjs). */
+function fmtBahtShort(n) {
+  if (!n || !isFinite(n)) return '';
+  return n >= 1e6 ? (n / 1e6).toFixed(n % 1e6 === 0 ? 0 : 1).replace('.', ',') + ' млн ฿'
+                  : Math.round(n / 1000) + ' тыс. ฿';
+}
 
 const fmt=n=>String(n).replace(/\B(?=(\d{3})+(?!\d))/g,' ');
 const links=D.map(d=>`<a class="chipf" href="${d.slug}.html">${esc(d.ru)}</a>`).join(' ');
@@ -106,13 +121,15 @@ for(const d of D){
     ${market}
   </div></section>`;
 
-  const mine = OI[d.ru]
-    ? `<section class="obj-index" style="padding:40px 0"><div class="container">
+  const list = CAT[d.ru] || [];
+  if (!list.length) throw new Error('районы: в offer-catalog.json нет объектов района ' + d.ru + ' — блок «Объекты в районе» был бы пустым');
+  const mine = `<section class="obj-index" style="padding:40px 0"><div class="container">
     <h2 style="font-size:22px;margin:0 0 6px">Объекты в ${esc(d.in)}</h2>
-    <p class="sub" style="margin:0 0 18px">Проекты этого района из нашего каталога — с ценами от застройщика.</p>
-    <div class="oi-grid"><div class="oi-col">${OI[d.ru]}</div></div>
-  </div></section>`
-    : '';
+    <p class="sub" style="margin:0 0 18px">Проекты этого района из нашего каталога, цены от застройщика.</p>
+    <div class="oi-box"><ul class="oi-list" style="max-height:none">${list.map(o =>
+      '<li><a href="object/' + esc(o.slug) + '">' + esc(o.name) + '</a><span class="oi-d">' + esc(o.type) + '</span>' +
+      (o.price ? '<span class="oi-p">' + esc(fmtBahtShort(o.price)) + '</span>' : '') + '</li>').join('')}</ul></div>
+  </div></section>`;
 
   const others=`<section style="padding-top:0"><div class="container">
     <h2 style="font-size:20px;margin:0 0 12px">Другие районы</h2>
