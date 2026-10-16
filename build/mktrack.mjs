@@ -12,9 +12,12 @@ import { fileURLToPath } from 'node:url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 const TEST = "location.protocol==='file:'||/^(localhost|127\\.0\\.0\\.1|0\\.0\\.0\\.0|\\[::1\\])$/.test(location.hostname)||navigator.webdriver";
-const PIXEL = '<!-- PLP:PIXEL --><script>(function(){if(' + TEST + ')return;'
+const OLD_PIXEL = '<!-- PLP:PIXEL --><script>(function(){if(' + TEST + ')return;'
   + "!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');"
   + "fbq('init','1387930368853540');fbq('track','PageView');})();</script>";
+/* 16.10.2026 (PDPA, «доработай!»): пиксель грузит только /js/consent.js после «Принять» на плашке согласия
+   (consent.js подключает тег PLP:GA из mkga.mjs, он идёт раньше). Здесь страница лишь объявляет номер пикселя. */
+const PIXEL = "<!-- PLP:PIXEL --><script>window.PLP_PIXEL='1387930368853540';</script>";
 
 const C0 = '<!-- PLP:COUNTER:START', C1 = '<!-- PLP:COUNTER:END -->';
 const idx = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
@@ -38,8 +41,13 @@ const st = { pixel: 0, pixelHad: 0, cntAdd: 0, cntSync: 0, cntOld: 0, pages: 0 }
     const b = s;
     const rel = path.relative(ROOT, p);
 
-    if (s.includes('PLP:PIXEL') || s.includes('fbevents.js')) st.pixelHad++;
+    if (s.includes(OLD_PIXEL)) { s = s.split(OLD_PIXEL).join(PIXEL); st.pixel++; }
+    else if (s.includes(PIXEL)) st.pixelHad++;
+    else if (s.includes('PLP:PIXEL')) throw new Error('mktrack: метка PLP:PIXEL есть, но код не узнан: ' + rel);
     else { s = s.replace('</head>', PIXEL + '</head>'); st.pixel++; }
+    /* пиксель грузит только consent.js: fbevents.js прямо на странице = обход согласия */
+    if (s.includes('fbevents.js')) throw new Error('mktrack: пиксель Meta грузится мимо согласия: ' + rel);
+    if (!s.includes('/js/consent.js')) throw new Error('mktrack: на странице с пикселем нет /js/consent.js: ' + rel);
 
     if (p !== path.join(ROOT, 'index.html') && !s.includes('/js/track.js')) {
       const a0 = s.indexOf(C0), a1 = s.indexOf(C1);
@@ -61,5 +69,5 @@ const st = { pixel: 0, pixelHad: 0, cntAdd: 0, cntSync: 0, cntOld: 0, pages: 0 }
     if (s !== b) fs.writeFileSync(p, s);
   }
 })(ROOT);
-console.log(`пиксель Meta: добавлен на ${st.pixel}, уже был на ${st.pixelHad} из ${st.pages}; ` +
+console.log(`пиксель Meta (через согласие): обновлён на ${st.pixel}, уже был на ${st.pixelHad} из ${st.pages}; ` +
   `счётчик: добавлен ${st.cntAdd}, сверен ${st.cntSync}, старых копий заменено ${st.cntOld}`);
