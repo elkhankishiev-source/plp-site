@@ -1373,12 +1373,23 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
   const metaDesc = (function(){
     let д = truncate(noContacts(usp) || '', 155);
     if (д.length < 70) {
-      const допы = [t.ru, String(o.name).includes(ru) ? '' : 'район ' + ru, areaLabel(o) ? ('площадь ' + areaLabel(o)) : '',
+      /* 16.10.2026 (SEO): было .toLowerCase() на всю строку — район выходил «район таланг».
+         Строчной делаем только тип; имя района остаётся с заглавной. И к имени добавляем хвост
+         публичного кода (U3, R1): без него юниты одного проекта получали ОДИНАКОВОЕ описание
+         (Qabalah U2/U3/U4, U5…U8) — поиск считает такие страницы дублями. Код и так стоит в адресе и заголовке. */
+      const допы = [String(t.ru || '').toLowerCase(), String(o.name).includes(ru) ? '' : 'район ' + ru, areaLabel(o) ? ('площадь ' + areaLabel(o)) : '',
                     o.bedrooms ? (o.bedrooms + ' спальни') : ''].filter(Boolean);
-      const хвост = o.name + ': ' + допы.join(', ').toLowerCase() + '. Пхукет, Property Library.';
+      const имя = o.name + (_хвостКода && !String(o.name).includes(_хвостКода) ? ' ' + _хвостКода : '');
+      const хвост = имя + ': ' + допы.join(', ') + '. Пхукет, Property Library.';
       д = truncate((д ? д + ' ' : '') + хвост, 155);
     }
     д = д.replace(/\s+—\s+/g, ', ');  /* 09.10.2026: длинное тире в превью — примета ИИ */
+    /* 16.10.2026 (SEO): у юнитов текст часто общий с проектом (Manor R1 и R2 — слово в слово).
+       Если код юнита в описании не назван, дописываем его в конец, пока влезает в 155 знаков. */
+    if (_хвостКода && !д.includes(_хвостКода)) {
+      const доп = ' Юнит ' + _различитель + (/\.$/.test(_различитель) ? '' : '.');
+      if ((д + доп).length <= 160) д = д.replace(/[.\s]*$/, '.') + доп;
+    }
     return д;
   })();
   const distBeach = o.distance_beach_m ? o.distance_beach_m + ' м до пляжа' : '';
@@ -1403,7 +1414,7 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
     '@type': 'Residence',
     '@id': idRes,
     name: o.name,
-    description: truncate(noContacts(usp), 500),
+    description: truncate(noContacts(usp), 500) || metaDesc,
     url,
     image: img,
     address: { '@type': 'PostalAddress', addressRegion: 'Phuket', addressLocality: ru, addressCountry: 'TH' },
@@ -1420,7 +1431,7 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
       '@id': url + '#listing',
       url,
       name: o.name,
-      description: truncate(noContacts(usp), 500),
+      description: truncate(noContacts(usp), 500) || metaDesc,
       about: { '@id': idRes },
       /* datePosted намеренно нет: он подставлялся датой сборки, то есть «сегодня»
          на каждом прогоне. Это неправда про объявление и вдобавок трогало все
@@ -1442,6 +1453,17 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
     url,
     seller: { '@type': 'RealEstateAgent', name: 'Property Library Phuket', url: SITE_BASE },
   });
+  /* 16.10.2026 (SEO): «хлебные крошки» для поиска — Главная › Купить/Аренда › район › объект.
+     Google показывает их в выдаче вместо голого адреса. Только публичное: названия разделов, района и объекта. */
+  {
+    const крошки = [{ name: 'Главная', item: SITE_BASE + '/' }];
+    крошки.push(isRent ? { name: 'Аренда', item: SITE_BASE + '/rent' } : { name: 'Купить', item: SITE_BASE + '/buy' });
+    const _дс = String(en || '').toLowerCase().replace(/[^a-z]+/g, '-').replace(/^-|-$/g, '');
+    if (_дс && fs.existsSync(path.join(ROOT, 'districts', _дс + '.html'))) крошки.push({ name: ru, item: SITE_BASE + '/districts/' + _дс });
+    крошки.push({ name: o.name, item: url });
+    graph.push({ '@type': 'BreadcrumbList', '@id': url + '#crumbs',
+      itemListElement: крошки.map((к, i) => ({ '@type': 'ListItem', position: i + 1, name: к.name, item: к.item })) });
+  }
   const ld = { '@context': 'https://schema.org', '@graph': graph };
 
   /* 16.09 Эльнур: «мы не размещаем на сайте конфиденциальную информацию — номера,
