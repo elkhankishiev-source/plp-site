@@ -16,7 +16,8 @@ const D=[
  {ru:'Камала', slug:'kamala', in:'Камале',
   about:'Семейный район между Сурином и Патонгом. Длинный спокойный пляж, набережная, школы рядом — сюда чаще переезжают жить, а не только инвестировать.'},
  {ru:'Равай', slug:'rawai', in:'Равае',
-  about:'Юг острова: рыбацкая гавань, рынки, лодки на Ко Ланта и Пхи-Пхи. Самый доступный вход в рынок и большая русскоязычная община.'},
+  /* 16.10.2026: «самый доступный вход в рынок» убрано — по нашему каталогу вход в кондо Равая выше, чем в Банг Тао. */
+  about:'Юг острова: рыбацкая гавань, рынки, лодки на Ко Ланта и Пхи-Пхи. Большая русскоязычная община.'},
  {ru:'Ката', slug:'kata', in:'Кате', about:
   'Курортный юго-запад с двумя пляжами — Ката и Ката Ной. Живой туристический поток круглый год, устойчивый спрос на аренду.'},
  {ru:'Най Янг', slug:'nai-yang', in:'Най Янге', about:
@@ -83,6 +84,27 @@ function fmtBahtShort(n) {
                   : Math.round(n / 1000) + ' тыс. ฿';
 }
 
+/* Тексты районов (16.10.2026, «го» Эльнура; черновики ~/plp-ops/разборы/seo_1610/районы/*.md).
+   Цифры каталога в текст не пишем руками: {n} — число проектов района, {p:<адрес объекта>} — цена «от»
+   из offer-catalog.json. Нет такого объекта или цены — сборка падает, а не печатает устаревшее. */
+const TEXT = JSON.parse(fs.readFileSync(path.join(ROOT, 'build/districts_text.json'), 'utf8'));
+const PRICE = (() => {
+  const m = {};
+  for (const x of JSON.parse(fs.readFileSync(path.join(ROOT, 'offer-catalog.json'), 'utf8')).items || [])
+    m[String(x.url || '').split('/').pop()] = x.price_from;
+  return m;
+})();
+const проектов = n => n + ' ' + (n % 10 === 1 && n % 100 !== 11 ? 'проект'
+  : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14)) ? 'проекта' : 'проектов');
+function districtText(d, n) {
+  const paras = TEXT[d.slug];
+  if (!paras || !paras.length) throw new Error('районы: нет текста для ' + d.slug + ' в build/districts_text.json');
+  return paras.map(t => t.replace(/\{n\}/g, проектов(n)).replace(/\{p:([a-z0-9-]+)\}/g, (_, sl) => {
+    if (!PRICE[sl]) throw new Error('районы: в тексте ' + d.slug + ' цена объекта ' + sl + ', а в каталоге его нет или нет цены');
+    return fmtBahtShort(Number(PRICE[sl]));
+  }));
+}
+
 const fmt=n=>String(n).replace(/\B(?=(\d{3})+(?!\d))/g,' ');
 const links=D.map(d=>`<a class="chipf" href="${d.slug}.html">${esc(d.ru)}</a>`).join(' ');
 
@@ -131,6 +153,11 @@ for(const d of D){
       (o.price ? '<span class="oi-p">' + esc(fmtBahtShort(o.price)) + '</span>' : '') + '</li>').join('')}</ul></div>
   </div></section>`;
 
+  const about = `<section style="padding:40px 0 0"><div class="container" style="max-width:820px">
+    <h2 style="font-size:22px;margin:0 0 12px">Купить недвижимость в ${esc(d.in)}</h2>
+    ${districtText(d, list.length).map(p => '<p style="font-size:17px;line-height:1.7;margin:0 0 14px">' + esc(p) + '</p>').join('\n    ')}
+  </div></section>`;
+
   const others=`<section style="padding-top:0"><div class="container">
     <h2 style="font-size:20px;margin:0 0 12px">Другие районы</h2>
     <div class="filters">${links}</div>
@@ -153,7 +180,7 @@ for(const d of D){
     /* див заголовка обязан закрыться: без этого head-row (flex) поглощал ленту
        объектов, и она растягивалась на 10 000 px за край экрана. Эльнур 06.09 */
     '<div class="head-row reveal"><div></div>');
-  let html=head+'\n'+intro+'\n'+saleHtml+'\n'+mine+'\n'+others+'\n'+ПОДВАЛ+'\n'+tail;
+  let html=head+'\n'+intro+'\n'+saleHtml+'\n'+about+'\n'+mine+'\n'+others+'\n'+ПОДВАЛ+'\n'+tail;
   html=html.replace(/<title>[\s\S]*?<\/title>/,'<title>'+esc(title)+'</title>');
   html=html.replace(/(<meta name="description" content=")[^"]*(")/,'$1'+esc(desc)+'$2');
   html=html.replace(/(<link rel="canonical" href=")[^"]*(")/,'$1'+url+'$2');
