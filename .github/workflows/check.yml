@@ -62,6 +62,10 @@ jobs:
           grep -q 'property-library.com/sitemap.xml' robots.txt || { echo "❌ в robots.txt чужая карта сайта"; fail=1; }
           grep -q '<loc>' sitemap.xml || { echo "❌ карта сайта пуста"; fail=1; }
           test -f 404.html || { echo "❌ нет страницы 404"; fail=1; }
+          # 16.10.2026: согласие на cookies (PDPA). Google Analytics и пиксель Meta грузит только js/consent.js;
+          # прямая загрузка на странице = обход согласия. Регрессия 86c6dc98: листы offers/*/page.htm пересобрали мимо mkga/mktrack.
+          direct=$(grep -rlE 'googletagmanager\.com/gtag/js|connect\.facebook\.net/[^"]*/fbevents\.js' --include='*.html' --include='*.htm' --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=tools --exclude-dir=build . 2>/dev/null || true)
+          [ -z "$direct" ] || { echo "❌ прямая загрузка GA/пикселя мимо согласия (consent.js):"; echo "$direct"; fail=1; }
           # 29.09.2026. Было: проверялся только служебный ключ и только в .html.
           # Проверка расширена на все файлы репозитория и на все виды секретов,
           # которые у нас реально бывают. Публичный ключ anon — разрешён, его
