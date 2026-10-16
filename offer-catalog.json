@@ -2906,7 +2906,7 @@
    "name": "The Standard Residences Phuket Bang Tao",
    "district": "Банг Тао",
    "type": "Кондо",
-   "price_from": 21930000,
+   "price_from": 21070000,
    "units": [
     {
      "name": "2 спальни",
@@ -2915,7 +2915,7 @@
      "area": 99.95,
      "areaMin": 99.95,
      "areaMax": 99.95,
-     "from": 21930000
+     "from": 21070000
     },
     {
      "name": "3 спальни",
