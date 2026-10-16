@@ -2209,6 +2209,11 @@ async function main() {
       if (why) { console.warn('[gen] ⚠ не публикую', arr[i].plp_property_id, '—', why); arr.splice(i, 1); }
     }
   }
+  /* 16.10.2026: в имени карточки бывает хвост-список написаний для поиска двойника, «Vibe II Karon (Вайб 2, Vibe 2, …)».
+     Мозг ищет по name, поэтому в базе хвост остаётся; на витрину идёт имя без него. */
+  for (const arr of [objects, rentals]) for (const o of arr) {
+    if (o && o.name) o.name = String(o.name).replace(/\s*\((?=[^()]*,)[^()]*\)\s*$/, '');
+  }
 
   /* №113: строящиеся проекты, у которых часть уже сдана (дочерние объекты на сайте со стадией Ready) */
   for (const r of rentals || []) {

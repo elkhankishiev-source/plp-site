@@ -3082,6 +3082,42 @@
    ]
   },
   {
+   "id": "PLP-VIBE2-KARON",
+   "pub": "PLP-VIBE2",
+   "url": "https://property-library.com/object/vibe2",
+   "name": "Vibe II Karon",
+   "district": "Карон",
+   "type": "Кондо",
+   "price_from": 2772000,
+   "units": [
+    {
+     "beds": 0,
+     "name": "студия",
+     "area_sqm": 28,
+     "area": 28
+    },
+    {
+     "beds": 1,
+     "name": "1 спальня",
+     "note": "брошюра застройщика 12.10.2026",
+     "area_max": 46,
+     "area_min": 33
+    },
+    {
+     "beds": 1,
+     "name": "1 спальня+",
+     "note": "тип на плане этажа застройщика, площадь не указана"
+    },
+    {
+     "beds": 2,
+     "name": "2 спальни",
+     "note": "брошюра застройщика 12.10.2026",
+     "area_max": 52,
+     "area_min": 51
+    }
+   ]
+  },
+  {
    "id": "PLP-VIVANA",
    "pub": "PLP-VIVANA",
    "url": "https://property-library.com/object/vivana",
