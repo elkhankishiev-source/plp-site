@@ -453,6 +453,8 @@ function send(){
   if (A.channel === 'telegram' && tgNick.replace(/^@|https?:\/\/t\.me\//g, '').length < 3) { $('err').textContent = 'Укажите ник в Telegram, например @name.'; try { $('tg').focus(); } catch (e) {} TR('tg_err'); return; }
   if (tgNick) lead.tg_username = tgNick;
   try { if (window.PLPTrack) lead.track = PLPTrack.lead(); } catch (e) {}
+  /* 16.10.2026 CAPI: приёмник шлёт серверный Lead в Meta только при согласии «Принять» (как пиксель, PDPA) */
+  try { lead.consent = (window.PLPConsent && PLPConsent.get()) || 'none'; } catch (e) { lead.consent = 'none'; }
   TR('submit');
   const btn = document.querySelector('#f .cta'), label = btn ? btn.textContent : '';
   busy = true; if (btn) { btn.disabled = true; btn.textContent = 'Отправляем…'; } $('err').textContent = '';
