@@ -4,11 +4,11 @@ import os, subprocess, tempfile, sys
 SITE=os.path.dirname(os.path.dirname(os.path.abspath(__file__))); CH='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 D=[ # slug, фото (1 или 2), надзаголовок, название, цена, плашка
  ('cg-capital',['andaz-hd.webp'],'Central Group · Лаян и Банг Тао','Andaz и PURITA','от 7,xx млн ฿','старт продаж'),
- ('vibe2',['v2-hero.webp'],'Карон · застройщик ESM','Vibe II Downtown','от 99 тыс. ฿ за м²','старт 28 октября'),
+ ('vibe2',['v2-hero.webp'],'Карон · застройщик ESM','Vibe II Downtown','от 2,8 млн ฿','старт 28 октября'),  # 16.10 №303: цена входа, не за м²; студия 28 м² (kviz, горячие_офферы)
  ('zero-naiyang',['z-ext.webp'],'Най Янг · 350 м до пляжа','The ZERO Nai Yang','от 4,94 млн ฿','гарантия 10% на 3 года'),
  ('eden',['lake-cover.webp'],'Банг Тао · третья фаза','Gardens of Eden Lake','от 11,9 млн ฿','рассрочка на 5 лет'),
  ('kuartz',['k-pool2.webp'],'Карон · 400 м до пляжа','KUARTZ','от 5,77 млн ฿','закрытый старт'),
- ('fizz',['f-pool.webp'],'Ката · 135 квартир','FIZZ','от 146 тыс. ฿ за м²','закрытый старт'),
+ ('fizz',['f-pool.webp'],'Ката · 135 квартир','FIZZ','от 4,53 млн ฿','закрытый старт'),  # 16.10 №303: 1-спальная, прайс застройщика (offer-catalog price_from 4 532 000)
  ('aileen',['hero.jpg'],'Лагуна · таунхаусы 159 м²','Aileen Residence Lagoon','от 11,85 млн ฿','предстарт'),
  ('millennium',['hero.webp'],'Банг Тао · 750 м до пляжа','Millennium','от 3,42 млн ฿','старт 14 октября'),  # 14.10.2026: цена и дата с листа offers/millennium (прайс застройщика 13.10)
 ]
@@ -43,5 +43,5 @@ for slug,ph,ey,t,p,tag in D:
         if os.path.exists(png) and os.path.getsize(png)>10000: time.sleep(1); break
     pr.kill(); import shutil; shutil.rmtree(prof, ignore_errors=True)
     os.remove(f)
-    out=os.path.join(d,'preview-v10.jpg')  # 14.10.2026: новое имя файла против кэша мессенджеров
+    out=os.path.join(d,'preview-v11.jpg' if slug in ('vibe2','fizz') else 'preview-v10.jpg')  # 14.10.2026: новое имя файла против кэша мессенджеров
     subprocess.run(['ffmpeg','-loglevel','error','-y','-i',png,'-q:v','3',out]); print(slug,'→',out)

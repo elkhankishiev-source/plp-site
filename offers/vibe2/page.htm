@@ -9,7 +9,7 @@
 <meta property="og:title" content="Vibe II Downtown · Карон: закрытый предстарт">
 <meta property="og:description" content="Предложение Property Library Phuket: Vibe II на Кароне от ESM, цены на входе, бронь, график оплаты и расчёт аренды">
 <meta property="og:url" content="https://property-library.com/offers/vibe2/page.htm">
-<meta property="og:image" content="https://property-library.com/offers/vibe2/img/preview-v10.jpg">
+<meta property="og:image" content="https://property-library.com/offers/vibe2/img/preview-v11.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
@@ -117,7 +117,7 @@ svg text{font-family:Manrope,Arial,sans-serif}
 .pol::after{inset:2mm 2mm 8mm}
 .w::after{content:"";position:absolute;inset:0;z-index:9;pointer-events:none;background:url(../../img/brand/plp-wm.svg) 0 0/90mm auto;opacity:.07}
 .wmfoot{text-align:center;font-size:8pt;letter-spacing:.04em;color:var(--muted);padding:5mm 0 6mm}
-</style><!-- PLP:GA --><script>window.PLP_GA='G-HQNDG3B8MW';window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied'});</script><script src="/js/consent.js" defer></script><!-- PLP:PIXEL --><script>window.PLP_PIXEL='1387930368853540';</script></head>
+</style><!-- PLP:GA --><script async src="https://www.googletagmanager.com/gtag/js?id=G-HQNDG3B8MW"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-HQNDG3B8MW');</script></head>
 <body><div class="w">
 
 <div class="top">
@@ -396,16 +396,13 @@ const SAGE = '#D2D5B3', SUN = '#F2D96B';
 
 (() => {
   const s = $('sold');
-  const pts = [['27–28.10.25', 0, 20], ['', 1, 38], ['01.11.25', 3.5, 61], ['20.08.26', 100, 85]];
+  const pts = [['27–28.10.25', 0, 20], ['', 1, 38], ['20.08.26', 100, 85]];
   const X = d => 12 + (d <= 3.5 ? d * 9 : 43.5 + (d - 3.5) * .52), Y = v => 50 - v * .45;
   grid(s, [0, 25, 50, 75, 100], Y);
   add(s, `<path d="M${X(0)} 50 L${pts.map(p => X(p[1]) + ' ' + Y(p[2])).join(' L')} L${X(100)} 50 Z" fill="#D2D5B3" opacity=".5"/>`);
   add(s, `<path d="M${pts.map(p => X(p[1]) + ' ' + Y(p[2])).join(' L')}" stroke="#5E6B35" stroke-width=".9" fill="none"/>`);
-  pts.forEach(([l, d, v], i) => { add(s, `<circle cx="${X(d)}" cy="${Y(v)}" r="1.2" fill="#17180F"/>`); if (i === 0) txt(s, X(d) + 2, Y(v) + 4.5, v + '%', { size: 3.6, w: 800 }); else if (i === 1) txt(s, X(d) - 1.5, Y(v) - 1.8, v + '%', { size: 3.6, w: 800, a: 'end' }); else txt(s, X(d), Y(v) - 2.6, v + '%', { size: 3.6, w: 800, a: i === 3 ? 'end' : 'middle' }); txt(s, X(d), 54.5, l, { size: 2.5, c: '#62665A', a: i === 0 ? 'start' : (i === 3 ? 'end' : 'middle') }); });
+  pts.forEach(([l, d, v], i) => { add(s, `<circle cx="${X(d)}" cy="${Y(v)}" r="1.2" fill="#17180F"/>`); if (i === 0) txt(s, X(d) + 2, Y(v) + 4.5, v + '%', { size: 3.6, w: 800 }); else if (i === 1) txt(s, X(d) - 1.5, Y(v) - 1.8, v + '%', { size: 3.6, w: 800, a: 'end' }); else txt(s, X(d), Y(v) - 2.6, v + '%', { size: 3.6, w: 800, a: i === 2 ? 'end' : 'middle' }); txt(s, X(d), 54.5, l, { size: 2.5, c: '#62665A', a: i === 0 ? 'start' : (i === 2 ? 'end' : 'middle') }); });
   txt(s, 54, 54.5, '10 месяцев', { size: 2.5, c: '#8E917F' });
-  pen(s, ring(X(3.5), Y(61) - 2.4, 5, 4.4));
-  pen(s, `M${X(3.5) + 4} ${Y(61) + 1.2} Q 50 38 60 38`);
-  txt(s, 61, 39, 'за пять дней', { size: 5.2, c: '#B4533A', f: hand });
 })();
 
 (() => {
