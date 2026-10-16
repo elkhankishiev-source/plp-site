@@ -24,10 +24,10 @@ function jpegSize(p) {
   return null;
 }
 
-const ОФФЕРЫ = { 'vibe2.html': 'offers/vibe2/img/preview-v10.jpg', 'zero-naiyang.html': 'offers/zero-naiyang/img/preview-v10.jpg',
+const ОФФЕРЫ = { 'vibe2.html': 'offers/vibe2/img/preview-v11.jpg', 'zero-naiyang.html': 'offers/zero-naiyang/img/preview-v10.jpg',
   // 07.10 Эльнур: «превью ссылки соответствующее фото, не везде одно и то же» — /cg-capital и /aileen показывали Heritage
   'cg-capital.html': 'offers/cg-capital/img/preview-v10.jpg', 'aileen.html': 'offers/aileen/img/preview-v10.jpg',
-  'kuartz.html': 'offers/kuartz/img/preview-v10.jpg', 'fizz.html': 'offers/fizz/img/preview-v10.jpg', 'eden.html': 'offers/eden/img/preview-v10.jpg',
+  'kuartz.html': 'offers/kuartz/img/preview-v10.jpg', 'fizz.html': 'offers/fizz/img/preview-v11.jpg', 'eden.html': 'offers/eden/img/preview-v10.jpg',
   'millennium.html': 'offers/millennium/img/preview-v10.jpg' };
 const РАЙОНЫ = { 'bang-tao': 'PLP-SIERRA', kamala: 'PLP-VIVANA', kata: 'PLP-KATABELLO', 'koh-kaew': 'PLP-ZENITHY', layan: 'PLP-SUNHILLS-LAYAN',
   'nai-yang': 'PLP-ZERO-NAIYANG', rawai: 'PLP-FANTASY-RAWAI', surin: 'PLP-BIANCANA', karon: 'PLP-VIBE-KARON',

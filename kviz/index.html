@@ -524,7 +524,7 @@ function finish(r){
     /* 16.10.2026 Эльнур: «лист проекта открыть только в чат-боте или в личном сообщении, введут фейковый номер и заберут нашу наработку;
        можно показать обложку листа, как будто презентация». Показываем обложку (og-картинка листа), клик ведёт в бот с меткой заявки. */
     '<a class="cover" href="' + (r.tg_start || ('https://t.me/elnurphuket_bot?start=' + C.bot)) + '" target="_blank" rel="noopener">' +
-      '<img src="' + C.sheet.replace(/\/([a-z0-9-]+)$/, '/offers/$1/img/preview-v10.jpg') + '" alt="Презентация ' + C.name + '">' +
+      '<img src="' + C.sheet.replace(/\/([a-z0-9-]+)$/, '/offers/$1/img/preview-' + (/\/(vibe2|fizz)$/.test(C.sheet) ? 'v11' : 'v10') + '.jpg') + '" alt="Презентация ' + C.name + '">' +
       '<span>🔒 Презентация ' + C.name + ': цены, планировки, расчёт. Пришлём в Telegram-бот или в личном сообщении</span></a>' +
     '<div class="lnks"><a class="lnk" href="' + POST[key] + '" target="_blank" rel="noopener">Читать разбор ' + C.name + ' в Telegram</a></div>';
   $('done').hidden = false; scrollTo(0, 0);
