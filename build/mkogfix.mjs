@@ -31,7 +31,7 @@ const ОФФЕРЫ = { 'vibe2.html': 'offers/vibe2/img/preview-v11.jpg', 'zero-n
   'millennium.html': 'offers/millennium/img/preview-v10.jpg' };
 const РАЙОНЫ = { 'bang-tao': 'PLP-SIERRA', kamala: 'PLP-VIVANA', kata: 'PLP-KATABELLO', 'koh-kaew': 'PLP-ZENITHY', layan: 'PLP-SUNHILLS-LAYAN',
   'nai-yang': 'PLP-ZERO-NAIYANG', rawai: 'PLP-FANTASY-RAWAI', surin: 'PLP-BIANCANA', karon: 'PLP-VIBE-KARON',
-  laguna: 'PLP-BELLAGUNA', thalang: 'PLP-QABALAH' };
+  laguna: 'PLP-BELLAGUNA', thalang: 'PLP-QABALAH', 'ao-por': 'PLP-TONINO-OV' };
 /* 09.10.2026 Эльнур: «превью некрасивое… чтобы все превью ссылок были всегда красивыми, а не мертво-глухо».
    Главная, «Купить», «Аренда», «Управление», «О нас», «Добавить объект» наследовали шапку главной с фото Heritage,
    а /predstart и гайды — серую обложку. Теперь у каждой своя фирменная карточка 1200×630 (tools/og_objects.py --pages). */

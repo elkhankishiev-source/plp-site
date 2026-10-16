@@ -82,7 +82,7 @@ const DISTRICT_RU = {
   'Kata': 'Ката', 'Layan': 'Лаян', 'Patong': 'Патонг',
   'Cherng Talay': 'Чернг Талай', 'Nai Harn': 'Най Харн', 'Laguna': 'Лагуна',
   'Kamala Beach': 'Камала', 'Nai Thon': 'Най Тон',
-  'Thalang': 'Таланг', 'Mai Khao': 'Май Кхао', 'Karon': 'Карон', 'Naiharn': 'Найхарн',
+  'Ao Por': 'Ао По', 'Thalang': 'Таланг', 'Mai Khao': 'Май Кхао', 'Karon': 'Карон', 'Naiharn': 'Найхарн',
 };
 
 // -------------------------------------------------------------- env / supabase
@@ -2110,7 +2110,7 @@ function sitemap(objects, rentals) {
   const pages = [
     ['buy.html', '0.9'], ['rent.html', '0.9'], ['management.html', '0.8'],
     ['add-property.html', '0.8'], ['about.html', '0.7'],
-    ...['bang-tao','layan','surin','kamala','rawai','kata','nai-yang','koh-kaew','karon','laguna','thalang']
+    ...['bang-tao','layan','surin','kamala','rawai','kata','nai-yang','koh-kaew','karon','laguna','thalang','ao-por']
         .map(d => ['districts/' + d + '.html', '0.8']),
     /* 09.10.2026: справочник встроен в FAQ главной, /guide/* стали переадресациями.
        16.10.2026 («го» Эльнура, разбор seo_1610 п.2): статьи снова отдельные страницы в поиске. */
