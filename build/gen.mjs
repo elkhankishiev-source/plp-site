@@ -2112,7 +2112,11 @@ function sitemap(objects, rentals) {
     ['add-property.html', '0.8'], ['about.html', '0.7'],
     ...['bang-tao','layan','surin','kamala','rawai','kata','nai-yang','koh-kaew']
         .map(d => ['districts/' + d + '.html', '0.8']),
-    /* 09.10.2026: справочник встроен в FAQ главной, /guide/* — переадресации, в сайтмап не идут */
+    /* 09.10.2026: справочник встроен в FAQ главной, /guide/* стали переадресациями.
+       16.10.2026 («го» Эльнура, разбор seo_1610 п.2): статьи снова отдельные страницы в поиске. */
+    ['guide/index.html', '0.7'],
+    ...['inostranec-mozhet-kupit','leasehold-ili-freehold','nalogi-i-rashody','skolko-oformlyaetsya-sdelka','kupit-udalenno','stoimost-uslug','kakaya-dohodnost','garantirovannaya-dohodnost','kto-upravlyaet-obektom','viza-i-vnzh','risk-nedostroya','pereprodazha-do-sdachi']
+        .map(g => ['guide/' + g + '.html', '0.6']),
   ];
   const parts = [];
   parts.push('<?xml version="1.0" encoding="UTF-8"?>');
