@@ -11,7 +11,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
    стили из index.html, и при старом порядке buy/rent/районы отставали на одну
    сборку: правка общей части появлялась на них только со второго прогона. */
 const steps = ['mkog.mjs', 'gen.mjs', 'mkshared.mjs', 'mkpages.mjs', 'mkdistricts.mjs', 'mkextra.mjs',
-               'mkabout.mjs', 'mkoffers.mjs', 'mktheme.mjs', 'mkpreview.mjs', 'mklinks.mjs', 'mkga.mjs', 'mkogfix.mjs'];
+               'mkabout.mjs', 'mkoffers.mjs', 'mktheme.mjs', 'mkpreview.mjs', 'mklinks.mjs', 'mkga.mjs', 'mktrack.mjs', 'mkogfix.mjs'];
 for (const s of steps) {
   process.stdout.write(`— ${s}\n`);
   execFileSync('node', [`build/${s}`], { cwd: ROOT, stdio: 'inherit' });

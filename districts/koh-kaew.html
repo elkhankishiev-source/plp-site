@@ -2251,7 +2251,7 @@ body{background:var(--bg)}
 <link rel="preconnect" href="https://tile.openstreetmap.org" crossorigin>
 <link rel="preconnect" href="https://server.arcgisonline.com" crossorigin>
 <!-- PLP:GA --><script async src="https://www.googletagmanager.com/gtag/js?id=G-HQNDG3B8MW"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-HQNDG3B8MW');</script><script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Главная","item":"https://property-library.com/"},{"@type":"ListItem","position":2,"name":"Ко Кео","item":"https://property-library.com/districts/koh-kaew"}]}</script>
-</head>
+<!-- PLP:PIXEL --><script>(function(){if(location.protocol==='file:'||/^(localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\])$/.test(location.hostname)||navigator.webdriver)return;!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','1387930368853540');fbq('track','PageView');})();</script></head>
 <body>
 
 <canvas id="liquid" aria-hidden="true"></canvas>
@@ -6967,6 +6967,7 @@ addEventListener('hashchange',function(){if(isObjectHash())openFromHash();});
 <script src="https://cdn.jsdelivr.net/npm/@maplibre/maplibre-gl-leaflet@0.1.0/leaflet-maplibre-gl.js" defer
   onload="try{renderMapReal();}catch(e){}"></script>
 <script>window.addEventListener("load",function(){try{renderMapReal();}catch(e){}});</script>
+<!-- PLP:COUNTER:START — один код счётчика site_events; build/mktrack.mjs копирует его на все страницы -->
 <script>
 /* Обезличенная аналитика: без неё нельзя сказать, конвертит сайт или нет.
    Ни телефонов, ни имён, ни почт — только событие, страница и источник.
@@ -6975,6 +6976,8 @@ addEventListener('hashchange',function(){if(isObjectHash())openFromHash();});
 (function () {
   try {
     if (!window.fetch) return;
+    /* 16.10.2026: заходы с Мака (localhost, файл) и роботов-проверок (phone_shot, headless) не считаем. */
+    if (location.protocol === 'file:' || /^(localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\])$/.test(location.hostname) || navigator.webdriver) return;
     /* Адрес задан явно: LEAD_ENDPOINT объявлена внутри замыкания и в глобальной
        области недоступна — на этом трекер молча не запускался. Ключ тот же, что
        у site-lead, и он и так виден в исходнике страницы. */
@@ -7069,6 +7072,7 @@ addEventListener('hashchange',function(){if(isObjectHash())openFromHash();});
   } catch (e) {}
 })();
 </script>
+<!-- PLP:COUNTER:END -->
 <script>
 /* 15.09: книга каталога чуть наклоняется за курсором внутри зелёной полосы.
    Только для мыши; на тачах и при reduce-motion — ничего. */
