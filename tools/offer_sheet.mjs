@@ -41,10 +41,13 @@ function wide(p, h) {
     (p.cap ? `\n  <p class="src">${p.cap}</p>` : '');
 }
 
-function cardsRow(cards, layout) {
+function cardsRow(cards, layout, align) {
   if (!cards || !cards.length) return '';
   if (cards.length === 1) return `<div style="margin-top:4mm">\n    ${cards[0]}\n  </div>`;
-  return `<div class="grid ${layout || 'g2'}" style="margin-top:4mm;align-items:start">\n    ${cards.join('\n    ')}\n  </div>`;
+  /* 17.10.2026: три карточки в сетке на две колонки оставляли третью одну слева (лист «съезжал влево»):
+     первые две рядом, остальные на всю ширину отдельными рядами */
+  if (cards.length === 3 && (!layout || layout === 'g2')) return cardsRow(cards.slice(0, 2), layout, align) + '\n  ' + cardsRow([cards[2]]);
+  return `<div class="grid ${layout || 'g2'}" style="margin-top:4mm;align-items:${align || 'start'}">\n    ${cards.join('\n    ')}\n  </div>`;
 }
 
 function section(eyebrow, h2, body, extra) {
@@ -63,7 +66,7 @@ function render(J) {
   let ub = '';
   if (U.lead) ub += `<p class="lead">${U.lead}</p>\n  `;
   if (U.facts) ub += U.facts + '\n  ';
-  ub += cardsRow(U.cards, U.cards_layout);
+  ub += cardsRow(U.cards, U.cards_layout, 'stretch');
   if (U.photos && U.photos.length) {
     ub += `\n  <div class="sub3">Квартиры внутри</div>\n  ` + polRow(U.photos);
     if (U.photos_note) ub += `\n  <p class="src">${U.photos_note}</p>`;

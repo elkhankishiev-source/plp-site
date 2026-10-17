@@ -39,7 +39,10 @@ function coverPdf(html) {
   if (i < 0 || j < 0 || j < i) { console.log('⚠️ нет шапки/hero в листе — печатаю как есть'); return html; }
   return h.slice(0, i) + cover + h.slice(j);   // от шапки до строки цифр (включая hero) заменено обложкой
 }
-fs.writeFileSync(TMP, coverPdf(fs.readFileSync(SHEET, 'utf8')));
+/* 17.10.2026: плашка cookies (js/consent.js, с 16.10) попала в PDF и растянула низ листа на 800 pt пустоты (последний «текст» = плашка).
+   В печатную копию аналитику и согласие не кладём. */
+const чистый = (h) => h.replace(/<script src="\/js\/consent\.js"[^>]*><\/script>/g, '').replace(/<!-- PLP:(GA|PIXEL) -->\s*(<script>[\s\S]*?<\/script>)?/g, '');
+fs.writeFileSync(TMP, чистый(coverPdf(fs.readFileSync(SHEET, 'utf8'))));
 const raw = path.join(os.tmpdir(), 'offer_raw_' + slug + '.pdf');
 const port = 8700 + Math.floor(Math.random() * 200);
 let prof = ''; // 09.10.2026: профиль Chrome удаляем за собой (накопилось 137 штук, 1,8 ГБ)
