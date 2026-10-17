@@ -412,7 +412,7 @@ function render(){
       '<label class="tgf" id="tgf" hidden><input id="tg" placeholder="Ник в Telegram, например @name" autocomplete="off" autocapitalize="off" spellcheck="false"><span class="fh">Нужен вместе с номером: так мы точно найдём вас в Telegram.</span></label>' +
       '<input class="hp" id="co" tabindex="-1" autocomplete="off" aria-hidden="true">' +
       '<div class="err" id="err"></div><button class="cta" type="submit">Получить подборку</button></form>' +
-      '<p class="note">Оставляя номер, вы соглашаетесь, что Property Library Phuket свяжется с вами по этому запросу.</p>';
+      '<p class="note">Оставляя номер, вы соглашаетесь получать сообщения от Property Library Phuket в WhatsApp и Telegram по этому запросу.</p>';
     A.channel = 'whatsapp'; TR('form_view');
     $('ph').addEventListener('paste', () => pasted = true);
     document.querySelectorAll('.chan button').forEach(b => b.onclick = () => {
