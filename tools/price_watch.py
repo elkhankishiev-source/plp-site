@@ -43,7 +43,11 @@ def main():
     # 04.10.2026: репозиторий общий (вторая сессия Claude, Codex). Раньше выкладка делала git add -A
     # и забрала бы чужие незаписанные правки. Выкладываем, только если до прогона копия была чистой,
     # и сначала подтягиваем свежий main, чтобы не затереть чужие коммиты.
-    чисто_до = not run(['git', 'status', '--porcelain']).strip()
+    # 19.10.2026: неотслеживаемые файлы (tools/__pycache__ от собственных импортов сторожа, чужая img/VIBE2.jpg)
+    # с 12.10 навсегда держали «чисто_до» ложным. Считаем только отслеживаемые правки; неотслеживаемое, что лежало
+    # до прогона, в коммит не берём никогда (новые страницы, созданные сборкой, берём как раньше).
+    чисто_до = not run(['git', 'status', '--porcelain', '--untracked-files=no']).strip()
+    чужие_новые = set(run(['git', 'ls-files', '--others', '--exclude-standard']).split('\n')) - {''}
     if чисто_до and PUBLISH:
         run(['git', 'pull', '--ff-only', 'origin', 'main'])
     changed, waiting, soldout, nolist, nochan = [], [], [], [], []
@@ -109,12 +113,27 @@ def main():
         b = run(['node', os.path.join(ROOT, 'build', 'all.mjs')], timeout=3000)
         ok = all(s in b for s in ('[вид] ок', '[кабинет] ок')) and 'сборка завершена' in b
         built = 'сборка: ок' if ok else 'сборка: ПРОВЕРКИ НЕ ПРОШЛИ — не публикую'
+        # 19.10.2026: 19.10 проверки упали, а вывода сборки не осталось — причину не узнать. Пишем вывод в журнал
+        # и в отчёт кладём строку, на которой упало.
+        try:
+            open(os.path.expanduser('~/plp_pricewatch_build.log'), 'w', encoding='utf-8').write(
+                '%s\n%s' % (datetime.datetime.now().isoformat(), b))
+        except Exception:
+            pass
+        if not ok:
+            почему = [l for l in b.splitlines() if (l.startswith('[вид]') or l.startswith('[кабинет]')) and ' ок' not in l[:12]]
+            почему = почему or [l for l in b.splitlines() if ('Error' in l and 'BrokenPipe' not in l) or l.startswith('Traceback')]
+            if 'сборка завершена' not in b:
+                почему.append('сборка не дошла до конца')
+            built += ' (' + ('; '.join(x.strip()[:160] for x in почему[:2]) or 'причина в ~/plp_pricewatch_build.log') + ')'
         if ok and PUBLISH and not чисто_до:
             published = 'не выкладываю: в репозитории до прогона были чужие незаписанные правки'
         elif ok and PUBLISH:
             st = run(['git', 'status', '--porcelain'])
             if st.strip():
                 run(['git', 'add', '-A'])
+                if чужие_новые:   # лежали до прогона — не наши, в коммит не берём
+                    run(['git', 'reset', '-q', '--'] + sorted(чужие_новые))
                 run(['git', 'commit', '-m', 'Обновление цен и наличия по прайсам застройщиков (автосверка)'])
                 push = run(['git', 'push', 'origin', 'main'])
                 published = 'сайт обновлён' if 'error' not in push.lower() else 'выложить не удалось'
