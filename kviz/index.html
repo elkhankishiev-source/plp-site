@@ -205,6 +205,13 @@ input[aria-invalid="true"]{border-color:var(--red);background:#FFF7F7}
 .done .cta2.bot{margin-top:18px}
 .lnks{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 18px;padding:14px 18px 22px}
 .lnks .lnk{padding:4px 0}
+/* 19.10.2026: «Другие способы» — мелко, свёрнуто */
+.alt{margin:18px 18px 22px;text-align:center}
+.alt summary{display:inline-block;cursor:pointer;color:var(--muted,#6b6b5e);font-weight:700;font-size:.85rem;list-style:none;padding:6px 4px}
+.alt summary::-webkit-details-marker{display:none}
+.alt summary::after{content:' ▾'}
+.alt[open] summary::after{content:' ▴'}
+.alt .lnks{flex-direction:column;align-items:center;gap:8px;padding:6px 0 0}
 #qwrap{animation:fade .3s ease}@keyframes fade{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:none}}
 body{min-height:101vh;overscroll-behavior-y:contain}
 
@@ -498,14 +505,20 @@ function finish(r){
      (Эльнур: «одни карточки на меня, другие на Дарью, и всё»). */
   if (r.assigned_to === 'elnur' || r.assigned_to === 'daria') AS = r.assigned_to;
   const wkey = Object.keys(P).find(k => P[k] === C), ref = r.client_code || r.phone || PH || '';
-  const who = AS || assignee(r.phone || PH), W = WRK[who];
+  /* 19.10.2026 Эльнур «да, го»: назначенного не узнали (приёмник не ответил) — номер Эльнура, не чётность. */
+  const who = AS || 'elnur', W = WRK[who];
   const msg = encodeURIComponent('Здравствуйте! Хочу забрать бонус по ' + C.name + '.' + (ref ? ' Заявка ' + ref : ''));
   const icWA = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.2s.9 2.5 1 2.7c.1.2 1.8 2.8 4.4 3.9 1.6.7 2.3.8 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></svg>';
   const icTG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.9 4.3 18.7 19.4c-.2 1-.9 1.3-1.7.8l-4.8-3.6-2.3 2.2c-.3.3-.5.5-1 .5l.3-4.9 8.9-8c.4-.3-.1-.5-.6-.2l-11 6.9-4.7-1.5c-1-.3-1-1 .2-1.5l18.5-7.1c.9-.3 1.6.2 1.4 1.3z"/></svg>';
-  const bWA = '<a class="wa" data-ev="click_wa_write" href="https://wa.me/' + W.wa + '?text=' + msg + '" target="_blank" rel="noopener">' + icWA + 'Забрать бонус в WhatsApp</a>';
-  const bTG = '<a class="tg" data-ev="click_tg_write" href="https://t.me/' + W.tg + '?text=' + msg + '" target="_blank" rel="noopener">' + icTG + 'Забрать бонус в Telegram</a>';
+  /* 19.10.2026 Эльнур «да, го» (путь_лида_и_бан_1910.md): за 5 дней 11 заявок, нажатий WhatsApp 1, Telegram 1, бот 0 —
+     на экране одна главная кнопка в выбранный мессенджер, остальное мелко под «Другие способы». */
+  const tgFirst = (r.channel || A.channel) === 'telegram';
+  const bWA = '<a class="wa" data-ev="click_wa_write" href="https://wa.me/' + W.wa + '?text=' + msg + '" target="_blank" rel="noopener">' + icWA + 'Получить бонус в WhatsApp</a>';
+  const bTG = '<a class="tg" data-ev="click_tg_write" href="https://t.me/' + W.tg + '?text=' + msg + '" target="_blank" rel="noopener">' + icTG + 'Получить бонус в Telegram</a>';
+  const lWA = '<a class="lnk" data-ev="click_wa_write" href="https://wa.me/' + W.wa + '?text=' + msg + '" target="_blank" rel="noopener">Написать в WhatsApp</a>';
+  const lTG = '<a class="lnk" data-ev="click_tg_write" href="https://t.me/' + W.tg + '?text=' + msg + '" target="_blank" rel="noopener">Написать в Telegram</a>';
   const write = '<p class="mot">' + (MOT[wkey] || 'Напишите, и пришлём расчёт под ваш бюджет.') + '</p>' +
-    '<div class="wr">' + ((r.channel || A.channel) === 'telegram' ? bTG + bWA : bWA + bTG) + '</div>' +
+    '<div class="wr">' + (tgFirst ? bTG : bWA) + '</div>' +
     '<p class="wrh">Сообщение уже набрано, останется нажать «Отправить»</p>';
   $('quiz').hidden = true;
   const ch = (r.channel || A.channel) === 'telegram' ? 'Telegram' : 'WhatsApp', key = Object.keys(P).find(k => P[k] === C);
@@ -518,16 +531,12 @@ function finish(r){
             : '<p>Я напишу вам в выбранный мессенджер. Быстрее всего заберите бонус сами: кнопка ниже.</p>') + '</div></div>' + write +
     '<div class="facts">' + C.facts.map(f => '<div><b>' + f[0] + '</b>' + f[1] + '</div>').join('') + '</div>' +
     '<div class="gal">' + C.gal.map(g => { const [n, st] = g.split('|'); return '<i class="gi"><img src="img/' + n + '.webp" alt=""' + (st ? ' style="' + st + '"' : '') + '></i>'; }).join('') + '</div>' +
-    /* 13.10.2026 Эльнур («лид нажал — и автоматом в Telegram»): ссылка в бот несёт метку заявки (r.tg_start от приёмника),
-       бот по ней узнаёт Telegram человека, даже если номер в Telegram скрыт.
-       15.10.2026 (вечер): бот ниже кнопок «Написать Эльнуру», канал и лист ссылками. Метка та же: r.tg_start, без неё kviz_<проект>. */
-    '<a class="cta2 bot" href="' + (r.tg_start || ('https://t.me/elnurphuket_bot?start=' + C.bot)) + '" target="_blank" rel="noopener">Получить расчёт в Telegram</a>' +
-    /* 16.10.2026 Эльнур: «лист проекта открыть только в чат-боте или в личном сообщении, введут фейковый номер и заберут нашу наработку;
-       можно показать обложку листа, как будто презентация». Показываем обложку (og-картинка листа), клик ведёт в бот с меткой заявки. */
-    '<a class="cover" href="' + (r.tg_start || ('https://t.me/elnurphuket_bot?start=' + C.bot)) + '" target="_blank" rel="noopener">' +
-      '<img src="' + C.sheet.replace(/\/([a-z0-9-]+)$/, '/offers/$1/img/preview-' + (/\/(vibe2|fizz)$/.test(C.sheet) ? 'v11' : 'v10') + '.jpg') + '" alt="Презентация ' + C.name + '">' +
-      '<span>🔒 Презентация ' + C.name + ': цены, планировки, расчёт. Пришлём в Telegram-бот или в личном сообщении</span></a>' +
-    '<div class="lnks"><a class="lnk" href="' + POST[key] + '" target="_blank" rel="noopener">Читать разбор ' + C.name + ' в Telegram</a></div>';
+    /* 13.10.2026: ссылка в бот несёт метку заявки (r.tg_start), бот по ней узнаёт Telegram человека.
+       19.10.2026: бот, второй мессенджер и канал — мелкими ссылками под «Другие способы»; обложка презентации убрана с экрана
+       (клики 0 с 14.10), презентацию по-прежнему отдаёт бот. */
+    '<details class="alt"><summary>Другие способы</summary><div class="lnks">' + (tgFirst ? lWA : lTG) +
+      '<a class="lnk" href="' + (r.tg_start || ('https://t.me/elnurphuket_bot?start=' + C.bot)) + '" target="_blank" rel="noopener">Получить расчёт в Telegram-боте</a>' +
+      '<a class="lnk" href="' + POST[key] + '" target="_blank" rel="noopener">Читать разбор ' + C.name + ' в Telegram</a></div></details>';
   $('done').hidden = false; scrollTo(0, 0);
   $('done').onclick = e => { const a = e.target.closest && e.target.closest('a'); if (!a) return; const h = a.getAttribute('href') || '';
     if (a.dataset.ev) { TR(a.dataset.ev, who); if (window.PLPTrack) PLPTrack.flush(false); return; }
