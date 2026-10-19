@@ -1710,8 +1710,45 @@
    "name": "Eden Residences",
    "district": "Банг Тао",
    "type": "Кондо",
-   "price_from": 13900000,
-   "units": []
+   "price_from": 21600000,
+   "units": [
+    {
+     "area": "72–75 м²",
+     "name": "1 спальня",
+     "price_from_thb": 21600000,
+     "from": 21600000
+    },
+    {
+     "area": "105–132 м²",
+     "name": "2 спальни",
+     "price_from_thb": 31800000,
+     "from": 31800000
+    },
+    {
+     "area": "179–229,5 м²",
+     "name": "3 спальни",
+     "price_from_thb": 62650000,
+     "from": 62650000
+    },
+    {
+     "area": "190 м²",
+     "name": "дуплекс 3 спальни",
+     "price_from_thb": 66500000,
+     "from": 66500000
+    },
+    {
+     "area": "260 м²",
+     "name": "пентхаус 2 спальни",
+     "price_from_thb": 72800000,
+     "from": 72800000
+    },
+    {
+     "area": "381 м²",
+     "name": "пентхаус 4 спальни",
+     "price_from_thb": 110490000,
+     "from": 110490000
+    }
+   ]
   },
   {
    "id": "PLP-ESTELLA",
