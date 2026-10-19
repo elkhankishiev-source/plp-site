@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-17",
+ "updated": "2026-10-19",
  "items": [
   {
    "id": "ATT-KYE",
@@ -1530,17 +1530,17 @@
    "name": "The Title Coralina Kamala",
    "district": "Камала",
    "type": "Кондо",
-   "price_from": 4693524,
+   "price_from": 5236272,
    "units": [
     {
      "beds": 1,
-     "code": "1BMG5",
-     "free": 1,
+     "code": "1BMG3",
+     "free": 4,
      "name": "1 спальня",
-     "area_sqm": 30,
-     "price_from_thb": 5319120,
-     "area": 30,
-     "from": 5319120
+     "area_sqm": 31,
+     "price_from_thb": 5236272,
+     "area": 31,
+     "from": 5236272
     },
     {
      "beds": 1,
@@ -1555,7 +1555,7 @@
     {
      "beds": 1,
      "code": "1BPLC1-2",
-     "free": 69,
+     "free": 67,
      "name": "1 спальня",
      "area_sqm": 46,
      "price_from_thb": 6884352,
