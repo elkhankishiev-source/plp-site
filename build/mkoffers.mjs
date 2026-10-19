@@ -83,7 +83,17 @@ for (const o of OFFERS) {
   /* 02.10.2026: кнопка PDF только когда файл правда лежит рядом. У Aileen кнопка стояла,
      а файла не было, и человек получал «не найдено». Надпись по правилу кнопок «Получить + что». */
   const hasPdf = o.pdf && fs.existsSync(path.join(ROOT, o.dir, o.pdf));
-  const body = `<section class="offer-wrap" style="padding:18px 0 120px"><div class="container">
+  const body = `<style>
+/* 19.10.2026 (#2.13): на телефоне кнопка «Дарья · на связи» закрывала цифры аренды справа. На листах-офферах она узкая, только значок; куда ведёт и чей номер, не менялось. */
+@media(max-width:600px){
+  .fabwrap{right:6px}
+  .fabwrap .fab{padding:6px;gap:0;position:relative}
+  .fabwrap .fab .fabtxt{display:none}
+  .fabwrap .fab .dot{position:absolute;top:2px;right:2px;margin:0}
+  .fabwrap .fabmin{display:none}
+}
+</style>
+<section class="offer-wrap" style="padding:18px 0 120px"><div class="container">
   <!-- 09.10.2026 Эльнур: «открыл ссылку, а там на пол-экрана скачать PDF, стрёмно». Маленькая строка справа, лист сразу виден. -->
   <div style="display:flex;justify-content:flex-end;margin:0 0 8px">
     ${hasPdf ? `<a href="/${o.dir}/${o.pdf}" target="_blank" rel="noopener" style="font-size:13px;line-height:1;padding:7px 12px;border:1px solid rgba(255,255,255,.28);border-radius:999px;color:#EFECE2;text-decoration:none;opacity:.85">PDF ↓</a>` : ''}

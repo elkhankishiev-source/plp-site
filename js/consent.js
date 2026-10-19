@@ -85,7 +85,8 @@
         'html.plp-cb-on body{padding-bottom:calc(var(--plp-cb-h,120px) + 16px)}' +
         'html.plp-cb-on .fab,html.plp-cb-on .fabwrap,html.plp-cb-on .tray{bottom:calc(var(--plp-cb-h,120px) + 24px)!important}' +
         'html.plp-cb-on #toTop{bottom:calc(var(--plp-cb-h,120px) + 84px)!important}' +
-        '@media (max-width:420px){.plp-cb{font-size:13px;padding:12px 14px}.plp-cb .b{width:100%}.plp-cb button{flex:1}}';
+        '@media (max-width:600px){.plp-cb{left:8px;right:8px;bottom:calc(8px + env(safe-area-inset-bottom,0px));font-size:11.5px;line-height:1.35;padding:9px 12px;border-radius:12px;gap:7px 10px}' +
+        '.plp-cb p{flex:1 1 100%}.plp-cb .b{width:100%;gap:6px}.plp-cb button{flex:1;font-size:12px;padding:7px 10px}}';
       document.head.appendChild(st);
     }
     box = document.createElement('div');
