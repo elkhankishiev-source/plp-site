@@ -24,7 +24,7 @@ function jpegSize(p) {
   return null;
 }
 
-const ОФФЕРЫ = { 'vibe2.html': 'offers/vibe2/img/preview-v11.jpg', 'zero-naiyang.html': 'offers/zero-naiyang/img/preview-v10.jpg',
+const ОФФЕРЫ = { 'vibe2.html': 'offers/vibe2/img/preview-v12.jpg', 'zero-naiyang.html': 'offers/zero-naiyang/img/preview-v10.jpg',
   // 07.10 Эльнур: «превью ссылки соответствующее фото, не везде одно и то же» — /cg-capital и /aileen показывали Heritage
   'cg-capital.html': 'offers/cg-capital/img/preview-v10.jpg', 'aileen.html': 'offers/aileen/img/preview-v10.jpg',
   'kuartz.html': 'offers/kuartz/img/preview-v11.jpg', 'fizz.html': 'offers/fizz/img/preview-v12.jpg', 'eden.html': 'offers/eden/img/preview-v10.jpg',
