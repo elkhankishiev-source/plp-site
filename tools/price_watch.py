@@ -129,11 +129,10 @@ def main():
         if ok and PUBLISH and not чисто_до:
             published = 'не выкладываю: в репозитории до прогона были чужие незаписанные правки'
         elif ok and PUBLISH:
-            st = run(['git', 'status', '--porcelain'])
-            if st.strip():
-                run(['git', 'add', '-A'])
-                if чужие_новые:   # лежали до прогона — не наши, в коммит не берём
-                    run(['git', 'reset', '-q', '--'] + sorted(чужие_новые))
+            run(['git', 'add', '-A'])
+            if чужие_новые:   # лежали до прогона — не наши, в коммит не берём
+                run(['git', 'reset', '-q', '--'] + sorted(чужие_новые))
+            if run(['git', 'diff', '--cached', '--stat']).strip():   # 19.10: решаем по тому, что реально в коммите
                 run(['git', 'commit', '-m', 'Обновление цен и наличия по прайсам застройщиков (автосверка)'])
                 push = run(['git', 'push', 'origin', 'main'])
                 published = 'сайт обновлён' if 'error' not in push.lower() else 'выложить не удалось'
