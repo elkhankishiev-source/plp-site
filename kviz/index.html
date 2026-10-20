@@ -419,7 +419,7 @@ function render(){
       '<input id="ph" type="tel" inputmode="tel" placeholder="+7 900 123 45 67" value="+" autocomplete="tel" aria-describedby="phh err">' +
       '<div class="fh" id="phh">Номер с кодом страны, например +7 900 123 45 67 или +66 81 234 5678</div>' +
       '<div class="chan"><button type="button" class="on" data-c="whatsapp">WhatsApp</button><button type="button" data-c="telegram">Telegram</button></div>' +
-      '<label class="tgf" id="tgf" hidden><input id="tg" placeholder="Ник в Telegram, например @name" autocomplete="off" autocapitalize="off" spellcheck="false"><span class="fh">Нужен вместе с номером: так мы точно найдём вас в Telegram.</span></label>' +
+      '<label class="tgf" id="tgf" hidden><input id="tg" placeholder="Ник в Telegram, если есть" autocomplete="off" autocapitalize="off" spellcheck="false"><span class="fh">Необязательно. После заявки нажмите «Продолжить в Telegram», и мы сразу увидим вас там.</span></label>' +
       '<input class="hp" id="co" tabindex="-1" autocomplete="off" aria-hidden="true">' +
       '<div class="err" id="err"></div><button class="cta" type="submit">Получить подборку</button></form>' +
       '<p class="note">Нажимая кнопку, вы соглашаетесь получать сообщения от Property Library Phuket в WhatsApp или Telegram только по этому запросу. <a href="/privacy" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">Политика конфиденциальности</a></p>';
@@ -460,8 +460,8 @@ function send(){
   lead.channel_pref = A.channel === 'telegram' ? 'telegram' : 'whatsapp';
   /* ник в Telegram (необязательно): приёмник sitelead.mjs читает tg_username и сам убирает @ и t.me/ */
   const tgNick = A.channel === 'telegram' && $('tg') ? $('tg').value.trim().slice(0, 64) : '';
-  /* 15.10 Эльнур: «ник и номер обязательно, просто ник не надо» — при Telegram без ника не отправляем */
-  if (A.channel === 'telegram' && tgNick.replace(/^@|https?:\/\/t\.me\//g, '').length < 3) { $('err').textContent = 'Укажите ник в Telegram, например @name.'; try { $('tg').focus(); } catch (e) {} TR('tg_err'); return; }
+  /* 20.10.2026 го Эльнура: номер обязателен, ник необязательный (отменяет 15.10 «ник и номер обязательно»).
+     Telegram человека бот узнаёт сам по кнопке «Продолжить в Telegram» с кодом заявки (заявка 14139: в поле ника вписали номер). */
   if (tgNick) lead.tg_username = tgNick;
   try { if (window.PLPTrack) lead.track = PLPTrack.lead(); } catch (e) {}
   /* 16.10.2026 CAPI: приёмник шлёт серверный Lead в Meta только при согласии «Принять» (как пиксель, PDPA) */
@@ -521,9 +521,14 @@ function finish(r){
   const bTG = '<a class="tg" data-ev="click_tg_write" href="https://t.me/' + W.tg + '?text=' + msg + '" target="_blank" rel="noopener">' + icTG + 'Получить бонус в Telegram</a>';
   const lWA = '<a class="lnk" data-ev="click_wa_write" href="https://wa.me/' + W.wa + '?text=' + msg + '" target="_blank" rel="noopener">Написать в WhatsApp</a>';
   const lTG = '<a class="lnk" data-ev="click_tg_write" href="https://t.me/' + W.tg + '?text=' + msg + '" target="_blank" rel="noopener">Написать в Telegram</a>';
+  /* 20.10.2026 го Эльнура: выбрал Telegram и приёмник дал код заявки (r.tg_start) — главная кнопка «Продолжить в Telegram»
+     ведёт в @elnurphuket_bot с кодом: бот узнаёт человека, связывает Telegram с номером заявки, ведущему уходит карточка,
+     человеку бот отвечает по его квизу. Кода нет (приёмник не ответил) — как раньше, в рабочий Telegram с набранным текстом. */
+  const botMain = tgFirst && r.tg_start;
+  const bBOT = '<a class="tg" data-ev="click_tg_bot" href="' + r.tg_start + '" target="_blank" rel="noopener">' + icTG + 'Продолжить в Telegram</a>';
   const write = '<p class="mot">' + (MOT[wkey] || 'Напишите, и пришлём расчёт под ваш бюджет.') + '</p>' +
-    '<div class="wr">' + (tgFirst ? bTG : bWA) + '</div>' +
-    '<p class="wrh">Сообщение уже набрано, останется нажать «Отправить»</p>';
+    '<div class="wr">' + (botMain ? bBOT : tgFirst ? bTG : bWA) + '</div>' +
+    (botMain ? '<p class="wrh">Откроется Telegram, нажмите там «Старт»</p>' : '<p class="wrh">Сообщение уже набрано, останется нажать «Отправить»</p>');
   $('quiz').hidden = true;
   const ch = (r.channel || A.channel) === 'telegram' ? 'Telegram' : 'WhatsApp', key = Object.keys(P).find(k => P[k] === C);
   $('done').innerHTML =
@@ -538,8 +543,8 @@ function finish(r){
     /* 13.10.2026: ссылка в бот несёт метку заявки (r.tg_start), бот по ней узнаёт Telegram человека.
        19.10.2026: бот, второй мессенджер и канал — мелкими ссылками под «Другие способы»; обложка презентации убрана с экрана
        (клики 0 с 14.10), презентацию по-прежнему отдаёт бот. */
-    '<details class="alt"><summary>Другие способы</summary><div class="lnks">' + (tgFirst ? lWA : lTG) +
-      '<a class="lnk" href="' + (r.tg_start || ('https://t.me/elnurphuket_bot?start=' + C.bot)) + '" target="_blank" rel="noopener">Получить расчёт в Telegram-боте</a>' +
+    '<details class="alt"><summary>Другие способы</summary><div class="lnks">' + (tgFirst ? lWA : lTG) + (botMain ? lTG : '') +
+      (botMain ? '' : '<a class="lnk" href="' + (r.tg_start || ('https://t.me/elnurphuket_bot?start=' + C.bot)) + '" target="_blank" rel="noopener">Получить расчёт в Telegram-боте</a>') +
       '<a class="lnk" href="' + POST[key] + '" target="_blank" rel="noopener">Читать разбор ' + C.name + ' в Telegram</a></div></details>';
   $('done').hidden = false; scrollTo(0, 0);
   $('done').onclick = e => { const a = e.target.closest && e.target.closest('a'); if (!a) return; const h = a.getAttribute('href') || '';
