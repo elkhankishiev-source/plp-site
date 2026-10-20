@@ -11,6 +11,7 @@ import json, sys, urllib.request
 
 URL = 'https://api.property-library.com/ukowner'
 import os as _os
+import os as _os_l, sys as _sys_l; _sys_l.path.insert(0, _os_l.path.dirname(_os_l.path.abspath(__file__))); from _lichny import ЛИЧНЫЙ, ЛИЧНЫЙ9  # 20.10: личный номер вне репо
 # токен штаба НЕ хранить в репозитории (11.09.2026): ~/.plp_staff_token или PLP_STAFF_TOKEN
 TOKEN = (_os.environ.get('PLP_STAFF_TOKEN') or (open(_os.path.expanduser('~/.plp_staff_token')).read().strip() if _os.path.exists(_os.path.expanduser('~/.plp_staff_token')) else ''))
 if not TOKEN: sys.exit('нет токена штаба: положи в ~/.plp_staff_token')
@@ -190,7 +191,7 @@ check('лента касаний', {'action': 'touch_list', 'status': 'draft'}, 
 
 # 10.09: встречи. До этого дня встреча не оставляла следа нигде — договорились
 # и забыли. Проверяем и запись, и отказы: без телефона и в прошлое пускать нельзя.
-_TEST_PHONE = '66954143874'   # номер Эльнура: на реальных не тестируем
+_TEST_PHONE = ЛИЧНЫЙ   # номер Эльнура: на реальных не тестируем
 _when = (__import__('datetime').datetime.utcnow()
          + __import__('datetime').timedelta(days=3)).strftime('%Y-%m-%dT09:00:00+07:00')
 check('встречи: назначить', {'action': 'meeting_set', 'phone': _TEST_PHONE,

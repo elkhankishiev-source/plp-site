@@ -20,6 +20,7 @@
     python3 tools_smoke.py --tg      # и сообщить в тех-чат, если что-то сломано
 """
 import json, os, re, sys, urllib.error, urllib.parse, urllib.request
+import os as _os_l, sys as _sys_l; _sys_l.path.insert(0, _os_l.path.dirname(_os_l.path.abspath(__file__))); from _lichny import ЛИЧНЫЙ, ЛИЧНЫЙ9  # 20.10: личный номер вне репо
 
 СООБЩАТЬ = '--tg' in sys.argv
 
@@ -127,7 +128,7 @@ def _():
 
 @проверка('опознание человека по номеру')
 def _():
-    к, д = гет('/rpc/identity_resolve', {'p_value': '66954143874'})
+    к, д = гет('/rpc/identity_resolve', {'p_value': ЛИЧНЫЙ})
     if к != 200:
         return False, 'запрос не прошёл: %s %s' % (к, д)
     return (bool(д and д.get('найден')), 'опознан' if (д or {}).get('найден') else 'не опознан свой же номер')

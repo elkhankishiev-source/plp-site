@@ -17,6 +17,7 @@
 """
 import json, sys, urllib.parse, urllib.request, urllib.error
 from datetime import datetime, timedelta, timezone
+import os as _os_l, sys as _sys_l; _sys_l.path.insert(0, _os_l.path.dirname(_os_l.path.abspath(__file__))); from _lichny import ЛИЧНЫЙ, ЛИЧНЫЙ9  # 20.10: личный номер вне репо
 
 
 def env(k, f='/opt/plp-api/.env'):
@@ -32,7 +33,7 @@ AK = env('ANTHROPIC_API_KEY')
 H = {'apikey': SK, 'Authorization': 'Bearer ' + SK, 'Content-Type': 'application/json'}
 # Свои номера команды — те же, что в сторожe plp_watch. Тестовые и демо-номера в публичный код не пишем:
 # они лежат в настройках сервера (PLP_DEMO_NUMBERS), как у сторожа (03.10).
-СВОИ = {'66954143874', '66955492587', '66640709032', '509498386', '8554364120', '8227351774', '66960169127'}
+СВОИ = {ЛИЧНЫЙ, '66955492587', '66640709032', '509498386', '8554364120', '8227351774', '66960169127'}
 СВОИ |= {x.strip() for x in env('PLP_DEMO_NUMBERS').split(',') if x.strip()}
 ПРАВИЛА = [
     'цена объекта, которую не спрашивали и не связанная с разговором (по запросу и вилкой — хорошо)',

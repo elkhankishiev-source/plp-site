@@ -27,6 +27,7 @@ from urllib.parse import urlparse, parse_qs
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cab_check  # noqa: E402  (сервер страниц и снимок данных кабинета)
+import os as _os_l, sys as _sys_l; _sys_l.path.insert(0, _os_l.path.dirname(_os_l.path.abspath(__file__))); from _lichny import ЛИЧНЫЙ, ЛИЧНЫЙ9  # 20.10: личный номер вне репо
 
 ROOT = cab_check.ROOT
 OUT = os.environ.get('AUDIT_OUT', '/tmp/plp_flow_audit.json')
@@ -116,7 +117,7 @@ FILL_JS = r"""
     if (f.value && f.tagName !== 'SELECT') return;
     const hint = ((f.name || '') + ' ' + (f.id || '') + ' ' + (f.placeholder || '') + ' ' + (f.getAttribute('aria-label') || '')).toLowerCase();
     let v = 'ТЕСТ обход кнопок — не обрабатывать';
-    if (t === 'tel' || /phone|тел|номер|whatsapp/.test(hint)) v = '+66954143874';
+    if (t === 'tel' || /phone|тел|номер|whatsapp/.test(hint)) v = '+__ЛИЧНЫЙ__';
     else if (t === 'email' || /mail|почт/.test(hint)) v = 'audit.test@example.com';
     else if (t === 'number' || /цен|сумм|price|amount|бюджет|площад|спал|кол|cost/.test(hint)) v = '3';
     else if (t === 'date') v = /out|выезд|до|end|to/.test(hint) ? iso(12) : iso(8);
@@ -133,6 +134,7 @@ FILL_JS = r"""
 }
 """
 
+FILL_JS = FILL_JS.replace("__ЛИЧНЫЙ__", ЛИЧНЫЙ)
 SNAP_JS = r"""
 ([id, msgSel]) => {
   const el = document.querySelector('[data-audit-id="' + id + '"]');

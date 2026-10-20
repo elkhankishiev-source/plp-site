@@ -16,11 +16,12 @@ from urllib.parse import urlparse
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cab_check, flow_audit  # noqa: E402
+import os as _os_l, sys as _sys_l; _sys_l.path.insert(0, _os_l.path.dirname(_os_l.path.abspath(__file__))); from _lichny import ЛИЧНЫЙ, ЛИЧНЫЙ9  # 20.10: личный номер вне репо
 
 cab_check.PORT = int(os.environ.get('AUDIT_PORT', 8805))
 BASE = 'http://127.0.0.1:%d' % cab_check.PORT
 OUT = os.environ.get('JOURNEYS_OUT', '/tmp/plp_journeys.json')
-PHONE, NAME = '+66954143874', 'ТЕСТ Claude'
+PHONE, NAME = '+' + ЛИЧНЫЙ, 'ТЕСТ Claude'
 
 
 class J:
@@ -321,7 +322,7 @@ def cabinet(j):
     lg = j.page('/owner.html')
 
     def login():
-        lg.fill('#login', '954143874'); lg.click('#send-code'); lg.wait_for_timeout(900)
+        lg.fill('#login', ЛИЧНЫЙ9); lg.click('#send-code'); lg.wait_for_timeout(900)
         lg.fill('#code', '123456'); lg.click('#check-code'); lg.wait_for_timeout(2500)
         return 'кабинет открыт' if lg.evaluate("() => document.getElementById('app').style.display !== 'none'") else txt(lg, '#gate-err')
     j.run('Вход: номер → код → кабинет', login, expect=r'verify_code', where='Кабинет · вход')

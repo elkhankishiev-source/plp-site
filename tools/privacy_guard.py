@@ -21,6 +21,7 @@
     python3 tools/privacy_guard.py --short    # одна строка для сборки
 """
 import glob, json, os, re, sys, urllib.request
+import os as _os_l, sys as _sys_l; _sys_l.path.insert(0, _os_l.path.dirname(_os_l.path.abspath(__file__))); from _lichny import ЛИЧНЫЙ, ЛИЧНЫЙ9  # 20.10: личный номер вне репо
 
 ENV = os.path.expanduser('~/.plp_site_supabase.env')
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -42,7 +43,7 @@ YEAR = re.compile(r'^(19|20)\d\d$')
 PHONE = re.compile(r'(?<!\d)(?:\+?\d[\s()-]?){9,}\d')
 MAIL = re.compile(r'[\w.+-]+@[\w-]+\.[a-z]{2,}', re.I)
 # наши собственные номера — их публикация не нарушение
-OURS = {'955492587', '954143874', '509498386'}
+OURS = {'955492587', ЛИЧНЫЙ9, '509498386'}
 REAL_PHONE = re.compile(r'\+\d{1,3}[\s()-]?\d{2,4}[\s()-]?\d{2,4}[\s()-]?\d{2,4}')
 
 
