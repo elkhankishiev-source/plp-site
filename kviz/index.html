@@ -237,6 +237,7 @@ body{min-height:101vh;overscroll-behavior-y:contain}
 .gal .gi{aspect-ratio:16/10}.gal img{transform:none!important;height:100%}
 .pj .ph0{aspect-ratio:16/9}.pj img.bg{transform:none!important}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.phrow{display:flex;gap:8px}.phrow #cc{flex:0 0 84px;width:84px;text-align:center}.phrow #pn{flex:1 1 auto;min-width:0}
 </style>
 <!-- PLP:GA --><script>window.PLP_GA='G-HQNDG3B8MW';window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied'});</script><script src="/js/consent.js" defer></script></head>
 <body>
@@ -349,6 +350,28 @@ const POST = { kuartz:'https://t.me/property_library_phuket', vibe2:'https://t.m
 /* 16.10.2026 Эльнур: «поле код с флажками всё испортит, убери, организуй поле номер заново без ошибок».
    Одно поле, в нём уже стоит +, номер целиком с кодом страны. Проверяет тот же phone.js, что и приёмник.
    Набрал 00 вместо + или российское 8XXXXXXXXXX — поправляем сами. */
+/* 21.10.2026 Эльнур: «поле для кода страны, код определяется сам, и поле для номера — как это уже работает в мире».
+   Как на большинстве сайтов: код страны отдельно (подставлен по часовому поясу телефона, можно поменять), номер отдельно.
+   Без флажков (16.10: «поле код с флажками всё испортит»). Вписал полный номер с + или 8 — берём его целиком. */
+const CCL = [['7','Россия, Казахстан'],['375','Беларусь'],['380','Украина'],['998','Узбекистан'],['996','Кыргызстан'],['992','Таджикистан'],['994','Азербайджан'],['995','Грузия'],['374','Армения'],['373','Молдова'],['370','Литва'],['371','Латвия'],['372','Эстония'],['66','Таиланд'],['972','Израиль'],['971','ОАЭ'],['90','Турция'],['65','Сингапур'],['852','Гонконг'],['60','Малайзия'],['62','Индонезия'],['84','Вьетнам'],['86','Китай'],['81','Япония'],['82','Корея'],['61','Австралия'],['49','Германия'],['48','Польша'],['420','Чехия'],['43','Австрия'],['41','Швейцария'],['44','Великобритания'],['33','Франция'],['34','Испания'],['39','Италия'],['351','Португалия'],['31','Нидерланды'],['32','Бельгия'],['357','Кипр'],['30','Греция'],['381','Сербия'],['382','Черногория'],['359','Болгария'],['36','Венгрия'],['40','Румыния'],['46','Швеция'],['47','Норвегия'],['45','Дания'],['358','Финляндия'],['353','Ирландия'],['1','США, Канада']];
+function ccGuess(){
+  const TZ = { 'Europe/Moscow':'7','Europe/Samara':'7','Asia/Yekaterinburg':'7','Asia/Omsk':'7','Asia/Novosibirsk':'7','Asia/Krasnoyarsk':'7','Asia/Irkutsk':'7','Asia/Vladivostok':'7','Europe/Kaliningrad':'7','Asia/Almaty':'7','Asia/Qostanay':'7','Asia/Aqtobe':'7','Asia/Aqtau':'7','Asia/Atyrau':'7','Asia/Oral':'7','Asia/Qyzylorda':'7',
+    'Europe/Minsk':'375','Europe/Kiev':'380','Europe/Kyiv':'380','Asia/Tashkent':'998','Asia/Samarkand':'998','Asia/Bishkek':'996','Asia/Dushanbe':'992','Asia/Baku':'994','Asia/Tbilisi':'995','Asia/Yerevan':'374','Europe/Chisinau':'373',
+    'Europe/Vilnius':'370','Europe/Riga':'371','Europe/Tallinn':'372','Asia/Bangkok':'66','Asia/Jerusalem':'972','Asia/Tel_Aviv':'972','Asia/Dubai':'971','Europe/Istanbul':'90','Asia/Singapore':'65','Asia/Hong_Kong':'852','Asia/Kuala_Lumpur':'60','Asia/Jakarta':'62','Asia/Makassar':'62','Asia/Ho_Chi_Minh':'84','Asia/Saigon':'84','Asia/Shanghai':'86','Asia/Tokyo':'81','Asia/Seoul':'82',
+    'Europe/Berlin':'49','Europe/Warsaw':'48','Europe/Prague':'420','Europe/Vienna':'43','Europe/Zurich':'41','Europe/London':'44','Europe/Paris':'33','Europe/Madrid':'34','Europe/Rome':'39','Europe/Lisbon':'351','Europe/Amsterdam':'31','Europe/Brussels':'32','Asia/Nicosia':'357','Asia/Famagusta':'357','Europe/Athens':'30','Europe/Belgrade':'381','Europe/Podgorica':'382','Europe/Sofia':'359','Europe/Budapest':'36','Europe/Bucharest':'40','Europe/Stockholm':'46','Europe/Oslo':'47','Europe/Copenhagen':'45','Europe/Helsinki':'358','Europe/Dublin':'353' };
+  let tz = ''; try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
+  const c = TZ[tz] || (/^Australia\//.test(tz) ? '61' : /^America\//.test(tz) ? '1' : '7');
+  return '+' + c;
+}
+function phoneJoin(cc, pn){
+  const n = String(pn || '').trim();
+  if (/^(\+|00)/.test(n)) return n;                         /* вписал полный номер с + — берём как есть */
+  const c = String(cc || '').replace(/\D/g, ''), d = n.replace(/\D/g, '');
+  if (!d) return '';
+  if (c === '7' && /^8\d{10}$/.test(d)) return '+7' + d.slice(1); /* российское 8XXXXXXXXXX */
+  if (c && d.startsWith(c) && d.length >= c.length + 9) return '+' + d; /* код уже набран в поле номера */
+  return '+' + c + d;
+}
 function phoneCheck(raw){
   let s = String(raw || '').trim().replace(/^00/, '+');
   let d = s.replace(/\D/g, '');
@@ -424,22 +447,25 @@ function render(){
     $('qwrap').innerHTML = '<div class="q">Куда прислать подборку?</div>' +
       '<div class="who"><img src="img/elnur.jpg" alt=""><span><b>Эльнур Ханкишиев</b>, основатель Property Library. Пришлю лично цены и расчёт доходности.</span></div>' +
       '<form id="f" novalidate><input id="nm" placeholder="Ваше имя" autocomplete="name" required aria-required="true">' +
-      '<input id="ph" type="tel" inputmode="tel" placeholder="+7 900 123 45 67" value="+" autocomplete="tel" aria-describedby="phh err">' +
-      '<div class="fh" id="phh">Номер с кодом страны, например +7 900 123 45 67 или +66 81 234 5678</div>' +
+      '<div class="phrow"><input id="cc" type="tel" inputmode="tel" list="ccl" aria-label="Код страны" autocomplete="tel-country-code" value="' + ccGuess() + '">' +
+      '<input id="pn" type="tel" inputmode="tel" placeholder="Номер телефона" autocomplete="tel-national" aria-describedby="phh err"></div>' +
+      '<datalist id="ccl">' + CCL.map(c => '<option value="+' + c[0] + '">' + c[1] + '</option>').join('') + '</datalist>' +
+      '<input id="ph" type="hidden">' +
+      '<div class="fh" id="phh">Код страны подставлен сам, его можно поменять. Номер без кода, например 900 123 45 67</div>' +
       '<div class="chan"><button type="button" class="on" data-c="whatsapp">WhatsApp</button><button type="button" data-c="telegram">Telegram</button></div>' +
       '<label class="tgf" id="tgf" hidden><input id="tg" placeholder="Ник в Telegram, если есть" autocomplete="off" autocapitalize="off" spellcheck="false"><span class="fh">Необязательно. После заявки нажмите «Продолжить в Telegram», и мы сразу увидим вас там.</span></label>' +
       '<input class="hp" id="co" tabindex="-1" autocomplete="off" aria-hidden="true">' +
       '<div class="err" id="err"></div><button class="cta" type="submit">Получить подборку</button></form>' +
       '<p class="note">Отправляя заявку, вы соглашаетесь на обработку данных и их передачу рекламным партнёрам для подбора предложений. Сообщения от Property Library Phuket придут в WhatsApp или Telegram только по этому запросу. <a href="/privacy" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">Политика конфиденциальности</a></p>';
     A.channel = 'whatsapp'; TR('form_view');
-    $('ph').addEventListener('paste', () => pasted = true);
+    $('pn').addEventListener('paste', () => pasted = true);
+    const sync = () => { $('ph').value = phoneJoin($('cc').value, $('pn').value); $('err').textContent = ''; $('pn').removeAttribute('aria-invalid'); };
+    ['input','change','blur'].forEach(ev => { $('cc').addEventListener(ev, sync); $('pn').addEventListener(ev, sync); }); sync();
     document.querySelectorAll('.chan button').forEach(b => b.onclick = () => {
       document.querySelectorAll('.chan button').forEach(x => x.classList.remove('on')); b.classList.add('on'); A.channel = b.dataset.c; TR('channel', A.channel);
       $('tgf').hidden = A.channel !== 'telegram'; });
     $('f').addEventListener('submit', e => { e.preventDefault(); send(); });
-    /* + в начале держим: стёр — вернём; набрал с 00 или 8 — phoneCheck поправит */
-    $('ph').addEventListener('blur', () => { const v = $('ph').value.trim(); if (v && !/^[+0]/.test(v) && !/^8\d{10}$/.test(v.replace(/\D/g, ''))) $('ph').value = '+' + v; if (!v) $('ph').value = '+'; });
-    $('ph').addEventListener('input', () => { $('err').textContent = ''; $('ph').removeAttribute('aria-invalid'); });
+
   }
 }
 
@@ -455,7 +481,7 @@ function send(){
   if (nm.replace(/[^A-Za-zА-Яа-яЁё]/g, '').length < 2) { $('err').textContent = 'Как к вам обращаться? Укажите имя.'; $('nm').setAttribute('aria-invalid', 'true'); try { $('nm').focus(); } catch (e) {} TR('name_err'); return; }
   const raw = $('ph').value;
   const chk = phoneCheck(raw);
-  if (!chk.ok) { $('err').textContent = chk.hint || 'Проверьте номер: код страны и все цифры.'; $('ph').setAttribute('aria-invalid', 'true'); try { $('ph').focus(); } catch (e) {} TR('phone_err'); return; }
+  if (!chk.ok) { $('err').textContent = chk.hint || 'Проверьте номер: код страны и все цифры.'; $('pn').setAttribute('aria-invalid', 'true'); try { $('pn').focus(); } catch (e) {} TR('phone_err'); return; }
   const d = chk.digits; PH = '+' + d; AS = '';
   const p = new URLSearchParams(location.search), utm = {};
   ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','utm_id','fbclid','gclid'].forEach(k => { if (p.get(k)) utm[k] = p.get(k); });
@@ -493,7 +519,7 @@ function send(){
     .then(r => r.json())
     .then(r => {
       clearTimeout(timer);
-      if (r && r.ok === false && r.field === 'phone') { unlock(); $('err').textContent = r.hint || 'Проверьте номер: код страны и все цифры.'; $('ph').setAttribute('aria-invalid', 'true'); return; }
+      if (r && r.ok === false && r.field === 'phone') { unlock(); $('err').textContent = r.hint || 'Проверьте номер: код страны и все цифры.'; $('pn').setAttribute('aria-invalid', 'true'); return; }
       if (!isTest) {   // тестовые номера (то же правило, что ТЕСТ в реклама_сводка.py) не считаем лидом в рекламе
         const ev = r && r.event_id ? { eventID: r.event_id } : undefined;
         try { if (window.fbq) fbq('track', 'Lead', { content_name: C.name, content_category: 'kviz' }, ev); } catch (e) {}
