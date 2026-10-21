@@ -106,9 +106,11 @@
 
   window.PLPConsent = { get: read, open: show, granted: function () { return read() === 'all'; } };
 
+  /* 21.10.2026 Эльнур «как делают продвинутые компании, нам тоже надо, го»: после плашки 16.10 Meta перестала видеть заходы
+     (клики 45 в день, заходов 2–6, было 34 из 41), группы объявлений ушли в обучение с 0 конверсий, расход упал втрое.
+     Как у конкурентов и до 16.10: аналитика и пиксель грузятся сразу (opt-out), плашку не показываем.
+     Отказ остаётся: privacy.html, раздел 5, кнопка PLPConsent.open() → «Только необходимые» — после этого не грузим.
+     Откат: вернуть прежние 4 строки (git show 0e0e0e0:js/consent.js). */
   var v = read();
-  if (v === 'all') loadAll();
-  else if (v === null) {
-    if (document.body) show(); else document.addEventListener('DOMContentLoaded', show);
-  }
+  if (v !== 'necessary') loadAll();
 })();
