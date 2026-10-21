@@ -366,19 +366,26 @@ function ccGuess(){
 function phoneJoin(cc, pn){
   const n = String(pn || '').trim();
   if (/^(\+|00)/.test(n)) return n;                         /* вписал полный номер с + — берём как есть */
-  const c = String(cc || '').replace(/\D/g, ''), d = n.replace(/\D/g, '');
+  const c = String(cc || '').replace(/\D/g, '');
+  let d = n.replace(/\D/g, '');
   if (!d) return '';
-  if (c === '7' && /^8\d{10}$/.test(d)) return '+7' + d.slice(1); /* российское 8XXXXXXXXXX */
-  if (c && d.startsWith(c) && d.length >= c.length + 9) return '+' + d; /* код уже набран в поле номера */
+  if (!c) return 'NOCODE';                                   /* код стёрт: просим указать, номер не угадываем */
+  /* длина номера без кода по стране; известная — по ней решаем, набран ли код повторно */
+  const NAT = { '7':10, '375':9, '380':9, '998':9, '996':9, '992':9, '994':9, '995':9, '374':8, '373':8, '370':8, '371':8, '372':8, '66':9, '972':9, '971':9, '90':10, '65':8, '852':8, '60':9, '62':10, '84':9, '86':11, '81':10, '82':10, '61':9, '49':10, '48':9, '420':9, '44':10, '33':9, '34':9, '351':9, '357':8, '30':10, '381':9, '382':8, '359':9, '1':10 };
+  if (c === '7' && /^8\d{10}$/.test(d)) return '+7' + d.slice(1);      /* российское 8XXXXXXXXXX */
+  if (d.startsWith(c) && NAT[c] && d.length === c.length + NAT[c]) return '+' + d;   /* код уже набран в поле номера */
+  if (c !== '39' && /^0/.test(d)) d = d.replace(/^0+/, '');        /* местный «0» (Таиланд 08…, Украина 050…, Европа) — без него */
   return '+' + c + d;
 }
 function phoneCheck(raw){
+  if (raw === 'NOCODE') return { ok: false, hint: 'Укажите код страны в первом поле, например +7 или +66.' };
   let s = String(raw || '').trim().replace(/^00/, '+');
   let d = s.replace(/\D/g, '');
   if (!d) return { ok: false, hint: 'Укажите номер телефона с кодом страны, например +7 900 123 45 67.' };
   if (/^8\d{10}$/.test(d)) d = '7' + d.slice(1);
   const x = '+' + d;
   const r = window.PLPPhone ? PLPPhone.check(x) : { ok: d.length >= 10 && d.length <= 15, digits: d };
+  if (r.ok && /^7/.test(d) && d.length !== 11) { r.ok = false; r.hint = 'Для кода +7 нужно 10 цифр номера, например 900 123 45 67.'; }
   if (!r.ok && !r.hint) r.hint = 'Проверьте номер: нужен код страны и все цифры, например +7 900 123 45 67 или +66 81 234 5678.';
   return r;
 }
