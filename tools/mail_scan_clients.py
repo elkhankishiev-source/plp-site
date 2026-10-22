@@ -19,7 +19,8 @@ SKIP = {'PLP-001555', 'PLP-004198'}
 # Ищем во всех рабочих папках, а не только во «Входящих»: договоры Эльнур
 # часто отправлял сам, и часть переписки лежит в архиве и в папке личной почты.
 FOLDERS = ['INBOX', 'Sent', '&BBAEQARFBDgEMgQ4BEAEPgQyBDAEQgRM-',
-           'el.khankishiev@gmail.com', 'Archive', 'Sent Messages', 'Drafts',
+           *[l.strip() for l in open(__import__('os').path.expanduser('~/plp-ops/конфиг/почта_личная_папка.txt'), encoding='utf-8') if l.strip()],   # 22.10 п.9: имя личной папки вне публичного репо
+           'Archive', 'Sent Messages', 'Drafts',
            'Spam', 'Junk']
 DOC = re.compile(r'\.(pdf|docx?|xlsx?|jpg|jpeg|png)$', re.I)
 CONTRACT = re.compile(r'contract|agreement|договор|lease|sale|purchase|reservation|бронир', re.I)
