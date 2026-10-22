@@ -72,6 +72,16 @@ const OFFERS = [
     og: 'offers/top15/img/preview-v2.jpg',
     h: 16715,   // PDF 4421 мм × 794/210
   },
+  {
+    /* 23.10.2026 Эльнур: «скинул инф по проекту пурита … сделай презентацию офер, ссылку мне сюда скинь». Данные: offers/purita/make_sheet.py
+       (каталог продаж и презентация застройщика 22.10, презентация Plus Property). hidden: только /purita/<номер из build/nomera.json>. */
+    slug: 'purita', dir: 'offers/purita', hidden: true,
+    title: 'PURITA · Банг Тао, CG Capital',
+    desc: 'PURITA на Банг Тао от CG Capital (Central Group): квартиры с мебелью, цены, условия оплаты, аренда по прогнозу управляющей компании. Предложение для клиентов Property Library Phuket.',
+    pdf: 'PURITA_Bangtao.pdf',
+    og: 'offers/purita/img/preview-v10.jpg',
+    h: 8780,   // PDF 2322 мм × 794/210
+  },
   /* 09.10.2026 Эльнур: общий лист KUARTZ+FIZZ «лишний, удали» — убран; /kuartz-fizz пересылает на /kuartz. */
   {
     /* 04.10.2026 Эльнур: «на секретной странице… зеро наянг гарантия 10% годовых». Факты: objects PLP-ZERO-NAIYANG
