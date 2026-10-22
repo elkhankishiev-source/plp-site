@@ -2961,22 +2961,58 @@
    "price_from": 21070000,
    "units": [
     {
-     "name": "2 спальни",
+     "beds": 1,
+     "code": "1 Bed",
+     "name": "1 спальня",
+     "areaMax": 78.9,
+     "areaMin": 77.6,
+     "area_sqm": 77.6,
+     "area": 77.6
+    },
+    {
      "beds": 2,
-     "code": null,
+     "code": "2 Bed-M",
+     "free": 1,
+     "name": "2 спальни, тип M",
+     "area_sqm": 99.95,
+     "price_from_thb": 21070000,
      "area": 99.95,
-     "areaMin": 99.95,
-     "areaMax": 99.95,
      "from": 21070000
     },
     {
-     "name": "3 спальни",
+     "beds": 2,
+     "code": "2 Bed-L",
+     "free": 2,
+     "name": "2 спальни, тип L",
+     "area_sqm": 120.2,
+     "price_from_thb": 23260000,
+     "area": 120.2,
+     "from": 23260000
+    },
+    {
      "beds": 3,
-     "code": null,
-     "area": 172.7,
-     "areaMin": 172.7,
+     "code": "3 Bed-L",
+     "free": 9,
+     "name": "3 спальни, тип L",
      "areaMax": 172.7,
+     "areaMin": 167.05,
+     "area_sqm": 167.05,
+     "price_from_thb": 28880000,
+     "area": 167.05,
      "from": 28880000
+    },
+    {
+     "beds": 3,
+     "code": "Duplex",
+     "free": 3,
+     "name": "Дуплекс, 3 спальни",
+     "note": "Частный бассейн и многофункциональная комната",
+     "areaMax": 298.9,
+     "areaMin": 288.95,
+     "area_sqm": 288.95,
+     "price_from_thb": 65070000,
+     "area": 288.95,
+     "from": 65070000
     }
    ]
   },
