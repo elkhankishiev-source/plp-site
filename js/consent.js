@@ -37,9 +37,41 @@
     /* Пиксель Meta: только PageView здесь; Lead шлёт сам квиз после отправки анкеты. Тестовые заходы не шлём (как раньше). */
     var px = window.PLP_PIXEL;
     if (px && !TEST) {
+      /* 22.10.2026 Эльнур «го»: качество сопоставления событий Meta (Event Match Quality, PageView 6,1 из 10).
+         Как советует Meta: (1) куки _fbc из fbclid ставим сразу на входе, формат fb.1.<мс>.<fbclid>;
+         (2) external_id = постоянный id посетителя первой стороны (plp_vid, тот же, что у js/track.js и в заявке),
+         пиксель сам хэширует его SHA-256, сервер заявок шлёт в Meta тот же хэш (sitelead.mjs, CAPI).
+         Номер и имя здесь не передаём: они появляются только в квизе при заявке (kviz/index.html, PLPPixelUser). */
+      fbcFromClick();
+      var vid = visitorId();
       !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
-      fbq('init', px); fbq('track', 'PageView');
+      if (vid) fbq('init', px, { external_id: vid }); else fbq('init', px);
+      fbq('track', 'PageView');
     }
+  }
+
+  function ck(n) { var m = (document.cookie || '').match(new RegExp('(?:^|; )' + n + '=([^;]*)')); return m ? decodeURIComponent(m[1]) : ''; }
+  /* id посетителя: тот же ключ и формат, что в js/track.js (там он заводится первым, если скрипт есть на странице) */
+  function visitorId() {
+    var v = '';
+    try { v = (window.PLPTrack && PLPTrack.vid) || localStorage.getItem('plp_vid') || ''; } catch (e) {}
+    if (!v) v = ck('plp_vid');
+    if (!/^[A-Za-z0-9_-]{8,64}$/.test(v || '')) {
+      try { v = crypto.randomUUID().replace(/-/g, ''); } catch (e) { v = Date.now().toString(36) + Math.random().toString(36).slice(2, 12); }
+    }
+    try { localStorage.setItem('plp_vid', v); } catch (e) {}
+    try { document.cookie = 'plp_vid=' + encodeURIComponent(v) + '; max-age=' + (395 * 86400) + '; path=/; SameSite=Lax'; } catch (e) {}
+    return v;
+  }
+  /* _fbc: новый клик по рекламе (новый fbclid) обновляет куки, старый не трогаем; домен как у самого пикселя */
+  function fbcFromClick() {
+    var id = '';
+    try { id = new URLSearchParams(location.search).get('fbclid') || ''; } catch (e) {}
+    if (!id) return;
+    var cur = ck('_fbc');
+    if (cur && cur.slice(-(id.length + 1)) === '.' + id) return;
+    var dom = /(^|\.)property-library\.com$/.test(location.hostname) ? '; domain=.property-library.com' : '';
+    try { document.cookie = '_fbc=' + encodeURIComponent('fb.1.' + Date.now() + '.' + id) + '; max-age=' + (90 * 86400) + '; path=/; SameSite=Lax' + dom; } catch (e) {}
   }
 
   /* отказ после согласия: уже загруженное не выгрузить, поэтому стираем их cookies и перезагружаем страницу */
