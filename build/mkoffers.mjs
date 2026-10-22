@@ -165,7 +165,7 @@ const млн = (n) => (n / 1e6).toFixed(2).replace(/0$/, '').replace('.', ',');
 const тыс = (n) => String(Math.round(n / 1000));
 const вКв = (s) => String(s || '').replace(/квартал/, 'квартале');
 const фр = (...parts) => parts.filter(Boolean).join(' ');
-const V = T('vibe2'), K = T('kuartz'), F = T('fizz'), Z = T('zero-naiyang');
+const V = T('vibe2'), K = T('kuartz'), F = T('fizz'), Z = T('zero-naiyang'), C = T('cg-capital');
 
 const CARDS = [
   {
@@ -218,7 +218,7 @@ const CARDS = [
        (каталог и прайс застройщика 05.10), PURITA и Andaz (слайды 07.10). Старый текст карточки — в git. */
     name: 'Central Group: Andaz и PURITA', where: 'Лаян · Банг Тао', tag: 'старт продаж',
     text: ['Andaz у пляжа Лаян: до 100 квартир и около 9 вилл, 2-спальная 80 м² от 16,xx млн бат, старт продаж в I квартале 2027. PURITA на Банг Тао: 1-спальная 56 м² с мебелью от 7,xx млн бат, первые продажи в конце ноября.',
-           'Строит Central Group, её первый проект на Пхукете, The Standard на Банг Тао, продан на 88% до сдачи.'],
+           'Строит Central Group, её первый проект на Пхукете, The Standard на Банг Тао' + (C.продано_процентов ? `, продан на ${C.продано_процентов}% до сдачи.` : '.')],
     open: '/cg-capital', pdf: '/offers/cg-capital/CentralGroup_Phuket.pdf',
   },
   {
