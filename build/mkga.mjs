@@ -33,3 +33,18 @@ let n = 0, all = 0;
   }
 })(ROOT);
 console.log('GA (через согласие): обновлено', n, 'страниц, всего страниц с <head>:', all);
+/* 22.10.2026 claude-инвентаризация: исходники листов offers/<slug>/sheet.json хранили старый тег (до 16.10), и каждая пересборка листа
+   возвращала в page.htm загрузку gtag.js мимо согласия. Чиним сам исходник, чтобы пересборка давала тег с согласием. */
+let ns = 0;
+const OFF = path.join(ROOT, 'offers');
+for (const d of fs.existsSync(OFF) ? fs.readdirSync(OFF) : []) {
+  const p = path.join(OFF, d, 'sheet.json');
+  if (!fs.existsSync(p)) continue;
+  const s = fs.readFileSync(p, 'utf8');
+  const oe = JSON.stringify(OLD).slice(1, -1), te = JSON.stringify(TAG).slice(1, -1);   // как строка лежит внутри JSON
+  const t = s.includes(oe) ? s.split(oe).join(te) : s;   // заменяем текстом, разметку файла не трогаем
+  JSON.parse(t);
+  if (t !== s) { fs.writeFileSync(p, t); ns++; }
+  if (t.includes('googletagmanager.com/gtag/js')) throw new Error('mkga: в исходнике листа прямая загрузка gtag.js: ' + path.relative(ROOT, p));
+}
+console.log('GA в исходниках листов: исправлено', ns);
