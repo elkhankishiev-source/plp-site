@@ -237,6 +237,10 @@ body{min-height:101vh;overscroll-behavior-y:contain}
 .gal .gi{aspect-ratio:16/10}.gal img{transform:none!important;height:100%}
 .pj .ph0{aspect-ratio:16/9}.pj img.bg{transform:none!important}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* 22.10.2026 «квиз: вопрос сразу»: заголовок-оффер одной строкой над первым вопросом */
+.top{background:var(--paper);padding:14px 16px 0}
+.top h1{font-size:1.08rem;line-height:1.25;font-weight:800;letter-spacing:-.01em}
+.foot0{padding:0 16px;text-align:left}
 .phrow{display:flex;gap:8px}.phrow #cc{flex:0 0 84px;width:84px;text-align:center}.phrow #pn{flex:1 1 auto;min-width:0}
 </style>
 <!-- PLP:GA --><script>window.PLP_GA='G-HQNDG3B8MW';window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied'});</script><script src="/js/consent.js" defer></script></head>
@@ -253,6 +257,7 @@ body{min-height:101vh;overscroll-behavior-y:contain}
     <button class="back" id="back">← Назад</button>
   </section>
   <section id="done" class="card done" hidden></section>
+  <p class="note foot0" id="foot0" hidden></p>
 </div>
 
 <script src="/js/phone.js"></script>
@@ -390,7 +395,7 @@ function phoneCheck(raw){
   return r;
 }
 const $ = id => document.getElementById(id);
-let C, A, i, T0, tStep, timing, pasted, LID, PH = '', AS = '', busy = false;
+let C, A, i, T0, tStep, timing, pasted, LID, PH = '', AS = '', busy = false, started = false;
 /* 15.10.2026 Эльнур: лиды делим между двумя рабочими номерами, чтобы грелись оба.
    16.10.2026 Эльнур («по чётности — бред, если все чётные? Живая очередь: по очереди мне и Дарье»): кому лид, решает приёмник заявок
    по очереди по кругу (функция базы очередь_ведущего: повторная заявка — тому, кто уже ведёт) и отдаёт в ответе assigned_to.
@@ -414,17 +419,20 @@ function boot(){
   A = {}; i = 0; timing = []; pasted = false; T0 = Date.now(); LID = newLid();
   /* 14.10 трекинг: каждый шаг квиза — событие посетителя (отказы видно по последнему шагу) */
   TR('kviz_open', key);
-  $('quiz').hidden = true; $('done').hidden = true; $('s0').hidden = false;
-  $('s0').innerHTML = '<div class="start"><div class="ph0"><img class="bg" src="img/' + C.hero + '.webp" alt=""' + (C.heroPos || C.heroSt ? ' style="' + (C.heroPos ? 'object-position:' + C.heroPos + ';' : '') + (C.heroSt || '') + '"' : '') + '></div>' +
-    '<div class="logo"><img src="img/plp-logo-ink.webp" alt="Property Library Phuket"></div>' +
-    '<div class="t"><h1>' + C.h1 + '</h1><p>' + C.sub + '</p>' +
-    '<button class="cta" id="start">Получить подборку</button><small>' + C.foot + '</small></div></div>';
-  $('start').onclick = () => { TR('kviz_start'); $('s0').hidden = true; $('quiz').hidden = false; tStep = Date.now(); render(); scrollTo(0, 0); };
+  /* 22.10.2026 Эльнур «квиз: вопрос сразу»: экран-заставка с кнопкой повторял рекламу, 18–21.10 из 168 переходов
+     «Получить подборку» нажали 19 (11%). Теперь сразу первый вопрос, над ним одной строкой заголовок-оффер, сноска под квизом.
+     Событие kviz_start (начал квиз) шлётся на первом ответе — аналитика «начал и ушёл» считает его как раньше. */
+  started = false;
+  $('done').hidden = true; $('s0').hidden = false; $('quiz').hidden = false;
+  $('s0').innerHTML = '<div class="top"><h1>' + C.h1 + '</h1></div>';
+  $('foot0').textContent = C.foot; $('foot0').hidden = false;
+  tStep = Date.now(); render();
 }
 
 function pick(key){
   TR('kviz_pick', key);
   $('quiz').hidden = true; $('done').hidden = true; $('s0').hidden = false;
+  $('foot0').hidden = true;
   const q = new URLSearchParams(location.search);
   $('s0').innerHTML = '<div class="card"><div class="q">Какой проект вам интересен?</div><div class="opts pics">' +
     ['vibe2', 'kuartz', 'fizz', 'zero', 'eden'].filter(k => P[k]).map(k => { q.set('p', k);
@@ -445,6 +453,7 @@ function render(){
       s.o.map((o, n) => '<button class="opt' + (A[s.k] === o[0] ? ' on' : '') + '" data-n="' + n + '">' +
         (o[1] ? '<i class="ph"><img' + (s.fit ? ' class="fit"' : '') + ' src="img/' + o[1] + '.webp" alt=""' + (o[2] ? ' style="' + o[2] + '"' : '') + '></i>' : '') + '<span>' + o[0] + (o[3] ? '<small class="hint">' + o[3] + '</small>' : '') + '</span></button>').join('') + '</div>';
     document.querySelectorAll('.opt').forEach(b => b.onclick = () => {
+      if (!started) { started = true; TR('kviz_start'); }
       A[s.k] = s.o[+b.dataset.n][0]; TR('q' + (i + 1), s.k + ':' + A[s.k]);
       document.querySelectorAll('.opt').forEach(x => x.classList.remove('on')); b.classList.add('on');
       timing.push(Math.round((Date.now() - tStep) / 1000)); tStep = Date.now();
@@ -573,7 +582,7 @@ function finish(r){
   const write = '<p class="mot">' + (MOT[wkey] || 'Напишите, и пришлём расчёт под ваш бюджет.') + '</p>' +
     '<div class="wr">' + (botMain ? bBOT : tgFirst ? bTG : bWA) + '</div>' +
     (botMain ? '<p class="wrh">Откроется Telegram, нажмите там «Старт»</p>' : '<p class="wrh">Сообщение уже набрано, останется нажать «Отправить»</p>');
-  $('quiz').hidden = true;
+  $('quiz').hidden = true; $('s0').hidden = true; $('foot0').hidden = true;
   const ch = (r.channel || A.channel) === 'telegram' ? 'Telegram' : 'WhatsApp', key = Object.keys(P).find(k => P[k] === C);
   $('done').innerHTML =
     '<div class="pj"><div class="ph0"><img class="bg" src="img/' + C.hero + '.webp" alt=""' + (C.heroPos || C.heroSt ? ' style="' + (C.heroPos ? 'object-position:' + C.heroPos + ';' : '') + (C.heroSt || '') + '"' : '') + '></div>' +
