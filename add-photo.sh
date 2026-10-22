@@ -24,7 +24,7 @@ prep () {  # $1=исходник $2=назначение
 
 publish () {
   git add img/elnur-hero.jpg img/elnur-founder.jpg 2>/dev/null || true
-  git -c user.name="Elnur" -c user.email="el.khankishiev@gmail.com" \
+  git -c user.name="Elnur" -c user.email="info@property-library.com" \
       commit -q -m "Фото Эльнура и семьи на сайт" || { echo "Нечего коммитить"; exit 0; }
   # Публикуем обычным git push: доступ к GitHub уже настроен на этом маке.
   # Раньше скрипт доставал ключ n8n из ~/plp_diag.py и выменивал на него токен
