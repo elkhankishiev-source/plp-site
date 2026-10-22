@@ -62,6 +62,16 @@ const OFFERS = [
     pdf: 'Millennium_Bangtao.pdf',
     h: 7310,
   },
+  {
+    /* 22.10.2026 Эльнур 23:45: «топ 15 каталог очень не красивый … переделай» — лист в фирменном наборе (gen: ~/plp-ops/tools/top15).
+       hidden: публичного /top15 и /top15.html нет, обёртка пишется сразу в top15/<номер из build/nomera.json>/index.html. */
+    slug: 'top15', dir: 'offers/top15', hidden: true,
+    title: 'Топ-15 кондо Пхукета · Property Library Phuket',
+    desc: 'Подборка Property Library Phuket: 15 проектов кондо на Пхукете, цены «от», сроки сдачи и что рядом.',
+    pdf: 'Top15_Phuket.pdf',
+    og: 'offers/top15/img/preview-v2.jpg',
+    h: 16715,   // PDF 4421 мм × 794/210
+  },
   /* 09.10.2026 Эльнур: общий лист KUARTZ+FIZZ «лишний, удали» — убран; /kuartz-fizz пересылает на /kuartz. */
   {
     /* 04.10.2026 Эльнур: «на секретной странице… зеро наянг гарантия 10% годовых». Факты: objects PLP-ZERO-NAIYANG
@@ -125,7 +135,9 @@ for (const o of OFFERS) {
 })();
 </script>`;
 
-  const url = SITE + '/' + o.slug;
+  const NOMERA = JSON.parse(fs.readFileSync(path.join(ROOT, 'build/nomera.json'), 'utf8'));
+  if (o.hidden && !NOMERA[o.slug]) throw new Error('mkoffers: для скрытого листа ' + o.slug + ' нет номера в build/nomera.json');
+  const url = SITE + '/' + o.slug + (o.hidden ? '/' + NOMERA[o.slug] : '');
   let html = head + '\n' + body + '\n' + tail;
   html = html.replace(/<title>[\s\S]*?<\/title>/, '<title>' + esc(o.title) + '</title>');
   html = html.replace(/(<meta name="description" content=")[^"]*(")/, '$1' + esc(o.desc) + '$2');
@@ -141,6 +153,20 @@ for (const o of OFFERS) {
   html = html.replace(/href="#top"/g, 'href="index.html"');
   html = html.replace(/href="#(why|sale|rent|map|quiz|faq|do|contacts|about)"/g, 'href="/#$1"');
 
+  if (o.hidden) {
+    /* скрытый лист: превью — его собственная картинка; пути страницы переводим от корня сайта (как build/mknomer.mjs);
+       в корень (<slug>.html) не пишем, в sitemap не попадает */
+    html = html.replace(/(<meta property="og:image" content=")[^"]*(")/, '$1' + SITE + '/' + o.og + '$2');
+    html = html.replace(/(\s(?:src|href)=")(?![a-z]+:|\/|#|\?|data:|mailto:|tel:)([^"]+")/gi, '$1/$2');
+    html = html.replace(/href="\/index\.html"/g, 'href="/"');
+    html = html.split("var want = pre + 'img/brand/").join("var want = '/img/brand/");
+    html = html.split("p.img='img/'+").join("p.img='/img/'+");
+    const dir = path.join(ROOT, o.slug, NOMERA[o.slug]);
+    fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(path.join(dir, 'index.html'), html);
+    console.log(o.slug + '/' + NOMERA[o.slug] + '/index.html собран (скрытый адрес):', html.length, 'байт');
+    continue;
+  }
   fs.writeFileSync(path.join(ROOT, o.slug + '.html'), html);
   console.log(o.slug + '.html собран:', html.length, 'байт');
 }
