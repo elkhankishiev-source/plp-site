@@ -10,6 +10,7 @@ D=[ # slug, фото (1 или 2), надзаголовок, название, �
  ('kuartz',['k-pool2.webp'],'Карон · 400 м до пляжа','KUARTZ','от 5 767 967 ฿','закрытый старт'),
  ('fizz',['f-pool.webp'],'Ката · 135 квартир','FIZZ','от 5 154 707 ฿','закрытый старт'),  # 17.10: 1-спальная от 5 154 707, Fizz_Price_List_3 (прайс застройщика), точная сумма без округления (Эльнур 17.10)
  ('aileen',['hero.jpg'],'Лагуна · таунхаусы 159 м²','Aileen Residence Lagoon','от 11,85 млн ฿','предстарт'),
+ ('top15',['p10-ayana.webp','p02-intercontinental.webp'],'Пхукет · подборка для клиентов','Топ-15 кондо','от 2,97 млн ฿','15 проектов'),  # 22.10.2026: цена = самый низкий вход в подборке (Vibe II, список ~/plp-ops/tools/top15/sheet.json)
  ('millennium',['hero.webp'],'Банг Тао · 750 м до пляжа','Millennium','от 3,42 млн ฿','старт 14 октября'),  # 14.10.2026: цена и дата с листа offers/millennium (прайс застройщика 13.10)
 ]
 T='''<!doctype html><html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
@@ -43,5 +44,5 @@ for slug,ph,ey,t,p,tag in D:
         if os.path.exists(png) and os.path.getsize(png)>10000: time.sleep(1); break
     pr.kill(); import shutil; shutil.rmtree(prof, ignore_errors=True)
     os.remove(f)
-    out=os.path.join(d,'preview-v12.jpg' if slug in ('fizz','vibe2') else ('preview-v12.jpg' if slug=='vibe2' else 'preview-v11.jpg' if slug=='kuartz' else 'preview-v10.jpg'))  # 14.10.2026: новое имя файла против кэша мессенджеров
+    out=os.path.join(d,'preview-v2.jpg' if slug=='top15' else 'preview-v12.jpg' if slug in ('fizz','vibe2') else ('preview-v12.jpg' if slug=='vibe2' else 'preview-v11.jpg' if slug=='kuartz' else 'preview-v10.jpg'))  # 14.10.2026: новое имя файла против кэша мессенджеров
     subprocess.run(['ffmpeg','-loglevel','error','-y','-i',png,'-q:v','3',out]); print(slug,'→',out)
