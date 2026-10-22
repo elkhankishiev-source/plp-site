@@ -564,12 +564,27 @@ function send(){
       if (r && r.ok === false && r.field === 'phone') { unlock(); $('err').textContent = r.hint || 'Проверьте номер: код страны и все цифры.'; $('pn').setAttribute('aria-invalid', 'true'); return; }
       if (!isTest) {   // тестовые номера (то же правило, что ТЕСТ в реклама_сводка.py) не считаем лидом в рекламе
         const ev = r && r.event_id ? { eventID: r.event_id } : undefined;
+        /* 22.10.2026 Эльнур «го» (качество сопоставления Meta): ручное расширенное сопоставление (manual advanced matching) —
+           номер, имя и id посетителя в пиксель перед Lead; пиксель сам хэширует SHA-256, в открытом виде не уходят.
+           Только если пиксель загружен (нет отказа «Только необходимые») и номер не тестовый (мы внутри !isTest). */
+        try { if (window.fbq && window.PLP_PIXEL) fbq('init', window.PLP_PIXEL, pixelUser(d, nm)); } catch (e) {}
         try { if (window.fbq) fbq('track', 'Lead', { content_name: C.name, content_category: 'kviz' }, ev); } catch (e) {}
         try { if (window.gtag) gtag('event', 'generate_lead', { lead_source: 'kviz', item_name: C.name }); } catch (e) {}
       }
       finish(r || { ok: true, sent: false });
     })
     .catch(() => { clearTimeout(timer); finish({ ok: true, sent: false, late: true }); });
+}
+
+/* данные для пикселя при заявке: ph — цифры с кодом страны; fn/ln — имя и фамилия строчными, только буквы (как требует Meta);
+   external_id — тот же id посетителя, что в PageView (js/consent.js) и в заявке (js/track.js). Сервер шлёт те же хэши в CAPI. */
+function pixelUser(digits, name){
+  const w = String(name || '').toLowerCase().split(/\s+/).map(s => s.replace(/[^\p{L}]/gu, '')).filter(Boolean);
+  const u = { ph: String(digits || '').replace(/\D/g, '') };
+  if (w[0]) u.fn = w[0];
+  if (w.length > 1) u.ln = w[w.length - 1];
+  try { const v = (window.PLPTrack && PLPTrack.vid) || localStorage.getItem('plp_vid'); if (v) u.external_id = v; } catch (e) {}
+  return u;
 }
 
 function finish(r){
