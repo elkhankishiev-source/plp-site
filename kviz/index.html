@@ -397,6 +397,12 @@ function phoneJoin(cc, pn){
   const NAT = { '7':10, '375':9, '380':9, '998':9, '996':9, '992':9, '994':9, '995':9, '374':8, '373':8, '370':8, '371':8, '372':8, '66':9, '972':9, '971':9, '90':10, '65':8, '852':8, '60':9, '62':10, '84':9, '86':11, '81':10, '82':10, '61':9, '49':10, '48':9, '420':9, '44':10, '33':9, '34':9, '351':9, '357':8, '30':10, '381':9, '382':8, '359':9, '1':10 };
   if (c === '7' && /^8\d{10}$/.test(d)) return '+7' + d.slice(1);      /* российское 8XXXXXXXXXX */
   if (d.startsWith(c) && NAT[c] && d.length === c.length + NAT[c]) return '+' + d;   /* код уже набран в поле номера */
+  /* 22.10.2026 золотая запись: «+49» и 4915112345678 давали +494915112345678 (у Германии номер 10–11 цифр, NAT знает одну длину).
+     Код уже набран, если с ним номер мобильный, а с повтором кода — нет. Окончательно номер собирает приёмник (номер_норма). */
+  if (d.startsWith(c) && window.PLPPhone) {
+    const a = PLPPhone.check('+' + d), b2 = PLPPhone.check('+' + c + d);
+    if (a && a.ok && a.mobile && !(b2 && b2.ok && b2.mobile)) return '+' + d;
+  }
   if (c !== '39' && /^0/.test(d)) d = d.replace(/^0+/, '');        /* местный «0» (Таиланд 08…, Украина 050…, Европа) — без него */
   return '+' + c + d;
 }
@@ -519,7 +525,9 @@ function send(){
   const d = chk.digits; PH = '+' + d; AS = '';
   const p = new URLSearchParams(location.search), utm = {};
   ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','utm_id','fbclid','gclid'].forEach(k => { if (p.get(k)) utm[k] = p.get(k); });
+  /* 22.10.2026: код страны и номер — ещё и отдельно, как ввёл человек: номер собирает приёмник функцией базы (номер_норма) */
   const lead = { source:'website', funnel:'ads_quiz', object_id:C.id, object_name:C.name, name:$('nm').value.trim(), phone:'+' + d, lid:LID,
+    phone_cc:String($('cc').value || '').trim().slice(0, 8), phone_national:String($('pn').value || '').trim().slice(0, 40),
     contact_pref:A.channel, plan:A.plan, goal:VAL('goal'), budget:VAL('budget'), srok:VAL('when'), quiz_v:2,
     message:'Квиз ' + C.name + ': ' + C.Q.map(s => VAL(s.k)).filter(Boolean).join(' · '),
     page:location.href, utm, quiz:A,
