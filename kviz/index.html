@@ -284,6 +284,11 @@ const WHEN = {k:'when', q:'Когда планируете покупку?', o:[
 const STD = () => [GOAL, {k:'budget', q:'Какой бюджет рассматриваете?', o:BUD.concat([['Помогите подобрать',null,null,null,'помогите подобрать']])}, WHEN];
 /* значение ответа для заявки: пятый элемент варианта, иначе сама надпись */
 const VAL = k => { const s = C.Q.find(x => x.k === k); if (!s || A[k] === undefined) return ''; const o = s.o.find(x => x[0] === A[k]); return o ? (o[4] || o[0]) : A[k]; };
+/* 22.10.2026 Эльнур (го): «варианты ответа планировок полный бред… студия, однушка, двушка, помогите выбрать, так примерно везде одинаково,
+   только там, где есть пентхаусы, можно добавить пентхаусы»; «зеро ответил нормально виды планировок» — формат ZERO («Тип, площадь м²») на всех.
+   Площади: KUARTZ — лист offers/kuartz (файл застройщика, «плюс» вошёл в 1-спальную, пентхаусы проданы 19.10); Vibe II — objects.unit_types
+   (студия 28 м² — пул 19.10, 1-спальные 33–46 и 2-спальные 51–52 — брошюра 12.10); FIZZ и Eden Lake — objects.unit_types.
+   Картинки 2-спальных KUARTZ и FIZZ — вырезка из листа планировок застройщика (k-units, f-units). */
 const P = {
   kuartz: {
     id:'PLP-KUARTZ', name:'KUARTZ', hero:'k-pool-c',
@@ -295,7 +300,7 @@ const P = {
     gal:['k-roof-c','k-pool2-c','k-1brplus-c'], sheet:'https://property-library.com/kuartz', bot:'kviz_kuartz',
     Q:[
       {k:'plan', q:'Сколько спален?',
-        o:[['1-спальная, 32–38 м²','k-1br-c'],['1-спальная плюс, 45–48 м²','k-1brplus-c'],['2-спальная, 57–63 м²','k-roof-c']]},
+        o:[['1-спальная, 31,7–47,8 м²','k-1br-c'],['2-спальная, 56,6–62,7 м²','k-2br-plan-c','object-fit:contain;transform:none'],['Помогите выбрать','k-pool-c']]},
       ...STD()]
   },
   vibe2: {
@@ -308,7 +313,7 @@ const P = {
     gal:['v2-sky-pool','v2-main-pool','v2-2br-bedroom'], sheet:'https://property-library.com/vibe2', bot:'kviz_vibe2',
     Q:[
       {k:'plan', q:'Сколько спален?',
-        o:[['Студия, 28 м²','v2-sky-pool'],['1-спальная, 33 м²','v2-1br-living'],['1-спальная, 35 м², вид на бассейн','v2-main-pool'],['Помогите выбрать','v2-hero']]},
+        o:[['Студия, 28 м²','v2-sky-pool'],['1-спальная, 33–46 м²','v2-1br-living'],['2-спальная, 51–52 м²','v2-2br-living'],['Помогите выбрать','v2-hero']]},
       ...STD()]
   },
   fizz: {
@@ -321,7 +326,7 @@ const P = {
     gal:['f-pool-c','f-lobby-c','c-club-c'], sheet:'https://property-library.com/fizz', bot:'kviz_fizz',
     Q:[
       {k:'plan', q:'Сколько спален?',
-        o:[['1-спальная, 31–33 м²','u-1br-c'],['1-спальная плюс, 44–52 м²','u-1brplus-c'],['2-спальная, 58 м²','f-lobby-c'],['Пентхаус с 2–3 спальнями','f-pool-c']]},
+        o:[['1-спальная, 31–52 м²','u-1br-c'],['2-спальная, 58 м²','f-2br-plan-c','object-fit:contain;transform:none'],['Пентхаус, 64–110 м²','f-pool-c'],['Помогите выбрать','f-building-c']]},
       ...STD()]
   },
   eden: {
@@ -334,7 +339,7 @@ const P = {
     gal:['lake-pool','lake-club','lake-int1'], sheet:'https://property-library.com/eden', bot:'kviz_eden',
     Q:[
       {k:'plan', q:'Сколько спален?',
-        o:[['1-спальная, 52 м²','lake-int1'],['2-спальная, 80 м²','lake-int2'],['3-спальная, до 124 м²','lake-club'],['Помогите выбрать','lake-pool']]},
+        o:[['1-спальная, 52 м²','lake-int1'],['2-спальная, 80,5 м²','lake-int2'],['3-спальная, 123,7 м²','lake-club'],['Помогите выбрать','lake-pool']]},
       ...STD()]
   },
   zero: {
