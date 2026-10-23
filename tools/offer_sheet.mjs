@@ -66,7 +66,7 @@ function render(J) {
   let ub = '';
   if (U.lead) ub += `<p class="lead">${U.lead}</p>\n  `;
   if (U.facts) ub += U.facts + '\n  ';
-  ub += cardsRow(U.cards, U.cards_layout, 'stretch');
+  ub += cardsRow(U.cards, U.cards_layout, U.cards_align || 'stretch');  // 23.10: у Vibe II карточки по верху (cards_align: start), как было вручную
   if (U.photos && U.photos.length) {
     ub += `\n  <div class="sub3">Квартиры внутри</div>\n  ` + polRow(U.photos);
     if (U.photos_note) ub += `\n  <p class="src">${U.photos_note}</p>`;
