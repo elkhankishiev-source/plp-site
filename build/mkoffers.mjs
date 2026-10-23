@@ -90,7 +90,7 @@ const OFFERS = [
     desc: 'Naturale Kamala от AAG Development: 14 вилл на Millionaire\'s Mile, три типа, цены от 67,7 млн ฿, график оплаты и планировки. Предложение для клиентов Property Library Phuket.',
     pdf: 'Naturale_Kamala.pdf',
     og: 'offers/naturale-kamala/img/preview-v1.jpg',
-    h: 8434,   // PDF 2224 мм × 794/210 (24.10)
+    h: 8498,   // PDF 2241 мм × 794/210 (24.10)
   },
   /* 09.10.2026 Эльнур: общий лист KUARTZ+FIZZ «лишний, удали» — убран; /kuartz-fizz пересылает на /kuartz. */
   {

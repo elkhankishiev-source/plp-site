@@ -2674,6 +2674,44 @@
    "units": []
   },
   {
+   "id": "PLP-NATURALE-KAMALA",
+   "pub": "PLP-NATURALE-KAMALA",
+   "url": "https://property-library.com/object/naturale-kamala",
+   "name": "Naturale Kamala (AAG Development)",
+   "district": "Камала",
+   "type": "Вилла",
+   "price_from": 67700000,
+   "units": [
+    {
+     "name": "Aria, 3 спальни",
+     "beds": 3,
+     "code": null,
+     "area": 385,
+     "areaMin": 385,
+     "areaMax": 385,
+     "from": 67700000
+    },
+    {
+     "name": "Kamala, 4 спальни",
+     "beds": 4,
+     "code": null,
+     "area": 926.5,
+     "areaMin": 926.5,
+     "areaMax": 926.5,
+     "from": 157700000
+    },
+    {
+     "name": "Andaman, 5 спален",
+     "beds": 5,
+     "code": null,
+     "area": 1332.3,
+     "areaMin": 1332.3,
+     "areaMax": 1332.3,
+     "from": 267100000
+    }
+   ]
+  },
+  {
    "id": "PLP-PEYLAA",
    "pub": "PLP-PEYLAA",
    "url": "https://property-library.com/object/peylaa",
