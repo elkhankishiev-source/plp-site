@@ -3033,7 +3033,7 @@
    "name": "SUN HILLS Layan",
    "district": "Лаян",
    "type": "Кондо",
-   "price_from": 3312500,
+   "price_from": null,
    "units": [
     {
      "beds": null,
@@ -3046,17 +3046,15 @@
      "beds": null,
      "name": null,
      "area_sqm": 53,
-     "price_from_thb": 6750000,
-     "area": 53,
-     "from": 6750000
+     "price_from_thb": null,
+     "area": 53
     },
     {
      "beds": null,
      "name": null,
      "area_sqm": 42.5,
-     "price_from_thb": 5100000,
-     "area": 42.5,
-     "from": 5100000
+     "price_from_thb": null,
+     "area": 42.5
     },
     {
      "beds": null,

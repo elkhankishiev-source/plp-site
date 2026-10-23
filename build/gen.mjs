@@ -371,6 +371,7 @@ function withFacts(calc, o) {
      и переживал любую правку базы. Цена на витрине жила своей жизнью месяцами.
      Из старого расчёта бережём настройки (ставки, загрузку), цену берём из базы. */
   if (Number(o.price_from_thb) > 0) c.priceTHB = Number(o.price_from_thb);
+  else { c.priceTHB = 0; c.handoverTHB = 0; } /* 23.10: в базе цены нет (убрана как непроверенная) — сохранённая из старой сборки цена и «цена к сдаче» не живут дальше (SUN HILLS держал 3 312 500 с порталов) */
   let buildYears = 0;
   if (o.handover_date) {
     const months = (new Date(o.handover_date) - new Date()) / (1000 * 60 * 60 * 24 * 30.44);
