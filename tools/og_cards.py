@@ -3,7 +3,7 @@
 import os, subprocess, tempfile, sys
 SITE=os.path.dirname(os.path.dirname(os.path.abspath(__file__))); CH='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 D=[ # slug, фото (1 или 2), надзаголовок, название, цена, плашка
- ('cg-capital',['andaz-hd.webp'],'Central Group · Лаян и Банг Тао','Andaz и PURITA','от 7,xx млн ฿','старт продаж'),
+ ('cg-capital',['andaz-hd.webp'],'Central Group · Лаян и Банг Тао','Andaz и PURITA','от 7,29 млн ฿','старт продаж'),
  ('vibe2',['v2-hero.webp'],'Карон · застройщик ESM','Vibe II Downtown','от 2 968 000 ฿','старт 28 октября'),  # 16.10 №303: цена входа, не за м²; студия 28 м² (kviz, горячие_офферы)
  ('zero-naiyang',['z-ext.webp'],'Най Янг · 350 м до пляжа','The ZERO Nai Yang','от 4,94 млн ฿','гарантия 10% на 3 года'),
  ('eden',['lake-cover.webp'],'Банг Тао · третья фаза','Gardens of Eden Lake','от 11,9 млн ฿','рассрочка на 5 лет'),
@@ -11,7 +11,7 @@ D=[ # slug, фото (1 или 2), надзаголовок, название, �
  ('fizz',['f-pool.webp'],'Ката · 135 квартир','FIZZ','от 5 154 707 ฿','закрытый старт'),  # 17.10: 1-спальная от 5 154 707, Fizz_Price_List_3 (прайс застройщика), точная сумма без округления (Эльнур 17.10)
  ('aileen',['hero.jpg'],'Лагуна · таунхаусы 159 м²','Aileen Residence Lagoon','от 11,85 млн ฿','предстарт'),
  ('top15',['p10-ayana.webp','p02-intercontinental.webp'],'Пхукет · подборка для клиентов','Топ-15 кондо','от 2,97 млн ฿','15 проектов'),  # 22.10.2026: цена = самый низкий вход в подборке (Vibe II, список ~/plp-ops/tools/top15/sheet.json)
- ('purita',['p-pool.webp'],'Банг Тао · Central Group','PURITA','от 7,29 млн ฿','новый старт'),  # 23.10.2026: старт «от 7,29 млн» из презентации застройщика 22.10 (Agent Night); лист offers/purita
+ ('purita',['p-og-air.webp'],'Банг Тао · Central Group','PURITA','от 7,29 млн ฿','новый старт'),  # 23.10.2026: старт «от 7,29 млн» из презентации застройщика 22.10 (Agent Night); лист offers/purita
  ('millennium',['hero.webp'],'Банг Тао · 750 м до пляжа','Millennium','от 3,42 млн ฿','старт 14 октября'),  # 14.10.2026: цена и дата с листа offers/millennium (прайс застройщика 13.10)
 ]
 T='''<!doctype html><html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
