@@ -1,0 +1,189 @@
+{
+ "slug": "naturale-kamala",
+ "pdf": "Naturale_Kamala.pdf",
+ "head": "<!doctype html>\n<html lang=\"ru\"><head><script>/* 02.10.2026: прямую ссылку на лист А4 открыли на телефоне — правую часть обрезало. На узком экране вне рамки ведём на /vibe2, где лист уменьшается целиком. Печать и PDF не трогаем. */if(window.top===window&&window.Math.min(innerWidth,screen.width||9999)<800&&!/[?&]pdf/.test(location.search)&&!window.matchMedia('print').matches){location.replace('/naturale-kamala/73204'+location.hash);}</script>\n<base target=\"_top\"><meta charset=\"utf-8\">\n<meta name=\"robots\" content=\"noindex, nofollow\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>Naturale Kamala · Камала, виллы с бассейном · Property Library Phuket</title>\n<meta property=\"og:type\" content=\"website\">\n<meta property=\"og:site_name\" content=\"Property Library Phuket\">\n<meta property=\"og:title\" content=\"Naturale Kamala: 14 вилл с бассейном на Millionaire's Mile\">\n<meta property=\"og:description\" content=\"Предложение Property Library Phuket: виллы Naturale Kamala от AAG Development. Три типа, цены от 67,7 млн ฿, график оплаты, планировки\">\n<meta property=\"og:url\" content=\"https://property-library.com/naturale-kamala/73204\">\n<meta property=\"og:image\" content=\"https://property-library.com/offers/naturale-kamala/img/preview-v1.jpg\">\n<meta property=\"og:image:width\" content=\"1200\">\n<meta property=\"og:image:height\" content=\"630\">\n<meta name=\"twitter:card\" content=\"summary_large_image\">\n<link rel=\"stylesheet\" href=\"https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Marck+Script&display=swap\">\n<style>\n@page{size:210mm 4200mm;margin:0}\n.photo{position:absolute;z-index:2;border-radius:3mm;overflow:hidden;box-shadow:0 1.5mm 4mm rgba(23,24,15,.18)}\n.photo img{width:100%;height:100%;object-fit:cover;display:block}\n:root{--ink:#17180F;--ink2:#2B2D22;--sage:#D2D5B3;--olive:#5E6B35;--cream:#EFECE2;--line:#DAD8C8;--muted:#62665A;--rust:#B4533A;--teal:#4E7F80;--sun:#F2D96B}\n*{box-sizing:border-box}\nhtml,body{margin:0;background:var(--cream)}\nbody{color:var(--ink);font:10pt/1.55 Manrope,-apple-system,\"Segoe UI\",Arial,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}\n.w{width:210mm;margin:0 auto;background:var(--cream);position:relative;overflow:hidden}\n.pad{padding-left:15mm;padding-right:15mm}\na{color:inherit}\n.pen{font-family:\"Marck Script\",cursive;color:var(--rust)}\n.eyebrow{font-weight:700;font-size:7.6pt;letter-spacing:.18em;text-transform:uppercase;color:var(--olive)}\nh1{font-weight:800;font-size:58pt;line-height:.95;letter-spacing:-.04em;margin:3mm 0 4mm;white-space:nowrap}\nh1 span{color:var(--olive)}\nh2{font-weight:800;font-size:21pt;line-height:1.08;letter-spacing:-.015em;margin:1.5mm 0 3mm;max-width:140mm}\nh3{font-weight:700;font-size:7.6pt;letter-spacing:.14em;text-transform:uppercase;color:var(--olive);margin:0 0 2.5mm}\np{margin:0 0 2mm}\n.lead{font-size:11pt;color:var(--ink2);max-width:150mm}\n.src{font-size:7pt;color:var(--muted);margin-top:2.5mm}\n.num{font-variant-numeric:tabular-nums}\nsection{padding-top:14mm;position:relative}\n.layer{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:5}\n.top{display:flex;justify-content:space-between;align-items:flex-start;padding:10mm 15mm 0}\n.top img{height:19mm;display:block}\n.top .tag{font-size:7.4pt;letter-spacing:.16em;text-transform:uppercase;color:var(--olive);text-align:right;line-height:1.7;font-weight:700}\n.hero{position:relative;height:150mm}\n.hero .txt{position:absolute;left:15mm;top:12mm;width:76mm;z-index:3}\n.hero .sub{font-size:11pt;color:var(--ink2);max-width:66mm}\n.block{position:absolute;background:var(--sage);background-image:repeating-linear-gradient(135deg,rgba(23,24,15,.07) 0 .6mm,transparent .6mm 2.4mm)}\n.sticker{position:absolute;z-index:2}\n.sticker img{width:100%;display:block}\n.label{position:absolute;z-index:4;background:var(--ink);color:var(--sun);font-weight:800;font-size:9pt;letter-spacing:.14em;text-transform:uppercase;padding:2mm 3.5mm;border-radius:1mm;box-shadow:.8mm .8mm 0 rgba(23,24,15,.25)}\n.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:3.5mm;padding:0 15mm;position:relative;z-index:3}\n.stat{background:#FFFFFF;border:1px solid var(--line);border-radius:2.5mm;padding:4mm 4mm 4.5mm;position:relative}\n.stat svg{position:absolute;right:2.5mm;top:2.5mm;width:11mm;height:11mm;overflow:visible}\n.stat b{display:block;font-weight:800;font-size:15.5pt;letter-spacing:-.01em;white-space:nowrap;margin-top:7mm}\n.stat span{font-size:7.1pt;color:var(--muted);white-space:nowrap}\n.grid{display:grid;gap:6mm}\n.g2{grid-template-columns:1fr 1fr}\n.g64{grid-template-columns:1.5fr 1fr}\n.card{background:#FFFFFF;border:1px solid var(--line);border-radius:2.5mm;padding:5.5mm 6mm;position:relative}\ntable{border-collapse:collapse;width:100%}\ntd{padding:1.9mm 0;border-bottom:1px solid #ECECE0;font-size:9pt;vertical-align:top}\ntr:last-child td{border-bottom:0}\ntd.r{text-align:right;font-weight:700;white-space:nowrap;padding-left:4mm}\n.hl{color:var(--olive)}\n.big{font-weight:800;font-size:26pt;letter-spacing:-.02em;line-height:1}\nul.l{margin:0;padding:0;list-style:none}\nul.l li{position:relative;padding:1.6mm 0 1.6mm 5mm;border-bottom:1px solid #E1DFD0;font-size:9pt}\nul.l li:last-child{border-bottom:0}\nul.l li:before{content:\"\";position:absolute;left:0;top:3.6mm;width:2mm;height:2mm;border-radius:50%;background:var(--olive)}\n.head-ico{position:absolute;right:15mm;top:11mm;width:20mm;height:20mm;overflow:visible}\n.polaroid{position:absolute;background:#fff;padding:2mm 2mm 8mm;box-shadow:0 1.2mm 3mm rgba(23,24,15,.18)}\n.polaroid img{display:block;width:100%;height:100%;object-fit:cover}\n.polaroid i{position:absolute;left:0;right:0;bottom:1.6mm;text-align:center;font-family:\"Marck Script\",cursive;font-style:normal;font-size:11pt;color:var(--ink2)}\n.tape{position:absolute;width:18mm;height:5.5mm;background:rgba(242,217,107,.78);z-index:3}\n.dev{position:relative;height:112mm;margin-top:4mm}\n.facts{display:grid;grid-template-columns:1fr 1fr;gap:3mm 5mm}\n.facts b{display:block;font-weight:800;font-size:15pt}\n.facts span{font-size:8pt;color:var(--muted)}\n.cta{margin:12mm 15mm 0;padding:7mm 0 7mm;border-top:1px solid var(--line)}\n.ctahead{display:grid;grid-template-columns:1.3fr 1fr;gap:8mm;align-items:end}\n.cta h2{font-size:17pt;margin:1mm 0 0}\n.cta .ctahead p{font-size:9pt;color:var(--ink2);margin:0}\n.links{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;gap:2.5mm;margin-top:5mm}\n.links a{display:block;text-decoration:none;border:1px solid var(--line);border-radius:2mm;padding:2.8mm 3.2mm;color:var(--ink);background:#FFFFFF}\n.links a b{display:block;font-weight:700;font-size:8.6pt;white-space:nowrap}\n.links a span{font-size:7.2pt;color:var(--muted);white-space:nowrap}\n.links a.main{background:var(--sage);border-color:var(--sage)}\n.foot{display:flex;justify-content:space-between;gap:8mm;font-size:6.8pt;color:var(--muted);margin-top:4mm}\n.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:10mm 7mm;margin-top:3mm}\n.pol{background:#fff;padding:2mm 2mm 8mm;box-shadow:0 .6mm 1.6mm rgba(23,24,15,.14);position:relative}\n.pol img{display:block;width:100%;height:52mm;object-fit:cover}\n.pol i{position:absolute;left:0;right:0;bottom:1.4mm;text-align:center;font-family:\"Marck Script\",cursive;font-style:normal;font-size:11pt;color:var(--ink2)}\n.tl{display:grid;grid-template-columns:repeat(4,1fr);gap:3.5mm;margin-top:3mm;position:relative}\n.tl div{background:#fff;border:1px solid var(--line);border-radius:2.5mm;padding:4mm;border-top:1.2mm solid var(--olive)}\n.tl b{display:block;font-weight:800;font-size:11pt;margin-bottom:1mm}\n.tl span{font-size:8.4pt;color:var(--ink2)}\n.plans-band{position:relative;background:var(--olive);border-radius:3mm;padding:8mm 9mm 6mm;color:#fff}\n.tl2{list-style:none;margin:4mm 0 0;padding:0}\n.tl2 li{display:grid;grid-template-columns:42mm 1fr;grid-template-rows:auto auto;column-gap:5mm;padding:3.2mm 0;border-top:1px solid rgba(255,255,255,.22)}\n.tl2 li b{grid-row:1/3;font-weight:800;font-size:12pt;color:var(--sun)}\n.tl2 li span{font-weight:700;font-size:10pt}\n.tl2 li em{font-style:normal;font-size:8.6pt;color:rgba(255,255,255,.78)}\n.dd{position:absolute;z-index:6;pointer-events:none}\n.dd img{width:100%;display:block;filter:drop-shadow(0 .6mm .8mm rgba(23,24,15,.18))}\nsvg text{font-family:Manrope,Arial,sans-serif}\n\n</style><!-- PLP:GA --><script>window.PLP_GA='G-HQNDG3B8MW';window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied'});</script><script src=\"/js/consent.js\" defer></script><!-- PLP:PIXEL --><script>window.PLP_PIXEL='1387930368853540';</script></head>\n",
+ "top": "<div class=\"top\">\n  <a href=\"https://property-library.com\"><img src=\"img/plp-logo-ink.webp\" alt=\"Property Library Phuket\"></a>\n  <div class=\"tag\">Предложение<br>для клиентов Property Library<br><span style=\"color:var(--muted)\">по прайсу и брошюре застройщика</span></div>\n</div>",
+ "hero": "<div class=\"hero\" style=\"height:118mm\">\n  <div class=\"txt\">\n    <div class=\"eyebrow\">Камала · Millionaire's Mile</div>\n    <h1 style=\"font-size:40pt;white-space:normal;line-height:.95\">Naturale<br><span>Kamala</span></h1>\n    <p class=\"sub\">14 вилл с бассейном на склоне Millionaire's Mile у пляжа Камала. Три типа на 3, 4 и 5 спален, у старших вид на океан. От 67,7 млн ฿ (около 1,93 млн $), на ближайшие две сделки предпродажная цена от 57,5 млн ฿.</p>\n  </div>\n  <div class=\"photo\" style=\"left:90mm;top:24mm;width:112mm;height:76mm;transform:rotate(-1.5deg)\"><img src=\"img/hero.webp\" alt=\"Naturale Kamala, вилла Andaman с бассейном, рендер застройщика\"></div>\n  <div class=\"label\" style=\"left:150mm;top:9mm;transform:rotate(6deg)\">14 вилл</div>\n  <div style=\"position:absolute;left:92mm;top:102.5mm;font-size:7pt;color:var(--muted);z-index:3\">Вилла Andaman, рендер застройщика</div>\n</div>",
+ "stats": "<div class=\"stats\">\n  <div class=\"stat\"><b>14</b><span>вилл, 2 уже проданы</span></div>\n  <div class=\"stat\"><b>3–5</b><span>спален, три типа вилл</span></div>\n  <div class=\"stat\"><b>67,7 млн ฿</b><span>цена «от», вилла Aria</span></div>\n  <div class=\"stat\"><b>25 км</b><span>до аэропорта</span></div>\n</div>",
+ "units": {
+  "eyebrow": "Виллы и цены",
+  "h2": "Три типа вилл с бассейном и садом в цене",
+  "lead": "Aria на 3 спальни с террасой, Kamala на 4 спальни с частичным видом на океан и Andaman на 5 спален с видом на океан. В цену каждой виллы входят бассейн с солёной водой, скрытые кондиционеры, встроенные шкафы, кухня-пантри со встроенной техникой, умное освещение, ванные и ландшафтный сад.",
+  "facts": "<div class=\"facts\" style=\"grid-template-columns:repeat(4,1fr);margin:5mm 0 6mm\">\n    <div><b>14</b><span>вилл в посёлке</span></div>\n    <div><b>12</b><span>в продаже, 2 проданы</span></div>\n    <div><b>30%</b><span>взнос: бронь 2% и договор 28%</span></div>\n    <div><b>лизхолд</b><span>аренда земли, регистрируется в госорганах</span></div>\n  </div>",
+  "cards": [
+   "<div class=\"card\"><h3>Площади и бассейны</h3>\n      <table>\n        <tr><td>Aria · 3 спальни</td><td class=\"r num\">248 м²</td></tr>\n        <tr><td><span style=\"color:var(--muted);font-size:7.6pt\">участок 285–297 м², бассейн 15 × 3,4 м</span></td><td></td></tr>\n        <tr><td>Kamala · 4 спальни</td><td class=\"r num\">526–589 м²</td></tr>\n        <tr><td><span style=\"color:var(--muted);font-size:7.6pt\">участок 500–550 м², бассейн 18,1 × 6 м</span></td><td></td></tr>\n        <tr><td>Andaman · 5 спален</td><td class=\"r num\">778–798 м²</td></tr>\n        <tr><td><span style=\"color:var(--muted);font-size:7.6pt\">участок 624–973 м², бассейн 21,15 × 6,5 м</span></td><td></td></tr>\n      </table>\n      <p class=\"src\">Площадь дома внутри, без террас. Прайс застройщика, 15.10.2026. Размеры ориентировочные, окончательный обмер после стройки.</p></div>",
+   "<div class=\"card\"><h3>Что в каждом типе</h3>\n      <ul class=\"l\">\n        <li><b>Aria</b>: 3 спальни с ванными и гардеробными, 2 столовые, 2 кухни (европейская и тайская), беседка-сала, 2 места на парковке</li>\n        <li><b>Kamala</b>: 4 спальни (можно до 6), 8 санузлов, семейная комната, спортзал и сауна, кабинет, частный лифт, комната для горничной, 3 места</li>\n        <li><b>Andaman</b>: 5 спален (можно до 9), 9 санузлов, спа, спортзал, сауна и парная, кинозал, кабинет, частный лифт, 2 комнаты для горничной, 4 места</li>\n      </ul>\n      <p class=\"src\">Прайс и брошюра застройщика, 2026.</p></div>"
+  ],
+  "cards_wide": [
+   "<div class=\"card\"><h3>Цены по типам, млн ฿</h3>\n      <table>\n        <tr><td style=\"color:var(--muted)\">Тип</td><td class=\"r\" style=\"color:var(--muted);font-weight:600\">прайс 15.10</td><td class=\"r\" style=\"color:var(--muted);font-weight:600\">предпродажная цена</td></tr>\n        <tr><td>Aria, 3 спальни<span style=\"color:var(--muted);font-size:7.6pt\"> · 5 вилл</span></td><td class=\"r num\">67,7–73,1</td><td class=\"r num hl\">57,5–62,1</td></tr>\n        <tr><td>Kamala, 4 спальни<span style=\"color:var(--muted);font-size:7.6pt\"> · 4 виллы</span></td><td class=\"r num\">157,7–178,9</td><td class=\"r num hl\">134–152</td></tr>\n        <tr><td>Andaman, 5 спален<span style=\"color:var(--muted);font-size:7.6pt\"> · 3 виллы</span></td><td class=\"r num\">267,1–311,8</td><td class=\"r num hl\">227–265</td></tr>\n      </table>\n      <p style=\"margin:3mm 0 0;color:var(--ink2);font-size:9pt\">Цена «от» по прайсу: Aria 67,7 млн ฿ (около 1,93 млн $), Kamala 157,7 млн ฿ (около 4,51 млн $), Andaman 267,1 млн ฿ (около 7,63 млн $). Предпродажная цена действует на ближайшие две сделки проекта, дальше цена по прайсу. Подберём виллу под задачу и уточним, осталась ли предпродажная цена.</p>\n      <p class=\"src\">Прайс застройщика AAG Development от 15.10.2026, цены в батах за виллу. Доллары по курсу сайта 35 ฿ за $, ориентир. Цены могут меняться без уведомления.</p></div>"
+  ],
+  "photos_title": "Виллы снаружи и внутри",
+  "photos": [
+   {
+    "src": "img/r-aria.webp",
+    "alt": "Naturale Kamala, вилла Aria, рендер застройщика",
+    "cap": "Aria: терраса и бассейн"
+   },
+   {
+    "src": "img/i-aria-living.webp",
+    "alt": "Вилла Aria, гостиная, рендер застройщика",
+    "cap": "Aria: гостиная"
+   },
+   {
+    "src": "img/i-aria-master.webp",
+    "alt": "Вилла Aria, главная спальня, рендер застройщика",
+    "cap": "Aria: главная спальня"
+   },
+   {
+    "src": "img/r-kamala.webp",
+    "alt": "Naturale Kamala, вилла Kamala, рендер застройщика",
+    "cap": "Kamala: бассейн на крыше"
+   },
+   {
+    "src": "img/i-kamala-living.webp",
+    "alt": "Вилла Kamala, гостиная, рендер застройщика",
+    "cap": "Kamala: гостиная"
+   },
+   {
+    "src": "img/i-kamala-master.webp",
+    "alt": "Вилла Kamala, главная спальня, рендер застройщика",
+    "cap": "Kamala: главная спальня"
+   },
+   {
+    "src": "img/i-andaman-pool.webp",
+    "alt": "Вилла Andaman, гостиная и бассейн, рендер застройщика",
+    "cap": "Andaman: гостиная и бассейн"
+   },
+   {
+    "src": "img/i-andaman-master.webp",
+    "alt": "Вилла Andaman, главная спальня с видом на океан, рендер застройщика",
+    "cap": "Andaman: спальня с видом"
+   },
+   {
+    "src": "img/i-andaman-spa.webp",
+    "alt": "Вилла Andaman, спа, рендер застройщика",
+    "cap": "Andaman: спа"
+   }
+  ],
+  "photos_note": "Рендеры застройщика, отделка может отличаться.",
+  "plans_title": "Планировки по этажам",
+  "plans_cols": 2,
+  "plans_pol": [
+   {
+    "src": "img/pl-aria-1.webp",
+    "alt": "Aria, первый этаж",
+    "cap": "Aria, 1 этаж"
+   },
+   {
+    "src": "img/pl-aria-2.webp",
+    "alt": "Aria, второй этаж",
+    "cap": "Aria, 2 этаж"
+   },
+   {
+    "src": "img/pl-kamala-1.webp",
+    "alt": "Kamala, первый этаж",
+    "cap": "Kamala, 1 этаж"
+   },
+   {
+    "src": "img/pl-kamala-2.webp",
+    "alt": "Kamala, второй этаж",
+    "cap": "Kamala, 2 этаж"
+   },
+   {
+    "src": "img/pl-kamala-3.webp",
+    "alt": "Kamala, третий этаж",
+    "cap": "Kamala, 3 этаж"
+   },
+   {
+    "src": "img/pl-andaman-0.webp",
+    "alt": "Andaman, цокольный этаж",
+    "cap": "Andaman, цоколь"
+   },
+   {
+    "src": "img/pl-andaman-1.webp",
+    "alt": "Andaman, первый этаж",
+    "cap": "Andaman, 1 этаж"
+   },
+   {
+    "src": "img/pl-andaman-2.webp",
+    "alt": "Andaman, второй этаж",
+    "cap": "Andaman, 2 этаж"
+   },
+   {
+    "src": "img/pl-andaman-3.webp",
+    "alt": "Andaman, третий этаж",
+    "cap": "Andaman, 3 этаж"
+   }
+  ],
+  "plans_src": "Планировки застройщика, обновление 18.10.2026."
+ },
+ "project": {
+  "h2": "Посёлок из 14 вилл у пляжа Камала",
+  "lead": "Виллы стоят на склоне Millionaire's Mile. Застройщик называет это место «Beverly Hills of Asia» и описывает каждую виллу как личный мир для здоровья: бассейн с солёной водой, спа, спортзал, сауна и парная, террасы для загара. Набор зависит от типа виллы, он описан выше.",
+  "big": {
+   "src": "img/aerial.webp",
+   "alt": "Naturale Kamala, посёлок из 14 вилл на склоне, рендер застройщика",
+   "contain": false,
+   "cap": "Посёлок на склоне Millionaire's Mile, рендер застройщика."
+  },
+  "cards": [
+   "<div class=\"card\"><h3>Что входит в содержание посёлка</h3>\n      <ul class=\"l\">\n        <li>Охрана 24 часа и видеонаблюдение</li>\n        <li>Вывоз мусора</li>\n        <li>Общее электричество и водоснабжение</li>\n        <li>Уход за общим ландшафтным садом</li>\n        <li>По желанию отдельно: чистка бассейна, садовник, горничная и обслуживание виллы</li>\n      </ul>\n      <p class=\"src\">Прайс застройщика, 15.10.2026.</p></div>",
+   "<div class=\"card\"><h3>Взносы после покупки</h3>\n      <table>\n        <tr><td>Содержание, за м² участка в месяц</td><td class=\"r num\">50 ฿</td></tr>\n        <tr><td>Оплата содержания</td><td class=\"r num\">за год вперёд</td></tr>\n        <tr><td>Резервный фонд, за м² участка разово</td><td class=\"r num\">500 ฿</td></tr>\n        <tr><td>Электричество</td><td class=\"r num\">по счётчику</td></tr>\n        <tr><td>Вода</td><td class=\"r num\">от проекта</td></tr>\n      </table>\n      <p class=\"src\">Прайс застройщика, 15.10.2026. Электричество платится напрямую поставщику.</p></div>"
+  ],
+  "plans": []
+ },
+ "buy": {
+  "h2": "Бронь, договор и этапы стройки",
+  "html": "<div class=\"card\" style=\"max-width:170mm\"><table>\n        <tr><td>Бронь (невозвратная)</td><td class=\"r num\">2%</td></tr>\n        <tr><td>Договор</td><td class=\"r num\">28%</td></tr>\n        <tr><td>Фундамент готов</td><td class=\"r num\">20%</td></tr>\n        <tr><td>Каркас готов</td><td class=\"r num\">15%</td></tr>\n        <tr><td>Кровля готова</td><td class=\"r num\">15%</td></tr>\n        <tr><td>Плитка пола и стен готова</td><td class=\"r num\">10%</td></tr>\n        <tr><td>Вилла готова, ключи</td><td class=\"r num\">10%</td></tr>\n      </table>\n      <p style=\"margin:3mm 0 0;color:var(--ink2);font-size:9pt\">Пример для Aria по предпродажной цене 57,5 млн ฿: бронь 1 150 000 ฿, договор 16 100 000 ฿, вместе 30% и 17 250 000 ฿. Налоги и сборы при регистрации аренды застройщик и покупатель делят поровну. Если владелец меняется до сдачи, юридический сбор 200 000 ฿ за договор.</p>\n      <p class=\"src\">Условия оплаты: прайс застройщика, 15.10.2026. Застройщик может менять условия без уведомления.</p></div>"
+ },
+ "step": {
+  "eyebrow": "Предпродажная цена",
+  "h2": "Как войти по цене на ближайшие две сделки",
+  "items": [
+   [
+    "Сейчас",
+    "Выбираем виллу",
+    "подберём тип под вашу задачу и уточним, осталась ли предпродажная цена"
+   ],
+   [
+    "Бронь 2%",
+    "Невозвратный взнос",
+    "фиксирует виллу за вами"
+   ],
+   [
+    "Договор 28%",
+    "Подписание договора",
+    "вместе с бронью 30% от цены виллы"
+   ],
+   [
+    "4 этапа стройки",
+    "Фундамент, каркас, кровля, плитка",
+    "20%, 15%, 15% и 10% по готовности этапа"
+   ],
+   [
+    "Ключи 10%",
+    "Вилла готова",
+    "последний платёж при передаче виллы"
+   ]
+  ],
+  "src": "Прайс застройщика от 15.10.2026: предпродажная цена ограничена ближайшими двумя сделками. Срок сдачи в материалах застройщика не указан."
+ },
+ "who": {
+  "h2": "Для жизни у океана",
+  "html": "<div class=\"grid g2\" style=\"align-items:start\">\n    <div class=\"card\"><ul class=\"l\">\n      <li><b>Семье для жизни</b>: от 3 до 5 спален, у каждой спальни своя ванная и гардеробная, сад и бассейн на участке</li>\n      <li><b>Тем, кто ценит вид</b>: у Andaman вид на океан, у Kamala частичный вид</li>\n    </ul></div>\n    <div class=\"card\"><ul class=\"l\">\n      <li><b>Тем, кому нужен сервис</b>: застройщик предлагает обслуживание виллы, бассейна и сада, горничную</li>\n      <li><b>Для сдачи в аренду</b>: застройщик предлагает услугу аренды по запросу</li>\n    </ul></div>\n  </div>\n  <div class=\"card\" style=\"margin-top:6mm\"><h3>Наш взгляд</h3>\n    <p style=\"margin:1.5mm 0 0;color:var(--ink2)\">Это штучный продукт: всего 14 вилл, две уже проданы. По фактам застройщика сильные стороны такие: Millionaire's Mile у пляжа Камала, бассейн с солёной водой и сервис, у Andaman и Kamala спа, спортзал и частный лифт. Что учесть: земля в лизхолде (договор аренды регистрируется в государственных органах), срока сдачи в материалах застройщика нет, поэтому уточним его до брони.</p>\n    <p class=\"src\">Прайс и брошюра застройщика, 2026.</p></div>"
+ },
+ "income": {
+  "h2": "Аренда и сервис после покупки",
+  "html": "<div style=\"margin-top:5mm\">\n    <div class=\"card\"><h3>Что предлагает застройщик</h3>\n      <ul class=\"l\">\n        <li>Сервис виллы по желанию: чистка бассейна, уход за садом, горничная, обслуживание виллы</li>\n        <li>Услуга аренды для арендаторов по запросу</li>\n      </ul>\n      <p style=\"margin:3mm 0 0;color:var(--ink2);font-size:9pt\">Прогноза доходности и ставок аренды в материалах застройщика нет, поэтому цифр не приводим.</p>\n      <p class=\"src\">Прайс застройщика, 15.10.2026.</p></div>\n  </div>"
+ },
+ "place": {
+  "h2": "Камала: Millionaire's Mile рядом с пляжем",
+  "html": "<div class=\"grid g2\" style=\"align-items:start\">\n    <div class=\"card\"><h3>Дорога</h3>\n      <table>\n        <tr><td>Пляж Камала</td><td class=\"r num\">рядом</td></tr>\n        <tr><td>Аэропорт</td><td class=\"r num\">25 км</td></tr>\n      </table></div>\n    <div class=\"card\"><h3>Торговля и отдых</h3>\n      <ul class=\"l\">\n        <li>Villa Market, Tops (24 часа), Boat Avenue, Central Phuket</li>\n        <li>Cafe del Mar, Laguna Golf Club, Phuket Boat Lagoon, Royal Phuket Marina</li>\n      </ul></div>\n  </div>\n  <div class=\"grid g2\" style=\"align-items:start;margin-top:5mm\">\n    <div class=\"card\"><h3>Школы</h3>\n      <ul class=\"l\">\n        <li>HeadStart International School</li>\n        <li>BCIS International School</li>\n        <li>ISP International School</li>\n        <li>British International School</li>\n      </ul></div>\n    <div class=\"card\"><h3>Больницы</h3>\n      <ul class=\"l\">\n        <li>Bumrungrad International Hospital</li>\n        <li>Bangkok Hospital Clinic</li>\n        <li>Wattanapat Hospital</li>\n        <li>Bangkok Hospital</li>\n      </ul></div>\n  </div>\n  <p class=\"src\">Список мест рядом: брошюра застройщика. Расстояния застройщик не указывает.</p>\n  <div class=\"photo\" style=\"position:relative;left:0;top:0;width:100%;height:101mm;margin-top:5mm\"><img src=\"img/map.webp\" alt=\"Naturale Kamala на карте Пхукета, Камала и аэропорт\"></div>\n  <p class=\"src\">Карта застройщика: Камала на западном побережье, до международного аэропорта 25 км.</p>"
+ },
+ "developer": {
+  "h2": "AAG Development: виллы Naturale на Пхукете",
+  "html": "<div class=\"grid g2\" style=\"align-items:start\">\n    <div class=\"card\"><h3>Застройщик</h3>\n      <ul class=\"l\">\n        <li><b>AAG Development</b>: застройщик проектов Naturale Phuket</li>\n        <li><b>Naturale Kamala</b>: 14 вилл на Millionaire's Mile, три типа Aria, Kamala и Andaman</li>\n      </ul>\n      <p class=\"src\">Брошюра застройщика, 2026.</p></div>\n    <div class=\"card\"><h3>Награды застройщика</h3>\n      <ul class=\"l\">\n        <li>Asia Pacific Property Awards 2026–2027, Award Winner</li>\n        <li>PropertyGuru Thailand Property Awards 2025, Best Luxury Housing / Villa Development (Phuket)</li>\n        <li>Dot Property Southeast Asia Awards 2025, Best Luxury Villa Development</li>\n      </ul>\n      <p class=\"src\">Награды указаны в брошюре застройщика для Naturale Phuket Luxury Pool Villas.</p></div>\n  </div>"
+ },
+ "cta": "<footer class=\"cta\">\n  <div class=\"ctahead\">\n    <div><div class=\"eyebrow\">Следующий шаг</div><h2>Подберём виллу под вашу задачу</h2></div>\n    <p>Покажем планировки и цену по каждой вилле, уточним, осталась ли предпродажная цена, и пришлём график платежей.</p>\n  </div>\n  <div class=\"links\">\n    <a class=\"main\" href=\"https://wa.me/66955492587?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5%21%20%D0%98%D0%BD%D1%82%D0%B5%D1%80%D0%B5%D1%81%D0%BD%D1%8B%20%D0%B2%D0%B8%D0%BB%D0%BB%D1%8B%20Naturale%20Kamala\"><b>Написать Эльнуру →</b><span>WhatsApp</span></a>\n    <a href=\"https://t.me/elnurphuket_bot?start=naturale_offer\"><b>Telegram</b><span>@elnurphuket_bot</span></a>\n    <a href=\"https://property-library.com\"><b>Сайт</b><span>каталог объектов</span></a>\n    <a href=\"https://t.me/property_library_phuket\"><b>Канал</b><span>новости рынка</span></a>\n  </div>\n  <div class=\"foot\"><span>Property Library Phuket. Сопровождаем от выбора до ключей</span><span>По материалам застройщика, условия могут меняться.</span></div>\n</footer>",
+ "tail": "\n</div>\n</body></html>\n"
+}
