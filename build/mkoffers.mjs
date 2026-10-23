@@ -80,7 +80,7 @@ const OFFERS = [
     desc: 'PURITA на Банг Тао от CG Capital (Central Group): квартиры с мебелью, цены, условия оплаты, аренда по прогнозу управляющей компании. Предложение для клиентов Property Library Phuket.',
     pdf: 'PURITA_Bangtao.pdf',
     og: 'offers/purita/img/preview-v10.jpg',
-    h: 8527,   // PDF 2255 мм × 794/210 (23.10)
+    h: 11680,   // PDF 3082 мм (+23 px запас по проверке) × 794/210 (23.10, после доработки)
   },
   /* 09.10.2026 Эльнур: общий лист KUARTZ+FIZZ «лишний, удали» — убран; /kuartz-fizz пересылает на /kuartz. */
   {
