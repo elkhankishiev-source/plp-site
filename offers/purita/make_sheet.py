@@ -177,7 +177,7 @@ J = {
     </ul></div>
     <div class="card"><ul class="l">
       <li><b>Инвесторам вдолгую</b>: мебель в цене, сдача через управляющую Plus Property</li>
-      <li><b>Тем, кто смотрит на марку</b>: застройщик Central Group, на острове у группы торговые центры, отели и The Standard Residences</li>
+      <li><b>Тем, кто смотрит на марку</b>: застройщик CG Capital из Central Group, их The Standard Residences на Банг Тао продан на 90%</li>
     </ul></div>
   </div>
   <div class="card" style="margin-top:6mm"><h3>Наш взгляд</h3>
