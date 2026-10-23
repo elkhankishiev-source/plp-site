@@ -12,6 +12,7 @@ D=[ # slug, фото (1 или 2), надзаголовок, название, �
  ('aileen',['hero.jpg'],'Лагуна · таунхаусы 159 м²','Aileen Residence Lagoon','от 11,85 млн ฿','предстарт'),
  ('top15',['hero.webp'],'Пхукет · подборка для клиентов','Топ-15 кондо','от 2,97 млн ฿','15 проектов'),  # 22.10.2026: цена = самый низкий вход в подборке (Vibe II, список ~/plp-ops/tools/top15/sheet.json)
  ('purita',['r-og.webp'],'Банг Тао · Central Group','PURITA','от 7,29 млн ฿','новый старт'),  # 23.10.2026: старт «от 7,29 млн» из презентации застройщика 22.10 (Agent Night); лист offers/purita
+ ('naturale-kamala',['hero.webp'],'Камала · Millionaire\'s Mile','Naturale Kamala','от 67,7 млн ฿','14 вилл'),  # 24.10.2026: цена «от» = вилла Aria, прайс застройщика 15.10.2026
  ('millennium',['hero.webp'],'Банг Тао · 750 м до пляжа','Millennium','от 3,42 млн ฿','старт 14 октября'),  # 14.10.2026: цена и дата с листа offers/millennium (прайс застройщика 13.10)
 ]
 T='''<!doctype html><html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
@@ -45,5 +46,5 @@ for slug,ph,ey,t,p,tag in D:
         if os.path.exists(png) and os.path.getsize(png)>10000: time.sleep(1); break
     pr.kill(); import shutil; shutil.rmtree(prof, ignore_errors=True)
     os.remove(f)
-    out=os.path.join(d,'preview-v3.jpg' if slug=='top15' else 'preview-v13.jpg' if slug=='vibe2' else 'preview-v12.jpg' if slug=='fizz' else ('preview-v13.jpg' if slug=='vibe2' else 'preview-v11.jpg' if slug=='kuartz' else 'preview-v10.jpg'))  # 14.10.2026: новое имя файла против кэша мессенджеров
+    out=os.path.join(d,'preview-v1.jpg' if slug=='naturale-kamala' else 'preview-v3.jpg' if slug=='top15' else 'preview-v13.jpg' if slug=='vibe2' else 'preview-v12.jpg' if slug=='fizz' else ('preview-v13.jpg' if slug=='vibe2' else 'preview-v11.jpg' if slug=='kuartz' else 'preview-v10.jpg'))  # 14.10.2026: новое имя файла против кэша мессенджеров
     subprocess.run(['ffmpeg','-loglevel','error','-y','-i',png,'-q:v','3',out]); print(slug,'→',out)

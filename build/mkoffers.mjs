@@ -82,6 +82,16 @@ const OFFERS = [
     og: 'offers/purita/img/preview-v10.jpg',
     h: 11598,   // PDF 3061 мм (+25 px запас) × 794/210 (23.10, правка потолки/1947/подписи)
   },
+  {
+    /* 24.10.2026 Эльнур 23.10: «виллы топ, закинь их к нам на сайт и в офер». Факты: прайс застройщика 15.10.2026, брошюра и планировки AAG Development
+       (offers/naturale-kamala/make_sheet.py). hidden: только /naturale-kamala/<номер из build/nomera.json>. */
+    slug: 'naturale-kamala', dir: 'offers/naturale-kamala', hidden: true,
+    title: 'Naturale Kamala · Камала, виллы с бассейном',
+    desc: 'Naturale Kamala от AAG Development: 14 вилл на Millionaire\'s Mile, три типа, цены от 67,7 млн ฿, график оплаты и планировки. Предложение для клиентов Property Library Phuket.',
+    pdf: 'Naturale_Kamala.pdf',
+    og: 'offers/naturale-kamala/img/preview-v1.jpg',
+    h: 8434,   // PDF 2224 мм × 794/210 (24.10)
+  },
   /* 09.10.2026 Эльнур: общий лист KUARTZ+FIZZ «лишний, удали» — убран; /kuartz-fizz пересылает на /kuartz. */
   {
     /* 04.10.2026 Эльнур: «на секретной странице… зеро наянг гарантия 10% годовых». Факты: objects PLP-ZERO-NAIYANG

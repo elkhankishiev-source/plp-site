@@ -69,7 +69,7 @@ function render(J) {
   ub += cardsRow(U.cards, U.cards_layout, U.cards_align || 'stretch');  // 23.10: у Vibe II карточки по верху (cards_align: start), как было вручную
   if (U.cards_wide && U.cards_wide.length) ub += '\n  ' + cardsRow(U.cards_wide);  /* 23.10: карточки на всю ширину под сеткой (PURITA: вилла) */
   if (U.photos && U.photos.length) {
-    ub += `\n  <div class="sub3">Квартиры внутри</div>\n  ` + polRow(U.photos);
+    ub += `\n  <div class="sub3">${U.photos_title || 'Квартиры внутри'}</div>\n  ` + polRow(U.photos);
     if (U.photos_note) ub += `\n  <p class="src">${U.photos_note}</p>`;
   }
   if (U.plans_pol && U.plans_pol.length) {
@@ -115,7 +115,7 @@ function render(J) {
   // 8. место
   out.push(section('Место', J.place.h2, J.place.html, DD('pin', 'right:15mm;top:9mm;width:14mm;transform:rotate(-6deg)')));
   // 9. рынок
-  out.push(section(J.market.eyebrow || 'Рынок', J.market.h2, J.market.html));
+  if (J.market) out.push(section(J.market.eyebrow || 'Рынок', J.market.h2, J.market.html));  /* 24.10: у листа может не быть рынка (нет документа застройщика) */
   // 10. застройщик (+ прошлые фазы)
   out.push(section('Кто строит', J.developer.h2, J.developer.html));
   for (const x of J.developer.after || []) out.push(x);
