@@ -2222,16 +2222,16 @@ body{background:var(--bg)}
   <div style="display:flex;justify-content:flex-end;margin:0 0 8px">
     <a href="/offers/purita/PURITA_Bangtao.pdf" target="_blank" rel="noopener" style="font-size:13px;line-height:1;padding:7px 12px;border:1px solid rgba(255,255,255,.28);border-radius:999px;color:#EFECE2;text-decoration:none;opacity:.85">PDF ↓</a>
   </div>
-  <div id="offerBox" style="width:100%;max-width:794px;margin:0 auto;overflow:hidden;border-radius:14px;background:#EFECE2;box-shadow:0 2px 18px rgba(23,24,15,.08);height:8527px">
-    <iframe id="offerFrame" src="/offers/purita/page.htm?v=mvkgqkn5.jd" title="PURITA · Банг Тао, CG Capital" loading="eager" scrolling="no"
-      style="display:block;width:794px;height:8527px;border:0;transform-origin:0 0"></iframe>
+  <div id="offerBox" style="width:100%;max-width:794px;margin:0 auto;overflow:hidden;border-radius:14px;background:#EFECE2;box-shadow:0 2px 18px rgba(23,24,15,.08);height:11680px">
+    <iframe id="offerFrame" src="/offers/purita/page.htm?v=mvkl488j.bma" title="PURITA · Банг Тао, CG Capital" loading="eager" scrolling="no"
+      style="display:block;width:794px;height:11680px;border:0;transform-origin:0 0"></iframe>
   </div>
 </div></section>
 <script>
 /* Лист оффера показываем ровно как в PDF: ширина листа 794px (210 мм), на узком экране
    уменьшаем его целиком, а не перестраиваем в колонку. Эльнур 18.09: «как в PDF, рядом». */
 (function () {
-  var box = document.getElementById('offerBox'), f = document.getElementById('offerFrame'), H = 8527;
+  var box = document.getElementById('offerBox'), f = document.getElementById('offerFrame'), H = 11680;
   function layout() {
     var k = Math.min(1, box.clientWidth / 794);
     f.style.transform = k < 1 ? 'scale(' + k + ')' : '';

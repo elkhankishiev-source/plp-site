@@ -30,7 +30,7 @@ const CSS = `
 
 function polRow(items, cols, plans) {
   if (!items || !items.length) return '';
-  const c = cols || (items.length === 3 || items.length === 5 || items.length === 6 ? 3 : 2);
+  const c = cols || (items.length === 3 || items.length === 5 || items.length % 3 === 0 ? 3 : 2);  /* 23.10: 9 и 12 фото тоже по три в ряд (раньше только 3, 5, 6) */
   return `<div class="pgrid${c === 3 ? ' c3' : ''}${plans ? ' plans' : ''}">\n` +
     items.map((p, i) => `    <div class="pol" style="transform:rotate(${plans ? '0deg' : ROT[i % ROT.length]})"><img src="${esc(p.src)}" alt="${esc(p.alt || p.cap)}"><i>${esc(p.cap)}</i></div>`).join('\n') +
     '\n  </div>';
@@ -67,6 +67,7 @@ function render(J) {
   if (U.lead) ub += `<p class="lead">${U.lead}</p>\n  `;
   if (U.facts) ub += U.facts + '\n  ';
   ub += cardsRow(U.cards, U.cards_layout, U.cards_align || 'stretch');  // 23.10: у Vibe II карточки по верху (cards_align: start), как было вручную
+  if (U.cards_wide && U.cards_wide.length) ub += '\n  ' + cardsRow(U.cards_wide);  /* 23.10: карточки на всю ширину под сеткой (PURITA: вилла) */
   if (U.photos && U.photos.length) {
     ub += `\n  <div class="sub3">Квартиры внутри</div>\n  ` + polRow(U.photos);
     if (U.photos_note) ub += `\n  <p class="src">${U.photos_note}</p>`;
@@ -107,6 +108,7 @@ function render(J) {
   if (P.big) pb += wide(P.big, 101) + '\n  ';
   if (P.photos && P.photos.length) pb += `<div class="sub3">Общие зоны</div>\n  ` + polRow(P.photos) + '\n  ';
   pb += cardsRow(P.cards, 'g2');
+  if (P.cards_wide && P.cards_wide.length) pb += '\n  ' + cardsRow(P.cards_wide);  /* 23.10: карточки на всю ширину под сеткой (PURITA: дизайн) */
   if (P.plans && P.plans.length) pb += `\n  <div class="sub3">${P.plans_title || 'Мастер-план'}</div>\n  ` + P.plans.map((p) => wide(p, p.contain ? 101 : 101)).join('\n  ');
   out.push(section('Проект', P.h2, pb));
 
