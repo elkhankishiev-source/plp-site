@@ -44,7 +44,7 @@ J = {
   <div class="label" style="left:150mm;top:9mm;transform:rotate(6deg)">новый старт</div>
 </div>''',
  'stats': '''<div class="stats">
-  <div class="stat"><b>258</b><span>квартир и одна вилла</span></div>
+  <div class="stat"><b>257</b><span>квартир и вилла</span></div>
   <div class="stat"><b>25</b><span>квартир на рай участка</span></div>
   <div class="stat"><b>50 м</b><span>бассейн в саду 3 рай</span></div>
   <div class="stat"><b>2028</b><span>сдача по плану</span></div>
@@ -54,8 +54,8 @@ J = {
   'lead': 'Три типа квартир и одна вилла на 5 спален. Больше половины проекта составляют 1-спальные. У части 2-спальных на первом этаже выход прямо в сад.',
   'facts': '''<div class="facts" style="grid-template-columns:repeat(4,1fr);margin:5mm 0 6mm">
     <div><b>10 рай</b><span>участок, 16 289 м²</span></div>
-    <div><b>4 × 6</b><span>корпусов × этажей</span></div>
-    <div><b>258</b><span>квартир</span></div>
+    <div><b>4 корпуса</b><span>по 6 этажей</span></div>
+    <div><b>257 + 1</b><span>квартир и вилла</span></div>
     <div><b>125</b><span>парковочных мест</span></div>
   </div>''',
   'cards': [
@@ -78,7 +78,7 @@ J = {
         <tr><td>Вилла, 5 спален</td><td class="r num">708 м²</td></tr>
       </table>
       <p style="margin:3mm 0 0;color:var(--ink2);font-size:9pt">Высота потолка в гостиной и главной спальне 3 м, в остальных комнатах 2,65 м.</p>
-      <p class="src">Площади и потолки: каталог продаж застройщика, слайды Factsheet и Specification.</p></div>''',
+      <p class="src">Площади и потолки: каталог продаж застройщика.</p></div>''',
    '''<div class="card"><h3>Вилла · 5 спален · 708 м²</h3>
       <p style="margin:0 0 3mm;color:var(--ink2)">Одна на весь проект: двусветная гостиная с потолком в два этажа, своя кухня-столовая с выходом в сад, частный бассейн. Сдаётся с отделкой и встроенной кухней.</p>
       <div class="grid g2" style="gap:4mm"><div class="photo" style="position:relative;left:0;top:0;width:100%;height:52mm"><img src="img/r-villa.webp" alt="PURITA, вилла, гостиная, рендер застройщика"></div><div class="photo" style="position:relative;left:0;top:0;width:100%;height:52mm"><img src="img/r-villa-kitchen.webp" alt="PURITA, вилла, кухня-столовая, рендер застройщика"></div></div>
@@ -102,7 +102,7 @@ J = {
  },
  'project': {
   'h2': 'Сад 3 рай, бассейн 50 метров, всё для жизни внутри',
-  'lead': 'Название от тайского «бхурита», полнота: в комплексе есть всё нужное, чтобы не искать в другом месте. Фасады повторяют рябь песка и линию волны, на балконах дерево.',
+  'lead': 'Имя проекта застройщик выводит из тайского «бхурита», то есть полнота: всё нужное для жизни есть внутри комплекса. Фасады повторяют рябь песка и линию волны, на балконах дерево.',
   'big': {'src': 'img/r-front.webp', 'alt': 'PURITA, корпуса и павильон у бассейна, рендер застройщика', 'contain': False, 'cap': ''},
   'photos': [
    {'src': 'img/r-pool.webp', 'alt': 'PURITA, бассейн 50 м', 'cap': 'бассейн 50 метров'},
@@ -129,7 +129,7 @@ J = {
         <li>Сантехника Kohler, скрытые кондиционеры Mitsubishi</li>
         <li>Пол под дерево в комнатах, керамогранит в ванных</li>
       </ul>
-      <p class="src">Источник: каталог продаж застройщика, слайд Specification; марки «или аналог».</p></div>''',
+      <p class="src">Источник: каталог продаж застройщика; марки «или аналог».</p></div>''',
    '''<div class="card"><h3>Команда</h3>
       <ul class="l">
         <li>Застройщик: CG Capital, инвестиционная часть Central Group</li>
@@ -155,7 +155,7 @@ J = {
         <tr><td>Содержание, за м² в месяц</td><td class="r num">80 ฿</td></tr>
         <tr><td>Фонд проекта, за м² разово</td><td class="r num">600 ฿</td></tr>
       </table>
-      <p class="src">Условия: каталог продаж застройщика, слайд Term payment. Остаток 50% посчитан нами как разница; график взносов пришлём по выбранной квартире.</p></div>'''
+      <p class="src">Условия: каталог продаж застройщика. Остаток 50% посчитан нами как разница; график взносов пришлём по выбранной квартире.</p></div>'''
  },
  'step': {
   'eyebrow': 'Старт продаж',
@@ -194,7 +194,7 @@ J = {
         <tr><td>2 спальни плюс · 124,5–136 м²</td><td class="r num">100–120 тыс. ฿</td></tr>
       </table>
       <p style="margin:3mm 0 0;color:var(--ink2);font-size:9pt">Доходность по их оценке 8–12% в год. Это прогноз компании, которая будет сдавать квартиры, гарантии нет. Свой расчёт по лоту сделаем с учётом содержания и налогов.</p>
-      <p class="src">Источник: презентация Plus Property (группа Sansiri), Expected rental rate, октябрь 2026.</p></div>
+      <p class="src">Источник: презентация Plus Property (группа Sansiri), октябрь 2026.</p></div>
   </div>'''
  },
  'place': {
@@ -221,7 +221,7 @@ J = {
     <div><b>25 мин</b><span>аэропорт</span></div>
     <div><b>30 мин</b><span>Пхукет-таун</span></div>
   </div>
-  <p class="src">Расстояния и время на машине: каталог продаж застройщика, слайд Neighborhood.</p>
+  <p class="src">Расстояния и время на машине: каталог продаж застройщика.</p>
   <div class="photo" style="position:relative;left:0;top:0;width:100%;height:101mm;margin-top:5mm;background:#fff"><img style="object-fit:contain" src="img/map.webp" alt="PURITA на карте Банг Тао"></div>
   <p class="src">Карта застройщика: проект на дороге Пасак–Коктанод, по соседству POP Phuket, чуть дальше Boat Avenue.</p>'''
  },
