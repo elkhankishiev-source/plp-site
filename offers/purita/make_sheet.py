@@ -38,9 +38,9 @@ J = {
   <div class="txt">
     <div class="eyebrow">Банг Тао · Central Group</div>
     <h1 style="font-size:46pt;white-space:normal;line-height:.95">PURITA<br><span>на Банг Тао</span></h1>
-    <p class="sub">Первый собственный жилой проект CG Capital на Пхукете. Четыре малоэтажных корпуса по 6 этажей и вилла на участке 10 рай, во дворе сад 3 рай и бассейн 50 метров. Квартиры сдаются с мебелью и техникой, потолки в гостиной 3 метра. Сдача в 2028 году.</p>
+    <p class="sub">Первый собственный жилой проект CG Capital на Пхукете. Четыре малоэтажных корпуса по 6 этажей и вилла на участке 10 рай, во дворе сад 3 рай и бассейн 50 метров. Квартиры сдаются с мебелью и техникой, потолки в гостиной 3 метра. Старт от 7,29 млн ฿, сдача в 2028 году.</p>
   </div>
-  <div class="photo" style="left:90mm;top:24mm;width:112mm;height:76mm;transform:rotate(-1.5deg)"><img src="img/p-pool.webp" alt="PURITA, бассейн 50 м во дворе, рендер застройщика"></div>
+  <div class="photo" style="left:90mm;top:24mm;width:112mm;height:76mm;transform:rotate(-1.5deg)"><img src="img/p-hero-air.webp" alt="PURITA, сад 3 рай и бассейн 50 м, рендер застройщика"></div>
   <div class="label" style="left:150mm;top:9mm;transform:rotate(6deg)">новый старт</div>
 </div>''',
  'stats': '''<div class="stats">
@@ -61,13 +61,13 @@ J = {
   'cards': [
    '''<div class="card"><h3>Цены по типам квартир</h3>
       <table>
-        <tr><td>1-спальная<span style="color:var(--muted);font-size:7.6pt"> · 147 шт.</span></td><td class="r num">7,99–8,49 млн ฿</td></tr>
+        <tr><td>1-спальная<span style="color:var(--muted);font-size:7.6pt"> · 147 шт.</span></td><td class="r num">от 7,29 млн ฿</td></tr>
         <tr><td>2 спальни<span style="color:var(--muted);font-size:7.6pt"> · 78 шт.</span></td><td class="r num">14,69–16,49 млн ฿</td></tr>
         <tr><td>2 спальни плюс<span style="color:var(--muted);font-size:7.6pt"> · 32 шт.</span></td><td class="r num">19–21,9 млн ฿</td></tr>
         <tr><td>Вилла, 5 спален<span style="color:var(--muted);font-size:7.6pt"> · 1 шт.</span></td><td class="r num">по запросу</td></tr>
       </table>
-      <p style="margin:3mm 0 0;color:var(--ink2);font-size:9pt">На вечере для агентов 22.10 застройщик назвал старт «от 7,29 млн ฿». Какие лоты и на каких условиях идут по этой цене, пока не раскрыто, уточним для вас.</p>
-      <p class="src">Диапазоны: презентация Plus Property, эксклюзивного агента проекта, октябрь 2026. Старт 7,29 млн: презентация застройщика 22.10.2026. Цены могут меняться.</p></div>''',
+      <p style="margin:3mm 0 0;color:var(--ink2);font-size:9pt">Старт 1-спальных от 7,29 млн ฿, верхние лоты этого типа до 8,49 млн ฿. Подберём лот по стартовой цене.</p>
+      <p class="src">Старт 7,29 млн: презентация застройщика 22.10.2026. Остальные диапазоны: презентация Plus Property, эксклюзивного агента проекта, октябрь 2026. Цены могут меняться.</p></div>''',
    '''<div class="card"><h3>Типы квартир и площади</h3>
       <table>
         <tr><td>1-спальная</td><td class="r num">56,4–58,4 м²</td></tr>
@@ -97,7 +97,7 @@ J = {
  'project': {
   'h2': 'Сад 3 рай, бассейн 50 метров, всё для жизни внутри',
   'lead': 'Название от тайского «бхурита», полнота: в комплексе есть всё нужное, чтобы не искать в другом месте. Фасады повторяют рябь песка и линию волны, на балконах дерево.',
-  'big': {'src': 'img/p-court-air.webp', 'alt': 'PURITA, двор и бассейн 50 м сверху, рендер застройщика', 'contain': False, 'cap': ''},
+  'big': {'src': 'img/p-pool.webp', 'alt': 'PURITA, бассейн 50 м во дворе, рендер застройщика', 'contain': False, 'cap': ''},
   'photos': [
    {'src': 'img/p-courtyard.webp', 'alt': 'PURITA, двор', 'cap': 'двор и бассейн'},
    {'src': 'img/p-lobby.webp', 'alt': 'PURITA, лобби', 'cap': 'лобби'},
