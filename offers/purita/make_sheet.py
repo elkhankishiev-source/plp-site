@@ -40,7 +40,7 @@ J = {
     <h1 style="font-size:46pt;white-space:normal;line-height:.95">PURITA<br><span>на Банг Тао</span></h1>
     <p class="sub">Первый собственный жилой проект Central Group на Пхукете. Сад 3 рай с бассейном 50 метров, квартиры с мебелью. Старт от 7,29 млн ฿, сдача в 2028.</p>
   </div>
-  <div class="photo" style="left:90mm;top:24mm;width:112mm;height:76mm;transform:rotate(-1.5deg)"><img src="img/p-hero-air.webp" alt="PURITA, сад 3 рай и бассейн 50 м, рендер застройщика"></div>
+  <div class="photo" style="left:90mm;top:24mm;width:112mm;height:76mm;transform:rotate(-1.5deg)"><img src="img/r-hero.webp" alt="PURITA, сад 3 рай и бассейн 50 м, рендер застройщика"></div>
   <div class="label" style="left:150mm;top:9mm;transform:rotate(6deg)">новый старт</div>
 </div>''',
  'stats': '''<div class="stats">
@@ -78,13 +78,19 @@ J = {
         <tr><td>Вилла, 5 спален</td><td class="r num">708 м²</td></tr>
       </table>
       <p style="margin:3mm 0 0;color:var(--ink2);font-size:9pt">Высота потолка в гостиной и главной спальне 3 м, в остальных комнатах 2,65 м.</p>
-      <p class="src">Площади и потолки: каталог продаж застройщика, слайды Factsheet и Specification.</p></div>'''
+      <p class="src">Площади и потолки: каталог продаж застройщика, слайды Factsheet и Specification.</p></div>''',
+   '''<div class="card"><h3>Вилла · 5 спален · 708 м²</h3>
+      <p style="margin:0 0 3mm;color:var(--ink2)">Одна на весь проект: двусветная гостиная с потолком в два этажа, своя кухня-столовая с выходом в сад, частный бассейн. Сдаётся с отделкой и встроенной кухней.</p>
+      <div class="grid g2" style="gap:4mm"><div class="photo" style="position:relative;left:0;top:0;width:100%;height:52mm"><img src="img/r-villa.webp" alt="PURITA, вилла, гостиная, рендер застройщика"></div><div class="photo" style="position:relative;left:0;top:0;width:100%;height:52mm"><img src="img/r-villa-kitchen.webp" alt="PURITA, вилла, кухня-столовая, рендер застройщика"></div></div>
+      <p class="src">Каталог продаж и презентация застройщика: вилла 708 м², 5 спален, с бассейном; для виллы отделка и встроенная мебель (fully-fitted).</p></div>'''
   ],
   'photos': [
-   {'src': 'img/u-1br.webp', 'alt': 'PURITA, 1-спальная, гостиная, рендер застройщика', 'cap': '1-спальная · 56,4–58,4 м²'},
-   {'src': 'img/u-bed.webp', 'alt': 'PURITA, спальня, рендер застройщика', 'cap': 'спальня с окном в сад'},
-   {'src': 'img/u-2br.webp', 'alt': 'PURITA, 2 спальни, гостиная, рендер застройщика', 'cap': '2 спальни · 93–103,5 м²'},
-   {'src': 'img/u-2brp.webp', 'alt': 'PURITA, 2 спальни плюс, гостиная, рендер застройщика', 'cap': '2 спальни плюс · 124,5–136 м²'}
+   {'src': 'img/r-1br.webp', 'alt': 'PURITA, 1-спальная, гостиная, рендер застройщика', 'cap': '1-спальная · гостиная и кухня'},
+   {'src': 'img/r-1br-bed.webp', 'alt': 'PURITA, 1-спальная, спальня, рендер застройщика', 'cap': '1-спальная · спальня'},
+   {'src': 'img/r-2br.webp', 'alt': 'PURITA, 2 спальни, гостиная, рендер застройщика', 'cap': '2 спальни · 93–103,5 м²'},
+   {'src': 'img/r-2brp.webp', 'alt': 'PURITA, 2 спальни плюс, гостиная, рендер застройщика', 'cap': '2 спальни плюс · 124,5–136 м²'},
+   {'src': 'img/r-2brp-bed.webp', 'alt': 'PURITA, главная спальня, рендер застройщика', 'cap': 'главная спальня с гардеробной'},
+   {'src': 'img/r-bath.webp', 'alt': 'PURITA, ванная, рендер застройщика', 'cap': 'ванная с отдельной ванной'}
   ],
   'plans_cols': 3,
   'plans_src': 'Планировки: каталог продаж застройщика. Варианты с выходом в сад 103,5 и 136 м² есть в каталоге, пришлём по запросу.',
@@ -97,12 +103,14 @@ J = {
  'project': {
   'h2': 'Сад 3 рай, бассейн 50 метров, всё для жизни внутри',
   'lead': 'Название от тайского «бхурита», полнота: в комплексе есть всё нужное, чтобы не искать в другом месте. Фасады повторяют рябь песка и линию волны, на балконах дерево.',
-  'big': {'src': 'img/p-pool.webp', 'alt': 'PURITA, бассейн 50 м во дворе, рендер застройщика', 'contain': False, 'cap': ''},
+  'big': {'src': 'img/r-front.webp', 'alt': 'PURITA, корпуса и павильон у бассейна, рендер застройщика', 'contain': False, 'cap': ''},
   'photos': [
-   {'src': 'img/p-courtyard.webp', 'alt': 'PURITA, двор', 'cap': 'двор и бассейн'},
-   {'src': 'img/p-lobby.webp', 'alt': 'PURITA, лобби', 'cap': 'лобби'},
-   {'src': 'img/p-cowork.webp', 'alt': 'PURITA, коворкинг', 'cap': 'коворкинг'},
-   {'src': 'img/p-gym.webp', 'alt': 'PURITA, фитнес', 'cap': 'фитнес с видом на сад'}
+   {'src': 'img/r-pool.webp', 'alt': 'PURITA, бассейн 50 м', 'cap': 'бассейн 50 метров'},
+   {'src': 'img/r-court.webp', 'alt': 'PURITA, двор', 'cap': 'сад и бассейн у корпусов'},
+   {'src': 'img/r-drop.webp', 'alt': 'PURITA, въезд', 'cap': 'въезд в зелени'},
+   {'src': 'img/r-lobby.webp', 'alt': 'PURITA, лобби', 'cap': 'лобби'},
+   {'src': 'img/r-cowork.webp', 'alt': 'PURITA, коворкинг', 'cap': 'коворкинг в два уровня'},
+   {'src': 'img/r-gym.webp', 'alt': 'PURITA, фитнес', 'cap': 'фитнес с окнами в сад'}
   ],
   'cards': [
    '''<div class="card"><h3>Инфраструктура</h3>
@@ -173,8 +181,8 @@ J = {
     </ul></div>
   </div>
   <div class="card" style="margin-top:6mm"><h3>Наш взгляд</h3>
-    <p style="margin:1.5mm 0 0;color:var(--ink2)">Проект на долгий горизонт: сдача в 2028 году, и это не первая линия, до пляжа Банг Тао 1,5 км. Сильная сторона в том, что за проектом стоит Central Group. Плотность низкая, сад большой, мебель уже в цене. По юридической справке застройщика экологическое заключение получено, разрешение на строительство ещё оформляется. Документы проекта проверим для вас до брони.</p>
-    <p class="src">Источник: юридическая справка в каталоге продаж застройщика.</p></div>'''
+    <p style="margin:1.5mm 0 0;color:var(--ink2)">Central Group впервые строит жильё на Пхукете под своей маркой, рядом со своим же торговым кварталом POP Phuket. Стройка уже идёт, сдача в 2028. До пляжа Банг Тао 1,5 км, зато внутри сад 3 рай и всего 25 квартир на рай: тихо, зелено, без соседских стен под окнами. Мебель и техника уже в цене, квартиру можно сдавать сразу после ключей.</p>
+    <p class="src">Стройка и срок: юридическая справка в каталоге продаж застройщика.</p></div>'''
  },
  'income': {
   'h2': 'Аренда по прогнозу управляющей компании',
@@ -249,11 +257,10 @@ J = {
         <li>POP Phuket, торговый квартал на Банг Тао</li>
       </ul></div>
   </div>
-  <div class="pgrid">
+  <div class="pgrid c3">
     <div class="pol" style="transform:rotate(-.6deg)"><img src="img/cg-standard.webp" alt="The Standard Residences Phuket Bang Tao"><i>The Standard, Банг Тао</i></div>
     <div class="pol" style="transform:rotate(.5deg)"><img src="img/cg-ic.webp" alt="InterContinental Residences Bangkok Asoke"><i>InterContinental, Бангкок</i></div>
-    <div class="pol" style="transform:rotate(.4deg)"><img src="img/pop.webp" alt="POP Phuket"><i>POP Phuket</i></div>
-    <div class="pol" style="transform:rotate(-.5deg)"><img src="img/u-villa2.webp" alt="PURITA, вилла"><i>вилла PURITA, 708 м²</i></div>
+    <div class="pol" style="transform:rotate(.4deg)"><img src="img/r-pop.webp" alt="POP Phuket"><i>POP Phuket, рядом с PURITA</i></div>
   </div>'''
  },
  'cta': '''<footer class="cta">
