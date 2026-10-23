@@ -226,6 +226,10 @@ def main():
         for где, т in surf[s].items():
             tok = prices(т)
             if db:
+                # 23.10.2026 решение №322: квиз — посадочная рекламы Vibe II, там цена входа «от 2,8 млн бат», как в рекламе.
+                # В базе остаётся цена пула 2 968 000 (№317). Исключение только для этой пары.
+                if s == 'vibe2' and где == 'квиз' and 2_800_000 in tok:
+                    continue
                 if tok and not has_price(tok, db):
                     add('цена', ПРОЕКТ[s], где, 'цена от', '{:,}'.format(db).replace(',', ' '), ', '.join('{:,}'.format(x).replace(',', ' ') for x in sorted(tok)[:4]))
                 low = lower_than(prices(т, True), db)
