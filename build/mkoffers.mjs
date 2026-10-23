@@ -69,8 +69,8 @@ const OFFERS = [
     title: 'Топ-15 кондо Пхукета · Property Library Phuket',
     desc: 'Подборка Property Library Phuket: 15 проектов кондо на Пхукете, цены «от», сроки сдачи и что рядом.',
     pdf: 'Top15_Phuket.pdf',
-    og: 'offers/top15/img/preview-v2.jpg',
-    h: 16715,   // PDF 4421 мм × 794/210
+    og: 'offers/top15/img/preview-v3.jpg',
+    h: 16559,   // PDF 4380 мм × 794/210 (23.10)
   },
   {
     /* 23.10.2026 Эльнур: «скинул инф по проекту пурита … сделай презентацию офер, ссылку мне сюда скинь». Данные: offers/purita/make_sheet.py
@@ -80,7 +80,7 @@ const OFFERS = [
     desc: 'PURITA на Банг Тао от CG Capital (Central Group): квартиры с мебелью, цены, условия оплаты, аренда по прогнозу управляющей компании. Предложение для клиентов Property Library Phuket.',
     pdf: 'PURITA_Bangtao.pdf',
     og: 'offers/purita/img/preview-v10.jpg',
-    h: 8780,   // PDF 2322 мм × 794/210
+    h: 8475,   // PDF 2242 мм × 794/210 (23.10)
   },
   /* 09.10.2026 Эльнур: общий лист KUARTZ+FIZZ «лишний, удали» — убран; /kuartz-fizz пересылает на /kuartz. */
   {

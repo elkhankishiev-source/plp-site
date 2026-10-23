@@ -29,7 +29,7 @@ const ОФФЕРЫ = { 'vibe2.html': 'offers/vibe2/img/preview-v12.jpg', 'zero-n
   'cg-capital.html': 'offers/cg-capital/img/preview-v10.jpg', 'aileen.html': 'offers/aileen/img/preview-v10.jpg',
   'kuartz.html': 'offers/kuartz/img/preview-v11.jpg', 'fizz.html': 'offers/fizz/img/preview-v12.jpg', 'eden.html': 'offers/eden/img/preview-v10.jpg',
   'millennium.html': 'offers/millennium/img/preview-v10.jpg',
-  'top15/48213/index.html': 'offers/top15/img/preview-v2.jpg',
+  'top15/48213/index.html': 'offers/top15/img/preview-v3.jpg',
   'purita/64925/index.html': 'offers/purita/img/preview-v10.jpg' };  /* 23.10 топ-15 живёт только по скрытому адресу */
 const РАЙОНЫ = { 'bang-tao': 'PLP-SIERRA', kamala: 'PLP-VIVANA', kata: 'PLP-KATABELLO', 'koh-kaew': 'PLP-ZENITHY', layan: 'PLP-SUNHILLS-LAYAN',
   'nai-yang': 'PLP-ZERO-NAIYANG', rawai: 'PLP-FANTASY-RAWAI', surin: 'PLP-BIANCANA', karon: 'PLP-VIBE-KARON',
