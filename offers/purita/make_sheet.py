@@ -38,9 +38,9 @@ def tbl(rows):
 
 TIMELINE = '''<div class="facts" style="grid-template-columns:.75fr 1.7fr .95fr 1.9fr .95fr 1.3fr;margin-top:3mm;gap:2mm">
     <div><b>2024</b><span>KIS<br>школа</span></div>
-    <div><b>2026</b><span>Glenalmond, школа<br>Bangkok Phuket Clinic<br>POP Phuket<br>Central Phuket, Floresta, IV кв.</span></div>
+    <div><b>2026</b><span>Glenalmond, школа<br>Bangkok Phuket Clinic<br>POP Phuket<br>Central Phuket: этап Floresta, IV кв.</span></div>
     <div><b>2027</b><span>Bumrungrad<br>больница</span></div>
-    <div><b>2028</b><span>North London, школа<br>Central Phuket, Festival, I кв.<br>Central Phuket, World-class Attractions, III кв.</span></div>
+    <div><b>2028</b><span>North London, школа<br>Central Phuket: этап Festival, I кв.<br>Central Phuket: World-class Attractions, III кв.</span></div>
     <div><b>2029</b><span>ICONPHUKET<br>досуг</span></div>
     <div><b>2030</b><span>Songklanagarind<br>больница, кампус на Пхукете</span></div>
   </div>'''
@@ -54,7 +54,7 @@ J = {
   <div class="txt">
     <div class="eyebrow">Банг Тао · Central Group</div>
     <h1 style="font-size:46pt;white-space:normal;line-height:.95">PURITA<br><span>на Банг Тао</span></h1>
-    <p class="sub">Новый проект CG Capital из Central Group: сад 3 рай (4 800 м²) с бассейном 50 м, квартиры сразу с мебелью, потолки 3 метра. Старт от 7,29 млн ฿, сдача в 2028.</p>
+    <p class="sub">Новый проект CG Capital из Central Group: сад 3 рай (4 800 м²) с бассейном 50 м, квартиры сразу с мебелью, потолки 3 метра. Старт от 7,29 млн ฿ по акции застройщика, ключи в ноябре 2028.</p>
   </div>
   <div class="photo" style="left:90mm;top:24mm;width:112mm;height:76mm;transform:rotate(-1.5deg)"><img src="img/r-hero.webp" alt="PURITA, сад 3 рай (4 800 м²) и бассейн 50 м, рендер застройщика"></div>
   <div class="label" style="left:150mm;top:9mm;transform:rotate(6deg)">новый старт</div>
@@ -83,13 +83,13 @@ J = {
   'cards': [
    '''<div class="card"><h3>Цены по типам квартир</h3>
       <table>
-        <tr><td>1-спальная<span style="%(sm)s"> · 147 шт.</span></td><td class="r num">от 7,29 млн ฿</td></tr>
-        <tr><td>2 спальни<span style="%(sm)s"> · 78 шт.</span></td><td class="r num">14,69–16,49 млн ฿</td></tr>
-        <tr><td>2 спальни плюс<span style="%(sm)s"> · 32 шт.</span></td><td class="r num">19–21,9 млн ฿</td></tr>
-        <tr><td>Вилла, 5 спален<span style="%(sm)s"> · 1 шт.</span></td><td class="r num">по запросу</td></tr>
+        <tr><td>1-спальная<span style="%(sm)s"> · 56,4–58,4 м²</span></td><td class="r num">от 7,29 млн ฿ по акции</td></tr>
+        <tr><td>2 спальни<span style="%(sm)s"> · 93–103,5 м²</span></td><td class="r num">14,87–18,48 млн ฿</td></tr>
+        <tr><td>2 спальни плюс<span style="%(sm)s"> · 124,5–136 м²</span></td><td class="r num">19,9–23,58 млн ฿</td></tr>
+        <tr><td>Вилла, 5 спален<span style="%(sm)s"> · 708 м²</span></td><td class="r num">по запросу</td></tr>
       </table>
-      <p style="margin:3mm 0 0;color:var(--ink2);font-size:9pt">Старт 1-спальных от 7,29 млн ฿, верхние лоты этого типа до 8,49 млн ฿. Подберём лот по стартовой цене.</p>
-      <p class="src">Презентация застройщика, 22.10.2026. Диапазоны цен: Plus Property, партнёр застройщика по продажам. Цены могут меняться.</p></div>''' % {'sm': SM},
+      <p style="margin:3mm 0 0;color:var(--ink2);font-size:9pt">Скидка застройщика по прайсу: 300 тыс. ฿ на 1-спальные, 500 тыс. на 2 спальни, 800 тыс. на 2 спальни плюс.</p>
+      <p class="src">Прайс и презентация застройщика.</p></div>''' % {'sm': SM},
    '''<div class="card"><h3>Типы квартир и площади</h3>
       <table>
         <tr><td>1-спальная</td><td class="r num">56,4 м²</td></tr>
@@ -99,8 +99,7 @@ J = {
         <tr><td>2 спальни плюс</td><td class="r num">124,5 м²</td></tr>
         <tr><td>2 спальни плюс, выход в сад</td><td class="r num">136 м²</td></tr>
         <tr><td>Вилла, 5 спален, бассейн</td><td class="r num">708 м²</td></tr>
-      </table>
-      <p class="src">Каталог продаж застройщика, 22.10.2026.</p></div>''',
+      </table></div>''',
    '''<div class="card"><h3>Состав проекта</h3>
       <table>
         <tr><td>1-спальные, 56,4–58,4 м²</td><td class="r num">147 · 57%</td></tr>
@@ -108,8 +107,7 @@ J = {
         <tr><td>2 спальни плюс, 124,5–136 м²</td><td class="r num">32 · 12,4%</td></tr>
         <tr><td>Вилла, 708 м²</td><td class="r num">1 · 0,4%</td></tr>
       </table>
-      <p style="margin:3mm 0 0;color:var(--ink2);font-size:9pt">Квартиры и доли в проекте: штук и процент от всех 258 лотов. Четыре низких корпуса по 6 этажей и вилла в углу участка.</p>
-      <p class="src">Каталог продаж застройщика, 22.10.2026.</p></div>''',
+            <p class="src">Материалы застройщика.</p></div>''',
    '''<div class="card"><h3>Отделка: пол, стены, кухня</h3>
       <table>
         <tr><td>Гостиная, столовая, спальни: пол</td><td class="r">синтетическое дерево</td></tr>
@@ -122,7 +120,7 @@ J = {
         <tr><td>Холодильник</td><td class="r">LG</td></tr>
         <tr><td>Мойка, смеситель</td><td class="r">TEKA</td></tr>
       </table>
-      <p class="src">Каталог продаж застройщика, 22.10.2026. У каждой позиции указан бренд или равноценная замена.</p></div>''',
+      </div>''',
    '''<div class="card"><h3>Сантехника и кондиционеры</h3>
       <table>
         <tr><td>Унитаз</td><td class="r">Kohler</td></tr>
@@ -132,22 +130,19 @@ J = {
         <tr><td>Гигиенический душ, держатели</td><td class="r">Kohler</td></tr>
         <tr><td>Кондиционеры скрытого типа: гостиная, столовая, все спальни</td><td class="r">Mitsubishi</td></tr>
       </table>
-      <p class="src">Каталог продаж застройщика, 22.10.2026. У каждой позиции указан бренд или равноценная замена.</p></div>''',
+      <p class="src">Материалы застройщика: бренд или равноценная замена.</p></div>''',
    '''<div class="card"><h3>Мебель в цене</h3>
       <table>
         <tr><td>Кухня, шкафы и гардеробные</td><td class="r">входят в цену</td></tr>
         <tr><td>Свободная мебель</td><td class="r">входит в цену</td></tr>
         <tr><td>Бытовая техника</td><td class="r">входит в цену</td></tr>
-        <tr><td>Потолки</td><td class="r num">3 метра</td></tr>
       </table>
-      <p style="margin:3mm 0 0;color:var(--ink2);font-size:9pt">Квартиры сдаются полностью меблированными: заезжаете с чемоданом. У виллы встроенная отделка.</p>
-      <p class="src">Каталог продаж застройщика, 22.10.2026.</p></div>'''
+      <p style="margin:3mm 0 0;color:var(--ink2);font-size:9pt">Квартиры передают с мебелью, кухней и техникой; вилла с отделкой и встроенной кухней.</p></div>'''
   ],
   'cards_wide': [
    '''<div class="card"><h3>Вилла · 5 спален · 708 м²</h3>
       <p style="margin:0 0 3mm;color:var(--ink2)">Одна на весь проект: двусветная гостиная с потолком в два этажа, своя кухня-столовая с выходом в сад, частный бассейн. Сдаётся с отделкой и встроенной кухней.</p>
-      <div class="grid g2" style="gap:4mm"><div class="photo" style="position:relative;left:0;top:0;width:100%;height:52mm"><img src="img/r-villa.webp" alt="PURITA, вилла, гостиная, рендер застройщика"></div><div class="photo" style="position:relative;left:0;top:0;width:100%;height:52mm"><img src="img/r-villa-kitchen.webp" alt="PURITA, вилла, кухня-столовая, рендер застройщика"></div></div>
-      <p class="src">Каталог продаж и презентация застройщика, 22.10.2026.</p></div>'''
+      <div class="grid g2" style="gap:4mm"><div class="photo" style="position:relative;left:0;top:0;width:100%;height:52mm"><img src="img/r-villa.webp" alt="PURITA, вилла, гостиная, рендер застройщика"></div><div class="photo" style="position:relative;left:0;top:0;width:100%;height:52mm"><img src="img/r-villa-kitchen.webp" alt="PURITA, вилла, кухня-столовая, рендер застройщика"></div></div></div>'''
   ],
   'photos': [
    {'src': 'img/r-1br.webp', 'alt': 'PURITA, 1-спальная, гостиная, рендер застройщика', 'cap': '1-спальная · гостиная и кухня'},
@@ -160,9 +155,9 @@ J = {
    {'src': 'img/r-2brp-bed.webp', 'alt': 'PURITA, главная спальня, рендер застройщика', 'cap': 'главная спальня с гардеробной'},
    {'src': 'img/r-bath.webp', 'alt': 'PURITA, ванная, рендер застройщика', 'cap': 'ванная с отдельной ванной'}
   ],
-  'photos_note': 'Рендеры застройщика (каталог продаж и презентация 22.10.2026): отделка и мебель могут отличаться от готовых квартир.',
+  'photos_note': 'Рендеры застройщика.',
   'plans_cols': 3,
-  'plans_src': 'Планировки: каталог продаж застройщика, 22.10.2026. Размеры и расстановка мебели ориентировочные.',
+  'plans_src': 'Планировки застройщика.',
   'plans_pol': [
    {'src': 'img/pl-1br.webp', 'alt': 'Планировка 1-спальной 56,4 м²', 'cap': '1-спальная · 56,4 м²'},
    {'src': 'img/pl-1brc.webp', 'alt': 'Планировка 1-спальной Innercourt 58,4 м²', 'cap': '1-спальная Innercourt · 58,4 м²'},
@@ -173,8 +168,8 @@ J = {
   ]
  },
  'project': {
-  'h2': 'Сад 3 рай (4 800 м²), бассейн 50 метров, всё для жизни внутри',
-  'lead': 'PURITA, по-тайски «Бхурита», значит полнота. Застройщик задумал место, где всё нужное для жизни под рукой и никуда не нужно ехать. Слоган проекта «Shaped by nature»: формы подсказала природа. Фасады повторяют рябь на песке и волну океана, на балконах тёплое дерево.',
+  'h2': 'Коворкинг, фитнес с паровыми и бассейн 50 метров во дворе',
+  'lead': 'Общие зоны около 9 200 м²: лобби, лаунж, коворкинг, переговорные, фитнес, раздевалки с паровыми, бассейн 50 м и купель. Фасады с тёплым деревом на балконах.',
   'big': {'src': 'img/r-front.webp', 'alt': 'PURITA, корпуса и павильон у бассейна, рендер застройщика', 'contain': False, 'cap': ''},
   'photos': [
    {'src': 'img/r-pool.webp', 'alt': 'PURITA, бассейн 50 м', 'cap': 'бассейн 50 метров'},
@@ -198,22 +193,16 @@ J = {
         <li>Общие зоны около 9 200 м², парковка на 125 мест</li>
         <li>Плотность 25 квартир на рай (1 600 м²)</li>
       </ul>
-      <p class="src">Каталог продаж застройщика, 22.10.2026.</p></div>''',
+      <p class="src">Материалы застройщика.</p></div>''',
    '''<div class="card"><h3>Команда и участок</h3>
       <ul class="l">
-        <li>Застройщик: CG Capital, инвестиционная часть Central Group</li>
+        <li>Застройщик: CG Capital (Central Group), продавец по договору Harmony Zensations Co., Ltd.</li>
         <li>Архитектор: stu/D/O architects, ландшафт: Shma, интерьер: makeAscene</li>
-        <li>Продажи и сдача в аренду: Plus Property из группы Sansiri</li>
         <li>Участок 10 рай на дороге Пасак–Коктанод, Чернгталай</li>
       </ul>
-      <p class="src">Каталог продаж застройщика, 22.10.2026; презентация Plus Property.</p></div>'''
+      <p class="src">Материалы застройщика.</p></div>'''
   ],
-  'cards_wide': [
-   '''<div class="card"><h3>Концепция «Shaped by nature»</h3>
-      <p style="margin:0 0 3mm;color:var(--ink2)">Архитектуру вдохновили рябь на песке и волны океанских течений. Строгие современные линии фасадов смягчают тёплые деревянные акценты на балконах. Так застройщик формулирует идею: современность, которую природа делает мягче.</p>
-      <div class="photo" style="position:relative;left:0;top:0;width:100%;height:52mm"><img src="img/r-shaped.webp" alt="Вода, рябь песка, песок и дерево: образы концепции Shaped by nature" style="object-fit:cover"></div>
-      <p class="src">Каталог продаж застройщика, 22.10.2026.</p></div>'''
-  ],
+  'cards_wide': [],
   'plans': [
    {'src': 'img/mp.webp', 'alt': 'Мастер-план PURITA, первый этаж', 'contain': True,
     'cap': 'Мастер-план первого этажа, визуализация застройщика: корпуса A–D вокруг сада с бассейном, вилла в углу участка.'}
@@ -223,26 +212,26 @@ J = {
   'h2': 'Бронь, договор и оплата',
   'html': '''<div class="card" style="max-width:170mm"><table>
         <tr><td>Бронь, 1-спальная</td><td class="r num">100 000 ฿</td></tr>
-        <tr><td>Бронь, 2 спальни и 2 спальни плюс</td><td class="r num">200 000 ฿</td></tr>
+        <tr><td>Бронь, 2 спальни</td><td class="r num">200 000 ฿</td></tr>
+        <tr><td>Бронь, 2 спальни плюс</td><td class="r num">300 000 ฿</td></tr>
         <tr><td>Бронь, вилла</td><td class="r num">300 000 ฿</td></tr>
         <tr><td>Договор</td><td class="r num">20%</td></tr>
-        <tr><td>Взнос по графику застройщика</td><td class="r num">30%</td></tr>
+        <tr><td>Первый взнос</td><td class="r num">30%</td></tr>
         <tr><td>Остаток по графику</td><td class="r num">50%</td></tr>
         <tr><td>Содержание, за м² в месяц</td><td class="r num">80 ฿</td></tr>
         <tr><td>Фонд проекта, за м² разово</td><td class="r num">600 ฿</td></tr>
       </table>
-      <p class="src">Условия оплаты: каталог продаж застройщика, 22.10.2026. Сумму брони и график взносов подтвердим по вашему лоту.</p></div>'''
+      <p class="src">Прайс и каталог продаж застройщика.</p></div>'''
  },
  'step': {
   'eyebrow': 'Старт продаж',
   'h2': 'Как войти по стартовой цене',
   'items': [
-   ['22 октября 2026', 'Презентация проекта', 'материалы у нас, подберём лот под вашу задачу'],
    ['конец ноября 2026', 'Старт продаж', 'бронируем лот до открытых продаж'],
    ['январь 2027', 'Шоу-юнит в POP Phuket', 'покажем квартиру вживую'],
-   ['2028', 'Сдача', 'ключи, мебель уже в квартире, запуск аренды']
+   ['ноябрь 2028', 'Сдача', 'ключи, мебель уже в квартире, запуск аренды']
   ],
-  'src': 'Презентация CG Capital, 10.10.2026; каталог продаж застройщика, 22.10.2026.'
+  'src': 'Материалы застройщика.'
  },
  'who': {
   'h2': 'Для жизни на Банг Тао и на долгий горизонт',
@@ -252,13 +241,13 @@ J = {
       <li><b>На долгий сезон</b>: коворкинг, фитнес, торговый квартал POP Phuket рядом</li>
     </ul></div>
     <div class="card"><ul class="l">
-      <li><b>Инвесторам вдолгую</b>: мебель в цене, сдача через управляющую Plus Property</li>
+      <li><b>Инвесторам вдолгую</b>: мебель и техника от застройщика, аренда с первого дня после ключей</li>
       <li><b>Тем, кто смотрит на марку</b>: застройщик CG Capital из Central Group, их The Standard Residences на Банг Тао продан на 90%</li>
     </ul></div>
   </div>
   <div class="card" style="margin-top:6mm"><h3>Наш взгляд</h3>
-    <p style="margin:1.5mm 0 0;color:var(--ink2)">Застройщик сам описывает PURITA четырьмя словами: лучшее место, низкая плотность, качество, доступная цена. По фактам это так. Место: Банг Тао, по соседству торговый квартал Central POP Phuket, до Boat Avenue 500 м, до гольфа Laguna 2,5 км. Плотность: 25 квартир на рай (1 600 м²) и сад 3 рай (4 800 м²) в центре комплекса. Качество: за проектом Central Group, их The Standard Residences на том же Банг Тао продан на 90% ещё до сдачи. Цена: 1-спальная с мебелью от 7,29 млн ฿; в соседнем The Standard в продаже остались квартиры от 21,07 млн ฿. Что учесть: до пляжа 1,5 км, ключи в 2028 году.</p>
-    <p class="src">Формула «лучшее место, низкая плотность, качество, доступная цена»: презентация застройщика 22.10.2026. The Standard: прайс застройщика на 20.10.2026.</p></div>'''
+    <p style="margin:1.5mm 0 0;color:var(--ink2)">Однушка с мебелью от 7,29 млн ฿ по акции застройщика, 25 квартир на рай и сад 3 рай в центре. POP Phuket по соседству, Boat Avenue в 500 м, пляж в 1,5 км. Застройщик тот же, что у The Standard: там 90% продано до сдачи.</p>
+    <p class="src">Материалы застройщика.</p></div>'''
  },
  'income': {
   'h2': 'Аренда и сервис после покупки',
@@ -269,22 +258,8 @@ J = {
         <tr><td>2 спальни · 93–103,5 м²</td><td class="r num">80–90 тыс. ฿</td></tr>
         <tr><td>2 спальни плюс · 124,5–136 м²</td><td class="r num">100–120 тыс. ฿</td></tr>
       </table>
-      <p style="margin:3mm 0 0;color:var(--ink2);font-size:9pt">Доходность по оценке управляющей компании 8–12% в год. Это прогноз, гарантии нет. Свой расчёт по лоту сделаем с учётом содержания и налогов.</p>
-      <p class="src">Презентация Plus Property, октябрь 2026.</p></div>
-    <div class="card" style="margin-top:5mm"><h3>Plus Property: сервис после покупки</h3>
-      <p style="margin:0 0 3mm;color:var(--ink2)">Plus Property входит в группу Sansiri и называет себя компанией номер один по решениям в недвижимости Таиланда. Работает с 1996 года. Для владельцев на Пхукете у неё три направления сервиса.</p>
-      <div class="facts" style="grid-template-columns:repeat(4,1fr);margin:0 0 3mm">
-        <div><b>30 лет</b><span>на рынке, с 1996 года</span></div>
-        <div><b>450</b><span>проектов</span></div>
-        <div><b>120 000</b><span>юнитов</span></div>
-        <div><b>20 млн м²</b><span>площадь объектов</span></div>
-      </div>
-      <ul class="l">
-        <li><b>Property Solutions</b>: решения по недвижимости</li>
-        <li><b>Plus Concierge</b>: консьерж-сервис для владельцев</li>
-        <li><b>Rental Management</b>: управление арендой</li>
-      </ul>
-      <p class="src">Презентация Plus Property, 2026.</p></div>
+      <p style="margin:3mm 0 0;color:var(--ink2);font-size:9pt">Доходность по оценке управляющей компании 8–12% в год.</p>
+      <p class="src">Оценка управляющей компании.</p></div>
   </div>'''
  },
  'place': {
@@ -323,15 +298,14 @@ J = {
         <tr><td>QSI International School</td><td class="r num">35 мин</td></tr>
       </table></div>
   </div>
-  <p class="src">Расстояния и время на машине: каталог продаж застройщика, 22.10.2026.</p>
+  <p class="src">Материалы застройщика.</p>
   <div class="photo" style="position:relative;left:0;top:0;width:100%;height:101mm;margin-top:5mm;background:#fff"><img style="object-fit:contain" src="img/map.webp" alt="PURITA на карте Банг Тао"></div>
   <p class="src">Карта застройщика: проект на дороге Пасак–Коктанод, по соседству POP Phuket, чуть дальше Boat Avenue.</p>'''
  },
  'market': {
   'eyebrow': 'Рынок',
   'h2': 'Почему Банг Тао: рынок в цифрах',
-  'html': '''<p style="margin:3mm 0 0;color:var(--ink2);max-width:165mm">Застройщик называет Банг Тао премиальным рынком номер один для долгих проживаний. Вот цифры из его презентации.</p>
-  <div class="facts" style="grid-template-columns:repeat(4,1fr);margin-top:4mm">
+  'html': '''<div class="facts" style="grid-template-columns:repeat(4,1fr);margin-top:4mm">
     <div><b>82%</b><span>загрузка отелей Банг Тао и Чернгталая</span></div>
     <div><b>+20%</b><span>к средней цене номера (ADR)</span></div>
     <div><b>17,2 млн</b><span>пассажиров аэропорта в 2026, 70% иностранцы</span></div>
@@ -349,29 +323,28 @@ J = {
     <div class="card"><h3>Школы и долгая жизнь</h3>
       <p style="margin:0;color:var(--ink2)">Международных школ за три года стало больше на 51%. Три новые школы в графике ниже, с 2024 по 2028 год.</p></div>
   </div>
-  <div class="sub3">Что открывается рядом по годам</div>
+  <div class="sub3">Что появится рядом по годам</div>
   ''' + TIMELINE + '''
-  <p class="src">Презентация застройщика, 22.10.2026. Сроки открытия могут сдвигаться.</p>'''
+  <p class="src">Презентация застройщика.</p>'''
  },
  'developer': {
   'h2': 'CG Capital: жилые проекты Central Group',
   'html': '''<div class="grid g64" style="align-items:start">
     <div class="card"><h3>Компания</h3>
       <ul class="l">
-        <li><b>Central Group</b>: семейная группа Чиратхиват, основана в 1947 году в Бангкоке. Сегодня у группы 7 торговых объектов и 7 отелей, в Европе универмаги Rinascente, KaDeWe и Selfridges.</li>
-        <li><b>CG Capital</b>: ведущий застройщик брендированных резиденций Таиланда, объём проектов больше 20 млрд ฿. Девиз: опыт, честность, качество.</li>
-        <li><b>The Standard Residences, Банг Тао</b>: продано 90%, осталось 20 юнитов.</li>
+        <li><b>Central Group</b>: семейная группа Чиратхиват, основана в 1947 году в Бангкоке. На Пхукете у Central 7 торговых объектов и 7 отелей, в Европе универмаги Rinascente, KaDeWe и Selfridges.</li>
+        <li><b>CG Capital</b>: ведущий застройщик брендированных резиденций Таиланда, объём проектов больше 20 млрд ฿.</li>
+        <li><b>The Standard Residences, Банг Тао</b>: продано 90% до сдачи.</li>
         <li><b>InterContinental Residences Bangkok Asoke</b>: продано 60%. Награда Thailand Real Estate Awards 2026 в номинации Best Ultra Luxury Condominium Thailand.</li>
-        <li><b>PURITA</b>: жилой проект CG Capital на Банг Тао рядом с The Standard и POP Phuket.</li>
       </ul>
-      <p class="src">Презентация и каталог продаж застройщика, 22.10.2026. Год основания и семья: Central Group.</p></div>
+      <p class="src">Материалы застройщика; Central Group.</p></div>
     <div class="card"><h3>Проекты</h3>
       <ul class="l">
         <li>The Standard Residences, Банг Тао: сдача в конце 2026</li>
         <li>InterContinental Residences, Бангкок</li>
         <li>Andaz на Лаяне: старт продаж в I квартале 2027</li>
         <li>POP Phuket, торговый квартал на Банг Тао, открытие в 2026</li>
-        <li>Central Phuket: очереди Floresta в IV квартале 2026, Festival в I квартале 2028 и World-class Attractions в III квартале 2028</li>
+        <li>Central Phuket: этапы Floresta (IV кв. 2026), Festival (I кв. 2028) и World-class Attractions (III кв. 2028)</li>
       </ul></div>
   </div>
   <div class="pgrid c3">
@@ -391,7 +364,7 @@ J = {
     <a href="https://property-library.com"><b>Сайт</b><span>каталог объектов</span></a>
     <a href="https://t.me/property_library_phuket"><b>Канал</b><span>новости рынка</span></a>
   </div>
-  <div class="foot"><span>Property Library Phuket. Сопровождаем от выбора до ключей</span><span>По материалам застройщика, условия могут меняться.</span></div>
+  <div class="foot"><span>Property Library Phuket. Сопровождаем от выбора до ключей</span><span>По материалам застройщика.</span></div>
 </footer>''' % WA,
  'tail': k['tail'],
 }
