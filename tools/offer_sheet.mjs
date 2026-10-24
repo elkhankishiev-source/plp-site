@@ -8,6 +8,7 @@
    Данные: offers/<slug>/sheet.json (тексты и цифры перенесены из проверенных листов).
      node tools/offer_sheet.mjs kuartz fizz vibe2 zero-naiyang eden   → offers/<slug>/page.htm */
 import fs from 'node:fs';
+import { lint as lintOffer } from './offer_lint.mjs';  // 24.10.2026
 import { applyWatermark } from './offer_watermark.mjs';  // 15.10.2026 водяной знак PL
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -148,6 +149,14 @@ for (const slug of slugs) {
   const ПОРТАЛЫ = /estatyx|fazwaz|ddproperty|hipflat|dot\s?property(?!\s+thailand\s+awards)|propertyguru(?!\s+thailand\s+property\s+awards)|thailand-property|realting|prian|tranio|bayut|facebook\.com|t\.me\//i;
   for (const m of html.matchAll(/<p class="src"[^>]*>([\s\S]*?)<\/p>/g))
     if (ПОРТАЛЫ.test(m[1])) throw new Error(slug + ': в источниках портал или брокер (решение №273): «' + m[1].slice(0, 120) + '»');
+  /* 24.10.2026 линт «преза, а не статья» (tools/offer_lint.mjs, скил plp-offer-sheet): пока ПРЕДУПРЕЖДЕНИЕ;
+     OFFER_LINT=strict — сборка падает. Строгий режим включать после правки листов по отметкам Эльнура. */
+  { const L = lintOffer(html, { slug });
+    if (L.length) {
+      const by = {}; for (const x of L) by[x.кат] = (by[x.кат] || 0) + 1;
+      console.warn('  ⚠ ' + slug + ': замечаний линта ' + L.length + ' (' + Object.entries(by).map(([k, n]) => k + ' ' + n).join(', ') + '); подробно: node tools/offer_lint.mjs ' + slug);
+      if (process.env.OFFER_LINT === 'strict') throw new Error(slug + ': линт листа не пройден (OFFER_LINT=strict), ' + L.length + ' замечаний');
+    } }
   fs.writeFileSync(path.join(ROOT, 'offers', slug, 'page.htm'), html);
   console.log(slug, 'собран:', html.length, 'знаков');
 }
