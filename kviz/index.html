@@ -316,11 +316,11 @@ const P = {
   },
   vibe2: {
     id:'PLP-VIBE2-KARON', name:'Vibe II', hero:'v2-hero',
-    h1:'Карон Vibe II Downtown: закрытый список ниже открытого прайса*',
-    sub:'От 2,8 млн ฿. Закрытый список ограничен, с каждой бронью выбор меньше. Собственность: лизхолд, фрихолд с доплатой 12 000 ฿ за м². Ответьте на 4 вопроса и получите мебель и технику в подарок.',
+    h1:'Vibe II Downtown на пляже Карон: последние 7 видовых квартир*',
+    sub:'От 2,9 млн ฿, на 20% ниже открытого прайса застройщика. Ответьте на 4 вопроса и заберите бонус: мебель и техника в подарок.',
     foot:'*Студия 28 м² по цене закрытого списка Property Library. Рендеры застройщика',
-    gifts:['Цена закрытого списка, ниже открытого прайса','Мебель и техника в подарок клиентам Property Library','Подборка под ваш бюджет и расчёт доходности по каждой квартире'],
-    facts:[['от 2,8 млн ฿','студия 28 м²'],['мебель и техника','в подарок'],['ниже прайса','закрытый список'],['лизхолд','фрихолд +12 000 ฿ за м²']],
+    gifts:['Цены закрытого списка, на 20% ниже открытого','Планировки и свободные квартиры с видом','Мебель и техника в подарок'],
+    facts:[['от 2,9 млн ฿','студия 28 м²'],['−20%','к открытому прайсу'],['мебель и техника','в подарок'],['200 000 ฿','бронь, возвратный депозит']],
     gal:['v2-sky-pool','v2-main-pool','v2-2br-bedroom'], sheet:'https://property-library.com/vibe2', bot:'kviz_vibe2',
     Q:[
       {k:'plan', q:'Сколько спален?',
@@ -343,15 +343,41 @@ const P = {
   },
   eden: {
     id:'PLP-EDEN-LAKE', name:'Eden Lake', place:'Банг Тао', hero:'lake-cover',
-    h1:'Eden Lake на Банг Тао: резиденции от 11,9 млн ฿*',
-    sub:'Третья фаза Gardens of Eden у озера, 500 м до пляжа. Первый взнос 20% и рассрочка на 5 лет.',
+    h1:'Eden Lake на Банг Тао: 400 м до пляжа Лаян*',
+    sub:'Третья фаза Gardens of Eden. Специально для клиентов Property Library опция дополнительного финансирования: первый взнос 20%, остальное в рассрочку на 5 лет.',
     foot:'*Каталог застройщика',
-    gifts:['Первый взнос 20% и рассрочка на 5 лет','Свободные резиденции по виду и этажу','Подборка резиденций под ваш бюджет и расчёт рассрочки'],
-    facts:[['от 11,9 млн ฿','1-спальная, 52 м²'],['500 м','до пляжа Банг Тао'],['20%','первый взнос, рассрочка 5 лет'],['698','резиденций, 9 корпусов']],
+    gifts:['Цены и планировки Eden Lake','Опция финансирования: взнос 20%, рассрочка 5 лет','Резиденции по виду и этажу'],
+    facts:[['от 11,9 млн ฿','1-спальная, 52 м²'],['400 м','до пляжа Лаян'],['20%','первый взнос, рассрочка 5 лет'],['до +48%','рост прошлых фаз']],
     gal:['lake-pool','lake-club','lake-int1'], sheet:'https://property-library.com/eden', bot:'kviz_eden',
     Q:[
       {k:'plan', q:'Сколько спален?',
         o:[['1-спальная, 52 м²','lake-int1'],['2-спальная, 80,5 м²','lake-int2'],['3-спальная, 123,7 м²','lake-club'],['Помогите выбрать','lake-pool']]},
+      ...STD()]
+  },
+  purita: {
+    id:'PLP-PURITA', name:'Purita', place:'Банг Тао', hero:'pu-hero',
+    h1:'Purita в центре Банг Тао от Central Group*',
+    sub:'Квартиры с одной спальней от 7,29 млн ฿, первый платёж всего 20%. Полностью меблированы, с техникой. Ответьте на 4 вопроса и получите подборку с лучшим этажом и видом.',
+    foot:'*Стартовая цена по акции застройщика. Рендеры застройщика',
+    gifts:['Цены и планировки Purita','Стартовая цена от 7,29 млн и первый платёж 20%','Квартира с лучшим этажом и видом на сад'],
+    facts:[['от 7,29 млн ฿','1 спальня, 56 м²'],['20%','первый платёж'],['50%','при передаче ключей'],['90%','The Standard продан до сдачи']],
+    gal:['pu-pool','pu-garden','pu-furn'], sheet:'https://property-library.com/purita/64925', bot:'kviz_purita',
+    Q:[
+      {k:'plan', q:'Сколько спален?',
+        o:[['1-спальная, 56,4–58,4 м²','pu-1br'],['2-спальная, 93–103,5 м²','pu-2br'],['2-спальная плюс, 124,5–136 м²','pu-2brp'],['Вилла 5 спален, 708 м²','pu-villa'],['Помогите выбрать','pu-hero']]},
+      ...STD()]
+  },
+  millennium: {
+    id:'PLP-MILLENNIUM', name:'Millennium', place:'Банг Тао', hero:'mi-hero',
+    h1:'Millennium на Банг Тао: 750 м до пляжа*',
+    sub:'Квартира в собственность по иностранной квоте от 3,42 млн ฿ (≈98 тыс. $). Пять бассейнов, инфинити 56 м на крыше. Ответьте на 4 вопроса и получите подборку с лучшим этажом и видом.',
+    foot:'*Прайс застройщика Layan Green Park. Рендеры застройщика',
+    gifts:['Цены и планировки Millennium','Квартиры по иностранной квоте от 3,42 млн','Подборка с лучшим этажом и видом'],
+    facts:[['от 3,42 млн ฿','студия 24,4 м²'],['750 м','до пляжа Банг Тао'],['56 м','инфинити на крыше'],['10%','при получении ключей']],
+    gal:['mi-pool','mi-court','mi-bar'], sheet:'https://property-library.com/millennium', bot:'kviz_millennium',
+    Q:[
+      {k:'plan', q:'Сколько спален?',
+        o:[['Студия, 24,4–30 м²','mi-studio'],['1-спальная, 35–46,2 м²','mi-1br'],['2-спальная, 60–74,2 м²','mi-2br'],['Помогите выбрать','mi-hero']]},
       ...STD()]
   },
   zero: {
@@ -369,7 +395,7 @@ const P = {
       ...STD()]
   }
 };
-const POST = { kuartz:'https://t.me/property_library_phuket', vibe2:'https://t.me/property_library_phuket', fizz:'https://t.me/property_library_phuket', eden:'https://t.me/property_library_phuket', zero:'https://t.me/property_library_phuket' }; /* ссылки на посты-разборы: подставить, когда выйдут */
+const POST = { kuartz:'https://t.me/property_library_phuket', vibe2:'https://t.me/property_library_phuket', fizz:'https://t.me/property_library_phuket', eden:'https://t.me/property_library_phuket', purita:'https://t.me/property_library_phuket', millennium:'https://t.me/property_library_phuket', zero:'https://t.me/property_library_phuket' }; /* ссылки на посты-разборы: подставить, когда выйдут */
 /* 16.10.2026 Эльнур: «поле код с флажками всё испортит, убери, организуй поле номер заново без ошибок».
    Одно поле, в нём уже стоит +, номер целиком с кодом страны. Проверяет тот же phone.js, что и приёмник.
    Набрал 00 вместо + или российское 8XXXXXXXXXX — поправляем сами. */
@@ -459,7 +485,7 @@ function pick(key){
   $('foot0').hidden = true;
   const q = new URLSearchParams(location.search);
   $('s0').innerHTML = '<div class="card"><div class="q">Какой проект вам интересен?</div><div class="opts pics">' +
-    ['vibe2', 'kuartz', 'fizz', 'zero', 'eden'].filter(k => P[k]).map(k => { q.set('p', k);
+    ['vibe2', 'purita', 'eden', 'millennium', 'kuartz', 'fizz', 'zero'].filter(k => P[k]).map(k => { q.set('p', k);
       return '<a class="opt" href="?' + q.toString() + '"><i class="ph"><img src="img/' + P[k].hero + '.webp" alt=""></i><span>' +
         P[k].name + ', ' + (P[k].place || { vibe2: 'Карон', kuartz: 'Карон' }[k] || '') + '</span></a>'; }).join('') + '</div></div>';
 }
@@ -467,7 +493,7 @@ function pick(key){
 function render(){
   const Q = C.Q, total = Q.length + 1;
   const left = Q.length - i;
-  $('stepn').textContent = i < Q.length ? 'Вопрос ' + (i + 1) + ' из ' + Q.length + (left > 1 ? ' · ещё ' + (left - 1) + ' и подборка готова' : ' · последний вопрос') : 'Подборка готова на 100%';
+  $('stepn').textContent = i < Q.length ? 'Вопрос ' + (i + 1) + ' из ' + Q.length + (left > 2 ? ' · ещё ' + (left - 1) + ', и пришлю цены и планировки' : left > 1 ? ' · ещё 1, и закреплю спецусловия' : ' · последний вопрос, и бонус ваш') : 'Подборка готова на 100%';
   $('gift').innerHTML = '<b>' + (i < Q.length ? 'Бонусы после опроса' : 'Пришлю вам') + '</b>' + C.gifts.map(g => '<span>🎁 ' + g + '</span>').join('');
   $('bar').style.width = Math.round((i + 1) / total * 100) + '%'; $('back').hidden = !i;
   if (i < Q.length) {
@@ -484,7 +510,7 @@ function render(){
       setTimeout(() => { i++; render(); }, 260);
     });
   } else {
-    $('qwrap').innerHTML = '<div class="q">Куда прислать подборку?</div>' +
+    $('qwrap').innerHTML = '<div class="q">Куда прислать цены, планировки и бонус?</div>' +
       '<div class="who"><img src="img/elnur.jpg" alt=""><span><b>Эльнур Ханкишиев</b>, основатель Property Library. Пришлю лично цены и расчёт доходности.</span></div>' +
       '<form id="f" novalidate><input id="nm" placeholder="Ваше имя" autocomplete="name" required aria-required="true">' +
       '<div class="phrow"><input id="cc" type="tel" inputmode="tel" list="ccl" aria-label="Код страны" autocomplete="tel-country-code" value="' + ccGuess() + '">' +
