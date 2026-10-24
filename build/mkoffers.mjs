@@ -69,7 +69,7 @@ const OFFERS = [
     title: 'Топ-15 кондо Пхукета · Property Library Phuket',
     desc: 'Подборка Property Library Phuket: 15 проектов кондо на Пхукете, цены «от», сроки сдачи и что рядом.',
     pdf: 'Top15_Phuket.pdf',
-    og: 'offers/top15/img/preview-v3.jpg',
+    og: 'offers/top15/img/preview-v4.jpg',  // 25.10.2026: обложка InterContinental
     h: 16559,   // PDF 4380 мм × 794/210 (23.10)
   },
   {
