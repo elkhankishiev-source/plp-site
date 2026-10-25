@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-22",
+ "updated": "2026-10-25",
  "items": [
   {
    "id": "ATT-KYE",
@@ -610,7 +610,7 @@
    "name": "The GENS by Botanica, у Blue Tree",
    "district": "Банг Тао",
    "type": "Кондо",
-   "price_from": 5458000,
+   "price_from": 4270000,
    "units": []
   },
   {
@@ -826,76 +826,83 @@
    "name": "AYANA Heights Seaview Residences",
    "district": "Лаян",
    "type": "Кондо",
-   "price_from": 5426101,
+   "price_from": 8360630,
    "units": [
     {
      "beds": 1,
      "code": null,
-     "free": 2,
+     "free": 6,
      "name": "1 спальня",
-     "area_sqm": 43.5,
+     "area_sqm": 43.42,
+     "price_to_thb": 8444440,
      "price_from_thb": 8421026,
-     "area": 43.5,
+     "area": 43.42,
      "from": 8421026
     },
     {
      "beds": 1,
      "code": null,
-     "free": 5,
+     "free": 11,
      "name": "1 спальня",
-     "area_sqm": 44,
-     "price_from_thb": 8368435,
-     "area": 44,
-     "from": 8368435
+     "area_sqm": 43.95,
+     "price_to_thb": 8769313,
+     "price_from_thb": 8360630,
+     "area": 43.95,
+     "from": 8360630
     },
     {
      "beds": 1,
      "code": null,
      "free": 1,
      "name": "1 спальня",
-     "area_sqm": 45.5,
+     "area_sqm": 45.54,
+     "price_to_thb": 8832658,
      "price_from_thb": 8832658,
-     "area": 45.5,
+     "area": 45.54,
      "from": 8832658
     },
     {
      "beds": 1,
      "code": null,
-     "free": 4,
+     "free": 20,
      "name": "1 спальня",
-     "area_sqm": 57.5,
+     "area_sqm": 57.57,
+     "price_to_thb": 11703977,
      "price_from_thb": 8891103,
-     "area": 57.5,
+     "area": 57.57,
      "from": 8891103
     },
     {
      "beds": 2,
      "code": null,
-     "free": 6,
+     "free": 15,
      "name": "2 спальни",
-     "area_sqm": 57.5,
+     "area_sqm": 57.57,
+     "price_to_thb": 11728563,
      "price_from_thb": 9995403,
-     "area": 57.5,
+     "area": 57.57,
      "from": 9995403
     },
     {
      "beds": 2,
      "code": null,
-     "free": 2,
+     "free": 35,
      "name": "2 спальни",
-     "area_sqm": 75.5,
-     "price_from_thb": 15608615,
-     "area": 75.5,
-     "from": 15608615
+     "area_sqm": 75.51,
+     "price_to_thb": 20282684,
+     "price_from_thb": 15007853,
+     "area": 75.51,
+     "from": 15007853
     },
     {
      "beds": 3,
      "code": null,
-     "free": 3,
+     "free": 11,
      "name": "3 спальни",
-     "area_sqm": 113,
+     "area_sqm": 112.89,
+     "price_to_thb": 24355728,
      "price_from_thb": 23359324,
-     "area": 113,
+     "area": 112.89,
      "from": 23359324
     }
    ]
@@ -1799,7 +1806,7 @@
    "name": "Fantasy Plus Rawai",
    "district": "Равай",
    "type": "Кондо",
-   "price_from": 2996000,
+   "price_from": 4990000,
    "units": [
     {
      "beds": 1,
@@ -2175,11 +2182,13 @@
     },
     {
      "тип": "Дюплекс",
-     "площадь_м2": "267,26–273,27"
+     "площадь_м2": "398,59–402,51",
+     "примечание": "общая площадь с бассейном и парковкой, прайс 08.2026"
     },
     {
      "тип": "Пентхаус",
-     "площадь_м2": "683,78–702,00"
+     "площадь_м2": "694,6–702",
+     "примечание": "общая площадь с бассейном и парковкой, прайс 08.2026"
     }
    ]
   },
@@ -2190,7 +2199,7 @@
    "name": "The Residences at InterContinental Phuket Resort",
    "district": "Камала",
    "type": "Кондо",
-   "price_from": 15700000,
+   "price_from": 13600000,
    "units": []
   },
   {
@@ -2735,6 +2744,65 @@
      "price_from_thb": 14325000,
      "area": 83.56,
      "from": 14325000
+    }
+   ]
+  },
+  {
+   "id": "PLP-PURITA",
+   "pub": "PLP-PURITA",
+   "url": "https://property-library.com/object/purita",
+   "name": "PURITA Phuket Bangtao",
+   "district": "Банг Тао",
+   "type": "Кондо",
+   "price_from": 7290000,
+   "units": [
+    {
+     "beds": 1,
+     "code": "1 Bed",
+     "name": "1 спальня",
+     "count": 147,
+     "areaMax": 58.4,
+     "areaMin": 56.4,
+     "area_sqm": 56.4,
+     "price_to_thb": 10643000,
+     "price_from_thb": 7290000,
+     "area": 56.4,
+     "from": 7290000
+    },
+    {
+     "beds": 2,
+     "code": "2 Bed",
+     "name": "2 спальни (с выходом в сад 103,5 м²)",
+     "count": 78,
+     "areaMax": 103.5,
+     "areaMin": 93,
+     "area_sqm": 93,
+     "price_to_thb": 18479000,
+     "price_from_thb": 14871000,
+     "area": 93,
+     "from": 14871000
+    },
+    {
+     "beds": 2,
+     "code": "2 Bed Plus",
+     "name": "2 спальни плюс (с выходом в сад 136 м²)",
+     "count": 32,
+     "areaMax": 136,
+     "areaMin": 124.5,
+     "area_sqm": 124.5,
+     "price_to_thb": 23575000,
+     "price_from_thb": 19899000,
+     "area": 124.5,
+     "from": 19899000
+    },
+    {
+     "beds": 5,
+     "code": "Villa",
+     "name": "Вилла, 5 спален, с бассейном",
+     "note": "цена по запросу",
+     "count": 1,
+     "area_sqm": 708,
+     "area": 708
     }
    ]
   },

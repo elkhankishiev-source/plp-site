@@ -157,7 +157,9 @@ for (const o of OFFERS) {
 
   const NOMERA = JSON.parse(fs.readFileSync(path.join(ROOT, 'build/nomera.json'), 'utf8'));
   if (o.hidden && !NOMERA[o.slug]) throw new Error('mkoffers: для скрытого листа ' + o.slug + ' нет номера в build/nomera.json');
-  const url = SITE + '/' + o.slug + (o.hidden ? '/' + NOMERA[o.slug] : '');
+  /* 25.10.2026: скрытый адрес /<лист>/<номер> сервер отдаёт со слэшем на конце (без слэша 301), поэтому canonical
+     и og:url тоже со слэшем: адрес, который видит мессенджер после перехода, совпадает с og:url. */
+  const url = SITE + '/' + o.slug + (o.hidden ? '/' + NOMERA[o.slug] + '/' : '');
   let html = head + '\n' + body + '\n' + tail;
   html = html.replace(/<title>[\s\S]*?<\/title>/, '<title>' + esc(o.title) + '</title>');
   html = html.replace(/(<meta name="description" content=")[^"]*(")/, '$1' + esc(o.desc) + '$2');
@@ -177,6 +179,20 @@ for (const o of OFFERS) {
     /* скрытый лист: превью — его собственная картинка; пути страницы переводим от корня сайта (как build/mknomer.mjs);
        в корень (<slug>.html) не пишем, в sitemap не попадает */
     html = html.replace(/(<meta property="og:image" content=")[^"]*(")/, '$1' + SITE + '/' + o.og + '$2');
+    /* 25.10.2026 Эльнур: «убедись что все превью работают» (топ-15). WhatsApp читает только начало страницы:
+       блок Open Graph и Twitter поднимаем сразу под viewport, og:image оказывается в первых ~2 КБ, а не на 5,4 КБ. */
+    {
+      const a = html.indexOf('<!-- Open Graph -->');
+      const tw = html.indexOf('<meta name="twitter:image:alt"');
+      const vp = html.indexOf('<meta name="viewport"');
+      if (a > 0 && tw > a && vp > 0 && vp < a) {
+        const b = html.indexOf('\n', tw) + 1;
+        const block = html.slice(a, b);
+        html = html.slice(0, a) + html.slice(b);
+        const at = html.indexOf('\n', html.indexOf('<meta name="viewport"')) + 1;
+        html = html.slice(0, at) + block + html.slice(at);
+      }
+    }
     html = html.replace(/(\s(?:src|href)=")(?![a-z]+:|\/|#|\?|data:|mailto:|tel:)([^"]+")/gi, '$1/$2');
     html = html.replace(/href="\/index\.html"/g, 'href="/"');
     html = html.split("var want = pre + 'img/brand/").join("var want = '/img/brand/");
