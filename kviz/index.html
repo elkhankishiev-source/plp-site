@@ -638,7 +638,9 @@ function finish(r){
   const icTG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.9 4.3 18.7 19.4c-.2 1-.9 1.3-1.7.8l-4.8-3.6-2.3 2.2c-.3.3-.5.5-1 .5l.3-4.9 8.9-8c.4-.3-.1-.5-.6-.2l-11 6.9-4.7-1.5c-1-.3-1-1 .2-1.5l18.5-7.1c.9-.3 1.6.2 1.4 1.3z"/></svg>';
   /* 19.10.2026 Эльнур «да, го» (путь_лида_и_бан_1910.md): за 5 дней 11 заявок, нажатий WhatsApp 1, Telegram 1, бот 0 —
      на экране одна главная кнопка в выбранный мессенджер, остальное мелко под «Другие способы». */
-  const tgFirst = (r.channel || A.channel) === 'telegram';
+  /* 25.10.2026 Эльнур «м чини»: главная кнопка — по выбору человека. Было по r.channel: выбрал Telegram, а Telegram по номеру
+     не нашли — касание ушло в WhatsApp, и экран тоже вёл в WhatsApp (заявки 21–22.10, funnel_events 20741, 20858). */
+  const tgFirst = A.channel === 'telegram';
   const bWA = '<a class="wa" data-ev="click_wa_write" href="https://wa.me/' + W.wa + '?text=' + msg + '" target="_blank" rel="noopener">' + icWA + 'Получить бонус в WhatsApp</a>';
   const bTG = '<a class="tg" data-ev="click_tg_write" href="https://t.me/' + W.tg + '?text=' + msg + '" target="_blank" rel="noopener">' + icTG + 'Получить бонус в Telegram</a>';
   const lWA = '<a class="lnk" data-ev="click_wa_write" href="https://wa.me/' + W.wa + '?text=' + msg + '" target="_blank" rel="noopener">Написать в WhatsApp</a>';
