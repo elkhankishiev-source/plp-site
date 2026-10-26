@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-25",
+ "updated": "2026-10-26",
  "items": [
   {
    "id": "ATT-KYE",
@@ -1121,7 +1121,7 @@
     {
      "beds": 2,
      "code": "4215",
-     "free": 20,
+     "free": 21,
      "name": "2 спальни",
      "area_sqm": 122,
      "price_from_thb": 25770000,
@@ -1133,9 +1133,9 @@
      "code": "4103",
      "free": 3,
      "name": "2 спальни",
-     "area_sqm": 156,
+     "area_sqm": 125,
      "price_from_thb": 38990000,
-     "area": 156,
+     "area": 125,
      "from": 38990000
     },
     {
@@ -1143,9 +1143,9 @@
      "code": "5103",
      "free": 3,
      "name": "2 спальни",
-     "area_sqm": 157,
+     "area_sqm": 126,
      "price_from_thb": 39340000,
-     "area": 157,
+     "area": 126,
      "from": 39340000
     },
     {
@@ -1173,9 +1173,9 @@
      "code": "4104",
      "free": 2,
      "name": "3 спальни",
-     "area_sqm": 318,
+     "area_sqm": 255,
      "price_from_thb": 87800000,
-     "area": 318,
+     "area": 255,
      "from": 87800000
     },
     {
@@ -1232,7 +1232,7 @@
     {
      "beds": 1,
      "code": "3202",
-     "free": 24,
+     "free": 23,
      "name": "1 спальня",
      "area_sqm": 67,
      "price_from_thb": 11810000,
@@ -1783,7 +1783,7 @@
    "name": "Ever Prime",
    "district": "Карон",
    "type": "Кондо",
-   "price_from": 6420000,
+   "price_from": 5152575,
    "units": [
     {
      "area": "46,53–60,09 м²",
@@ -1994,7 +1994,7 @@
    "name": "The Title Halo 1 Naiyang",
    "district": "Най Янг",
    "type": "Кондо",
-   "price_from": 5136160,
+   "price_from": 3946800,
    "units": [
     {
      "beds": 1,
@@ -2002,9 +2002,9 @@
      "free": 2,
      "name": "1 спальня",
      "area_sqm": 36,
-     "price_from_thb": 5136160,
+     "price_from_thb": 3946800,
      "area": 36,
-     "from": 5136160
+     "from": 3946800
     },
     {
      "beds": 1,
@@ -2012,9 +2012,9 @@
      "free": 2,
      "name": "1 спальня",
      "area_sqm": 40,
-     "price_from_thb": 5670760,
+     "price_from_thb": 4392300,
      "area": 40,
-     "from": 5670760
+     "from": 4392300
     },
     {
      "beds": 2,
@@ -2022,9 +2022,9 @@
      "free": 1,
      "name": "2 спальни",
      "area_sqm": 58.5,
-     "price_from_thb": 7594600,
+     "price_from_thb": 6426200,
      "area": 58.5,
-     "from": 7594600
+     "from": 6426200
     }
    ]
   },
@@ -2452,43 +2452,43 @@
    "name": "The Title Legendary Bang-Tao",
    "district": "Банг Тао",
    "type": "Кондо",
-   "price_from": 6153600,
+   "price_from": 6858900,
    "units": [
     {
-     "beds": null,
+     "beds": 1,
      "code": "L3",
      "free": 9,
-     "name": "Планировка",
+     "name": "1 спальня",
      "area_sqm": 50,
      "price_from_thb": 6858900,
      "area": 50,
      "from": 6858900
     },
     {
-     "beds": null,
+     "beds": 1,
      "code": "WN3",
      "free": 4,
-     "name": "Планировка",
+     "name": "1 спальня",
      "area_sqm": 52.5,
      "price_from_thb": 8524200,
      "area": 52.5,
      "from": 8524200
     },
     {
-     "beds": null,
+     "beds": 1,
      "code": "WN3",
      "free": 8,
-     "name": "Планировка",
+     "name": "1 спальня",
      "area_sqm": 53.5,
      "price_from_thb": 8583600,
      "area": 53.5,
      "from": 8583600
     },
     {
-     "beds": null,
+     "beds": 1,
      "code": "L6",
      "free": 4,
-     "name": "Планировка",
+     "name": "1 спальня",
      "area_sqm": 54,
      "price_from_thb": 8105200,
      "area": 54,
