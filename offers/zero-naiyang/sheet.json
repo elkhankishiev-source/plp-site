@@ -10,9 +10,9 @@
   "units": {
     "h2": "Silhouette by The Zero состоит из двух корпусов по 5 этажей",
     "lead": "150 квартир в двух корпусах: Sky Residences и Earth Residences, во втором можно жить с питомцами. Бассейн и бар на крыше, кинотеатр под открытым небом, своя управляющая компания. Экспертиза EIA одобрена.",
-    "facts": "<div class=\"facts\" style=\"grid-template-columns:repeat(4,1fr);margin:5mm 0 6mm\">\n    <div><b>150</b><span>квартир</span></div>\n    <div><b>2 корпуса</b><span>по 5 этажей</span></div>\n    <div><b>35–105 м²</b><span>от студии до сьюта, текущий прайс</span></div>\n    <div><b>EIA</b><span>одобрена</span></div>\n  </div>",
+    "facts": "<div class=\"facts\" style=\"grid-template-columns:repeat(4,1fr);margin:5mm 0 6mm\">\n    <div><b>150</b><span>квартир</span></div>\n    <div><b>2 корпуса</b><span>по 5 этажей</span></div>\n    <div><b>29,5–105 м²</b><span>от студии до сьюта, текущий прайс</span></div>\n    <div><b>EIA</b><span>одобрена</span></div>\n  </div>",
     "cards": [
-      "<div class=\"card\"><h3>Что в продаже</h3>\n      <table>\n        <tr><td>Студия · 29,5–36,3 м²</td><td class=\"r num\">4,71–5,52 млн ฿</td></tr>\n        <tr><td>1-спальная · 37,5–46 м²</td><td class=\"r num\">5,23–6,76 млн ฿</td></tr>\n        <tr><td>1-спальная плюс · 44,4–52,4 м²</td><td class=\"r num\">6,23–7,34 млн ฿</td></tr>\n        <tr><td>2 спальни · 52,8–66,7 м²</td><td class=\"r num\">6,62–10,15 млн ฿</td></tr>\n        <tr><td>Сьют · 81,2–105 м²</td><td class=\"r num\">11,77–15,22 млн ฿</td></tr>\n      </table>\n      <p style=\"margin:3mm 0 0;color:var(--ink2);font-size:9pt\">105 квартир в продаже по прайсу, 125–154 тыс. ฿ за м². Мебельный пакет 350–700 тыс. ฿ по планировке.</p>\n      <p class=\"src\">Прайс застройщика; цены могут меняться.</p></div>"
+      "<div class=\"card\"><h3>Что в продаже</h3>\n      <table>\n        <tr><td>Студия · 29,5–36,3 м²</td><td class=\"r num\">4,71–5,52 млн ฿</td></tr>\n        <tr><td>1-спальная · 37,5–46 м²</td><td class=\"r num\">5,23–6,76 млн ฿</td></tr>\n        <tr><td>1-спальная плюс · 44,4–52,4 м²</td><td class=\"r num\">6,23–7,34 млн ฿</td></tr>\n        <tr><td>2 спальни · 52,8–66,7 м²</td><td class=\"r num\">6,62–10,15 млн ฿</td></tr>\n        <tr><td>Сьют · 81,2–105 м²</td><td class=\"r num\">11,77–15,22 млн ฿</td></tr>\n      </table>\n      <p style=\"margin:3mm 0 0;color:var(--ink2);font-size:9pt\">107 квартир в продаже по прайсу, 125–160 тыс. ฿ за м². Мебельный пакет 350–700 тыс. ฿ по планировке.</p>\n      <p class=\"src\">Прайс застройщика; цены могут меняться.</p></div>"
     ],
     "photos": [
       {
@@ -131,7 +131,7 @@
       ],
       [
         "октябрь 2026",
-        "Действующий прайс: 125–154 тыс. ฿ за м²",
+        "Действующий прайс: 125–160 тыс. ฿ за м²",
         "корпус Earth уже подорожал со 110 до 125 тыс. ฿ за м²"
       ],
       [
