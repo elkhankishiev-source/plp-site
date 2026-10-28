@@ -1,11 +1,10 @@
-/* 22.10.2026 Эльнур: «одна ссылка для всех, но с доп номером, просто название длиннее, чтобы его наугад не нашли».
-   Это «скрытая ссылка» (unlisted link, как у YouTube и Google Drive): страница есть, но в меню, sitemap и поиске её нет,
-   и угадать адрес по имени проекта нельзя. Номер у листа один для всех получателей.
-   Здесь из готового <лист>.html делаем копию по адресу /<лист>/<номер>/: те же лист, PDF и счётчик site_events
-   (в нём страница видна как /<лист>/<номер>, по ней считаем, сколько раз и когда открыли).
-   Номера живут только в build/nomera.json, поменять номер = поменять там и пересобрать.
-   Старые адреса /<лист> пока работают как были: по ним уже разосланы ссылки.
-   Идёт последним шагом в build/all.mjs, после счётчиков и превью. Повторный прогон ничего не меняет. */
+/* Сторож одной истины листов-офферов. Запуск: node build/mknomer.mjs (последний шаг build/all.mjs и проверка в pre-push).
+   22.10.2026 Эльнур: «одна ссылка для всех, но с доп номером, просто название длиннее, чтобы его наугад не нашли» —
+   скрытая ссылка (unlisted link): /<лист>/<номер>/, номера в build/nomera.json.
+   До 28.10 этот файл копировал готовый <лист>.html в /<лист>/<номер>/index.html, и у листа было две живые страницы.
+   28.10.2026 Эльнур: «копии не уместны… ищи все копии, дубли, доработай, своди в одну истину! это наше важное правило».
+   Теперь лист пишет только build/mkoffers.mjs, сразу по номерному адресу; старые адреса там же становятся переадресацией.
+   Здесь ничего не собирается, только проверка: копия листа вне номерного адреса или кривая переадресация = код 1. */
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -13,24 +12,38 @@ import { fileURLToPath } from 'node:url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SITE = 'https://property-library.com';
 const nomera = JSON.parse(fs.readFileSync(path.join(ROOT, 'build/nomera.json'), 'utf8'));
+const плохо = [];
+const листы = new Set();
 
 for (const [slug, nomer] of Object.entries(nomera)) {
   if (slug.startsWith('_')) continue;
-  const src = path.join(ROOT, slug + '.html');
-  if (!fs.existsSync(src)) { console.log('mknomer: нет ' + slug + '.html, пропускаю (лист собирается отдельно)'); continue; }
-  const url = SITE + '/' + slug + '/' + nomer;
-  let html = fs.readFileSync(src, 'utf8');
-  html = html.replace(/(<link rel="canonical" href=")[^"]*(")/, '$1' + url + '$2');
-  html = html.replace(/(<meta property="og:url" content=")[^"]*(")/, '$1' + url + '$2');
-  /* страница лежит на два уровня глубже: относительные пути переводим от корня сайта */
-  html = html.replace(/(\s(?:src|href)=")(?![a-z]+:|\/|#|\?|data:|mailto:|tel:)([^"]+")/gi, '$1/$2');
-  html = html.replace(/href="\/index\.html"/g, 'href="/"');
-  /* и в скриптах главной, которые подставляют пути сами: знак в шапке и фото каталога */
-  html = html.split("var want = pre + 'img/brand/").join("var want = '/img/brand/");
-  html = html.split("p.img='img/'+").join("p.img='/img/'+");
-  const dir = path.join(ROOT, slug, nomer);
-  fs.mkdirSync(dir, { recursive: true });
-  const out = path.join(dir, 'index.html');
-  if (!fs.existsSync(out) || fs.readFileSync(out, 'utf8') !== html) fs.writeFileSync(out, html);
-  console.log('mknomer: ' + url);
+  const f = path.join(slug, nomer, 'index.html');
+  листы.add(f);
+  if (!fs.existsSync(path.join(ROOT, f))) { плохо.push(f + ': нет листа (node build/mkoffers.mjs)'); continue; }
+  const h = fs.readFileSync(path.join(ROOT, f), 'utf8');
+  if (!h.includes('id="offerFrame"')) плохо.push(f + ': это не лист (нет offerFrame)');
+  if (!h.includes('<link rel="canonical" href="' + SITE + '/' + slug + '/' + nomer + '/">')) плохо.push(f + ': canonical не на свой номерной адрес');
 }
+
+/* любая другая страница с рамкой листа = вторая копия */
+(function walk(d) {
+  for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+    if (e.name.startsWith('.') || e.name === 'node_modules' || e.name === 'offers') continue;
+    const p = path.join(d, e.name);
+    if (e.isDirectory()) { walk(p); continue; }
+    if (!e.name.endsWith('.html')) continue;
+    const rel = path.relative(ROOT, p);
+    if (листы.has(rel)) continue;
+    const h = fs.readFileSync(p, 'utf8');
+    if (/id="offerFrame"[^>]*src="\/offers\//.test(h)) плохо.push(rel + ': вторая копия листа (должна быть переадресация)');
+    const m = h.match(/<!-- PLP:REDIRECT (\/[^ ]+\/) /);
+    if (m) {
+      if (!h.includes('<link rel="canonical" href="' + SITE + m[1] + '">')) плохо.push(rel + ': canonical переадресации не на ' + m[1]);
+      if (!h.includes('url=' + m[1] + '"')) плохо.push(rel + ': refresh не на ' + m[1]);
+      if (!fs.existsSync(path.join(ROOT, m[1], 'index.html'))) плохо.push(rel + ': ведёт на ' + m[1] + ', а листа там нет');
+    }
+  }
+})(ROOT);
+
+if (плохо.length) { console.log('[одна истина листов] ' + плохо.length + ':\n  ' + плохо.join('\n  ')); process.exit(1); }
+console.log('[одна истина листов] ' + листы.size + ' листов, у каждого один адрес /<лист>/<номер>/, копий нет');

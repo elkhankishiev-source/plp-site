@@ -24,14 +24,28 @@ function jpegSize(p) {
   return null;
 }
 
-const ОФФЕРЫ = { 'vibe2.html': 'offers/vibe2/img/preview-v13.jpg', 'zero-naiyang.html': 'offers/zero-naiyang/img/preview-v10.jpg',
+/* 28.10.2026 Эльнур: «копии не уместны… своди в одну истину». Лист живёт только по адресу /<лист>/<номер>/ (build/nomera.json),
+   старые адреса (<лист>.html, <лист>/index.html, kuartz-fizz.html) — переадресации из build/mkoffers.mjs. Превью ставим листу
+   и каждой его переадресации (их находим по canonical), чтобы мессенджер по старой ссылке показал ту же картинку. */
+const ПРЕВЬЮ = { vibe2: 'offers/vibe2/img/preview-v13.jpg', 'zero-naiyang': 'offers/zero-naiyang/img/preview-v10.jpg',
   // 07.10 Эльнур: «превью ссылки соответствующее фото, не везде одно и то же» — /cg-capital и /aileen показывали Heritage
-  'cg-capital.html': 'offers/cg-capital/img/preview-v10.jpg', 'aileen.html': 'offers/aileen/img/preview-v10.jpg',
-  'kuartz.html': 'offers/kuartz/img/preview-v11.jpg', 'fizz.html': 'offers/fizz/img/preview-v12.jpg', 'eden.html': 'offers/eden/img/preview-v10.jpg',
-  'millennium.html': 'offers/millennium/img/preview-v10.jpg',
-  'top15/48213/index.html': 'offers/top15/img/preview-v4.jpg',
-  'purita/64925/index.html': 'offers/purita/img/preview-v10.jpg',
-  'naturale-kamala/73204/index.html': 'offers/naturale-kamala/img/preview-v1.jpg' };  /* 23.10 топ-15 живёт только по скрытому адресу */
+  'cg-capital': 'offers/cg-capital/img/preview-v10.jpg', aileen: 'offers/aileen/img/preview-v10.jpg',
+  kuartz: 'offers/kuartz/img/preview-v11.jpg', fizz: 'offers/fizz/img/preview-v12.jpg', eden: 'offers/eden/img/preview-v10.jpg',
+  millennium: 'offers/millennium/img/preview-v10.jpg',
+  top15: 'offers/top15/img/preview-v4.jpg',
+  purita: 'offers/purita/img/preview-v10.jpg',
+  'naturale-kamala': 'offers/naturale-kamala/img/preview-v1.jpg' };
+const НОМЕРА = JSON.parse(fs.readFileSync(path.join(ROOT, 'build/nomera.json'), 'utf8'));
+const ОФФЕРЫ = {};
+const корневые = fs.readdirSync(ROOT).filter(f => f.endsWith('.html'))
+  .concat(fs.readdirSync(ROOT, { withFileTypes: true }).filter(e => e.isDirectory() && fs.existsSync(path.join(ROOT, e.name, 'index.html'))).map(e => e.name + '/index.html'));
+for (const [slug, img] of Object.entries(ПРЕВЬЮ)) {
+  if (!НОМЕРА[slug]) continue;
+  const адрес = SITE + '/' + slug + '/' + НОМЕРА[slug] + '/';
+  ОФФЕРЫ[slug + '/' + НОМЕРА[slug] + '/index.html'] = img;
+  for (const f of корневые)
+    if (fs.readFileSync(path.join(ROOT, f), 'utf8').includes('<link rel="canonical" href="' + адрес + '">')) ОФФЕРЫ[f] = img;
+}
 const РАЙОНЫ = { 'bang-tao': 'PLP-SIERRA', kamala: 'PLP-VIVANA', kata: 'PLP-KATABELLO', 'koh-kaew': 'PLP-ZENITHY', layan: 'PLP-SUNHILLS-LAYAN',
   'nai-yang': 'PLP-ZERO-NAIYANG', rawai: 'PLP-FANTASY-RAWAI', surin: 'PLP-BIANCANA', karon: 'PLP-VIBE-KARON',
   laguna: 'PLP-BELLAGUNA', thalang: 'PLP-QABALAH', 'ao-por': 'PLP-TONINO-OV' };

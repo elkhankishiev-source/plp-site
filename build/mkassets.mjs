@@ -42,7 +42,7 @@ const ASSETS = path.join(ROOT, 'assets');
 /* Страницы с общим кодом витрины. owner.html (кабинет) и add-property.html
    (анкета) живут на своём коде — их не трогаем. */
 const PAGES = ['index.html', 'buy.html', 'rent.html', 'about.html',
-               'management.html', 'vibe2.html'];
+               'management.html', 'vibe2/46163/index.html'];  // 28.10: лист Vibe II живёт по номерному адресу, vibe2.html только переадресация
 
 const AF = '/* PLP:ANTIFLICKER */';
 const SALE_START = '/* ===== SALE CATALOG';

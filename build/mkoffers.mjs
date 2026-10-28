@@ -8,6 +8,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import crypto from 'node:crypto';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SITE = 'https://property-library.com';
@@ -15,13 +16,13 @@ const esc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g,
 
 const OFFERS = [
   {
-    slug: 'aileen', dir: 'offers/aileen',
+    slug: 'aileen', dir: 'offers/aileen', old: true,
     title: 'Aileen Residence Lagoon · Лагуна: предстарт',
     desc: 'Aileen Residence Lagoon в Лагуне: таунхаусы 159,3 м² с бассейном, цены, график оплаты и что построил застройщик. Предложение для клиентов Property Library Phuket.',
     pdf: 'Aileen_Lagoon.pdf',
   },
   {
-    slug: 'vibe2', dir: 'offers/vibe2',
+    slug: 'vibe2', dir: 'offers/vibe2', old: true,
     title: 'Vibe II Downtown · Карон: закрытый предстарт',
     desc: 'Vibe II на Кароне: предстартовые цены, бронь, график оплаты и расчёт аренды. Предложение для клиентов Property Library Phuket.',
     pdf: 'Vibe2_Karon.pdf',
@@ -29,34 +30,34 @@ const OFFERS = [
   },
   {
     /* 07.10.2026 Эльнур: «собрать презентацию по формату Vibe II и скинуть ссылку». Факты: слайды CG Capital (фото Эльнура 07.10) и его голосовые. */
-    slug: 'cg-capital', dir: 'offers/cg-capital',
+    slug: 'cg-capital', dir: 'offers/cg-capital', old: true,
     title: 'Central Group на Пхукете · Andaz и PURITA: старт продаж',
     desc: 'Andaz у пляжа Лаян от 16,xx млн ฿ и PURITA на Банг Тао от 7,xx млн ฿ от Central Group. Сроки, первые цены, как попасть в первую очередь.',
     pdf: 'CentralGroup_Phuket.pdf',   // node tools/offer_longpdf.mjs cg-capital CentralGroup_Phuket.pdf
   },
   {
     /* 08.10.2026 Эльнур: «сделай эден 1 2 и акцент на 3 фазу новая возможность». Факты: брошюры и сейл-киты застройщика (Диск), карточки PLP-EDEN*, каталог LAKE 24.11.2025, канал застройщика 09.09.2026. */
-    slug: 'eden', dir: 'offers/eden',
+    slug: 'eden', dir: 'offers/eden', old: true,
     title: 'Gardens of Eden · третья фаза Lake: новая возможность',
     desc: 'Gardens of Eden на Банг Тао: три фазы, рост цены метра с 2023 года, третья фаза Lake от 11,9 млн ฿ и рассрочка после ключей.',
     pdf: 'Eden_Layan.pdf',
   },
   {
     /* 08.10.2026 Эльнур: «сделай кварц, сделай физз» — отдельные листы по эталону /cg-capital. */
-    slug: 'kuartz', dir: 'offers/kuartz',
+    slug: 'kuartz', dir: 'offers/kuartz', old: true, oldExtra: ['kuartz-fizz.html'],
     title: 'KUARTZ · Карон: закрытый старт',
     desc: 'KUARTZ в 400 м от пляжа Карон от The Title × AssetWise: планировки, аренда по прогнозу застройщика, сроки и ориентир цены.',
     pdf: 'KUARTZ_Karon.pdf',
   },
   {
-    slug: 'fizz', dir: 'offers/fizz',
+    slug: 'fizz', dir: 'offers/fizz', old: true,
     title: 'FIZZ · Ката: закрытый старт',
     desc: 'FIZZ на Кате от The Title × AssetWise: камерный кондоминиум на 135 квартир, можно с питомцами. Планировки, аренда, сроки и ориентир цены.',
     pdf: 'FIZZ_Kata.pdf',
   },
   {
     /* 13.10.2026 Эльнур: «Millennium выгружай на сайт и в оффер, всё по стандартам». Факты: прайс и брошюра застройщика (Диск), карточка PLP-MILLENNIUM; офферный лист по эталону kuartz/vibe2. */
-    slug: 'millennium', dir: 'offers/millennium',
+    slug: 'millennium', dir: 'offers/millennium', old: true,
     title: 'Millennium · Банг Тао: старт продаж',
     desc: 'Millennium на Банг Тао в 750 м от пляжа: студии, 1 и 2 спальни, пять бассейнов, график оплаты и сроки. Предложение для клиентов Property Library Phuket.',
     pdf: 'Millennium_Bangtao.pdf',
@@ -65,7 +66,7 @@ const OFFERS = [
   {
     /* 22.10.2026 Эльнур 23:45: «топ 15 каталог очень не красивый … переделай» — лист в фирменном наборе (gen: ~/plp-ops/tools/top15).
        hidden: публичного /top15 и /top15.html нет, обёртка пишется сразу в top15/<номер из build/nomera.json>/index.html. */
-    slug: 'top15', dir: 'offers/top15', hidden: true,
+    slug: 'top15', dir: 'offers/top15', hidden: true, old: true,   // 28.10: /top15 и /top15/ отдавали 404 → переадресация на номерной
     title: 'Топ-15 кондо Пхукета · Property Library Phuket',
     desc: 'Подборка Property Library Phuket: 15 проектов кондо на Пхукете, цены «от», сроки сдачи и что рядом.',
     pdf: 'Top15_Phuket.pdf',
@@ -96,7 +97,7 @@ const OFFERS = [
   {
     /* 04.10.2026 Эльнур: «на секретной странице… зеро наянг гарантия 10% годовых». Факты: objects PLP-ZERO-NAIYANG
        (current_promo, unit_types, payment_plan; прайс и сообщение застройщика 07.09.2026) и презентация застройщика 11.2025. */
-    slug: 'zero-naiyang', dir: 'offers/zero-naiyang',
+    slug: 'zero-naiyang', dir: 'offers/zero-naiyang', old: true,
     title: 'The ZERO Nai Yang · Най Янг: гарантия 10% на три года',
     desc: 'The ZERO Nai Yang в 350 метрах от пляжа Най Янг: гарантия 10% годовых на три года, цены, график оплаты. Предложение для клиентов Property Library Phuket.',
     pdf: 'ZERO_NaiYang.pdf',
@@ -104,6 +105,44 @@ const OFFERS = [
 ];
 
 const idx = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+const NOMERA_PATH = path.join(ROOT, 'build/nomera.json');
+const NOMERA = JSON.parse(fs.readFileSync(NOMERA_PATH, 'utf8'));
+const номерной = (slug) => '/' + slug + '/' + NOMERA[slug] + '/';
+/* 28.10.2026: какие старые адреса листа переадресуют на номерной. old: true — лист был открыт по /<лист> до 28.10;
+   oldExtra — прежние имена. Скрытые с рождения (PURITA, Naturale) старых адресов не получают: номер в адресе, чтобы лист
+   не нашли наугад по имени (Эльнур 22.10). */
+const старые = (o) => (o.old ? [o.slug + '.html', o.slug + '/index.html'] : []).concat(o.oldExtra || []);
+function пишиПереадресацию(file, o, url, og) {
+  const to = url.slice(SITE.length);
+  const знак = '<!-- PLP:REDIRECT ' + to + ' ' + crypto.createHash('sha1').update(o.title + '|' + o.desc).digest('hex').slice(0, 10) + ' -->';
+  const p = path.join(ROOT, file);
+  /* уже стоит та же переадресация (с метками GA/пикселя от следующих шагов сборки) — не переписываем, иначе дифф на каждом прогоне */
+  if (fs.existsSync(p) && fs.readFileSync(p, 'utf8').includes(знак)) return;
+  const t = esc(o.title), d = esc(o.desc);
+  const html = `<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8">
+${знак}
+<!-- 28.10.2026 Эльнур: «копии не уместны… своди в одну истину». Лист живёт по адресу ${to}; этот адрес только переадресует. -->
+<title>${t}</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="${d}">
+<meta property="og:type" content="website"><meta property="og:site_name" content="Property Library Phuket">
+<meta property="og:title" content="${t}"><meta property="og:description" content="${d}">
+<meta property="og:url" content="${url}">
+<meta property="og:image" content="${og}"><meta property="og:image:secure_url" content="${og}">
+<meta property="og:image:type" content="image/jpeg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="${t}"><meta property="og:locale" content="ru_RU">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${t}"><meta name="twitter:description" content="${d}">
+<meta name="twitter:image" content="${og}"><meta name="twitter:image:alt" content="${t}">
+<link rel="canonical" href="${url}">
+<meta http-equiv="refresh" content="0; url=${to}">
+<script>location.replace('${to}' + location.search + location.hash);</script>
+</head><body style="background:#0C0D09;color:#B9BCA6;font-family:sans-serif"><p><a href="${to}" style="color:#B9BCA6">${t}</a></p></body></html>
+`;
+  fs.mkdirSync(path.dirname(p), { recursive: true });
+  fs.writeFileSync(p, html);
+  console.log('  переадресация ' + file + ' → ' + to);
+}
 const mStart = idx.indexOf('<main'), mOpen = idx.indexOf('>', mStart) + 1, mEnd = idx.indexOf('</main>');
 const head = idx.slice(0, mOpen), tail = idx.slice(mEnd);
 
@@ -155,11 +194,18 @@ for (const o of OFFERS) {
 })();
 </script>`;
 
-  const NOMERA = JSON.parse(fs.readFileSync(path.join(ROOT, 'build/nomera.json'), 'utf8'));
-  if (o.hidden && !NOMERA[o.slug]) throw new Error('mkoffers: для скрытого листа ' + o.slug + ' нет номера в build/nomera.json');
+  /* 28.10.2026 Эльнур: «копии не уместны… своди в одну истину». У каждого листа один адрес /<лист>/<номер>/;
+     новому листу номер выдаётся сам и записывается в build/nomera.json. */
+  if (!NOMERA[o.slug]) {
+    const занято = new Set(Object.values(NOMERA));
+    let n; do { n = String(crypto.randomInt(10000, 100000)); } while (занято.has(n));
+    NOMERA[o.slug] = n;
+    fs.writeFileSync(NOMERA_PATH, JSON.stringify(NOMERA, null, 2) + '\n');
+    console.log('mkoffers: новому листу ' + o.slug + ' выдан номер ' + n + ' (build/nomera.json)');
+  }
   /* 25.10.2026: скрытый адрес /<лист>/<номер> сервер отдаёт со слэшем на конце (без слэша 301), поэтому canonical
      и og:url тоже со слэшем: адрес, который видит мессенджер после перехода, совпадает с og:url. */
-  const url = SITE + '/' + o.slug + (o.hidden ? '/' + NOMERA[o.slug] + '/' : '');
+  const url = SITE + '/' + o.slug + '/' + NOMERA[o.slug] + '/';
   let html = head + '\n' + body + '\n' + tail;
   html = html.replace(/<title>[\s\S]*?<\/title>/, '<title>' + esc(o.title) + '</title>');
   html = html.replace(/(<meta name="description" content=")[^"]*(")/, '$1' + esc(o.desc) + '$2');
@@ -175,10 +221,10 @@ for (const o of OFFERS) {
   html = html.replace(/href="#top"/g, 'href="index.html"');
   html = html.replace(/href="#(why|sale|rent|map|quiz|faq|do|contacts|about)"/g, 'href="/#$1"');
 
-  if (o.hidden) {
-    /* скрытый лист: превью — его собственная картинка; пути страницы переводим от корня сайта (как build/mknomer.mjs);
-       в корень (<slug>.html) не пишем, в sitemap не попадает */
-    html = html.replace(/(<meta property="og:image" content=")[^"]*(")/, '$1' + SITE + '/' + o.og + '$2');
+  {
+    /* лист живёт только по адресу /<лист>/<номер>/ (до 28.10 так было лишь у скрытых; открытые <slug>.html были второй копией).
+       Превью: o.og, иначе ставит build/mkogfix.mjs. Пути страницы переводим от корня сайта; в sitemap не попадает. */
+    if (o.og) html = html.replace(/(<meta property="og:image" content=")[^"]*(")/, '$1' + SITE + '/' + o.og + '$2');
     /* 25.10.2026 Эльнур: «убедись что все превью работают» (топ-15). WhatsApp читает только начало страницы:
        блок Open Graph и Twitter поднимаем сразу под viewport, og:image оказывается в первых ~2 КБ, а не на 5,4 КБ. */
     {
@@ -198,13 +244,16 @@ for (const o of OFFERS) {
     html = html.split("var want = pre + 'img/brand/").join("var want = '/img/brand/");
     html = html.split("p.img='img/'+").join("p.img='/img/'+");
     const dir = path.join(ROOT, o.slug, NOMERA[o.slug]);
+    const out = path.join(dir, 'index.html');
+    const былоOg = fs.existsSync(out) ? ((fs.readFileSync(out, 'utf8').match(/<meta property="og:image" content="([^"]*)"/) || [])[1] || '') : '';
     fs.mkdirSync(dir, { recursive: true });
-    fs.writeFileSync(path.join(dir, 'index.html'), html);
-    console.log(o.slug + '/' + NOMERA[o.slug] + '/index.html собран (скрытый адрес):', html.length, 'байт');
-    continue;
+    fs.writeFileSync(out, html);
+    console.log(o.slug + '/' + NOMERA[o.slug] + '/index.html собран:', html.length, 'байт');
+    /* старые адреса (/<лист>, /<лист>/, /kuartz-fizz): ссылки на них уже у лидов, поэтому файл остаётся,
+       но это переадресация на номерной адрес, а не вторая копия листа. Превью в ней то же, что у листа (мессенджеры не ходят по refresh). */
+    const og = o.og ? SITE + '/' + o.og : былоOg || ((html.match(/<meta property="og:image" content="([^"]*)"/) || [])[1] || '');
+    for (const f of старые(o)) пишиПереадресацию(f, o, url, og);
   }
-  fs.writeFileSync(path.join(ROOT, o.slug + '.html'), html);
-  console.log(o.slug + '.html собран:', html.length, 'байт');
 }
 
 /* ——— 02.10.2026. Скрытая страница закрытых предложений: /predstart ———
@@ -236,13 +285,13 @@ const CARDS = [
            фр(V.цена_за_м2 && V.цена_от ? `Закреплённые юниты от ${тыс(V.цена_за_м2)} тыс. бат за м², квартиры от ${млн(V.цена_от)} млн бат.` : '',
               V.мебель_в_цене ? 'Мебель и техника в подарок клиентам Property Library.' : '', V.владение ? `Собственность: ${V.владение}.` : '',
               'Бронь 200 тыс. бат, депозит возвратный 30 дней.', V.сдача ? `Сдача в ${вКв(V.сдача)}.` : '')],
-    open: '/vibe2', pdf: '/offers/vibe2/Vibe2_Karon.pdf',
+    open: номерной('vibe2'), pdf: '/offers/vibe2/Vibe2_Karon.pdf',
   },
   {
     name: 'The ZERO Nai Yang', where: 'Най Янг', tag: 'гарантия 10% × 3 года',
     text: ['Бутиковый эко-проект в 350 метрах от пляжа Най Янг и в 2,5 км от аэропорта. 150 квартир в двух пятиэтажных корпусах' + (Z.сдача ? `, сдача в ${вКв(Z.сдача)}.` : '.'),
            (Z.цена_от ? `Студии от ${млн(Z.цена_от)} млн бат. ` : '') + 'Застройщик гарантирует 10% годовых три года при покупке в лизхолд, первый взнос снижен до 25%.'],
-    open: '/zero-naiyang',
+    open: номерной('zero-naiyang'),
     pdf: '/offers/zero-naiyang/ZERO_NaiYang.pdf',
   },
   {
@@ -254,7 +303,7 @@ const CARDS = [
     note: 'Формируем список инвесторов закрытого старта: участники первыми выбирают планировку и получают условия старта.',
     ask: 'Здравствуйте! Пришлите, пожалуйста, презентацию KUARTZ на Кароне',
     // pdf: '/offers/kuartz/KUARTZ_Karon.pdf',  05.10 Эльнур: эталон PDF — Vibe II, этот лист хуже, не выдаём
-    open: '/kuartz', pdf: '/offers/kuartz/KUARTZ_Karon.pdf',   // 08.10: свой лист по эталону №263
+    open: номерной('kuartz'), pdf: '/offers/kuartz/KUARTZ_Karon.pdf',   // 08.10: свой лист по эталону №263
   },
   {
     name: 'FIZZ', where: 'Ката', tag: 'старт продаж в октябре',
@@ -265,14 +314,14 @@ const CARDS = [
     note: 'Формируем список инвесторов закрытого старта: участники первыми выбирают планировку и получают условия старта.',
     ask: 'Здравствуйте! Пришлите, пожалуйста, презентацию FIZZ на Кате',
     // pdf: '/offers/fizz/FIZZ_Kata.pdf',  05.10 Эльнур: эталон PDF — Vibe II, этот лист хуже, не выдаём
-    open: '/fizz', pdf: '/offers/fizz/FIZZ_Kata.pdf',   // 08.10: свой лист по эталону №263
+    open: номерной('fizz'), pdf: '/offers/fizz/FIZZ_Kata.pdf',   // 08.10: свой лист по эталону №263
   },
   {
     /* 08.10.2026: лист /eden по эталону (решение №263), фокус «Eden 3-я фаза — сейчас» (№267). */
     name: 'Gardens of Eden: третья фаза', where: 'Банг Тао', tag: 'новая возможность',
     text: ['Курорт на 122 000 м², 70% территории под парки и озёра. Первая фаза стартовала осенью 2023 примерно от 180 тыс. бат за м², по каталогу ноября 2025 метр в ней 280–350 тыс. Во второй фазе Park Residences 200–400 тыс., в третьей Lake 210–229 тыс. (каталоги застройщика, ноябрь 2025, цены без скидок).',
            'Третья фаза Lake: 698 квартир, бассейн 150 метров, от 11,9 млн бат за 52 м². Акция застройщика: первый взнос 20% и рассрочка на 5 лет.'],
-    open: '/eden', pdf: '/offers/eden/Eden_Layan.pdf',
+    open: номерной('eden'), pdf: '/offers/eden/Eden_Layan.pdf',
   },
   {
     /* 08.10.2026 Эльнур: «увидел эту презу в чате, почему нет этого в пульте офер?». Была карточка «Новый проект Central Group»
@@ -281,7 +330,7 @@ const CARDS = [
     name: 'Central Group: Andaz и PURITA', where: 'Лаян · Банг Тао', tag: 'старт продаж',
     text: ['Andaz у пляжа Лаян: до 100 квартир и около 9 вилл, 2-спальная 80 м² от 16,xx млн бат, старт продаж в I квартале 2027. PURITA на Банг Тао: 1-спальная 56 м² с мебелью от 7,xx млн бат, первые продажи в конце ноября.',
            'Строит Central Group, её первый проект на Пхукете, The Standard на Банг Тао' + (C.продано_процентов ? `, продан на ${C.продано_процентов}% до сдачи.` : '.')],
-    open: '/cg-capital', pdf: '/offers/cg-capital/CentralGroup_Phuket.pdf',
+    open: номерной('cg-capital'), pdf: '/offers/cg-capital/CentralGroup_Phuket.pdf',
   },
   {
     /* 13.10.2026 Эльнур: «Millennium выгружай на сайт и в оффер». Лист /millennium по эталону, цены по свободным квартирам из прайса застройщика. */
@@ -289,14 +338,14 @@ const CARDS = [
     text: ['Кондо курортного типа в 750 метрах от пляжа Банг Тао. 7 этажей, 253 квартиры, пять бассейнов, на крыше бассейн-инфинити 56 метров.',
            'Бронь 200 тыс. бат, 35% при договоре, дальше по этапам стройки. Сдача в I квартале 2029.'],
     plans: [['студия 24,4–30 м²', 'от 3,42 млн ฿'], ['1 спальня 35–46 м²', 'от 4,89 млн ฿'], ['2 спальни 60–74 м²', 'от 8,39 млн ฿']],
-    open: '/millennium', pdf: '/offers/millennium/Millennium_Bangtao.pdf',
+    open: номерной('millennium'), pdf: '/offers/millennium/Millennium_Bangtao.pdf',
   },
   {
     /* 09.10.2026: лист Aileen Residence Lagoon пересобран по канону (решение №263: каждый оффер — в пульте /predstart). */
     name: 'Aileen Residence Lagoon', where: 'Лагуна', tag: 'предстарт',
     text: ['Посёлок таунхаусов и вилл с бассейном в Лагуне от Trinity Property. Таунхаус 159,3 м², 3 спальни и свой бассейн, от 11,85 до 17,85 млн бат.',
            '18 из 48 таунхаусов уже продано и в брони. Оплата семью платежами по этапам стройки, сдача в IV квартале 2027.'],
-    open: '/aileen', pdf: '/offers/aileen/Aileen_Lagoon.pdf',
+    open: номерной('aileen'), pdf: '/offers/aileen/Aileen_Lagoon.pdf',
   },
 ];
 
