@@ -372,6 +372,33 @@
      "price_from_thb": 11000000,
      "area": "82.43",
      "from": 11000000
+    },
+    {
+     "beds": "2",
+     "code": "PLP-SATURDAYS-R14",
+     "name": "квартира 2 сп., 83.36 м²",
+     "area_sqm": "83.36",
+     "price_from_thb": 11500000,
+     "area": "83.36",
+     "from": 11500000
+    },
+    {
+     "beds": "2",
+     "code": "PLP-SATURDAYS-R15",
+     "name": "квартира 2 сп., 86.84 м²",
+     "area_sqm": "86.84",
+     "price_from_thb": 11800000,
+     "area": "86.84",
+     "from": 11800000
+    },
+    {
+     "beds": "2",
+     "code": "PLP-SATURDAYS-R16",
+     "name": "квартира 2 сп., 142.94 м²",
+     "area_sqm": "142.94",
+     "price_from_thb": 12900000,
+     "area": "142.94",
+     "from": 12900000
     }
    ]
   },
@@ -2156,6 +2183,16 @@
      "price_from_thb": 14971050,
      "area": 97.85,
      "from": 14971050
+    },
+    {
+     "beds": 3,
+     "code": null,
+     "free": 8,
+     "name": "3 спальни",
+     "area_sqm": 121.42,
+     "price_from_thb": 21545979,
+     "area": 121.42,
+     "from": 21545979
     }
    ]
   },
@@ -2452,8 +2489,18 @@
    "name": "The Title Legendary Bang-Tao",
    "district": "Банг Тао",
    "type": "Кондо",
-   "price_from": 6858900,
+   "price_from": 6679500,
    "units": [
+    {
+     "beds": 1,
+     "code": "M4",
+     "free": 1,
+     "name": "1 спальня",
+     "area_sqm": 42.9,
+     "price_from_thb": 6679500,
+     "area": 42.9,
+     "from": 6679500
+    },
     {
      "beds": 1,
      "code": "L3",
@@ -2467,7 +2514,7 @@
     {
      "beds": 1,
      "code": "L6",
-     "free": 41,
+     "free": 1,
      "name": "1 спальня",
      "area_sqm": 53.95,
      "price_from_thb": 8105200,
@@ -2486,13 +2533,53 @@
     },
     {
      "beds": 1,
+     "code": "WN3",
+     "free": 35,
+     "name": "1 спальня",
+     "area_sqm": 52.65,
+     "price_from_thb": 8524200,
+     "area": 52.65,
+     "from": 8524200
+    },
+    {
+     "beds": 1,
+     "code": "L1",
+     "free": 2,
+     "name": "1 спальня",
+     "area_sqm": 55.95,
+     "price_from_thb": 8995530,
+     "area": 55.95,
+     "from": 8995530
+    },
+    {
+     "beds": 1,
+     "code": "WN4",
+     "free": 3,
+     "name": "1 спальня",
+     "area_sqm": 54.1,
+     "price_from_thb": 9393200,
+     "area": 54.1,
+     "from": 9393200
+    },
+    {
+     "beds": 1,
      "code": "WN5",
-     "free": 4,
+     "free": 2,
      "name": "1 спальня",
      "area_sqm": 57.9,
      "price_from_thb": 10062000,
      "area": 57.9,
      "from": 10062000
+    },
+    {
+     "beds": 1,
+     "code": "WN2",
+     "free": 2,
+     "name": "1 спальня",
+     "area_sqm": 59.55,
+     "price_from_thb": 10524000,
+     "area": 59.55,
+     "from": 10524000
     }
    ]
   },
@@ -3442,6 +3529,46 @@
      "price_from_thb": 15466000,
      "area": 104.5,
      "from": 15466000
+    },
+    {
+     "beds": 2,
+     "code": "PH04",
+     "free": 1,
+     "name": "Пентхаус · 2 спальни",
+     "area_sqm": 105,
+     "price_from_thb": 15540000,
+     "area": 105,
+     "from": 15540000
+    },
+    {
+     "beds": 3,
+     "code": "PH05",
+     "free": 1,
+     "name": "Пентхаус · 3 спальни",
+     "area_sqm": 113.5,
+     "price_from_thb": 16798000,
+     "area": 113.5,
+     "from": 16798000
+    },
+    {
+     "beds": 3,
+     "code": "PH06",
+     "free": 1,
+     "name": "Пентхаус · 3 спальни",
+     "area_sqm": 120,
+     "price_from_thb": 17760000,
+     "area": 120,
+     "from": 17760000
+    },
+    {
+     "beds": 3,
+     "code": "PH07",
+     "free": 1,
+     "name": "Пентхаус · 3 спальни",
+     "area_sqm": 122,
+     "price_from_thb": 18056000,
+     "area": 122,
+     "from": 18056000
     }
    ]
   },

@@ -571,7 +571,9 @@ function unitsOf(o) {
   /* Типы приходят из разных источников и называют поля по-разному
      (area/area_sqm, beds/bedrooms). Приводим к одному виду, а ставки аренды
      по типу переносим отдельными полями — у аренды цена не «от застройщика». */
-  const named = (Array.isArray(o.unit_types) ? o.unit_types.slice(0, 12) : []).map(u => {
+  /* 28.10.2026 «одна единая истина»: список типов не обрезаем (было slice(0, 12) — у Heritage пропала 3-спальная
+     121,42 м² при шапке «Спальни 1–3»). Сколько типов в базе, столько и на странице. */
+  const named = (Array.isArray(o.unit_types) ? o.unit_types : []).map(u => {
     const n = Object.assign({}, u);
     if (n.area == null && n.area_sqm != null) n.area = n.area_sqm;
     if (n.from == null && n.price_from_thb != null) n.from = n.price_from_thb;
