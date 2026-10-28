@@ -475,7 +475,9 @@ function buildCatalog(objects, benchmarks, preserve) {
       // «сегодня». Отдаём дату, чтобы витрина честно её показывала.
       priceDate: o.last_synced_at ? String(o.last_synced_at).slice(0, 10) : null,
       // сколько юнитов свободно по последнему прайсу застройщика
-      avail: (function(){ var m=/(\d+)/.exec(o.availability || ''); return m ? +m[1] : null; })(),
+      /* 28.10: текст наличия может начинаться с даты («На 27.10.2026 … свободно 164 лота»).
+         Берём число после слова «свободно», если оно есть; иначе прежнее поведение — первое число. */
+      avail: (function(){ var t=o.availability || '', m=/свободно\s+(\d+)/i.exec(t) || /(\d+)/.exec(t); return m ? +m[1] : null; })(),
       beach: o.beach || null,
       beachM: (o.distance_beach_m === 0 || o.distance_beach_m) ? o.distance_beach_m : null,
       // Снимки из хранилища: первый идёт обложкой, остальные — лентой в карточке.
@@ -595,7 +597,9 @@ function unitsOf(o) {
     }
     return Object.assign({}, t, { bedrooms: b,
       price_from_thb: t.price_from_thb || t.price_thb || null });
-  }).filter(t => t.bedrooms != null);
+  }).filter(t => t.bedrooms != null)
+    /* 28.10: акционный лот не задаёт ни «от», ни тип планировки: «цена как в прайсе, скидка отдельно» (17.10) */
+    .filter(t => !/акци|promo/i.test(String(t.code || '') + ' ' + String(t.kind || '')));
   const priceByBeds = {};
   for (const t of tiers) {
     const b = t.bedrooms;
@@ -1579,6 +1583,7 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
   for (const t of (Array.isArray(o.price_tiers) ? o.price_tiers : [])) {
     const b = t && t.bedrooms, pr = t && (t.price_from_thb || t.price_thb);
     if (b == null || !pr || t.kind === 'penthouse') continue;
+    if (/акци|promo/i.test(String(t.code || '') + ' ' + String(t.kind || ''))) continue;   /* 28.10: акционный лот не задаёт «от» */
     if (!priceForBeds[b] || pr < priceForBeds[b]) priceForBeds[b] = pr;
   }
   if (fromPlans.length > unitList.length) {
