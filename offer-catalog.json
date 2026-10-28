@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-27",
+ "updated": "2026-10-28",
  "items": [
   {
    "id": "ATT-KYE",
@@ -2987,13 +2987,23 @@
    "units": [
     {
      "beds": 1,
-     "code": null,
-     "free": 68,
+     "code": "1BS",
+     "free": 67,
      "name": "1 спальня",
-     "area_sqm": 28.5,
+     "area_sqm": 28.4,
      "price_from_thb": 3145400,
-     "area": 28.5,
+     "area": 28.4,
      "from": 3145400
+    },
+    {
+     "beds": 1,
+     "code": "1BM",
+     "free": 81,
+     "name": "1 спальня",
+     "area_sqm": 30.3,
+     "price_from_thb": 3333700,
+     "area": 30.3,
+     "from": 3333700
     },
     {
      "beds": 1,
@@ -3007,8 +3017,18 @@
     },
     {
      "beds": 1,
+     "code": "1BMA",
+     "free": 1,
+     "name": "1 спальня",
+     "area_sqm": 38.4,
+     "price_from_thb": 4526100,
+     "area": 38.4,
+     "from": 4526100
+    },
+    {
+     "beds": 1,
      "code": "1BP",
-     "free": 51,
+     "free": 63,
      "name": "1 спальня",
      "area_sqm": 44,
      "price_from_thb": 5350800,
@@ -3026,23 +3046,43 @@
      "from": 5607400
     },
     {
-     "beds": 2,
-     "code": "2BSC",
-     "free": 8,
-     "name": "2 спальни",
-     "area_sqm": 55.5,
-     "price_from_thb": 6523800,
-     "area": 55.5,
-     "from": 6523800
+     "beds": 1,
+     "code": "1BPA",
+     "free": 6,
+     "name": "1 спальня",
+     "area_sqm": 50.9,
+     "price_from_thb": 6358500,
+     "area": 50.9,
+     "from": 6358500
+    },
+    {
+     "beds": 1,
+     "code": "1BPA",
+     "free": 2,
+     "name": "1 спальня",
+     "area_sqm": 59.7,
+     "price_from_thb": 7112100,
+     "area": 59.7,
+     "from": 7112100
     },
     {
      "beds": 2,
-     "code": null,
+     "code": "2BS",
+     "free": 7,
+     "name": "2 спальни",
+     "area_sqm": 55.7,
+     "price_from_thb": 6699100,
+     "area": 55.7,
+     "from": 6699100
+    },
+    {
+     "beds": 2,
+     "code": "2BM",
      "free": 22,
      "name": "2 спальни",
-     "area_sqm": 58,
+     "area_sqm": 58.1,
      "price_from_thb": 6634600,
-     "area": 58,
+     "area": 58.1,
      "from": 6634600
     },
     {
@@ -3050,9 +3090,9 @@
      "code": "2BMA",
      "free": 2,
      "name": "2 спальни",
-     "area_sqm": 63,
+     "area_sqm": 62.9,
      "price_from_thb": 7560100,
-     "area": 63,
+     "area": 62.9,
      "from": 7560100
     }
    ]
@@ -3139,14 +3179,15 @@
    "name": "SUN HILLS Layan",
    "district": "Лаян",
    "type": "Кондо",
-   "price_from": null,
+   "price_from": 4160500,
    "units": [
     {
-     "beds": null,
-     "name": null,
+     "beds": 0,
+     "name": "Студия",
      "area_sqm": 30.4,
-     "price_from_thb": null,
-     "area": 30.4
+     "price_from_thb": 4468800,
+     "area": 30.4,
+     "from": 4468800
     },
     {
      "beds": null,
@@ -3156,18 +3197,20 @@
      "area": 53
     },
     {
-     "beds": null,
-     "name": null,
+     "beds": 1,
+     "name": "1 спальня",
      "area_sqm": 42.5,
-     "price_from_thb": null,
-     "area": 42.5
+     "price_from_thb": 5907500,
+     "area": 42.5,
+     "from": 5610000
     },
     {
-     "beds": null,
-     "name": null,
+     "beds": 0,
+     "name": "Студия",
      "area_sqm": 26.5,
-     "price_from_thb": null,
-     "area": 26.5
+     "price_from_thb": 4160500,
+     "area": 26.5,
+     "from": 4160500
     }
    ]
   },
