@@ -2039,123 +2039,123 @@
    "units": [
     {
      "beds": 1,
-     "code": "SC",
-     "free": 18,
+     "code": "XSA",
+     "free": 35,
      "name": "1 спальня",
-     "area_sqm": 36,
-     "price_from_thb": 5616555,
-     "area": 36,
-     "from": 5616555
+     "area_sqm": 35.62,
+     "price_from_thb": 5385744,
+     "area": 35.62,
+     "from": 5385744
     },
     {
      "beds": 1,
-     "code": "SB",
-     "free": 9,
+     "code": "SA",
+     "free": 105,
      "name": "1 спальня",
-     "area_sqm": 41.5,
-     "price_from_thb": 5955390,
-     "area": 41.5,
-     "from": 5955390
+     "area_sqm": 38.85,
+     "price_from_thb": 5588573,
+     "area": 38.85,
+     "from": 5588573
+    },
+    {
+     "beds": 1,
+     "code": "MA",
+     "free": 18,
+     "name": "1 спальня",
+     "area_sqm": 44.34,
+     "price_from_thb": 6378309,
+     "area": 44.34,
+     "from": 6378309
     },
     {
      "beds": 1,
      "code": "MB",
-     "free": 5,
+     "free": 57,
      "name": "1 спальня",
-     "area_sqm": 47.5,
+     "area_sqm": 47.59,
      "price_from_thb": 6845822,
-     "area": 47.5,
+     "area": 47.59,
      "from": 6845822
     },
     {
      "beds": 1,
-     "code": "L2C",
+     "code": "L1A",
+     "free": 25,
+     "name": "1 спальня",
+     "area_sqm": 54.29,
+     "price_from_thb": 7709180,
+     "area": 54.29,
+     "from": 7709180
+    },
+    {
+     "beds": 1,
+     "code": "L1B",
      "free": 7,
      "name": "1 спальня",
-     "area_sqm": 48.5,
-     "price_from_thb": 7700370,
-     "area": 48.5,
-     "from": 7700370
+     "area_sqm": 60.63,
+     "price_from_thb": 8609460,
+     "area": 60.63,
+     "from": 8609460
     },
     {
      "beds": 2,
      "code": "XLC",
-     "free": 4,
+     "free": 21,
      "name": "2 спальни",
-     "area_sqm": 64.5,
+     "area_sqm": 64.68,
      "price_from_thb": 11002068,
-     "area": 64.5,
+     "area": 64.68,
      "from": 11002068
     },
     {
      "beds": 2,
-     "code": "XL1A",
-     "free": 2,
-     "name": "2 спальни",
-     "area_sqm": 67,
-     "price_from_thb": 11302683,
-     "area": 67,
-     "from": 11302683
-    },
-    {
-     "beds": 2,
-     "code": "XLA",
-     "free": 2,
-     "name": "2 спальни",
-     "area_sqm": 67.5,
-     "price_from_thb": 11022102,
-     "area": 67.5,
-     "from": 11022102
-    },
-    {
-     "beds": 2,
-     "code": null,
+     "code": "XLB",
      "free": 4,
      "name": "2 спальни",
-     "area_sqm": 92,
-     "price_from_thb": 14439290,
-     "area": 92,
-     "from": 14439290
+     "area_sqm": 72.38,
+     "price_from_thb": 11855844,
+     "area": 72.38,
+     "from": 11855844
     },
     {
-     "beds": 3,
-     "code": null,
+     "beds": 2,
+     "code": "XXL1C",
+     "free": 6,
+     "name": "2 спальни",
+     "area_sqm": 85.29,
+     "price_from_thb": 13390530,
+     "area": 85.29,
+     "from": 13390530
+    },
+    {
+     "beds": 2,
+     "code": "XXL2A",
+     "free": 17,
+     "name": "2 спальни",
+     "area_sqm": 88.66,
+     "price_from_thb": 14008280,
+     "area": 88.66,
+     "from": 14008280
+    },
+    {
+     "beds": 2,
+     "code": "XXL1B",
      "free": 2,
-     "name": "3 спальни",
-     "area_sqm": 121.5,
-     "price_from_thb": 21545979,
-     "area": 121.5,
-     "from": 21545979
+     "name": "2 спальни",
+     "area_sqm": 97.28,
+     "price_from_thb": 14689280,
+     "area": 97.28,
+     "from": 14689280
     },
     {
-     "beds": 3,
-     "code": null,
-     "free": 1,
-     "name": "3 спальни",
-     "area_sqm": 130,
-     "price_from_thb": 22259769,
-     "area": 130,
-     "from": 22259769
-    },
-    {
-     "beds": 3,
-     "code": null,
-     "free": 1,
-     "name": "3 спальни",
-     "area_sqm": 162.5,
-     "price_from_thb": 27115790,
-     "area": 162.5,
-     "from": 27115790
-    },
-    {
-     "beds": 3,
-     "code": null,
-     "free": 1,
-     "name": "3 спальни",
-     "area_sqm": 166,
-     "price_from_thb": 29548000,
-     "area": 166,
-     "from": 29548000
+     "beds": 2,
+     "code": "XXLB",
+     "free": 3,
+     "name": "2 спальни",
+     "area_sqm": 97.85,
+     "price_from_thb": 14971050,
+     "area": 97.85,
+     "from": 14971050
     }
    ]
   },
@@ -2457,42 +2457,42 @@
     {
      "beds": 1,
      "code": "L3",
-     "free": 9,
+     "free": 13,
      "name": "1 спальня",
-     "area_sqm": 50,
+     "area_sqm": 49.85,
      "price_from_thb": 6858900,
-     "area": 50,
+     "area": 49.85,
      "from": 6858900
     },
     {
      "beds": 1,
-     "code": "WN3",
-     "free": 4,
-     "name": "1 спальня",
-     "area_sqm": 52.5,
-     "price_from_thb": 8524200,
-     "area": 52.5,
-     "from": 8524200
-    },
-    {
-     "beds": 1,
-     "code": "WN3",
-     "free": 8,
-     "name": "1 спальня",
-     "area_sqm": 53.5,
-     "price_from_thb": 8583600,
-     "area": 53.5,
-     "from": 8583600
-    },
-    {
-     "beds": 1,
      "code": "L6",
+     "free": 41,
+     "name": "1 спальня",
+     "area_sqm": 53.95,
+     "price_from_thb": 8105200,
+     "area": 53.95,
+     "from": 8105200
+    },
+    {
+     "beds": 1,
+     "code": "M5",
+     "free": 3,
+     "name": "1 спальня",
+     "area_sqm": 42.9,
+     "price_from_thb": 8138100,
+     "area": 42.9,
+     "from": 8138100
+    },
+    {
+     "beds": 1,
+     "code": "WN5",
      "free": 4,
      "name": "1 спальня",
-     "area_sqm": 54,
-     "price_from_thb": 8105200,
-     "area": 54,
-     "from": 8105200
+     "area_sqm": 57.9,
+     "price_from_thb": 10062000,
+     "area": 57.9,
+     "from": 10062000
     }
    ]
   },
@@ -2582,18 +2582,28 @@
    "units": [
     {
      "beds": 1,
-     "code": "1BMA",
-     "free": 9,
+     "code": "1BS",
+     "free": 30,
      "name": "1 спальня",
-     "area_sqm": 37,
-     "price_from_thb": 6475000,
-     "area": 37,
-     "from": 6475000
+     "area_sqm": 29,
+     "price_from_thb": 4750200,
+     "area": 29,
+     "from": 4750200
+    },
+    {
+     "beds": 1,
+     "code": "1BM",
+     "free": 20,
+     "name": "1 спальня",
+     "area_sqm": 33,
+     "price_from_thb": 5336100,
+     "area": 33,
+     "from": 5336100
     },
     {
      "beds": 1,
      "code": "1BL",
-     "free": 119,
+     "free": 113,
      "name": "1 спальня",
      "area_sqm": 41,
      "price_from_thb": 6629700,
@@ -2603,7 +2613,7 @@
     {
      "beds": 1,
      "code": "1BLA",
-     "free": 8,
+     "free": 9,
      "name": "1 спальня",
      "area_sqm": 43,
      "price_from_thb": 7525000,
@@ -2622,18 +2632,8 @@
     },
     {
      "beds": 2,
-     "code": "2BP",
-     "free": 1,
-     "name": "2 спальни",
-     "area_sqm": 93,
-     "price_from_thb": 14418720,
-     "area": 93,
-     "from": 14418720
-    },
-    {
-     "beds": 2,
      "code": "2BDPAC",
-     "free": 1,
+     "free": 4,
      "name": "2 спальни",
      "area_sqm": 113,
      "price_from_thb": 19248420,
@@ -2852,126 +2852,66 @@
    "name": "The Title Serenity Naiyang",
    "district": "Най Янг",
    "type": "Кондо",
-   "price_from": 5221467,
+   "price_from": 3739106,
    "units": [
     {
      "beds": 1,
-     "code": "1BL",
-     "free": 2,
+     "code": "1BS",
+     "free": 1,
      "name": "1 спальня",
-     "area_sqm": 36.5,
+     "area_sqm": 26,
+     "price_from_thb": 3739106,
+     "area": 26,
+     "from": 3739106
+    },
+    {
+     "beds": 1,
+     "code": "1BL",
+     "free": 105,
+     "name": "1 спальня",
+     "area_sqm": 36.35,
      "price_from_thb": 5221467,
-     "area": 36.5,
+     "area": 36.35,
      "from": 5221467
-    },
-    {
-     "beds": 1,
-     "code": "1BL",
-     "free": 30,
-     "name": "1 спальня",
-     "area_sqm": 37,
-     "price_from_thb": 5227459,
-     "area": 37,
-     "from": 5227459
-    },
-    {
-     "beds": 1,
-     "code": "1BL",
-     "free": 18,
-     "name": "1 спальня",
-     "area_sqm": 38,
-     "price_from_thb": 5384754,
-     "area": 38,
-     "from": 5384754
-    },
-    {
-     "beds": 1,
-     "code": "1BL",
-     "free": 17,
-     "name": "1 спальня",
-     "area_sqm": 38.5,
-     "price_from_thb": 5287123,
-     "area": 38.5,
-     "from": 5287123
     },
     {
      "beds": 2,
      "code": "2BS",
-     "free": 3,
+     "free": 7,
      "name": "2 спальни",
-     "area_sqm": 56.5,
+     "area_sqm": 56.45,
      "price_from_thb": 8108715,
-     "area": 56.5,
+     "area": 56.45,
      "from": 8108715
     },
     {
      "beds": 2,
      "code": "2BM",
-     "free": 4,
+     "free": 17,
      "name": "2 спальни",
-     "area_sqm": 60,
+     "area_sqm": 60.2,
      "price_from_thb": 8178173,
-     "area": 60,
+     "area": 60.2,
      "from": 8178173
-    },
-    {
-     "beds": 2,
-     "code": "2BM",
-     "free": 5,
-     "name": "2 спальни",
-     "area_sqm": 60.5,
-     "price_from_thb": 8225721,
-     "area": 60.5,
-     "from": 8225721
-    },
-    {
-     "beds": 2,
-     "code": "2BM",
-     "free": 7,
-     "name": "2 спальни",
-     "area_sqm": 62,
-     "price_from_thb": 8409118,
-     "area": 62,
-     "from": 8409118
     },
     {
      "beds": 3,
      "code": "3B",
-     "free": 4,
+     "free": 6,
      "name": "3 спальни",
-     "area_sqm": 112.5,
+     "area_sqm": 112.55,
      "price_from_thb": 13826768,
-     "area": 112.5,
+     "area": 112.55,
      "from": 13826768
     },
     {
      "beds": 3,
-     "code": "3B",
-     "free": 1,
-     "name": "3 спальни",
-     "area_sqm": 113,
-     "price_from_thb": 14206500,
-     "area": 113,
-     "from": 14206500
-    },
-    {
-     "beds": 3,
-     "code": "3B",
-     "free": 1,
-     "name": "3 спальни",
-     "area_sqm": 117,
-     "price_from_thb": 16236990,
-     "area": 117,
-     "from": 16236990
-    },
-    {
-     "beds": 3,
      "code": "3BL",
-     "free": 9,
+     "free": 11,
      "name": "3 спальни",
-     "area_sqm": 119,
+     "area_sqm": 118.95,
      "price_from_thb": 14987700,
-     "area": 119,
+     "area": 118.95,
      "from": 14987700
     }
    ]
@@ -3183,34 +3123,45 @@
    "units": [
     {
      "beds": 0,
+     "free": 63,
      "name": "Студия",
-     "area_sqm": 30.4,
-     "price_from_thb": 4468800,
-     "area": 30.4,
-     "from": 4468800
-    },
-    {
-     "beds": null,
-     "name": null,
-     "area_sqm": 53,
-     "price_from_thb": null,
-     "area": 53
+     "areaMax": 31.4,
+     "areaMin": 26.5,
+     "area_sqm": 26.5,
+     "price_from_thb": 4160500,
+     "area": 26.5,
+     "from": 4160500
     },
     {
      "beds": 1,
+     "free": 76,
      "name": "1 спальня",
+     "areaMax": 53.4,
+     "areaMin": 42.5,
      "area_sqm": 42.5,
      "price_from_thb": 5907500,
      "area": 42.5,
      "from": 5610000
     },
     {
-     "beds": 0,
-     "name": "Студия",
-     "area_sqm": 26.5,
-     "price_from_thb": 4160500,
-     "area": 26.5,
-     "from": 4160500
+     "beds": 2,
+     "free": 20,
+     "name": "2 спальни",
+     "areaMax": 70.4,
+     "areaMin": 45,
+     "area_sqm": 45,
+     "price_from_thb": 6525000,
+     "area": 45,
+     "from": 6525000
+    },
+    {
+     "beds": 3,
+     "free": 5,
+     "name": "3 спальни",
+     "area_sqm": 70.4,
+     "price_from_thb": 11264000,
+     "area": 70.4,
+     "from": 11264000
     }
    ]
   },
