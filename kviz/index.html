@@ -408,6 +408,105 @@ const P = {
       ...STD()]
   }
 };
+/* 01.11.2026 го Эльнура («го», «го сейчас! гитхаб вошел»): английский квиз, шаг 2 — PURITA и Millennium. Один файл, второй копии нет.
+   Язык: ?lang=en или ?lang=ru; без параметра EN только если среди ВСЕХ языков браузера нет русского и соседних (uk, be, kk, ky, uz, tg, hy, az, ka),
+   и только у проектов с английскими текстами (EN_P). Перевод только на экране: ответы A, значения в заявку (VAL), сообщение заявки и события
+   site_events остаются русскими — их читают приёмник sitelead.mjs и мозг. В заявку добавляется lang:'en'.
+   Цифры — те же, что в русских текстах этих проектов выше (P.purita, P.millennium), ничего нового. */
+const EN_P = {
+  purita: { place:'Bang Tao', h1:'Purita in central Bang Tao by Central Group*',
+    ad:{ img:'pu-hero', sub:'From the creators of Central Phuket', big:'from 7.29M THB', note:'one-bedroom apartment, 20% first payment', chip:'Furnished, appliances included' },
+    foot:'*Starting price under the developer promotion. Developer renderings',
+    gifts:['Purita prices and floor plans','Starting price from 7.29M THB and a 20% first payment','An apartment with the best floor and garden view'],
+    facts:[['from 7.29M ฿','1 bedroom, 56 m²'],['20%','first payment'],['50%','on key handover'],['90%','of The Standard sold before completion']],
+    mot:'Message me now and I will send Purita prices and floor plans and hold an apartment with the best floor and garden view for you.' },
+  millennium: { place:'Bang Tao', h1:'Millennium in Bang Tao: 750 m to the beach*',
+    ad:{ img:'mi-hero', sub:'Freehold under the foreign quota', big:'from 3.42M THB', note:'≈ $98K · 56 m rooftop infinity pool', chip:'Only 10% due at key handover' },
+    foot:'*Layan Green Park developer price list. Developer renderings',
+    gifts:['Millennium prices and floor plans','Foreign quota apartments from 3.42M THB','A selection with the best floor and view'],
+    facts:[['from 3.42M ฿','studio, 24.4 m²'],['750 m','to Bang Tao beach'],['56 m','rooftop infinity pool'],['10%','on key handover']],
+    mot:'Message me now and I will send Millennium prices and floor plans under the foreign quota and pick the best floor and view.' }
+};
+/* вопросы, варианты и подсказки: русская строка → английская (ключ — та же строка, что уходит в заявку) */
+const EN = {
+  'Сколько спален?':'How many bedrooms?',
+  '1-спальная, 56,4–58,4 м²':'1 bedroom, 56.4–58.4 m²', '2-спальная, 93–103,5 м²':'2 bedrooms, 93–103.5 m²',
+  '2-спальная плюс, 124,5–136 м²':'2 bedrooms plus, 124.5–136 m²', 'Вилла 5 спален, 708 м²':'Villa, 5 bedrooms, 708 m²',
+  'Студия, 24,4–30 м²':'Studio, 24.4–30 m²', '1-спальная, 35–46,2 м²':'1 bedroom, 35–46.2 m²', '2-спальная, 60–74,2 м²':'2 bedrooms, 60–74.2 m²',
+  'Помогите выбрать':'Help me choose', 'Помогите подобрать':'Help me choose',
+  'Для чего рассматриваете?':'What are you buying for?',
+  'Для себя':'For myself', 'жить или отдыхать':'to live in or for holidays', 'Инвестиция':'Investment', 'сдавать в аренду или перепродать':'to rent out or resell',
+  'Комбо':'Both', 'жить и сдавать':'live in it and rent it out',
+  'Какой бюджет рассматриваете?':'What is your budget?',
+  'До 5 млн бат (до 145 тыс. $)':'Up to 5M THB (up to $145K)', '5–10 млн бат (145–285 тыс. $)':'5–10M THB ($145K–285K)',
+  '10–20 млн бат (285–570 тыс. $)':'10–20M THB ($285K–570K)', 'Больше 20 млн бат (больше 570 тыс. $)':'Over 20M THB (over $570K)',
+  'Когда планируете покупку?':'When are you planning to buy?',
+  'В течение месяца':'Within a month', '1–3 месяца':'In 1–3 months', '3–6 месяцев':'In 3–6 months', 'Пока присматриваюсь':'Just looking for now'
+};
+const CCL_EN = { '7':'Russia, Kazakhstan','375':'Belarus','380':'Ukraine','998':'Uzbekistan','996':'Kyrgyzstan','992':'Tajikistan','994':'Azerbaijan','995':'Georgia','374':'Armenia','373':'Moldova','370':'Lithuania','371':'Latvia','372':'Estonia','66':'Thailand','972':'Israel','971':'UAE','90':'Turkey','65':'Singapore','852':'Hong Kong','60':'Malaysia','62':'Indonesia','84':'Vietnam','86':'China','81':'Japan','82':'Korea','61':'Australia','49':'Germany','48':'Poland','420':'Czechia','43':'Austria','41':'Switzerland','44':'United Kingdom','33':'France','34':'Spain','39':'Italy','351':'Portugal','31':'Netherlands','32':'Belgium','357':'Cyprus','30':'Greece','381':'Serbia','382':'Montenegro','359':'Bulgaria','36':'Hungary','40':'Romania','46':'Sweden','47':'Norway','45':'Denmark','358':'Finland','353':'Ireland','1':'USA, Canada' };
+/* строки интерфейса */
+const UI = {
+  ru:{ back:'← Назад', title:'Подбор квартиры на Пхукете · Property Library Phuket', pickQ:'Какой проект вам интересен?',
+    step:(n, t, left) => 'Вопрос ' + n + ' из ' + t + (left > 2 ? ' · ещё ' + (left - 1) + ', и пришлю цены и планировки' : left > 1 ? ' · ещё 1, и закреплю спецусловия' : ' · последний вопрос, и бонус ваш'),
+    ready:'Подборка готова на 100%', giftsQ:'Бонусы после опроса', giftsF:'Пришлю вам',
+    formQ:'Куда прислать цены, планировки и бонус?', who:'<b>Эльнур Ханкишиев</b>, основатель Property Library. Пришлю лично цены и расчёт доходности.',
+    nm:'Ваше имя', cc:'Код страны', pn:'Номер телефона', phh:'Код страны подставлен сам, его можно поменять. Номер без кода, например 900 123 45 67',
+    tg:'Ник в Telegram, если есть', tgh:'Необязательно. После заявки нажмите «Продолжить в Telegram», и мы сразу увидим вас там.',
+    submit:'Получить подборку', sending:'Отправляем…',
+    note:'Отправляя заявку, вы соглашаетесь на обработку данных и их передачу рекламным партнёрам для подбора предложений. Сообщения от Property Library Phuket придут в WhatsApp или Telegram только по этому запросу. <a href="/privacy" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">Политика конфиденциальности</a>',
+    nameErr:'Как к вам обращаться? Укажите имя.', phoneErr:'Проверьте номер: код страны и все цифры.',
+    msg:(name, ref) => 'Здравствуйте! Хочу забрать бонус по ' + name + '.' + (ref ? ' Заявка ' + ref : ''),
+    bWA:'Получить бонус в WhatsApp', bTG:'Получить бонус в Telegram', lWA:'Написать в WhatsApp', lTG:'Написать в Telegram', bBOT:'Продолжить в Telegram',
+    wrhBot:'Откроется Telegram, нажмите там «Старт»', wrh:'Сообщение уже набрано, останется нажать «Отправить»',
+    motDef:'Напишите, и пришлём расчёт под ваш бюджет.', ok:'Заявка принята',
+    sent:(ch, ph) => 'Написал вам в ' + ch + (ph ? ' на ' + ph : '') + ', проверьте сообщения. Быстрее всего заберите бонус сами: кнопка ниже.',
+    notSent:'Я напишу вам в выбранный мессенджер. Быстрее всего заберите бонус сами: кнопка ниже.',
+    alt:'Другие способы', bot:'Получить расчёт в Telegram-боте', post:name => 'Читать разбор ' + name + ' в Telegram' },
+  en:{ back:'← Back', title:'Find an apartment in Phuket · Property Library Phuket', pickQ:'Which project are you interested in?',
+    step:(n, t, left) => 'Question ' + n + ' of ' + t + (left > 2 ? ' · ' + (left - 1) + ' more, then I send prices and floor plans' : left > 1 ? ' · 1 more, then I lock in the special terms' : ' · last question, then the bonus is yours'),
+    ready:'Your selection is 100% ready', giftsQ:'Bonuses after the quiz', giftsF:'I will send you',
+    formQ:'Where should I send prices, floor plans and your bonus?', who:'<b>Elnur Khankishiev</b>, founder of Property Library. I will personally send you prices and a rental yield estimate.',
+    nm:'Your name', cc:'Country code', pn:'Phone number', phh:'Country code is filled in automatically, you can change it. Number without the code, e.g. 81 234 5678',
+    tg:'Telegram username, if you have one', tgh:'Optional. After sending, tap “Continue in Telegram” and we will see you there right away.',
+    submit:'Get my selection', sending:'Sending…',
+    note:'By sending this request, you agree to the processing of your data and its transfer to advertising partners to match offers. Property Library Phuket will message you on WhatsApp or Telegram only about this request. <a href="/privacy" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">Privacy policy</a>',
+    nameErr:'What should we call you? Please enter your name.', phoneErr:'Check the number: country code and all digits, e.g. +66 81 234 5678.',
+    msg:(name, ref) => 'Hello! I would like to get the bonus for ' + name + '.' + (ref ? ' Request ' + ref : ''),
+    bWA:'Get the bonus on WhatsApp', bTG:'Get the bonus on Telegram', lWA:'Message on WhatsApp', lTG:'Message on Telegram', bBOT:'Continue in Telegram',
+    wrhBot:'Telegram will open, tap “Start” there', wrh:'The message is already typed, just tap “Send”',
+    motDef:'Message me and I will send an estimate for your budget.', ok:'Request received',
+    sent:(ch, ph) => 'I have messaged you on ' + ch + (ph ? ' at ' + ph : '') + ', please check your messages. The fastest way to get your bonus is the button below.',
+    notSent:'I will message you in the messenger you chose. The fastest way to get your bonus is the button below.',
+    alt:'Other ways', bot:'Get an estimate in our Telegram bot', post:null }
+};
+let LANG = 'ru', KEY = '';
+function langFor(key){
+  if (!EN_P[key]) return 'ru';
+  const q = String(new URLSearchParams(location.search).get('lang') || '').toLowerCase();
+  if (q === 'en') return 'en';
+  if (q) return 'ru';
+  let ls = []; try { ls = (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || '']).map(x => String(x || '').toLowerCase()); } catch (e) {}
+  if (!ls.filter(Boolean).length) return 'ru';
+  return ls.some(x => /^(ru|uk|be|kk|ky|uz|tg|hy|az|ka)\b/.test(x)) ? 'ru' : 'en';
+}
+const L = s => (LANG === 'en' && EN[s]) || s;                          /* вопрос, вариант, подсказка на экране */
+const U = k => UI[LANG][k];                                             /* строка интерфейса */
+const CP = f => (LANG === 'en' && EN_P[KEY] && EN_P[KEY][f] !== undefined) ? EN_P[KEY][f] : C[f];   /* текст проекта */
+/* подсказка о номере по-английски: phone.js общий с главной, его не трогаем — переводим по причине отказа */
+function hintEn(r, cc){
+  const w = String(r.why || ''), e = String(r.error || ''), ex = ', e.g. +66 81 234 5678.';
+  if (w === 'нет кода') return 'Enter the country code in the first field, e.g. +66 or +44.';
+  if (w === 'пусто' || e === 'пусто') return 'Enter your phone number with the country code' + ex;
+  if (w === '+7 не 10') return 'For +7 you need 10 digits after the code, e.g. 900 123 45 67.';
+  if (w === 'чужой код') { const m = String(r.hint || '').match(/у вас (\d+)/);
+    return NAT[cc] ? 'For +' + cc + ' you need ' + NAT[cc] + ' digits after the code' + (m ? ', you have ' + m[1] : '') + '. Check the number and the country code.'
+                   : 'Check the number: digits are missing after +' + cc + ', or the country code is different.'; }
+  if (e === 'буквы') return 'Use digits only' + ex;
+  if (e === 'короткий') return 'The number is too short. Enter it in full, with the country code.';
+  if (e === 'длинный') return 'The number has more than 15 digits. Check for extra ones.';
+  if (/^не тот вид/.test(e)) return 'This does not look like a valid +' + (r.code || '') + ' number. Check the digits and the country code.';
+  return UI.en.phoneErr;
+}
 const POST = { kuartz:'https://t.me/property_library_phuket', vibe2:'https://t.me/property_library_phuket', fizz:'https://t.me/property_library_phuket', eden:'https://t.me/property_library_phuket', purita:'https://t.me/property_library_phuket', millennium:'https://t.me/property_library_phuket', zero:'https://t.me/property_library_phuket' }; /* ссылки на посты-разборы: подставить, когда выйдут */
 /* 16.10.2026 Эльнур: «поле код с флажками всё испортит, убери, организуй поле номер заново без ошибок».
    Одно поле, в нём уже стоит +, номер целиком с кодом страны. Проверяет тот же phone.js, что и приёмник.
@@ -422,7 +521,7 @@ function ccGuess(){
     'Europe/Vilnius':'370','Europe/Riga':'371','Europe/Tallinn':'372','Asia/Bangkok':'66','Asia/Jerusalem':'972','Asia/Tel_Aviv':'972','Asia/Dubai':'971','Europe/Istanbul':'90','Asia/Singapore':'65','Asia/Hong_Kong':'852','Asia/Kuala_Lumpur':'60','Asia/Jakarta':'62','Asia/Makassar':'62','Asia/Ho_Chi_Minh':'84','Asia/Saigon':'84','Asia/Shanghai':'86','Asia/Tokyo':'81','Asia/Seoul':'82',
     'Europe/Berlin':'49','Europe/Warsaw':'48','Europe/Prague':'420','Europe/Vienna':'43','Europe/Zurich':'41','Europe/London':'44','Europe/Paris':'33','Europe/Madrid':'34','Europe/Rome':'39','Europe/Lisbon':'351','Europe/Amsterdam':'31','Europe/Brussels':'32','Asia/Nicosia':'357','Asia/Famagusta':'357','Europe/Athens':'30','Europe/Belgrade':'381','Europe/Podgorica':'382','Europe/Sofia':'359','Europe/Budapest':'36','Europe/Bucharest':'40','Europe/Stockholm':'46','Europe/Oslo':'47','Europe/Copenhagen':'45','Europe/Helsinki':'358','Europe/Dublin':'353' };
   let tz = ''; try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
-  const c = TZ[tz] || (/^Australia\//.test(tz) ? '61' : /^America\//.test(tz) ? '1' : '7');
+  const c = TZ[tz] || (/^Australia\//.test(tz) ? '61' : /^America\//.test(tz) ? '1' : LANG === 'en' ? '' : '7');   /* EN: страну не угадываем, человек впишет код сам */
   return '+' + c;
 }
 /* длина номера без кода по стране; известная — по ней решаем, набран ли код повторно */
@@ -507,7 +606,9 @@ function boot(){
   /* 16.10.2026 Эльнур: «откуда у нас квиз Standard вообще? у нас Vibe 2, KUARTZ, FIZZ, ZERO, Eden» (решение №275, фокус).
      Вариант standard убран; ?p=standard и любой незнакомый проект открывают выбор из проектов фокуса (метки рекламы сохраняем). */
   if (!P[key]) { pick(key); return; }
-  C = P[key];
+  C = P[key]; KEY = key; LANG = langFor(key);
+  document.documentElement.lang = LANG; document.title = U('title'); $('back').textContent = U('back');
+  if (LANG === 'en') TR('lang', 'en');
   Object.keys(P).forEach(k => { const e = $('sw-' + k); if (e) e.classList.toggle('on', P[k] === C); });
   A = {}; i = 0; timing = []; pasted = false; T0 = Date.now(); LID = newLid();
   /* 14.10 трекинг: каждый шаг квиза — событие посетителя (отказы видно по последнему шагу) */
@@ -520,10 +621,11 @@ function boot(){
   /* 27.10.2026 Эльнур «го»: первый экран = продолжение рекламы. 25–27.10 из 284 открывших квиз на первый вопрос ответили 37 (13%).
      Человек видит ту же картинку, название и цену, что в объявлении (кампания 4proj_2510), сразу под ними вопрос.
      Замер: доля kviz_start от kviz_open в site_events по 4proj_2510 до и после этой правки. */
-  $('s0').innerHTML = C.ad ? '<div class="adh"><img src="img/' + C.ad.img + '.webp" alt=""><div class="adt"><b>' + (C.ad.title || C.name) + '</b><span>' + C.ad.sub +
-    '</span><i></i><strong>' + C.ad.big + '</strong><span>' + C.ad.note + '</span><em>' + C.ad.chip + '</em></div></div>'
-    : '<div class="top"><h1>' + C.h1 + '</h1></div>';
-  $('foot0').textContent = C.foot; $('foot0').hidden = false;
+  const AD = CP('ad');
+  $('s0').innerHTML = AD ? '<div class="adh"><img src="img/' + AD.img + '.webp" alt=""><div class="adt"><b>' + (AD.title || C.name) + '</b><span>' + AD.sub +
+    '</span><i></i><strong>' + AD.big + '</strong><span>' + AD.note + '</span><em>' + AD.chip + '</em></div></div>'
+    : '<div class="top"><h1>' + CP('h1') + '</h1></div>';
+  $('foot0').textContent = CP('foot'); $('foot0').hidden = false;
   tStep = Date.now(); render();
 }
 
@@ -532,25 +634,28 @@ function pick(key){
   $('quiz').hidden = true; $('done').hidden = true; $('s0').hidden = false;
   $('foot0').hidden = true;
   const q = new URLSearchParams(location.search);
-  $('s0').innerHTML = '<div class="card"><div class="q">Какой проект вам интересен?</div><div class="opts pics">' +
-    ['vibe2', 'purita', 'eden', 'millennium', 'kuartz', 'fizz', 'zero'].filter(k => P[k]).map(k => { q.set('p', k);
+  /* 01.11: ?lang=en на выборе проекта — только проекты с английскими текстами */
+  const en = String(q.get('lang') || '').toLowerCase() === 'en'; LANG = en ? 'en' : 'ru';
+  if (en) { document.documentElement.lang = 'en'; document.title = U('title'); }
+  $('s0').innerHTML = '<div class="card"><div class="q">' + U('pickQ') + '</div><div class="opts pics">' +
+    ['vibe2', 'purita', 'eden', 'millennium', 'kuartz', 'fizz', 'zero'].filter(k => P[k] && (!en || EN_P[k])).map(k => { q.set('p', k);
       return '<a class="opt" href="?' + q.toString() + '"><i class="ph"><img src="img/' + P[k].hero + '.webp" alt=""></i><span>' +
-        P[k].name + ', ' + (P[k].place || { vibe2: 'Карон', kuartz: 'Карон' }[k] || '') + '</span></a>'; }).join('') + '</div></div>';
+        P[k].name + ', ' + (en ? EN_P[k].place : (P[k].place || { vibe2: 'Карон', kuartz: 'Карон' }[k] || '')) + '</span></a>'; }).join('') + '</div></div>';
 }
 
 function render(){
   const Q = C.Q, total = Q.length + 1;
   const left = Q.length - i;
-  $('stepn').textContent = i < Q.length ? 'Вопрос ' + (i + 1) + ' из ' + Q.length + (left > 2 ? ' · ещё ' + (left - 1) + ', и пришлю цены и планировки' : left > 1 ? ' · ещё 1, и закреплю спецусловия' : ' · последний вопрос, и бонус ваш') : 'Подборка готова на 100%';
-  $('gift').style.display = C.ad && i === 0 ? 'none' : '';   // 27.10: на первом шаге бонус уже в рекламной шапке, вопрос поднимаем выше
-  $('gift').innerHTML = '<b>' + (i < Q.length ? 'Бонусы после опроса' : 'Пришлю вам') + '</b>' + C.gifts.map(g => '<span>🎁 ' + g + '</span>').join('');
+  $('stepn').textContent = i < Q.length ? U('step')(i + 1, Q.length, left) : U('ready');
+  $('gift').style.display = CP('ad') && i === 0 ? 'none' : '';   // 27.10: на первом шаге бонус уже в рекламной шапке, вопрос поднимаем выше
+  $('gift').innerHTML = '<b>' + (i < Q.length ? U('giftsQ') : U('giftsF')) + '</b>' + CP('gifts').map(g => '<span>🎁 ' + g + '</span>').join('');
   $('bar').style.width = Math.round((i + 1) / total * 100) + '%'; $('back').hidden = !i;
   if (i < Q.length) {
     const s = Q[i], pics = !!s.o[0][1];
     $('qwrap').style.animation='none'; void $('qwrap').offsetWidth; $('qwrap').style.animation='';
-    $('qwrap').innerHTML = '<div class="q">' + s.q + '</div><div class="opts' + (pics ? ' pics' : '') + '">' +
+    $('qwrap').innerHTML = '<div class="q">' + L(s.q) + '</div><div class="opts' + (pics ? ' pics' : '') + '">' +
       s.o.map((o, n) => '<button class="opt' + (A[s.k] === o[0] ? ' on' : '') + '" data-n="' + n + '">' +
-        (o[1] ? '<i class="ph"><img' + (s.fit ? ' class="fit"' : '') + ' src="img/' + o[1] + '.webp" alt=""' + (o[2] ? ' style="' + o[2] + '"' : '') + '></i>' : '') + '<span>' + o[0] + (o[3] ? '<small class="hint">' + o[3] + '</small>' : '') + '</span></button>').join('') + '</div>';
+        (o[1] ? '<i class="ph"><img' + (s.fit ? ' class="fit"' : '') + ' src="img/' + o[1] + '.webp" alt=""' + (o[2] ? ' style="' + o[2] + '"' : '') + '></i>' : '') + '<span>' + L(o[0]) + (o[3] ? '<small class="hint">' + L(o[3]) + '</small>' : '') + '</span></button>').join('') + '</div>';
     document.querySelectorAll('.opt').forEach(b => b.onclick = () => {
       if (!started) { started = true; TR('kviz_start'); }
       A[s.k] = s.o[+b.dataset.n][0]; TR('q' + (i + 1), s.k + ':' + A[s.k]);
@@ -559,19 +664,19 @@ function render(){
       setTimeout(() => { i++; render(); }, 260);
     });
   } else {
-    $('qwrap').innerHTML = '<div class="q">Куда прислать цены, планировки и бонус?</div>' +
-      '<div class="who"><img src="img/elnur.jpg" alt=""><span><b>Эльнур Ханкишиев</b>, основатель Property Library. Пришлю лично цены и расчёт доходности.</span></div>' +
-      '<form id="f" novalidate><div class="err" id="err"></div><input id="nm" placeholder="Ваше имя" autocomplete="name" required aria-required="true">' +
-      '<div class="phrow"><input id="cc" type="tel" inputmode="tel" list="ccl" aria-label="Код страны" autocomplete="tel-country-code" value="' + ccGuess() + '">' +
-      '<input id="pn" type="tel" inputmode="tel" placeholder="Номер телефона" autocomplete="tel-national" aria-describedby="phh err"></div>' +
-      '<datalist id="ccl">' + CCL.map(c => '<option value="+' + c[0] + '">' + c[1] + '</option>').join('') + '</datalist>' +
+    $('qwrap').innerHTML = '<div class="q">' + U('formQ') + '</div>' +
+      '<div class="who"><img src="img/elnur.jpg" alt=""><span>' + U('who') + '</span></div>' +
+      '<form id="f" novalidate><div class="err" id="err"></div><input id="nm" placeholder="' + U('nm') + '" autocomplete="name" required aria-required="true">' +
+      '<div class="phrow"><input id="cc" type="tel" inputmode="tel" list="ccl" aria-label="' + U('cc') + '" autocomplete="tel-country-code" value="' + ccGuess() + '">' +
+      '<input id="pn" type="tel" inputmode="tel" placeholder="' + U('pn') + '" autocomplete="tel-national" aria-describedby="phh err"></div>' +
+      '<datalist id="ccl">' + CCL.map(c => '<option value="+' + c[0] + '">' + (LANG === 'en' ? CCL_EN[c[0]] || c[1] : c[1]) + '</option>').join('') + '</datalist>' +
       '<input id="ph" type="hidden">' +
-      '<div class="fh" id="phh">Код страны подставлен сам, его можно поменять. Номер без кода, например 900 123 45 67</div>' +
+      '<div class="fh" id="phh">' + U('phh') + '</div>' +
       '<div class="chan"><button type="button" class="on" data-c="whatsapp">WhatsApp</button><button type="button" data-c="telegram">Telegram</button></div>' +
-      '<label class="tgf" id="tgf" hidden><input id="tg" placeholder="Ник в Telegram, если есть" autocomplete="off" autocapitalize="off" spellcheck="false"><span class="fh">Необязательно. После заявки нажмите «Продолжить в Telegram», и мы сразу увидим вас там.</span></label>' +
+      '<label class="tgf" id="tgf" hidden><input id="tg" placeholder="' + U('tg') + '" autocomplete="off" autocapitalize="off" spellcheck="false"><span class="fh">' + U('tgh') + '</span></label>' +
       '<input class="hp" id="co" tabindex="-1" autocomplete="off" aria-hidden="true">' +
-      '<button class="cta" type="submit">Получить подборку</button></form>' +
-      '<p class="note">Отправляя заявку, вы соглашаетесь на обработку данных и их передачу рекламным партнёрам для подбора предложений. Сообщения от Property Library Phuket придут в WhatsApp или Telegram только по этому запросу. <a href="/privacy" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">Политика конфиденциальности</a></p>';
+      '<button class="cta" type="submit">' + U('submit') + '</button></form>' +
+      '<p class="note">' + U('note') + '</p>';
     A.channel = 'whatsapp'; TR('form_view');
     $('pn').addEventListener('paste', () => pasted = true);
     /* 31.10.2026 (находка проверяльщика): «Go»/Enter в поле номера при пустом имени — форма показывала «Как к вам обращаться?»,
@@ -609,12 +714,12 @@ function send(){
      латинские буквы: казахские, грузинские, арабские и др. имена не проходили. Теперь любая буква любого алфавита, хватит одной;
      ошибка видна прямо над формой, в событие уходит только причина (пусто / длина / нет букв), не само имя. */
   let okName = true; try { okName = /\p{L}/u.test(nm); } catch (e) { okName = nm.length > 0; }
-  if (!okName) { $('err').textContent = 'Как к вам обращаться? Укажите имя.'; $('err').dataset.f = 'nm'; $('nm').setAttribute('aria-invalid', 'true'); try { $('err').scrollIntoView({ block: 'center' }); $('nm').focus(); } catch (e) {} TR('name_err', nm ? 'нет букв, ' + nm.length + ' зн.' : 'пусто'); return; }
+  if (!okName) { $('err').textContent = U('nameErr'); $('err').dataset.f = 'nm'; $('nm').setAttribute('aria-invalid', 'true'); try { $('err').scrollIntoView({ block: 'center' }); $('nm').focus(); } catch (e) {} TR('name_err', nm ? 'нет букв, ' + nm.length + ' зн.' : 'пусто'); return; }
   /* номер собираем заново в момент отправки (не полагаемся на последнее событие поля) */
   const raw = phoneJoin($('cc').value, $('pn').value); $('ph').value = raw;
   const ccUsed = /^\s*(\+|00)/.test($('pn').value) ? '' : ccSplit($('cc').value).code;
   const chk = phoneCheck(raw, ccUsed);
-  if (!chk.ok) { const h = chk.hint || 'Проверьте номер: код страны и все цифры.'; $('err').textContent = h; $('err').dataset.f = 'pn'; $('pn').setAttribute('aria-invalid', 'true'); try { $('pn').focus(); } catch (e) {} TR('phone_err', phoneWhy('форма', chk.why, h)); return; }
+  if (!chk.ok) { const h = LANG === 'en' ? hintEn(chk, ccUsed) : (chk.hint || 'Проверьте номер: код страны и все цифры.'); $('err').textContent = h; $('err').dataset.f = 'pn'; $('pn').setAttribute('aria-invalid', 'true'); try { $('pn').focus(); } catch (e) {} TR('phone_err', phoneWhy('форма', chk.why, h)); return; }
   const d = chk.digits; PH = '+' + d; AS = '';
   const p = new URLSearchParams(location.search), utm = {};
   ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','utm_id','fbclid','gclid'].forEach(k => { if (p.get(k)) utm[k] = p.get(k); });
@@ -638,9 +743,11 @@ function send(){
   /* 20.10.2026 го Эльнура «надо чтобы работало… Европа тоже нужна»: согласие берём в самой форме (строка под кнопкой).
      form_consent:true — приёмник шлёт серверный Lead в Meta и без «Принять» на плашке, но без куки _fbp/_fbc. Пиксель — по-прежнему только после «Принять». */
   lead.form_consent = true;
+  /* 01.11.2026: язык квиза — для двойника и первого касания (ответы и сообщение заявки остаются русскими) */
+  if (LANG === 'en') lead.lang = 'en';
   TR('submit');
   const btn = document.querySelector('#f .cta'), label = btn ? btn.textContent : '';
-  busy = true; if (btn) { btn.disabled = true; btn.textContent = 'Отправляем…'; } $('err').textContent = '';
+  busy = true; if (btn) { btn.disabled = true; btn.textContent = U('sending'); } $('err').textContent = '';
   const unlock = () => { busy = false; if (btn) { btn.disabled = false; btn.textContent = label; } };
   /* ждём не дольше 15 с (обычно 6–10: приёмник сам пишет человеку). Не дождались — заявка почти наверняка дошла,
      показываем «напишем в ближайшее время»; повтор с тем же LID приёмник не задвоит. */
@@ -654,7 +761,7 @@ function send(){
     .then(r => r.json())
     .then(r => {
       clearTimeout(timer);
-      if (r && r.ok === false && r.field === 'phone') { unlock(); const h = r.hint || 'Проверьте номер: код страны и все цифры.'; $('err').textContent = h; $('err').dataset.f = 'pn'; $('pn').setAttribute('aria-invalid', 'true'); TR('phone_err', phoneWhy('приёмник', 'отказ', h)); return; }
+      if (r && r.ok === false && r.field === 'phone') { unlock(); const h = LANG === 'en' ? UI.en.phoneErr : (r.hint || 'Проверьте номер: код страны и все цифры.'); $('err').textContent = h; $('err').dataset.f = 'pn'; $('pn').setAttribute('aria-invalid', 'true'); TR('phone_err', phoneWhy('приёмник', 'отказ', h)); return; }
       if (!isTest) {   // тестовые номера (то же правило, что ТЕСТ в реклама_сводка.py) не считаем лидом в рекламе
         const ev = r && r.event_id ? { eventID: r.event_id } : undefined;
         /* 22.10.2026 Эльнур «го» (качество сопоставления Meta): ручное расширенное сопоставление (manual advanced matching) —
@@ -700,7 +807,7 @@ function finish(r){
   const wkey = Object.keys(P).find(k => P[k] === C), ref = r.client_code || r.phone || PH || '';
   /* 19.10.2026 Эльнур «да, го»: назначенного не узнали (приёмник не ответил) — номер Эльнура, не чётность. */
   const who = AS || 'elnur', W = WRK[who];
-  const msg = encodeURIComponent('Здравствуйте! Хочу забрать бонус по ' + C.name + '.' + (ref ? ' Заявка ' + ref : ''));
+  const msg = encodeURIComponent(U('msg')(C.name, ref));
   const icWA = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.2s.9 2.5 1 2.7c.1.2 1.8 2.8 4.4 3.9 1.6.7 2.3.8 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></svg>';
   const icTG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.9 4.3 18.7 19.4c-.2 1-.9 1.3-1.7.8l-4.8-3.6-2.3 2.2c-.3.3-.5.5-1 .5l.3-4.9 8.9-8c.4-.3-.1-.5-.6-.2l-11 6.9-4.7-1.5c-1-.3-1-1 .2-1.5l18.5-7.1c.9-.3 1.6.2 1.4 1.3z"/></svg>';
   /* 19.10.2026 Эльнур «да, го» (путь_лида_и_бан_1910.md): за 5 дней 11 заявок, нажатий WhatsApp 1, Telegram 1, бот 0 —
@@ -708,35 +815,35 @@ function finish(r){
   /* 25.10.2026 Эльнур «м чини»: главная кнопка — по выбору человека. Было по r.channel: выбрал Telegram, а Telegram по номеру
      не нашли — касание ушло в WhatsApp, и экран тоже вёл в WhatsApp (заявки 21–22.10, funnel_events 20741, 20858). */
   const tgFirst = A.channel === 'telegram';
-  const bWA = '<a class="wa" data-ev="click_wa_write" href="https://wa.me/' + W.wa + '?text=' + msg + '" target="_blank" rel="noopener">' + icWA + 'Получить бонус в WhatsApp</a>';
-  const bTG = '<a class="tg" data-ev="click_tg_write" href="https://t.me/' + W.tg + '?text=' + msg + '" target="_blank" rel="noopener">' + icTG + 'Получить бонус в Telegram</a>';
-  const lWA = '<a class="lnk" data-ev="click_wa_write" href="https://wa.me/' + W.wa + '?text=' + msg + '" target="_blank" rel="noopener">Написать в WhatsApp</a>';
-  const lTG = '<a class="lnk" data-ev="click_tg_write" href="https://t.me/' + W.tg + '?text=' + msg + '" target="_blank" rel="noopener">Написать в Telegram</a>';
+  const bWA = '<a class="wa" data-ev="click_wa_write" href="https://wa.me/' + W.wa + '?text=' + msg + '" target="_blank" rel="noopener">' + icWA + U('bWA') + '</a>';
+  const bTG = '<a class="tg" data-ev="click_tg_write" href="https://t.me/' + W.tg + '?text=' + msg + '" target="_blank" rel="noopener">' + icTG + U('bTG') + '</a>';
+  const lWA = '<a class="lnk" data-ev="click_wa_write" href="https://wa.me/' + W.wa + '?text=' + msg + '" target="_blank" rel="noopener">' + U('lWA') + '</a>';
+  const lTG = '<a class="lnk" data-ev="click_tg_write" href="https://t.me/' + W.tg + '?text=' + msg + '" target="_blank" rel="noopener">' + U('lTG') + '</a>';
   /* 20.10.2026 го Эльнура: выбрал Telegram и приёмник дал код заявки (r.tg_start) — главная кнопка «Продолжить в Telegram»
      ведёт в @elnurphuket_bot с кодом: бот узнаёт человека, связывает Telegram с номером заявки, ведущему уходит карточка,
      человеку бот отвечает по его квизу. Кода нет (приёмник не ответил) — как раньше, в рабочий Telegram с набранным текстом. */
   const botMain = tgFirst && r.tg_start;
-  const bBOT = '<a class="tg" data-ev="click_tg_bot" href="' + r.tg_start + '" target="_blank" rel="noopener">' + icTG + 'Продолжить в Telegram</a>';
-  const write = '<p class="mot">' + (MOT[wkey] || 'Напишите, и пришлём расчёт под ваш бюджет.') + '</p>' +
+  const bBOT = '<a class="tg" data-ev="click_tg_bot" href="' + r.tg_start + '" target="_blank" rel="noopener">' + icTG + U('bBOT') + '</a>';
+  const write = '<p class="mot">' + ((LANG === 'en' && EN_P[wkey] && EN_P[wkey].mot) || MOT[wkey] || U('motDef')) + '</p>' +
     '<div class="wr">' + (botMain ? bBOT : tgFirst ? bTG : bWA) + '</div>' +
-    (botMain ? '<p class="wrh">Откроется Telegram, нажмите там «Старт»</p>' : '<p class="wrh">Сообщение уже набрано, останется нажать «Отправить»</p>');
+    (botMain ? '<p class="wrh">' + U('wrhBot') + '</p>' : '<p class="wrh">' + U('wrh') + '</p>');
   $('quiz').hidden = true; $('s0').hidden = true; $('foot0').hidden = true;
   const ch = (r.channel || A.channel) === 'telegram' ? 'Telegram' : 'WhatsApp', key = Object.keys(P).find(k => P[k] === C);
   $('done').innerHTML =
     '<div class="pj"><div class="ph0"><img class="bg" src="img/' + C.hero + '.webp" alt=""' + (C.heroPos || C.heroSt ? ' style="' + (C.heroPos ? 'object-position:' + C.heroPos + ';' : '') + (C.heroSt || '') + '"' : '') + '></div>' +
-    '<div class="pt"><span class="ok">Заявка принята</span><h2>' + C.name + ', ' + (C.place || 'Карон') + '</h2>' +
+    '<div class="pt"><span class="ok">' + U('ok') + '</span><h2>' + C.name + ', ' + (CP('place') || 'Карон') + '</h2>' +
     /* 15.10.2026: без обещания «напишу в ближайшее время»; главный путь к расчёту — бот в Telegram.
        «Написал вам» остаётся только когда приёмник подтвердил отправку (r.sent). */
-    (r.sent ? '<p>Написал вам в ' + ch + (r.phone ? ' на ' + r.phone : '') + ', проверьте сообщения. Быстрее всего заберите бонус сами: кнопка ниже.</p>'
-            : '<p>Я напишу вам в выбранный мессенджер. Быстрее всего заберите бонус сами: кнопка ниже.</p>') + '</div></div>' + write +
-    '<div class="facts">' + C.facts.map(f => '<div><b>' + f[0] + '</b>' + f[1] + '</div>').join('') + '</div>' +
+    (r.sent ? '<p>' + U('sent')(ch, r.phone) + '</p>'
+            : '<p>' + U('notSent') + '</p>') + '</div></div>' + write +
+    '<div class="facts">' + CP('facts').map(f => '<div><b>' + f[0] + '</b>' + f[1] + '</div>').join('') + '</div>' +
     '<div class="gal">' + C.gal.map(g => { const [n, st] = g.split('|'); return '<i class="gi"><img src="img/' + n + '.webp" alt=""' + (st ? ' style="' + st + '"' : '') + '></i>'; }).join('') + '</div>' +
     /* 13.10.2026: ссылка в бот несёт метку заявки (r.tg_start), бот по ней узнаёт Telegram человека.
        19.10.2026: бот, второй мессенджер и канал — мелкими ссылками под «Другие способы»; обложка презентации убрана с экрана
        (клики 0 с 14.10), презентацию по-прежнему отдаёт бот. */
-    '<details class="alt"><summary>Другие способы</summary><div class="lnks">' + (tgFirst ? lWA : lTG) + (botMain ? lTG : '') +
-      (botMain ? '' : '<a class="lnk" href="' + (r.tg_start || ('https://t.me/elnurphuket_bot?start=' + C.bot)) + '" target="_blank" rel="noopener">Получить расчёт в Telegram-боте</a>') +
-      '<a class="lnk" href="' + POST[key] + '" target="_blank" rel="noopener">Читать разбор ' + C.name + ' в Telegram</a></div></details>';
+    '<details class="alt"><summary>' + U('alt') + '</summary><div class="lnks">' + (tgFirst ? lWA : lTG) + (botMain ? lTG : '') +
+      (botMain ? '' : '<a class="lnk" href="' + (r.tg_start || ('https://t.me/elnurphuket_bot?start=' + C.bot)) + '" target="_blank" rel="noopener">' + U('bot') + '</a>') +
+      (U('post') ? '<a class="lnk" href="' + POST[key] + '" target="_blank" rel="noopener">' + U('post')(C.name) + '</a>' : '') + '</div></details>';   /* EN: русский канал не показываем */
   $('done').hidden = false; scrollTo(0, 0);
   $('done').onclick = e => { const a = e.target.closest && e.target.closest('a'); if (!a) return; const h = a.getAttribute('href') || '';
     if (a.dataset.ev) { TR(a.dataset.ev, who); if (window.PLPTrack) PLPTrack.flush(false); return; }
