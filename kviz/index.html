@@ -485,7 +485,7 @@ function phoneWhy(who, why, hint){
   const pn = $('pn') ? $('pn').value : '', ccv = $('cc') ? $('cc').value : '';
   const full = /^\s*(\+|00)/.test(pn), sp = ccSplit(ccv);
   const nat = pn.replace(/\D/g, '').length, all = full ? nat : (sp.code + sp.rest).length + nat;
-  return (who + ' ' + (full ? 'номер с +' : '+' + (sp.code || '?') + (sp.rest ? '(+' + sp.rest.length + ')' : '')) + ' н' + nat + ' в' + all + ' ' + (why || '') + ' · ' + (hint || '')).slice(0, 80);
+  return (who + ' ' + (full ? 'номер с +' : '+' + (sp.code || '?') + (sp.rest ? '(+' + sp.rest.length + ')' : '')) + ' н' + nat + ' в' + all + ' ' + (why || '') + ' · ' + (hint || '').replace(/\+?\d[\d\s()-]{3,}\d/g, '…')).slice(0, 80);   // 31.10 ВЕРДИКТ #147: подсказка приёмника несёт номер целиком — цифры в событие не пишем
 }
 const $ = id => document.getElementById(id);
 let C, A, i, T0, tStep, timing, pasted, LID, PH = '', AS = '', busy = false, started = false;
