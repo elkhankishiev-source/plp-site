@@ -111,7 +111,33 @@ const номерной = (slug) => '/' + slug + '/' + NOMERA[slug] + '/';
 /* 28.10.2026: какие старые адреса листа переадресуют на номерной. old: true — лист был открыт по /<лист> до 28.10;
    oldExtra — прежние имена. Скрытые с рождения (PURITA, Naturale) старых адресов не получают: номер в адресе, чтобы лист
    не нашли наугад по имени (Эльнур 22.10). */
-const старые = (o) => (o.old ? [o.slug + '.html', o.slug + '/index.html'] : []).concat(o.oldExtra || []);
+const старые = (o) => (o.old ? [o.slug + '.html', o.slug + '/index.html', o.dir + '/index.html'] : []).concat(o.oldExtra || []);
+/* 01.11.2026 Эльнур: «у нас было стр офера с двумя разными адресами, нужен ток один». Второй живой адрес был у самого
+   лендинга: /offers/<лист>/page.htm (уходил людям до 28.10) на компьютере открывался целиком, без перехода; на телефоне
+   вёл на старый /<лист>. Теперь вне рамки лендинг всегда ведёт на номерной адрес со всеми параметрами (?lang=en и др.)
+   и несёт canonical на него. В рамке, в печати и в сборке PDF (?pdf) не ведёт никуда. Метка PLP:ONEADDR. */
+function одинАдресЛендинга(o, to) {
+  const p = path.join(ROOT, o.dir, 'page.htm');
+  let h = fs.readFileSync(p, 'utf8');
+  const было = h;
+  const скрипт = `<script>/* PLP:ONEADDR 01.11.2026: лист живёт по адресу ${to}; этот файл только рамка листа и печать PDF. */` +
+    `if(window.top===window&&!/[?&]pdf/.test(location.search)&&!(window.matchMedia&&window.matchMedia('print').matches)){location.replace('${to}'+location.search+location.hash);}</script>`;
+  const m = /<script>(?:(?!<\/script>)[\s\S])*?window\.top===window(?:(?!<\/script>)[\s\S])*?location\.replace\((?:(?!<\/script>)[\s\S])*?<\/script>/.exec(h.slice(0, 8000));
+  if (m) h = h.slice(0, m.index) + скрипт + h.slice(m.index + m[0].length);
+  else h = h.replace(/<head>/i, '<head>' + скрипт);
+  const canon = '<link rel="canonical" href="' + SITE + to + '">';
+  h = h.replace(/<link rel="canonical"[^>]*>\n?/g, '');
+  h = h.replace(скрипт, скрипт + '\n' + canon);
+  /* RU/EN на той же странице: если рядом лежит en.json, подключаем js/offer-lang.js (слова из en.json, цифры из разметки) */
+  h = h.replace(/<script src="\/js\/offer-lang\.js[^"]*"[^>]*><\/script>\n?/g, '');
+  const en = path.join(ROOT, o.dir, 'en.json');
+  if (fs.existsSync(en)) {
+    const хэш = (f) => crypto.createHash('sha1').update(fs.readFileSync(f)).digest('hex').slice(0, 8);
+    const тег = `<script src="/js/offer-lang.js?v=${хэш(path.join(ROOT, 'js/offer-lang.js'))}" data-en="/${o.dir}/en.json?v=${хэш(en)}"></script>`;
+    h = h.replace(canon, canon + '\n' + тег);
+  }
+  if (h !== было) { fs.writeFileSync(p, h); console.log('  ' + o.dir + '/page.htm: один адрес ' + to + (fs.existsSync(en) ? ', RU/EN' : '')); }
+}
 function пишиПереадресацию(file, o, url, og) {
   const to = url.slice(SITE.length);
   const знак = '<!-- PLP:REDIRECT ' + to + ' ' + crypto.createHash('sha1').update(o.title + '|' + o.desc).digest('hex').slice(0, 10) + ' -->';
@@ -148,6 +174,12 @@ const head = idx.slice(0, mOpen), tail = idx.slice(mEnd);
 
 for (const o of OFFERS) {
   if (!fs.existsSync(path.join(ROOT, o.dir, 'page.htm'))) { console.log('нет лендинга:', o.dir); continue; }
+  if (NOMERA[o.slug]) одинАдресЛендинга(o, '/' + o.slug + '/' + NOMERA[o.slug] + '/');
+  const есть_en = fs.existsSync(path.join(ROOT, o.dir, 'en.json'));
+  if (есть_en) {
+    const r = (await import('./offer_lang.mjs')).проверь(o.slug);
+    if (r && (r.нет.length || r.плохо.length)) console.log('⚠ ' + o.slug + ': английский неполный (без перевода ' + r.нет.length + ', ошибок ' + r.плохо.length + '): node build/offer_lang.mjs ' + o.slug);
+  }
   const v = fs.statSync(path.join(ROOT, o.dir, 'page.htm')).mtimeMs.toString(36);
   /* 02.10.2026: кнопка PDF только когда файл правда лежит рядом. У Aileen кнопка стояла,
      а файла не было, и человек получал «не найдено». Надпись по правилу кнопок «Получить + что». */
@@ -164,7 +196,12 @@ for (const o of OFFERS) {
 </style>
 <section class="offer-wrap" style="padding:18px 0 120px"><div class="container">
   <!-- 09.10.2026 Эльнур: «открыл ссылку, а там на пол-экрана скачать PDF, стрёмно». Маленькая строка справа, лист сразу виден. -->
-  <div style="display:flex;justify-content:flex-end;margin:0 0 8px">
+  <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin:0 0 8px">
+    ${есть_en ? `<!-- 01.11.2026 Эльнур: «один адрес листа, внутри переключатель RU/EN». Перевод на той же странице: js/offer-lang.js. -->
+    <div class="olang" role="group" aria-label="Язык листа" style="display:inline-flex;border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:2px;font-size:12px;line-height:1">
+      <button type="button" data-ol="ru" style="border:0;border-radius:999px;padding:6px 10px;font:inherit;font-weight:700;cursor:pointer">RU</button>
+      <button type="button" data-ol="en" style="border:0;border-radius:999px;padding:6px 10px;font:inherit;font-weight:700;cursor:pointer">EN</button>
+    </div>` : ''}
     ${hasPdf ? `<a href="/${o.dir}/${o.pdf}" target="_blank" rel="noopener" style="font-size:13px;line-height:1;padding:7px 12px;border:1px solid rgba(255,255,255,.28);border-radius:999px;color:#EFECE2;text-decoration:none;opacity:.85">PDF ↓</a>` : ''}
   </div>
   <div id="offerBox" style="width:100%;max-width:794px;margin:0 auto;overflow:hidden;border-radius:14px;background:#EFECE2;box-shadow:0 2px 18px rgba(23,24,15,.08);height:${o.h || 4531}px">
@@ -192,7 +229,24 @@ for (const o of OFFERS) {
   addEventListener('message', function (e) { if (e && e.data && e.data.plpOfferHeight > 300) { H = Math.ceil(e.data.plpOfferHeight); layout(); } });
   layout();
 })();
-</script>`;
+</script>${есть_en ? `
+<script>
+/* 01.11.2026: кнопка RU/EN над листом. Язык решает сам лист (js/offer-lang.js: ?lang, выбор pl_lang, язык браузера) и сообщает его сюда;
+   шапка сайта переключается тем же setLang, лист слушает тот же pl_lang. */
+(function () {
+  var f = document.getElementById('offerFrame'), bs = document.querySelectorAll('[data-ol]');
+  function mark(l) {
+    for (var i = 0; i < bs.length; i++) { var on = bs[i].getAttribute('data-ol') === l; bs[i].style.background = on ? '#EFECE2' : 'transparent'; bs[i].style.color = on ? '#17180F' : '#EFECE2'; }
+    try { if (window.PL && PL.lang !== l && typeof setLang === 'function') setLang(l); } catch (e) {}
+  }
+  for (var i = 0; i < bs.length; i++) bs[i].addEventListener('click', function () {
+    var l = this.getAttribute('data-ol'); mark(l);
+    try { f.contentWindow.postMessage({ plpLang: l }, location.origin); } catch (e) {}
+  });
+  addEventListener('message', function (e) { if (e.origin === location.origin && e.data && (e.data.plpOfferLangNow === 'en' || e.data.plpOfferLangNow === 'ru')) mark(e.data.plpOfferLangNow); });
+  mark((/[?&]lang=(en|ru)/i.exec(location.search) || [])[1] || (function () { try { return localStorage.getItem('pl_lang'); } catch (e) {} })() || 'ru');
+})();
+</script>` : ''}`;
 
   /* 28.10.2026 Эльнур: «копии не уместны… своди в одну истину». У каждого листа один адрес /<лист>/<номер>/;
      новому листу номер выдаётся сам и записывается в build/nomera.json. */

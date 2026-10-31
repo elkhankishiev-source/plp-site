@@ -23,6 +23,13 @@ for (const [slug, nomer] of Object.entries(nomera)) {
   const h = fs.readFileSync(path.join(ROOT, f), 'utf8');
   if (!h.includes('id="offerFrame"')) плохо.push(f + ': это не лист (нет offerFrame)');
   if (!h.includes('<link rel="canonical" href="' + SITE + '/' + slug + '/' + nomer + '/">')) плохо.push(f + ': canonical не на свой номерной адрес');
+  /* 01.11.2026 Эльнур: «нужен ток один [адрес]». Лендинг рамки /offers/<лист>/page.htm вне рамки сам ведёт на номерной адрес */
+  const lp = path.join(ROOT, 'offers', slug, 'page.htm');
+  if (fs.existsSync(lp)) {
+    const l = fs.readFileSync(lp, 'utf8').slice(0, 8000), to = '/' + slug + '/' + nomer + '/';
+    if (!l.includes('PLP:ONEADDR') || !l.includes("location.replace('" + to + "'+location.search")) плохо.push('offers/' + slug + '/page.htm: вне рамки не ведёт на ' + to + ' (node build/mkoffers.mjs)');
+    if (!l.includes('<link rel="canonical" href="' + SITE + to + '">')) плохо.push('offers/' + slug + '/page.htm: canonical не на ' + to);
+  }
 }
 
 /* любая другая страница с рамкой листа = вторая копия */
