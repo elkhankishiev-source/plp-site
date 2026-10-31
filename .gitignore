@@ -47,3 +47,6 @@ tools/participants_people.py
 
 # 19.10.2026: кэш python из tools/, не коммитить
 __pycache__/
+
+# 31.10.2026: рабочие скрипты вынесены в закрытый plp-site-tools (вложенное хранилище по тому же пути)
+tools/
