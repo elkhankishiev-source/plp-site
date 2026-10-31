@@ -247,6 +247,15 @@ body{min-height:101vh}
 .top{background:var(--paper);padding:14px 16px 0}
 .top h1{font-size:1.08rem;line-height:1.25;font-weight:800;letter-spacing:-.01em}
 .foot0{padding:0 16px;text-align:left}
+/* 27.10.2026 первый экран = продолжение рекламы (картинка и текст объявления) */
+.adh{position:relative;background:#1c1d17;color:#f4f1e8;margin:0 0 12px}
+.adh img{display:block;width:100%;aspect-ratio:16/10;object-fit:cover;object-position:top}
+.adh .adt{display:grid;gap:2px;padding:44px 18px 16px;margin-top:-96px;position:relative;background:linear-gradient(to bottom,rgba(28,29,23,0),#1c1d17 60px)}
+.adh .adt b{font-size:1.9rem;line-height:1.05;font-weight:800;letter-spacing:-.02em}
+.adh .adt span{font-size:.92rem;opacity:.88}
+.adh .adt i{display:block;width:36px;height:3px;background:#c96a46;margin:8px 0 6px}
+.adh .adt strong{font-size:1.6rem;line-height:1.1;font-weight:800}
+.adh .adt em{font-style:normal;justify-self:start;background:#c96a46;color:#fff;font-weight:700;font-size:.9rem;border-radius:8px;padding:6px 12px;margin-top:10px}
 .phrow{display:flex;gap:8px}.phrow #cc{flex:0 0 84px;width:84px;text-align:center}.phrow #pn{flex:1 1 auto;min-width:0}
 </style>
 <!-- PLP:GA --><script>window.PLP_GA='G-HQNDG3B8MW';window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied'});</script><script src="/js/consent.js" defer></script></head>
@@ -316,6 +325,7 @@ const P = {
   },
   vibe2: {
     id:'PLP-VIBE2-KARON', name:'Vibe II', hero:'v2-hero',
+    ad:{img:'ad-vibe2', title:'Vibe II Downtown', sub:'Последние 7 видовых квартир', big:'от 2,9 млн бат', note:'на 20% ниже открытого прайса застройщика', chip:'Мебель и техника в подарок'},
     h1:'Vibe II Downtown на пляже Карон: последние 7 видовых квартир*',
     sub:'От 2,9 млн ฿, на 20% ниже открытого прайса застройщика. Ответьте на 4 вопроса и заберите бонус: мебель и техника в подарок.',
     foot:'*Студия 28 м² по цене закрытого списка Property Library. Рендеры застройщика',
@@ -343,6 +353,7 @@ const P = {
   },
   eden: {
     id:'PLP-EDEN-LAKE', name:'Eden Lake', place:'Банг Тао', hero:'lake-cover',
+    ad:{img:'ad-eden', sub:'Курорт без машин на Банг Тао', big:'взнос 20%', note:'остальное в рассрочку на 5 лет', chip:'Рост прошлых фаз до +48%'},
     h1:'Eden Lake на Банг Тао: 400 м до пляжа Лаян*',
     sub:'Третья фаза Gardens of Eden. Специально для клиентов Property Library опция дополнительного финансирования: первый взнос 20%, остальное в рассрочку на 5 лет.',
     foot:'*Каталог застройщика',
@@ -356,6 +367,7 @@ const P = {
   },
   purita: {
     id:'PLP-PURITA', name:'Purita', place:'Банг Тао', hero:'pu-hero',
+    ad:{img:'ad-purita', sub:'От создателей Central Phuket', big:'от 7,29 млн бат', note:'квартира с одной спальней, первый платёж 20%', chip:'С мебелью и техникой'},
     h1:'Purita в центре Банг Тао от Central Group*',
     sub:'Квартиры с одной спальней от 7,29 млн ฿, первый платёж всего 20%. Полностью меблированы, с техникой. Ответьте на 4 вопроса и получите подборку с лучшим этажом и видом.',
     foot:'*Стартовая цена по акции застройщика. Рендеры застройщика',
@@ -369,6 +381,7 @@ const P = {
   },
   millennium: {
     id:'PLP-MILLENNIUM', name:'Millennium', place:'Банг Тао', hero:'mi-hero',
+    ad:{img:'ad-millennium', sub:'В собственность по иностранной квоте', big:'от 3,42 млн бат', note:'≈98 тыс. $ · инфинити-бассейн 56 м на крыше', chip:'При ключах всего 10%'},
     h1:'Millennium на Банг Тао: 750 м до пляжа*',
     sub:'Квартира в собственность по иностранной квоте от 3,42 млн ฿ (≈98 тыс. $). Пять бассейнов, инфинити 56 м на крыше. Ответьте на 4 вопроса и получите подборку с лучшим этажом и видом.',
     foot:'*Прайс застройщика Layan Green Park. Рендеры застройщика',
@@ -474,7 +487,12 @@ function boot(){
      Событие kviz_start (начал квиз) шлётся на первом ответе — аналитика «начал и ушёл» считает его как раньше. */
   started = false;
   $('done').hidden = true; $('s0').hidden = false; $('quiz').hidden = false;
-  $('s0').innerHTML = '<div class="top"><h1>' + C.h1 + '</h1></div>';
+  /* 27.10.2026 Эльнур «го»: первый экран = продолжение рекламы. 25–27.10 из 284 открывших квиз на первый вопрос ответили 37 (13%).
+     Человек видит ту же картинку, название и цену, что в объявлении (кампания 4proj_2510), сразу под ними вопрос.
+     Замер: доля kviz_start от kviz_open в site_events по 4proj_2510 до и после этой правки. */
+  $('s0').innerHTML = C.ad ? '<div class="adh"><img src="img/' + C.ad.img + '.webp" alt=""><div class="adt"><b>' + (C.ad.title || C.name) + '</b><span>' + C.ad.sub +
+    '</span><i></i><strong>' + C.ad.big + '</strong><span>' + C.ad.note + '</span><em>' + C.ad.chip + '</em></div></div>'
+    : '<div class="top"><h1>' + C.h1 + '</h1></div>';
   $('foot0').textContent = C.foot; $('foot0').hidden = false;
   tStep = Date.now(); render();
 }
@@ -494,6 +512,7 @@ function render(){
   const Q = C.Q, total = Q.length + 1;
   const left = Q.length - i;
   $('stepn').textContent = i < Q.length ? 'Вопрос ' + (i + 1) + ' из ' + Q.length + (left > 2 ? ' · ещё ' + (left - 1) + ', и пришлю цены и планировки' : left > 1 ? ' · ещё 1, и закреплю спецусловия' : ' · последний вопрос, и бонус ваш') : 'Подборка готова на 100%';
+  $('gift').style.display = C.ad && i === 0 ? 'none' : '';   // 27.10: на первом шаге бонус уже в рекламной шапке, вопрос поднимаем выше
   $('gift').innerHTML = '<b>' + (i < Q.length ? 'Бонусы после опроса' : 'Пришлю вам') + '</b>' + C.gifts.map(g => '<span>🎁 ' + g + '</span>').join('');
   $('bar').style.width = Math.round((i + 1) / total * 100) + '%'; $('back').hidden = !i;
   if (i < Q.length) {
@@ -512,7 +531,7 @@ function render(){
   } else {
     $('qwrap').innerHTML = '<div class="q">Куда прислать цены, планировки и бонус?</div>' +
       '<div class="who"><img src="img/elnur.jpg" alt=""><span><b>Эльнур Ханкишиев</b>, основатель Property Library. Пришлю лично цены и расчёт доходности.</span></div>' +
-      '<form id="f" novalidate><input id="nm" placeholder="Ваше имя" autocomplete="name" required aria-required="true">' +
+      '<form id="f" novalidate><div class="err" id="err"></div><input id="nm" placeholder="Ваше имя" autocomplete="name" required aria-required="true">' +
       '<div class="phrow"><input id="cc" type="tel" inputmode="tel" list="ccl" aria-label="Код страны" autocomplete="tel-country-code" value="' + ccGuess() + '">' +
       '<input id="pn" type="tel" inputmode="tel" placeholder="Номер телефона" autocomplete="tel-national" aria-describedby="phh err"></div>' +
       '<datalist id="ccl">' + CCL.map(c => '<option value="+' + c[0] + '">' + c[1] + '</option>').join('') + '</datalist>' +
@@ -521,7 +540,7 @@ function render(){
       '<div class="chan"><button type="button" class="on" data-c="whatsapp">WhatsApp</button><button type="button" data-c="telegram">Telegram</button></div>' +
       '<label class="tgf" id="tgf" hidden><input id="tg" placeholder="Ник в Telegram, если есть" autocomplete="off" autocapitalize="off" spellcheck="false"><span class="fh">Необязательно. После заявки нажмите «Продолжить в Telegram», и мы сразу увидим вас там.</span></label>' +
       '<input class="hp" id="co" tabindex="-1" autocomplete="off" aria-hidden="true">' +
-      '<div class="err" id="err"></div><button class="cta" type="submit">Получить подборку</button></form>' +
+      '<button class="cta" type="submit">Получить подборку</button></form>' +
       '<p class="note">Отправляя заявку, вы соглашаетесь на обработку данных и их передачу рекламным партнёрам для подбора предложений. Сообщения от Property Library Phuket придут в WhatsApp или Telegram только по этому запросу. <a href="/privacy" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">Политика конфиденциальности</a></p>';
     A.channel = 'whatsapp'; TR('form_view');
     $('pn').addEventListener('paste', () => pasted = true);
@@ -544,7 +563,11 @@ function send(){
   if ($('co').value) { finish({ ok: true, sent: false }); return; }   // робот заполнил скрытое поле: показываем успех, заявку не шлём
   /* 16.10.2026: имя обязательно — без имени первое касание не уходит (решение №299 «без имени не шлём»), лид повисал без ответа */
   const nm = $('nm').value.trim();
-  if (nm.replace(/[^A-Za-zА-Яа-яЁё]/g, '').length < 2) { $('err').textContent = 'Как к вам обращаться? Укажите имя.'; $('nm').setAttribute('aria-invalid', 'true'); try { $('nm').focus(); } catch (e) {} TR('name_err'); return; }
+  /* 27.10.2026 Эльнур «разберись»: 25–27.10 отказ по имени 13 раз у 5 человек (один 7 раз подряд и ушёл). Считались только русские и
+     латинские буквы: казахские, грузинские, арабские и др. имена не проходили. Теперь любая буква любого алфавита, хватит одной;
+     ошибка видна прямо над формой, в событие уходит только причина (пусто / длина / нет букв), не само имя. */
+  let okName = true; try { okName = /\p{L}/u.test(nm); } catch (e) { okName = nm.length > 0; }
+  if (!okName) { $('err').textContent = 'Как к вам обращаться? Укажите имя.'; $('nm').setAttribute('aria-invalid', 'true'); try { $('err').scrollIntoView({ block: 'center' }); $('nm').focus(); } catch (e) {} TR('name_err', nm ? 'нет букв, ' + nm.length + ' зн.' : 'пусто'); return; }
   const raw = $('ph').value;
   const chk = phoneCheck(raw);
   if (!chk.ok) { $('err').textContent = chk.hint || 'Проверьте номер: код страны и все цифры.'; $('pn').setAttribute('aria-invalid', 'true'); try { $('pn').focus(); } catch (e) {} TR('phone_err'); return; }
