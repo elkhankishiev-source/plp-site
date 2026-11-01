@@ -536,14 +536,35 @@ function ccSplit(cc){
   for (let n = Math.min(3, c.length); n >= 1; n--) if (CODES.has(c.slice(0, n))) return { code: c.slice(0, n), rest: c.slice(n) };
   return { code: c, rest: '' };                              /* незнакомый код не режем: проверка скажет сама */
 }
+/* 01.11.2026: «+994 050 123 45 67» — местный 0 после кода страны лишний (человек приписал код к местной записи).
+   Снимаем, только если без 0 номер верный, а с 0 нет; Италия (+39) держит 0 в номере, её не трогаем. Правило то же в номер_норма. */
+function zeroAfterCode(n){
+  if (!window.PLPPhone) return n;
+  const dd = String(n).trim().replace(/^00/, '').replace(/\D/g, '');
+  const a = PLPPhone.check('+' + dd);
+  if (a && a.ok) return n;
+  const code = a && a.code;
+  if (!code || code === '39' || !/^0/.test(dd.slice(code.length))) return n;
+  const fixed = code + dd.slice(code.length).replace(/^0+/, ''), b = PLPPhone.check('+' + fixed);
+  return b && b.ok ? '+' + fixed : n;
+}
 function phoneJoin(cc, pn){
   const n = String(pn || '').trim();
-  if (/^(\+|00)/.test(n)) return n;                         /* вписал полный номер с + — берём как есть */
+  if (/^(\+|00)/.test(n)) return zeroAfterCode(n);           /* вписал полный номер с + — берём как есть (без местного 0 после кода) */
   const sp = ccSplit(cc), c = sp.code;
   let d = sp.rest + n.replace(/\D/g, '');
   if (!d) return '';
   if (!c) return 'NOCODE';                                   /* код стёрт: просим указать, номер не угадываем */
-  if (c === '7' && /^8\d{10}$/.test(d)) return '+7' + d.slice(1);      /* российское 8XXXXXXXXXX */
+  /* 01.11.2026 (го Эльнура «до зелёной», лид квиза +84… записан как +7…): 8XXXXXXXXXX при коде +7 — российское 8 только если
+     с +7 номер мобильный РФ/КЗ (8 9xx…, 8 7xx…) или иначе никак не читается. Если цифры сами — мобильный номер другой страны
+     (84… Вьетнам, 86… Китай, 82… Корея), код уже набран в номере: берём как есть. То же правило в функции базы номер_норма. */
+  if (c === '7' && /^8\d{10}$/.test(d)) {
+    if (window.PLPPhone) {
+      const ru = PLPPhone.check('+7' + d.slice(1)), as = PLPPhone.check('+' + d);
+      if (!(ru && ru.ok && ru.mobile) && as && as.ok && as.mobile && as.code !== '7') return '+' + d;
+    }
+    return '+7' + d.slice(1);                                    /* российское 8XXXXXXXXXX */
+  }
   if (d.startsWith(c) && NAT[c] && d.length === c.length + NAT[c]) return '+' + d;   /* код уже набран в поле номера */
   /* 22.10.2026 золотая запись: «+49» и 4915112345678 давали +494915112345678 (у Германии номер 10–11 цифр, NAT знает одну длину).
      Код уже набран, если с ним номер мобильный, а с повтором кода — нет. Окончательно номер собирает приёмник (номер_норма). */
@@ -561,10 +582,11 @@ function phoneCheck(raw, cc){
   let s = String(raw || '').trim().replace(/^00/, '+');
   let d = s.replace(/\D/g, '');
   if (!d) return { ok: false, why: 'пусто', hint: 'Укажите номер телефона с кодом страны, например +7 900 123 45 67.' };
-  if (/^8\d{10}$/.test(d)) d = '7' + d.slice(1);
+  /* 01.11.2026: строки «8XXXXXXXXXX → 7» здесь больше нет: она била уже собранный номер с кодом (+84 3xx… → +7 3xx…).
+     Российское 8 решают phoneJoin (код +7) и phone.js (8 → 7, только если номер иначе не читается как мобильный). */
   const x = '+' + d;
   const r = window.PLPPhone ? PLPPhone.check(x) : { ok: d.length >= 10 && d.length <= 15, digits: d };
-  if (r.ok && /^7/.test(d) && d.length !== 11) { r.ok = false; r.why = '+7 не 10'; r.hint = 'Для кода +7 нужно 10 цифр номера, например 900 123 45 67.'; }
+  if (r.ok && /^7/.test(String(r.digits || d)) && String(r.digits || d).length !== 11) { r.ok = false; r.why = '+7 не 10'; r.hint = 'Для кода +7 нужно 10 цифр номера, например 900 123 45 67.'; }
   /* 31.10.2026: код страны выбран явно, а phone.js «исправил» номер под другую страну (+996 и 6 цифр → +66…, +996 и 7 цифр → +79…).
      Форма пропускала, приёмник отбивал (номер_норма видит код +996), человек получал общую подсказку и пробовал снова.
      Теперь отказ сразу и по делу: сколько цифр нужно после этого кода. */
