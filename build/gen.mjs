@@ -716,6 +716,8 @@ function promoShort(o) {
   if (/для\s+клиентов\s+Property\s+Library/i.test(t)) return null;
   if (!t || /\(estimated\)/i.test(t) || /^\s*(уточнить|нужно|\[)/i.test(t)) return null;
   if (promoIsTimed(t)) return null;
+  /* 01.11.2026 решение №360: скидки и спецусловия только в личной переписке, на витрину не выводим (место им objects.financing_options) */
+  if (/скидк|discount/i.test(t)) return null;
   const YEARS = { 'один': 1, 'два': 2, 'две': 2, 'три': 3, 'четыре': 4, 'пять': 5, 'шесть': 6, 'семь': 7, 'десять': 10 };
   let m = /гарантирован[а-яё]*\s+доход[а-яё]*\s+(\d{1,2})\s*%[^.]{0,60}?(\d+|один|два|две|три|четыре|пять|шесть|семь|десять)\s*(?:года|лет|год)/i.exec(t);
   if (m) {
@@ -1658,6 +1660,8 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
   if (/для\s+клиентов\s+Property\s+Library/i.test(txt)) return '';
     if (/\(estimated\)/i.test(txt)) return '';
     if (promoIsTimed(txt)) return '';
+    /* 01.11.2026 решение №360: скидки только в личной переписке, на витрину не выводим */
+    if (/скидк|discount/i.test(txt)) return '';
     if (/^\s*(уточнить|нужно|\[|—|-)\s*/i.test(txt) && txt.length < 60) return '';
     txt = txt.replace(/\s*\((?:источник|source)\s*:[^)]*\)/ig, '')
              .replace(/\s*\(сообщение застройщика[^)]*\)/ig, '')

@@ -184,7 +184,7 @@ svg text{font-family:Manrope,Arial,sans-serif}
 <section class="pad">
   <div class="eyebrow">Первый проект на Пхукете · Банг Тао</div>
   <h2>The Standard Residences: продано 90% до сдачи</h2>
-  <p class="lead">Шесть семиэтажных корпусов на участке около 20 000 м², 188 квартир от 75 до 313 м², все с мебелью. Общие зоны около 4 400 м²: бассейн 25 метров, релакс-бассейн, спа, театральный зал. Продано 169 квартир из 188, покупатели поровну тайцы и иностранцы (Bangkok Post). Сдача в конце 2026 года.</p>
+  <p class="lead">Шесть семиэтажных корпусов на участке около 20 000 м², 188 квартир от 75 до 313 м², все с мебелью. Общие зоны около 4 400 м²: бассейн 25 метров, релакс-бассейн, спа, театральный зал. Продано 170 квартир из 188, покупатели поровну тайцы и иностранцы (Bangkok Post). Сдача в конце 2026 года.</p>
   <div class="facts" style="grid-template-columns:repeat(4,1fr);margin:5mm 0 6mm">
     <div><b>188</b><span>квартир</span></div>
     <div><b>6 корпусов</b><span>по 7 этажей</span></div>
@@ -200,8 +200,8 @@ svg text{font-family:Manrope,Arial,sans-serif}
         <tr><td>3 спальни L · 167–173 м²</td><td class="r num">28,88–34,65 млн ฿</td></tr>
         <tr><td>Дуплекс с бассейном · 289–299 м²</td><td class="r num">65,07–67,32 млн ฿</td></tr>
       </table>
-      <p style="margin:3mm 0 0;color:var(--ink2);font-size:9pt">Свободно 19 позиций из 188, около 167–225 тыс. ฿ за м². Собственность: лизхолд. Полностью с мебелью и техникой.</p>
-      <p class="src">Прайс застройщика на 20.10.2026; цены могут меняться.</p></div>
+      <p style="margin:3mm 0 0;color:var(--ink2);font-size:9pt">Свободно 18 позиций из 188, около 167–225 тыс. ฿ за м². Собственность: лизхолд. Полностью с мебелью и техникой.</p>
+      <p class="src">Прайс застройщика на 29.10.2026; цены могут меняться.</p></div>
   </div>
   <h3 style="margin-top:7mm">Планировки</h3>
   <div class="pgrid">
@@ -226,7 +226,7 @@ svg text{font-family:Manrope,Arial,sans-serif}
   <div class="grid g2" style="margin:7mm 0 0;align-items:start">
     <div class="card"><h3>Продано до сдачи</h3>
       <svg id="sold" viewBox="0 0 110 58" style="width:100%;height:62mm"></svg>
-      <p class="src">По прайсу застройщика на 20.10 свободно 19 из 188. Цены: прайс застройщика на 20.10.</p></div>
+      <p class="src">По прайсу застройщика на 29.10 свободно 18 из 188. Цены: прайс застройщика на 29.10.</p></div>
     <div class="card"><h3>Что осталось: цена за м², тыс. ฿</h3>
       <svg id="ppm" viewBox="0 0 110 58" style="width:100%;height:62mm"></svg>
       <p class="src">Расчёт по прайсу застройщика: цена квартиры, делённая на площадь.</p></div>
@@ -270,7 +270,7 @@ svg text{font-family:Manrope,Arial,sans-serif}
     <ol class="tl2">
       <li><b>2026</b><span>Открывается POP Phuket на территории The Standard</span><em>район получает свой торговый центр рядом</em></li>
       <li><b>конец ноября 2026</b><span>Первые продажи PURITA, Банг Тао</span><em>бронируем вам лот до открытых продаж</em></li>
-      <li><b>конец 2026</b><span>Сдача The Standard Residences</span><em>свободно ещё 19 позиций по прайсу на 20.10, можно брать до сдачи</em></li>
+      <li><b>конец 2026</b><span>Сдача The Standard Residences</span><em>свободно ещё 18 позиций по прайсу на 29.10, можно брать до сдачи</em></li>
       <li><b>январь 2027</b><span>Шоу-юнит PURITA в POP Phuket</span><em>покажем квартиру вживую</em></li>
       <li><b>начало марта 2027</b><span>Закрытые VIP-продажи Andaz, Лаян</span><em>запись на лоты принимаем заранее</em></li>
     </ol>
@@ -335,10 +335,10 @@ const txt=(s,x,y,t,o={})=>add(s,`<text x="${x}" y="${y}" font-size="${o.size||3}
 const pen=(s,d,c='#B4533A',w=.45)=>add(s,`<path d="${d}" fill="none" stroke="${c}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`);
 const ring=(cx,cy,rx,ry)=>{let d='';for(let i=0;i<=30;i++){const t=i/28*Math.PI*2+.5;d+=(i?' L':'M')+J(cx+rx*Math.cos(t),.35)+' '+J(cy+ry*Math.sin(t),.35);}return d;};
 const hand='Marck Script';
-/* продано: 188 квартир клетками, 169 закрашены */
-(()=>{const s=$('sold');let k=0;for(let r=0;r<8;r++)for(let c=0;c<24;c++){if(k>=188)break;const x=4+c*3.4,y=6+r*4.6;add(s,`<rect x="${x}" y="${y}" width="2.6" height="3.6" rx=".5" fill="${k<169?'#5E6B35':'#F2D96B'}" stroke="${k<169?'none':'#17180F'}" stroke-width=".25"/>`);k++;}
-txt(s,4,50,'90%',{size:9,w:800});txt(s,26,46.5,'169 продано',{size:3.2,w:700,c:'#5E6B35'});txt(s,26,51,'из 188 квартир',{size:3,c:'#62665A'});
-const fx=4+(169%24)*3.4,fy=6+Math.floor(169/24)*4.6+1.8,fw=19*3.4;pen(s,ring(fx+fw/2-.4,fy+.1,fw/2+1.5,4.2));pen(s,`M${fx+fw-4} ${fy+4.4} Q 78 47 88 50`);txt(s,92,52.5,'19 свободных',{size:5,c:'#B4533A',f:hand,a:'middle'});})();
+/* продано: 188 квартир клетками, 170 закрашены */
+(()=>{const s=$('sold');let k=0;for(let r=0;r<8;r++)for(let c=0;c<24;c++){if(k>=188)break;const x=4+c*3.4,y=6+r*4.6;add(s,`<rect x="${x}" y="${y}" width="2.6" height="3.6" rx=".5" fill="${k<170?'#5E6B35':'#F2D96B'}" stroke="${k<170?'none':'#17180F'}" stroke-width=".25"/>`);k++;}
+txt(s,4,50,'90%',{size:9,w:800});txt(s,26,46.5,'170 продано',{size:3.2,w:700,c:'#5E6B35'});txt(s,26,51,'из 188 квартир',{size:3,c:'#62665A'});
+const fx=4+(170%24)*3.4,fy=6+Math.floor(170/24)*4.6+1.8,fw=18*3.4;pen(s,ring(fx+fw/2-.4,fy+.1,fw/2+1.5,4.2));pen(s,`M${fx+fw-4} ${fy+4.4} Q 78 47 88 50`);txt(s,92,52.5,'18 свободных',{size:5,c:'#B4533A',f:hand,a:'middle'});})();
 /* цена за м² по типам */
 (()=>{const s=$('ppm');const Y=v=>48-v*.13;[0,100,200].forEach(v=>{add(s,`<line x1="10" x2="106" y1="${Y(v)}" y2="${Y(v)}" stroke="#ECECE0" stroke-width=".3"/>`);txt(s,8.5,Y(v)+1,v,{size:2.6,c:'#8E917F',a:'end'});});
 const rows=[['2 спальни M','100 м²',211,211],['2 спальни L','120 м²',194,194],['3 спальни L','167–173 м²',167,201],['дуплекс','289–299 м²',225,225]];
