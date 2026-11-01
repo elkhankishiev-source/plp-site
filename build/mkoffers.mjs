@@ -93,6 +93,17 @@ const OFFERS = [
     og: 'offers/naturale-kamala/img/preview-v1.jpg',
     h: 8498,   // PDF 2241 мм × 794/210 (24.10)
   },
+  {
+    /* 01.11.2026 Эльнур: «Храчу отправь ту же презу, только PDF, со всеми отсылками на нас и наше! Превью тоже должен быть корректный».
+       Факты: прайс застройщика V.3 30.10.26, брошюра застройщика, сверка платежей F707, срок по слову Эльнура (offers/katabello/make_sheet.py).
+       hidden: только /katabello/<номер из build/nomera.json>. Скидки на лист не выносим (Эльнур 01.11: только в личку). */
+    slug: 'katabello', dir: 'offers/katabello', hidden: true,
+    title: 'The Title Katabello · Ката, квартиры у пляжа',
+    desc: 'The Title Katabello у пляжа Ката: квартиры с ремонтом от 4 851 000 ฿, бронь 100 000 ฿, оплата до сдачи без процентов. Предложение Property Library Phuket.',
+    pdf: 'Katabello_Kata.pdf',
+    og: 'offers/katabello/img/preview-v1.jpg',
+    h: 8708,   // PDF 2303 мм (8 стр.) × 794/210 (01.11)
+  },
   /* 09.10.2026 Эльнур: общий лист KUARTZ+FIZZ «лишний, удали» — убран; /kuartz-fizz пересылает на /kuartz. */
   {
     /* 04.10.2026 Эльнур: «на секретной странице… зеро наянг гарантия 10% годовых». Факты: objects PLP-ZERO-NAIYANG
