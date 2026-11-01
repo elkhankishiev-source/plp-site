@@ -1401,7 +1401,18 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
     }
     return д;
   })();
-  const distBeach = o.distance_beach_m ? o.distance_beach_m + ' м до пляжа' : '';
+  /* 01.11.2026 (вердикт #217): ближайший пляж не всегда пляж района. Ever Prime стоит в Кароне, а по брошюре
+     застройщика до пляжа Ката 0,9 км, до Карона 1,4 км. Поле beach называет другой пляж — пишем его имя по-русски. */
+  const пляжИмя = (function () {
+    const b = String(o.beach || '').replace(/\s*beach$/i, '').trim();
+    const bru = DISTRICT_RU[b] || b, dru = DISTRICT_RU[o.district] || o.district || '';
+    return (b && bru !== dru && /^[А-Яа-яЁё ]+$/.test(bru)) ? ' ' + bru : '';
+  })();
+  const distBeach = o.distance_beach_m ? o.distance_beach_m + ' м до пляжа' + пляжИмя : '';
+  /* 01.11.2026 (вердикт #217): у прайса с парой колонок «Leasehold / Freehold» цена «от» — лизхолд (первая колонка),
+     фрихолд в карточке отдельным полем freehold_from_thb. Покупателю это пишем рядом с ценой. */
+  const отЛизхолд = [].concat(Array.isArray(o.unit_types) ? o.unit_types : [], Array.isArray(o.price_tiers) ? o.price_tiers : [])
+    .some(x => x && x.freehold_from_thb);
 
   const waText = encodeURIComponent(o.name + ' — интересует этот объект. ' + url);
   const waLink = 'https://wa.me/' + WA + '?text=' + waText;
@@ -1802,7 +1813,7 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
   const distSlug = String(en || '').toLowerCase().replace(/[^a-z]+/g, '-').replace(/^-|-$/g, '');
   const hasDistPage = distSlug && fs.existsSync(path.join(ROOT, 'districts', distSlug + '.html'));
   const areaBits = [
-    o.distance_beach_m ? (o.distance_beach_m + ' м до пляжа') : '',
+    distBeach,
     o.distance_airport_km ? (o.distance_airport_km + ' км до аэропорта') : '',
   ].filter(Boolean);
   const nearbyTxt = nearbyIsFacilities ? '' : nearbyRaw;
@@ -2028,7 +2039,7 @@ if(dark) i.src='../img/brand/plp-mark-white.png';})();</script>
   ${shots}
   <h1>${htmlEsc(o.name)}</h1>
   <p class="loc">${htmlEsc(ru)}, Пхукет${distBeach ? ' · ' + htmlEsc(distBeach) : ''}</p>
-  ${rentLine || soldOutLine || (priceFmt ? '<div class="price">от ' + htmlEsc(priceFmt) + '<small>цена по прайсу застройщика на дату сверки</small></div>' : '')}
+  ${rentLine || soldOutLine || (priceFmt ? '<div class="price">от ' + htmlEsc(priceFmt) + (отЛизхолд ? ' · лизхолд' : '') + '<small>цена по прайсу застройщика на дату сверки</small></div>' : '')}
   <div class="chips">${chips}</div>
   ${(!isRent && stageNoteOf(o)) ? '<p class="stgnote">' + htmlEsc(stageNoteOf(o)) + '</p>' : ''}
   ${'' /* акции на витрину не выводим — см. комментарий у promo в каталоге */}
