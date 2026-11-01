@@ -2261,12 +2261,22 @@
     {
      "beds": 1,
      "code": "1BL",
-     "free": 15,
+     "free": 19,
      "name": "1 спальня",
      "area_sqm": 37,
      "price_from_thb": 5827500,
      "area": 37,
      "from": 5827500
+    },
+    {
+     "beds": 1,
+     "code": "1BXL",
+     "free": 3,
+     "name": "1 спальня",
+     "area_sqm": 41,
+     "price_from_thb": 6242250,
+     "area": 41,
+     "from": 6242250
     },
     {
      "beds": 1,
@@ -2277,6 +2287,16 @@
      "price_from_thb": 7303800,
      "area": 47,
      "from": 7303800
+    },
+    {
+     "beds": 1,
+     "code": "1BPMA",
+     "free": 7,
+     "name": "1 спальня",
+     "area_sqm": 54,
+     "price_from_thb": 9128700,
+     "area": 54,
+     "from": 9128700
     },
     {
      "beds": 1,
@@ -2291,12 +2311,22 @@
     {
      "beds": 1,
      "code": "1BPLA",
-     "free": 13,
+     "free": 14,
      "name": "1 спальня",
      "area_sqm": 61,
      "price_from_thb": 10632300,
      "area": 61,
      "from": 10632300
+    },
+    {
+     "beds": 3,
+     "code": "PH22",
+     "free": 2,
+     "name": "Пентхаус · 3 спальни",
+     "area_sqm": 100,
+     "price_from_thb": 13965000,
+     "area": 100,
+     "from": 13965000
     },
     {
      "beds": 2,
@@ -2309,26 +2339,6 @@
      "from": 18549300
     },
     {
-     "beds": 2,
-     "code": "PH17C",
-     "free": 1,
-     "name": "Пентхаус · 2 спальни",
-     "area_sqm": 129,
-     "price_from_thb": 19911150,
-     "area": 129,
-     "from": 19911150
-    },
-    {
-     "beds": 3,
-     "code": "PH22",
-     "free": 1,
-     "name": "Пентхаус · 3 спальни",
-     "area_sqm": 100,
-     "price_from_thb": 13965000,
-     "area": 100,
-     "from": 13965000
-    },
-    {
      "beds": 3,
      "code": "PH18C",
      "free": 1,
@@ -2337,6 +2347,16 @@
      "price_from_thb": 19293750,
      "area": 125,
      "from": 19293750
+    },
+    {
+     "beds": 2,
+     "code": "PH17C",
+     "free": 1,
+     "name": "Пентхаус · 2 спальни",
+     "area_sqm": 129,
+     "price_from_thb": 19911150,
+     "area": 129,
+     "from": 19911150
     },
     {
      "beds": 3,
@@ -2370,40 +2390,60 @@
    "price_from": 29020000,
    "units": [
     {
-     "beds": null,
-     "code": null,
+     "beds": 3,
+     "code": "S",
      "free": 1,
-     "name": "Планировка",
+     "name": "3 спальни",
      "area_sqm": 295,
      "price_from_thb": 38260000,
      "area": 295,
      "from": 38260000
     },
     {
-     "beds": null,
-     "code": null,
+     "beds": 3,
+     "code": "S",
+     "free": 1,
+     "name": "3 спальни",
+     "area_sqm": 305,
+     "price_from_thb": 36100000,
+     "area": 305,
+     "from": 36100000
+    },
+    {
+     "beds": 3,
+     "code": "A",
      "free": 12,
-     "name": "Планировка",
+     "name": "3 спальни",
      "area_sqm": 328,
      "price_from_thb": 29020000,
      "area": 328,
      "from": 29020000
     },
     {
-     "beds": null,
-     "code": null,
-     "free": 3,
-     "name": "Планировка",
+     "beds": 3,
+     "code": "M",
+     "free": 5,
+     "name": "3 спальни",
      "area_sqm": 406,
      "price_from_thb": 47990000,
      "area": 406,
      "from": 47990000
     },
     {
-     "beds": null,
-     "code": null,
+     "beds": 4,
+     "code": "L",
+     "free": 3,
+     "name": "4 спальни",
+     "area_sqm": 496,
+     "price_from_thb": 64960000,
+     "area": 496,
+     "from": 64960000
+    },
+    {
+     "beds": 4,
+     "code": "XL",
      "free": 2,
-     "name": "Планировка",
+     "name": "4 спальни",
      "area_sqm": 660,
      "price_from_thb": 96720000,
      "area": 660,
