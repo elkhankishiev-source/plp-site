@@ -1294,8 +1294,15 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
   const en = o.district || o.beach || '';
   const ru = DISTRICT_RU[en] || en;
   const t = typeLabel(o.type);
-  const beds = bedsLabel(o);
-  const area = areaLabel(o);
+  /* 01.11.2026 (вердикт #240): в плашке страницы спальни перечнем, если в типах пропуск (Ever Prime: 1, 2 и 4, трёх нет),
+     и площадь с запятой, как в описании. Каталог (beds/area в index) не трогаем: там свой формат и фильтры. */
+  const beds = (function () {
+    const тип = [].concat(Array.isArray(o.unit_types) ? o.unit_types : [], Array.isArray(o.price_tiers) ? o.price_tiers : []);
+    const сп = [...new Set(тип.map(x => x && Number(x.bedrooms)).filter(n => Number.isInteger(n) && n >= 0))].sort((a, b) => a - b);
+    const пропуск = сп.length >= 2 && сп.length < сп[сп.length - 1] - сп[0] + 1;
+    return пропуск ? сп.map(n => n === 0 ? 'студия' : String(n)).join(', ') : bedsLabel(o);
+  })();
+  const area = String(areaLabel(o) || '').replace(/(\d)\.(\d)/g, '$1,$2');
   const dl = deadline(o.handover_date);
   const yr = yieldRange(benchmarks, en, o.type);
   const usp = (o.usp || '').trim();
@@ -1619,7 +1626,7 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
            а в списке минимальная планировка 37 м². Показываем вилку группы. */
         const areaTxt = (u.areaMin && u.areaMax && u.areaMax - u.areaMin > 0.5)
           ? (num(u.areaMin) + '–' + num(u.areaMax) + ' м²')
-          : (u.area ? (/м²|м2/.test(String(u.area)) ? String(u.area) : (u.area + ' м²')) : '');   /* 10.10: площадь уже со «м²» не удваиваем */
+          : (u.area ? (/м²|м2/.test(String(u.area)) ? String(u.area) : (u.area + ' м²')).replace(/(\d)\.(\d)/g, '$1,$2') : '');   /* 01.11 #240: запятая, как в описании */   /* 10.10: площадь уже со «м²» не удваиваем */
         const line = [areaTxt, (u.beds != null ? u.beds + ' сп.' : ''),
                       u.plot ? ('участок ' + u.plot) : '',
                       u.free ? ('свободно ' + u.free) : '']
@@ -1797,17 +1804,17 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
   const payBlock = payLines.length
     ? '<section class="desc"><h2>Как платить</h2><dl class="pairs">' +
       payLines.map(([k, v]) => '<dt>' + htmlEsc(k) + '</dt><dd>' + htmlEsc(v) + '</dd>').join('') +
-      '</dl><p class="fine">Точный график под ваш юнит и сроки считает специалист — цифры застройщика меняются.</p></section>'
+      '</dl><p class="fine">Точный график под ваш юнит и сроки считает специалист: цифры застройщика меняются.</p></section>'
     : '';
 
   const ownRaw = String(o.ownership || '').trim();
   const ownRu = !ownRaw ? '' :
-    /both/i.test(ownRaw) ? 'Фрихолд или лизхолд — на выбор' :
+    /both/i.test(ownRaw) ? 'Фрихолд или лизхолд на выбор' :
     /^leasehold/i.test(ownRaw) ? 'Лизхолд' :
     /^freehold/i.test(ownRaw) ? 'Фрихолд' : ownRaw;
   const ownBlock = ownRu
     ? '<section class="desc"><h2>Форма владения</h2><p>' + htmlEsc(ownRu) +
-      '</p><p class="fine">Что это значит для иностранца — в <a href="../#faq-leasehold-ili-freehold">ответе про формы владения</a>.</p></section>'
+      '</p><p class="fine">Что это значит для иностранца, читайте в <a href="../#faq-leasehold-ili-freehold">ответе про формы владения</a>.</p></section>'
     : '';
 
   const distSlug = String(en || '').toLowerCase().replace(/[^a-z]+/g, '-').replace(/^-|-$/g, '');
