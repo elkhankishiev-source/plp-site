@@ -548,6 +548,11 @@ const CP = f => (LANG === 'en' && EN_P[KEY] && EN_P[KEY][f] !== undefined) ? EN_
 const VISA = new URLSearchParams(location.search).get('offer') === 'visa';
 const VISA_T = { ru:{ chip:'Виза на вас и вашу семью на 10 лет', gifts:['Виза LTR на 10 лет для вас и вашей семьи в подарок, оформление берём на себя','Консультация наших специалистов по вашему случаю'], cond:'Условия визы LTR: покупка недвижимости от 500 000 $ и активы по миру от 1 млн $, включая эту покупку. Требования уточните у специалиста' },
                  en:{ chip:'A 10-year visa for you and your family', gifts:['A 10-year LTR visa for you and your family as a gift; we handle the application','A consultation with our team on your case'], cond:'LTR visa conditions: property from USD 500,000 and worldwide assets of USD 1 million, including this purchase. Please check the requirements with our specialist' } };
+/* 02.11 Эльнур: «после квиза… разместить требования к визе LTR, базовые, детали всегда у нас: даём затравку, греем, отсеиваем, остальное у специалиста». */
+const VISA_DONE_T = { ru:{ h:'Виза LTR на 10 лет: главное', li:['Срок 10 лет: 5 лет и продление ещё на 5','Вам, супругу или супруге и детям до 20 лет','Покупка недвижимости в Таиланде от 500 000 $, одним объектом или несколькими','Активы по миру от 1 млн $, включая эту покупку'], f:'Ваш случай разберёт наш специалист и подскажет, что нужно именно вам. Оформление визы берём на себя.' },
+                      en:{ h:'LTR visa for 10 years: the essentials', li:['10 years: 5 years plus a 5-year extension','For you, your spouse and children under 20','Property in Thailand from USD 500,000, one unit or several','Worldwide assets of USD 1 million, including this purchase'], f:'Our specialist will go through your case and tell you exactly what you need. We handle the visa application.' } };
+const VISA_DONE = () => { if (!VISA) return ''; const t = VISA_DONE_T[LANG] || VISA_DONE_T.ru;
+  return '<div class="gift" style="margin:14px 18px 0"><b>' + t.h + '</b>' + t.li.map(x => '<span>✓ ' + x + '</span>').join('') + '<small style="font-weight:500;opacity:.8;margin-top:4px">' + t.f + '</small></div>'; };
 const CPV = f => { const v = CP(f); if (!VISA) return v; const t = VISA_T[LANG] || VISA_T.ru;
   if (f === 'gifts') return t.gifts; if (f === 'ad' && v) return Object.assign({}, v, { chip: t.chip }); return v; };
 /* подсказка о номере по-английски: phone.js общий с главной, его не трогаем — переводим по причине отказа */
@@ -919,7 +924,7 @@ function finish(r){
        «Написал вам» остаётся только когда приёмник подтвердил отправку (r.sent). */
     (r.sent ? '<p>' + U('sent')(ch, r.phone) + '</p>'
             : '<p>' + U('notSent') + '</p>') + '</div></div>' + write +
-    '<div class="facts">' + CP('facts').map(f => '<div><b>' + f[0] + '</b>' + f[1] + '</div>').join('') + '</div>' +
+    '<div class="facts">' + CP('facts').map(f => '<div><b>' + f[0] + '</b>' + f[1] + '</div>').join('') + '</div>' + VISA_DONE() +
     '<div class="gal">' + C.gal.map(g => { const [n, st] = g.split('|'); return '<i class="gi"><img src="img/' + n + '.webp" alt=""' + (st ? ' style="' + st + '"' : '') + '></i>'; }).join('') + '</div>' +
     /* 13.10.2026: ссылка в бот несёт метку заявки (r.tg_start), бот по ней узнаёт Telegram человека.
        19.10.2026: бот, второй мессенджер и канал — мелкими ссылками под «Другие способы»; обложка презентации убрана с экрана
