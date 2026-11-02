@@ -534,6 +534,13 @@ function langFor(key){
 const L = s => (LANG === 'en' && EN[s]) || s;                          /* вопрос, вариант, подсказка на экране */
 const U = k => (C && C.ui && C.ui[LANG] && C.ui[LANG][k] !== undefined) ? C.ui[LANG][k] : UI[LANG][k];   /* строка интерфейса; 02.11 проект может перекрыть (виза LTR) */
 const CP = f => (LANG === 'en' && EN_P[KEY] && EN_P[KEY][f] !== undefined) ? EN_P[KEY][f] : C[f];   /* текст проекта */
+/* 02.11 Эльнур: «квиз у нас бюджет сроки даты, как и было! после квиза требования, и мы берём помощь в оформлении на себя, а не гарантия».
+   ?offer=visa на квизе проекта (purita, eden): вопросы те же; шапка с плашкой визы; после квиза требования и помощь в оформлении. */
+const VISA = new URLSearchParams(location.search).get('offer') === 'visa';
+const VISA_T = { ru:{ chip:'Виза семье на 10 лет', gifts:['Виза LTR на 10 лет для всей семьи: помощь в оформлении берём на себя, за наш счёт','Требования визы: покупка недвижимости от 500 000 $ и активы от 1 млн $','Консультация наших специалистов по вашему случаю'] },
+                 en:{ chip:'10-year visa for your family', gifts:['10-year LTR visa for your whole family: we handle the application, at our cost','Visa requirements: property from USD 500,000 and assets of USD 1 million','A consultation with our team on your case'] } };
+const CPV = f => { const v = CP(f); if (!VISA) return v; const t = VISA_T[LANG] || VISA_T.ru;
+  if (f === 'gifts') return t.gifts; if (f === 'ad' && v) return Object.assign({}, v, { chip: t.chip }); return v; };
 /* подсказка о номере по-английски: phone.js общий с главной, его не трогаем — переводим по причине отказа */
 function hintEn(r, cc){
   const w = String(r.why || ''), e = String(r.error || ''), ex = ', e.g. +66 81 234 5678.';
@@ -685,7 +692,7 @@ function boot(){
   /* 27.10.2026 Эльнур «го»: первый экран = продолжение рекламы. 25–27.10 из 284 открывших квиз на первый вопрос ответили 37 (13%).
      Человек видит ту же картинку, название и цену, что в объявлении (кампания 4proj_2510), сразу под ними вопрос.
      Замер: доля kviz_start от kviz_open в site_events по 4proj_2510 до и после этой правки. */
-  const AD = CP('ad');
+  const AD = CPV('ad');
   $('s0').innerHTML = AD ? '<div class="adh"><img src="img/' + AD.img + '.webp" alt=""><div class="adt"><b>' + (AD.title || C.name) + '</b><span>' + AD.sub +
     '</span><i></i><strong>' + AD.big + '</strong><span>' + AD.note + '</span><em>' + AD.chip + '</em></div></div>'
     : '<div class="top"><h1>' + CP('h1') + '</h1></div>';
@@ -712,7 +719,7 @@ function render(){
   const left = Q.length - i;
   $('stepn').textContent = i < Q.length ? U('step')(i + 1, Q.length, left) : U('ready');
   $('gift').style.display = (CP('ad') || C.short) && i === 0 ? 'none' : '';   // 02.11: и у короткой шапки (виза LTR) вопрос сразу под заголовком   // 27.10: на первом шаге бонус уже в рекламной шапке, вопрос поднимаем выше
-  $('gift').innerHTML = '<b>' + (i < Q.length ? U('giftsQ') : U('giftsF')) + '</b>' + CP('gifts').map(g => '<span>🎁 ' + g + '</span>').join('');
+  $('gift').innerHTML = '<b>' + (i < Q.length ? U('giftsQ') : U('giftsF')) + '</b>' + CPV('gifts').map(g => '<span>🎁 ' + g + '</span>').join('');
   $('bar').style.width = Math.round((i + 1) / total * 100) + '%'; $('back').hidden = !i;
   if (i < Q.length) {
     const s = Q[i], pics = !!s.o[0][1];
