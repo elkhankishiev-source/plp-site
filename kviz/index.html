@@ -912,7 +912,7 @@ function finish(r){
      человеку бот отвечает по его квизу. Кода нет (приёмник не ответил) — как раньше, в рабочий Telegram с набранным текстом. */
   const botMain = tgFirst && r.tg_start;
   const bBOT = '<a class="tg" data-ev="click_tg_bot" href="' + r.tg_start + '" target="_blank" rel="noopener">' + icTG + U('bBOT') + '</a>';
-  const write = '<p class="mot">' + ((LANG === 'en' && EN_P[wkey] && EN_P[wkey].mot) || MOT[wkey] || U('motDef')) + '</p>' +
+  const write = '<p class="mot">' + (VISA ? (LANG === 'en' ? 'Message us now and we will send prices for ' + C.name + ' and the visa terms for your family.' : 'Напишите сейчас, и пришлём цены ' + C.name + ' и условия визы для вашей семьи.') : ((LANG === 'en' && EN_P[wkey] && EN_P[wkey].mot) || MOT[wkey] || U('motDef'))) + '</p>' +
     '<div class="wr">' + (botMain ? bBOT : tgFirst ? bTG : bWA) + '</div>' +
     (botMain ? '<p class="wrh">' + U('wrhBot') + '</p>' : '<p class="wrh">' + U('wrh') + '</p>');
   $('quiz').hidden = true; $('s0').hidden = true; $('foot0').hidden = true;
