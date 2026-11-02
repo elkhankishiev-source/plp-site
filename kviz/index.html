@@ -784,7 +784,9 @@ function send(){
     .then(r => {
       clearTimeout(timer);
       if (r && r.ok === false && r.field === 'phone') { unlock(); const h = LANG === 'en' ? UI.en.phoneErr : (r.hint || 'Проверьте номер: код страны и все цифры.'); $('err').textContent = h; $('err').dataset.f = 'pn'; $('pn').setAttribute('aria-invalid', 'true'); TR('phone_err', phoneWhy('приёмник', 'отказ', h)); return; }
-      if (!isTest) {   // тестовые номера (то же правило, что ТЕСТ в реклама_сводка.py) не считаем лидом в рекламе
+      /* 02.11.2026 спам0211 (го Эльнура 02.11 «чини!»): приёмник отвечает lead_event:false на повтор того же номера за 72 ч, «шум» и партнёра —
+         тогда Lead в пиксель и generate_lead не шлём (сервер в Meta тоже не шлёт). event_id приёмника один на номер за 72 ч. */
+      if (!isTest && !(r && r.lead_event === false)) {   // тестовые номера (то же правило, что ТЕСТ в реклама_сводка.py) не считаем лидом в рекламе
         const ev = r && r.event_id ? { eventID: r.event_id } : undefined;
         /* 22.10.2026 Эльнур «го» (качество сопоставления Meta): ручное расширенное сопоставление (manual advanced matching) —
            номер, имя и id посетителя в пиксель перед Lead; пиксель сам хэширует SHA-256, в открытом виде не уходят.
