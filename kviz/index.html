@@ -546,8 +546,8 @@ const CP = f => (LANG === 'en' && EN_P[KEY] && EN_P[KEY][f] !== undefined) ? EN_
 /* 02.11 Эльнур: «квиз у нас бюджет сроки даты, как и было! после квиза требования, и мы берём помощь в оформлении на себя, а не гарантия».
    ?offer=visa на квизе проекта (purita, eden): вопросы те же; шапка с плашкой визы; после квиза требования и помощь в оформлении. */
 const VISA = new URLSearchParams(location.search).get('offer') === 'visa';
-const VISA_T = { ru:{ chip:'Виза на вас и вашу семью на 10 лет', gifts:['Виза LTR на 10 лет для вас и вашей семьи в подарок, оформление берём на себя','Консультация наших специалистов по вашему случаю'], cond:'Условия визы LTR: покупка недвижимости от 500 000 $ и активы от 1 млн $' },
-                 en:{ chip:'A 10-year visa for you and your family', gifts:['A 10-year LTR visa for you and your family as a gift; we handle the application','A consultation with our team on your case'], cond:'LTR visa conditions: property from USD 500,000 and assets of USD 1 million' } };
+const VISA_T = { ru:{ chip:'Виза на вас и вашу семью на 10 лет', gifts:['Виза LTR на 10 лет для вас и вашей семьи в подарок, оформление берём на себя','Консультация наших специалистов по вашему случаю'], cond:'Условия визы LTR: покупка недвижимости от 500 000 $ и активы по миру от 1 млн $, включая эту покупку. Требования уточните у специалиста' },
+                 en:{ chip:'A 10-year visa for you and your family', gifts:['A 10-year LTR visa for you and your family as a gift; we handle the application','A consultation with our team on your case'], cond:'LTR visa conditions: property from USD 500,000 and worldwide assets of USD 1 million, including this purchase. Please check the requirements with our specialist' } };
 const CPV = f => { const v = CP(f); if (!VISA) return v; const t = VISA_T[LANG] || VISA_T.ru;
   if (f === 'gifts') return t.gifts; if (f === 'ad' && v) return Object.assign({}, v, { chip: t.chip }); return v; };
 /* подсказка о номере по-английски: phone.js общий с главной, его не трогаем — переводим по причине отказа */
