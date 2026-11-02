@@ -128,6 +128,7 @@ h1,.q{text-wrap:balance;letter-spacing:-.025em}
 .opts.pics .opt:last-child:nth-child(odd){grid-column:1/-1}
 .opts.pics .opt:last-child:nth-child(odd) .ph{aspect-ratio:16/7}
 .opts.pics .opt span{padding:0 4px 4px;font-size:.88rem;line-height:1.25}
+.opts.big .opt{padding:19px 18px;font-size:1.08rem;min-height:62px}   /* 02.11 виза LTR: первый вопрос крупными кнопками */
 .opt .hint{display:block;margin-top:3px;font-weight:400;font-size:.84rem;color:var(--muted);line-height:1.3}
 a.opt{color:inherit;text-decoration:none;min-width:0}.opts.pics{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
 .opt:hover{border-color:var(--olive)}.opt.on{border-color:var(--olive);background:var(--sage-soft)}
@@ -406,6 +407,36 @@ const P = {
         o:[['Студия, 29,5–36,3 м²','z-studio'],['1-спальная, 37,5–46 м²','z-1bed'],['1-спальная плюс, 44,4–52,4 м²','z-1bplus-plan','object-fit:contain;transform:none'],
           ['2-спальная, 52,8–66,7 м²','z-2bed'],['Сьют, 81,2–105 м²','z-suite'],['Помогите выбрать','z-front']]},
       ...STD()]
+  },
+  /* 02.11.2026 го Эльнура («ок го!» на группу «Резидентство и капитал», «супер го!» на формулу «Фрихолд у моря в собственность + 10 лет визы семье»):
+     программа «виза LTR на 10 лет семье за счёт Property Library при покупке от 500 000 $» (память plp-visa-offer-ltr-0211, тексты ~/plp-ops/реклама/виза_0211/тексты_v2.md).
+     Не проект: object_id пустой (иначе в карточку встанет несуществующий active_object_id), заявку видно по object_name «Виза LTR» и адресу ?p=visa.
+     Шапка одной строкой без картинки (разбор квиз_первый_экран_0211.md: шапка 375 px съедала полэкрана), первый вопрос крупными кнопками без фото.
+     Значения в заявку (пятый элемент) с подписью: sitelead отдельными полями берёт budget и srok, состав семьи и активы идут в тексте заявки (message). */
+  visa: {
+    id:'', name:'Виза LTR', place:'Пхукет', hero:'lake-cover', short:true,
+    h1:'Виза на 10 лет всей семье*',
+    foot:'*Виза LTR за счёт Property Library для клиентов, которые соответствуют требованиям: от 500 000 $ в недвижимость Таиланда и активы от 1 млн $. Рендеры застройщиков',
+    gifts:['Результат теста: подходите ли под визу LTR','Условия программы и подбор недвижимости от 500 000 $','Консультация наших специалистов по вашему случаю'],
+    facts:[['10 лет','виза LTR вам, супругу и детям'],['от 500 000 $','одним объектом или несколькими'],['фрихолд','в собственность по иностранной квоте'],['за наш счёт','оформление визы клиентам Property Library']],
+    gal:['pu-pool','lake-pool','pu-garden'], sheet:'', bot:'kviz_visa',
+    ui:{ ru:{ formQ:'Куда прислать результат теста и условия программы?', submit:'Получить условия',
+               who:'<b>Эльнур Ханкишиев</b>, основатель Property Library. Пришлю лично результат теста и условия программы.',
+               msg:(name, ref) => 'Здравствуйте! Хочу получить условия программы визы LTR.' + (ref ? ' Заявка ' + ref : ''),
+               step:(n, t, left) => 'Вопрос ' + n + ' из ' + t + (left > 1 ? ' · ещё ' + (left - 1) + ', и пришлю результат' : ' · последний вопрос') },
+         en:{ formQ:'Where should I send your quiz result and the programme terms?', submit:'Get the details',
+               who:'<b>Elnur Khankishiev</b>, founder of Property Library. I will personally send you your result and the programme terms.',
+               msg:(name, ref) => 'Hello! I would like to get the terms of the LTR visa programme.' + (ref ? ' Request ' + ref : ''),
+               step:(n, t, left) => 'Question ' + n + ' of ' + t + (left > 1 ? ' · ' + (left - 1) + ' more, then I send your result' : ' · last question') } },
+    Q:[
+      {k:'who', q:'Кому нужна виза?', big:true,
+        o:[['Только мне',null,null,null,'виза: только мне'],['Мне и супругу или супруге',null,null,null,'виза: мне и супругу'],['Всей семье с детьми',null,null,null,'виза: всей семье с детьми']]},
+      {k:'budget', q:'Сколько планируете вложить в недвижимость?',
+        o:[['500 тыс.–1 млн $',null,null,null,'от 500 тыс. до 1 млн $'],['1–2 млн $',null,null,null,'от 1 до 2 млн $'],['Больше 2 млн $',null,null,null,'больше 2 млн $']]},
+      {k:'assets', q:'Ваши активы в сумме, включая недвижимость и вложения, от 1 млн $?',
+        o:[['Да',null,null,null,'активы от 1 млн $: да'],['Около того',null,null,null,'активы от 1 млн $: около того'],['Пока нет',null,null,null,'активы от 1 млн $: пока нет']]},
+      {k:'when', q:'Когда нужна виза?',
+        o:[['В течение года',null,null,null,'виза нужна в течение года'],['Через 1–2 года',null,null,null,'виза нужна через 1–2 года'],['Подожду сдачи объекта',null,null,null,'виза после сдачи объекта']]}]
   }
 };
 /* 01.11.2026 го Эльнура («го», «го сейчас! гитхаб вошел»): английский квиз, шаг 2 — PURITA и Millennium. Один файл, второй копии нет.
@@ -425,7 +456,13 @@ const EN_P = {
     foot:'*Layan Green Park developer price list. Developer renderings',
     gifts:['Millennium prices and floor plans','Foreign quota apartments from 3.42M THB','A selection with the best floor and view'],
     facts:[['from 3.42M ฿','studio, 24.4 m²'],['750 m','to Bang Tao beach'],['56 m','rooftop infinity pool'],['10%','on key handover']],
-    mot:'Message me now and I will send Millennium prices and floor plans under the foreign quota and pick the best floor and view.' }
+    mot:'Message me now and I will send Millennium prices and floor plans under the foreign quota and pick the best floor and view.' },
+  /* 02.11 виза LTR: те же факты, что в русском P.visa и в тексте EN-объявления (тексты_v2.md) */
+  visa: { place:'Phuket', h1:'A 10-year visa for your whole family*',
+    foot:'*LTR visa covered by Property Library for clients who meet the criteria: USD 500,000 in Thai property and at least USD 1 million in assets. Developer renderings',
+    gifts:['Your result: do you qualify for the LTR visa','Programme terms and property from USD 500,000','A consultation with our team on your case'],
+    facts:[['10 years','LTR visa for you, your spouse and children'],['from $500K','one property or several'],['freehold','in your name under the foreign quota'],['covered','visa paperwork for Property Library clients']],
+    mot:'Message me now and I will send your result, the programme terms and a property selection from USD 500,000.' }
 };
 /* вопросы, варианты и подсказки: русская строка → английская (ключ — та же строка, что уходит в заявку) */
 const EN = {
@@ -441,7 +478,12 @@ const EN = {
   'До 5 млн бат (до 145 тыс. $)':'Up to 5M THB (up to $145K)', '5–10 млн бат (145–285 тыс. $)':'5–10M THB ($145K–285K)',
   '10–20 млн бат (285–570 тыс. $)':'10–20M THB ($285K–570K)', 'Больше 20 млн бат (больше 570 тыс. $)':'Over 20M THB (over $570K)',
   'Когда планируете покупку?':'When are you planning to buy?',
-  'В течение месяца':'Within a month', '1–3 месяца':'In 1–3 months', '3–6 месяцев':'In 3–6 months', 'Пока присматриваюсь':'Just looking for now'
+  'В течение месяца':'Within a month', '1–3 месяца':'In 1–3 months', '3–6 месяцев':'In 3–6 months', 'Пока присматриваюсь':'Just looking for now',
+  /* 02.11 виза LTR */
+  'Кому нужна виза?':'Who needs the visa?', 'Только мне':'Just me', 'Мне и супругу или супруге':'Me and my spouse', 'Всей семье с детьми':'My whole family, with children',
+  'Сколько планируете вложить в недвижимость?':'How much do you plan to invest in property?', '500 тыс.–1 млн $':'$500K–1M', '1–2 млн $':'$1–2M', 'Больше 2 млн $':'Over $2M',
+  'Ваши активы в сумме, включая недвижимость и вложения, от 1 млн $?':'Are your total assets, including property and investments, at least $1M?', 'Да':'Yes', 'Около того':'About that', 'Пока нет':'Not yet',
+  'Когда нужна виза?':'When do you need the visa?', 'В течение года':'Within a year', 'Через 1–2 года':'In 1–2 years', 'Подожду сдачи объекта':'I can wait until the property is completed'
 };
 const CCL_EN = { '7':'Russia, Kazakhstan','375':'Belarus','380':'Ukraine','998':'Uzbekistan','996':'Kyrgyzstan','992':'Tajikistan','994':'Azerbaijan','995':'Georgia','374':'Armenia','373':'Moldova','370':'Lithuania','371':'Latvia','372':'Estonia','66':'Thailand','972':'Israel','971':'UAE','90':'Turkey','65':'Singapore','852':'Hong Kong','60':'Malaysia','62':'Indonesia','84':'Vietnam','86':'China','81':'Japan','82':'Korea','61':'Australia','49':'Germany','48':'Poland','420':'Czechia','43':'Austria','41':'Switzerland','44':'United Kingdom','33':'France','34':'Spain','39':'Italy','351':'Portugal','31':'Netherlands','32':'Belgium','357':'Cyprus','30':'Greece','381':'Serbia','382':'Montenegro','359':'Bulgaria','36':'Hungary','40':'Romania','46':'Sweden','47':'Norway','45':'Denmark','358':'Finland','353':'Ireland','1':'USA, Canada' };
 /* строки интерфейса */
@@ -490,7 +532,7 @@ function langFor(key){
   return ls.some(x => /^(ru|uk|be|kk|ky|uz|tg|hy|az|ka)\b/.test(x)) ? 'ru' : 'en';
 }
 const L = s => (LANG === 'en' && EN[s]) || s;                          /* вопрос, вариант, подсказка на экране */
-const U = k => UI[LANG][k];                                             /* строка интерфейса */
+const U = k => (C && C.ui && C.ui[LANG] && C.ui[LANG][k] !== undefined) ? C.ui[LANG][k] : UI[LANG][k];   /* строка интерфейса; 02.11 проект может перекрыть (виза LTR) */
 const CP = f => (LANG === 'en' && EN_P[KEY] && EN_P[KEY][f] !== undefined) ? EN_P[KEY][f] : C[f];   /* текст проекта */
 /* подсказка о номере по-английски: phone.js общий с главной, его не трогаем — переводим по причине отказа */
 function hintEn(r, cc){
@@ -507,7 +549,7 @@ function hintEn(r, cc){
   if (/^не тот вид/.test(e)) return 'This does not look like a valid +' + (r.code || '') + ' number. Check the digits and the country code.';
   return UI.en.phoneErr;
 }
-const POST = { kuartz:'https://t.me/property_library_phuket', vibe2:'https://t.me/property_library_phuket', fizz:'https://t.me/property_library_phuket', eden:'https://t.me/property_library_phuket', purita:'https://t.me/property_library_phuket', millennium:'https://t.me/property_library_phuket', zero:'https://t.me/property_library_phuket' }; /* ссылки на посты-разборы: подставить, когда выйдут */
+const POST = { kuartz:'https://t.me/property_library_phuket', vibe2:'https://t.me/property_library_phuket', fizz:'https://t.me/property_library_phuket', eden:'https://t.me/property_library_phuket', purita:'https://t.me/property_library_phuket', millennium:'https://t.me/property_library_phuket', zero:'https://t.me/property_library_phuket', visa:'https://t.me/property_library_phuket' }; /* ссылки на посты-разборы: подставить, когда выйдут */
 /* 16.10.2026 Эльнур: «поле код с флажками всё испортит, убери, организуй поле номер заново без ошибок».
    Одно поле, в нём уже стоит +, номер целиком с кодом страны. Проверяет тот же phone.js, что и приёмник.
    Набрал 00 вместо + или российское 8XXXXXXXXXX — поправляем сами. */
@@ -669,13 +711,13 @@ function render(){
   const Q = C.Q, total = Q.length + 1;
   const left = Q.length - i;
   $('stepn').textContent = i < Q.length ? U('step')(i + 1, Q.length, left) : U('ready');
-  $('gift').style.display = CP('ad') && i === 0 ? 'none' : '';   // 27.10: на первом шаге бонус уже в рекламной шапке, вопрос поднимаем выше
+  $('gift').style.display = (CP('ad') || C.short) && i === 0 ? 'none' : '';   // 02.11: и у короткой шапки (виза LTR) вопрос сразу под заголовком   // 27.10: на первом шаге бонус уже в рекламной шапке, вопрос поднимаем выше
   $('gift').innerHTML = '<b>' + (i < Q.length ? U('giftsQ') : U('giftsF')) + '</b>' + CP('gifts').map(g => '<span>🎁 ' + g + '</span>').join('');
   $('bar').style.width = Math.round((i + 1) / total * 100) + '%'; $('back').hidden = !i;
   if (i < Q.length) {
     const s = Q[i], pics = !!s.o[0][1];
     $('qwrap').style.animation='none'; void $('qwrap').offsetWidth; $('qwrap').style.animation='';
-    $('qwrap').innerHTML = '<div class="q">' + L(s.q) + '</div><div class="opts' + (pics ? ' pics' : '') + '">' +
+    $('qwrap').innerHTML = '<div class="q">' + L(s.q) + '</div><div class="opts' + (pics ? ' pics' : '') + (s.big ? ' big' : '') + '">' +
       s.o.map((o, n) => '<button class="opt' + (A[s.k] === o[0] ? ' on' : '') + '" data-n="' + n + '">' +
         (o[1] ? '<i class="ph"><img' + (s.fit ? ' class="fit"' : '') + ' src="img/' + o[1] + '.webp" alt=""' + (o[2] ? ' style="' + o[2] + '"' : '') + '></i>' : '') + '<span>' + L(o[0]) + (o[3] ? '<small class="hint">' + L(o[3]) + '</small>' : '') + '</span></button>').join('') + '</div>';
     document.querySelectorAll('.opt').forEach(b => b.onclick = () => {
@@ -823,7 +865,8 @@ function finish(r){
     eden:'Напишите сейчас, и пришлём цены, планировки и расчёт рассрочки на 5 лет с первым взносом 20%.',
     purita:'Напишите сейчас, и пришлём цены и планировки Purita и закрепим квартиру с лучшим этажом и видом на сад.',
     millennium:'Напишите сейчас, и пришлём цены и планировки Millennium по иностранной квоте и подберём лучший этаж и вид.',
-    zero:'Напишите, и пришлём расчёт дохода 10% годовых по программе застройщика.' };
+    zero:'Напишите, и пришлём расчёт дохода 10% годовых по программе застройщика.',
+    visa:'Напишите сейчас, и пришлём результат теста, условия программы и подбор недвижимости от 500 000 $.' };
   /* 15.10.2026 Эльнур: кнопка называется как бонус (бонус = мотивация выше), ведёт к тому, за кем закреплён лид.
      16.10.2026: кто — из ответа приёмника (r.assigned_to); нет ответа — запасной вариант по чётности. Подпись без имени
      (Эльнур: «одни карточки на меня, другие на Дарью, и всё»). */
