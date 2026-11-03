@@ -541,6 +541,11 @@ function langFor(key){
   const q = String(new URLSearchParams(location.search).get('lang') || '').toLowerCase();
   if (q === 'en') return 'en';
   if (q) return 'ru';
+  /* 03.11.2026 го Эльнура («срочно чини»): Алекс +(номер в базе) пришёл с русской рекламы visa_ru_0211, браузер без русского → квиз EN, чат EN.
+     Язык рекламы важнее языка браузера: кампания с _ru / _en в utm_campaign решает сама. */
+  const cmp = String(new URLSearchParams(location.search).get('utm_campaign') || '').toLowerCase();
+  if (/(^|[_-])ru([_-]|$)/.test(cmp)) return 'ru';
+  if (/(^|[_-])en([_-]|$)/.test(cmp)) return 'en';
   let ls = []; try { ls = (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || '']).map(x => String(x || '').toLowerCase()); } catch (e) {}
   if (!ls.filter(Boolean).length) return 'ru';
   return ls.some(x => /^(ru|uk|be|kk|ky|uz|tg|hy|az|ka)\b/.test(x)) ? 'ru' : 'en';
