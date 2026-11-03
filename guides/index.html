@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Гиды Property Library Phuket</title>
 <meta name="description" content="Авторские гиды Эльнура Ханкишиева: маршруты по Азии в PDF на русском и английском.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Property Library Phuket">
+<meta property="og:title" content="Гиды Property Library Phuket">
+<meta property="og:description" content="Авторские маршруты по Азии в PDF на русском и английском. Бангкок за 48 часов.">
+<meta property="og:url" content="https://property-library.com/guides/">
+<meta property="og:image" content="https://property-library.com/guides/bangkok-48h-ru.jpg">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <!-- 03.11.2026 Эльнур: «такие штуки держать где-то на сайте, с возможностью скачать PDF и выбор языка, чтобы не терять и можно было всегда дать по назначению».
@@ -29,6 +36,8 @@ p.sub{color:var(--mute);margin:0 0 22px}
 .btns{display:flex;gap:10px;flex-wrap:wrap}
 .btn{display:inline-block;padding:10px 18px;border-radius:999px;text-decoration:none;font-size:15px;border:1px solid var(--acc);color:var(--acc)}
 .btn.main{background:var(--acc);color:var(--accInk)}
+.card img{width:100%;height:auto;border-radius:10px;margin:0 0 14px;display:block}
+.card h2 a{color:inherit;text-decoration:none}
 </style>
 </head>
 <body>
@@ -55,7 +64,7 @@ p.sub{color:var(--mute);margin:0 0 22px}
     document.documentElement.lang=L; document.title=(L==='ru'?'Гиды':'Guides')+' · Property Library Phuket';
     document.getElementById('h').textContent=T[L].h; document.getElementById('s').textContent=T[L].s;
     [].forEach.call(document.querySelectorAll('.lang button'),function(b){b.setAttribute('aria-pressed',b.dataset.l===L?'true':'false')});
-    document.getElementById('list').innerHTML=data.map(function(g){var x=g[L]||g.ru;return '<div class="card" id="'+esc(g.id)+'"><h2>'+esc(x.title)+'</h2><p>'+esc(x.lead)+'</p><div class="meta">PDF · '+esc(x.pages)+' '+T[L].pg+'</div><div class="btns"><a class="btn main" href="'+esc(x.pdf)+'" download>'+T[L].dl+'</a><a class="btn" href="'+esc(x.pdf)+'" target="_blank" rel="noopener">'+T[L].op+'</a></div></div>'}).join('');
+    document.getElementById('list').innerHTML=data.map(function(g){var x=g[L]||g.ru;return '<div class="card" id="'+esc(g.id)+'">'+(x.cover?'<a href="'+esc(x.page||x.pdf)+'"><img src="'+esc(x.cover)+'" alt="" loading="lazy"></a>':'')+'<h2><a href="'+esc(x.page||x.pdf)+'">'+esc(x.title)+'</a></h2><p>'+esc(x.lead)+'</p><div class="meta">PDF · '+esc(x.pages)+' '+T[L].pg+'</div><div class="btns"><a class="btn main" href="'+esc(x.pdf)+'" download>'+T[L].dl+'</a><a class="btn" href="'+esc(x.pdf)+'" target="_blank" rel="noopener">'+T[L].op+'</a></div></div>'}).join('');
   }
   [].forEach.call(document.querySelectorAll('.lang button'),function(b){b.addEventListener('click',function(){L=b.dataset.l;try{history.replaceState(null,'','?lang='+L+location.hash)}catch(e){};draw()})});
   fetch('guides.json',{cache:'no-cache'}).then(function(r){return r.json()}).then(function(d){data=d;draw()}).catch(function(){draw()});
