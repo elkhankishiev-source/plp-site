@@ -839,6 +839,21 @@ function send(){
   /* номер собираем заново в момент отправки (не полагаемся на последнее событие поля) */
   const raw = phoneJoin($('cc').value, $('pn').value); $('ph').value = raw;
   const own = phoneJoin.own, ccUsed = (own || /^(\+|00)/.test(pnClean($('pn').value))) ? '' : ccSplit($('cc').value).code;
+  /* 03.11.2026 вечер (го Эльнура «почини, чтобы было корректно и лид не путался при наборе»; ВЕРДИКТ #312: код +44 и «7911 1234567»
+     с лишней цифрой молча уходил как российский +7 911…). Догадку о коде страны молча не отправляем: ставим понятый код в поле кода,
+     остальные цифры в поле номера и просим проверить. Второе нажатие идёт обычным путём (код совпадает с номером). */
+  if (own && window.PLPPhone) {
+    const k = String((PLPPhone.check(raw) || {}).code || '');
+    if (k && raw.startsWith('+' + k)) {
+      const nat = raw.slice(1 + k.length);
+      $('cc').value = '+' + k; $('pn').value = nat; $('ph').value = raw;
+      const shown = '+' + k + ' ' + nat;
+      $('err').textContent = LANG === 'en' ? 'Please check your number: ' + shown + '. If it is correct, press the button again.'
+                                           : 'Проверьте номер: ' + shown + '. Если верно, нажмите кнопку ещё раз.';
+      $('err').dataset.f = 'pn'; try { $('pn').focus(); } catch (e) {}
+      TR('phone_err', phoneWhy('форма', 'свой код: показали', own)); return;
+    }
+  }
   const chk = phoneCheck(raw, ccUsed);
   if (!chk.ok) { const h = LANG === 'en' ? hintEn(chk, ccUsed) : (chk.hint || 'Проверьте номер: код страны и все цифры.'); $('err').textContent = h; $('err').dataset.f = 'pn'; $('pn').setAttribute('aria-invalid', 'true'); try { $('pn').focus(); } catch (e) {} TR('phone_err', phoneWhy('форма', chk.why, h)); return; }
   const d = chk.digits; PH = '+' + d; AS = '';
