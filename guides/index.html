@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Гиды Property Library Phuket</title>
+<meta name="description" content="Авторские гиды Эльнура Ханкишиева: маршруты по Азии в PDF на русском и английском.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<!-- 03.11.2026 Эльнур: «такие штуки держать где-то на сайте, с возможностью скачать PDF и выбор языка, чтобы не терять и можно было всегда дать по назначению».
+     Список гидов — одна истина: guides/guides.json. Новый гид = файлы PDF в этой папке + одна запись в guides.json. -->
+<style>
+:root{--bg:#f7f6f1;--card:#fff;--ink:#16170f;--mute:#6b6b60;--line:#e4e2d8;--acc:#1f4d3a;--accInk:#fff}
+@media (prefers-color-scheme:dark){:root{--bg:#0C0D09;--card:#16170f;--ink:#efeee6;--mute:#a3a296;--line:#2a2b22;--acc:#8fc7a8;--accInk:#0C0D09}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:28px 16px 60px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+a.home{color:var(--mute);text-decoration:none;font-size:14px}
+h1{font-size:28px;line-height:1.2;margin:18px 0 6px}
+p.sub{color:var(--mute);margin:0 0 22px}
+.lang{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.lang button{border:0;background:transparent;color:var(--ink);padding:7px 16px;font:inherit;font-size:14px;cursor:pointer}
+.lang button[aria-pressed="true"]{background:var(--acc);color:var(--accInk)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin:0 0 14px}
+.card h2{font-size:21px;margin:0 0 6px}
+.card p{margin:0 0 14px;color:var(--mute)}
+.meta{font-size:13px;color:var(--mute);margin-bottom:14px}
+.btns{display:flex;gap:10px;flex-wrap:wrap}
+.btn{display:inline-block;padding:10px 18px;border-radius:999px;text-decoration:none;font-size:15px;border:1px solid var(--acc);color:var(--acc)}
+.btn.main{background:var(--acc);color:var(--accInk)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="home" href="/">← Property Library Phuket</a>
+    <div class="lang" role="group" aria-label="Язык">
+      <button type="button" data-l="ru">RU</button><button type="button" data-l="en">EN</button>
+    </div>
+  </header>
+  <h1 id="h"></h1>
+  <p class="sub" id="s"></p>
+  <div id="list"></div>
+</div>
+<script>
+(function(){
+  var T={ru:{h:'Гиды',s:'Авторские маршруты Эльнура Ханкишиева. Скачайте PDF или откройте в браузере.',dl:'Скачать PDF',op:'Открыть',pg:'стр.'},
+         en:{h:'Guides',s:'Curated routes by Elnur Khankishiev. Download the PDF or open it in your browser.',dl:'Download PDF',op:'Open',pg:'pages'}};
+  var q=new URLSearchParams(location.search).get('lang');
+  var L=(q==='en'||q==='ru')?q:(function(){try{var ls=navigator.languages||[navigator.language||''];return ls.some(function(x){return /^(ru|uk|be|kk|ky|uz|tg|hy|az|ka)\b/i.test(x)})?'ru':'en'}catch(e){return 'ru'}})();
+  var data=[];
+  function esc(s){return String(s||'').replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+  function draw(){
+    document.documentElement.lang=L; document.title=(L==='ru'?'Гиды':'Guides')+' · Property Library Phuket';
+    document.getElementById('h').textContent=T[L].h; document.getElementById('s').textContent=T[L].s;
+    [].forEach.call(document.querySelectorAll('.lang button'),function(b){b.setAttribute('aria-pressed',b.dataset.l===L?'true':'false')});
+    document.getElementById('list').innerHTML=data.map(function(g){var x=g[L]||g.ru;return '<div class="card" id="'+esc(g.id)+'"><h2>'+esc(x.title)+'</h2><p>'+esc(x.lead)+'</p><div class="meta">PDF · '+esc(x.pages)+' '+T[L].pg+'</div><div class="btns"><a class="btn main" href="'+esc(x.pdf)+'" download>'+T[L].dl+'</a><a class="btn" href="'+esc(x.pdf)+'" target="_blank" rel="noopener">'+T[L].op+'</a></div></div>'}).join('');
+  }
+  [].forEach.call(document.querySelectorAll('.lang button'),function(b){b.addEventListener('click',function(){L=b.dataset.l;try{history.replaceState(null,'','?lang='+L+location.hash)}catch(e){};draw()})});
+  fetch('guides.json',{cache:'no-cache'}).then(function(r){return r.json()}).then(function(d){data=d;draw()}).catch(function(){draw()});
+  draw();
+})();
+</script>
+</body>
+</html>
