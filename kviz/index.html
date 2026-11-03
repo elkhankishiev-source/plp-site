@@ -541,7 +541,7 @@ function langFor(key){
   const q = String(new URLSearchParams(location.search).get('lang') || '').toLowerCase();
   if (q === 'en') return 'en';
   if (q) return 'ru';
-  /* 03.11.2026 го Эльнура («срочно чини»): Алекс +(номер в базе) пришёл с русской рекламы visa_ru_0211, браузер без русского → квиз EN, чат EN.
+  /* 03.11.2026 го Эльнура («срочно чини»): Алекс (номер в базе) пришёл с русской рекламы visa_ru_0211, браузер без русского → квиз EN, чат EN.
      Язык рекламы важнее языка браузера: кампания с _ru / _en в utm_campaign решает сама. */
   const cmp = String(new URLSearchParams(location.search).get('utm_campaign') || '').toLowerCase();
   if (/(^|[_-])ru([_-]|$)/.test(cmp)) return 'ru';
@@ -621,13 +621,30 @@ function zeroAfterCode(n){
   const fixed = code + dd.slice(code.length).replace(/^0+/, ''), b = PLPPhone.check('+' + fixed);
   return b && b.ok ? '+' + fixed : n;
 }
+/* 03.11.2026: номер, вставленный из контактов, несёт невидимые знаки направления текста (U+200E, U+202A…): «00…» и «+…» за ними
+   не узнавались, номер склеивался с кодом второй раз. Снимаем их до разбора. */
+const pnClean = s => String(s || '').replace(/[\u200b-\u200f\u202a-\u202e\u2060-\u2069\ufeff]/g, '').trim();
+/* 03.11.2026: в поле номера вставили номер со своим кодом страны, а код в первом поле другой или стёрт
+   (код +66, а в номере 7 9xx…; код +66, а в номере 8 9xx…; код стёрт, а в номере 08…). Берём его сам, только если с кодом из поля номер невозможен,
+   а сам по себе он мобильный по libphonenumber: целиком с кодом (без догадок phone.js), российское 8 9xx/8 7xx, тайское 0 6/8/9.
+   Голые 9–10 цифр без кода по-прежнему не угадываем. phoneJoin.own — что сделали (форма тогда шлёт приёмнику номер целиком). */
+function pnOwnCode(d){
+  if (!window.PLPPhone) return null;
+  const m = x => { const r = PLPPhone.check('+' + x); return r && r.ok && r.mobile && !r.fixed ? r.digits : ''; };
+  const dd = d.replace(/^00/, '');
+  let o = m(dd); if (o) return { d: o, why: 'номер со своим кодом' };
+  if (/^8[79]\d{9}$/.test(d) && (o = m('7' + d.slice(1)))) return { d: o, why: '8 → +7' };
+  if (/^0[689]\d{8}$/.test(d) && (o = m('66' + d.slice(1)))) return { d: o, why: '0 → +66' };
+  return null;
+}
 function phoneJoin(cc, pn){
-  const n = String(pn || '').trim();
+  phoneJoin.own = '';
+  const n = pnClean(pn);
   if (/^(\+|00)/.test(n)) return zeroAfterCode(n);           /* вписал полный номер с + — берём как есть (без местного 0 после кода) */
   const sp = ccSplit(cc), c = sp.code;
   let d = sp.rest + n.replace(/\D/g, '');
   if (!d) return '';
-  if (!c) return 'NOCODE';                                   /* код стёрт: просим указать, номер не угадываем */
+  if (!c) { const o = pnOwnCode(d); if (o) { phoneJoin.own = o.why; return '+' + o.d; } return 'NOCODE'; }   /* код стёрт: только номер со своим кодом, иначе просим код */
   /* 01.11.2026 (го Эльнура «до зелёной», лид квиза +84… записан как +7…): 8XXXXXXXXXX при коде +7 — российское 8 только если
      с +7 номер мобильный РФ/КЗ (8 9xx…, 8 7xx…) или иначе никак не читается. Если цифры сами — мобильный номер другой страны
      (84… Вьетнам, 86… Китай, 82… Корея), код уже набран в номере: берём как есть. То же правило в функции базы номер_норма. */
@@ -645,7 +662,10 @@ function phoneJoin(cc, pn){
     const a = PLPPhone.check('+' + d), b2 = PLPPhone.check('+' + c + d);
     if (a && a.ok && a.mobile && !(b2 && b2.ok && b2.mobile)) return '+' + d;
   }
+  const d0 = d;
   if (c !== '39' && /^0/.test(d)) d = d.replace(/^0+/, '');        /* местный «0» (Таиланд 08…, Украина 050…, Европа) — без него */
+  if (window.PLPPhone) { const j = PLPPhone.check('+' + c + d);
+    if (!(j && j.ok)) { const o = pnOwnCode(d0); if (o) { phoneJoin.own = o.why; return '+' + o.d; } } }   /* 03.11: с кодом поля номер невозможен */
   return '+' + c + d;
 }
 /* cc — код страны из первого поля (цифры), если номер собран из двух полей; пусто — человек вписал номер целиком с +.
@@ -812,7 +832,7 @@ function send(){
   if (!okName) { $('err').textContent = U('nameErr'); $('err').dataset.f = 'nm'; $('nm').setAttribute('aria-invalid', 'true'); try { $('err').scrollIntoView({ block: 'center' }); $('nm').focus(); } catch (e) {} TR('name_err', nm ? 'нет букв, ' + nm.length + ' зн.' : 'пусто'); return; }
   /* номер собираем заново в момент отправки (не полагаемся на последнее событие поля) */
   const raw = phoneJoin($('cc').value, $('pn').value); $('ph').value = raw;
-  const ccUsed = /^\s*(\+|00)/.test($('pn').value) ? '' : ccSplit($('cc').value).code;
+  const own = phoneJoin.own, ccUsed = (own || /^(\+|00)/.test(pnClean($('pn').value))) ? '' : ccSplit($('cc').value).code;
   const chk = phoneCheck(raw, ccUsed);
   if (!chk.ok) { const h = LANG === 'en' ? hintEn(chk, ccUsed) : (chk.hint || 'Проверьте номер: код страны и все цифры.'); $('err').textContent = h; $('err').dataset.f = 'pn'; $('pn').setAttribute('aria-invalid', 'true'); try { $('pn').focus(); } catch (e) {} TR('phone_err', phoneWhy('форма', chk.why, h)); return; }
   const d = chk.digits; PH = '+' + d; AS = '';
@@ -820,11 +840,12 @@ function send(){
   ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','utm_id','fbclid','gclid'].forEach(k => { if (p.get(k)) utm[k] = p.get(k); });
   /* 22.10.2026: код страны и номер — ещё и отдельно, как ввёл человек: номер собирает приёмник функцией базы (номер_норма) */
   const lead = { source:'website', funnel:'ads_quiz', object_id:C.id, object_name:C.name, name:$('nm').value.trim(), phone:'+' + d, lid:LID,
-    phone_cc:String($('cc').value || '').trim().slice(0, 8), phone_national:String($('pn').value || '').trim().slice(0, 40),
+    /* 03.11: номер со своим кодом (phoneJoin.own) — приёмнику целиком с +, без кода поля, иначе номер_норма склеит код второй раз */
+    phone_cc:own ? '' : String($('cc').value || '').trim().slice(0, 8), phone_national:own ? raw : pnClean($('pn').value).slice(0, 40),
     contact_pref:A.channel, plan:A.plan, goal:VAL('goal'), budget:VAL('budget'), srok:VAL('when'), quiz_v:2,
     message:'Квиз ' + C.name + ': ' + C.Q.map(s => VAL(s.k)).filter(Boolean).join(' · '),
     page:location.href, utm, quiz:A,
-    quality:{ secs_total:Math.round((Date.now() - T0) / 1000), secs_per_step:timing, pasted_phone:pasted, phone_fixed:chk.fixed || '',
+    quality:{ secs_total:Math.round((Date.now() - T0) / 1000), secs_per_step:timing, pasted_phone:pasted, phone_fixed:chk.fixed || own || '',
       all_first_answers:C.Q.every(s => A[s.k] === s.o[0][0]) } };
   lead.channel_pref = A.channel === 'telegram' ? 'telegram' : 'whatsapp';
   /* ник в Telegram (необязательно): приёмник sitelead.mjs читает tg_username и сам убирает @ и t.me/ */
