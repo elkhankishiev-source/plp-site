@@ -628,9 +628,15 @@ const pnClean = s => String(s || '').replace(/[\u200b-\u200f\u202a-\u202e\u2060-
    (код +66, а в номере 7 9xx…; код +66, а в номере 8 9xx…; код стёрт, а в номере 08…). Берём его сам, только если с кодом из поля номер невозможен,
    а сам по себе он мобильный по libphonenumber: целиком с кодом (без догадок phone.js), российское 8 9xx/8 7xx, тайское 0 6/8/9.
    Голые 9–10 цифр без кода по-прежнему не угадываем. phoneJoin.own — что сделали (форма тогда шлёт приёмнику номер целиком). */
+/* 03.11.2026 вечер (го Эльнура «почини, чтобы было корректно и лид не путался»): лишние цифры читались как номер чужой страны
+   (код +998 и 12 цифр → Южный Судан +211). Свой код берём только из нашего списка стран (CODES; длину и вид номера проверяет PLPPhone);
+   иначе отказ с подсказкой, сколько цифр нужно после выбранного кода. */
 function pnOwnCode(d){
   if (!window.PLPPhone) return null;
-  const m = x => { const r = PLPPhone.check('+' + x); return r && r.ok && r.mobile && !r.fixed ? r.digits : ''; };
+  const m = x => { const r = PLPPhone.check('+' + x); if (!(r && r.ok && r.mobile && !r.fixed)) return '';
+    const g = String(r.digits || ''), k = String(r.code || '');
+    if (!k || !CODES.has(k) || !g.startsWith(k)) return '';
+    return g; };
   const dd = d.replace(/^00/, '');
   let o = m(dd); if (o) return { d: o, why: 'номер со своим кодом' };
   if (/^8[79]\d{9}$/.test(d) && (o = m('7' + d.slice(1)))) return { d: o, why: '8 → +7' };
