@@ -98,5 +98,15 @@ if (!LIVE) (function walk(d) {
   }
 })(ROOT);
 
+/* 04.11: в самих листах (offers/<лист>/page.htm, блок «Кнопки») тоже стоит голая ссылка на PDF, и она же внутри PDF.
+   Чинится в сборщике листов (sheet.json → tools/offer_sheet.mjs) с пересборкой PDF, это работа plp-sheets. Пока предупреждение, не стоп. */
+const предупреждения = [];
+if (!LIVE) for (const d of fs.readdirSync(path.join(ROOT, 'offers'))) {
+  const f = path.join(ROOT, 'offers', d, 'page.htm');
+  if (!fs.existsSync(f)) continue;
+  const m = fs.readFileSync(f, 'utf8').match(/href="(?:https:\/\/property-library\.com)?\/offers\/[^"]+\.pdf(?:\?[^"]*)?"/);
+  if (m) предупреждения.push('offers/' + d + '/page.htm: ' + m[0]);
+}
+if (предупреждения.length) console.log('⚠ [превью ссылок] голая ссылка на PDF внутри листа (и в его PDF), ' + предупреждения.length + ', чинить в sheet.json:\n  ' + предупреждения.join('\n  '));
 if (плохо.length) { console.log('[превью ссылок] ' + плохо.length + ':\n  ' + плохо.join('\n  ')); process.exit(1); }
 console.log('[превью ссылок] ' + страниц + ' страниц' + (LIVE ? ' на живом сайте' : '') + ': у каждой og:title, og:description и og:image, картинка открывается; голых ссылок на PDF нет');
