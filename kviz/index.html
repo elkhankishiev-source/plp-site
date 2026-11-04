@@ -148,7 +148,7 @@ input{height:54px;border:1.5px solid var(--line);border-radius:12px;padding:0 14
 /* 15.10.2026: телефон = выбор страны + номер. Без кода страны заявку не принимаем. */
 input[aria-invalid="true"]{border-color:var(--red);background:#FFF7F7}
 .fh{font-size:.75rem;color:var(--muted);margin-top:-4px;line-height:1.35}
-.fh.alt{color:#b45309;font-weight:600}
+.fh.fh-alt{color:#b45309;font-weight:600}
 .tgf{display:grid;gap:4px}.tgf[hidden]{display:none}
 .tgf input{border-color:var(--olive)}
 .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
@@ -831,8 +831,8 @@ function render(){
     const clearErr = f => { if ($('err').dataset.f === f) { $('err').textContent = ''; $('err').dataset.f = ''; $(f).removeAttribute('aria-invalid'); } };
     const ccAuto = $('cc').value;
     const sync = ev => { $('ph').value = phoneJoin($('cc').value, $('pn').value); if (ev && ev.type !== 'blur') clearErr('pn');
-      const h = ccAltHint($('cc').value, $('pn').value, ccAuto, !!ev && ev.type !== 'input');   /* 04.11: номер подходит и под другую страну — пишем под полем */
-      if ($('phh').dataset.alt !== h) { $('phh').dataset.alt = h; $('phh').textContent = h || U('phh'); $('phh').classList.toggle('alt', !!h); }
+      const h = ccAltHint($('cc').value, $('pn').value, ccAuto, false);   /* ВЕРДИКТ #319: не при уходе из поля — иначе строка появлялась в момент нажатия кнопки и сдвигала её из-под пальца */   /* 04.11: номер подходит и под другую страну — пишем под полем */
+      if ($('phh').dataset.alt !== h) { $('phh').dataset.alt = h; $('phh').textContent = h || U('phh'); $('phh').classList.toggle('fh-alt', !!h); }
       const k = h ? '+' + ccSplit($('cc').value).code + ' → ' + (h.match(/код (\+\d+)\.$/) || [, ''])[1] : '';
       if (k && $('phh').dataset.tr !== k) { $('phh').dataset.tr = k; TR('cc_alt', k); } };   /* одно событие на пару кодов */
     /* код страны длиннее 3 цифр — человек набирает номер в поле кода: лишнее переносим в начало номера и ставим курсор туда */
