@@ -213,7 +213,8 @@ for (const o of OFFERS) {
       <button type="button" data-ol="ru" style="border:0;border-radius:999px;padding:6px 10px;font:inherit;font-weight:700;cursor:pointer">RU</button>
       <button type="button" data-ol="en" style="border:0;border-radius:999px;padding:6px 10px;font:inherit;font-weight:700;cursor:pointer">EN</button>
     </div>` : ''}
-    ${hasPdf ? `<a href="/${o.dir}/${o.pdf}" target="_blank" rel="noopener" style="font-size:13px;line-height:1;padding:7px 12px;border:1px solid rgba(255,255,255,.28);border-radius:999px;color:#EFECE2;text-decoration:none;opacity:.85">PDF ↓</a>` : ''}
+    ${hasPdf ? `<!-- 04.11.2026 Эльнур: «пдф … всегда с превью». Ссылка на обёртку /<лист>/<номер>/pdf/ (build/mkpdfwrap.mjs): у голого .pdf превью нет. -->
+    <a href="${номерной(o.slug)}pdf/" target="_blank" rel="noopener" style="font-size:13px;line-height:1;padding:7px 12px;border:1px solid rgba(255,255,255,.28);border-radius:999px;color:#EFECE2;text-decoration:none;opacity:.85">PDF ↓</a>` : ''}
   </div>
   <div id="offerBox" style="width:100%;max-width:794px;margin:0 auto;overflow:hidden;border-radius:14px;background:#EFECE2;box-shadow:0 2px 18px rgba(23,24,15,.08);height:${o.h || 4531}px">
     <iframe id="offerFrame" src="/${o.dir}/page.htm?v=${v}" title="${esc(o.title)}" loading="eager" scrolling="no"
@@ -418,7 +419,8 @@ function card(c) {
   const pdfOk = c.pdf && fs.existsSync(path.join(ROOT, c.pdf.replace(/^\//, '')));
   const btns = [];
   if (c.open) btns.push(`<a class="btn btn-primary" href="${c.open}">Открыть предложение</a>`);
-  if (pdfOk) btns.push(`<a class="btn btn-ghost" href="${c.pdf}" target="_blank" rel="noopener">Получить PDF</a>`);
+  /* 04.11.2026: «Получить PDF» ведёт на обёртку с превью /<лист>/<номер>/pdf/ (build/mkpdfwrap.mjs), не на голый .pdf */
+  if (pdfOk) btns.push(`<a class="btn btn-ghost" href="${c.open ? c.open + 'pdf/' : c.pdf}" target="_blank" rel="noopener">Получить PDF</a>`);
   if (c.ask) btns.push(`<a class="btn btn-primary" href="${WA}${encodeURIComponent(c.ask)}" target="_blank" rel="noopener">Получить презентацию</a>`);
   const plans = c.plans ? `<ul class="pc-plans">${c.plans.map(([a, b]) => `<li><span>${esc(a)}</span><b>${esc(b)}</b></li>`).join('')}</ul>` : '';
   /* 05.10.2026 Эльнур: «карточки гигантские, некрасивые». Компактно: название, метка, одна ключевая строка, кнопки;
@@ -490,3 +492,5 @@ function card(c) {
 /* 07.10: mkoffers, запущенный отдельно, возвращал офферам превью Heritage (шапка главной), а mkogfix стоит только в all.mjs.
    Поэтому превью по теме ставим и здесь, сразу после сборки офферов. */
 await import('./mkogfix.mjs');
+/* 04.11.2026: обёртки PDF с превью берут og:image готового листа, поэтому после mkogfix */
+await import('./mkpdfwrap.mjs');
