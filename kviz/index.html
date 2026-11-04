@@ -148,6 +148,7 @@ input{height:54px;border:1.5px solid var(--line);border-radius:12px;padding:0 14
 /* 15.10.2026: телефон = выбор страны + номер. Без кода страны заявку не принимаем. */
 input[aria-invalid="true"]{border-color:var(--red);background:#FFF7F7}
 .fh{font-size:.75rem;color:var(--muted);margin-top:-4px;line-height:1.35}
+.fh.alt{color:#b45309;font-weight:600}
 .tgf{display:grid;gap:4px}.tgf[hidden]{display:none}
 .tgf input{border-color:var(--olive)}
 .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
@@ -643,6 +644,27 @@ function pnOwnCode(d){
   if (/^0[689]\d{8}$/.test(d) && (o = m('66' + d.slice(1)))) return { d: o, why: '0 → +66' };
   return null;
 }
+/* 04.11.2026 (го Эльнура «го по списку до зеленой»): код +66 форма ставит сама по поясу телефона. Украинец на Пхукете набирает
+   свой «068 123 45 67» — те же 10 цифр верны и как тайский 068-123-4567, цифрами их не различить. Нажатий не добавляем:
+   пока код подставлен сам (человек его не трогал), а номер с местным 0 подходит и под другую страну нашего списка, под полем
+   номера пишем, как мы его читаем, и какой код поставить. Тайский номер уходит как раньше, с первого нажатия. */
+const ALT0 = { '380':'украинский', '994':'азербайджанский', '374':'армянский', '373':'молдавский' };   /* мобильный пишут с местным 0, как в Таиланде */
+function ccAltHint(cc, pn, auto){
+  if (!window.PLPPhone || LANG === 'en') return '';
+  const c = ccSplit(cc).code, n = pnClean(pn), d = n.replace(/\D/g, '');
+  if (!c || c !== ccSplit(auto).code || /^(\+|00)/.test(n) || !/^0[1-9]/.test(d)) return '';
+  const here = PLPPhone.check('+' + c + d.slice(1)), ok = here && here.ok && !here.fixed;
+  for (const k of Object.keys(ALT0)) {
+    if (k === c) continue;
+    const r = PLPPhone.check('+' + k + d.slice(1));
+    if (r && r.ok && r.mobile && !r.fixed && String(r.digits || '') === k + d.slice(1)) {
+      const nm = c === '66' ? 'тайский' : 'номер с кодом +' + c;
+      return (ok ? 'Номер читается как ' + nm + ' (+' + c + ')' : 'С кодом +' + c + ' такого номера нет') +
+             '. Если номер ' + ALT0[k] + ', поставьте код +' + k + '.';
+    }
+  }
+  return '';
+}
 function phoneJoin(cc, pn){
   phoneJoin.own = '';
   const n = pnClean(pn);
@@ -804,7 +826,11 @@ function render(){
        ставила курсор в имя, поле номера теряло фокус, и sync на blur тут же стирал ошибку. Теперь blur только собирает номер,
        а ошибку убирает ввод в том поле, к которому она относится (err.dataset.f: nm — имя, pn — номер). */
     const clearErr = f => { if ($('err').dataset.f === f) { $('err').textContent = ''; $('err').dataset.f = ''; $(f).removeAttribute('aria-invalid'); } };
-    const sync = ev => { $('ph').value = phoneJoin($('cc').value, $('pn').value); if (ev && ev.type !== 'blur') clearErr('pn'); };
+    const ccAuto = $('cc').value;
+    const sync = ev => { $('ph').value = phoneJoin($('cc').value, $('pn').value); if (ev && ev.type !== 'blur') clearErr('pn');
+      const h = ccAltHint($('cc').value, $('pn').value, ccAuto);   /* 04.11: номер подходит и под другую страну — пишем под полем */
+      if ($('phh').dataset.alt !== h) { $('phh').dataset.alt = h; $('phh').textContent = h || U('phh'); $('phh').classList.toggle('alt', !!h); }
+      if (h && $('phh').dataset.tr !== h) { $('phh').dataset.tr = h; TR('cc_alt', h.slice(0, 80)); } };
     /* код страны длиннее 3 цифр — человек набирает номер в поле кода: лишнее переносим в начало номера и ставим курсор туда */
     $('cc').addEventListener('input', () => {
       const raw = $('cc').value.replace(/\D/g, ''); if (raw.length <= 3) return;
