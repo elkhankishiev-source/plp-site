@@ -649,13 +649,16 @@ function pnOwnCode(d){
    пока код подставлен сам (человек его не трогал), а номер с местным 0 подходит и под другую страну нашего списка, под полем
    номера пишем, как мы его читаем, и какой код поставить. Тайский номер уходит как раньше, с первого нажатия. */
 const ALT0 = { '380':'украинский', '994':'азербайджанский', '374':'армянский', '373':'молдавский' };   /* мобильный пишут с местным 0, как в Таиланде */
-function ccAltHint(cc, pn, auto){
+function ccAltHint(cc, pn, auto, done){
   if (!window.PLPPhone || LANG === 'en') return '';
   const c = ccSplit(cc).code, n = pnClean(pn), d = n.replace(/\D/g, '');
   if (!c || c !== ccSplit(auto).code || /^(\+|00)/.test(n) || !/^0[1-9]/.test(d)) return '';
+  /* ВЕРДИКТ #317: пока номер набирается, 9 цифр 068… совпадали с мобильным Молдовы/Армении — подсказка мигала чужой страной.
+     Показываем, только когда номер набран полностью для текущего кода или человек ушёл из поля (done), и длина точная для другой страны. */
+  if (!done && !(NAT[c] && d.length - 1 === NAT[c])) return '';
   const here = PLPPhone.check('+' + c + d.slice(1)), ok = here && here.ok && !here.fixed;
   for (const k of Object.keys(ALT0)) {
-    if (k === c) continue;
+    if (k === c || d.length - 1 !== NAT[k]) continue;
     const r = PLPPhone.check('+' + k + d.slice(1));
     if (r && r.ok && r.mobile && !r.fixed && String(r.digits || '') === k + d.slice(1)) {
       const nm = c === '66' ? 'тайский' : 'номер с кодом +' + c;
@@ -828,9 +831,10 @@ function render(){
     const clearErr = f => { if ($('err').dataset.f === f) { $('err').textContent = ''; $('err').dataset.f = ''; $(f).removeAttribute('aria-invalid'); } };
     const ccAuto = $('cc').value;
     const sync = ev => { $('ph').value = phoneJoin($('cc').value, $('pn').value); if (ev && ev.type !== 'blur') clearErr('pn');
-      const h = ccAltHint($('cc').value, $('pn').value, ccAuto);   /* 04.11: номер подходит и под другую страну — пишем под полем */
+      const h = ccAltHint($('cc').value, $('pn').value, ccAuto, !!ev && ev.type !== 'input');   /* 04.11: номер подходит и под другую страну — пишем под полем */
       if ($('phh').dataset.alt !== h) { $('phh').dataset.alt = h; $('phh').textContent = h || U('phh'); $('phh').classList.toggle('alt', !!h); }
-      if (h && $('phh').dataset.tr !== h) { $('phh').dataset.tr = h; TR('cc_alt', h.slice(0, 80)); } };
+      const k = h ? '+' + ccSplit($('cc').value).code + ' → ' + (h.match(/код (\+\d+)\.$/) || [, ''])[1] : '';
+      if (k && $('phh').dataset.tr !== k) { $('phh').dataset.tr = k; TR('cc_alt', k); } };   /* одно событие на пару кодов */
     /* код страны длиннее 3 цифр — человек набирает номер в поле кода: лишнее переносим в начало номера и ставим курсор туда */
     $('cc').addEventListener('input', () => {
       const raw = $('cc').value.replace(/\D/g, ''); if (raw.length <= 3) return;
@@ -873,6 +877,7 @@ function send(){
     if (k && raw.startsWith('+' + k)) {
       const nat = raw.slice(1 + k.length);
       $('cc').value = '+' + k; $('pn').value = nat; $('ph').value = raw;
+      try { $('pn').dispatchEvent(new Event('blur')); } catch (e) {}   /* ВЕРДИКТ #317: подсказку под полем пересчитать под новый код (blur не стирает ошибку) */
       const shown = '+' + k + ' ' + nat;
       $('err').textContent = LANG === 'en' ? 'Please check your number: ' + shown + '. If it is correct, press the button again.'
                                            : 'Проверьте номер: ' + shown + '. Если верно, нажмите кнопку ещё раз.';
