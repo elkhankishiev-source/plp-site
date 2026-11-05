@@ -182,6 +182,8 @@ function pubOf(o) { return (o && o.public_code) || (o && o.plp_property_id) || '
    (objects/<ID>/<вид>/…): в витрину идут только обложка, территория, интерьеры, инфраструктура и старые снимки
    без вида. Планировки остаются в своём блоке рядом с ценами, мастер-план и ход стройки — в своих разделах. */
 const НЕ_ВИТРИНА = /\/objects\/[^/]+\/(plans?|master|progress|docs?|documents?|permits?|floorplans?)\//i;
+/* 05.11 Эльнур «шоу-рум раздельно, не в кучу»: один шаблон для галереи и блока (ВЕРДИКТ #391: ключ showroom, имена «Шоу-юнит(ы)») */
+const ШОУРУМ = /шоу-рум|шоу-юнит|showroom|show ?unit/i;
 const НЕ_ВИТРИНА_ГРУППА = /plan|план|unit|тип|master|мастер|генплан|siteplan|progress|стройк|doc|документ|permit|разреш/i;
 /* 05.10.2026: вид каждого фото витрины размечен (таблица фото_витрина, /opt/plp-tools/photo_classify.py):
    санузлы, техника, слайды с текстом, коридоры с номерами дверей, стройка и брак в первые кадры не идут. */
@@ -197,7 +199,7 @@ function heroGallery(o, limit = 8) {
   const all = Array.isArray(o.gallery_urls) ? o.gallery_urls.filter(витрина) : [];
   const gs = (Array.isArray(o.photo_groups) ? o.photo_groups : [])
     .filter(g => !НЕ_ВИТРИНА_ГРУППА.test(String(g.key || '') + ' ' + String(g.name || '')))
-    .filter(g => !/шоу-рум|showroom|show unit/i.test(String(g.name || '')))  // 05.11 Эльнур: шоу-рум отдельно, не в кучу
+    .filter(g => !ШОУРУМ.test(String(g.key || '') + ' ' + String(g.name || '')))  // 05.11 Эльнур: шоу-рум отдельно, не в кучу
     .map(g => (Array.isArray(g.urls) ? g.urls.filter(витрина) : []))
     .filter(a => a.length);
   if (gs.length < 2) return all.slice(0, limit);
@@ -1797,7 +1799,7 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
     : '';
 
   /* 05.11.2026 Эльнур: «фото шоурума лучше разместить раздельно, не в кучу» — свой блок внизу, в общую галерею не идут */
-  const showGroups = groupBy(/шоу-рум|showroom|show unit/i);
+  const showGroups = groupBy(ШОУРУМ);
   const showBlock = showGroups.length
     ? '<section class="desc"><h2>Шоу-рум застройщика</h2>' + showGroups.map(g => shotGrid(g.urls)).join('') +
       '<p class="fine">Так застройщик оформил квартиру-образец. Нажмите на фото, чтобы открыть крупно.</p></section>'
