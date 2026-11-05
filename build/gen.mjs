@@ -197,6 +197,7 @@ function heroGallery(o, limit = 8) {
   const all = Array.isArray(o.gallery_urls) ? o.gallery_urls.filter(витрина) : [];
   const gs = (Array.isArray(o.photo_groups) ? o.photo_groups : [])
     .filter(g => !НЕ_ВИТРИНА_ГРУППА.test(String(g.key || '') + ' ' + String(g.name || '')))
+    .filter(g => !/шоу-рум|showroom|show unit/i.test(String(g.name || '')))  // 05.11 Эльнур: шоу-рум отдельно, не в кучу
     .map(g => (Array.isArray(g.urls) ? g.urls.filter(витрина) : []))
     .filter(a => a.length);
   if (gs.length < 2) return all.slice(0, limit);
@@ -1795,6 +1796,13 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
       facGroups.map(g => shotGrid(g.urls)).join('') + '</section>'
     : '';
 
+  /* 05.11.2026 Эльнур: «фото шоурума лучше разместить раздельно, не в кучу» — свой блок внизу, в общую галерею не идут */
+  const showGroups = groupBy(/шоу-рум|showroom|show unit/i);
+  const showBlock = showGroups.length
+    ? '<section class="desc"><h2>Шоу-рум застройщика</h2>' + showGroups.map(g => shotGrid(g.urls)).join('') +
+      '<p class="fine">Так застройщик оформил квартиру-образец. Нажмите на фото, чтобы открыть крупно.</p></section>'
+    : '';
+
   const payLines = [
     o.payment_plan ? ['План застройщика', noContacts(String(o.payment_plan))] : null,
     (!o.payment_plan && o.payment_schedule) ? ['График', noContacts(String(o.payment_schedule))] : null,
@@ -2069,6 +2077,7 @@ if(dark) i.src='../img/brand/plp-mark-white.png';})();</script>
   ${isRent ? '' : payBlock}
   ${isRent ? '' : ownBlock}
   ${facBlock}
+  ${showBlock}
   ${isRent ? '' : progressBlock}
   ${isRent ? '' : `<div class="yield">
     <div class="num">${yr.low}${DASH}${yr.high}%</div>
