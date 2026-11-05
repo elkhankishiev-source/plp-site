@@ -104,6 +104,18 @@ const OFFERS = [
     og: 'offers/katabello/img/preview-v1.jpg',
     h: 8708,   // PDF 2303 мм (8 стр.) × 794/210 (01.11)
   },
+  {
+    /* 05.11.2026 Эльнур: «Мне нужен один офер по VIVI, по нашему стандарту», «Виви дай презу нормальную».
+       Факты: слова Эльнура 05.11 (две однушки от собственников, 4 200 000 и 4 600 000 ฿, лизхолд, срок 4Q 2027), Factsheet,
+       20 Facilities, Free Package, Standard Materials, Living Service застройщика (сборщик ~/plp-ops/офферы/make_sheet/vivi_make_sheet.py).
+       hidden: только /vivi/<номер из build/nomera.json>. Номера юнитов не выводим, только этажи. «Башня» не пишем: одно здание. */
+    slug: 'vivi', dir: 'offers/vivi', hidden: true,
+    title: 'The Title VIVI · Банг Тао, однушки от собственников',
+    desc: 'The Title VIVI на Банг Тао: две однушки около 30 м² от собственников, 4 200 000 ฿ и 4 600 000 ฿, лизхолд. Предложение Property Library Phuket.',
+    pdf: 'VIVI_BangTao.pdf',
+    og: 'offers/vivi/img/preview-v1.jpg',
+    h: 7191,   // PDF 1902 мм (7 стр.) × 794/210 (05.11)
+  },
   /* 09.10.2026 Эльнур: общий лист KUARTZ+FIZZ «лишний, удали» — убран; /kuartz-fizz пересылает на /kuartz. */
   {
     /* 04.10.2026 Эльнур: «на секретной странице… зеро наянг гарантия 10% годовых». Факты: objects PLP-ZERO-NAIYANG
