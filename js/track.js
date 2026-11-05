@@ -34,8 +34,12 @@
   var visits = +(ls('plp_visits') || 0);
   try { if (!sessionStorage.getItem('plp_counted')) { visits++; ls('plp_visits', String(visits)); sessionStorage.setItem('plp_counted', '1'); } } catch (e) {}
 
-  var URL_ = '', PAGE = location.pathname, T0 = Date.now(), EV = [], timer = null;
+  var URL_ = '', PAGE = location.pathname, T0 = Date.now(), EV = [], timer = null, left = false;
+  /* 05.11.2026 (го Эльнура «го по всем пунктам», разбор квиз_0511): раньше уход без новых событий не отправлялся вовсе,
+     а duration_ms был временем последней отправки (~4 с таймера). Теперь при уходе всегда событие leave
+     с настоящим временем на странице (t, мс), а пока вкладка видна — метки t10/t30/t60. */
   function flush(final) {
+    if (final && URL_ && !left) { left = true; EV.length < 60 ? EV.push({ e: 'leave', t: Date.now() - T0 }) : (EV[59] = { e: 'leave', t: Date.now() - T0 }); }
     if (!URL_ || !EV.length) return;
     var body = JSON.stringify({ session_id: sid, visitor_id: vid, page: PAGE, referrer: document.referrer || '',
       utm: Object.keys(utm).length ? utm : null, events: EV.splice(0, 60),
@@ -53,7 +57,8 @@
       URL_ = 'https://api.property-library.com/siteevents?key=' + encodeURIComponent(key || '');
       if (page) PAGE = String(page).slice(0, 200);
       addEventListener('pagehide', function () { flush(true); });
-      document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') flush(true); });
+      document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') flush(true); else left = false; });
+      [10, 30, 60].forEach(function (s) { setTimeout(function () { if (document.visibilityState === 'visible') PLPTrack.ev('t' + s); }, s * 1000); });
     },
     ev: function (name, v) {
       if (EV.length >= 60) return;

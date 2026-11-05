@@ -66,7 +66,10 @@
 <title>Подбор квартиры на Пхукете · Property Library Phuket</title>
 <meta name="robots" content="noindex,nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- 05.11.2026 скорость первого экрана: шрифт не держит показ страницы (до шрифта текст системным, display=swap) -->
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet"></noscript>
 <style>
 html{background:var(--bg);overscroll-behavior-y:none}
 /* PLP:ANTIFLICKER */
@@ -769,9 +772,12 @@ function boot(){
      Человек видит ту же картинку, название и цену, что в объявлении (кампания 4proj_2510), сразу под ними вопрос.
      Замер: доля kviz_start от kviz_open в site_events по 4proj_2510 до и после этой правки. */
   const AD = CPV('ad');
-  $('s0').innerHTML = AD ? '<div class="adh"><img src="img/' + AD.img + '.webp" alt=""><div class="adt"><b>' + (AD.title || C.name) + '</b><span>' + AD.sub +
+  /* 05.11.2026 скорость: шапка из img/h (≤1080 px, сжата), грузится первой; карточки из img/c (600 px), последняя широкая из img/w (960 px),
+     с 5-й карточки лениво. Оригиналы в img/ остаются для страницы результата и галереи. Событие hero_img = фото шапки показано. */
+  $('s0').innerHTML = AD ? '<div class="adh"><img src="img/h/' + AD.img + '.webp" alt="" fetchpriority="high"><div class="adt"><b>' + (AD.title || C.name) + '</b><span>' + AD.sub +
     '</span><i></i><strong>' + AD.big + '</strong><span>' + AD.note + '</span><em>' + AD.chip + '</em></div></div>'
     : '<div class="top"><h1>' + CP('h1') + '</h1></div>';
+  const hi = AD && $('s0').querySelector('.adh img'); if (hi) hi.addEventListener('load', () => TR('hero_img'), { once: true });
   $('foot0').textContent = CP('foot'); $('foot0').hidden = false;
   tStep = Date.now(); render();
 }
@@ -785,8 +791,8 @@ function pick(key){
   const en = String(q.get('lang') || '').toLowerCase() === 'en'; LANG = en ? 'en' : 'ru';
   if (en) { document.documentElement.lang = 'en'; document.title = U('title'); }
   $('s0').innerHTML = '<div class="card"><div class="q">' + U('pickQ') + '</div><div class="opts pics">' +
-    ['vibe2', 'purita', 'eden', 'millennium', 'kuartz', 'fizz', 'zero'].filter(k => P[k] && (!en || EN_P[k])).map(k => { q.set('p', k);
-      return '<a class="opt" href="?' + q.toString() + '"><i class="ph"><img src="img/' + P[k].hero + '.webp" alt=""></i><span>' +
+    ['vibe2', 'purita', 'eden', 'millennium', 'kuartz', 'fizz', 'zero'].filter(k => P[k] && (!en || EN_P[k])).map((k, n, all) => { q.set('p', k);
+      return '<a class="opt" href="?' + q.toString() + '"><i class="ph"><img src="img/' + (n === all.length - 1 && all.length % 2 ? 'w/' : 'c/') + P[k].hero + '.webp" alt=""' + (n >= 4 ? ' loading="lazy"' : '') + '></i><span>' +
         P[k].name + ', ' + (en ? EN_P[k].place : (P[k].place || { vibe2: 'Карон', kuartz: 'Карон' }[k] || '')) + '</span></a>'; }).join('') + '</div></div>';
 }
 
@@ -802,7 +808,7 @@ function render(){
     $('qwrap').style.animation='none'; void $('qwrap').offsetWidth; $('qwrap').style.animation='';
     $('qwrap').innerHTML = '<div class="q">' + L(s.q) + '</div><div class="opts' + (pics ? ' pics' : '') + (s.big ? ' big' : '') + '">' +
       s.o.map((o, n) => '<button class="opt' + (A[s.k] === o[0] ? ' on' : '') + '" data-n="' + n + '">' +
-        (o[1] ? '<i class="ph"><img' + (s.fit ? ' class="fit"' : '') + ' src="img/' + o[1] + '.webp" alt=""' + (o[2] ? ' style="' + o[2] + '"' : '') + '></i>' : '') + '<span>' + L(o[0]) + (o[3] ? '<small class="hint">' + L(o[3]) + '</small>' : '') + '</span></button>').join('') + '</div>';
+        (o[1] ? '<i class="ph"><img' + (s.fit ? ' class="fit"' : '') + ' src="img/' + (n === s.o.length - 1 && s.o.length % 2 ? 'w/' : 'c/') + o[1] + '.webp" alt=""' + (n >= 4 ? ' loading="lazy"' : '') + (o[2] ? ' style="' + o[2] + '"' : '') + '></i>' : '') + '<span>' + L(o[0]) + (o[3] ? '<small class="hint">' + L(o[3]) + '</small>' : '') + '</span></button>').join('') + '</div>';
     document.querySelectorAll('.opt').forEach(b => b.onclick = () => {
       if (!started) { started = true; TR('kviz_start'); }
       A[s.k] = s.o[+b.dataset.n][0]; TR('q' + (i + 1), s.k + ':' + A[s.k]);
