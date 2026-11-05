@@ -480,7 +480,7 @@ function buildCatalog(objects, benchmarks, preserve) {
       // сколько юнитов свободно по последнему прайсу застройщика
       /* 28.10: текст наличия может начинаться с даты («На 27.10.2026 … свободно 164 лота»).
          Берём число после слова «свободно», если оно есть; иначе прежнее поведение — первое число. */
-      avail: (function(){ var t=o.availability || '', m=/свободно\s+(\d+)/i.exec(t) || /(\d+)/.exec(t); return m ? +m[1] : null; })(),
+      avail: (function(){ var t=o.availability || '', m=/свободно\s+(\d+)/i.exec(t) || /(\d+)\s*(?:лот|юнит|квартир|units?\b)/i.exec(t);  /* 05.11 ВЕРДИКТ #393: «первое число» брало площадь 30 м2 у VIVI как «свободно 30» */ return m ? +m[1] : null; })(),
       beach: o.beach || null,
       beachM: (o.distance_beach_m === 0 || o.distance_beach_m) ? o.distance_beach_m : null,
       // Снимки из хранилища: первый идёт обложкой, остальные — лентой в карточке.
