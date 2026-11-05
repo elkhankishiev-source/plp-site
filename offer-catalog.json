@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-01",
+ "updated": "2026-11-05",
  "items": [
   {
    "id": "ATT-KYE",
@@ -1483,7 +1483,7 @@
    "name": "The Title Cielo Rawai",
    "district": "Равай",
    "type": "Кондо",
-   "price_from": 7558583,
+   "price_from": 6500000,
    "units": [
     {
      "beds": 1,
@@ -1507,6 +1507,16 @@
     },
     {
      "beds": 1,
+     "code": "1BXLC",
+     "free": 1,
+     "name": "1 спальня",
+     "area_sqm": 48.5,
+     "price_from_thb": 6500000,
+     "area": 48.5,
+     "from": 6500000
+    },
+    {
+     "beds": 1,
      "code": "1BPMC",
      "free": 1,
      "name": "1 спальня",
@@ -1518,12 +1528,12 @@
     {
      "beds": 2,
      "code": "2BMC",
-     "free": 3,
+     "free": 2,
      "name": "2 спальни",
-     "area_sqm": 72.5,
-     "price_from_thb": 11984595,
-     "area": 72.5,
-     "from": 11984595
+     "area_sqm": 73,
+     "price_from_thb": 12001080,
+     "area": 73,
+     "from": 12001080
     },
     {
      "beds": 2,
@@ -1537,8 +1547,18 @@
     },
     {
      "beds": 2,
+     "code": "2BLC",
+     "free": 1,
+     "name": "2 спальни",
+     "area_sqm": 81,
+     "price_from_thb": 12548550,
+     "area": 81,
+     "from": 12548550
+    },
+    {
+     "beds": 2,
      "code": "2BLAC",
-     "free": 2,
+     "free": 1,
      "name": "2 спальни",
      "area_sqm": 85.5,
      "price_from_thb": 13882575,
@@ -3021,6 +3041,59 @@
    "units": []
   },
   {
+   "id": "PLP-SANSIRI-RHEA",
+   "pub": "PLP-SANSIRI-RHEA",
+   "url": "https://property-library.com/object/sansiri-rhea",
+   "name": "Rhea (Sansiri)",
+   "district": "Сурин",
+   "type": "Кондо",
+   "price_from": 5520000,
+   "units": [
+    {
+     "beds": 1,
+     "code": "1B",
+     "free": 4,
+     "name": "1 спальня, 1 с/у",
+     "area_sqm": 34.75,
+     "price_from_thb": 5520000,
+     "area": 34.75,
+     "from": 5520000
+    },
+    {
+     "area": "47,75–48,75 м²",
+     "beds": 2,
+     "code": "2A",
+     "free": 11,
+     "name": "2 спальни, 1 с/у",
+     "area_sqm": 47.75,
+     "area_sqm_max": 48.75,
+     "price_from_thb": 7510000,
+     "from": 7510000
+    },
+    {
+     "area": "59,75–61,25 м²",
+     "beds": 2,
+     "code": "2B",
+     "free": 15,
+     "name": "2 спальни, 2 с/у",
+     "area_sqm": 59.75,
+     "area_sqm_max": 61.25,
+     "price_from_thb": 8960000,
+     "from": 8960000
+    },
+    {
+     "beds": 2,
+     "code": "2C",
+     "free": 3,
+     "name": "Вилла, фрихолд",
+     "area_sqm": 120,
+     "price_from_thb": 23990000,
+     "area": 120,
+     "from": 23990000
+    }
+   ]
+  },
+  {
    "id": "PLP-SERENITY",
    "pub": "PLP-SERENITY",
    "url": "https://property-library.com/object/serenity",
@@ -3667,37 +3740,43 @@
    "name": "The Title VIVI",
    "district": "Банг Тао",
    "type": "Кондо",
-   "price_from": 4300000,
+   "price_from": 4200000,
    "units": [
     {
+     "area": "27,67–28,09 м²",
      "beds": 1,
-     "name": "1 спальня",
-     "area_sqm": 27,
-     "price_from_thb": 3500000,
-     "area": 27,
-     "from": 3500000
+     "code": "S",
+     "name": "1 спальня S",
+     "area_sqm": 27.67
+    },
+    {
+     "area": "около 30 м²",
+     "beds": 1,
+     "code": "M",
+     "name": "1 спальня M · 3 этаж, в продаже",
+     "note": "перепродажа, лизхолд",
+     "area_sqm": 30,
+     "price_from_thb": 4200000,
+     "from": 4200000
+    },
+    {
+     "area": "около 30 м²",
+     "beds": 1,
+     "code": "M",
+     "name": "1 спальня M · 5 этаж, в продаже",
+     "note": "перепродажа, лизхолд",
+     "area_sqm": 30,
+     "price_from_thb": 4600000,
+     "from": 4600000
+    },
+    {
+     "area": "46,39–52,30 м²",
+     "beds": 1,
+     "code": "PLUS",
+     "name": "1 спальня Plus",
+     "area_sqm": 46.39
     }
    ]
-  },
-  {
-   "id": "PLP-VIVI-R3",
-   "pub": "PLP-VIVI-R3",
-   "url": "https://property-library.com/object/vivi-r3",
-   "name": "The Title VIVI · квартира",
-   "district": "Банг Тао",
-   "type": "Кондо",
-   "price_from": 4300000,
-   "units": []
-  },
-  {
-   "id": "PLP-VIVI-R5",
-   "pub": "PLP-VIVI-R5",
-   "url": "https://property-library.com/object/vivi-r5",
-   "name": "The Title VIVI · квартира",
-   "district": "Банг Тао",
-   "type": "Кондо",
-   "price_from": 4300000,
-   "units": []
   },
   {
    "id": "PLP-ZENITHY",
