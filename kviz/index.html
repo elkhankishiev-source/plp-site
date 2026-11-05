@@ -560,8 +560,10 @@ const CP = f => (LANG === 'en' && EN_P[KEY] && EN_P[KEY][f] !== undefined) ? EN_
 /* 02.11 Эльнур: «квиз у нас бюджет сроки даты, как и было! после квиза требования, и мы берём помощь в оформлении на себя, а не гарантия».
    ?offer=visa на квизе проекта (purita, eden): вопросы те же; шапка с плашкой визы; после квиза требования и помощь в оформлении. */
 const VISA = new URLSearchParams(location.search).get('offer') === 'visa';
-const VISA_T = { ru:{ chip:'Виза на вас и вашу семью на 10 лет', gifts:['Виза LTR на 10 лет для вас и вашей семьи в подарок после сдачи объекта, оформление берём на себя','Консультация наших специалистов по вашему случаю'], cond:'Условия визы LTR: покупка недвижимости от 500\u00a0000\u00a0$ и активы по миру от 1\u00a0млн\u00a0$, включая эту покупку. Для LTR объект должен быть сдан, на время стройки поможем оформить Элит визу. Требования уточните у специалиста' },
-                 en:{ chip:'A 10-year visa for you and your family', gifts:['A 10-year LTR visa for you and your family as a gift once the property is completed; we handle the application','A consultation with our team on your case'], cond:'LTR visa conditions: property from USD\u00a0500,000 and worldwide assets of USD\u00a01\u00a0million, including this purchase. The property must be completed for LTR; while it is under construction, we help you obtain a Thailand Privilege visa. Please check the requirements with our specialist' } };
+/* 05.11 го Эльнура (~13:50, «делай!»): «нам нужен наш стандартный квиз, условия по визе могут быть просто описаны… лид может податься и не обязательно
+   на визу, задача получить квал лид». С ?offer=visa бонусы проекта остаются как в обычном квизе, виза идёт одной строкой бонуса и описанием условий. */
+const VISA_T = { ru:{ chip:'Виза на 10 лет при покупке от 500\u00a0000\u00a0$', gift:'Условия визы LTR на 10 лет для вас и семьи при покупке от 500\u00a0000\u00a0$', mot:' Расскажем и об условиях визы LTR для вашей семьи.', cond:'Условия визы LTR: покупка недвижимости от 500\u00a0000\u00a0$ и активы по миру от 1\u00a0млн\u00a0$, включая эту покупку. Для LTR объект должен быть сдан, на время стройки поможем оформить Элит визу. Требования уточните у специалиста' },
+                 en:{ chip:'A 10-year visa from USD\u00a0500,000', gift:'LTR visa terms for you and your family with a purchase from USD\u00a0500,000', mot:' We will also walk you through the LTR visa terms for your family.', cond:'LTR visa conditions: property from USD\u00a0500,000 and worldwide assets of USD\u00a01\u00a0million, including this purchase. The property must be completed for LTR; while it is under construction, we help you obtain a Thailand Privilege visa. Please check the requirements with our specialist' } };
 /* 04.11 решение №365, канон 108 (го Эльнура 04.11 ~23:00, №24 учёта): для LTR объект сдан, на стройке Элит виза, после сдачи LTR; строки визы ниже и в P.visa, EN_P.visa по нему. */
 /* 02.11 Эльнур: «после квиза… разместить требования к визе LTR, базовые, детали всегда у нас: даём затравку, греем, отсеиваем, остальное у специалиста». */
 const VISA_DONE_T = { ru:{ h:'Виза LTR на 10 лет: главное', li:['Срок 10 лет: 5 лет и продление ещё на\u00a05','Вам, супругу или супруге и детям до\u00a020\u00a0лет','Покупка недвижимости в Таиланде от 500\u00a0000\u00a0$, одним объектом или несколькими','Активы по миру от 1\u00a0млн\u00a0$, включая эту покупку','Объект сдан. Пока он строится, поможем оформить Элит визу, а после сдачи оформим LTR'], f:'Детали по вашему случаю расскажет наш специалист на консультации. Оформление и оплату визы LTR берём на себя.' },
@@ -569,7 +571,7 @@ const VISA_DONE_T = { ru:{ h:'Виза LTR на 10 лет: главное', li:[
 const VISA_DONE = () => { if (!VISA) return ''; const t = VISA_DONE_T[LANG] || VISA_DONE_T.ru;
   return '<div class="gift" style="margin:14px 18px 0"><b>' + t.h + '</b>' + t.li.map(x => '<span>✓ ' + x + '</span>').join('') + '<small style="font-weight:500;opacity:.8;margin-top:4px">' + t.f + '</small></div>'; };
 const CPV = f => { const v = CP(f); if (!VISA) return v; const t = VISA_T[LANG] || VISA_T.ru;
-  if (f === 'gifts') return t.gifts; if (f === 'ad' && v) return Object.assign({}, v, { chip: t.chip }); return v; };
+  if (f === 'gifts') return (v || []).concat([t.gift]); if (f === 'ad' && v) return Object.assign({}, v, { chip: t.chip }); return v; };
 /* подсказка о номере по-английски: phone.js общий с главной, его не трогаем — переводим по причине отказа */
 function hintEn(r, cc){
   const w = String(r.why || ''), e = String(r.error || ''), ex = ', e.g. +66 81 234 5678.';
@@ -1002,7 +1004,7 @@ function finish(r){
      человеку бот отвечает по его квизу. Кода нет (приёмник не ответил) — как раньше, в рабочий Telegram с набранным текстом. */
   const botMain = tgFirst && r.tg_start;
   const bBOT = '<a class="tg" data-ev="click_tg_bot" href="' + r.tg_start + '" target="_blank" rel="noopener">' + icTG + U('bBOT') + '</a>';
-  const write = '<p class="mot">' + (VISA ? (LANG === 'en' ? 'Message us now and we will send prices for ' + C.name + ' and the visa terms for your family.' : 'Напишите сейчас, и пришлём цены ' + C.name + ' и условия визы для вашей семьи.') : ((LANG === 'en' && EN_P[wkey] && EN_P[wkey].mot) || MOT[wkey] || U('motDef'))) + '</p>' +
+  const write = '<p class="mot">' + ((LANG === 'en' && EN_P[wkey] && EN_P[wkey].mot) || MOT[wkey] || U('motDef')) + (VISA ? (VISA_T[LANG] || VISA_T.ru).mot : '') + '</p>' +
     '<div class="wr">' + (botMain ? bBOT : tgFirst ? bTG : bWA) + '</div>' +
     (botMain ? '<p class="wrh">' + U('wrhBot') + '</p>' : '<p class="wrh">' + U('wrh') + '</p>');
   $('quiz').hidden = true; $('s0').hidden = true; $('foot0').hidden = true;
