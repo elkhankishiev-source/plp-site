@@ -1,7 +1,8 @@
 /* 05.11.2026 Эльнур «го!»: запись сессий квиза (session replay) на открытой библиотеке rrweb (MIT, копия в /js/vendor/, без чужих CDN).
    Записываются не видео и не ввод, а действия на странице: что было на экране, нажатия, прокрутка, уход.
    Правила: 1) только /kviz/, включается после показа страницы, первый экран не тормозит;
-   2) только с согласия на аналитику, как Google Analytics (plp_consent = «Принять»); «Только необходимые» = не пишем;
+   2) по правилу аналитики 21.10 (opt-out, как GA и пиксель в consent.js): пишем, пока посетитель не выбрал «Только необходимые»;
+      06.11 Эльнур «го сайт: запись квиза по правилу 21.10»: до этого ждали «Принять», а плашки с 21.10 нет, записей было 0;
    3) не пишем наши проверки (utm_source test_, verify_, audit_) и роботов; 4) выборка 50% сессий;
    5) все поля ввода скрыты (maskAllInputs), форма с именем и номером (#f) не записывается вовсе, в записи на её месте пустой блок;
    6) пачки уходят в наш приёмник n8n, хранятся в закрытом хранилище 30 дней, на сайте их не видно.
@@ -78,7 +79,7 @@
     var s = document.createElement('script'); s.src = LIB; s.async = true;
     s.onload = function () {
       try {
-        if (consent() !== 'all' || !window.rrwebRecord) return;
+        if (consent() === 'necessary' || !window.rrwebRecord) return;
         t0 = Date.now();
         stop = rrwebRecord.record({ emit: emit, maskAllInputs: true, blockSelector: '#f, form, .rr-block',
           recordCanvas: false, collectFonts: false, inlineImages: false, slimDOMOptions: 'all',
@@ -90,12 +91,12 @@
   addEventListener('pagehide', function () { if (stop) flush(true); });
   document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden' && stop) flush(true); });
 
-  /* согласие: есть «Принять» — пишем; нажмёт позже — подхватим (проверка раз в 2 с, до 3 минут); передумал — останавливаем */
+  /* согласие: нет отказа — пишем; выберет «Только необходимые» — останавливаем (проверка раз в 2 с, до 3 минут) */
   var tries = 0;
   function check() {
     var c = consent();
-    if (c === 'all') { if (!stop) start(); }
-    else if (c === 'necessary') { if (stop) end(); return; }
+    if (c === 'necessary') { if (stop) end(); return; }
+    if (!stop) start();
     if (++tries < 90 || stop) setTimeout(check, 2000);
   }
   function go() { setTimeout(function () { (window.requestIdleCallback || function (f) { setTimeout(f, 1); })(check); }, 1500); }
