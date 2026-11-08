@@ -116,6 +116,26 @@ const OFFERS = [
     og: 'offers/vivi/img/preview-v1.jpg',
     h: 7191,   // PDF 1902 мм (7 стр.) × 794/210 (05.11)
   },
+  {
+    /* 08.11.2026 Эльнур: «каталог презу по тем проектам которые в длительную рассрочку, оффер на сайте, офер пдф».
+       Сборщик ~/plp-ops/tools/katalog (data.py → gen.mjs rassrochka), образец топ-15. hidden: только /rassrochka/<номер из build/nomera.json>. */
+    slug: 'rassrochka', dir: 'offers/rassrochka', hidden: true,
+    title: 'Длительная рассрочка · Property Library Phuket',
+    desc: 'Подборка Property Library Phuket: проекты Пхукета, где часть оплаты идёт после ключей. Цены «от», схемы рассрочки и сроки.',
+    pdf: 'Rassrochka_Phuket.pdf',
+    og: 'offers/rassrochka/img/preview-v1.jpg',
+    h: 10801,   // PDF 2850 мм (12 стр.) × 794/210 (08.11)
+  },
+  {
+    /* 08.11.2026 Эльнур: «презу готовых объектов сейчас и тех которые будут готовы около середины 2027 года».
+       Состав — подбор_объектов({"сдача_до":"2027-07-31"}), сборщик ~/plp-ops/tools/katalog. hidden: только /gotovye/<номер>. */
+    slug: 'gotovye', dir: 'offers/gotovye', hidden: true,
+    title: 'Готовые и со сдачей до середины 2027 · Property Library Phuket',
+    desc: 'Подборка Property Library Phuket: готовые квартиры и виллы Пхукета и проекты со сдачей до середины 2027 года. Цены «от» и сроки.',
+    pdf: 'Gotovye_Phuket.pdf',
+    og: 'offers/gotovye/img/preview-v1.jpg',
+    h: 21225,   // PDF 5607 мм (23 стр.) × 794/210 (08.11)
+  },
   /* 09.10.2026 Эльнур: общий лист KUARTZ+FIZZ «лишний, удали» — убран; /kuartz-fizz пересылает на /kuartz. */
   {
     /* 04.10.2026 Эльнур: «на секретной странице… зеро наянг гарантия 10% годовых». Факты: objects PLP-ZERO-NAIYANG
