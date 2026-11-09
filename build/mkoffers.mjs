@@ -124,7 +124,7 @@ const OFFERS = [
     desc: 'Подборка Property Library Phuket: проекты Пхукета, где часть оплаты идёт после ключей. Цены «от», схемы рассрочки и сроки.',
     pdf: 'Rassrochka_Phuket.pdf',
     og: 'offers/rassrochka/img/preview-v1.jpg',
-    h: 10789,   // PDF 2853 мм × 794/210 (09.11)
+    h: 10752,   // PDF 2844 мм × 794/210 (09.11)
   },
   {
     /* 08.11.2026 Эльнур: «презу готовых объектов сейчас и тех которые будут готовы около середины 2027 года».
@@ -133,17 +133,17 @@ const OFFERS = [
     title: 'Готовые и со сдачей до середины 2027 · Property Library Phuket',
     desc: 'Подборка Property Library Phuket: готовые квартиры и виллы Пхукета и проекты со сдачей до середины 2027 года. Цены «от» и сроки.',
     pdf: 'Gotovye_Phuket.pdf',
-    og: 'offers/gotovye/img/preview-v1.jpg',
-    h: 23336,   // PDF 6172 мм × 794/210 (09.11)
+    og: 'offers/gotovye/img/preview-v2.jpg',
+    h: 23299,   // PDF 6162 мм × 794/210 (09.11)
   },
   {
     /* 09.11.2026 Эльнур: варианты до 150 тыс. «можно чуть двигать наверх», пять объектов до 165 тыс. $, сдача до середины 2027. */
-    slug: 'do165', dir: 'offers/do165', hidden: true,
+    slug: 'do185', dir: 'offers/do185', hidden: true,
     title: 'Готовые и сдача до середины 2027, до 185 тыс. $ · Property Library Phuket',
     desc: 'Подборка Property Library Phuket: квартиры Пхукета до 185 тыс. $, готовые и со сдачей до середины 2027 года. Цены «от» и сроки.',
-    pdf: 'Do165_Phuket.pdf',
-    og: 'offers/do165/img/preview-v1.jpg',
-    h: 8665,   // PDF 2292 мм × 794/210 (09.11)
+    pdf: 'Do185_Phuket.pdf',
+    og: 'offers/do185/img/preview-v2.jpg',
+    h: 8628,   // PDF 2282 мм × 794/210 (09.11)
   },
   /* 09.10.2026 Эльнур: общий лист KUARTZ+FIZZ «лишний, удали» — убран; /kuartz-fizz пересылает на /kuartz. */
   {
