@@ -37,7 +37,7 @@ const ПРЕВЬЮ = { vibe2: 'offers/vibe2/img/preview-v13.jpg', 'zero-naiyang'
   'naturale-kamala': 'offers/naturale-kamala/img/preview-v1.jpg',
   katabello: 'offers/katabello/img/preview-v1.jpg',
   vivi: 'offers/vivi/img/preview-v1.jpg',
-  rassrochka: 'offers/rassrochka/img/preview-v1.jpg', gotovye: 'offers/gotovye/img/preview-v1.jpg' };
+  rassrochka: 'offers/rassrochka/img/preview-v1.jpg', gotovye: 'offers/gotovye/img/preview-v1.jpg', do165: 'offers/do165/img/preview-v1.jpg' };
 const НОМЕРА = JSON.parse(fs.readFileSync(path.join(ROOT, 'build/nomera.json'), 'utf8'));
 const ОФФЕРЫ = {};
 const корневые = fs.readdirSync(ROOT).filter(f => f.endsWith('.html'))
