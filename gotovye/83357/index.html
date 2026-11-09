@@ -2224,16 +2224,16 @@ body{background:var(--bg)}
     <!-- 04.11.2026 Эльнур: «пдф … всегда с превью». Ссылка на обёртку /<лист>/<номер>/pdf/ (build/mkpdfwrap.mjs): у голого .pdf превью нет. -->
     <a href="/gotovye/83357/pdf/" target="_blank" rel="noopener" style="font-size:13px;line-height:1;padding:7px 12px;border:1px solid rgba(255,255,255,.28);border-radius:999px;color:#EFECE2;text-decoration:none;opacity:.85">PDF ↓</a>
   </div>
-  <div id="offerBox" style="width:100%;max-width:794px;margin:0 auto;overflow:hidden;border-radius:14px;background:#EFECE2;box-shadow:0 2px 18px rgba(23,24,15,.08);height:21225px">
-    <iframe id="offerFrame" src="/offers/gotovye/page.htm?v=mw8s5k70.snh" title="Готовые и со сдачей до середины 2027 · Property Library Phuket" loading="eager" scrolling="no"
-      style="display:block;width:794px;height:21225px;border:0;transform-origin:0 0"></iframe>
+  <div id="offerBox" style="width:100%;max-width:794px;margin:0 auto;overflow:hidden;border-radius:14px;background:#EFECE2;box-shadow:0 2px 18px rgba(23,24,15,.08);height:23165px">
+    <iframe id="offerFrame" src="/offers/gotovye/page.htm?v=mw8t0dnr.9a" title="Готовые и со сдачей до середины 2027 · Property Library Phuket" loading="eager" scrolling="no"
+      style="display:block;width:794px;height:23165px;border:0;transform-origin:0 0"></iframe>
   </div>
 </div></section>
 <script>
 /* Лист оффера показываем ровно как в PDF: ширина листа 794px (210 мм), на узком экране
    уменьшаем его целиком, а не перестраиваем в колонку. Эльнур 18.09: «как в PDF, рядом». */
 (function () {
-  var box = document.getElementById('offerBox'), f = document.getElementById('offerFrame'), H = 21225;
+  var box = document.getElementById('offerBox'), f = document.getElementById('offerFrame'), H = 23165;
   function layout() {
     var k = Math.min(1, box.clientWidth / 794);
     f.style.transform = k < 1 ? 'scale(' + k + ')' : '';
