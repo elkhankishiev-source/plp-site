@@ -407,7 +407,7 @@ const P = {
   /* 15.11.2026 Эльнур про рекламу BRISA: «Да, давай такое запустим. Бронь 25 ноября 100 тыс бат, виза на год в подарок»; «в квизе тоже надо расписать эти детали…
      забери бонус»; «Полная собственность по иностранной квоте, фрихолд, тоже используй». Факты ~/plp-ops/черновики/brisa_1511/факты.md: брошюра и прайс Sansiri 13.11.2026
      (FQ = фрихолд по иностранной квоте, цены «от» — фрихолд), ответ застройщика 15.11 17:38 (годовая виза и год консьерж-сервиса для всех покупателей), голосовые 15.11 (25 ноября,
-     живая очередь, одна квартира в одни руки). Не ставим: экспертизу (№334), мебель в цене (не подтверждено), скидки (№360), требование оплатить бронь (№416, №426).
+     живая очередь, одна квартира в одни руки). Не ставим: экспертизу (№334), скидки (№360), требование оплатить бронь (№416, №426).
      Четыре вопроса: вопрос про 25 ноября стоит вместо WHEN с тем же ключом when (приёмник берёт его полем srok). Фото планировок нет, варианты без картинок.
      Дополнение 15.11 вечер, слова Эльнура: бронирование только 25 ноября и для готовых бронировать в этот день, живая очередь, одна квартира в одни руки;
      нужна одна квартира — заранее выбрать три варианта; первый платёж 30% в течение 30 дней после брони, бронь входит; подарки: годовая виза и год консьерж-сервиса.
@@ -417,8 +417,9 @@ const P = {
     ad:{img:'ad-brisa', title:'BRISA Patong', sub:'От Sansiri, в центре Патонга', big:'от 3,99 млн бат', note:'фрихолд, полная собственность по иностранной квоте', chip:'Годовая виза в подарок'},
     h1:'BRISA Patong от Sansiri: 900 м до пляжа Патонг*',
     sub:'Квартиры от 3,99 млн ฿ во фрихолд, полная собственность по иностранной квоте. Бронирование один день, 25 ноября, живая очередь, одна квартира в одни руки. Ответьте на 4 вопроса и заберите бонус.',
-    foot:'*Прайс застройщика Sansiri от 13.11.2026, фрихолд по иностранной квоте. Годовая виза и год консьерж-сервиса входят в покупку по условиям застройщика. Рендеры застройщика',
-    gifts:['Планировки и цены по выбранному типу','Место в нашей очереди на бронирование 25 ноября','Годовая виза и год консьерж-сервиса от застройщика'],
+    foot:'*Прайс застройщика Sansiri от 13.11.2026, фрихолд по иностранной квоте. По акции застройщика к квартире идут мебельный пакет, бытовая техника, комплект для сдачи в аренду, год консьерж-сервиса и годовая виза. Рендеры застройщика',
+    /* 15.11 ~19:20 Эльнур: «Да, переделай обнови все везде» (подарки = пять пунктов «Promotion» прайса Sansiri 13.11, подаём как акцию застройщика) */
+    gifts:['Планировки и цены по выбранному типу','Место в нашей очереди на бронирование 25 ноября','По акции застройщика: мебельный пакет, бытовая техника, комплект для сдачи в аренду, год консьерж-сервиса и годовая виза'],
     facts:[['от 3,99 млн ฿','1 спальня, фрихолд'],['900 м','до пляжа Патонг'],['30%','в течение 30 дней после брони, бронь входит'],['25 ноября','бронирование, одна квартира в одни руки']],
     gal:['br-pool','br-facade','br-garden'], sheet:'', bot:'kviz_brisa',
     ui:{ ru:{ formQ:'Куда прислать планировки и цены?', submit:'Получить планировки',
@@ -510,8 +511,8 @@ const EN_P = {
   /* 15.11 BRISA Patong EN: перевод P.brisa, ничего нового. Шапка — фото без русских плашек (EN объявление = EN картинка, 02.11) */
   brisa: { place:'Patong', h1:'BRISA Patong by Sansiri: 900 m to Patong beach*',
     ad:{ img:'brisa-hero', title:'BRISA Patong', sub:'By Sansiri, in central Patong', big:'from 3.99M THB', note:'freehold, full ownership under the foreign quota', chip:'1-year visa included' },
-    foot:'*Sansiri price list of 13.11.2026, freehold under the foreign quota. A 1-year visa and 1 year of concierge service come with the purchase under the developer terms. Developer renderings',
-    gifts:['Floor plans and prices for your chosen type','A place in our queue for the 25 November booking day','A 1-year visa and 1 year of concierge service from the developer'],
+    foot:'*Sansiri price list of 13.11.2026, freehold under the foreign quota. Under the developer promotion, the apartment comes with a furniture package, home appliances, a rental-ready kit, 1 year of concierge service and a 1-year visa. Developer renderings',
+    gifts:['Floor plans and prices for your chosen type','A place in our queue for the 25 November booking day','Developer promotion: furniture package, home appliances, rental-ready kit, 1 year of concierge service and a 1-year visa'],
     facts:[['from 3.99M ฿','1 bedroom, freehold'],['900 m','to Patong beach'],['30%','within 30 days after booking, booking included'],['25 November','booking day, one apartment per buyer']],
     mot:'Message me now and I will send BRISA floor plans and prices, help you pick three options in advance and add you to our queue for 25 November.' },
   /* 02.11 виза LTR: те же факты, что в русском P.visa и в тексте EN-объявления (тексты_v2.md) */
