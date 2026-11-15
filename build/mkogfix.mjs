@@ -32,7 +32,7 @@ const ПРЕВЬЮ = { vibe2: 'offers/vibe2/img/preview-v13.jpg', 'zero-naiyang'
   'cg-capital': 'offers/cg-capital/img/preview-v10.jpg', aileen: 'offers/aileen/img/preview-v10.jpg',
   kuartz: 'offers/kuartz/img/preview-v11.jpg', fizz: 'offers/fizz/img/preview-v12.jpg', eden: 'offers/eden/img/preview-v10.jpg',
   millennium: 'offers/millennium/img/preview-v10.jpg',
-  top15: 'offers/top15/img/preview-v4.jpg',
+  top15: 'offers/top15/img/preview-v5.jpg',
   purita: 'offers/purita/img/preview-v10.jpg',
   'naturale-kamala': 'offers/naturale-kamala/img/preview-v1.jpg',
   katabello: 'offers/katabello/img/preview-v1.jpg',
