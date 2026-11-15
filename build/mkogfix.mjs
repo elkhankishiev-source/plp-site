@@ -30,14 +30,14 @@ function jpegSize(p) {
 const ПРЕВЬЮ = { vibe2: 'offers/vibe2/img/preview-v13.jpg', 'zero-naiyang': 'offers/zero-naiyang/img/preview-v10.jpg',
   // 07.10 Эльнур: «превью ссылки соответствующее фото, не везде одно и то же» — /cg-capital и /aileen показывали Heritage
   'cg-capital': 'offers/cg-capital/img/preview-v10.jpg', aileen: 'offers/aileen/img/preview-v10.jpg',
-  kuartz: 'offers/kuartz/img/preview-v11.jpg', fizz: 'offers/fizz/img/preview-v12.jpg', eden: 'offers/eden/img/preview-v10.jpg',
+  kuartz: 'offers/kuartz/img/preview-v11.jpg', fizz: 'offers/fizz/img/preview-v12.jpg', eden: 'offers/eden/img/preview-v11.jpg',
   millennium: 'offers/millennium/img/preview-v10.jpg',
   top15: 'offers/top15/img/preview-v5.jpg',
   purita: 'offers/purita/img/preview-v10.jpg',
   'naturale-kamala': 'offers/naturale-kamala/img/preview-v1.jpg',
   katabello: 'offers/katabello/img/preview-v1.jpg',
   vivi: 'offers/vivi/img/preview-v1.jpg',
-  rassrochka: 'offers/rassrochka/img/preview-v1.jpg', gotovye: 'offers/gotovye/img/preview-v2.jpg', do185: 'offers/do185/img/preview-v2.jpg' };
+  rassrochka: 'offers/rassrochka/img/preview-v2.jpg', gotovye: 'offers/gotovye/img/preview-v2.jpg', do185: 'offers/do185/img/preview-v2.jpg' };
 const НОМЕРА = JSON.parse(fs.readFileSync(path.join(ROOT, 'build/nomera.json'), 'utf8'));
 const ОФФЕРЫ = {};
 const корневые = fs.readdirSync(ROOT).filter(f => f.endsWith('.html'))
