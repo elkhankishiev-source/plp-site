@@ -1725,7 +1725,7 @@
    "name": "Eden · Lake Residences",
    "district": "Банг Тао",
    "type": "Кондо",
-   "price_from": 11904800,
+   "price_from": 9800000,
    "units": [
     {
      "area": "52 м²",
@@ -1744,6 +1744,18 @@
      "name": "3 спальни (A Plus)",
      "price_from_thb": 25979100,
      "from": 25979100
+    },
+    {
+     "area": "49 м²",
+     "name": "1 спальня (корпус Mango)",
+     "price_from_thb": 9800000,
+     "from": 9800000
+    },
+    {
+     "area": "77 м²",
+     "name": "2 спальни (корпус Mango)",
+     "price_from_thb": 14630000,
+     "from": 14630000
     }
    ]
   },
