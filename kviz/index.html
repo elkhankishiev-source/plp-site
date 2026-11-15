@@ -404,6 +404,38 @@ const P = {
         o:[['Студия, 24,4–30 м²','mi-studio'],['1-спальная, 35–46,2 м²','mi-1br'],['2-спальная, 60–74,2 м²','mi-2br'],['Помогите выбрать','mi-hero']]},
       ...STD()]
   },
+  /* 15.11.2026 Эльнур про рекламу BRISA: «Да, давай такое запустим. Бронь 25 ноября 100 тыс бат, виза на год в подарок»; «в квизе тоже надо расписать эти детали…
+     забери бонус»; «Полная собственность по иностранной квоте, фрихолд, тоже используй». Факты ~/plp-ops/черновики/brisa_1511/факты.md: брошюра и прайс Sansiri 13.11.2026
+     (FQ = фрихолд по иностранной квоте, цены «от» — фрихолд), ответ застройщика 15.11 17:38 (годовая виза и год консьерж-сервиса для всех покупателей), голосовые 15.11 (25 ноября,
+     живая очередь, одна квартира в одни руки). Не ставим: экспертизу (№334), мебель в цене (не подтверждено), скидки (№360), требование оплатить бронь (№416, №426).
+     Четыре вопроса: вопрос про 25 ноября стоит вместо WHEN с тем же ключом when (приёмник берёт его полем srok). Фото планировок нет, варианты без картинок.
+     Дополнение 15.11 вечер, слова Эльнура: бронирование только 25 ноября и для готовых бронировать в этот день, живая очередь, одна квартира в одни руки;
+     нужна одна квартира — заранее выбрать три варианта; первый платёж 30% в течение 30 дней после брони, бронь входит; подарки: годовая виза и год консьерж-сервиса.
+     «го» 15.11 ~19:00: «Ролик 2 ок, двигаемся дальше бриса го». */
+  brisa: {
+    id:'PLP-SANSIRI-BRISA', name:'BRISA Patong', place:'Патонг', hero:'brisa-hero',
+    ad:{img:'ad-brisa', title:'BRISA Patong', sub:'От Sansiri, в центре Патонга', big:'от 3,99 млн бат', note:'фрихолд, полная собственность по иностранной квоте', chip:'Годовая виза в подарок'},
+    h1:'BRISA Patong от Sansiri: 900 м до пляжа Патонг*',
+    sub:'Квартиры от 3,99 млн ฿ во фрихолд, полная собственность по иностранной квоте. Бронирование один день, 25 ноября, живая очередь, одна квартира в одни руки. Ответьте на 4 вопроса и заберите бонус.',
+    foot:'*Прайс застройщика Sansiri от 13.11.2026, фрихолд по иностранной квоте. Годовая виза и год консьерж-сервиса входят в покупку по условиям застройщика. Рендеры застройщика',
+    gifts:['Планировки и цены по выбранному типу','Место в нашей очереди на бронирование 25 ноября','Годовая виза и год консьерж-сервиса от застройщика'],
+    facts:[['от 3,99 млн ฿','1 спальня, фрихолд'],['900 м','до пляжа Патонг'],['30%','в течение 30 дней после брони, бронь входит'],['25 ноября','бронирование, одна квартира в одни руки']],
+    gal:['br-pool','br-facade','br-garden'], sheet:'', bot:'kviz_brisa',
+    ui:{ ru:{ formQ:'Куда прислать планировки и цены?', submit:'Получить планировки',
+               who:'<b>Эльнур Ханкишиев</b>, основатель Property Library. Пришлю лично планировки и цены, помогу заранее выбрать три варианта и запишу вас в нашу очередь на 25 ноября.',
+               step:(n, t, left) => 'Вопрос ' + n + ' из ' + t + (left > 2 ? ' · ещё ' + (left - 1) + ', и пришлю планировки и цены' : left > 1 ? ' · ещё 1, и место в очереди ваше' : ' · последний вопрос, и бонус ваш') },
+         en:{ formQ:'Where should I send floor plans, prices and your bonus?', submit:'Get floor plans',
+               who:'<b>Elnur Khankishiev</b>, founder of Property Library. I will personally send you floor plans and prices, help you pick three options in advance and add you to our queue for 25 November.',
+               step:(n, t, left) => 'Question ' + n + ' of ' + t + (left > 2 ? ' · ' + (left - 1) + ' more, then I send floor plans and prices' : left > 1 ? ' · 1 more, then your place in the queue is yours' : ' · last question, then your bonus is ready') } },
+    Q:[
+      {k:'plan', q:'Сколько спален?',
+        o:[['1-спальная, 30,25–41,25 м²',null,null,'фрихолд от 3,99 млн ฿, бронь 100 000 ฿'],['2-спальная, 1 ванная, 48,75–55,75 м²',null,null,'фрихолд от 6,4 млн ฿, бронь 200 000 ฿'],
+          ['2-спальная, 2 ванные, 61,25–71,25 м²',null,null,'фрихолд от 10,51 млн ฿, бронь 200 000 ฿'],['Помогите выбрать']]},
+      ...STD().slice(0, 2),
+      {k:'when', q:'Готовы выбрать квартиру к 25 ноября?',
+        o:[['Да, хочу место в очереди',null,null,'заранее подберём три варианта, чтобы одна квартира точно досталась','готов выбрать к 25 ноября, нужно место в очереди'],['Нужно больше деталей',null,null,'решу после планировок и цен','решу к 25 ноября после планировок и цен'],
+          ['Пока сравниваю',null,null,'смотрю и другие проекты','пока сравниваю, не к 25 ноября']]}]
+  },
   zero: {
     id:'PLP-ZERO-NAIYANG', name:'ZERO', place:'Най Янг', hero:'z-front',
     h1:'ZERO на Най Янге: доход 10% годовых по программе застройщика*',
@@ -475,6 +507,13 @@ const EN_P = {
     gifts:['Eden Lake prices and floor plans','Financing option: 35% down payment, 5-year instalments','Residences by view and floor'],
     facts:[['from 9.8M ฿','1 bedroom, 52 m²'],['500 m','to Bang Tao beach'],['35%','first payment, 5-year instalments'],['70%','of the land: parks, lakes, gardens']],
     mot:'Message me now and I will send Eden Lake prices, floor plans and a 5-year instalment plan with a 35% first payment.' },
+  /* 15.11 BRISA Patong EN: перевод P.brisa, ничего нового. Шапка — фото без русских плашек (EN объявление = EN картинка, 02.11) */
+  brisa: { place:'Patong', h1:'BRISA Patong by Sansiri: 900 m to Patong beach*',
+    ad:{ img:'brisa-hero', title:'BRISA Patong', sub:'By Sansiri, in central Patong', big:'from 3.99M THB', note:'freehold, full ownership under the foreign quota', chip:'1-year visa included' },
+    foot:'*Sansiri price list of 13.11.2026, freehold under the foreign quota. A 1-year visa and 1 year of concierge service come with the purchase under the developer terms. Developer renderings',
+    gifts:['Floor plans and prices for your chosen type','A place in our queue for the 25 November booking day','A 1-year visa and 1 year of concierge service from the developer'],
+    facts:[['from 3.99M ฿','1 bedroom, freehold'],['900 m','to Patong beach'],['30%','within 30 days after booking, booking included'],['25 November','booking day, one apartment per buyer']],
+    mot:'Message me now and I will send BRISA floor plans and prices, help you pick three options in advance and add you to our queue for 25 November.' },
   /* 02.11 виза LTR: те же факты, что в русском P.visa и в тексте EN-объявления (тексты_v2.md) */
   visa: { place:'Phuket', h1:'A 10-year visa for your whole family*',
     foot:'*LTR visa covered by Property Library for clients who meet the criteria: USD 500,000 in Thai property and at least USD 1 million in assets. The property must be completed for LTR; while it is under construction, we help you obtain a Thailand Privilege visa. Developer renderings',
@@ -490,6 +529,11 @@ const EN = {
   'Студия, 24,4–30 м²':'Studio, 24.4–30 m²', '1-спальная, 35–46,2 м²':'1 bedroom, 35–46.2 m²', '2-спальная, 60–74,2 м²':'2 bedrooms, 60–74.2 m²',
   '1-спальная, 52 м²':'1 bedroom, 52 m²', '2-спальная, 80,5 м²':'2 bedrooms, 80.5 m²', '3-спальная, 123,7 м²':'3 bedrooms, 123.7 m²',   /* Eden Lake 02.11 */
   'Помогите выбрать':'Help me choose', 'Помогите подобрать':'Help me choose',
+  /* 15.11 BRISA Patong */
+  '1-спальная, 30,25–41,25 м²':'1 bedroom, 30.25–41.25 m²', '2-спальная, 1 ванная, 48,75–55,75 м²':'2 bedrooms, 1 bathroom, 48.75–55.75 m²', '2-спальная, 2 ванные, 61,25–71,25 м²':'2 bedrooms, 2 bathrooms, 61.25–71.25 m²',
+  'фрихолд от 3,99 млн ฿, бронь 100 000 ฿':'freehold from 3.99M ฿, booking 100,000 ฿', 'фрихолд от 6,4 млн ฿, бронь 200 000 ฿':'freehold from 6.4M ฿, booking 200,000 ฿', 'фрихолд от 10,51 млн ฿, бронь 200 000 ฿':'freehold from 10.51M ฿, booking 200,000 ฿',
+  'Готовы выбрать квартиру к 25 ноября?':'Ready to choose an apartment by 25 November?', 'Да, хочу место в очереди':'Yes, I want a place in the queue', 'заранее подберём три варианта, чтобы одна квартира точно досталась':'we pick three options in advance, so one apartment is surely yours',
+  'Нужно больше деталей':'I need more details', 'решу после планировок и цен':'I will decide after floor plans and prices', 'Пока сравниваю':'Still comparing', 'смотрю и другие проекты':'looking at other projects too',
   'Для чего рассматриваете?':'What are you buying for?',
   'Для себя':'For myself', 'жить или отдыхать':'to live in or for holidays', 'Инвестиция':'Investment', 'сдавать в аренду или перепродать':'to rent out or resell',
   'Комбо':'Both', 'жить и сдавать':'live in it and rent it out',
@@ -588,7 +632,7 @@ function hintEn(r, cc){
   if (/^не тот вид/.test(e)) return 'This does not look like a valid +' + (r.code || '') + ' number. Check the digits and the country code.';
   return UI.en.phoneErr;
 }
-const POST = { kuartz:'https://t.me/property_library_phuket', vibe2:'https://t.me/property_library_phuket', fizz:'https://t.me/property_library_phuket', eden:'https://t.me/property_library_phuket', purita:'https://t.me/property_library_phuket', millennium:'https://t.me/property_library_phuket', zero:'https://t.me/property_library_phuket', visa:'https://t.me/property_library_phuket' }; /* ссылки на посты-разборы: подставить, когда выйдут */
+const POST = { brisa:'https://t.me/property_library_phuket', kuartz:'https://t.me/property_library_phuket', vibe2:'https://t.me/property_library_phuket', fizz:'https://t.me/property_library_phuket', eden:'https://t.me/property_library_phuket', purita:'https://t.me/property_library_phuket', millennium:'https://t.me/property_library_phuket', zero:'https://t.me/property_library_phuket', visa:'https://t.me/property_library_phuket' }; /* ссылки на посты-разборы: подставить, когда выйдут */
 /* 16.10.2026 Эльнур: «поле код с флажками всё испортит, убери, организуй поле номер заново без ошибок».
    Одно поле, в нём уже стоит +, номер целиком с кодом страны. Проверяет тот же phone.js, что и приёмник.
    Набрал 00 вместо + или российское 8XXXXXXXXXX — поправляем сами. */
@@ -979,6 +1023,7 @@ function finish(r){
     eden:'Напишите сейчас, и пришлём цены, планировки и расчёт рассрочки на 5 лет с первым взносом 35%.',
     purita:'Напишите сейчас, и пришлём цены и планировки Purita и закрепим квартиру с лучшим этажом и видом на сад.',
     millennium:'Напишите сейчас, и пришлём цены и планировки Millennium по иностранной квоте и подберём лучший этаж и вид.',
+    brisa:'Напишите сейчас, и пришлём планировки и цены BRISA, поможем заранее выбрать три варианта и запишем вас в нашу очередь на 25 ноября.',
     zero:'Напишите, и пришлём расчёт дохода 10% годовых по программе застройщика.',
     visa:'Напишите сейчас, и пришлём результат теста, условия программы и подбор недвижимости от 500 000 $.' };
   /* 15.10.2026 Эльнур: кнопка называется как бонус (бонус = мотивация выше), ведёт к тому, за кем закреплён лид.
