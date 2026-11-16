@@ -596,6 +596,10 @@ function langFor(key){
   const cmp = String(new URLSearchParams(location.search).get('utm_campaign') || '').toLowerCase();
   if (/(^|[_-])ru([_-]|$)/.test(cmp)) return 'ru';
   if (/(^|[_-])en([_-]|$)/.test(cmp)) return 'en';
+  /* 16.11.2026 слова Эльнура: «Я перешел по квизу объявления, оно на англ языке… я не просил этого», «Все объявления так».
+     За 4 дня с русской рекламы без пометки _ru квиз открылся на английском у 43 из 142 человек (4proj_2510 и brisa_housing_1611).
+     Правило: пришёл с рекламы (есть utm_source или utm_campaign) и реклама не помечена _en — русский, язык телефона не смотрим. */
+  if (cmp || new URLSearchParams(location.search).get('utm_source')) return 'ru';
   let ls = []; try { ls = (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || '']).map(x => String(x || '').toLowerCase()); } catch (e) {}
   if (!ls.filter(Boolean).length) return 'ru';
   return ls.some(x => /^(ru|uk|be|kk|ky|uz|tg|hy|az|ka)\b/.test(x)) ? 'ru' : 'en';
