@@ -32,7 +32,7 @@ const OFFERS = [
     /* 07.10.2026 Эльнур: «собрать презентацию по формату Vibe II и скинуть ссылку». Факты: слайды CG Capital (фото Эльнура 07.10) и его голосовые. */
     slug: 'cg-capital', dir: 'offers/cg-capital', old: true,
     title: 'Central Group на Пхукете · Andaz и PURITA: старт продаж',
-    desc: 'Andaz у пляжа Лаян от 16,xx млн ฿ и PURITA на Банг Тао от 7,xx млн ฿ от Central Group. Сроки, первые цены, как попасть в первую очередь.',
+    desc: 'Andaz у пляжа Лаян от 16,xx млн ฿ и PURITA на Банг Тао от 7,29 млн ฿ от Central Group. Сроки, первые цены, как попасть в первую очередь.',
     pdf: 'CentralGroup_Phuket.pdf',   // node tools/offer_longpdf.mjs cg-capital CentralGroup_Phuket.pdf
   },
   {
@@ -78,7 +78,7 @@ const OFFERS = [
        (каталог продаж и презентация застройщика 22.10, презентация Plus Property). hidden: только /purita/<номер из build/nomera.json>. */
     slug: 'purita', dir: 'offers/purita', hidden: true,
     title: 'PURITA · Банг Тао, CG Capital',
-    desc: 'PURITA на Банг Тао от CG Capital (Central Group): квартиры с мебелью, цены, условия оплаты, аренда по прогнозу управляющей компании. Предложение для клиентов Property Library Phuket.',
+    desc: 'PURITA на Банг Тао от CG Capital (Central Group): цены, условия оплаты, аренда по прогнозу управляющей компании. Мебель и техника в подарок для клиентов Property Library.',
     pdf: 'PURITA_Bangtao.pdf',
     og: 'offers/purita/img/preview-v10.jpg',
     h: 11598,   // PDF 3061 мм (+25 px запас) × 794/210 (23.10, правка потолки/1947/подписи)
@@ -445,7 +445,7 @@ const CARDS = [
        без своей страницы (04.10, до презентации застройщика 07.10). Теперь — лист /cg-capital: история компании, The Standard
        (каталог и прайс застройщика 05.10), PURITA и Andaz (слайды 07.10). Старый текст карточки — в git. */
     name: 'Central Group: Andaz и PURITA', where: 'Лаян · Банг Тао', tag: 'старт продаж',
-    text: ['Andaz у пляжа Лаян: до 100 квартир и около 9 вилл, 2-спальная 80 м² от 16,xx млн бат, старт продаж в I квартале 2027. PURITA на Банг Тао: 1-спальная 56 м² с мебелью от 7,xx млн бат, первые продажи в конце ноября.',
+    text: ['Andaz у пляжа Лаян: до 100 квартир и около 9 вилл, 2-спальная 80 м² от 16,xx млн бат, старт продаж в I квартале 2027. PURITA на Банг Тао: 1-спальная 56 м² от 7,29 млн бат, мебель и техника в подарок для клиентов Property Library, первые продажи в конце ноября.',
            'Строит Central Group, её первый проект на Пхукете, The Standard на Банг Тао' + (C.продано_процентов ? `, продан на ${C.продано_процентов}% до сдачи.` : '.')],
     open: номерной('cg-capital'), pdf: '/offers/cg-capital/CentralGroup_Phuket.pdf',
   },
