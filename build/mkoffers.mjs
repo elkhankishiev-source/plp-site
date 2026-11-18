@@ -150,7 +150,7 @@ const OFFERS = [
        жирные плюсы, рассрочка… госпиталь». Сборщик ~/plp-ops/офферы/make_sheet/darayana_make_sheet.py. hidden: только /darayana/<номер>. */
     slug: 'darayana', dir: 'offers/darayana', hidden: true,
     title: 'The Title DARAYANA · Камала, закрытый список',
-    desc: 'The Title DARAYANA на Камале: пляж в 120 м, клуб Cafe Del Mar в 40 м, квартиры по ориентиру от 5,8 млн ฿. Предложение Property Library Phuket.',
+    desc: 'The Title DARAYANA на Камале: пляж в 120 м, клуб Cafe Del Mar в 40 м, квартиры от 5,46 млн ฿. Предложение Property Library Phuket.',
     pdf: 'DARAYANA_Kamala.pdf',
     og: 'offers/darayana/img/preview-v1.jpg',
     h: 6152,   // PDF 1627 мм (6 стр.) × 794/210 (15.11)
