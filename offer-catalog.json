@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-17",
+ "updated": "2026-11-18",
  "items": [
   {
    "id": "ATT-KYE",
@@ -2737,7 +2737,7 @@
    "name": "Millennium Condominium, Банг Тао",
    "district": "Банг Тао",
    "type": "Кондо",
-   "price_from": 3420200,
+   "price_from": 3441200,
    "units": [
     {
      "area": "24,4–30,0 м²",
@@ -2745,8 +2745,8 @@
      "free": 145,
      "name": "Студия",
      "area_sqm": 24.4,
-     "price_from_thb": 3420200,
-     "from": 3420200
+     "price_from_thb": 3441200,
+     "from": 3441200
     },
     {
      "area": "35,0–46,2 м²",
@@ -2754,8 +2754,8 @@
      "free": 30,
      "name": "1 спальня",
      "area_sqm": 35,
-     "price_from_thb": 4893000,
-     "from": 4893000
+     "price_from_thb": 4993000,
+     "from": 4993000
     },
     {
      "area": "60,0–74,2 м²",
