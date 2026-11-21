@@ -397,12 +397,12 @@ const P = {
      Цена и площадь: лист offers/darayana (прайс The Title). chanBig: выбор мессенджера большими кнопками выше полей, только у этого проекта. */
   darayana: {
     id:'PLP-DARAYANA', name:'DARAYANA', place:'Камала', hero:'da-hero', chanBig:true,
-    ad:{img:'da-hero', title:'DARAYANA', sub:'120 м до пляжа Камала', big:'от 5,46 млн бат', note:'первый платёж 25% · рассрочка 0% на период строительства', chip:'Бронь 3 000 $'},
+    ad:{img:'da-hero', title:'DARAYANA', sub:'120 м до пляжа Камала', big:'от 161 000 $', note:'от 5,46 млн бат · первый платёж 25% · беспроцентная рассрочка до сдачи во II квартале 2029', chip:'Бронь 3 000 $'},
     h1:'DARAYANA: 120 м до пляжа Камала, бронь 3 000 $*',
-    sub:'Квартиры от 5,46 млн ฿, первый платёж 25%, рассрочка 0% на период строительства. Ответьте на 4 вопроса и получите прайс первого запуска и планировки.',
+    sub:'Квартиры от 161 000 $ (от 5,46 млн ฿), первый платёж 25%, остальное в беспроцентную рассрочку до сдачи во II квартале 2029 года. Ответьте на 4 вопроса и получите прайс первого запуска и планировки.',
     foot:'*Прайс застройщика The Title. Рендеры застройщика',
     gifts:['Прайс первого запуска и планировки файлом','Подбор квартиры с видом на море','Сопровождение бизнес-визы на год'],
-    facts:[['от 5,46 млн ฿','1 спальня 30,5 м²'],['120 м','до пляжа Камала'],['3 000 $','бронь'],['0%','рассрочка на период строительства']],
+    facts:[['от 161 000 $','от 5,46 млн ฿, 1 спальня 30,5 м²'],['120 м','до пляжа Камала'],['3 000 $','бронь'],['до II кв. 2029','беспроцентная рассрочка до сдачи']],
     gal:['da-wave','da-onsen','da-gate'], sheet:'https://property-library.com/offers/darayana/page.htm', bot:'kviz_darayana',
     ui:{ ru:{ formQ:'Куда прислать прайс и планировки?', submit:'Получить прайс и планировки',
                who:'<b>Эльнур Ханкишиев</b>, основатель Property Library. Пришлю лично прайс первого запуска и планировки DARAYANA.',
@@ -973,7 +973,7 @@ function send(){
   if (!chk.ok) { const h = LANG === 'en' ? hintEn(chk, ccUsed) : (chk.hint || 'Проверьте номер: код страны и все цифры.'); $('err').textContent = h; $('err').dataset.f = 'pn'; $('pn').setAttribute('aria-invalid', 'true'); try { $('pn').focus(); } catch (e) {} TR('phone_err', phoneWhy('форма', chk.why, h)); return; }
   const d = chk.digits; PH = '+' + d; AS = '';
   const p = new URLSearchParams(location.search), utm = {};
-  ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','utm_id','fbclid','gclid'].forEach(k => { if (p.get(k)) utm[k] = p.get(k); });
+  ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','utm_id','utm_placement','fbclid','gclid'].forEach(k => { if (p.get(k)) utm[k] = p.get(k); });
   /* 22.10.2026: код страны и номер — ещё и отдельно, как ввёл человек: номер собирает приёмник функцией базы (номер_норма) */
   const lead = { source:'website', funnel:'ads_quiz', object_id:C.id, object_name:C.name, name:$('nm').value.trim(), phone:'+' + d, lid:LID,
     /* 03.11: номер со своим кодом (phoneJoin.own) — приёмнику целиком с +, без кода поля, иначе номер_норма склеит код второй раз */
