@@ -146,6 +146,7 @@ form{display:grid;gap:10px;margin-top:16px}
 input{height:54px;border:1.5px solid var(--line);border-radius:12px;padding:0 14px;font:inherit;font-size:1rem;background:#fff;color:var(--ink)}
 .chan{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .chan button{height:46px;border-radius:12px;border:1.5px solid var(--line);font-weight:700}.chan button.on{border-color:var(--olive);background:var(--sage-soft)}
+.chan.big{margin:2px 0 12px}.chan.big button{height:60px;font-size:17px;border-width:2px}.chan.big button[data-c=whatsapp].on{border-color:#25D366;background:rgba(37,211,102,.12)}.chan.big button[data-c=telegram].on{border-color:#229ED9;background:rgba(34,158,217,.12)}
 .err{color:var(--red);font-size:.82rem;min-height:1em}
 .err:not(:empty){font-weight:700;background:#FDECEC;border-radius:10px;padding:8px 10px}
 /* 15.10.2026: телефон = выбор страны + номер. Без кода страны заявку не принимаем. */
@@ -388,6 +389,28 @@ const P = {
     Q:[
       {k:'plan', q:'Сколько спален?',
         o:[['1-спальная, 56,4–58,4 м²','pu-1br'],['2-спальная, 93–103,5 м²','pu-2br'],['2-спальная плюс, 124,5–136 м²','pu-2brp'],['Вилла 5 спален, 708 м²','pu-villa'],['Помогите выбрать','pu-hero']]},
+      ...STD()]
+  },
+  /* 21.11.2026 Эльнур (кнопки): «Да, пробная ветка» по образцу конкурентов: один вопрос, кнопка «Получить прайс и планировки», в форме две большие кнопки WhatsApp и Telegram.
+     Структура оффера «Го, готовь по ней»: крючок 120 м до пляжа Камала и бронь 3 000 $; от 5,46 млн бат, первый платёж 25%, рассрочка 0% на период строительства;
+     бонус: прайс первого запуска и планировки файлом, подбор квартиры с видом на море, сопровождение бизнес-визы на год. Скидки только в личке (№360).
+     Цена и площадь: лист offers/darayana (прайс The Title). chanBig: выбор мессенджера большими кнопками выше полей, только у этого проекта. */
+  darayana: {
+    id:'PLP-DARAYANA', name:'DARAYANA', place:'Камала', hero:'da-hero', chanBig:true,
+    ad:{img:'da-hero', title:'DARAYANA', sub:'120 м до пляжа Камала', big:'от 5,46 млн бат', note:'первый платёж 25% · рассрочка 0% на период строительства', chip:'Бронь 3 000 $'},
+    h1:'DARAYANA: 120 м до пляжа Камала, бронь 3 000 $*',
+    sub:'Квартиры от 5,46 млн ฿, первый платёж 25%, рассрочка 0% на период строительства. Ответьте на 4 вопроса и получите прайс первого запуска и планировки.',
+    foot:'*Прайс застройщика The Title. Рендеры застройщика',
+    gifts:['Прайс первого запуска и планировки файлом','Подбор квартиры с видом на море','Сопровождение бизнес-визы на год'],
+    facts:[['от 5,46 млн ฿','1 спальня 30,5 м²'],['120 м','до пляжа Камала'],['3 000 $','бронь'],['0%','рассрочка на период строительства']],
+    gal:['da-wave','da-onsen','da-gate'], sheet:'https://property-library.com/offers/darayana/page.htm', bot:'kviz_darayana',
+    ui:{ ru:{ formQ:'Куда прислать прайс и планировки?', submit:'Получить прайс и планировки',
+               who:'<b>Эльнур Ханкишиев</b>, основатель Property Library. Пришлю лично прайс первого запуска и планировки DARAYANA.',
+               step:(n, t, left) => 'Вопрос ' + n + ' из ' + t + (left > 1 ? ' · ещё ' + (left - 1) + ', и пришлю прайс и планировки' : ' · последний вопрос, и прайс ваш') } },
+    /* 21.11.2026 Эльнур «Четыре, как у нас»: планировка и три общих вопроса, площади и типы по листу offers/darayana */
+    Q:[
+      {k:'plan', q:'Сколько спален?',
+        o:[['1-спальная, 30,1–64 м²','da-1br','object-fit:contain;transform:none'],['1-спальная плюс, 46,8–58,4 м²','da-1brp','object-fit:contain;transform:none'],['2-спальная, 63,9–105,6 м²','da-2br','object-fit:contain;transform:none'],['Помогите выбрать','da-hero']]},
       ...STD()]
   },
   millennium: {
@@ -637,7 +660,7 @@ function hintEn(r, cc){
   if (/^не тот вид/.test(e)) return 'This does not look like a valid +' + (r.code || '') + ' number. Check the digits and the country code.';
   return UI.en.phoneErr;
 }
-const POST = { brisa:'https://t.me/property_library_phuket', kuartz:'https://t.me/property_library_phuket', vibe2:'https://t.me/property_library_phuket', fizz:'https://t.me/property_library_phuket', eden:'https://t.me/property_library_phuket', purita:'https://t.me/property_library_phuket', millennium:'https://t.me/property_library_phuket', zero:'https://t.me/property_library_phuket', visa:'https://t.me/property_library_phuket' }; /* ссылки на посты-разборы: подставить, когда выйдут */
+const POST = { darayana:'https://t.me/property_library_phuket', brisa:'https://t.me/property_library_phuket', kuartz:'https://t.me/property_library_phuket', vibe2:'https://t.me/property_library_phuket', fizz:'https://t.me/property_library_phuket', eden:'https://t.me/property_library_phuket', purita:'https://t.me/property_library_phuket', millennium:'https://t.me/property_library_phuket', zero:'https://t.me/property_library_phuket', visa:'https://t.me/property_library_phuket' }; /* ссылки на посты-разборы: подставить, когда выйдут */
 /* 16.10.2026 Эльнур: «поле код с флажками всё испортит, убери, организуй поле номер заново без ошибок».
    Одно поле, в нём уже стоит +, номер целиком с кодом страны. Проверяет тот же phone.js, что и приёмник.
    Набрал 00 вместо + или российское 8XXXXXXXXXX — поправляем сами. */
@@ -869,15 +892,17 @@ function render(){
       setTimeout(() => { i++; render(); }, 260);
     });
   } else {
+    /* 21.11 chanBig (DARAYANA): выбор мессенджера выше полей большими кнопками; у остальных проектов на прежнем месте */
+    const CHAN = '<div class="chan' + (C.chanBig ? ' big' : '') + '"><button type="button" class="on" data-c="whatsapp">WhatsApp</button><button type="button" data-c="telegram">Telegram</button></div>';
     $('qwrap').innerHTML = '<div class="q">' + U('formQ') + '</div>' +
       '<div class="who"><img src="img/elnur.jpg" alt=""><span>' + U('who') + '</span></div>' +
-      '<form id="f" novalidate><div class="err" id="err"></div><input id="nm" placeholder="' + U('nm') + '" autocomplete="name" required aria-required="true">' +
+      '<form id="f" novalidate><div class="err" id="err"></div>' + (C.chanBig ? CHAN : '') + '<input id="nm" placeholder="' + U('nm') + '" autocomplete="name" required aria-required="true">' +
       '<div class="phrow"><input id="cc" type="tel" inputmode="tel" list="ccl" aria-label="' + U('cc') + '" autocomplete="tel-country-code" value="' + ccGuess() + '">' +
       '<input id="pn" type="tel" inputmode="tel" placeholder="' + U('pn') + '" autocomplete="tel-national" aria-describedby="phh err"></div>' +
       '<datalist id="ccl">' + CCL.map(c => '<option value="+' + c[0] + '">' + (LANG === 'en' ? CCL_EN[c[0]] || c[1] : c[1]) + '</option>').join('') + '</datalist>' +
       '<input id="ph" type="hidden">' +
       '<div class="fh" id="phh">' + U('phh') + '</div>' +
-      '<div class="chan"><button type="button" class="on" data-c="whatsapp">WhatsApp</button><button type="button" data-c="telegram">Telegram</button></div>' +
+      (C.chanBig ? '' : CHAN) +
       '<label class="tgf" id="tgf" hidden><input id="tg" placeholder="' + U('tg') + '" autocomplete="off" autocapitalize="off" spellcheck="false"><span class="fh">' + U('tgh') + '</span></label>' +
       '<input class="hp" id="co" tabindex="-1" autocomplete="off" aria-hidden="true">' +
       '<button class="cta" type="submit">' + U('submit') + '</button></form>' +
@@ -1028,6 +1053,7 @@ function finish(r){
     eden:'Напишите сейчас, и пришлём цены, планировки и расчёт рассрочки на 5 лет с первым взносом 35%.',
     purita:'Напишите сейчас, и пришлём цены и планировки Purita и закрепим квартиру с лучшим этажом и видом на сад.',
     millennium:'Напишите сейчас, и пришлём цены и планировки Millennium по иностранной квоте и подберём лучший этаж и вид.',
+    darayana:'Напишите сейчас, и пришлём прайс первого запуска, планировки и подберём квартиру с видом на море.',
     brisa:'Напишите сейчас, и пришлём планировки и цены BRISA, поможем заранее выбрать три варианта и запишем вас в нашу очередь на 25 ноября.',
     zero:'Напишите, и пришлём расчёт дохода 10% годовых по программе застройщика.',
     visa:'Напишите сейчас, и пришлём результат теста, условия программы и подбор недвижимости от 500 000 $.' };
