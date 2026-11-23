@@ -1326,6 +1326,14 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
   const priceTHB = o.price_from_thb;
   const money = v => new Intl.NumberFormat('ru-RU').format(Math.round(v)) + ' ฿';
   const priceFmt = priceTHB ? money(priceTHB) : '';
+  /* 23.11.2026 MORI 1: цена по слову Эльнура (не по прайсу застройщика). Пока objects.source начинается
+     со «слово Эльнура», подпись цены берётся отсюда по коду объекта; сам source на страницу не выводится
+     (там внутренние пометки). Вернётся цена прайса (source сменится) — вернётся общая подпись. */
+  const ПОДПИСЬ_ЦЕНЫ_ЭЛЬНУРА = {
+    'PLP-MORI1': 'вилла с садом, цена для клиентов Property Library на 23.11.2026; бассейн за отдельную плату',
+  };
+  const ценаПоСловуЭльнура = /^\s*слово Эльнура/i.test(String(o.source || '')) && ПОДПИСЬ_ЦЕНЫ_ЭЛЬНУРА[o.plp_property_id];
+  const подписьЦены = ценаПоСловуЭльнура || 'цена по прайсу застройщика на дату сверки';
   /* Аренда: вместо стартовой цены застройщика — ставка (ночь или месяц),
      источник тот же, что на витрине: uk_rates → season_rates. */
   const isRent = /аренда|rent/i.test(String(o.purpose || ''));
@@ -1651,7 +1659,7 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
         return rest.length ? '<h3 class="sub-h">Другие планировки</h3>' +
           shotGrid(rest).replace('grid-shots', 'grid-shots plans') : '';
       })() +
-      (priceTHB ? '<p class="fine">Цены по прайсу застройщика на дату сверки, за свободные юниты.</p>' : '') +
+      ((priceTHB && !ценаПоСловуЭльнура) ? '<p class="fine">Цены по прайсу застройщика на дату сверки, за свободные юниты.</p>' : '') +
       '</section>'
     : (planShots.length
         ? '<section class="desc"><h2>Планировки</h2>' + shotGrid(planShots).replace('grid-shots', 'grid-shots plans') +
@@ -2056,7 +2064,7 @@ if(dark) i.src='../img/brand/plp-mark-white.png';})();</script>
   ${shots}
   <h1>${htmlEsc(o.name)}</h1>
   <p class="loc">${htmlEsc(ru)}, Пхукет${distBeach ? ' · ' + htmlEsc(distBeach) : ''}</p>
-  ${rentLine || soldOutLine || (priceFmt ? '<div class="price">от ' + htmlEsc(priceFmt) + (отЛизхолд ? ' · лизхолд' : '') + '<small>цена по прайсу застройщика на дату сверки</small></div>' : '')}
+  ${rentLine || soldOutLine || (priceFmt ? '<div class="price">от ' + htmlEsc(priceFmt) + (отЛизхолд ? ' · лизхолд' : '') + '<small>' + htmlEsc(подписьЦены) + '</small></div>' : '')}
   <div class="chips">${chips}</div>
   ${(!isRent && stageNoteOf(o)) ? '<p class="stgnote">' + htmlEsc(stageNoteOf(o)) + '</p>' : ''}
   ${'' /* акции на витрину не выводим — см. комментарий у promo в каталоге */}
@@ -2208,7 +2216,7 @@ async function main() {
     'brochure_url,floorplan_url,video_url,website_url,map_url,current_promo,' +
     'season_rates,occupancy_est_pct,maintenance_fee_thb_sqm,lat,lng,coord_source,last_synced_at,availability,' +
     'first_payment,payment_plan,payment_schedule,main_image_url,gallery_urls,unit_types,price_tiers,build_progress,photo_groups,hot_rank,public_code,' +
-    'plot_area_sqm,built_area_sqm,ownership,amenities,nearby,distance_airport_km');
+    'plot_area_sqm,built_area_sqm,ownership,amenities,nearby,distance_airport_km,source');
   const benchmarks = await sbGet(env,
     'rental_benchmarks?select=district,unit_type,disp_yield_low_pct,disp_yield_high_pct,net_yield_low_pct,net_yield_high_pct');
 
