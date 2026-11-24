@@ -570,6 +570,10 @@ function thumbUrl(u, w, q) {
   return R2_BASE + '/' + база + размер + '.webp';
 }
 
+/* 25.11.2026 ВЕРДИКТ #831, №459, №460: в unit_types родителя лот записан кодом дочерней карточки (PLP-ONYX-SY-R3).
+   Снятый с витрины лот (on_site=false) не должен жить в окне, на странице родителя и в offer-catalog.json.
+   Набор заполняется в main() кодами всех объектов on_site=true (продажа и аренда); код вида PLP-… вне набора отбрасываем. */
+const КОДЫ_НА_ВИТРИНЕ = new Set();
 function unitsOf(o) {
   /* Типы приходят из разных источников и называют поля по-разному
      (area/area_sqm, beds/bedrooms). Приводим к одному виду, а ставки аренды
@@ -589,7 +593,7 @@ function unitsOf(o) {
     if (isVilla(o) && n.note) { const pl = fmtPlot(plotNums(String(n.note))); if (pl) n.plot = pl; }
     n.note = noContacts(n.note);
     return n;
-  });
+  }).filter(n => !(КОДЫ_НА_ВИТРИНЕ.size && /^PLP-/i.test(String(n.code || '')) && !КОДЫ_НА_ВИТРИНЕ.has(String(n.code))));
   // Тиры приходят от разных застройщиков в двух видах: с числом спален или с
   // подписью типа «Studio / 1BR / 2BR», цена — price_from_thb либо price_thb.
   // Приводим к одному виду, иначе половина проектов остаётся без планировок.
@@ -1337,6 +1341,9 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
      список 19.10, открытый прайс от 3,72 млн; «Обе цены везде», подпись «прайс застройщика» у 2,97 убрать. */
   const ПОДПИСЬ_ЦЕНЫ_ПО_РЕШЕНИЮ = {
     'PLP-VIBE2-KARON': 'закрытый список от 19.10.2026; открытая продажа от 3,72 млн бат',
+    /* 25.11.2026 ВЕРДИКТ #831, №458: Qabalah сдан, в продаже вторичка, цена для рынка по слову Эльнура, прайса застройщика нет.
+       Нейтральная подпись без «застройщика»; строка «за свободные юниты» у него не выводится (ценаПоСловуЭльнура истинна). */
+    'PLP-QABALAH': 'цена на дату сверки',
   };
   /* 24.11.2026 №458 («убирай всевозможные расхождения»): у вторички цена собственника, не прайс застройщика. */
   const вторичка = /^resale$/i.test(String(o.stage || '').trim()) || /вторичк/i.test(String(o.name || ''));
@@ -2273,6 +2280,19 @@ async function main() {
     if (o && o.name) o.name = String(o.name).replace(/\s*\((?=[^()]*,)[^()]*\)\s*$/, '');
   }
 
+  /* 25.11.2026 №459: коды объектов на витрине, по ним unitsOf отсекает снятые лоты в unit_types родителя */
+  for (const arr of [objects, rentals]) for (const o of (arr || [])) if (o && o.public_code) КОДЫ_НА_ВИТРИНЕ.add(String(o.public_code));
+  console.log('[gen] Кодов на витрине для отбора лотов:', КОДЫ_НА_ВИТРИНЕ.size);
+  /* 25.11.2026 №459: у родителя со снятым лотом площадь «от–до» (area_min/area_max из базы) считаем по оставшимся лотам,
+     иначе в шапке и описании остаётся площадь снятого (Onyx 154–178 при одном лоте 154). */
+  for (const o of objects) {
+    const ut = Array.isArray(o.unit_types) ? o.unit_types : [];
+    if (!ut.some(u => u && /^PLP-/i.test(String(u.code || '')) && !КОДЫ_НА_ВИТРИНЕ.has(String(u.code)))) continue;
+    const пл = (unitsOf(o) || []).map(u => Number(u.area)).filter(v => Number.isFinite(v) && v > 0);
+    if (!пл.length) continue;
+    o.area_min = Math.min(...пл); o.area_max = Math.max(...пл);
+    console.log('[gen] Площадь без снятых лотов:', o.public_code, o.area_min + '–' + o.area_max);
+  }
   /* №113: строящиеся проекты, у которых часть уже сдана (дочерние объекты на сайте со стадией Ready) */
   for (const r of rentals || []) {
     if (r && r.parent_object_id && String(r.stage || '') === 'Ready') ЧАСТЬ_СДАНА.add(r.parent_object_id);
