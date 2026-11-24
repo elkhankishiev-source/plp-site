@@ -149,6 +149,17 @@ const OFFERS = [
     h: 4703,   // PDF 1244 мм (5 стр.) × 794/210 (24.11)
   },
   {
+    /* 24.11.2026 Эльнур: «Наполняйте сайт оферами», «вторичка или почти готовое». The Title Serenity Naiyang.
+       Факты: прайс застройщика 20.11.26 и брошюра 2024 (сборщик ~/plp-ops/офферы/make_sheet/serenity_make_sheet.py).
+       «Сдан» не пишем: документа застройщика нет. hidden: только /serenity/<номер из build/nomera.json>. */
+    slug: 'serenity', dir: 'offers/serenity', hidden: true,
+    title: 'The Title Serenity Naiyang · Най Янг, квартиры от 5 221 467 ฿',
+    desc: 'The Title Serenity Naiyang: 1 спальня от 5 221 467 ฿, 2 спальни от 8 108 715 ฿, 400 м до пляжа Най Янг. Предложение Property Library Phuket.',
+    pdf: 'Serenity_Naiyang.pdf',
+    og: 'offers/serenity/img/preview-v1.jpg',
+    h: 6318,   // PDF 1671 мм (6 стр.) × 794/210 (24.11)
+  },
+  {
     /* 05.11.2026 Эльнур: «Мне нужен один офер по VIVI, по нашему стандарту», «Виви дай презу нормальную».
        Факты: слова Эльнура 05.11 (две однушки от собственников, 4 200 000 и 4 600 000 ฿, лизхолд, срок 4Q 2027), Factsheet,
        20 Facilities, Free Package, Standard Materials, Living Service застройщика (сборщик ~/plp-ops/офферы/make_sheet/vivi_make_sheet.py).
