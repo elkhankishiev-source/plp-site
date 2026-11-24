@@ -105,9 +105,9 @@ const OFFERS = [
     h: 8708,   // PDF 2303 мм (8 стр.) × 794/210 (01.11)
   },
   {
-    /* 24.11.2026 Эльнур: «Чего нет наполни сейчас !». Готовая вилла Moss, цена наружу 15 000 000 ฿ (слова Эльнура 23–24.11).
+    /* 24.11.2026 Эльнур: «Чего нет наполни сейчас !». Готовая вилла Moss на 2 спальни.
        Факты: Qabalah Brochure 2024, презентация 2023, Project Information (сборщик ~/plp-ops/офферы/make_sheet/qabalah_make_sheet.py).
-       hidden: только /qabalah/<номер из build/nomera.json>. Коды вилл и цифры собственника не выносим. */
+       hidden: только /qabalah/<номер из build/nomera.json>. */
     slug: 'qabalah', dir: 'offers/qabalah', hidden: true,
     title: 'Villa Qabalah · Банг Тао, готовая вилла на 2 спальни',
     desc: 'Villa Qabalah у Банг Тао: готовая вилла на 2 спальни, 237,8 м², свой бассейн и сад на крыше, 15 000 000 ฿. Предложение Property Library Phuket.',
