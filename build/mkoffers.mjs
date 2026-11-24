@@ -127,6 +127,17 @@ const OFFERS = [
     h: 6167,   // PDF 1631 мм (6 стр.) × 794/210 (24.11)
   },
   {
+    /* 24.11.2026 Эльнур: «Чего нет наполни сейчас !». MORI 1, виллы на 3 спальни, цена как на сайте с 23.11.
+       Факты: брошюра застройщика и термшит фазы 1 (сборщик ~/plp-ops/офферы/make_sheet/mori1_make_sheet.py).
+       hidden: только /mori1/<номер из build/nomera.json>. */
+    slug: 'mori1', dir: 'offers/mori1', hidden: true,
+    title: 'MORI 1 · Банг Тао, виллы на 3 спальни',
+    desc: 'MORI 1 у Банг Тао: вилла на 3 спальни, 229 м² с садом, от 13 048 000 ฿, первый взнос 35%, сдача во II кв. 2027. Предложение Property Library Phuket.',
+    pdf: 'MORI1_BangTao.pdf',
+    og: 'offers/mori1/img/preview-v1.jpg',
+    h: 6946,   // PDF 1837 мм (6 стр.) × 794/210 (24.11)
+  },
+  {
     /* 05.11.2026 Эльнур: «Мне нужен один офер по VIVI, по нашему стандарту», «Виви дай презу нормальную».
        Факты: слова Эльнура 05.11 (две однушки от собственников, 4 200 000 и 4 600 000 ฿, лизхолд, срок 4Q 2027), Factsheet,
        20 Facilities, Free Package, Standard Materials, Living Service застройщика (сборщик ~/plp-ops/офферы/make_sheet/vivi_make_sheet.py).
