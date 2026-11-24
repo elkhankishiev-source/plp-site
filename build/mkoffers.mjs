@@ -138,6 +138,17 @@ const OFFERS = [
     h: 6946,   // PDF 1837 мм (6 стр.) × 794/210 (24.11)
   },
   {
+    /* 24.11.2026 Эльнур: «Наполняйте сайт оферами». Готовая вилла 2022 года, 3 спальни по решению №235.
+       Факты: лист продажи собственника 03.10.2026 (сборщик ~/plp-ops/офферы/make_sheet/mono-pasak_make_sheet.py).
+       hidden: только /mono-pasak/<номер из build/nomera.json>. Номер виллы не выносим. */
+    slug: 'mono-pasak', dir: 'offers/mono-pasak', hidden: true,
+    title: 'Mono Luxury Villas Pasak · Чернгталай, готовая вилла на 3 спальни',
+    desc: 'Mono Pasak: готовая вилла 2022 года на 3 спальни, 164 м² на участке 216 м², свой бассейн, с мебелью, 12 500 000 ฿. Предложение Property Library Phuket.',
+    pdf: 'Mono_Pasak.pdf',
+    og: 'offers/mono-pasak/img/preview-v1.jpg',
+    h: 4703,   // PDF 1244 мм (5 стр.) × 794/210 (24.11)
+  },
+  {
     /* 05.11.2026 Эльнур: «Мне нужен один офер по VIVI, по нашему стандарту», «Виви дай презу нормальную».
        Факты: слова Эльнура 05.11 (две однушки от собственников, 4 200 000 и 4 600 000 ฿, лизхолд, срок 4Q 2027), Factsheet,
        20 Facilities, Free Package, Standard Materials, Living Service застройщика (сборщик ~/plp-ops/офферы/make_sheet/vivi_make_sheet.py).
