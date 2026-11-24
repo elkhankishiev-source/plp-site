@@ -135,15 +135,6 @@
      "price_from_thb": 10500000,
      "area": "154",
      "from": 10500000
-    },
-    {
-     "beds": "2",
-     "code": "PLP-ONYX-SY-R3",
-     "name": "вилла 2 сп., 178 м²",
-     "area_sqm": "178",
-     "price_from_thb": 14000000,
-     "area": "178",
-     "from": 14000000
     }
    ]
   },
@@ -174,15 +165,6 @@
      "price_from_thb": 16500000,
      "area": "231.03",
      "from": 16500000
-    },
-    {
-     "beds": "3",
-     "code": "PLP-OXYGEN-BT-R3",
-     "name": "квартира 3 сп., 214.09 м²",
-     "area_sqm": "214.09",
-     "price_from_thb": 19700000,
-     "area": "214.09",
-     "from": 19700000
     }
    ]
   },
