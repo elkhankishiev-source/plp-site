@@ -158,16 +158,6 @@
    "units": []
   },
   {
-   "id": "PLP-ONYX-SY-R3",
-   "pub": "PLP-ONYX-SY-R3",
-   "url": "https://property-library.com/object/onyx-sy-r3",
-   "name": "Onyx Sai Yuan Estate · вилла",
-   "district": "Равай",
-   "type": "Вилла",
-   "price_from": 14000000,
-   "units": []
-  },
-  {
    "id": "ATT-OXYGEN-BT",
    "pub": "PLP-OXYGEN-BT",
    "url": "https://property-library.com/object/oxygen-bt",
@@ -204,16 +194,6 @@
    "district": "Банг Тао",
    "type": "Кондо",
    "price_from": 16500000,
-   "units": []
-  },
-  {
-   "id": "PLP-OXYGEN-BT-R3",
-   "pub": "PLP-OXYGEN-BT-R3",
-   "url": "https://property-library.com/object/oxygen-bt-r3",
-   "name": "Oxygen Bangtao · квартира",
-   "district": "Банг Тао",
-   "type": "Кондо",
-   "price_from": 19700000,
    "units": []
   },
   {
@@ -550,16 +530,6 @@
    "district": "Равай",
    "type": "Кондо",
    "price_from": 10500000,
-   "units": []
-  },
-  {
-   "id": "ATT-TARA",
-   "pub": "PLP-TARA",
-   "url": "https://property-library.com/object/tara",
-   "name": "Two Villas Tara",
-   "district": "Лаян",
-   "type": "Вилла",
-   "price_from": 18000000,
    "units": []
   },
   {
@@ -1714,9 +1684,9 @@
      "count": 140,
      "areaMax": 34.7,
      "areaMin": 30.1,
-     "area_sqm": 30.1,
+     "area_sqm": 30.5,
      "price_from_thb": 5459681,
-     "area": 30.1,
+     "area": 30.5,
      "from": 5459681
     },
     {
@@ -1727,7 +1697,9 @@
      "areaMax": 39.8,
      "areaMin": 33.3,
      "area_sqm": 33.3,
-     "area": 33.3
+     "price_from_thb": 5855946,
+     "area": 33.3,
+     "from": 5855946
     },
     {
      "beds": 1,
@@ -1736,8 +1708,10 @@
      "count": 88,
      "areaMax": 64,
      "areaMin": 40.5,
-     "area_sqm": 40.5,
-     "area": 40.5
+     "area_sqm": 41.1,
+     "price_from_thb": 7211258,
+     "area": 41.1,
+     "from": 7211258
     },
     {
      "beds": 1,
@@ -1746,8 +1720,10 @@
      "count": 114,
      "areaMax": 58.4,
      "areaMin": 46.8,
-     "area_sqm": 46.8,
-     "area": 46.8
+     "area_sqm": 47.5,
+     "price_from_thb": 8368437,
+     "area": 47.5,
+     "from": 8368437
     },
     {
      "beds": 2,
@@ -1756,9 +1732,9 @@
      "count": 72,
      "areaMax": 76,
      "areaMin": 63.9,
-     "area_sqm": 63.9,
+     "area_sqm": 68.9,
      "price_from_thb": 15224089,
-     "area": 63.9,
+     "area": 68.9,
      "from": 15224089
     },
     {
@@ -1768,8 +1744,10 @@
      "count": 35,
      "areaMax": 105.6,
      "areaMin": 91.1,
-     "area_sqm": 91.1,
-     "area": 91.1
+     "area_sqm": 104.8,
+     "price_from_thb": 19698124,
+     "area": 104.8,
+     "from": 19698124
     },
     {
      "beds": 3,
@@ -1779,7 +1757,9 @@
      "areaMax": 125.8,
      "areaMin": 123.9,
      "area_sqm": 123.9,
-     "area": 123.9
+     "price_from_thb": 25286845,
+     "area": 123.9,
+     "from": 25286845
     },
     {
      "beds": 3,
@@ -1788,9 +1768,9 @@
      "count": 18,
      "areaMax": 139.5,
      "areaMin": 138.2,
-     "area_sqm": 138.2,
+     "area_sqm": 139.5,
      "price_from_thb": 24130308,
-     "area": 138.2,
+     "area": 139.5,
      "from": 24130308
     },
     {
@@ -1799,8 +1779,10 @@
      "count": 14,
      "areaMax": 139.1,
      "areaMin": 81.8,
-     "area_sqm": 81.8,
-     "area": 81.8
+     "area_sqm": 104.8,
+     "price_from_thb": 23525904,
+     "area": 104.8,
+     "from": 23525904
     }
    ]
   },
@@ -3914,7 +3896,7 @@
     {
      "beds": 1,
      "name": "1 спальня+",
-     "note": "тип на плане этажа застройщика; 39 м² — прайс застройщика 15.10.2026 (A-корпус, 4–5 этаж)",
+     "note": "тип по планировке застройщика; 39 м², прайс застройщика 15.10.2026",
      "area_sqm": 39,
      "area": 39
     },
