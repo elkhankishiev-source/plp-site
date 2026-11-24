@@ -36,6 +36,7 @@ const ПРЕВЬЮ = { vibe2: 'offers/vibe2/img/preview-v13.jpg', 'zero-naiyang'
   purita: 'offers/purita/img/preview-v10.jpg',
   'naturale-kamala': 'offers/naturale-kamala/img/preview-v1.jpg',
   katabello: 'offers/katabello/img/preview-v1.jpg',
+  qabalah: 'offers/qabalah/img/preview-v1.jpg',  // 24.11.2026
   vivi: 'offers/vivi/img/preview-v1.jpg',
   rassrochka: 'offers/rassrochka/img/preview-v2.jpg', gotovye: 'offers/gotovye/img/preview-v2.jpg', do185: 'offers/do185/img/preview-v2.jpg' };
 const НОМЕРА = JSON.parse(fs.readFileSync(path.join(ROOT, 'build/nomera.json'), 'utf8'));
