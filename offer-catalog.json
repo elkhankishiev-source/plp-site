@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-18",
+ "updated": "2026-11-24",
  "items": [
   {
    "id": "ATT-KYE",
@@ -1699,6 +1699,112 @@
    ]
   },
   {
+   "id": "PLP-DARAYANA",
+   "pub": "PLP-DARAYANA",
+   "url": "https://property-library.com/object/darayana",
+   "name": "DARAYANA",
+   "district": "Камала",
+   "type": "Кондо",
+   "price_from": 5459681,
+   "units": [
+    {
+     "beds": 1,
+     "code": "1BS",
+     "name": "1 спальня S",
+     "count": 140,
+     "areaMax": 34.7,
+     "areaMin": 30.1,
+     "area_sqm": 30.1,
+     "price_from_thb": 5459681,
+     "area": 30.1,
+     "from": 5459681
+    },
+    {
+     "beds": 1,
+     "code": "1BM",
+     "name": "1 спальня M",
+     "count": 348,
+     "areaMax": 39.8,
+     "areaMin": 33.3,
+     "area_sqm": 33.3,
+     "area": 33.3
+    },
+    {
+     "beds": 1,
+     "code": "1BL",
+     "name": "1 спальня L",
+     "count": 88,
+     "areaMax": 64,
+     "areaMin": 40.5,
+     "area_sqm": 40.5,
+     "area": 40.5
+    },
+    {
+     "beds": 1,
+     "code": "1BP",
+     "name": "1 спальня Plus",
+     "count": 114,
+     "areaMax": 58.4,
+     "areaMin": 46.8,
+     "area_sqm": 46.8,
+     "area": 46.8
+    },
+    {
+     "beds": 2,
+     "code": "2BM",
+     "name": "2 спальни M",
+     "count": 72,
+     "areaMax": 76,
+     "areaMin": 63.9,
+     "area_sqm": 63.9,
+     "price_from_thb": 15224089,
+     "area": 63.9,
+     "from": 15224089
+    },
+    {
+     "beds": 2,
+     "code": "2BL",
+     "name": "2 спальни L",
+     "count": 35,
+     "areaMax": 105.6,
+     "areaMin": 91.1,
+     "area_sqm": 91.1,
+     "area": 91.1
+    },
+    {
+     "beds": 3,
+     "code": "3BM",
+     "name": "3 спальни M",
+     "count": 12,
+     "areaMax": 125.8,
+     "areaMin": 123.9,
+     "area_sqm": 123.9,
+     "area": 123.9
+    },
+    {
+     "beds": 3,
+     "code": "3BL",
+     "name": "3 спальни L",
+     "count": 18,
+     "areaMax": 139.5,
+     "areaMin": 138.2,
+     "area_sqm": 138.2,
+     "price_from_thb": 24130308,
+     "area": 138.2,
+     "from": 24130308
+    },
+    {
+     "code": "PH",
+     "name": "Пентхаус",
+     "count": 14,
+     "areaMax": 139.1,
+     "areaMin": 81.8,
+     "area_sqm": 81.8,
+     "area": 81.8
+    }
+   ]
+  },
+  {
    "id": "PLP-EDEN",
    "pub": "PLP-EDEN",
    "url": "https://property-library.com/object/eden",
@@ -1756,6 +1862,36 @@
      "name": "2 спальни (корпус Mango)",
      "price_from_thb": 14630000,
      "from": 14630000
+    },
+    {
+     "area": "63 м²",
+     "name": "1 спальня (B Plus)",
+     "price_from_thb": 12015600,
+     "from": 12015600
+    },
+    {
+     "area": "62,48 м²",
+     "name": "1 спальня (C)",
+     "price_from_thb": 12496000,
+     "from": 12496000
+    },
+    {
+     "area": "77,57 м²",
+     "name": "1 спальня (D Plus)",
+     "price_from_thb": 18616800,
+     "from": 18616800
+    },
+    {
+     "area": "100,28 м²",
+     "name": "2 спальни (B)",
+     "price_from_thb": 19053200,
+     "from": 19053200
+    },
+    {
+     "area": "118,65 м²",
+     "name": "2 спальни (C)",
+     "price_from_thb": 27289500,
+     "from": 27289500
     }
    ]
   },
@@ -1766,8 +1902,81 @@
    "name": "Eden · Park Residences",
    "district": "Банг Тао",
    "type": "Кондо",
-   "price_from": null,
-   "units": []
+   "price_from": 13900000,
+   "units": [
+    {
+     "area": "49 м²",
+     "name": "1 спальня (A)",
+     "price_from_thb": 14100000,
+     "from": 14100000
+    },
+    {
+     "area": "62 м²",
+     "name": "1 спальня (B)",
+     "price_from_thb": 13900000,
+     "from": 13900000
+    },
+    {
+     "area": "63 м²",
+     "name": "1 спальня (C)",
+     "price_from_thb": 17800000,
+     "from": 17800000
+    },
+    {
+     "area": "79 м²",
+     "name": "2 спальни (A)",
+     "price_from_thb": 20700000,
+     "from": 20700000
+    },
+    {
+     "area": "100 м²",
+     "name": "2 спальни (B)",
+     "price_from_thb": 22300000,
+     "from": 22300000
+    },
+    {
+     "area": "100 м²",
+     "name": "2 спальни (D)",
+     "price_from_thb": 23600000,
+     "from": 23600000
+    },
+    {
+     "area": "111 м²",
+     "name": "2 спальни (B Plus)",
+     "price_from_thb": 22500000,
+     "from": 22500000
+    },
+    {
+     "area": "122 м²",
+     "name": "3 спальни (A)",
+     "price_from_thb": 26654100,
+     "from": 26654100
+    },
+    {
+     "area": "161 м²",
+     "name": "3 спальни (B Plus)",
+     "price_from_thb": 35700000,
+     "from": 35700000
+    },
+    {
+     "area": "133 м²",
+     "name": "пентхаус 2 спальни",
+     "price_from_thb": 46800000,
+     "from": 46800000
+    },
+    {
+     "area": "200 м²",
+     "name": "пентхаус 3 спальни (Plus)",
+     "price_from_thb": 70300000,
+     "from": 70300000
+    },
+    {
+     "area": "223 м²",
+     "name": "4 спальни (A)",
+     "price_from_thb": 64900000,
+     "from": 64900000
+    }
+   ]
   },
   {
    "id": "PLP-EDEN-RES",
@@ -2742,7 +2951,7 @@
     {
      "area": "24,4–30,0 м²",
      "beds": 0,
-     "free": 145,
+     "free": 138,
      "name": "Студия",
      "area_sqm": 24.43,
      "price_from_thb": 3420200,
@@ -2751,7 +2960,7 @@
     {
      "area": "35,0–46,2 м²",
      "beds": 1,
-     "free": 30,
+     "free": 22,
      "name": "1 спальня",
      "area_sqm": 35,
      "price_from_thb": 4993000,
@@ -2760,7 +2969,7 @@
     {
      "area": "60,0–74,2 м²",
      "beds": 2,
-     "free": 25,
+     "free": 24,
      "name": "2 спальни",
      "area_sqm": 60,
      "price_from_thb": 8393000,
@@ -2968,7 +3177,7 @@
      "areaMax": 58.4,
      "areaMin": 56.4,
      "area_sqm": 56.4,
-     "price_to_thb": 10643000,
+     "price_to_thb": 9961000,
      "price_from_thb": 7290000,
      "area": 56.4,
      "from": 7290000
@@ -2977,15 +3186,15 @@
      "beds": 2,
      "code": "2 Bed",
      "name": "2 спальни (с выходом в сад 103,5 м²)",
-     "note": "фрихолд, прайс 07.11.2026",
+     "note": "фрихолд, прайс 17.11.2026",
      "count": 78,
      "areaMax": 103.5,
      "areaMin": 93,
      "area_sqm": 93,
-     "price_to_thb": 18479000,
-     "price_from_thb": 15516000,
+     "price_to_thb": 18842000,
+     "price_from_thb": 14947000,
      "area": 93,
-     "from": 15516000
+     "from": 14947000
     },
     {
      "beds": 2,
@@ -2996,10 +3205,10 @@
      "areaMax": 136,
      "areaMin": 124.5,
      "area_sqm": 124.5,
-     "price_to_thb": 23575000,
-     "price_from_thb": 19899000,
+     "price_to_thb": 22069000,
+     "price_from_thb": 19999000,
      "area": 124.5,
-     "from": 19899000
+     "from": 19999000
     },
     {
      "beds": 5,
@@ -3050,6 +3259,63 @@
    "type": "Вилла",
    "price_from": 20000000,
    "units": []
+  },
+  {
+   "id": "PLP-QABALAH-SALE2",
+   "pub": "PLP-QABALAH-RESALE2",
+   "url": "https://property-library.com/object/qabalah-resale2",
+   "name": "Villa Qabalah · вилла на 2 спальни, вторичка",
+   "district": "Таланг",
+   "type": "Вилла",
+   "price_from": 15000000,
+   "units": [
+    {
+     "beds": 2,
+     "name": "Moss",
+     "area_sqm": 237.8,
+     "price_from_thb": 15000000,
+     "area": 237.8,
+     "from": 15000000
+    }
+   ]
+  },
+  {
+   "id": "PLP-SANSIRI-BRISA",
+   "pub": "PLP-SANSIRI-BRISA",
+   "url": "https://property-library.com/object/sansiri-brisa",
+   "name": "BRISA Patong (Sansiri)",
+   "district": "Патонг",
+   "type": "Кондо",
+   "price_from": 3990000,
+   "units": [
+    {
+     "beds": 1,
+     "name": "1 спальня",
+     "area_sqm": 30.25,
+     "area_sqm_max": 41.25,
+     "price_from_thb": 3990000,
+     "area": 30.25,
+     "from": 3990000
+    },
+    {
+     "beds": 2,
+     "name": "2 спальни, 1 ванная",
+     "area_sqm": 48.75,
+     "area_sqm_max": 55.75,
+     "price_from_thb": 6404000,
+     "area": 48.75,
+     "from": 6404000
+    },
+    {
+     "beds": 2,
+     "name": "2 спальни, 2 ванные",
+     "area_sqm": 70,
+     "area_sqm_max": 71.25,
+     "price_from_thb": 10514000,
+     "area": 70,
+     "from": 10514000
+    }
+   ]
   },
   {
    "id": "PLP-SANSIRI-RHEA",
@@ -3626,7 +3892,7 @@
     {
      "beds": 0,
      "name": "студия",
-     "note": "прайс застройщика 15.10.2026 (студии 26 и 28 м²)",
+     "note": "закрытый список Property Library от 19.10.2026 (студии 26 и 28 м²)",
      "area_max": 28,
      "area_min": 26,
      "area_sqm": 28,
