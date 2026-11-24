@@ -116,6 +116,17 @@ const OFFERS = [
     h: 7479,   // PDF 1978 мм (7 стр.) × 794/210 (24.11)
   },
   {
+    /* 24.11.2026 Эльнур: «Чего нет наполни сейчас !». BRISA Patong от Sansiri, фрихолд и лизхолд.
+       Факты: брошюра застройщика и прайс Sansiri FQ/LH (сборщик ~/plp-ops/офферы/make_sheet/brisa_make_sheet.py).
+       hidden: только /brisa/<номер из build/nomera.json>. */
+    slug: 'brisa', dir: 'offers/brisa', hidden: true,
+    title: 'BRISA Patong · Патонг, квартиры Sansiri от 3 990 000 ฿',
+    desc: 'BRISA Patong от Sansiri: 1 спальня от 3 990 000 ฿, фрихолд, 900 м до пляжа Патонг, 30% при договоре. Предложение Property Library Phuket.',
+    pdf: 'BRISA_Patong.pdf',
+    og: 'offers/brisa/img/preview-v1.jpg',
+    h: 6167,   // PDF 1631 мм (6 стр.) × 794/210 (24.11)
+  },
+  {
     /* 05.11.2026 Эльнур: «Мне нужен один офер по VIVI, по нашему стандарту», «Виви дай презу нормальную».
        Факты: слова Эльнура 05.11 (две однушки от собственников, 4 200 000 и 4 600 000 ฿, лизхолд, срок 4Q 2027), Factsheet,
        20 Facilities, Free Package, Standard Materials, Living Service застройщика (сборщик ~/plp-ops/офферы/make_sheet/vivi_make_sheet.py).
