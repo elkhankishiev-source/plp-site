@@ -2737,16 +2737,16 @@
    "name": "Millennium Condominium, Банг Тао",
    "district": "Банг Тао",
    "type": "Кондо",
-   "price_from": 3441200,
+   "price_from": 3420200,
    "units": [
     {
      "area": "24,4–30,0 м²",
      "beds": 0,
      "free": 145,
      "name": "Студия",
-     "area_sqm": 24.4,
-     "price_from_thb": 3441200,
-     "from": 3441200
+     "area_sqm": 24.43,
+     "price_from_thb": 3420200,
+     "from": 3420200
     },
     {
      "area": "35,0–46,2 м²",
