@@ -215,16 +215,16 @@
    "name": "Oxygen Sai Yuan",
    "district": "Равай",
    "type": "Кондо",
-   "price_from": 11900000,
+   "price_from": 15000000,
    "units": [
     {
      "beds": "3",
      "code": "PLP-OXYGEN-SY-R2",
      "name": "квартира",
      "area_sqm": "145.07",
-     "price_from_thb": 11900000,
+     "price_from_thb": 15000000,
      "area": "145.07",
-     "from": 11900000
+     "from": 15000000
     }
    ]
   },
@@ -242,10 +242,10 @@
    "id": "PLP-OXYGEN-SY-R2",
    "pub": "PLP-OXYGEN-SY-R2",
    "url": "https://property-library.com/object/oxygen-sy-r2",
-   "name": "Oxygen Sai Yuan · квартира",
+   "name": "Oxygen Sai Yuan · дуплекс-кондоминиум, 2 спальни и кабинет, перепродажа",
    "district": "Равай",
    "type": "Кондо",
-   "price_from": 11900000,
+   "price_from": 15000000,
    "units": []
   },
   {
