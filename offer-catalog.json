@@ -32,6 +32,16 @@
    "units": []
   },
   {
+   "id": "PLP-KYE-R2",
+   "pub": "PLP-KYE-R2",
+   "url": "https://property-library.com/object/kye-r2",
+   "name": "KYE Villas · вилла",
+   "district": "Равай",
+   "type": "Вилла",
+   "price_from": 19900000,
+   "units": []
+  },
+  {
    "id": "ATT-MONO-PASAK",
    "pub": "PLP-MONO-PASAK",
    "url": "https://property-library.com/object/mono-pasak",
@@ -146,6 +156,26 @@
    "district": "Равай",
    "type": "Вилла",
    "price_from": 10500000,
+   "units": []
+  },
+  {
+   "id": "PLP-ONYX-SY-R2",
+   "pub": "PLP-ONYX-SY-R2",
+   "url": "https://property-library.com/object/onyx-sy-r2",
+   "name": "Onyx Sai Yuan Estate · вилла",
+   "district": "Равай",
+   "type": "Вилла",
+   "price_from": 10500000,
+   "units": []
+  },
+  {
+   "id": "PLP-ONYX-SY-R4",
+   "pub": "PLP-ONYX-SY-R4",
+   "url": "https://property-library.com/object/onyx-sy-r4",
+   "name": "Onyx Sai Yuan Estate · вилла",
+   "district": "Равай",
+   "type": "Вилла",
+   "price_from": 10900000,
    "units": []
   },
   {
@@ -445,6 +475,16 @@
    "units": []
   },
   {
+   "id": "PLP-SATURDAYS-R17",
+   "pub": "PLP-SATURDAYS-R17",
+   "url": "https://property-library.com/object/saturdays-r17",
+   "name": "Saturdays Residence · квартира",
+   "district": "Равай",
+   "type": "Кондо",
+   "price_from": 6500000,
+   "units": []
+  },
+  {
    "id": "PLP-SATURDAYS-R2",
    "pub": "PLP-SATURDAYS-R2",
    "url": "https://property-library.com/object/saturdays-r2",
@@ -570,6 +610,16 @@
    "district": "Банг Тао",
    "type": "Вилла",
    "price_from": 13500000,
+   "units": []
+  },
+  {
+   "id": "PLP-WINGS-R4",
+   "pub": "PLP-WINGS-R4",
+   "url": "https://property-library.com/object/wings-r4",
+   "name": "Wings Villas · вилла",
+   "district": "Банг Тао",
+   "type": "Вилла",
+   "price_from": 19700000,
    "units": []
   },
   {
@@ -726,6 +776,16 @@
      "from": 84000000
     }
    ]
+  },
+  {
+   "id": "PLP-ANGSANA-OV-R1",
+   "pub": "PLP-ANGSANA-OV-R1",
+   "url": "https://property-library.com/object/angsana-ov-r1",
+   "name": "Angsana Oceanview · 2 спальни, вторичка",
+   "district": "Лагуна",
+   "type": "Кондо",
+   "price_from": 49000000,
+   "units": []
   },
   {
    "id": "PLP-ANGSANA-TOPAZ",
@@ -1402,6 +1462,33 @@
    ]
   },
   {
+   "id": "PLP-CAPRI",
+   "pub": "PLP-CAPRI",
+   "url": "https://property-library.com/object/capri",
+   "name": "The Capri Resident",
+   "district": "Банг Тао",
+   "type": "Кондо",
+   "price_from": 5075000,
+   "units": [
+    {
+     "beds": 2,
+     "name": "2 спальни",
+     "area_sqm": 70,
+     "price_from_thb": 11500000,
+     "area": 70,
+     "from": 11500000
+    },
+    {
+     "beds": 1,
+     "name": "1 спальня",
+     "area_sqm": 35,
+     "price_from_thb": 5075000,
+     "area": 35,
+     "from": 5075000
+    }
+   ]
+  },
+  {
    "id": "PLP-CASADEMONTE",
    "pub": "PLP-CASADEMONTE",
    "url": "https://property-library.com/object/casademonte",
@@ -1427,6 +1514,36 @@
      "from": 42343000
     }
    ]
+  },
+  {
+   "id": "PLP-CASSIA-R1",
+   "pub": "PLP-CASSIA-R1",
+   "url": "https://property-library.com/object/cassia-r1",
+   "name": "Cassia Phuket · 2 спальни, вторичка",
+   "district": "Лагуна",
+   "type": "Кондо",
+   "price_from": 13000000,
+   "units": []
+  },
+  {
+   "id": "PLP-CELESTE-R1",
+   "pub": "PLP-CELESTE-R1",
+   "url": "https://property-library.com/object/celeste-r1",
+   "name": "Skypark Celeste · студия, вторичка",
+   "district": "Лагуна",
+   "type": "Кондо",
+   "price_from": 5500000,
+   "units": []
+  },
+  {
+   "id": "PLP-CELESTE-R2",
+   "pub": "PLP-CELESTE-R2",
+   "url": "https://property-library.com/object/celeste-r2",
+   "name": "Skypark Celeste · 2 спальни, вторичка",
+   "district": "Лагуна",
+   "type": "Кондо",
+   "price_from": 9990000,
+   "units": []
   },
   {
    "id": "PLP-CIELO",
@@ -1518,6 +1635,16 @@
      "from": 13882575
     }
    ]
+  },
+  {
+   "id": "PLP-CIELO-R1",
+   "pub": "PLP-CIELO-R1",
+   "url": "https://property-library.com/object/cielo-r1",
+   "name": "The Title Cielo Rawai · 2 спальни, вторичка",
+   "district": "Равай",
+   "type": "Кондо",
+   "price_from": 7578947,
+   "units": []
   },
   {
    "id": "PLP-CLOVER",
@@ -2068,6 +2195,26 @@
      "beds": 4
     }
    ]
+  },
+  {
+   "id": "PLP-FANTASEA-KAMALA-R1",
+   "pub": "PLP-FANTASEA-KAMALA-R1",
+   "url": "https://property-library.com/object/fantasea-kamala-r1",
+   "name": "Fantasea Condo Kamala · 2 спальни, вторичка",
+   "district": "Камала",
+   "type": "Кондо",
+   "price_from": 5280000,
+   "units": []
+  },
+  {
+   "id": "PLP-FANTASEA-KAMALA-R2",
+   "pub": "PLP-FANTASEA-KAMALA-R2",
+   "url": "https://property-library.com/object/fantasea-kamala-r2",
+   "name": "Fantasea Condo Kamala · 1 спальня, вторичка",
+   "district": "Камала",
+   "type": "Кондо",
+   "price_from": 3600000,
+   "units": []
   },
   {
    "id": "PLP-FANTASY-RAWAI",
@@ -2867,6 +3014,26 @@
    ]
   },
   {
+   "id": "PLP-LEGENDARY-R2",
+   "pub": "PLP-LEGENDARY-R2",
+   "url": "https://property-library.com/object/legendary-r2",
+   "name": "The Title Legendary · студия, вторичка",
+   "district": "Банг Тао",
+   "type": "Кондо",
+   "price_from": 3999999,
+   "units": []
+  },
+  {
+   "id": "PLP-LEGENDARY-R3",
+   "pub": "PLP-LEGENDARY-R3",
+   "url": "https://property-library.com/object/legendary-r3",
+   "name": "The Title Legendary · 2 спальни, вторичка",
+   "district": "Банг Тао",
+   "type": "Кондо",
+   "price_from": 6600000,
+   "units": []
+  },
+  {
    "id": "PLP-LIBERTY",
    "pub": "PLP-LIBERTY",
    "url": "https://property-library.com/object/liberty",
@@ -3255,10 +3422,10 @@
     {
      "beds": 1,
      "name": "1 спальня",
-     "area_sqm": 30.25,
+     "area_sqm": 30.5,
      "area_sqm_max": 41.25,
      "price_from_thb": 3990000,
-     "area": 30.25,
+     "area": 30.5,
      "from": 3990000
     },
     {
@@ -3331,6 +3498,24 @@
      "price_from_thb": 23990000,
      "area": 120,
      "from": 23990000
+    }
+   ]
+  },
+  {
+   "id": "PLP-SEAHEAVEN-22",
+   "pub": "PLP-SEAHEAVEN-PHASE2",
+   "url": "https://property-library.com/object/seaheaven-phase2",
+   "name": "Sea Heaven Nai Thon, фаза 2.2",
+   "district": "Най Тон",
+   "type": "Кондо",
+   "price_from": 6350000,
+   "units": [
+    {
+     "name": "Студия",
+     "area_sqm": 37.67,
+     "price_from_thb": 6350000,
+     "area": 37.67,
+     "from": 6350000
     }
    ]
   },
@@ -4214,6 +4399,45 @@
      "площадь_м2": "81,2–105,0",
      "area": 81.2,
      "from": 11774000
+    }
+   ]
+  },
+  {
+   "id": "RESALE-PANORA",
+   "pub": "PLP-PANORA-VILLA",
+   "url": "https://property-library.com/object/panora-villa",
+   "name": "Panora Villas, Сурин",
+   "district": "Сурин",
+   "type": "Вилла",
+   "price_from": 19850000,
+   "units": []
+  },
+  {
+   "id": "RESALE-PANORA-CONDO",
+   "pub": "PLP-PANORA-CONDO",
+   "url": "https://property-library.com/object/panora-condo",
+   "name": "The Panora Phuket, корпус D",
+   "district": "Сурин",
+   "type": "Кондо",
+   "price_from": 4425400,
+   "units": [
+    {
+     "name": "1 спальня",
+     "beds": 1,
+     "code": "A1",
+     "area": 38.7,
+     "areaMin": 38.7,
+     "areaMax": 92.89,
+     "from": 4425400
+    },
+    {
+     "name": "2 спальни",
+     "beds": 2,
+     "code": "B6",
+     "area": 166.88,
+     "areaMin": 166.88,
+     "areaMax": 166.88,
+     "from": 19532300
     }
    ]
   }
