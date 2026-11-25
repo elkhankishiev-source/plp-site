@@ -385,7 +385,7 @@ function withFacts(calc, o) {
   c.paymentPlan = noContacts(o.payment_plan || o.payment_schedule || '');
   // Сдан по-настоящему — только stage='Ready' (канон №38). Если стройка идёт,
   // а дата сдачи в базе уже прошла — это устаревшая дата, а не сданный объект.
-  c.ready = o.stage === 'Ready';
+  c.ready = o.stage === 'Ready' || (isResaleObj(o) && resaleGroup(o) === 'ready');
   // Потолок 5 — канон Эльнура 04.09: после сдачи 1–5% в год.
   c.capGrowthPct = Math.min(Number(o.capital_growth_pct) || c.capGrowthPct || 3, 5);
   return c;
@@ -445,7 +445,10 @@ function buildCatalog(objects, benchmarks, preserve) {
       deadline: deadline(o.handover_date),
       status: statusLabel(o.status),
       // 30.08 канон №38: «готов/сдан» — ТОЛЬКО из stage='Ready', никогда из даты сдачи.
-      ready: o.stage === 'Ready',
+      /* 25.11.2026 №463: у перепродажи «готово» по той же функции, что и группа (resaleGroup). */
+      ready: o.stage === 'Ready' || (isResaleObj(o) && resaleGroup(o) === 'ready'),
+      /* 25.11.2026 №463: перепродажа — признак «кто продаёт», не стадия: метка и фильтр, раздел по готовности. */
+      resale: isResaleObj(o),
       // 03.09: стадия отдельным полем — по ней фильтр и бейдж на карточке
       // числовой диапазон спален — по нему работает фильтр «Спальни»
       bmin: bedRange(o).min,
@@ -750,10 +753,13 @@ function saleGroup(o) {
   const st = String(o.stage || '').toLowerCase();
   const isPre = /pre-?sale|presale|старт|анонс|announced/.test(st);
   const isBuild = /construction|стро|off-?plan/.test(st);
-  const isResale = st === 'resale' || st === 'sold out' || /распродан|sold\s*out|перепродаж|вторичк|переуступ/.test(st) ||
-    String(o.purpose || '').toLowerCase() === 'resale' || String(o.status || '') === 'sold' ||
-    /перепродаж|вторичк|resale|переуступ/i.test(String(o.name || ''));
-  if (isResale) return 'resale';
+  /* 25.11.2026 решение №463: «есть стадия объекта… а есть перепродажа объекта, это так же может быть
+     объект любой стадии». Перепродажа больше не группа: её раздел считает resaleGroup по готовности.
+     Группа 'resale' осталась только у распроданного застройщиком (полка «Распродано · есть у нас», 16.09). */
+  if (st === 'sold out' || /распродан|sold\s*out/.test(st)) return 'resale';
+  if (isResaleObj(o)) return resaleGroup(o);
+  /* как было до №463: распроданный застройщиком (status sold, Estella) остаётся на полке «Распродано · есть у нас» */
+  if (String(o.purpose || '').toLowerCase() === 'resale' || String(o.status || '') === 'sold') return 'resale';
   /* 🔴 08.09: Estella стояла как «старт продаж», а сдача у неё через 84 дня.
      Эльнур: «ты как вообще придумал такое». Дата сдачи — факт из договора,
      стадия — слово; когда они спорят, верим дате и говорим об этом вслух. */
@@ -787,6 +793,21 @@ function saleGroup(o) {
   return '';
 }
 
+/* 25.11.2026 решение №463: признак перепродажи. Главный — objects.is_resale; прежние признаки (stage 'Resale',
+   слова в имени) — слой совместимости, пока stage в базе не переведён на Ready/Construction. */
+function isResaleObj(o) {
+  if (!o) return false;
+  if (o.is_resale === true) return true;
+  const st = String(o.stage || '').toLowerCase();
+  return st === 'resale' || /перепродаж|вторичк|переуступ/.test(st) ||
+    /перепродаж|вторичк|resale|переуступ/i.test(String(o.name || ''));
+}
+/* Раздел перепродажи только по дате сдачи, stage не читаем: после смены stage в базе ничего не сдвинется.
+   Сдача впереди — строится (переуступка); прошла или даты нет — готово (так же считает подбор_объектов). */
+function resaleGroup(o) {
+  const hd = o && o.handover_date ? new Date(o.handover_date) : null;
+  return (hd && !isNaN(hd) && hd > new Date()) ? 'construction' : 'ready';
+}
 /* 02.10.2026. Заметка о стадии (stage_note) печаталась на витрине как есть, а в ней живут
    рабочие приписки: «Эльнур 02.10.2026», «самого письма в наших сборщиках нет», «по термшиту…
    подтверждаем актуальность», «перед клиентом сверить». Наружу идут только предложения без них. */
@@ -876,7 +897,8 @@ function spreadFamilies(list) {
 function orderCatalog(list) {
   var live = [], weak = [], resale = [];
   list.forEach(function (p) {
-    if (p.stage_key === 'resale') resale.push(p);
+    /* 25.11.2026 №463: перепродажи внутри своего раздела после застройщиков; распроданное — как было, в конце */
+    if (p.resale || p.stage_key === 'resale') resale.push(p);
     else if (shelfScore(p) < 24) weak.push(p);     // пустая карточка вперёд не лезет
     else live.push(p);
   });
@@ -1307,7 +1329,8 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
     const тип = [].concat(Array.isArray(o.unit_types) ? o.unit_types : [], Array.isArray(o.price_tiers) ? o.price_tiers : []);
     const сп = [...new Set(тип.map(x => x && Number(x.bedrooms)).filter(n => Number.isInteger(n) && n >= 0))].sort((a, b) => a - b);
     const пропуск = сп.length >= 2 && сп.length < сп[сп.length - 1] - сп[0] + 1;
-    return пропуск ? сп.map(n => n === 0 ? 'студия' : String(n)).join(', ') : bedsLabel(o);
+    /* 25.11.2026 (приёмка #836): страница объекта русская, «Studio» из bedsLabel (каталог общий для RU и EN) — по-русски */
+    return пропуск ? сп.map(n => n === 0 ? 'студия' : String(n)).join(', ') : bedsLabel(o).replace(/^Studio\b/, 'Студия');
   })();
   const area = String(areaLabel(o) || '').replace(/(\d)\.(\d)/g, '$1,$2');
   const dl = deadline(o.handover_date);
@@ -1346,7 +1369,7 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
     'PLP-QABALAH': 'цена на дату сверки',
   };
   /* 24.11.2026 №458 («убирай всевозможные расхождения»): у вторички цена собственника, не прайс застройщика. */
-  const вторичка = /^resale$/i.test(String(o.stage || '').trim()) || /вторичк/i.test(String(o.name || ''));
+  const вторичка = o.is_resale === true || /^resale$/i.test(String(o.stage || '').trim()) || /вторичк/i.test(String(o.name || ''));
   const ценаПоСловуЭльнура = (/^\s*слово Эльнура/i.test(String(o.source || '')) && ПОДПИСЬ_ЦЕНЫ_ЭЛЬНУРА[o.plp_property_id])
     || ПОДПИСЬ_ЦЕНЫ_ПО_РЕШЕНИЮ[o.plp_property_id];
   const подписьЦены = ценаПоСловуЭльнура || (вторичка ? (/вторичк/i.test(String(o.name || '')) ? 'цена собственника на дату сверки' : 'цена на дату сверки') : 'цена по прайсу застройщика на дату сверки');
@@ -1393,7 +1416,9 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
     /* В заголовке сотые доли метра — мусор: «57.57 м²». Округляем до целого,
        точная площадь остаётся в карточке. */
     const пл = String(areaLabel(o) || '').replace(/(\d+)[.,]\d+/g, (_, ц) => ц);
-    const доп = (сп && пл) ? (сп + ' сп., ' + пл) : (пл || (сп ? сп + ' сп.' : ''));
+    /* 25.11.2026 (приёмка #836): «студия сп.» — « сп.» только к числу спален */
+    const спТ = /\d/.test(сп) ? сп + ' сп.' : сп;
+    const доп = (сп && пл) ? (спТ + ', ' + пл) : (пл || спТ);
     if (_хвостКода && доп) return _хвостКода + ' · ' + доп;
     return _хвостКода || доп;
   })();
@@ -1756,7 +1781,7 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
   })();
   const progressRows = [
     { k: 'Срок сдачи', v: dl.ru ? (dl.ru + (leftWord ? ' · ' + leftWord : '')) : '' },
-    { k: 'Стадия', v: GROUP_RU[grp] || '' },
+    { k: 'Стадия', v: (GROUP_RU[grp] || '') + (grp !== 'resale' && isResaleObj(o) ? (grp === 'construction' ? ' · переуступка' : ' · перепродажа') : '') },
     { k: 'Отчёт застройщика', v: bpReport ? ('на ' + ruDate(bpReport.on)) : (bpRaw && bpRaw.as_of ? 'на ' + ruDate(bpRaw.as_of) : '') },
     { k: 'Готовность', v: bpReport && bpReport.body['готовность'] ? String(bpReport.body['готовность']) : '' },
   ];
@@ -1886,7 +1911,7 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
     }
     const xa = areaClass(x.area_min || x.area_max);
     if (myArea != null && xa != null && xa === myArea) sc += 12;          // тот же размер жилья
-    if (saleGroup(x) === myGrp) sc += 10;                                 // та же стадия: сравнивать честно
+    if (saleGroup(x) === myGrp && isResaleObj(x) === isResaleObj(o)) sc += 10;                                 // та же стадия: сравнивать честно
     const bo = (o.bedrooms_min != null && x.bedrooms_min != null) &&
       Math.max(o.bedrooms_min, x.bedrooms_min) <= Math.min(o.bedrooms_max || o.bedrooms_min, x.bedrooms_max || x.bedrooms_min);
     if (bo) sc += 10;                                                     // спальни пересекаются
@@ -1912,7 +1937,8 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
           || (xпар && thumbUrl(главноеФото(xпар), 520, 72))
           || (fs.existsSync(path.join(ROOT, 'img', xp + '.jpg'))
                 ? '../img/' + xp + '.jpg' : '../img/og-default.jpg');
-        const xg = GROUP_RU[saleGroup(x)] || '';
+        const xgk = saleGroup(x);
+        const xg = (GROUP_RU[xgk] || '') + (xgk !== 'resale' && isResaleObj(x) ? (xgk === 'construction' ? ' · переуступка' : ' · перепродажа') : '');
         return '<a class="simi-c" href="' + htmlEsc(slugOf(xp)) + '">' +
           '<img src="' + htmlEsc(xi) + '" alt="" loading="lazy" decoding="async">' +
           '<b>' + htmlEsc(x.name) + '</b><span>' + htmlEsc([xru, xg].filter(Boolean).join(' · ')) +
@@ -1929,9 +1955,9 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
     // объекта и карточка спорят между собой («старт продаж» против «в продаже»)
     /* 02.10 Эльнур: в аренде стадия, застройщик и юрлицо — лишнее, объект и так в разделе аренды */
     { k: 'Стадия', v: isRent ? '' : soldOut ? 'распродано у застройщика' :
-        (saleGroup(o) === 'resale'
-          ? (String(o.stage || '') === 'Ready' || (o.handover_date && new Date(o.handover_date) < new Date())
-             ? 'вторичка' : 'переуступка')
+        /* 25.11.2026 №463: стадия по готовности, перепродажа меткой рядом: «перепродажа» у готового, «переуступка» у строящегося */
+        (isResaleObj(o) && saleGroup(o) !== 'resale'
+          ? (GROUP_RU[saleGroup(o)] || '') + ' · ' + (saleGroup(o) === 'construction' ? 'переуступка' : 'перепродажа')
           : (GROUP_RU[saleGroup(o)] || '')) },
     /* 🔴 10.09 Эльнур: «зашёл на карточку, а там доходность 7% до вычета расходов,
    мы такое не согласовывали». Показывали o.roi — цифру из буклета застройщика,
@@ -2227,7 +2253,7 @@ async function main() {
     '&order=plp_property_id' +
     '&select=plp_property_id,name,district,beach,purpose,type,price_from_thb,price_to_thb,' +
     'bedrooms,bedrooms_min,bedrooms_max,area_sqm,area_min,area_max,roi,rental_yield_pct,' +
-    'capital_growth_pct,handover_date,status,stage,stage_note,sale_started_on,developer,distance_beach_m,usp,usp_en,'+
+    'capital_growth_pct,handover_date,status,stage,is_resale,stage_note,sale_started_on,developer,distance_beach_m,usp,usp_en,'+
     'bedrooms_min,bedrooms_max,' +
     'brochure_url,floorplan_url,video_url,website_url,map_url,current_promo,' +
     'season_rates,occupancy_est_pct,maintenance_fee_thb_sqm,lat,lng,coord_source,last_synced_at,availability,' +
@@ -2243,7 +2269,7 @@ async function main() {
     'bedrooms_max,area_sqm,area_min,area_max,min_stay,deposit,rent_included,rent_excluded,' +
     'rent_rules,amenities,usp,usp_en,distance_beach_m,on_site,lat,lng,coord_source,last_synced_at,public_code,' +
     'main_image_url,gallery_urls,photo_groups,unit_types,price_tiers,season_rates,rent_price_month_thb,' +
-    'plot_area_sqm,built_area_sqm,developer,stage,stage_note,sale_started_on,handover_date,parent_object_id' +
+    'plot_area_sqm,built_area_sqm,developer,stage,is_resale,stage_note,sale_started_on,handover_date,parent_object_id' +
     '&and=(or(purpose.eq.' + encodeURIComponent('аренда') + ',purpose.eq.rent),' +
     'on_site.eq.true)&order=plp_property_id');
 
@@ -2295,7 +2321,8 @@ async function main() {
   }
   /* №113: строящиеся проекты, у которых часть уже сдана (дочерние объекты на сайте со стадией Ready) */
   for (const r of rentals || []) {
-    if (r && r.parent_object_id && String(r.stage || '') === 'Ready') ЧАСТЬ_СДАНА.add(r.parent_object_id);
+    /* 25.11.2026 №463: сданная перепродажа не делает проект застройщика «частично сданным» */
+    if (r && r.parent_object_id && String(r.stage || '') === 'Ready' && !isResaleObj(r)) ЧАСТЬ_СДАНА.add(r.parent_object_id);
   }
   console.log('[gen] Часть проекта сдана:', [...ЧАСТЬ_СДАНА].filter(id => objects.some(o => o.plp_property_id === id && String(o.stage || '') !== 'Ready')).join(', ') || 'нет');
   console.log('[gen] Объектов on_site=true:', objects.length, '| benchmarks:', benchmarks.length,
@@ -2318,7 +2345,7 @@ async function main() {
     .filter(id => !byId[id]);
   if (нужны.length) {
     const добор = await sbGet(env, 'objects?plp_property_id=in.(' +
-      encodeURIComponent(нужны.join(',')) + ')&select=plp_property_id,name,stage,handover_date,' +
+      encodeURIComponent(нужны.join(',')) + ')&select=plp_property_id,name,stage,is_resale,handover_date,' +
       'usp,usp_en,amenities,nearby,distance_beach_m,beach,district,area_min,area_max,' +
       'main_image_url,gallery_urls,photo_groups,ownership');
     for (const o of добор || []) byId[o.plp_property_id] = o;

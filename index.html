@@ -3056,7 +3056,7 @@ ru: {
   "u.req2":"Запросить (даты/цену)",
   "rent.dates.in":"Заезд","rent.dates.out":"Выезд","rent.dates.btn":"Показать свободные","rent.dates.reset":"Сбросить дату",
   "ft.addobj":"Сдать или продать свой объект",
-  "f.st.soon":"Скоро сдача","f.st.few":"Последние юниты","f.st.ready":"Готово к заезду","f.st.build":"Строится","f.st.presale":"Старт продаж","f.st.resale":"Вторичка",
+  "f.st.soon":"Скоро сдача","f.st.few":"Последние юниты","f.st.ready":"Готово к заезду","f.st.build":"Строится","f.st.presale":"Старт продаж","f.st.resale":"Перепродажа",
   "rent.dates.stay":"Даты проживания","rent.dates.pick":"Выберите даты","rent.dates.pickout":"выберите выезд","rent.dates.n1":"ночь","rent.dates.n2":"ночи","rent.dates.n5":"ночей",
   "rent.dates.hint":"Выберите даты заезда и выезда — покажем только свободные варианты. Без дат показаны все объекты.",
   "rent.dates.loading":"Проверяем доступность","rent.dates.free":"Показаны варианты, свободные на выбранные даты.",
@@ -4128,7 +4128,7 @@ var DEAL={
   presale:     {ru:'Старт продаж',    en:'Pre-sale'},
   construction:{ru:'Строится',        en:'Under construction'},
   ready:       {ru:'Готово к заезду', en:'Ready to move in'},
-  resale:      {ru:'Вторичка',        en:'Resale'}
+  resale:      {ru:'Перепродажа',     en:'Resale'}
 };
 /* Группу считает сборщик (build/gen.mjs → saleGroup) — витрина её только
    показывает. Здесь лишь страховка для карточек, где стадия не проставлена. */
@@ -4145,6 +4145,8 @@ function dealKey(p){
    полугода и последние юниты в проекте. Оба считаются из данных, руками не ставятся. */
 function stageTokens(p){
   var out=[dealKey(p)];
+  /* 25.11.2026 №463: перепродажа — признак, не раздел. Готовая перепродажа: ready + resale; строящаяся: construction + resale */
+  if(p.resale===true && out[0]!=='resale') out.push('resale');
   var d=daysToHandover(p);
   if(d!=null && d>=0 && d<=180) out.push('soon');
   if(p.avail!=null && p.avail<=10) out.push('few');
@@ -4159,7 +4161,7 @@ function dealBadge(p){
   if(p.soldOut) w=en?'Sold out · on request':'Распродано · есть у нас';
   /* Эльнур 16.09: «если проект в стройке, но куплен — это не вторичка, а переуступка».
      Полка одна, слово уточняет: готовый дом — вторичка, стройка — переуступка. */
-  if(k==='resale' && !p.soldOut) w=en?'Resale':(p.ready===true?'Вторичка':'Переуступка');
+  if(k==='resale' && !p.soldOut) w=en?'Resale':(p.ready===true?'Перепродажа':'Переуступка');
   /* готово — говорим с какого года, если он у нас есть */
   if(k==='ready' && p.deadline && p.deadline.ru){
     var y=String(p.deadline.ru).match(/(20\d\d)/);
@@ -4171,7 +4173,14 @@ function dealBadge(p){
     ? '<span class="stg stg-soon">'+(en?('handover in '+soon+' d.'):('сдача через '+soon+' дн.'))+'</span>' : '';
   /* резерв — не стадия, а пометка поверх неё */
   if(p.status==='reserved') extra+='<span class="stg stg-reserved">'+(en?'Reserved':'Резерв')+'</span>';
+  /* 25.11.2026 №463: вторая метка «кто продаёт»: у готовой перепродажи «Перепродажа», у строящейся «Переуступка» */
+  extra+=resaleMark(p);
   return '<span class="stg stg-'+k+'">'+w+'</span>'+extra;
+}
+function resaleMark(p){
+  if(!p || p.resale!==true || dealKey(p)==='resale') return '';
+  var en=PL.lang==='en';
+  return '<span class="stg stg-resale">'+(en?'Resale':(dealKey(p)==='construction'?'Переуступка':'Перепродажа'))+'</span>';
 }
 /* сколько дней до сдачи по кварталу из карточки: «4Q 2026» → конец квартала */
 function daysToHandover(p){
@@ -4220,7 +4229,7 @@ function priceAge(p){
      Эльнур 07.09 — учёт актуального наличия и цен. */
   if(p.priceDate){
     var days=Math.round((Date.now()-new Date(p.priceDate+'T00:00:00'))/86400000);
-    if(days>=45) out+='<span class="pdate stale">цену уточняем — сверяем с застройщиком</span>';
+    if(days>=45) out+='<span class="pdate stale">цену уточняем — сверяем с '+(p.resale===true?'собственником':'застройщиком')+'</span>';
   }
   return out;
 }
@@ -5084,7 +5093,9 @@ function openProp(pid){
   if(p.funnel==='sale'){
     var _dk=dealKey(p);
     if(_dk){ stEl.style.display=''; stEl.className='stg stg-'+_dk;
-             stEl.textContent=DEAL[_dk][PL.lang==='en'?'en':'ru']; }
+             stEl.textContent=DEAL[_dk][PL.lang==='en'?'en':'ru'];
+             /* 25.11.2026 №463: перепродажа меткой рядом со стадией */
+             if(p.resale===true && _dk!=='resale') stEl.textContent+=' · '+(PL.lang==='en'?'Resale':(_dk==='construction'?'Переуступка':'Перепродажа')); }
     else stEl.style.display='none';
     document.getElementById('pmPrice').innerHTML='<span>'+t('u.from')+'</span> '+fmtBaht(thbOf(p));
     document.getElementById('pmSpecs').innerHTML=
