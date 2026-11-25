@@ -155,12 +155,13 @@ function deadline(handover) {
   const q = Math.floor((parseInt(m, 10) - 1) / 3) + 1;
   return { ru: q + 'Q ' + y, en: 'Q' + q + ' ' + y };
 }
-/* 25.11.2026 ВЕРДИКТ #840: дней до сдачи — одна формула с карточкой каталога (index.html daysToHandover):
-   квартал из deadline(), счёт до последнего дня квартала. */
+/* 25.11.2026 ВЕРДИКТ #840, #841: дней до сдачи — одна формула с карточкой каталога (index.html daysToHandover).
+   Первое число месяца в базе — метка месяца или квартала: считаем до конца этого месяца (Purita 2028-11-01 → 30.11.2028).
+   Другое число — точная дата, считаем до неё (Eden 2026-12-31). Подпись квартала («4Q 2026») не меняется. */
 function daysToHandoverQ(handover) {
-  const d = deadline(handover ? String(handover) : '').ru;
-  const m = /([1-4])Q\s*(20\d\d)/.exec(d); if (!m) return null;
-  const end = new Date(Number(m[2]), Number(m[1]) * 3, 0);
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(handover || '')); if (!m) return null;
+  const y = Number(m[1]), mo = Number(m[2]), d = Number(m[3]);
+  const end = d === 1 ? new Date(y, mo, 0) : new Date(y, mo - 1, d);
   return Math.round((end - new Date()) / 86400000);
 }
 const STATUS_MAP = { active: 'available', archived: 'reserved', sold: 'sold' };
@@ -451,6 +452,8 @@ function buildCatalog(objects, benchmarks, preserve) {
       beds: bedsLabel(o),
       area: areaLabel(o),
       deadline: deadline(o.handover_date),
+      /* 25.11.2026 ВЕРДИКТ #841: дата сдачи для счёта «сдача через N дн.» той же формулой, что на странице (daysToHandoverQ) */
+      handover: o.handover_date ? String(o.handover_date).slice(0, 10) : null,
       status: statusLabel(o.status),
       // 30.08 канон №38: «готов/сдан» — ТОЛЬКО из stage='Ready', никогда из даты сдачи.
       /* 25.11.2026 №463: у перепродажи «готово» по той же функции, что и группа (resaleGroup). */
@@ -1782,7 +1785,8 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
   const leftWord = (function () {
     if (daysLeft == null || daysLeft < 0) return '';
     if (daysLeft <= 90) return 'осталось ' + daysLeft + ' дн.';
-    const mo = Math.round(daysLeft / 30);
+    /* 25.11.2026 ВЕРДИКТ #841: средний месяц 30,44 дн. (как buildYears выше); при /30 Purita 735 дн. давала «около 25 мес.» вместо 24 */
+    const mo = Math.round(daysLeft / 30.44);
     return 'осталось около ' + mo + ' мес.';
   })();
   const progressRows = [
