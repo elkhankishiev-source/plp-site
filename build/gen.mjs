@@ -155,6 +155,14 @@ function deadline(handover) {
   const q = Math.floor((parseInt(m, 10) - 1) / 3) + 1;
   return { ru: q + 'Q ' + y, en: 'Q' + q + ' ' + y };
 }
+/* 25.11.2026 ВЕРДИКТ #840: дней до сдачи — одна формула с карточкой каталога (index.html daysToHandover):
+   квартал из deadline(), счёт до последнего дня квартала. */
+function daysToHandoverQ(handover) {
+  const d = deadline(handover ? String(handover) : '').ru;
+  const m = /([1-4])Q\s*(20\d\d)/.exec(d); if (!m) return null;
+  const end = new Date(Number(m[2]), Number(m[1]) * 3, 0);
+  return Math.round((end - new Date()) / 86400000);
+}
 const STATUS_MAP = { active: 'available', archived: 'reserved', sold: 'sold' };
 function statusLabel(s) { return STATUS_MAP[s] || 'available'; }
 
@@ -1768,11 +1776,9 @@ function objectPage(o, benchmarks, ratesBy, allObjects) {
     const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(v || ''));
     return m ? m[3] + '.' + m[2] + '.' + m[1] : String(v || '');
   };
-  const daysLeft = (function () {
-    if (!o.handover_date) return null;
-    const hd = new Date(o.handover_date); if (isNaN(hd)) return null;
-    return Math.round((hd - new Date()) / 86400000);
-  })();
+  /* 25.11.2026 ВЕРДИКТ #840: срок до сдачи тем же способом, что у карточки каталога (index.html daysToHandover):
+     дата сдачи в базе — метка квартала («4Q 2026»), считаем до конца квартала, без ложной точности дня. */
+  const daysLeft = daysToHandoverQ(o.handover_date);
   const leftWord = (function () {
     if (daysLeft == null || daysLeft < 0) return '';
     if (daysLeft <= 90) return 'осталось ' + daysLeft + ' дн.';
