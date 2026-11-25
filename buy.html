@@ -2627,8 +2627,8 @@ ru: {
   "meta.title":"Property Library Phuket. Агентство недвижимости на Пхукете",
   "meta.desc":"Подберём недвижимость на Пхукете для покупки или аренды, оформим сделку, поможем с визой. Всё под ключ — от первого звонка до заезда и дохода.",
   "nav.why":"Пхукет","nav.sale":"Продажа","nav.rent":"Аренда","nav.map":"Районы","nav.quiz":"Подбор","nav.about":"О нас","nav.faq":"FAQ","nav.theme":"Оформление","nav.menu":"Меню",
-  "hero.h1":"Мы уже выбрали Пхукет — поможем и&nbsp;вам",
-  "hero.lead":"Подберём недвижимость для покупки или аренды, оформим сделку, поможем с визой и обустройством. Всё под ключ — от первого звонка до заезда и получения дохода.",
+  "hero.h1":"Мы уже выбрали Пхукет, поможем и&nbsp;вам",
+  "hero.lead":"Подберём недвижимость для покупки или аренды, оформим сделку, поможем с визой и обустройством. Всё под ключ: от первого звонка до заезда и получения дохода.",
   "cta.free":"консультация","hero.cta1":"Получить подборку","hero.price":"Вход примерно от 3 млн ฿","hero.cta2":"Смотреть объекты",
   "hero.note":"Бесплатная консультация","hero.float":"Ответим в течение 5 минут",
   "ph.elnur":"фото Эльнура","ph.object":"фото скоро",
@@ -2805,8 +2805,8 @@ en: {
   "meta.title":"Property Library Phuket. Real estate agency in Phuket",
   "meta.desc":"We help you buy or rent property in Phuket, handle the deal, visas and relocation. Full service — from the first call to move-in and first income.",
   "nav.why":"Phuket","nav.sale":"Buy","nav.rent":"Rent","nav.map":"Areas","nav.quiz":"Matchmaker","nav.about":"About","nav.faq":"FAQ","nav.theme":"Appearance","nav.menu":"Menu",
-  "hero.h1":"We already chose Phuket — let us help&nbsp;you",
-  "hero.lead":"We find property to buy or rent, handle the deal, help with visas and settling in. Full service — from the first call to move-in and first income.",
+  "hero.h1":"We already chose Phuket, let us help&nbsp;you",
+  "hero.lead":"We find property to buy or rent, handle the deal, help with visas and settling in. Full service: from the first call to move-in and first income.",
   "cta.free":"consultation","hero.cta1":"Get a shortlist","hero.price":"Entry from about 3 mln ฿","hero.cta2":"Browse properties",
   "hero.note":"Free consultation","hero.float":"We reply within 5 minutes",
   "ph.elnur":"photo of Elnur","ph.object":"photo soon",
@@ -3385,7 +3385,7 @@ function fmtBaht(thb){
   return PL.lang==='en' ? ('฿'+grp(n)) : (grp(n)+' ฿');
 }
 function fmtMoney(v){var n=Number(v);if(!isFinite(n))return String(v);try{return new Intl.NumberFormat(PL.lang==='en'?'en-US':'ru-RU').format(n)+' ฿';}catch(e){return n+' ฿';}}
-function areaOf(p){var a=(p&&p.area)||'';return PL.lang==='en'?a.replace(/м²/g,'m²'):a;}
+function areaOf(p){var a=(p&&p.area)||'';return PL.lang==='en'?a.replace(/м²/g,'m²'):a.replace(/(\d)\.(\d)/g,'$1,$2');} /* 25.11 (#832): «231.03 м²» → «231,03 м²» в ru */
 /* бюджет-бакет по РЕАЛЬНОЙ THB-цене: b1<฿5млн, b2<฿10млн, b3 ฿10млн+ */
 /* Шкала бюджета. Эльнур 04.09: «более 10 млн» — слишком грубо, дробим выше.
    Пороги в батах: до 5 / 5–10 / 10–15 / 15–20 / 20–25 / 25–30 / 30+. */
@@ -3560,8 +3560,13 @@ function unitsHTML(p){
            Без вилки читалось «три спальни дешевле двух» без объяснения. */
         '<span>'+(function(){
             var a=x.areaMin,b=x.areaMax;
-            if(a&&b&&(b-a)>0.5) return 'дом '+escHTML(String(a).replace('.',','))+'–'+escHTML(String(b).replace('.',','))+' м²';
-            return x.area?('дом '+escHTML(x.area)+' м²'):'';
+            /* 25.11 (ВЕРДИКТ #832, НЕ_ДЕЛАТЬ №28): «дом» только у виллы и таунхауса (рядом участок),
+               у квартиры просто площадь; тип из данных объекта p.type. Дробь через запятую, как везде. */
+            var tp=String((p.type&&(p.type.ru||p.type.en))||p.type||'');
+            var pre=/вилл|таунх|villa|townhouse/i.test(tp)?'дом ':'';
+            var cm=function(v){return String(v).replace('.',',');};
+            if(a&&b&&(b-a)>0.5) return pre+escHTML(cm(a))+'–'+escHTML(cm(b))+' м²';
+            return x.area?(pre+escHTML(cm(x.area))+' м²'):'';
           })()+
           /* участок виллы — вторая важная цифра рядом с площадью дома */
           (x.plot?(' · участок '+escHTML(x.plot)):'')+
@@ -3584,7 +3589,7 @@ function pickUnit(btn,pidEnc,i){
   var sp=document.getElementById('pmSpecs');
   if(sp){
     var cells=sp.querySelectorAll('.sp');
-    if(cells[0]&&x.area) cells[0].querySelector('b').textContent=x.area+' м²';
+    if(cells[0]&&x.area) cells[0].querySelector('b').textContent=(PL.lang==='en'?String(x.area):String(x.area).replace('.',','))+' м²'; /* 25.11: запятая в ru */
     if(cells[1]&&x.beds) cells[1].querySelector('b').textContent=String(x.beds);
   }
   var pr=document.getElementById('pmPrice');
