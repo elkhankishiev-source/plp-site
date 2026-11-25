@@ -229,6 +229,16 @@
    ]
   },
   {
+   "id": "PLP-OXYGEN-SY-R1",
+   "pub": "PLP-OXYGEN-SY-R1",
+   "url": "https://property-library.com/object/oxygen-sy-r1",
+   "name": "Oxygen Sai Yuan · дуплекс-кондоминиум, 3 спальни, перепродажа",
+   "district": "Равай",
+   "type": "Кондо",
+   "price_from": 15000000,
+   "units": []
+  },
+  {
    "id": "PLP-OXYGEN-SY-R2",
    "pub": "PLP-OXYGEN-SY-R2",
    "url": "https://property-library.com/object/oxygen-sy-r2",
@@ -246,6 +256,16 @@
    "district": "Равай",
    "type": "Вилла",
    "price_from": 12900000,
+   "units": []
+  },
+  {
+   "id": "ATT-SALIKA-1",
+   "pub": "PLP-SALIKA-R1",
+   "url": "https://property-library.com/object/salika-r1",
+   "name": "Salika · вилла, 3 спальни, перепродажа",
+   "district": "Равай",
+   "type": "Вилла",
+   "price_from": 14900000,
    "units": []
   },
   {
@@ -1647,6 +1667,16 @@
    "units": []
   },
   {
+   "id": "PLP-CITYGATE-R1",
+   "pub": "PLP-CITYGATE-R1",
+   "url": "https://property-library.com/object/citygate-r1",
+   "name": "Citygate · 1 спальня, перепродажа",
+   "district": "Камала",
+   "type": "Кондо",
+   "price_from": 3390000,
+   "units": []
+  },
+  {
    "id": "PLP-CLOVER",
    "pub": "PLP-CLOVER",
    "url": "https://property-library.com/object/clover",
@@ -2444,6 +2474,16 @@
      "from": 6426200
     }
    ]
+  },
+  {
+   "id": "PLP-HALO1-R1",
+   "pub": "PLP-HALO1-R1",
+   "url": "https://property-library.com/object/halo1-r1",
+   "name": "The Title Halo 1 Naiyang · 1 спальня, вторичка",
+   "district": "Най Янг",
+   "type": "Кондо",
+   "price_from": 3700000,
+   "units": []
   },
   {
    "id": "PLP-HERITAGE",
