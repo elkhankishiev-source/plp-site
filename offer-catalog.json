@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-25",
+ "updated": "2026-11-26",
  "items": [
   {
    "id": "ATT-KYE",
@@ -218,9 +218,18 @@
    "price_from": 15000000,
    "units": [
     {
-     "beds": "3",
+     "beds": "2",
      "code": "PLP-OXYGEN-SY-R2",
-     "name": "квартира",
+     "name": "дуплекс-кондоминиум, 2 спальни и кабинет",
+     "area_sqm": "145.07",
+     "price_from_thb": 15000000,
+     "area": "145.07",
+     "from": 15000000
+    },
+    {
+     "beds": "3",
+     "code": "PLP-OXYGEN-SY-R1",
+     "name": "дуплекс-кондоминиум, 3 спальни",
      "area_sqm": "145.07",
      "price_from_thb": 15000000,
      "area": "145.07",
@@ -973,7 +982,7 @@
    "name": "The BALCONY Nai Yang",
    "district": "Най Янг",
    "type": "Кондо",
-   "price_from": 5742030,
+   "price_from": 6082545,
    "units": [
     {
      "beds": 1,
@@ -981,9 +990,9 @@
      "free": 1,
      "name": "1 спальня",
      "area_sqm": 33,
-     "price_from_thb": 5742030,
+     "price_from_thb": 6082545,
      "area": 33,
-     "from": 5742030
+     "from": 6082545
     },
     {
      "beds": 1,
@@ -2172,56 +2181,56 @@
    "name": "Ever Prime",
    "district": "Карон",
    "type": "Кондо",
-   "price_from": 4144140,
+   "price_from": 4788784,
    "units": [
     {
      "name": "1 спальня",
      "area_sqm": 32.89,
      "bedrooms": 1,
-     "price_from_thb": 4144140,
-     "freehold_from_thb": 4727938,
+     "price_from_thb": 4788784,
+     "freehold_from_thb": 5507102,
      "area": 32.89,
-     "from": 4144140,
+     "from": 4788784,
      "beds": 1
     },
     {
      "name": "1 спальня",
      "area_sqm": 44.84,
      "bedrooms": 1,
-     "price_from_thb": 5649840,
-     "freehold_from_thb": 6497316,
+     "price_from_thb": 6528704,
+     "freehold_from_thb": 7508010,
      "area": 44.84,
-     "from": 5649840,
+     "from": 6528704,
      "beds": 1
     },
     {
      "name": "2 спальни",
      "area_sqm": 46.53,
      "bedrooms": 2,
-     "price_from_thb": 6141960,
-     "freehold_from_thb": 7063254,
+     "price_from_thb": 6886440,
+     "freehold_from_thb": 7919406,
      "area": 46.53,
-     "from": 6141960,
+     "from": 6886440,
      "beds": 2
     },
     {
      "name": "2 спальни",
      "area_sqm": 60.09,
      "bedrooms": 2,
-     "price_from_thb": 7571340,
-     "freehold_from_thb": 8707041,
+     "price_from_thb": 8749104,
+     "freehold_from_thb": 10061470,
      "area": 60.09,
-     "from": 7571340,
+     "from": 8749104,
      "beds": 2
     },
     {
      "name": "4 спальни",
      "area_sqm": 176.35,
      "bedrooms": 4,
-     "price_from_thb": 22220100,
-     "freehold_from_thb": 25553115,
+     "price_from_thb": 26099800,
+     "freehold_from_thb": 30014770,
      "area": 176.35,
-     "from": 22220100,
+     "from": 26099800,
      "beds": 4
     }
    ]
