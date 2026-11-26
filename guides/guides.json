@@ -1,5 +1,25 @@
 [
   {
+    "id": "koh-lanta-3d",
+    "date": "2026-11-26",
+    "ru": {
+      "title": "Ко Ланта за 3 дня",
+      "lead": "Семейный маршрут на машине: Пхукет → Ко Ланта → Пхукет. Ват Сувана Кууха, Ко Мук и Изумрудная пещера, маяк в парке Му Ко Ланта, Храм Тигровой пещеры. Туров мы не проводим.",
+      "pdf": "koh-lanta-3d-ru.pdf",
+      "pages": 5,
+      "page": "/guides/koh-lanta-3d/",
+      "cover": "koh-lanta-3d-ru.jpg"
+    },
+    "en": {
+      "title": "Koh Lanta in 3 days",
+      "lead": "A family route by car: Phuket → Koh Lanta → Phuket. Wat Suwan Khuha, Koh Mook and the Emerald Cave, the lighthouse in Mu Ko Lanta park, Tiger Cave Temple. We don't run tours.",
+      "pdf": "koh-lanta-3d-en.pdf",
+      "pages": 5,
+      "page": "/guides/koh-lanta-3d/en/",
+      "cover": "koh-lanta-3d-en.jpg"
+    }
+  },
+  {
     "id": "bangkok-48h",
     "date": "2026-11-03",
     "ru": {
